@@ -13,11 +13,6 @@ func Wiring() {
 
 }
 
-type IRNode interface {
-	Name() string
-	String() string
-}
-
 type WiringSpec struct {
 	builders map[string]BuildFunc
 }
