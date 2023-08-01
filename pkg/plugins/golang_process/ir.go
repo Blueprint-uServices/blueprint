@@ -30,7 +30,7 @@ func newGolangProcessNode(name string, nodes []blueprint.IRNode) (*GolangProcess
 		} else if instanceNode, ok := n.(golang.GolangCodeNode); ok {
 			node.ContainedInstanceNodes = append(node.ContainedInstanceNodes, instanceNode)
 		} else {
-			return nil, fmt.Errorf("cannot construct a golang process node with unsupported IR node type %s", n)
+			return nil, fmt.Errorf("golang process nodes do not support IR nodes of type: %s", n)
 		}
 	}
 
@@ -39,6 +39,10 @@ func newGolangProcessNode(name string, nodes []blueprint.IRNode) (*GolangProcess
 
 func (node *GolangProcessNode) Name() string {
 	return node.InstanceName
+}
+
+func (node *GolangProcessNode) String() string {
+	return fmt.Sprintf("GolangProcessNode %s", node.InstanceName)
 }
 
 func (node *GolangProcessNode) CollectArtifacts(ag *golang.GolangArtifactGenerator) error {

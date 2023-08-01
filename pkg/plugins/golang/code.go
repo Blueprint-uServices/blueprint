@@ -11,9 +11,9 @@ import (
 type GolangArtifactGenerator struct {
 	blueprint.ArtifactGenerator
 
-	modules map[string]string // Modules that will be included in the generated go.mod as 'require {package} {version}
-	code    map[string]string // Code that has been auto-generated and will be included as generated output
-	files   map[string]string // Code that will be copied into the generated output
+	Modules map[string]string // Modules that will be included in the generated go.mod as 'require {package} {version}
+	Code    map[string]string // Code that has been auto-generated and will be included as generated output
+	Files   map[string]string // Code that will be copied into the generated output
 }
 
 // This is used to accumulate code for instantiating golang instances
@@ -27,9 +27,9 @@ type GolangCodeGenerator struct {
 
 func NewGolangArtifactGenerator() *GolangArtifactGenerator {
 	gc := GolangArtifactGenerator{}
-	gc.modules = make(map[string]string)
-	gc.code = make(map[string]string)
-	gc.files = make(map[string]string)
+	gc.Modules = make(map[string]string)
+	gc.Code = make(map[string]string)
+	gc.Files = make(map[string]string)
 	return &gc
 }
 
@@ -44,34 +44,39 @@ func NewGolangCodeAccumulator() *GolangCodeGenerator {
 // Adds a dependency to the specified package and version to the generated code
 // Can return an error if there are conflicting version dependencies
 func (cg *GolangArtifactGenerator) AddModule(pkg, version string) error {
-	existing_version, ok := cg.modules[pkg]
+	existing_version, ok := cg.Modules[pkg]
 	if ok {
 		if existing_version != version {
 			return fmt.Errorf("incompatible module versions required %s and %s for package %s", existing_version, version, pkg)
 		}
 	} else {
-		cg.modules[pkg] = version
+		cg.Modules[pkg] = version
 	}
 	return nil
 }
 
 // Adds generated code at the specified path in the output
 func (cg *GolangArtifactGenerator) AddCode(path, code string) error {
-	_, ok := cg.code[path]
+	_, ok := cg.Code[path]
 	if ok {
 		slog.Warn("Overwriting existing code", "path", path)
 	}
-	cg.code[path] = code
+	cg.Code[path] = code
 	return nil
 }
 
 // Copies a file to the path specified
 func (cg *GolangArtifactGenerator) AddFile(path, inputpath string) error {
-	_, ok := cg.code[path]
+	_, ok := cg.Files[path]
 	if ok {
 		slog.Warn("Overwriting existing file", "outputpath", path, "inputpath", inputpath)
 	}
-	cg.code[path] = inputpath
+	cg.Files[path] = inputpath
+	return nil
+}
+
+func (cg *GolangArtifactGenerator) AddFiles(paths []string) error {
+	// TODO: implement
 	return nil
 }
 

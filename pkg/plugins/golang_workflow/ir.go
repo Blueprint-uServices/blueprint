@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/service"
 )
 
@@ -12,6 +13,18 @@ type GolangServiceDetails struct {
 	Interface service.ServiceInterface
 	Files     []string
 	Package   string
+}
+
+// This Node represents a Golang Workflow spec service in the Blueprint IR.
+type GolangWorkflowSpecServiceNode struct {
+	blueprint.IRNode
+	service.ServiceNode
+	golang.GolangArtifactNode
+	golang.GolangCodeNode
+
+	InstanceName   string
+	ServiceDetails *GolangServiceDetails
+	Args           []blueprint.IRNode
 }
 
 func (d GolangServiceDetails) String() string {
@@ -27,16 +40,6 @@ func (d GolangServiceDetails) String() string {
 	b.WriteString(")")
 
 	return b.String()
-}
-
-// This Node represents a Golang Workflow spec service in the Blueprint IR.
-type GolangWorkflowSpecServiceNode struct {
-	blueprint.IRNode
-	service.ServiceNode
-
-	InstanceName   string
-	ServiceDetails *GolangServiceDetails
-	Args           []blueprint.IRNode
 }
 
 func (n GolangWorkflowSpecServiceNode) String() string {
@@ -75,11 +78,18 @@ func (node *GolangWorkflowSpecServiceNode) GetInterface() *service.ServiceInterf
 	return &node.ServiceDetails.Interface
 }
 
-func (node *GolangWorkflowSpecServiceNode) GenerateInstantiationCode() string {
-	return `
+func (node *GolangWorkflowSpecServiceNode) GenerateInstantiationCode(g *golang.GolangCodeGenerator) error {
+	code := `
 		di.Add(serviceName, scope, func(ctr) {
 			first = ctr.Get(arg0)
 			second = ctr.Get(arg1)
 			return new ServiceName(first, second)
 		})`
+	g.Def(node.InstanceName, code)
+	g.Import(node.ServiceDetails.Package)
+	return nil
+}
+
+func (node *GolangWorkflowSpecServiceNode) CollectArtifacts(g *golang.GolangArtifactGenerator) error {
+	return g.AddFiles(node.ServiceDetails.Files)
 }

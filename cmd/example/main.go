@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/blueprint"
+	process "gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/golang_process"
 	workflow "gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/golang_workflow"
 	"golang.org/x/exp/slog"
 )
@@ -21,6 +22,9 @@ func main() {
 
 	workflow.Add(wiring, "b", "LeafService")
 	workflow.Add(wiring, "a", "nonLeafService", "b")
+
+	process.Add(wiring, "pa", "a")
+	process.Add(wiring, "pb", "b")
 
 	// Do the building and print some stuff
 

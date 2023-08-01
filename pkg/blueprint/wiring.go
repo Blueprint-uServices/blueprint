@@ -70,7 +70,7 @@ func (blueprint *Blueprint) Get(name string) (IRNode, error) {
 	node, ok = inode.(IRNode)
 	if !ok {
 		// TODO: support e.g. configuration strings as well as nodes
-		return nil, fmt.Errorf("builder returned a non-IRNode, not yet implemented, %s", inode)
+		return nil, fmt.Errorf("lookup of node %s returned something that is not an IRNode (possibly unimplemented): %s", name, inode)
 	}
 	blueprint.nodes[name] = node
 
