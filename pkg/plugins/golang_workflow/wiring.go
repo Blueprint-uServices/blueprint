@@ -39,19 +39,19 @@ func Add(wiring *blueprint.WiringSpec, name, serviceType string, args ...string)
 		os.Exit(1)
 	}
 
-	wiring.Add(name, func(bp *blueprint.Blueprint) (string, interface{}, error) {
+	wiring.Add(name, &GolangWorkflowSpecServiceNode{}, func(scope blueprint.Scope) (any, error) {
 		// Get all of the argument nodes; can error out if the arguments weren't actually defined
 		var arg_nodes []blueprint.IRNode
 		for _, arg_name := range args {
-			node, err := bp.Get(arg_name)
+			node, err := scope.Get(arg_name)
 			if err != nil {
-				return "", nil, err
+				return nil, err
 			}
 			arg_nodes = append(arg_nodes, node)
 		}
 
 		// Instantiate and return the service
 		service := newGolangWorkflowSpecServiceNode(name, details, arg_nodes)
-		return "golang instance", service, err
+		return service, err
 	})
 }

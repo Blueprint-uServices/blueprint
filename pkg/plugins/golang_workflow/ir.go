@@ -17,7 +17,7 @@ type GolangServiceDetails struct {
 
 // This Node represents a Golang Workflow spec service in the Blueprint IR.
 type GolangWorkflowSpecServiceNode struct {
-	blueprint.IRNode
+	golang.Node
 	service.ServiceNode
 	golang.GolangArtifactNode
 	golang.GolangCodeNode
