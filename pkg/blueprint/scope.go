@@ -22,7 +22,10 @@ Golang object instance nodes during the building process, and then creates a GoP
 Scopes are not the same as Namespaces, but to implement a Namespace will require a custom Scope for accumulating nodes.
 */
 type Scope interface {
+	SetVisible(name string, node IRNode)
+	Visible(name string) bool
 	Get(name string) (IRNode, error)
+	GetProperty(name string, key string) ([]any, error)
 	Build() (IRNode, error)
 }
 
@@ -30,15 +33,26 @@ type Scope interface {
 type blueprintScope struct {
 	Scope
 
-	wiring *WiringSpec
-	nodes  map[string]IRNode
+	wiring  *WiringSpec
+	visible map[string]IRNode
+	nodes   map[string]IRNode
 }
 
 func newBlueprintScope(wiring *WiringSpec) (*blueprintScope, error) {
 	scope := blueprintScope{}
 	scope.wiring = wiring
+	scope.visible = make(map[string]IRNode)
 	scope.nodes = make(map[string]IRNode)
 	return &scope, nil
+}
+
+func (scope *blueprintScope) SetVisible(name string, node IRNode) {
+	scope.visible[name] = node
+}
+
+func (scope *blueprintScope) Visible(name string) bool {
+	_, is_visible := scope.visible[name]
+	return is_visible
 }
 
 func (scope *blueprintScope) Get(name string) (IRNode, error) {
@@ -47,13 +61,13 @@ func (scope *blueprintScope) Get(name string) (IRNode, error) {
 		return node, nil
 	}
 
-	_, build := scope.wiring.GetDef(name)
-	if build == nil {
+	def := scope.wiring.GetDef(name)
+	if def == nil {
 		return nil, fmt.Errorf("wiring spec doesn't contain \"%s\".  Known nodes: %s", name, scope.wiring)
 	}
 
 	slog.Info("Building", "node", name)
-	inode, err := build(scope)
+	inode, err := def.Build(scope)
 	if err != nil {
 		return nil, err
 	}
@@ -66,6 +80,14 @@ func (scope *blueprintScope) Get(name string) (IRNode, error) {
 	scope.nodes[name] = node
 
 	return node, nil
+}
+
+func (scope *blueprintScope) GetProperty(name string, key string) ([]any, error) {
+	def, ok := scope.wiring.defs[name]
+	if !ok {
+		return nil, fmt.Errorf("wiring spec doesn't contain \"%s\".  Known nodes: %s", name, scope.wiring)
+	}
+	return def.GetProperty(key), nil
 }
 
 func (scope *blueprintScope) Close() (interface{}, error) {

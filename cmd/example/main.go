@@ -19,12 +19,13 @@ func main() {
 
 	// Create the wiring spec
 
-	golang_workflow.SetWorkflowSpecPath("path/to/workflow/spec")
+	golang_workflow.Init("path/to/workflow/spec")
 
-	golang_workflow.Add(wiring, "b", "LeafService")
-	golang_workflow.Add(wiring, "a", "nonLeafService", "b")
+	golang_workflow.Define(wiring, "b", "LeafService")
+	golang_workflow.Define(wiring, "a", "nonLeafService", "b")
 
-	golang_process.Add(wiring, "pa", "a")
+	golang_process.Define(wiring, "pa", "a")
+	golang_process.Define(wiring, "pb", "b")
 
 	// Do the building and print some stuff
 
@@ -34,7 +35,7 @@ func main() {
 	slog.Info(b.String())
 
 	bp := wiring.Blueprint()
-	bp.InstantiateAll()
+	bp.Instantiate("pa", "pb")
 
 	application, err := bp.Build()
 	if err != nil {
