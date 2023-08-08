@@ -33,3 +33,5 @@ func Define(wiring *blueprint.WiringSpec, name, serviceType string, args ...stri
 		return service, err
 	})
 }
+
+// TODO: implement a unique-clients option for Define, that opens a scope when getting the args, causing the clients to be unique
