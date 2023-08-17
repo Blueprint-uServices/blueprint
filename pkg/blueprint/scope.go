@@ -52,6 +52,7 @@ type SimpleScope struct {
 	Handler     SimpleScopeHandler // User-provided handler
 	Nodes       map[string]IRNode  // Nodes that were created in this scope
 	Edges       map[string]IRNode  // Nodes from parent scopes that have been referenced from this scope
+	Seen        map[string]IRNode  // Nodes that have been seen, mapped not by the definition name, but by their IRNode.Name(), which might be different
 	Deferred    []func() error     // Deferred functions to execute
 }
 
@@ -134,6 +135,7 @@ func (scope *SimpleScope) Init(name, scopetype string, parent Scope, wiring Wiri
 	scope.Handler = handler
 	scope.Nodes = make(map[string]IRNode)
 	scope.Edges = make(map[string]IRNode)
+	scope.Seen = make(map[string]IRNode)
 }
 func (scope *SimpleScope) Name() string {
 	return scope.ScopeName
@@ -165,7 +167,15 @@ func (scope *SimpleScope) Get(name string) (IRNode, error) {
 			return nil, err
 		}
 		scope.Edges[name] = node
-		scope.Handler.AddEdge(name, node)
+		if _, ok := scope.Seen[node.Name()]; !ok {
+			// Multiple definitions can result in building the same node, so only pass built nodes to the Handler if we haven't
+			// seen the actual node before (rather than the definition)
+			if _, is_metadata := node.(IRMetadata); !is_metadata {
+				// Don't bother adding edges for metadata
+				scope.Handler.AddEdge(name, node)
+			}
+		}
+		scope.Seen[node.Name()] = node
 		return node, nil
 	}
 
@@ -184,9 +194,15 @@ func (scope *SimpleScope) Get(name string) (IRNode, error) {
 	// 	return nil, scope.Errorf("expected %s to be a %s but it is a %s", name, reflect.TypeOf(def.NodeType).Name(), reflect.TypeOf(node).Name())
 	// }
 
-	scope.Info("Finished building %s of type %s", name, reflect.TypeOf(node).String())
 	scope.Nodes[name] = node
-	scope.Handler.AddNode(name, node)
+	if _, ok := scope.Seen[node.Name()]; !ok {
+		// Multiple definitions can result in building the same node, so only pass built nodes to the Handler if we haven't
+		// seen the actual node before (rather than the definition)
+		scope.Handler.AddNode(name, node)
+	}
+	scope.Seen[node.Name()] = node
+
+	scope.Info("Finished building %s of type %s", name, reflect.TypeOf(node).String())
 	return node, nil
 }
 

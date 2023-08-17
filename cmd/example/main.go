@@ -31,8 +31,10 @@ func main() {
 	workflow.Define(wiring, "b", "LeafService")
 	workflow.Define(wiring, "a", "nonLeafService", "b")
 
-	serviceDefaults(wiring, "a")
-	serviceDefaults(wiring, "b")
+	// serviceDefaults(wiring, "a")
+	// serviceDefaults(wiring, "b")
+
+	golang.CreateProcess(wiring, "proc", "a", "b")
 
 	// Do the building and print some stuff
 
@@ -42,7 +44,7 @@ func main() {
 	slog.Info(b.String())
 
 	bp := wiring.GetBlueprint()
-	bp.Instantiate("pa", "pb")
+	bp.Instantiate("proc")
 
 	application, err := bp.Build()
 	if err != nil {

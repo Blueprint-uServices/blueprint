@@ -40,10 +40,15 @@ type PointerCallsite struct {
 	scope blueprint.Scope // the scope of the callsite
 }
 
+/*
+Defining a pointer will actually produce four definitions:
+  - a definition for the name itself
+  - an address definition that will exist in the 'reachability' scope
+  - a visibility metadata definition that will exist in the 'visibility' scope
+*/
 func DefinePointer(wiring blueprint.WiringSpec, name string, pointsTo string, visibility any, reachability any) error {
 	addressName := name + ".addr"
 	metadataName := name + ".visibility"
-	callsiteName := name + ".callsite"
 
 	info := &pointerInfo{}
 	info.name = name
@@ -57,17 +62,6 @@ func DefinePointer(wiring blueprint.WiringSpec, name string, pointsTo string, vi
 	}
 
 	wiring.Define(name, def.NodeType, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		// Instantiate the callsite and addr
-		_, err := scope.Get(callsiteName)
-		if err != nil {
-			return nil, err
-		}
-
-		// Return the addr node
-		return scope.Get(addressName)
-	})
-
-	wiring.Define(callsiteName, def.NodeType, func(scope blueprint.Scope) (blueprint.IRNode, error) {
 		addrNode, err := scope.Get(addressName)
 		if err != nil {
 			return nil, err
@@ -102,7 +96,7 @@ func DefinePointer(wiring blueprint.WiringSpec, name string, pointsTo string, vi
 			})
 		}
 
-		return callsite, nil
+		return addrNode, nil
 	})
 
 	wiring.Define(addressName, reachability, func(scope blueprint.Scope) (blueprint.IRNode, error) {

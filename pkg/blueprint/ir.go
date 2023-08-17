@@ -12,7 +12,9 @@ type IRNode interface {
 	String() string
 }
 
-type IRMetadata interface{}
+type IRMetadata interface {
+	ImplementsIRMetadata()
+}
 
 // The IR Node that represents the whole application
 type ApplicationNode struct {
