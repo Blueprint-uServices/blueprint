@@ -1,15 +1,16 @@
-package golang_workflow
+package workflow
 
 import (
 	"os"
 
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/pkg/core/pointer"
 	"golang.org/x/exp/slog"
 )
 
 // Adds a service of type serviceType to the wiring spec, giving it the name specified.
 // Services can have arguments which are other named nodes
-func Define(wiring *blueprint.WiringSpec, name, serviceType string, args ...string) {
+func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, args ...string) {
 	// Eagerly look up the service in the workflow spec to make sure it exists
 	details, err := findService(serviceType)
 	if err != nil {
@@ -17,8 +18,11 @@ func Define(wiring *blueprint.WiringSpec, name, serviceType string, args ...stri
 		os.Exit(1)
 	}
 
-	wiring.Define(name, &GolangWorkflowSpecServiceNode{}, func(scope blueprint.Scope) (any, error) {
+	// First, define the handler that will be called
+	handler := serviceName + ".handler"
+	wiring.Define(handler, &WorkflowService{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
 		// Get all of the argument nodes; can error out if the arguments weren't actually defined
+		// For arguments that are pointer types, this will only get the caller-side of the pointer
 		var arg_nodes []blueprint.IRNode
 		for _, arg_name := range args {
 			node, err := scope.Get(arg_name)
@@ -29,9 +33,17 @@ func Define(wiring *blueprint.WiringSpec, name, serviceType string, args ...stri
 		}
 
 		// Instantiate and return the service
-		service := newGolangWorkflowSpecServiceNode(name, details, arg_nodes)
+		service := newWorkflowService(serviceName, details, arg_nodes)
 		return service, err
 	})
+
+	// Next, define the pointer
+	ptr := serviceName + ".ptr"
+	pointer.DefinePointer(wiring, ptr, handler, &blueprint.ApplicationNode{}, &WorkflowService{})
+
+	// Lastly, use the service name as an alias to the ptr for anybody wanting to call it
+	wiring.Alias(serviceName, ptr)
+
 }
 
 // TODO: implement a unique-clients option for Define, that opens a scope when getting the args, causing the clients to be unique

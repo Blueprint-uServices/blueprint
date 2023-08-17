@@ -4,7 +4,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/blueprint"
 )
 
-// This Node represents a Golang process that internally will instantiate a number of application-level services
+// This Node represents a process
 type ProcessNode interface {
 	blueprint.IRNode
 }

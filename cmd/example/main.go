@@ -6,10 +6,17 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/golang_process"
-	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/golang_workflow"
+	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/workflow"
 	"golang.org/x/exp/slog"
 )
+
+func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) {
+	procName := fmt.Sprintf("p%s", serviceName)
+	// opentelemetry.WrapService(wiring, serviceName)
+	golang.CreateProcess(wiring, procName, serviceName)
+
+}
 
 func main() {
 
@@ -19,13 +26,13 @@ func main() {
 
 	// Create the wiring spec
 
-	golang_workflow.Init("path/to/workflow/spec")
+	workflow.Init("path/to/workflow/spec")
 
-	golang_workflow.Define(wiring, "b", "LeafService")
-	golang_workflow.Define(wiring, "a", "nonLeafService", "b")
+	workflow.Define(wiring, "b", "LeafService")
+	workflow.Define(wiring, "a", "nonLeafService", "b")
 
-	golang_process.Define(wiring, "pa", "a")
-	golang_process.Define(wiring, "pb", "b")
+	serviceDefaults(wiring, "a")
+	serviceDefaults(wiring, "b")
 
 	// Do the building and print some stuff
 
@@ -34,7 +41,7 @@ func main() {
 	b.WriteString(wiring.String())
 	slog.Info(b.String())
 
-	bp := wiring.Blueprint()
+	bp := wiring.GetBlueprint()
 	bp.Instantiate("pa", "pb")
 
 	application, err := bp.Build()

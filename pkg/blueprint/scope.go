@@ -25,91 +25,121 @@ Scopes are not the same as Namespaces, but to implement a Namespace will require
 Most scope implementations should extend the BasicScope struct
 */
 type Scope interface {
-	Get(name string) (IRNode, error)                    // Get a node from this scope, possibly building it
-	GetProperty(name string, key string) ([]any, error) // Get a property from this scope
-	Put(name string, node IRNode) error                 // Put a node into this scope
-	Build() (IRNode, error)                             // Build a node from the scope; optional
+	Name() string                                         // The name of this scope
+	Get(name string) (IRNode, error)                      // Get a node from this scope or a parent scope, possibly building it
+	GetProperties(name string, key string) ([]any, error) // Get a property from this scope
+	Put(name string, node IRNode) error                   // Put a node into this scope
+	Defer(f func() error)                                 // Enqueue a function to be executed once finished building the current nodes
+
+	Info(message string, args ...any)        // Logging
+	Warn(message string, args ...any)        // Logging
+	Error(message string, args ...any) error // Logging
 }
 
 /*
-This is a scope implementation that most plugins will want to extend.  It takes care of most of the functionality
-needed for a scope while providing the following methods that can be overridden:
-  - LookupDef -- looks up a definition in the wiring spec by name
-  - Accepts -- declares whether this scope should build nodes of a particular type, or if they should be built in the parent scope
-  - AddEdge -- saves a node that was gotten from the parent scope
-  - AddNode -- saves a node that was built in the current scope
+A SimpleScope implements all of the Scope methods and only requires users to implement a SimpleScopeHandler interface.
+Most plugins will want to use SimpleScope rather than directly implementing Scope.
+
+See the documentation of SimpleScopeHandler for methods to override.
 */
-type BasicScope struct {
+type SimpleScope struct {
 	Scope
 
-	Name        string            // A name for this scope
-	ParentScope Scope             // The parent scope that created this scope; can be nil
-	Wiring      *WiringSpec       // The wiring spec
-	Nodes       map[string]IRNode // Nodes that were created in this scope
-	Edges       map[string]IRNode // Nodes from parent scopes that have been referenced from this scope
+	ScopeName   string             // A name for this scope
+	ScopeType   string             // The type of this scope
+	ParentScope Scope              // The parent scope that created this scope; can be nil
+	Wiring      WiringSpec         // The wiring spec
+	Handler     SimpleScopeHandler // User-provided handler
+	Nodes       map[string]IRNode  // Nodes that were created in this scope
+	Edges       map[string]IRNode  // Nodes from parent scopes that have been referenced from this scope
+	Deferred    []func() error     // Deferred functions to execute
 }
 
-func (scope *BasicScope) InitBasicScope(name string, parent Scope, wiring *WiringSpec) {
-	scope.Name = name
-	scope.ParentScope = parent
-	scope.Wiring = wiring
-	scope.Nodes = make(map[string]IRNode)
-	scope.Edges = make(map[string]IRNode)
+/*
+Has four methods with default implementations that callers can override with custom logic:
+  - LookupDef(name) - look up a WiringDef; default implementation directly consults the WiringSpec.
+    callers can override this if they want to restrict, modify, or wrap definitions
+    that get instantiated within this scope.
+  - Accepts(nodeType) - should return true if the specified node type should be built within this scope,
+    or false if we should ask the parent to build it instead.  Most scope implementations will only
+    accept certain node types, and will thus want to override this method.  For example, a golang process
+    will only accept golang nodes
+  - AddNode(name, IRNode) - this is called when a node is created within this scope.  The SimpleScope
+    internally saves the node for future lookups; callers might want to save the node e.g. as a child within
+    a node that is being created.
+  - AddEdge(name, IRNode) - this is called when a node was created by a parent scope but referenced within
+    this scope.  The SimpleScope internally saves the node for future lookups; callers might want to save the
+    node e.g. as an argument to the node that is being created
+*/
+type SimpleScopeHandler interface {
+	Init(*SimpleScope)
+	LookupDef(string) (*WiringDef, error)
+	Accepts(any) bool
+	AddEdge(string, IRNode) error
+	AddNode(string, IRNode) error
 }
 
-// Augments debug messages with information about the scope
-func (scope *BasicScope) Info(message string, args ...any) {
-	slog.Info(fmt.Sprintf(fmt.Sprintf("%s %s: %s", reflect.TypeOf(scope).String(), scope.Name, message), args...))
+type DefaultScopeHandler struct {
+	SimpleScopeHandler
+	Scope *SimpleScope
 }
 
-// Augments debug messages with information about the scope
-func (scope *BasicScope) Debug(message string, args ...any) {
-	slog.Debug(fmt.Sprintf(fmt.Sprintf("%s %s: %s", reflect.TypeOf(scope).String(), scope.Name, message), args...))
+func (handler *DefaultScopeHandler) Init(scope *SimpleScope) {
+	handler.Scope = scope
 }
 
-// Augments error messages with information about the scope
-func (scope *BasicScope) Error(err error) error {
-	slog.Error(fmt.Sprintf("%s %s: %s", reflect.TypeOf(scope).String(), scope.Name, err.Error()))
-	return err
-}
+/*
+Look up a WiringDef; default implementation directly consults the WiringSpec.
 
-// Augments error messages with information about the scope
-func (scope *BasicScope) Errorf(message string, args ...string) error {
-	return scope.Error(fmt.Errorf(message, args))
-}
-
-// Looks up a definition in the wiring spec.  By default this directly consults the wiring spec,
-// but this method can be overridden to perform more complex selective logic if needed.
-func (scope *BasicScope) LookupDef(name string) (*WiringDef, error) {
-	def := scope.Wiring.GetDef(name)
+	callers can override this if they want to restrict, modify, or wrap definitions
+	that get instantiated within this scope.
+*/
+func (handler *DefaultScopeHandler) LookupDef(name string) (*WiringDef, error) {
+	def := handler.Scope.Wiring.GetDef(name)
 	if def == nil {
-		return nil, fmt.Errorf("%s does not exist in the wiring spec of scope %s", name, scope.Name)
+		return nil, fmt.Errorf("%s does not exist in the wiring spec of scope %s", name, handler.Scope.Name())
 	}
 	return def, nil
 }
 
-// Asks if the node of the specified type should be built in this scope, or in the parent scope.
-// Most Scope implementations should override this method to be selective about which nodes should
-// get built in this scope.  For example, a golang scope only accepts golang nodes.
-func (scope *BasicScope) Accepts(nodeType any) bool {
+/*
+should return true if the specified node type should be built within this scope, or false if we should ask the parent to build it instead.  Most scope implementations will only
+
+	accept certain node types, and will thus want to override this method.  For example, a golang process
+	will only accept golang nodes
+*/
+func (handler *DefaultScopeHandler) Accepts(nodeType any) bool {
 	return true
 }
 
 // This is called after getting a node from the parent scope.  By default it just saves the node
 // as an edge.  Scope implementations can override this method to do other things.
-func (scope *BasicScope) AddEdge(name string, node IRNode) (IRNode, error) {
-	scope.Edges[name] = node
-	return node, nil
+func (handler *DefaultScopeHandler) AddEdge(name string, node IRNode) error {
+	handler.Scope.Edges[name] = node
+	return nil
 }
 
 // This is called after building a node in the current scope.  By default it just saves the node
 // on the scope.  Scope implementations can override this method to do other things.
-func (scope *BasicScope) AddNode(name string, node IRNode) (IRNode, error) {
-	scope.Nodes[name] = node
-	return node, nil
+func (handler *DefaultScopeHandler) AddNode(name string, node IRNode) error {
+	handler.Scope.Nodes[name] = node
+	return nil
 }
 
-func (scope *BasicScope) Get(name string) (IRNode, error) {
+func (scope *SimpleScope) Init(name, scopetype string, parent Scope, wiring WiringSpec, handler SimpleScopeHandler) {
+	scope.ScopeName = name
+	scope.ScopeType = scopetype
+	scope.ParentScope = parent
+	scope.Wiring = wiring
+	scope.Handler = handler
+	scope.Nodes = make(map[string]IRNode)
+	scope.Edges = make(map[string]IRNode)
+}
+func (scope *SimpleScope) Name() string {
+	return scope.ScopeName
+}
+
+func (scope *SimpleScope) Get(name string) (IRNode, error) {
 	// If it already exists, return it
 	if node, ok := scope.Nodes[name]; ok {
 		return node, nil
@@ -119,89 +149,134 @@ func (scope *BasicScope) Get(name string) (IRNode, error) {
 	}
 
 	// Look up the definition
-	def, err := scope.LookupDef(name)
+	def, err := scope.Handler.LookupDef(name)
 	if err != nil {
-		return nil, scope.Error(err)
+		return nil, err
 	}
-	scope.Debug("got %s of type %s", name, reflect.TypeOf(def.NodeType).String())
 
 	// See if the node should be created here or in the parent
-	if !scope.Accepts(def.NodeType) {
-		scope.Debug("getting %s from parent scope", name)
+	if !scope.Handler.Accepts(def.NodeType) {
 		if scope.ParentScope == nil {
-			return nil, scope.Errorf("scope does not accept nodes of type %s but there is no parent scope to get them from", reflect.TypeOf(def.NodeType).Name())
+			return nil, scope.Error("Scope does not accept node %s of type %s but there is no parent scope to get them from", name, reflect.TypeOf(def.NodeType).String())
 		}
+		scope.Info("Getting %s of type %s from parent scope %s", name, reflect.TypeOf(def.NodeType).String(), scope.ParentScope.Name())
 		node, err := scope.ParentScope.Get(name)
 		if err != nil {
-			return nil, scope.Error(err)
+			return nil, err
 		}
-		return scope.AddEdge(name, node)
+		scope.Edges[name] = node
+		scope.Handler.AddEdge(name, node)
+		return node, nil
 	}
+
+	scope.Info("Building %s of type %s", name, reflect.TypeOf(def.NodeType).String())
 
 	// Build the node
 	node, err := def.Build(scope)
 	if err != nil {
-		return nil, scope.Error(err)
+		scope.Error("Unable to build %v: %s", name, err.Error())
+		return nil, err
 	}
 
-	// Check the built node is an IRNode
-	ir_node, ok := node.(IRNode)
-	if !ok {
-		return nil, scope.Errorf("build function for %s did not return an IRNode", name)
-	}
+	// JM: wiringspec has relaxed requirements on build functions to allow building nodes that aren't of the declared type
+	// // Check the built node was of the type registered in the wiring declaration
+	// if !reflect.TypeOf(node).AssignableTo(reflect.TypeOf(def.NodeType)) {
+	// 	return nil, scope.Errorf("expected %s to be a %s but it is a %s", name, reflect.TypeOf(def.NodeType).Name(), reflect.TypeOf(node).Name())
+	// }
 
-	// Check the built node was of the type registered in the wiring declaration
-	if !reflect.TypeOf(node).AssignableTo(reflect.TypeOf(def.NodeType)) {
-		return nil, scope.Errorf("expected %s to be a %s but it is a %s", name, reflect.TypeOf(def.NodeType).Name(), reflect.TypeOf(node).Name())
-	}
-
-	scope.Info("Built node %s of type %s", name, reflect.TypeOf(node).String())
-	return scope.AddNode(name, ir_node)
+	scope.Info("Finished building %s of type %s", name, reflect.TypeOf(node).String())
+	scope.Nodes[name] = node
+	scope.Handler.AddNode(name, node)
+	return node, nil
 }
 
-func (scope *BasicScope) GetProperty(name string, key string) ([]any, error) {
-	def, err := scope.LookupDef(name)
+func (scope *SimpleScope) Put(name string, node IRNode) error {
+	if scope.Handler.Accepts(node) {
+		scope.Nodes[name] = node
+		scope.Handler.AddNode(name, node)
+		scope.Info("%s of type %s added to scope", name, reflect.TypeOf(node).Elem().Name())
+		return nil
+	}
+
+	if scope.ParentScope != nil {
+		return scope.Error("%s of type %s does not belong in this scope, but cannot push to parent scope because no parent scope exists", name, reflect.TypeOf(node).Elem().Name())
+	}
+
+	scope.Info("%s of type %s does not belong in this scope; pushing to parent scope %s", name, reflect.TypeOf(node).Elem().Name(), scope.ParentScope)
+	err := scope.ParentScope.Put(name, node)
 	if err != nil {
-		return nil, scope.Error(err)
+		return err
 	}
-	return def.GetProperty(key), nil
+	scope.Edges[name] = node
+	scope.Handler.AddEdge(name, node)
+	return err
 }
 
-func (scope *BasicScope) Put(name string, node IRNode) error {
-	if !scope.Accepts(node) {
-		scope.Debug("putting %s into parent scope", name)
-		if scope.ParentScope != nil {
-			return scope.Errorf("scope does not accept nodes of type %s but there is no parent scope to get them from", reflect.TypeOf(node).Name())
-		}
-		err := scope.ParentScope.Put(name, node)
-		if err != nil {
-			return scope.Error(err)
-		}
-		_, err = scope.AddEdge(name, node)
-		return err
+func (scope *SimpleScope) Defer(f func() error) {
+	if scope.ParentScope == nil {
+		scope.Deferred = append(scope.Deferred, f)
 	} else {
-		_, err := scope.AddNode(name, node)
-		return err
+		scope.ParentScope.Defer(f)
 	}
 }
 
-func (scope *BasicScope) Build() (IRNode, error) {
-	return nil, scope.Errorf("cannot build a scope of this type")
+func (scope *SimpleScope) GetProperties(name string, key string) ([]any, error) {
+	def, err := scope.Handler.LookupDef(name)
+	if err != nil {
+		return nil, err
+	}
+	return def.GetProperties(key), nil
 }
 
-type BlueprintScope struct {
-	BasicScope
+type blueprintScope struct {
+	SimpleScope
 }
 
-func newBlueprintScope(wiring *WiringSpec) (*BlueprintScope, error) {
-	scope := BlueprintScope{}
-	scope.InitBasicScope(wiring.name, nil, wiring)
-	return &scope, nil
+type blueprintScopeHandler struct {
+	DefaultScopeHandler
+
+	application *ApplicationNode
 }
 
-func (scope *BlueprintScope) Build() (IRNode, error) {
+func newBlueprintScope(wiring WiringSpec, name string) (*blueprintScope, error) {
+	scope := &blueprintScope{}
+	handler := blueprintScopeHandler{}
+	handler.Init(&scope.SimpleScope)
+	handler.application = &ApplicationNode{}
+	scope.Init(name, "BlueprintApplication", nil, wiring, &handler)
+	return scope, nil
+}
+
+func (scope *blueprintScope) Build() (IRNode, error) {
+	// Execute deferred functions until empty
+	for len(scope.Deferred) > 0 {
+		next := scope.Deferred[0]
+		scope.Deferred = scope.Deferred[1:]
+		err := next()
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	node := ApplicationNode{}
-	node.name = scope.Name
+	node.name = scope.Name()
 	node.children = scope.Nodes
 	return &node, nil
+}
+
+// Augments debug messages with information about the scope
+func (scope *SimpleScope) Info(message string, args ...any) {
+	slog.Info(fmt.Sprintf(fmt.Sprintf("%s %s: %s", scope.ScopeType, scope.Name(), message), args...))
+}
+
+// Augments debug messages with information about the scope
+func (scope *SimpleScope) Debug(message string, args ...any) {
+	slog.Debug(fmt.Sprintf(fmt.Sprintf("%s %s: %s", scope.ScopeType, scope.Name(), message), args...))
+}
+
+// Augments debug messages with information about the scope
+func (scope *SimpleScope) Error(message string, args ...any) error {
+	formattedMessage := fmt.Sprintf(message, args...)
+	slog.Error(fmt.Sprintf("%s %s: %s", scope.ScopeType, scope.Name(), formattedMessage))
+	return fmt.Errorf(formattedMessage)
 }

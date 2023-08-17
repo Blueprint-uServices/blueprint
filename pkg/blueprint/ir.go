@@ -1,6 +1,8 @@
 package blueprint
 
-import "strings"
+import (
+	"strings"
+)
 
 // This file contains some of the core IR nodes for Blueprint
 
@@ -9,6 +11,8 @@ type IRNode interface {
 	Name() string
 	String() string
 }
+
+type IRMetadata interface{}
 
 // The IR Node that represents the whole application
 type ApplicationNode struct {
@@ -30,9 +34,8 @@ func (node *ApplicationNode) Name() string {
 // Print the IR graph
 func (node *ApplicationNode) String() string {
 	var b strings.Builder
-	b.WriteString("BlueprintApplication ")
 	b.WriteString(node.name)
-	b.WriteString(" = {\n")
+	b.WriteString(" = BlueprintApplication() {\n")
 	var children []string
 	for _, node := range node.children {
 		children = append(children, node.String())
