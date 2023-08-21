@@ -2,14 +2,10 @@ package opentelemetry
 
 var DefaultOpenTelemetryCollectorName = "opentelemetry.collector"
 
-// func initOpenTelemetry(wiring *blueprint.WiringSpec, collectorName string) {
-// 	collectorAddr := collectorName + ".server.addr"
-// 	wiring.Define(collectorAddr, &blueprint.Address{ /* TODO visibility? */ }, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-// 		return newNetworkAddress()
-// 	})
+// func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName string) {
+// 	collectorClientName := collectorName + ".client"
 
-// 	collector := collectorName + ".server"
-// 	wiring.Define(collector, &OpenTelemetryCollector{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+// 	wiring.Define(collectorName, &OpenTelemetryCollector{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
 // 		addr := scope.Get(collectorAddr)
 // 		return newOpenTelemetryCollector(collector, addr), nil
 // 	})

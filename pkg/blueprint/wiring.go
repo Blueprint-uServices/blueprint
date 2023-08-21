@@ -24,7 +24,9 @@ type BuildFunc func(Scope) (IRNode, error)
 type WiringSpec interface {
 	Define(name string, nodeType any, build BuildFunc) // Adds a named node definition to the spec that can be built with the provided build function
 	GetDef(name string) *WiringDef                     // For use by plugins to access the defined build functions and metadata
-	Alias(name string, pointsto string)                // Defines an alias to another defined node; these can be recursive
+
+	Alias(name string, pointsto string)   // Defines an alias to another defined node; these can be recursive
+	GetAlias(alias string) (string, bool) // Gets the value of the specified alias, if it exists
 
 	SetProperty(name string, key string, value any) // Sets a static property value in the wiring spec, replacing any existing value specified
 	AddProperty(name string, key string, value any) // Adds a static property value in the wiring spec
@@ -143,6 +145,14 @@ func (wiring *wiringSpecImpl) Alias(alias string, pointsto string) {
 		delete(wiring.defs, alias)
 	}
 	wiring.aliases[alias] = pointsto
+}
+
+// If the provided name is an alias, returns what it points to.
+//
+//	Otherwise returns the empty string and false
+func (wiring *wiringSpecImpl) GetAlias(alias string) (string, bool) {
+	name, exists := wiring.aliases[alias]
+	return name, exists
 }
 
 // Sets a static value in the wiring spec, replacing any existing values for the specified key

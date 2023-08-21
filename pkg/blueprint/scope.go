@@ -27,6 +27,7 @@ Most scope implementations should extend the BasicScope struct
 type Scope interface {
 	Name() string                                         // The name of this scope
 	Get(name string) (IRNode, error)                      // Get a node from this scope or a parent scope, possibly building it
+	GetProperty(name string, key string) (any, error)     // Get a property from this scope
 	GetProperties(name string, key string) ([]any, error) // Get a property from this scope
 	Put(name string, node IRNode) error                   // Put a node into this scope
 	Defer(f func() error)                                 // Enqueue a function to be executed once finished building the current nodes
@@ -50,9 +51,8 @@ type SimpleScope struct {
 	ParentScope Scope              // The parent scope that created this scope; can be nil
 	Wiring      WiringSpec         // The wiring spec
 	Handler     SimpleScopeHandler // User-provided handler
-	Nodes       map[string]IRNode  // Nodes that were created in this scope
-	Edges       map[string]IRNode  // Nodes from parent scopes that have been referenced from this scope
-	Seen        map[string]IRNode  // Nodes that have been seen, mapped not by the definition name, but by their IRNode.Name(), which might be different
+	Seen        map[string]IRNode  // Cache of built nodes
+	Added       map[string]any     // Nodes that have been passed to the handler
 	Deferred    []func() error     // Deferred functions to execute
 }
 
@@ -83,10 +83,15 @@ type SimpleScopeHandler interface {
 type DefaultScopeHandler struct {
 	SimpleScopeHandler
 	Scope *SimpleScope
+
+	Nodes map[string]IRNode
+	Edges map[string]IRNode
 }
 
 func (handler *DefaultScopeHandler) Init(scope *SimpleScope) {
 	handler.Scope = scope
+	handler.Nodes = make(map[string]IRNode)
+	handler.Edges = make(map[string]IRNode)
 }
 
 /*
@@ -116,14 +121,14 @@ func (handler *DefaultScopeHandler) Accepts(nodeType any) bool {
 // This is called after getting a node from the parent scope.  By default it just saves the node
 // as an edge.  Scope implementations can override this method to do other things.
 func (handler *DefaultScopeHandler) AddEdge(name string, node IRNode) error {
-	handler.Scope.Edges[name] = node
+	handler.Edges[node.Name()] = node
 	return nil
 }
 
 // This is called after building a node in the current scope.  By default it just saves the node
 // on the scope.  Scope implementations can override this method to do other things.
 func (handler *DefaultScopeHandler) AddNode(name string, node IRNode) error {
-	handler.Scope.Nodes[name] = node
+	handler.Nodes[node.Name()] = node
 	return nil
 }
 
@@ -133,9 +138,8 @@ func (scope *SimpleScope) Init(name, scopetype string, parent Scope, wiring Wiri
 	scope.ParentScope = parent
 	scope.Wiring = wiring
 	scope.Handler = handler
-	scope.Nodes = make(map[string]IRNode)
-	scope.Edges = make(map[string]IRNode)
 	scope.Seen = make(map[string]IRNode)
+	scope.Added = make(map[string]any)
 }
 func (scope *SimpleScope) Name() string {
 	return scope.ScopeName
@@ -143,10 +147,7 @@ func (scope *SimpleScope) Name() string {
 
 func (scope *SimpleScope) Get(name string) (IRNode, error) {
 	// If it already exists, return it
-	if node, ok := scope.Nodes[name]; ok {
-		return node, nil
-	}
-	if node, ok := scope.Edges[name]; ok {
+	if node, ok := scope.Seen[name]; ok {
 		return node, nil
 	}
 
@@ -154,6 +155,14 @@ func (scope *SimpleScope) Get(name string) (IRNode, error) {
 	def, err := scope.Handler.LookupDef(name)
 	if err != nil {
 		return nil, err
+	}
+
+	// If it's an alias, get the aliased node
+	if def.Name != name {
+		scope.Info("Resolved %s to %s", name, def.Name)
+		node, err := scope.Get(def.Name)
+		scope.Seen[name] = node
+		return node, err
 	}
 
 	// See if the node should be created here or in the parent
@@ -166,20 +175,22 @@ func (scope *SimpleScope) Get(name string) (IRNode, error) {
 		if err != nil {
 			return nil, err
 		}
-		scope.Edges[name] = node
-		if _, ok := scope.Seen[node.Name()]; !ok {
-			// Multiple definitions can result in building the same node, so only pass built nodes to the Handler if we haven't
-			// seen the actual node before (rather than the definition)
+		if _, already_added := scope.Added[node.Name()]; !already_added {
 			if _, is_metadata := node.(IRMetadata); !is_metadata {
 				// Don't bother adding edges for metadata
 				scope.Handler.AddEdge(name, node)
 			}
+			scope.Added[node.Name()] = true
 		}
-		scope.Seen[node.Name()] = node
+		scope.Seen[name] = node
 		return node, nil
 	}
 
-	scope.Info("Building %s of type %s", name, reflect.TypeOf(def.NodeType).String())
+	if def.Name == name {
+		scope.Info("Building %s of type %s", name, reflect.TypeOf(def.NodeType).String())
+	} else {
+		scope.Info("Building %s (alias %s) of type %s", def.Name, name, reflect.TypeOf(def.NodeType).String())
+	}
 
 	// Build the node
 	node, err := def.Build(scope)
@@ -188,27 +199,20 @@ func (scope *SimpleScope) Get(name string) (IRNode, error) {
 		return nil, err
 	}
 
-	// JM: wiringspec has relaxed requirements on build functions to allow building nodes that aren't of the declared type
-	// // Check the built node was of the type registered in the wiring declaration
-	// if !reflect.TypeOf(node).AssignableTo(reflect.TypeOf(def.NodeType)) {
-	// 	return nil, scope.Errorf("expected %s to be a %s but it is a %s", name, reflect.TypeOf(def.NodeType).Name(), reflect.TypeOf(node).Name())
-	// }
-
-	scope.Nodes[name] = node
-	if _, ok := scope.Seen[node.Name()]; !ok {
-		// Multiple definitions can result in building the same node, so only pass built nodes to the Handler if we haven't
-		// seen the actual node before (rather than the definition)
+	if _, already_added := scope.Added[node.Name()]; !already_added {
 		scope.Handler.AddNode(name, node)
+		scope.Added[node.Name()] = true
 	}
-	scope.Seen[node.Name()] = node
-
 	scope.Info("Finished building %s of type %s", name, reflect.TypeOf(node).String())
+	scope.Seen[name] = node
+
 	return node, nil
 }
 
 func (scope *SimpleScope) Put(name string, node IRNode) error {
+	scope.Seen[name] = node
+
 	if scope.Handler.Accepts(node) {
-		scope.Nodes[name] = node
 		scope.Handler.AddNode(name, node)
 		scope.Info("%s of type %s added to scope", name, reflect.TypeOf(node).Elem().Name())
 		return nil
@@ -223,7 +227,6 @@ func (scope *SimpleScope) Put(name string, node IRNode) error {
 	if err != nil {
 		return err
 	}
-	scope.Edges[name] = node
 	scope.Handler.AddEdge(name, node)
 	return err
 }
@@ -236,6 +239,14 @@ func (scope *SimpleScope) Defer(f func() error) {
 	}
 }
 
+func (scope *SimpleScope) GetProperty(name string, key string) (any, error) {
+	def, err := scope.Handler.LookupDef(name)
+	if err != nil {
+		return nil, err
+	}
+	return def.GetProperty(key), nil
+}
+
 func (scope *SimpleScope) GetProperties(name string, key string) ([]any, error) {
 	def, err := scope.Handler.LookupDef(name)
 	if err != nil {
@@ -246,6 +257,8 @@ func (scope *SimpleScope) GetProperties(name string, key string) ([]any, error) 
 
 type blueprintScope struct {
 	SimpleScope
+
+	handler *blueprintScopeHandler
 }
 
 type blueprintScopeHandler struct {
@@ -259,6 +272,7 @@ func newBlueprintScope(wiring WiringSpec, name string) (*blueprintScope, error) 
 	handler := blueprintScopeHandler{}
 	handler.Init(&scope.SimpleScope)
 	handler.application = &ApplicationNode{}
+	scope.handler = &handler
 	scope.Init(name, "BlueprintApplication", nil, wiring, &handler)
 	return scope, nil
 }
@@ -276,7 +290,7 @@ func (scope *blueprintScope) Build() (IRNode, error) {
 
 	node := ApplicationNode{}
 	node.name = scope.Name()
-	node.children = scope.Nodes
+	node.children = scope.handler.Nodes
 	return &node, nil
 }
 

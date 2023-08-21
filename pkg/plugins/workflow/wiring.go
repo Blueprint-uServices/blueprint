@@ -1,30 +1,36 @@
 package workflow
 
 import (
-	"os"
-
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/core/pointer"
-	"golang.org/x/exp/slog"
 )
 
-// Adds a service of type serviceType to the wiring spec, giving it the name specified.
-// Services can have arguments which are other named nodes
-func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, args ...string) {
-	// Eagerly look up the service in the workflow spec to make sure it exists
-	details, err := findService(serviceType)
-	if err != nil {
-		slog.Error("Unable to resolve workflow spec services used by the wiring spec, exiting", "error", err)
-		os.Exit(1)
-	}
+/*
+This adds a service to the application, using a definition that was provided in the workflow spec.
 
-	// First, define the handler that will be called
-	handler := serviceName + ".handler"
-	wiring.Define(handler, &WorkflowService{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+`serviceType` must refer to a named service that was defined in the workflow spec.  If the service
+doesn't exist, then this will result in a build error.
+
+`serviceArgs` can be zero or more other named nodes that are provided as arguments to the service.
+
+This call creates several definitions within the wiring spec.  In particular, `serviceName` is
+defined as a pointer to the actual service, and can thus be modified and
+*/
+func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, serviceArgs ...string) {
+
+	// Define the service
+	handlerName := serviceName + ".handler"
+	wiring.Define(handlerName, &WorkflowService{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+		// Look up the service details; errors out if the service doesn't exist
+		details, err := findService(serviceType)
+		if err != nil {
+			return nil, err
+		}
+
 		// Get all of the argument nodes; can error out if the arguments weren't actually defined
 		// For arguments that are pointer types, this will only get the caller-side of the pointer
 		var arg_nodes []blueprint.IRNode
-		for _, arg_name := range args {
+		for _, arg_name := range serviceArgs {
 			node, err := scope.Get(arg_name)
 			if err != nil {
 				return nil, err
@@ -37,13 +43,20 @@ func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, args .
 		return service, err
 	})
 
-	// Next, define the pointer
-	ptr := serviceName + ".ptr"
-	pointer.DefinePointer(wiring, ptr, handler, &blueprint.ApplicationNode{}, &WorkflowService{})
+	// Mandate that this service with this name must be unique within the application (although, this can be changed by scopes)
+	dstName := serviceName + ".dst"
+	wiring.Alias(dstName, handlerName)
+	pointer.RequireUniqueness(wiring, dstName, &blueprint.ApplicationNode{})
 
-	// Lastly, use the service name as an alias to the ptr for anybody wanting to call it
-	wiring.Alias(serviceName, ptr)
-
+	// Lastly define the pointer
+	pointer.CreatePointer(wiring, serviceName, &WorkflowService{}, dstName)
 }
 
-// TODO: implement a unique-clients option for Define, that opens a scope when getting the args, causing the clients to be unique
+/*
+TODOs:
+
+-  can also implement a different version of Define that requests all clients specified in serviceArgs are unique.  This is achievable
+   by just opening a scope when getting the args
+
+
+*/

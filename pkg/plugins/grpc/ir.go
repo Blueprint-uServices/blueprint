@@ -1,65 +1,68 @@
 package grpc
 
-// type GolangGRPCServerNode struct {
-// 	golang.Node
-// 	golang.ArtifactGenerator
-// 	golang.CodeGenerator
+import (
+	"gitlab.mpi-sws.org/cld/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/golang"
+)
 
-// 	InstanceName string
-// 	Wrapped      golang.Service
-// }
+type GolangGRPCServerNode struct {
+	golang.Node
+	golang.ArtifactGenerator
+	golang.CodeGenerator
 
-// type GolangGRPCClientNode struct {
-// 	golang.Node
-// 	golang.ArtifactGenerator
-// 	golang.CodeGenerator
-// 	golang.Service
+	InstanceName string
+	Wrapped      golang.Service
+}
 
-// 	InstanceName   string
-// 	ServiceDetails golang.GolangServiceDetails
-// 	ServerPointer  blueprint.IRPointer
-// }
+type GolangGRPCClientNode struct {
+	golang.Node
+	golang.ArtifactGenerator
+	golang.CodeGenerator
+	golang.Service
 
-// func newGolangGRPCServerNode(name string, wrapped golang.Service) *GolangGRPCServerNode {
-// 	node := GolangGRPCServerNode{}
-// 	node.InstanceName = name
-// 	node.Wrapped = wrapped
-// 	return &node
-// }
+	InstanceName   string
+	ServiceDetails golang.GolangServiceDetails
+}
 
-// func newGolangGRPCClientNode(name string, serverPointer blueprint.IRPointer) *GolangGRPCClientNode {
-// 	node := GolangGRPCClientNode{}
-// 	node.InstanceName = name
-// 	node.ServerPointer = serverPointer
+func newGolangGRPCServerNode(name string, wrapped golang.Service) *GolangGRPCServerNode {
+	node := GolangGRPCServerNode{}
+	node.InstanceName = name
+	node.Wrapped = wrapped
+	return &node
+}
 
-// 	// TODO package and files correctly
-// 	node.ServiceDetails.Package = "TODO"
-// 	node.ServiceDetails.Files = []string{}
-// 	node.ServiceDetails.Interface.Name = name
-// 	constructorArg := service.Variable{}
-// 	constructorArg.Name = "RemoteAddr"
-// 	constructorArg.Type = "string"
-// 	node.ServiceDetails.Interface.ConstructorArgs = []service.Variable{constructorArg}
+func newGolangGRPCClientNode(name string) *GolangGRPCClientNode {
+	node := GolangGRPCClientNode{}
+	node.InstanceName = name
 
-// 	return &node
-// }
+	// TODO package and files correctly
+	node.ServiceDetails.Package = "TODO"
+	node.ServiceDetails.Files = []string{}
+	node.ServiceDetails.Interface.Name = name
+	constructorArg := service.Variable{}
+	constructorArg.Name = "RemoteAddr"
+	constructorArg.Type = "string"
+	node.ServiceDetails.Interface.ConstructorArgs = []service.Variable{constructorArg}
 
-// func (client *GolangGRPCClientNode) SetInterface(node golang.Service) {
-// 	client.ServiceDetails.Interface.Methods = node.GetInterface().Methods
-// }
+	return &node
+}
 
-// func (n *GolangGRPCServerNode) String() string {
-// 	return n.InstanceName
-// }
+func (client *GolangGRPCClientNode) SetInterface(node golang.Service) {
+	client.ServiceDetails.Interface.Methods = node.GetInterface().Methods
+}
 
-// func (n *GolangGRPCServerNode) Name() string {
-// 	return n.InstanceName
-// }
+func (n *GolangGRPCServerNode) String() string {
+	return n.InstanceName
+}
 
-// func (n *GolangGRPCClientNode) String() string {
-// 	return n.InstanceName
-// }
+func (n *GolangGRPCServerNode) Name() string {
+	return n.InstanceName
+}
 
-// func (n *GolangGRPCClientNode) Name() string {
-// 	return n.InstanceName
-// }
+func (n *GolangGRPCClientNode) String() string {
+	return n.InstanceName
+}
+
+func (n *GolangGRPCClientNode) Name() string {
+	return n.InstanceName
+}
