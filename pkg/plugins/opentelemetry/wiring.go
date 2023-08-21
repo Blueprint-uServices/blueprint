@@ -91,7 +91,6 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 	collectorClient := collectorName + ".client"
 
 	// Define the collector address
-	pointer.DefineAddress(wiring, collectorAddr, collectorProc, &blueprint.ApplicationNode{})
 
 	// Define the collector server
 	wiring.Define(collectorProc, &OpenTelemetryCollector{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
@@ -126,6 +125,10 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 
 		return newOpenTelemetryCollectorClient(collectorClient, collectorServer)
 	})
+
+	// Define the address and add it to the pointer dst
+	pointer.DefineAddress(wiring, collectorAddr, collectorProc, &blueprint.ApplicationNode{})
+	ptr.AddDstModifier(wiring, collectorAddr)
 
 	// Return the name of the pointer
 	return collectorName
