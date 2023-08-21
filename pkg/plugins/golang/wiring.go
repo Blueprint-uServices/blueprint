@@ -15,7 +15,7 @@ func AddChildToProcess(wiring blueprint.WiringSpec, procName, childName string) 
 
 // Adds a process that explicitly instantiates all of the children provided.
 // The process will also implicitly instantiate any of the dependencies of the children
-func CreateProcess(wiring blueprint.WiringSpec, procName string, children ...string) {
+func CreateProcess(wiring blueprint.WiringSpec, procName string, children ...string) string {
 	// If any children were provided in this call, add them to the process via a property
 	for _, childName := range children {
 		AddChildToProcess(wiring, procName, childName)
@@ -55,4 +55,6 @@ func CreateProcess(wiring blueprint.WiringSpec, procName string, children ...str
 		// Instantiate and return the service
 		return process.Build()
 	})
+
+	return procName
 }
