@@ -45,6 +45,7 @@ func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst st
 		}
 
 		scope.Defer(func() error {
+			// TODO: this only needs to happen once
 			_, err := ptr.InstantiateDst(scope)
 			return err
 		})
@@ -87,20 +88,31 @@ func (ptr *PointerDef) AddDstModifier(wiring blueprint.WiringSpec, modifierName 
 	nextDst := ptr.dstHead
 	ptr.dstHead = modifierName
 	wiring.Alias(ptr.srcTail, ptr.dstHead)
-	ptr.dstModifiers = append(ptr.dstModifiers, modifierName)
+	ptr.dstModifiers = append([]string{ptr.dstHead}, ptr.dstModifiers...)
 	return nextDst
 }
 
 func (ptr *PointerDef) InstantiateDst(scope blueprint.Scope) (blueprint.IRNode, error) {
-	_, err := scope.Get(ptr.dstHead)
-	if err != nil {
-		return nil, err
-	}
-
+	scope.Info("Instantiating pointer %s.dst from scope %s", ptr.name, scope.Name())
 	for _, modifier := range ptr.dstModifiers {
-		_, err := scope.Get(modifier)
+		node, err := scope.Get(modifier)
 		if err != nil {
 			return nil, err
+		}
+
+		addr, is_addr := node.(*Address)
+		if is_addr {
+			if addr.DstNode != nil {
+				// Destination has already been instantiated, stop instantiating now
+				scope.Info("Destination %s of %s has already been instantiated", addr.Destination, addr.name)
+				return nil, nil
+			} else {
+				dst, err := scope.Get(addr.Destination)
+				if err != nil {
+					return nil, err
+				}
+				addr.DstNode = dst
+			}
 		}
 	}
 

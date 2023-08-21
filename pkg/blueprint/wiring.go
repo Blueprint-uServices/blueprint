@@ -238,7 +238,7 @@ func (blueprint *Blueprint) InstantiateAll() {
 func (blueprint *Blueprint) Build() (*ApplicationNode, error) {
 	node, err := blueprint.applicationScope.Build()
 	if err != nil {
-		return nil, err
+		return node.(*ApplicationNode), err
 	}
 	return node.(*ApplicationNode), err
 }

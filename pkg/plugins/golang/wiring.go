@@ -45,7 +45,10 @@ func CreateProcess(wiring blueprint.WiringSpec, procName string, children ...str
 				}
 			} else {
 				// for pointer nodes, only instantiate the dst side of the pointer
-				ptr.InstantiateDst(process)
+				_, err := ptr.InstantiateDst(process)
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 

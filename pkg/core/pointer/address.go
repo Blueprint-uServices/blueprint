@@ -37,5 +37,7 @@ func (md *Address) Name() string {
 }
 
 func (md *Address) String() string {
-	return md.name
+	return md.name + " = Address(-> " + md.Destination + ")"
 }
+
+func (ad *Address) ImplementsAddress() {}

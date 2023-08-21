@@ -6,15 +6,17 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/opentelemetry"
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/workflow"
 	"golang.org/x/exp/slog"
 )
 
 func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) {
-	// procName := fmt.Sprintf("p%s", serviceName)
+	procName := fmt.Sprintf("p%s", serviceName)
 	opentelemetry.Instrument(wiring, serviceName)
-	// golang.CreateProcess(wiring, procName, serviceName)
+	grpc.Deploy(wiring, serviceName)
+	golang.CreateProcess(wiring, procName, serviceName)
 
 }
 
@@ -39,12 +41,13 @@ func main() {
 	slog.Info("Wiring Spec: \n" + wiring.String())
 
 	bp := wiring.GetBlueprint()
-	// bp.Instantiate("pa", "pb")
-	bp.Instantiate("proc")
+	bp.Instantiate("pa", "pb")
+	// bp.Instantiate("proc")
 
 	application, err := bp.Build()
 	if err != nil {
 		slog.Error("Unable to build blueprint, exiting", "error", err)
+		slog.Info("Application: \n" + application.String())
 		os.Exit(1)
 	}
 

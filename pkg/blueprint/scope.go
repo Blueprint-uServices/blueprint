@@ -278,20 +278,21 @@ func newBlueprintScope(wiring WiringSpec, name string) (*blueprintScope, error) 
 }
 
 func (scope *blueprintScope) Build() (IRNode, error) {
+	node := &ApplicationNode{}
+	node.name = scope.Name()
+
 	// Execute deferred functions until empty
 	for len(scope.Deferred) > 0 {
 		next := scope.Deferred[0]
 		scope.Deferred = scope.Deferred[1:]
 		err := next()
 		if err != nil {
-			return nil, err
+			node.children = scope.handler.Nodes
+			return node, err
 		}
 	}
-
-	node := ApplicationNode{}
-	node.name = scope.Name()
 	node.children = scope.handler.Nodes
-	return &node, nil
+	return node, nil
 }
 
 // Augments debug messages with information about the scope
