@@ -1,7 +1,6 @@
 package pointer
 
 import (
-	"fmt"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/blueprint"
@@ -27,17 +26,7 @@ func (ptr PointerDef) String() string {
 	return b.String()
 }
 
-func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst string) (*PointerDef, error) {
-	prop := wiring.GetProperty(name, "ptr")
-	if prop != nil {
-		_, is_ptr := prop.(*PointerDef)
-		if !is_ptr {
-			return nil, fmt.Errorf("%s already exists and has existing metadata for the \"ptr\" property but it is not valid pointer metadata", name)
-		} else {
-			return nil, fmt.Errorf("pointer %s already exists", name)
-		}
-	}
-
+func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst string) {
 	ptr := &PointerDef{}
 	ptr.name = name
 	ptr.srcModifiers = nil
@@ -56,7 +45,7 @@ func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst st
 		}
 
 		scope.Defer(func() error {
-			_, err := ptr.instantiateDst(scope)
+			_, err := ptr.InstantiateDst(scope)
 			return err
 		})
 
@@ -64,8 +53,6 @@ func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst st
 	})
 
 	wiring.SetProperty(name, "ptr", ptr)
-
-	return ptr, nil
 }
 
 func IsPointer(wiring blueprint.WiringSpec, name string) bool {
@@ -77,16 +64,14 @@ func IsPointer(wiring blueprint.WiringSpec, name string) bool {
 	return is_ptr
 }
 
-func GetPointer(wiring blueprint.WiringSpec, name string) (*PointerDef, error) {
+func GetPointer(wiring blueprint.WiringSpec, name string) *PointerDef {
 	prop := wiring.GetProperty(name, "ptr")
 	if prop != nil {
-		ptr, is_ptr := prop.(*PointerDef)
-		if !is_ptr {
-			return nil, fmt.Errorf("%s already exists and has existing metadata for the \"ptr\" property but it is not valid pointer metadata", name)
+		if ptr, is_ptr := prop.(*PointerDef); is_ptr {
+			return ptr
 		}
-		return ptr, nil
 	}
-	return nil, fmt.Errorf("cannot get pointer definition %s as it is has not been defined", name)
+	return nil
 }
 
 func (ptr *PointerDef) AddSrcModifier(wiring blueprint.WiringSpec, modifierName string) string {
@@ -106,7 +91,7 @@ func (ptr *PointerDef) AddDstModifier(wiring blueprint.WiringSpec, modifierName 
 	return nextDst
 }
 
-func (ptr *PointerDef) instantiateDst(scope blueprint.Scope) (blueprint.IRNode, error) {
+func (ptr *PointerDef) InstantiateDst(scope blueprint.Scope) (blueprint.IRNode, error) {
 	_, err := scope.Get(ptr.dstHead)
 	if err != nil {
 		return nil, err

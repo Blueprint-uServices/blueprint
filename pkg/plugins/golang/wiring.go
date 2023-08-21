@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/pkg/core/pointer"
 )
 
 // Adds a child node to an existing process
@@ -35,9 +36,16 @@ func CreateProcess(wiring blueprint.WiringSpec, procName string, children ...str
 
 		// Instantiate all of the child nodes.  If the child node hasn't actually been defined, then this will error out
 		for _, childName := range childNames {
-			_, err := process.Get(childName.(string))
-			if err != nil {
-				return nil, err
+			ptr := pointer.GetPointer(wiring, childName.(string))
+			if ptr == nil {
+				// for non-pointer types, just get the child node
+				_, err := process.Get(childName.(string))
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				// for pointer nodes, only instantiate the dst side of the pointer
+				ptr.InstantiateDst(process)
 			}
 		}
 

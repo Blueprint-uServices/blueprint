@@ -16,7 +16,7 @@ doesn't exist, then this will result in a build error.
 This call creates several definitions within the wiring spec.  In particular, `serviceName` is
 defined as a pointer to the actual service, and can thus be modified and
 */
-func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, serviceArgs ...string) {
+func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string {
 
 	// Define the service
 	handlerName := serviceName + ".handler"
@@ -50,6 +50,8 @@ func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, servic
 
 	// Lastly define the pointer
 	pointer.CreatePointer(wiring, serviceName, &WorkflowService{}, dstName)
+
+	return serviceName
 }
 
 /*

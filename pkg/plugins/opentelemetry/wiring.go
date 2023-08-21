@@ -1,62 +1,132 @@
 package opentelemetry
 
-var DefaultOpenTelemetryCollectorName = "opentelemetry.collector"
+import (
+	"gitlab.mpi-sws.org/cld/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/pkg/core/pointer"
+	"golang.org/x/exp/slog"
+)
 
-// func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName string) {
-// 	collectorClientName := collectorName + ".client"
+/*
+Instruments `serviceName` with OpenTelemetry.  This can only be done if `serviceName` is a
+pointer from Golang nodes to Golang nodes.
 
-// 	wiring.Define(collectorName, &OpenTelemetryCollector{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-// 		addr := scope.Get(collectorAddr)
-// 		return newOpenTelemetryCollector(collector, addr), nil
-// 	})
+This call will also define the OpenTelemetry collector.
 
-// 	client := collectorName + ".client"
-// 	wiring.Define(client, &OpenTelemetryClient{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-// 		addr := scope.Get(collectorAddr)
-// 		return newOpenTelemetryClient(client, addr), nil
-// 	})
-// }
+Instrumenting `serviceName` will add both src and dst-side modifiers to the pointer.
+*/
+func Instrument(wiring blueprint.WiringSpec, serviceName string) {
+	DefineOpenTelemetryCollector(wiring, DefaultOpenTelemetryCollectorName)
+	InstrumentUsingCustomCollector(wiring, serviceName, DefaultOpenTelemetryCollectorName)
+}
 
-// func defineClientsideOT(wiring *blueprint.WiringSpec, serviceName, downstream string) {
-// 	otClientName := "opentelemetry.collector.client"
-// 	serviceWithOT := serviceName + ".client.opentelemetry"
-// 	wiring.Define(serviceWithOT, &InstrumentedClientsideService, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-// 		otClient := scope.Get(otClientName)
-// 		wrappedService := scope.Get(downstream)
-// 		return newInstrumentedService(wrappedService, otClient)
-// 	})
-// }
+/*
+This is the same as the Instrument function, but uses `collectorName` as the OpenTelemetry
+collector and does not attempt to define or redefine the collector.
+*/
+func InstrumentUsingCustomCollector(wiring blueprint.WiringSpec, serviceName string, collectorName string) {
+	// The nodes that we are defining
+	clientWrapper := serviceName + ".client.ot"
+	serverWrapper := serviceName + ".server.ot"
 
-// func defineServersideOT(wiring *blueprint.WiringSpec, serviceName, handlerName string) {
-// 	wrappedHandlerName := serviceName + ".server.opentelemetry"
-// 	wiring.Define(serviceWithOT, &InstrumentedServersideService, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-// 		otClient := scope.Get("opentelemetry.collector.client")
-// 		handler := scope.Get(handlerName)
-// 		return newInstrumentedService(wrappedHandlerName, otClient, handler)
-// 	})
-// 	return wrappedHandlerName
-// }
+	// Get the pointer metadata
+	ptr := pointer.GetPointer(wiring, serviceName)
+	if ptr == nil {
+		slog.Error("Unable to instrument " + serviceName + " with OpenTelemetry as it is not a pointer")
+		return
+	}
 
-// // Instruments a service with OpenTelemetry.  This will do the following:
-// //   - Instantiate the OpenTelemetry collector process and define client libraries
-// //   - On the server side, it will wrap the handler with an extended interface that creates spans and then proxies calls
-// //   - On the client side, it will intercept calls to the server and create spans before proxying calls
-// func Instrument(wiring *blueprint.WiringSpec, serviceName string) {
-// 	// Define the OpenTelemetry collector process and client library
-// 	initOpenTelemetry(wiring, DefaultOpenTelemetryCollectorName)
+	// Add the client wrapper to the pointer src
+	clientNext := ptr.AddSrcModifier(wiring, clientWrapper)
 
-// 	addr, handler := wiring.GetPointer(serviceName)
+	// Define the client wrapper
+	wiring.Define(clientWrapper, &OpenTelemetryClientWrapper{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+		collectorClient, err := scope.Get(collectorName)
+		if err != nil {
+			return nil, err
+		}
 
-// 	wrappedHandler := defineServersideOT(wiring, serviceName, handler)
+		server, err := scope.Get(clientNext)
+		if err != nil {
+			return nil, err
+		}
 
-// 	// explicitly define the addr between client and server, with some name
-// 	// define the clientside with the addr as the downstream
-// 	// redefine the previous addr as the clientside
-// 	// readvertise the service pointer as pointing to the wrapped handler via the client and server handlers
-// 	defineClientsideOT(wiring, serviceName, addr)
+		return newOpenTelemetryClientWrapper(clientWrapper, server, collectorClient)
+	})
 
-// 	wiring.MakePointer(serviceName, wrappedHandler)
+	// Add the server wrapper to the pointer dst
+	serverNext := ptr.AddDstModifier(wiring, serverWrapper)
 
-// 	// Define the client-side and server-side wrapper classes
-// 	defineClientsideOT(wiring, serviceName, addr)
-// }
+	// Define the server wrapper
+	wiring.Define(serverWrapper, &OpenTelemetryServerWrapper{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+		collectorClient, err := scope.Get(collectorName)
+		if err != nil {
+			return nil, err
+		}
+
+		server, err := scope.Get(serverNext)
+		if err != nil {
+			return nil, err
+		}
+
+		return newOpenTelemetryServerWrapper(serverWrapper, server, collectorClient)
+	})
+
+}
+
+var DefaultOpenTelemetryCollectorName = "ot_collector"
+
+/*
+Defines the OpenTelemetry collector as a process node
+
+# Also creates a pointer to the collector and a client node that are used by OT clients
+
+This doesn't need to be explicitly called, although it can if users want to control
+the placement of the opentelemetry collector
+*/
+func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName string) string {
+	// The nodes that we are defining
+	collectorAddr := collectorName + ".addr"
+	collectorProc := collectorName + ".proc"
+	collectorDst := collectorName + ".dst"
+	collectorClient := collectorName + ".client"
+
+	// Define the collector address
+	pointer.DefineAddress(wiring, collectorAddr, collectorProc, &blueprint.ApplicationNode{})
+
+	// Define the collector server
+	wiring.Define(collectorProc, &OpenTelemetryCollector{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+		addr, err := scope.Get(collectorAddr)
+		if err != nil {
+			return nil, err
+		}
+
+		return newOpenTelemetryCollector(collectorProc, addr)
+	})
+
+	// By default, we should only have one collector globally
+	wiring.Alias(collectorDst, collectorProc)
+	pointer.RequireUniqueness(wiring, collectorDst, &blueprint.ApplicationNode{})
+
+	// Define the pointer to the collector for golang clients
+	pointer.CreatePointer(wiring, collectorName, &OpenTelemetryCollectorClient{}, collectorDst)
+	ptr := pointer.GetPointer(wiring, collectorName)
+
+	// Add the collectorAddr to the pointer dst
+	ptr.AddDstModifier(wiring, collectorAddr)
+
+	// Add the client to the pointer
+	clientNext := ptr.AddSrcModifier(wiring, collectorClient)
+
+	// Define the collector client
+	wiring.Define(collectorClient, &OpenTelemetryCollectorClient{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+		collectorServer, err := scope.Get(clientNext)
+		if err != nil {
+			return nil, err
+		}
+
+		return newOpenTelemetryCollectorClient(collectorClient, collectorServer)
+	})
+
+	// Return the name of the pointer
+	return collectorName
+}

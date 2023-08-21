@@ -11,6 +11,7 @@ import (
 // This Node represents a Golang Workflow spec service in the Blueprint IR.
 type WorkflowService struct {
 	golang.Node
+	golang.Service
 	service.ServiceNode
 	golang.ArtifactGenerator
 	golang.CodeGenerator
@@ -22,7 +23,6 @@ type WorkflowService struct {
 
 func (n WorkflowService) String() string {
 	var b strings.Builder
-	b.WriteString("WorkflowService ")
 	b.WriteString(n.InstanceName)
 	b.WriteString(" = ")
 	b.WriteString(n.ServiceDetails.Interface.Name)
@@ -71,3 +71,6 @@ func (node *WorkflowService) GenerateInstantiationCode(g *golang.GolangCodeGener
 func (node *WorkflowService) CollectArtifacts(g *golang.GolangArtifactGenerator) error {
 	return g.AddFiles(node.ServiceDetails.Files)
 }
+
+func (node *WorkflowService) ImplementsGolangNode()    {}
+func (node *WorkflowService) ImplementsGolangService() {}

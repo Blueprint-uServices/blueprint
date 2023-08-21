@@ -1,17 +1,20 @@
 package opentelemetry
 
 import (
+	"fmt"
+	"reflect"
+
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/pkg/core/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/core/process"
 	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/golang"
-	"golang.org/x/exp/slog"
 )
 
 type OpenTelemetryCollector struct {
 	process.ProcessNode
 
 	CollectorName string
-	Addr          blueprint.IRNode
+	Addr          *pointer.Address
 }
 
 type OpenTelemetryCollectorClient struct {
@@ -20,16 +23,17 @@ type OpenTelemetryCollectorClient struct {
 	golang.CodeGenerator
 
 	ClientName string
-	Server     blueprint.IRNode
+	ServerAddr *pointer.Address
 }
 
 type OpenTelemetryServerWrapper struct {
+	golang.Service
 	golang.ArtifactGenerator
 	golang.CodeGenerator
 
 	WrapperName string
 	Wrapped     golang.Service
-	Collector   blueprint.IRNode
+	Collector   *OpenTelemetryCollectorClient
 }
 
 type OpenTelemetryClientWrapper struct {
@@ -37,42 +41,69 @@ type OpenTelemetryClientWrapper struct {
 	golang.ArtifactGenerator
 	golang.CodeGenerator
 
-	WrapperName    string
-	Server         blueprint.IRNode
-	Collector      blueprint.IRNode
-	ServiceDetails *golang.GolangServiceDetails
+	WrapperName string
+	Server      golang.Service
+	Collector   *OpenTelemetryCollectorClient
 }
 
-func newOpenTelemetryCollector(name string, addr blueprint.IRNode) *OpenTelemetryCollector {
-	node := OpenTelemetryCollector{}
+func newOpenTelemetryCollector(name string, addr blueprint.IRNode) (*OpenTelemetryCollector, error) {
+	addrNode, is_addr := addr.(*pointer.Address)
+	if !is_addr {
+		return nil, fmt.Errorf("unable to create OpenTelemetryCollector node because %s is not an address", addr.Name())
+	}
+
+	node := &OpenTelemetryCollector{}
 	node.CollectorName = name
-	node.Addr = addr
-	slog.Info("Build OpenTelemetry Collector node " + name)
-	return &node
+	node.Addr = addrNode
+	return node, nil
 }
 
-func newOpenTelemetryCollectorClient(name string, server blueprint.IRNode) *OpenTelemetryCollectorClient {
-	node := OpenTelemetryCollectorClient{}
+func newOpenTelemetryCollectorClient(name string, addr blueprint.IRNode) (*OpenTelemetryCollectorClient, error) {
+	addrNode, is_addr := addr.(*pointer.Address)
+	if !is_addr {
+		return nil, fmt.Errorf("unable to create OpenTelemetryCollectorClient node because %s is not an address", addr.Name())
+	}
+
+	node := &OpenTelemetryCollectorClient{}
 	node.ClientName = name
-	node.Server = server
-	slog.Info("Build OpenTelemetry Collector client " + name)
-	return &node
+	node.ServerAddr = addrNode
+	return node, nil
 }
 
-func newOpenTelemetryServerWrapper(name string, wrapped golang.Service, addr blueprint.IRNode, collector blueprint.IRNode) *OpenTelemetryServerWrapper {
-	node := OpenTelemetryServerWrapper{}
+func newOpenTelemetryServerWrapper(name string, server blueprint.IRNode, collector blueprint.IRNode) (*OpenTelemetryServerWrapper, error) {
+	serverNode, is_callable := server.(golang.Service)
+	if !is_callable {
+		return nil, fmt.Errorf("opentelemetry server wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
+	}
+
+	collectorClient, is_collector_client := collector.(*OpenTelemetryCollectorClient)
+	if !is_collector_client {
+		return nil, fmt.Errorf("opentelemetry server wrapper requires %s to be an opentelemetry collector client", collector.Name())
+	}
+
+	node := &OpenTelemetryServerWrapper{}
 	node.WrapperName = name
-	node.Wrapped = wrapped
-	slog.Info("Build OpenTelemetry Server wrapper " + name)
-	return &node
+	node.Wrapped = serverNode
+	node.Collector = collectorClient
+	return node, nil
 }
 
-func newOpenTelemetryClientWrapper(name string, server blueprint.IRNode, collector blueprint.IRNode) *OpenTelemetryClientWrapper {
-	node := OpenTelemetryClientWrapper{}
+func newOpenTelemetryClientWrapper(name string, server blueprint.IRNode, collector blueprint.IRNode) (*OpenTelemetryClientWrapper, error) {
+	serverNode, is_callable := server.(golang.Service)
+	if !is_callable {
+		return nil, fmt.Errorf("opentelemetry client wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
+	}
+
+	collectorClient, is_collector_client := collector.(*OpenTelemetryCollectorClient)
+	if !is_collector_client {
+		return nil, fmt.Errorf("opentelemetry client  wrapper requires %s to be an opentelemetry collector client", collector.Name())
+	}
+
+	node := &OpenTelemetryClientWrapper{}
 	node.WrapperName = name
-	node.Server = server
-	slog.Info("Build OpenTelemetry Client wrapper " + name)
-	return &node
+	node.Server = serverNode
+	node.Collector = collectorClient
+	return node, nil
 }
 
 func (node *OpenTelemetryCollector) Name() string {
@@ -92,17 +123,22 @@ func (node *OpenTelemetryClientWrapper) Name() string {
 }
 
 func (node *OpenTelemetryCollector) String() string {
-	return node.Name()
+	return node.Name() + " = OTCollector(" + node.Addr.Name() + ")"
 }
 
 func (node *OpenTelemetryCollectorClient) String() string {
-	return node.Name()
+	return node.Name() + " = OTClient(" + node.ServerAddr.Name() + ")"
 }
 
 func (node *OpenTelemetryServerWrapper) String() string {
-	return node.Name()
+	return node.Name() + " = OTServerWrapper(" + node.Wrapped.Name() + ", " + node.Collector.Name() + ")"
 }
 
 func (node *OpenTelemetryClientWrapper) String() string {
-	return node.Name()
+	return node.Name() + " = OTClientWrapper(" + node.Server.Name() + ", " + node.Collector.Name() + ")"
 }
+
+func (node *OpenTelemetryServerWrapper) ImplementsGolangNode()    {}
+func (node *OpenTelemetryServerWrapper) ImplementsGolangService() {}
+func (node *OpenTelemetryClientWrapper) ImplementsGolangNode()    {}
+func (node *OpenTelemetryClientWrapper) ImplementsGolangService() {}
