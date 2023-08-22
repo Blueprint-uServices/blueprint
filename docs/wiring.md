@@ -67,3 +67,38 @@ Notice the argument `scope` of type `blueprint.Scope`.  In dependency injection 
 
 **Singletons.** One important aspect of scopes are that nodes within a scope are singletons -- if you call `scope.Get("bar")` multiple times, it will return the same instance each time.  Thus, within this scope, the build function of `bar` is only going to be called once.
 
+### Namespaces
+
+A key aspect of Blueprint is its support for hierarchical namespaces -- that is, for example, an application might comprise a number of containers; within each container a number of processes; within a process a number of application-level objects.  Within Blueprint's IR, there are IR nodes to represent these concepts. For example, a golang process node contains golang object nodes for the objects within the process.
+
+Namespace nodes like this are implemented by extending blueprint.Scope.  This is best explained through an example using the [golang process](pkg/plugins/golang) plugin as an example.  
+
+Recall that a golang process is defined with a name, and it contains a number of golang objects.  For example, if we want to deploy `foo` in a process and expose it with GRPC, we might write the following wiring:
+
+```
+workflow.Define(wiring, "foo", "MyFooService")
+grpc.Deploy(wiring, "foo")
+golang.CreateProcess(wiring, "fooProc", "foo")
+```
+
+In this example we want to particularly focusing on the implementation of `golang.CreateProcess`.  This implementation makes use of a custom `golang.ProcessScope` which is defined in [scope.go](pkg/plugins/golang/scope.go) and used in [wiring.go](pkg/plugins/golang/wiring.go) in the definition of `CreateProcess`.
+
+Its usage is rather straightforward.  In the build function for `fooProc`, the first thing that happens is to create a new scope as a child of the received scope:
+```
+process := NewGolangProcessScope(scope, wiring, procName)
+```
+
+Here, we say that `process` is a *child* scope of the received `scope`, and that `scope` is the *parent* scope of `process`.
+
+Subsequently, in the build function of `fooProc`, there is a call to `Get("foo")` which will, internally, invoke foo's build function.  However, instead of getting foo from the parent `scope`, we get foo from the `process` scope: `process.Get("foo")`.  This has the same semantics: foo's build function will be called once, and the instance will be a singleton within the `process` scope.  
+
+Internally, `process` will make note of nodes such as `foo` that get built, as well as any other nodes that `foo` builds recursively.  Eventually, once `foo` has been built, `fooProc`'s build function finishes.  It returns an IR node representing the process, that contains `foo` as well as any golang nodes that were built as a result of building `foo`.
+
+**Types.** Scopes make use of IR nodeTypes to decide whether to, either, (a) build a node here, in this scope; or (b) just get the node from the parent scope instead.  Consider the example of a memcached container image.  It is nonsensical for a golang process to contain a memcached container image.  So the `golang.ProcessScope` does not support building nodes of type Container.  The Scope interface, which is defined in [pkg/blueprint/scope.go](pkg/blueprint/scope.go) and implemented by the [Golang plugin](pkg/plugins/golang/scope.go) allows scopes to specify which node types they actually support and can be built in this scope; for all other node types, a call to Get will just recursively call Get in the parent scope.  Recall, that in `wiring.Define`, one of the arguments is `nodeType` -- the type of node that this definition will build.
+ that `golang.ProcessScope` *doesn't* support (e.g. to a memcached container image), then the node is instead gotten from the parent scope, recursively.  
+
+**Singletons.** Although nodes are singletons within a scope, there can be multiple different scope instances, each with its own node instance.  For example, suppose we have services A, B, and C, all making RPC calls to service D over GRPC.  Then there will be an instance of D's GRPC client in each of A, B, and C's processes.
+
+### Addresses
+
+
