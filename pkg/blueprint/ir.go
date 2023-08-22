@@ -10,6 +10,7 @@ import (
 type IRNode interface {
 	Name() string
 	String() string
+	// TODO: all nodes should have a Build() function
 }
 
 type IRMetadata interface {
