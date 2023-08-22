@@ -101,4 +101,12 @@ Internally, `process` will make note of nodes such as `foo` that get built, as w
 
 ### Addresses
 
+Sometimes, we don't want nodes to be immediately built, because we don't want them to live in the same scope as the caller.  Consider the example where two services, A and B, are both exposed over GRPC and deployed into a different process.  If A makes calls to B, then building A will require us to build the client library of B, and building the client library of B requires a corresponding server of B to make calls to.  We don't want to build the server of B in the same scope as A.
 
+Addresses break this chain.  An address from A to B is little more than metadata that records the fact that an instance of B is required, but is not yet built.  For example, while building the client library of B, the GRPC client library will be built, followed by the address to the server, but at that point building ends.
+
+When an address is defined, it is up to the plugin to decide the nodeType of the address -- that is, at what scope should it be built?  For most network addresses, they should be built in the root scope, because they should be accessible application-wide.
+
+### Pointers
+
+Pointers are a concept that are not directly part of Blueprint's wiring spec, but are built on top of it and widely used.  A pointer represents a chain of nodes, often with an address in the middle.  A pointer can be created for any defined node.  Modifers can be applied to pointers, which entails inserting extra nodes in the chain of nodes.  This is best illustrated by the [workflow plugin](pkg/plugins/workflow/wiring.go) which, for any service, defines both a handler and a pointer to the handler; and the [GRPC plugin](pkg/plugins/grpc/wiring.go), which adds client, server, and address nodes to a pointer.
