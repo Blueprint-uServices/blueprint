@@ -2,85 +2,100 @@
 
 This repository is a work-in-progress refactor / reimplementation of the core wiring and IR of blueprint's compiler.
 
-## Lifecycle
+This documentation assumes that you are familiar with Blueprint's concepts.
 
-The lifecycle of a blueprint application is as follows.
+## Overview
 
-1. Workflow spec is defined as before, as Golang services.
-2. Wiring spec is defined as Go programs; see [cmd/example/main.go](cmd/example/main.go) for an example.  It is semantically similar to the wiring files from before, but now instead of interpreting the wiring file we directly execute it.  Many of the functions used to construct the application in the wiring file are syntatic sugar defined by the plugins being used.
-3. The wiring spec is written using a dependency-injection style
-4. Building the wiring spec will produce a blueprint application comprising typed nodes
-5. Compiling the application entails compiling the root application node.
+In this version of Blueprint, we have the following pieces:
 
-## Wiring Spec
+1. A **Workflow Spec** is defined as before, as Golang services, and using interfaces like Caches, Databases, etc. that are defined by plugins.
+2. A **Wiring Spec** is defined that instantiates and places components of an application.  This aspect has significantly changed from Blueprint v1.  Before, a wiring spec was a python-like DSL.  Now, a wiring spec is simply a Go program that we directly execute to build the application.  While the syntax of the wiring spec has changed to be more go-like, conceptually the Go-style wiring spec remains similar to the previous DSL.  It is significantly more flexible and powerful now, however.
+3. When the wiring spec is executed, a **Blueprint IR** representation of the application is constructed.  This is also changed significantly from Blueprint v1.  Before, the IR was built using a visitor-like pattern.  Now, Blueprint IR nodes contain direct references to other, typed nodes, making compilation a simpler and more direct process of invoking methods on nodes.
+4. Most of the generated code looks the same as in Blueprint v1.  An exception, however, is in the code blocks that instantiate objects, for example in the main method of a process.  In this refactored code we generally favor a *dependency injection* style of instantiating objects in generated code, as it makes for cleaner output code as well as cleaner plugin implementations that generate code.
 
-To create a wiring spec, import blueprint and call
+## Example
 
+A simple example wiring spec can be found in [cmd/example/main.go](cmd/example/main.go).  The example:
+
+Creates a new Blueprint wiring spec
 ```
 wiring := blueprint.NewWiringSpec("example")
 ```
 
-The returned struct, `wiring`, is a **dependency injection container**.
-
-## Plugins
-
-Blueprint is a modular framework and most of its functionality is provided by plugins.  Plugins interact with the wiring spec and help to define dependencies in the dependency injection container.
-
-For example, the `workflow` plugin provides a method `workflow.Define` to instantiate workflow spec services ([link](pkg/plugins/workflow/wiring.go)).  e.g.
-
+Defines a cache and some services that call each other
 ```
-workflow.Define(wiring, "serviceA", "LeafService")
+b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
+b := workflow.Define(wiring, "b", "LeafService", b_cache)
+a := workflow.Define(wiring, "a", "nonLeafService", b)
 ```
 
-The above snippet defines `serviceA` to be an instantiation of the `LeafService` from the application's workflow spec.
-
-Different plugins do different things.  For example, the `memcached` plugin provides a method `PrebuiltProcess` to instantiate a prebuilt Memcached process ([link](pkg/plugins/memcached/wiring.go)).
-
+Applies some default modifiers to the services
 ```
-memcached.PrebuiltProcess(wiring, "cacheB")
-```
-
-Some plugins wrap or modify nodes that are defined by other plugins.  For example, the `grpc` plugin provides a method `Deploy` to serve some named service using GRPC ([link](pkg/plugins/grpc/wiring.go)).
-
-```
-grpc.Deploy(wiring, "serviceA")
+func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) string {
+	procName := fmt.Sprintf("p%s", serviceName)
+	opentelemetry.Instrument(wiring, serviceName)
+	grpc.Deploy(wiring, serviceName)
+	return golang.CreateProcess(wiring, procName, serviceName)
+}
+pa := serviceDefaults(wiring, a)
+pb := serviceDefaults(wiring, b)
 ```
 
-Similarly the `opentelemetry` plugin provides a method `Instrument` to wrap client and server code with OpenTelemetry instrumentation ([link](pkg/plugins/opentelemetry/wiring.go))
-
-```
-opentelemetry.Instrument(wiring, serviceName)
-```
-
-Almost all of the time, an application's wiring spec should interact with the Wiring struct via the utility methods offered by plugins.
-
-## Building
-
-Once the application has been defined, it can be built by calling
-
+Instructs Blueprint to instantiate `a` and `b`
 ```
 bp := wiring.GetBlueprint()
+bp.Instantiate(pa, pb)
 ```
 
-From here, different nodes of the application can be explicitly instantiated by name:
-
-```
-bp.Instantiate("serviceA")
-```
-
-Lastly, to build the application, we call
-
+And finally builds the application
 ```
 application, err := bp.Build()
 ```
 
-This will actually invoke all of the build functions, check types and compatibility between nodes of the application, and return a Blueprint IR Node that represents the application as a whole.
+Blueprint recursively instantiates all dependencies, such that in the built application, `b_cache` is also instantiated.  If we run the application and print the generated IR nodes, our output will look like this (some output lines have been removed):
 
-# Working with the Wiring Spec
+```
+example = BlueprintApplication() {
+  a.grpc.addr = Address(-> a.grpc_server)
+  b.grpc.addr = Address(-> b.grpc_server)
+  b_cache.addr = Address(-> b_cache.process)
+  ot_collector.addr = Address(-> ot_collector.proc)
 
-TODO: describe how plugins use the wiring spec
+  pa = GolangProcessNode(a.grpc.addr, ot_collector.addr, b.grpc.addr, ot_collector.proc) {
+    b.grpc_client = GRPCClient(b.grpc.addr)
+    b.client.ot = OTClientWrapper(b.grpc_client, ot_collector.client)
+    a = nonLeafService(b.client.ot)
+    ot_collector.client = OTClient(ot_collector.addr)
+    a.server.ot = OTServerWrapper(a, ot_collector.client)
+    a.grpc_server = GRPCServer(a.server.ot, a.grpc.addr)
+  }
 
-TODO: describe how plugins extend the IR
+  pb = GolangProcessNode(b.grpc.addr, ot_collector.addr, b_cache.addr, b_cache.process) {
+    b_cache.client = MemcachedClient(b_cache.addr)
+    b = LeafService(b_cache.client)
+    ot_collector.client = OTClient(ot_collector.addr)
+    b.server.ot = OTServerWrapper(b, ot_collector.client)
+    b.grpc_server = GRPCServer(b.server.ot, b.grpc.addr)
+  }
 
-TODO: describe how the IR, once constructed, is then used for artifact generation
+  ot_collector.proc = OTCollector(ot_collector.addr)
+  b_cache.process = MemcachedProcess(b_cache.addr)
+}
+```
 
+
+## Layout
+
+The code in this repository is currently laid out as follows:
+
+* `cmd` contains an example wiring spec
+* `pkg/blueprint` contains the implementation of Blueprint itself
+* `pkg/core` contains Blueprint plugins that we consider to be basic required functionality.  Each plugin resides in a subdirectory.
+* `pkg/plugins` contains Blueprint all remaining Blueprint plugins.  Each plugin resides in a subdirectory.
+
+## Anatomy of a plugin
+
+A plugin typically, at a minimum, defines two types of functionality.  What is described below is convention rather than strict requirement:
+
+* `ir.go` defines Blueprint IR nodes for the plugin.  For example, in the [GRPC ir.go](pkg/plugins/grpc/ir.go), two IR nodes are defined: one representing the GRPC server and one representing the GRPC client.  IR nodes implement interfaces such as `golang.Node` and `golang.CodeGenerator` which are used by other IR nodes.  For example, the `GolangServer` node contains a reference to some other node, `Wrapped`, that must be a `golang.Service` node.  See [docs/ir.md] for more information about the IR.
+* `wiring.go` integrates the plugin into Blueprint's wiring spec.  Blueprint's wiring API can be called directly by wiring spec implementations, but in practice plugins can provide utility methods that simplify things.  For example, in the [GRPC wiring.go](pkg/plugins/grpc/wiring.go), a method `Deploy` exists; this can be called from a user's wiring spec to wrap a service in GRPC.  See [docs/wiring.md] for more information about Wiring.
