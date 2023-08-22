@@ -4,6 +4,10 @@ This repository is a work-in-progress refactor / reimplementation of the core wi
 
 This documentation assumes that you are familiar with Blueprint's concepts.
 
+Shortcuts:
+* [IR documentation](docs/ir.md)
+* [Wiring documentation](docs/wiring.md)
+
 ## Overview
 
 In this version of Blueprint, we have the following pieces:
