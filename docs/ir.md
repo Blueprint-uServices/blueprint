@@ -1,73 +1,41 @@
+# Blueprint IR
 
-## Wiring Spec
+Blueprint's IR is a representation of a blueprint application that derives from a wiring spec and the workflow spec and plugins that it uses.  Blueprint's IR uses **typed Nodes** that plugins extend with specialized functionality.  The base type is `blueprint.IRNode` which is defined in [pkg/blueprint/ir.go](pkg/blueprint/ir.go).  All nodes must have a name and a string representation.
 
-To create a wiring spec, import blueprint and call
+The root of a Blueprint application is a `blueprint.ApplicationNode`.  Building a Blueprint wiring spec will produce a blueprint application node.
 
-```
-wiring := blueprint.NewWiringSpec("example")
-```
+## IR Node types
 
-The returned struct, `wiring`, is a **dependency injection container**.
+Blueprint's IR forms a type hierarchy building on the base `blueprint.IRNode`.  There are several further interfaces that extend the base `blueprint.IRNode`, such as (non-exhaustive):
 
-## Plugins
+* `service.ProcessNode` defined in [core/process/ir.go](pkg/core/process/ir.go) provides a generic representation of a process.
+* `service.ServiceNode` defined in [core/service/ir.go](pkg/core/service/ir.go) provides a generic representation of a service with a synchronous call API.
 
-Blueprint is a modular framework and most of its functionality is provided by plugins.  Plugins interact with the wiring spec and help to define dependencies in the dependency injection container.
+Plugins can introduce further extensions of nodes as well as hierarchies of their own.  For example, the `golang` plugin introduces generic interfaces:
 
-For example, the `workflow` plugin provides a method `workflow.Define` to instantiate workflow spec services ([link](pkg/plugins/workflow/wiring.go)).  e.g.
+* `golang.Node` defined in [plugins/golang/ir.go](pkg/plugins/golang/ir.go) provides a generic representation of a golang object.
+* `golang.Service` defined in [plugins/golang/ir.go](pkg/plugins/golang/ir.go) provides a generic representation of a golang service, extending the `ServiceNode` above.
+* `golang.Process` defined in [plugins/golang/ir.go](pkg/plugins/golang/ir.go) provides a generic representation of a golang process, extending the `ProcessNode` above.
 
-```
-workflow.Define(wiring, "serviceA", "LeafService")
-```
+## Example
 
-The above snippet defines `serviceA` to be an instantiation of the `LeafService` from the application's workflow spec.
+As an example, consider the [GRPC ir.go](pkg/plugins/grpc/ir.go), which defines two nodes, `GolangServer` and `GolangClient`.
 
-Different plugins do different things.  For example, the `memcached` plugin provides a method `PrebuiltProcess` to instantiate a prebuilt Memcached process ([link](pkg/plugins/memcached/wiring.go)).
+* `GolangClient` is a GRPC client object that can be instantiated within a Go process, and it can invoke methods of a remote service.  For this, it needs the address of the remote service; this is a field `ServerAddr *pointer.Address` which is an `Address` IRNode.  GolangClient itself is a `golang.Service` node, because it provides methods that can be invoked by callers.  It is a `golang.Node` because it exists within a Go process.  It is also a `golang.ArtifactGenerator` and `golang.CodeGenerator`, which are node types with methods for generating, collecting, and packaging Go code.
 
-```
-memcached.PrebuiltProcess(wiring, "cacheB")
-```
+* `GolangServer` is the corresponding GRPC server object that is also instantiated within a Go process.  A GolangServer also needs to know the address that is exposes, which is a field `Addr *pointer.Address` pointing to the same `Address` IRNode as the corresponding client would point to.  A `GolangServer` itself needs a handler that provides the actual methods that are exposed over RPC; this is a field `Wrapped golang.Service` which can point to any other node that implements the `golang.Service` interface.  GolangServer is a `golang.Node` because it exists within a Go process, and like the client, it is both an Artifact and a Code generator.  However, it is ***not*** a `golang.Service` node, because it does not have an interface that can be called directly by golang nodes -- callers would have to interact with the server's methods via the client.
 
-Some plugins wrap or modify nodes that are defined by other plugins.  For example, the `grpc` plugin provides a method `Deploy` to serve some named service using GRPC ([link](pkg/plugins/grpc/wiring.go)).
+## Code Generation etc.
 
-```
-grpc.Deploy(wiring, "serviceA")
-```
+IR node types provide the implementation of things like code generation that is used by compilation.  **The current IR implementation is partial and needs fleshing out**.  At the time of writing, golang code generation serves as the main example of how the IR hierarchy incorporates different concepts.
 
-Similarly the `opentelemetry` plugin provides a method `Instrument` to wrap client and server code with OpenTelemetry instrumentation ([link](pkg/plugins/opentelemetry/wiring.go))
 
-```
-opentelemetry.Instrument(wiring, serviceName)
-```
 
-Almost all of the time, an application's wiring spec should interact with the Wiring struct via the utility methods offered by plugins.
 
-## Building
 
-Once the application has been defined, it can be built by calling
+## Manual construction
 
-```
-bp := wiring.GetBlueprint()
-```
+In principle, Blueprint's wiring spec can be completely circumvented, and a caller could (laboriously) construct an IR manually by constructing nodes of an application.  In this regard, Blueprint's wiring is intended as a convenient API for programmatically constructing the IR nodes more easily.
 
-From here, different nodes of the application can be explicitly instantiated by name:
-
-```
-bp.Instantiate("serviceA")
-```
-
-Lastly, to build the application, we call
-
-```
-application, err := bp.Build()
-```
-
-This will actually invoke all of the build functions, check types and compatibility between nodes of the application, and return a Blueprint IR Node that represents the application as a whole.
-
-# Working with the Wiring Spec
-
-TODO: describe how plugins use the wiring spec
-
-TODO: describe how plugins extend the IR
-
-TODO: describe how the IR, once constructed, is then used for artifact generation
+## Current Status
 
