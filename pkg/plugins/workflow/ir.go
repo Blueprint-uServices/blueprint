@@ -17,6 +17,7 @@ type WorkflowService struct {
 	golang.CodeGenerator
 
 	InstanceName   string
+	ServiceType    string
 	ServiceDetails *golang.GolangServiceDetails
 	Args           []blueprint.IRNode
 }
@@ -39,13 +40,20 @@ func (n WorkflowService) String() string {
 	return b.String()
 }
 
-func newWorkflowService(name string, details *golang.GolangServiceDetails, args []blueprint.IRNode) *WorkflowService {
-	node := WorkflowService{}
+func newWorkflowService(name string, serviceType string, args []blueprint.IRNode) (*WorkflowService, error) {
+	// Look up the service details; errors out if the service doesn't exist
+	details, err := findService(serviceType)
+	if err != nil {
+		return nil, err
+	}
+
+	node := &WorkflowService{}
 
 	node.InstanceName = name
+	node.ServiceType = serviceType
 	node.ServiceDetails = details
 	node.Args = args
-	return &node
+	return node, nil
 }
 
 func (node *WorkflowService) Name() string {

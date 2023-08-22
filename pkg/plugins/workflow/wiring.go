@@ -21,12 +21,6 @@ func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, servic
 	// Define the service
 	handlerName := serviceName + ".handler"
 	wiring.Define(handlerName, &WorkflowService{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		// Look up the service details; errors out if the service doesn't exist
-		details, err := findService(serviceType)
-		if err != nil {
-			return nil, err
-		}
-
 		// Get all of the argument nodes; can error out if the arguments weren't actually defined
 		// For arguments that are pointer types, this will only get the caller-side of the pointer
 		var arg_nodes []blueprint.IRNode
@@ -39,8 +33,7 @@ func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, servic
 		}
 
 		// Instantiate and return the service
-		service := newWorkflowService(serviceName, details, arg_nodes)
-		return service, err
+		return newWorkflowService(serviceName, serviceType, arg_nodes)
 	})
 
 	// Mandate that this service with this name must be unique within the application (although, this can be changed by scopes)
