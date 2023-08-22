@@ -61,7 +61,7 @@ func (node *WorkflowService) Name() string {
 }
 
 func (node *WorkflowService) GetInterface() *service.ServiceInterface {
-	return &node.ServiceDetails.Interface
+	return &node.ServiceDetails.Interface.ServiceInterface
 }
 
 func (node *WorkflowService) GenerateInstantiationCode(g *golang.GolangCodeGenerator) error {
@@ -72,12 +72,12 @@ func (node *WorkflowService) GenerateInstantiationCode(g *golang.GolangCodeGener
 			return new ServiceName(first, second)
 		})`
 	g.Def(node.InstanceName, code)
-	g.Import(node.ServiceDetails.Package)
+	g.Import(node.ServiceDetails.Package.Name)
 	return nil
 }
 
 func (node *WorkflowService) CollectArtifacts(g *golang.GolangArtifactGenerator) error {
-	return g.AddFiles(node.ServiceDetails.Files)
+	return g.AddFiles(node.ServiceDetails.Package.Path)
 }
 
 func (node *WorkflowService) ImplementsGolangNode()    {}

@@ -32,11 +32,22 @@ type ArtifactGenerator interface {
 	CollectArtifacts(*GolangArtifactGenerator) error
 }
 
+type Package struct {
+	Name string
+	Path string
+}
+
+type ServiceInterface struct {
+	service.ServiceInterface
+	Package Package
+}
+
 // Code location and interfaces of a service
 type GolangServiceDetails struct {
-	Interface service.ServiceInterface
-	Files     []string
-	Package   string
+	Name        string                           // The name of the implementing struct
+	Package     Package                          // The package containing the implementing struct
+	Constructor service.ServiceMethodDeclaration // The constructor method for the implementing struct
+	Interface   ServiceInterface                 // The interface that is implemented
 }
 
 func (d GolangServiceDetails) String() string {
@@ -44,7 +55,7 @@ func (d GolangServiceDetails) String() string {
 	b.WriteString(d.Interface.Name)
 
 	var constructorArgs []string
-	for _, arg := range d.Interface.ConstructorArgs {
+	for _, arg := range d.Constructor.Args {
 		constructorArgs = append(constructorArgs, arg.Type)
 	}
 	b.WriteString("(")

@@ -75,7 +75,7 @@ func (cg *GolangArtifactGenerator) AddFile(path, inputpath string) error {
 	return nil
 }
 
-func (cg *GolangArtifactGenerator) AddFiles(paths []string) error {
+func (cg *GolangArtifactGenerator) AddFiles(paths ...string) error {
 	// TODO: implement
 	return nil
 }

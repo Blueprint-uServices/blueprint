@@ -10,6 +10,7 @@ type Variable struct {
 type ServiceMethodDeclaration struct {
 	Name string
 	Args []Variable
+	Ret  []Variable
 }
 
 func (method ServiceMethodDeclaration) AddArg(Name, Type string) ServiceMethodDeclaration {
@@ -19,9 +20,8 @@ func (method ServiceMethodDeclaration) AddArg(Name, Type string) ServiceMethodDe
 }
 
 type ServiceInterface struct {
-	Name            string
-	ConstructorArgs []Variable
-	Methods         []ServiceMethodDeclaration
+	Name    string
+	Methods []ServiceMethodDeclaration
 }
 
 func (iface ServiceInterface) ExtendMethodArgs(Name, Type string) ServiceInterface {

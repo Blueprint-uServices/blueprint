@@ -107,6 +107,15 @@ type ImplInfo struct {
 	ConstructorInfos []FuncInfo
 }
 
+func (d ImplInfo) String() string {
+	var b strings.Builder
+	b.WriteString(d.Name)
+	b.WriteString("(")
+	b.WriteString(strings.Join(d.ConstructorInfos[0].GetArgNames(), ", "))
+	b.WriteString(")")
+	return b.String()
+}
+
 type SpecParser struct {
 	srcDirs         []string
 	logger          *log.Logger
@@ -570,7 +579,7 @@ func (s *SpecParser) ParseSpec() error {
 			}
 
 			for k, v := range pkgs {
-				s.logger.Printf("Package found with in directory %s with name %s", path, k)
+				s.logger.Printf("Package found within directory %s with name %s", path, k)
 				all_pkgs[path] = v
 				s.PathPkgs[path] = k
 			}
