@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"gitlab.mpi-sws.org/cld/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/golang"
-	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/grpc"
-	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/memcached"
-	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/opentelemetry"
-	"gitlab.mpi-sws.org/cld/blueprint/pkg/plugins/workflow"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/memcached"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 	"golang.org/x/exp/slog"
 )
 
@@ -28,7 +28,7 @@ func main() {
 
 	// Create the wiring spec
 
-	workflow.Init("examples/leaf/workflow/leaf")
+	workflow.Init("../workflow/leaf")
 
 	b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
 
