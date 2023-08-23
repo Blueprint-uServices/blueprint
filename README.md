@@ -1,12 +1,23 @@
 # blueprintv2
 
-This repository is a work-in-progress refactor / reimplementation of the core wiring and IR of blueprint's compiler.
+This repository is a work-in-progress refactor and reimplementation of several components of Blueprint.  v1 of Blueprint can be found on the [MPI-SWS GitLab cld/blueprint](https://gitlab.mpi-sws.org/cld/blueprint).
 
-This documentation assumes that you are familiar with Blueprint's concepts.
+**While this repository remains a work-in-progress, all documentation assumes that you are familiar with Blueprint's concepts and the previous version of Blueprint.**
 
 Shortcuts:
 * [IR documentation](docs/ir.md)
 * [Wiring documentation](docs/wiring.md)
+
+## Rationale
+
+This refactor focuses on four things:
+
+* Improving the modularity of Blueprint's wiring, workflow, and plugins.
+* Streamlining and simplifying the experience of developing a plugin and integrating it with Blueprint's wiring and IR
+* Simplifying Blueprint's IR 
+* Removing hacks and strictly enforcing abstractions
+
+Thus the refactor is primarily affecting the wiring spec, the API for plugins to integrate with the wiring spec, the Blueprint IR, the process for generating artifacts, and the generated artifact code itself.
 
 ## Overview
 
