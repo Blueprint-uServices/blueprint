@@ -1,6 +1,6 @@
 # Blueprint IR
 
-Blueprint's IR is a representation of a blueprint application that derives from a wiring spec and the workflow spec and plugins that it uses.  Blueprint's IR uses **typed Nodes** that plugins extend with specialized functionality.  The base type is `blueprint.IRNode` which is defined in [pkg/blueprint/ir.go](pkg/blueprint/ir.go).  All nodes must have a name, a string representation, and a Build function implementation (see below)
+Blueprint's IR is a representation of a blueprint application that derives from a wiring spec and the workflow spec and plugins that it uses.  Blueprint's IR uses **typed Nodes** that plugins extend with specialized functionality.  The base type is `blueprint.IRNode` which is defined in [pkg/blueprint/ir.go](blueprint/pkg/blueprint/ir.go).  All nodes must have a name, a string representation, and a Build function implementation (see below)
 
 The root of a Blueprint application is a `blueprint.ApplicationNode`.  Building a Blueprint wiring spec will produce a blueprint application node.
 
@@ -8,18 +8,18 @@ The root of a Blueprint application is a `blueprint.ApplicationNode`.  Building 
 
 Blueprint's IR forms a type hierarchy building on the base `blueprint.IRNode`.  There are several further interfaces that extend the base `blueprint.IRNode`, such as (non-exhaustive):
 
-* `service.ProcessNode` defined in [core/process/ir.go](pkg/core/process/ir.go) provides a generic representation of a process.
-* `service.ServiceNode` defined in [core/service/ir.go](pkg/core/service/ir.go) provides a generic representation of a service with a synchronous call API.
+* `service.ProcessNode` defined in [core/process/ir.go](blueprint/pkg/core/process/ir.go) provides a generic representation of a process.
+* `service.ServiceNode` defined in [core/service/ir.go](blueprint/pkg/core/service/ir.go) provides a generic representation of a service with a synchronous call API.
 
 Plugins can introduce further extensions of nodes as well as hierarchies of their own.  For example, the `golang` plugin introduces generic interfaces:
 
-* `golang.Node` defined in [plugins/golang/ir.go](pkg/plugins/golang/ir.go) provides a generic representation of a golang object.
-* `golang.Service` defined in [plugins/golang/ir.go](pkg/plugins/golang/ir.go) provides a generic representation of a golang service, extending the `ServiceNode` above.
-* `golang.Process` defined in [plugins/golang/ir.go](pkg/plugins/golang/ir.go) provides a generic representation of a golang process, extending the `ProcessNode` above.
+* `golang.Node` defined in [plugins/golang/ir.go](plugins/golang/ir.go) provides a generic representation of a golang object.
+* `golang.Service` defined in [plugins/golang/ir.go](plugins/golang/ir.go) provides a generic representation of a golang service, extending the `ServiceNode` above.
+* `golang.Process` defined in [plugins/golang/ir.go](plugins/golang/ir.go) provides a generic representation of a golang process, extending the `ProcessNode` above.
 
 ## Example
 
-As an example, consider the [GRPC ir.go](pkg/plugins/grpc/ir.go), which defines two nodes, `GolangServer` and `GolangClient`.
+As an example, consider the [GRPC ir.go](plugins/grpc/ir.go), which defines two nodes, `GolangServer` and `GolangClient`.
 
 * `GolangClient` is a GRPC client object that can be instantiated within a Go process, and it can invoke methods of a remote service.  For this, it needs the address of the remote service; this is a field `ServerAddr *pointer.Address` which is an `Address` IRNode.  GolangClient itself is a `golang.Service` node, because it provides methods that can be invoked by callers.  It is a `golang.Node` because it exists within a Go process.  It is also a `golang.ArtifactGenerator` and `golang.CodeGenerator`, which are node types with methods for generating, collecting, and packaging Go code.
 
@@ -29,7 +29,7 @@ As an example, consider the [GRPC ir.go](pkg/plugins/grpc/ir.go), which defines 
 
 From Blueprint's IR representation, runnable artifacts are produced as output.  This functionality is plugin-dependent, and will be different for different IR nodes.  This is implemented in the `Build()` function of an IRNode.  **The current example IR implementation is partial and does not have this fully implemented**, though the basic concepts are demonstrated in the golang code generation interfaces.
 
-Since Blueprint's IR is extensible, some general interfaces in the IR type hierarchy represent common concepts.  For example, for [Golang nodes](pkg/plugins/golang/ir.go), if a node has source code files that need to be collected in the built artifact, then the node implements `golang.ArtifactGenerator`.  Likewise if a node needs to generate source code (e.g. GRPC plugins) then the node implements `golang.CodeGenerator`.
+Since Blueprint's IR is extensible, some general interfaces in the IR type hierarchy represent common concepts.  For example, for [Golang nodes](plugins/golang/ir.go), if a node has source code files that need to be collected in the built artifact, then the node implements `golang.ArtifactGenerator`.  Likewise if a node needs to generate source code (e.g. GRPC plugins) then the node implements `golang.CodeGenerator`.
 
 Golang nodes exist within a Golang process.  When the golang process gets built, it will invoke the `ArtifactGenerator` and `CodeGenerator` methods of, e.g. the GRPC nodes it contains.  Similar concepts (should) exist for, e.g. a container that has several processes within it, and an application with several container images.
 

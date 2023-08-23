@@ -19,7 +19,7 @@ In this version of Blueprint, we have the following pieces:
 
 ## Example
 
-A simple example wiring spec can be found in [cmd/example/main.go](cmd/example/main.go).  The example:
+A simple example wiring spec can be found in [examples/leaf/wiring/main.go](examples/leaf/wiring/main.go).  The example:
 
 Creates a new Blueprint wiring spec
 ```
@@ -101,5 +101,5 @@ The code in this repository is currently laid out as follows:
 
 A plugin typically, at a minimum, defines two types of functionality.  What is described below is convention rather than strict requirement:
 
-* `ir.go` defines Blueprint IR nodes for the plugin.  For example, in the [GRPC ir.go](pkg/plugins/grpc/ir.go), two IR nodes are defined: one representing the GRPC server and one representing the GRPC client.  IR nodes implement interfaces such as `golang.Node` and `golang.CodeGenerator` which are used by other IR nodes.  For example, the `GolangServer` node contains a reference to some other node, `Wrapped`, that must be a `golang.Service` node.  See [docs/ir.md](docs/ir.md) for more information about the IR.
-* `wiring.go` integrates the plugin into Blueprint's wiring spec.  Blueprint's wiring API can be called directly by wiring spec implementations, but in practice plugins can provide utility methods that simplify things.  For example, in the [GRPC wiring.go](pkg/plugins/grpc/wiring.go), a method `Deploy` exists; this can be called from a user's wiring spec to wrap a service in GRPC.  See [docs/wiring.md](docs/wiring.md) for more information about Wiring.
+* `ir.go` defines Blueprint IR nodes for the plugin.  For example, in the [GRPC ir.go](plugins/grpc/ir.go), two IR nodes are defined: one representing the GRPC server and one representing the GRPC client.  IR nodes implement interfaces such as `golang.Node` and `golang.CodeGenerator` which are used by other IR nodes.  For example, the `GolangServer` node contains a reference to some other node, `Wrapped`, that must be a `golang.Service` node.  See [docs/ir.md](docs/ir.md) for more information about the IR.
+* `wiring.go` integrates the plugin into Blueprint's wiring spec.  Blueprint's wiring API can be called directly by wiring spec implementations, but in practice plugins can provide utility methods that simplify things.  For example, in the [GRPC wiring.go](plugins/grpc/wiring.go), a method `Deploy` exists; this can be called from a user's wiring spec to wrap a service in GRPC.  See [docs/wiring.md](docs/wiring.md) for more information about Wiring.
