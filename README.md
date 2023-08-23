@@ -19,6 +19,10 @@ This refactor focuses on four things:
 
 Thus the refactor is primarily affecting the wiring spec, the API for plugins to integrate with the wiring spec, the Blueprint IR, the process for generating artifacts, and the generated artifact code itself.
 
+## Compatibility
+
+Applications written against Blueprint's v1 workflow spec and workflow abstractions will remain compatible.  However, the files of an application might need to be re-organized.  The wiring spec of an application will need to be rewritten using Blueprint v2's go-based wiring API.
+
 ## Overview
 
 In this version of Blueprint, we have the following pieces:
