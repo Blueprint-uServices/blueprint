@@ -1,9 +1,5 @@
 package blueprint
 
-import (
-	"golang.org/x/exp/slog"
-)
-
 func InitBlueprintCompilerLogging() {
 	// // For now don't bother configuring logger.  Maybe in future
 
@@ -17,6 +13,4 @@ func InitBlueprintCompilerLogging() {
 
 	// logger := slog.New(slog.NewTextHandler(os.Stdout, &opts))
 	// slog.SetDefault(logger)
-	slog.Info("Hello world")
-
 }

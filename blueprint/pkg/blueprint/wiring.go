@@ -9,11 +9,6 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func Wiring() {
-	fmt.Println("Hello wiring!")
-
-}
-
 type Blueprint struct {
 	applicationScope *blueprintScope
 	wiring           *wiringSpecImpl
@@ -225,7 +220,7 @@ func (blueprint *Blueprint) Instantiate(names ...string) {
 // Instantiates any nodes that haven't yet been instantiated.  Although this is commonly used,
 // it is preferred to explicitly instantiate nodes by name.
 func (blueprint *Blueprint) InstantiateAll() {
-	for name, _ := range blueprint.wiring.defs {
+	for name := range blueprint.wiring.defs {
 		nameToGet := name
 		blueprint.applicationScope.Defer(func() error {
 			blueprint.applicationScope.Info("Instantiating %v", nameToGet)
