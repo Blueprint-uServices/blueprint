@@ -21,8 +21,6 @@ type MemcachedProcess struct {
 }
 
 type MemcachedGoClient struct {
-	golang.GolangArtifactGenerator
-	golang.GolangCodeGenerator
 	golang.Service
 	backend.Cache
 

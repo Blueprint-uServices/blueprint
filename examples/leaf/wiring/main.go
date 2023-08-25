@@ -27,8 +27,7 @@ func main() {
 	wiring := blueprint.NewWiringSpec("leaf_example")
 
 	// Create the wiring spec
-
-	workflow.Init("../workflow/leaf")
+	workflow.Init("../workflow")
 
 	b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
 
@@ -54,4 +53,12 @@ func main() {
 	}
 
 	slog.Info("Application: \n" + application.String())
+
+	// Below here is a WIP on generating code
+	proc := application.Children["pa"].(*golang.Process)
+	err = proc.Build("tmp")
+	if err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
 }

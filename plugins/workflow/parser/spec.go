@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -10,6 +11,9 @@ import (
 	"reflect"
 	"strings"
 	"unicode"
+
+	"golang.org/x/exp/slog"
+	"golang.org/x/mod/modfile"
 )
 
 // Data structs
@@ -55,10 +59,12 @@ func GetVariadicArg(argName string, argType string) ArgInfo {
 }
 
 type FuncInfo struct {
-	Name   string
-	Args   []ArgInfo
-	Return []ArgInfo
-	Public bool
+	Name    string
+	Args    []ArgInfo
+	Return  []ArgInfo
+	Imports *ImportedPackages
+	Package *PackageInfo
+	Public  bool
 }
 
 func (f FuncInfo) GetArgNames() []string {
@@ -69,26 +75,27 @@ func (f FuncInfo) GetArgNames() []string {
 	return retvals
 }
 
-type RequireInfo struct {
-	Name    string
-	Path    string
-	Version string
-}
-
 type ServiceInfo struct {
 	Name    string
 	Methods map[string]FuncInfo
-	PkgPath string
+	Package *PackageInfo
+	Imports *ImportedPackages
 }
 
-type ImportInfo struct {
-	ImportName string
-	FullName   string
+type ImportedPackage struct {
+	Name          string // The optional alias for the imported package
+	ImportName    string // The fully qualified import package name
+	Module        string // The module that the package exists within
+	ModuleVersion string // The module version that the package exists within
+	IsStandard    bool   // Is this a stdlib package
 }
 
-type StructInfo struct {
-	Name   string
-	Fields []ArgInfo
+/*
+Used when parsing files to figure out what the module and package dependencies are
+of a source file
+*/
+type ImportedPackages struct {
+	Imports map[string]ImportedPackage // Map from the package alias to ImportedPackage struct
 }
 
 type EnumInfo struct {
@@ -104,6 +111,8 @@ type ImplInfo struct {
 	Methods          map[string]FuncInfo
 	Interfaces       map[string]bool
 	PkgPath          string
+	Imports          *ImportedPackages
+	Package          *PackageInfo
 	ConstructorInfos []FuncInfo
 }
 
@@ -116,6 +125,30 @@ func (d ImplInfo) String() string {
 	return b.String()
 }
 
+type ModuleInfo struct {
+	Name     string            // The fully qualified name of the module
+	Version  string            // The version of the module
+	Path     string            // Path on the local filesystem to the module
+	Requires map[string]string // Other modules required by this module
+}
+
+type PackageInfo struct {
+	ShortName  string // The name of the package in the `package xxx` declaration of a file
+	Name       string // The fully qualified name within the module, e.g. if it's in subdirs, it might be e.g. pkg/wiring/xxx
+	Path       string // The path on the local filesystem to the package
+	ImportName string // The fully qualified import used elsewhere, e.g. in the `import github.com/my/system/pkg/wiring/xxx`
+	Module     *ModuleInfo
+	Package    *ast.Package
+}
+
+func (pkg PackageInfo) String() string {
+	b := strings.Builder{}
+	b.WriteString(pkg.Module.String())
+	b.WriteString("\nPackage " + pkg.ShortName + " at " + pkg.Name)
+	b.WriteString("\nImport " + pkg.ImportName)
+	return b.String()
+}
+
 type SpecParser struct {
 	srcDirs         []string
 	logger          *log.Logger
@@ -125,7 +158,8 @@ type SpecParser struct {
 	ExtraFunctions  []*FuncInfo
 	RemoteTypes     map[string]*ImplInfo
 	Enums           map[string]*EnumInfo
-	PathPkgs        map[string]string
+	Modules         map[string]*ModuleInfo
+	Packages        map[string]*PackageInfo
 }
 
 // Printers
@@ -302,7 +336,7 @@ func (s *SpecParser) getType(node *ast.Field) TypeInfo {
 	return TypeInfo{}
 }
 
-func (s *SpecParser) getFuncInfo(node *ast.FuncType) FuncInfo {
+func (s *SpecParser) getFuncInfo(node *ast.FuncType, pkgInfo *PackageInfo, imports *ImportedPackages) FuncInfo {
 	var args []ArgInfo
 	var returns []ArgInfo
 	if node.Params != nil {
@@ -327,11 +361,18 @@ func (s *SpecParser) getFuncInfo(node *ast.FuncType) FuncInfo {
 		}
 	}
 
-	return FuncInfo{Args: args, Return: returns}
+	funcInfo := FuncInfo{}
+	funcInfo.Args = args
+	funcInfo.Return = returns
+	funcInfo.Package = pkgInfo
+	funcInfo.Imports = imports
+
+	return funcInfo
 }
 
 // Parser Functions
-func (s *SpecParser) parseTypes(path string, decl *ast.GenDecl) {
+func (s *SpecParser) parseTypes(path string, decl *ast.GenDecl, pkgInfo *PackageInfo, imports *ImportedPackages) {
+	// TODO: fully qualify any imported user types
 	for _, spec := range decl.Specs {
 		typespec, ok := spec.(*ast.TypeSpec)
 		if !ok {
@@ -346,7 +387,7 @@ func (s *SpecParser) parseTypes(path string, decl *ast.GenDecl) {
 				switch methodType := method.Type.(type) {
 				case *ast.FuncType:
 					funcName := method.Names[0].Name
-					funcInfo = s.getFuncInfo(methodType)
+					funcInfo = s.getFuncInfo(methodType, pkgInfo, imports)
 					funcInfo.Name = funcName
 					funcInfo.Public = true
 					methods[funcName] = funcInfo
@@ -354,7 +395,7 @@ func (s *SpecParser) parseTypes(path string, decl *ast.GenDecl) {
 					s.logger.Fatal("Parsing Error: Expected a function declaration in Interface Type and not", reflect.TypeOf(methodType))
 				}
 			}
-			serviceInfo := ServiceInfo{Name: name, Methods: methods, PkgPath: path}
+			serviceInfo := ServiceInfo{Name: name, Methods: methods, Package: pkgInfo, Imports: imports}
 			s.Services[name] = &serviceInfo
 
 		case *ast.StructType:
@@ -370,7 +411,7 @@ func (s *SpecParser) parseTypes(path string, decl *ast.GenDecl) {
 					fields = append(fields, fieldInfo)
 				}
 			}
-			implInfo := ImplInfo{Name: name, Fields: fields, PkgPath: path}
+			implInfo := ImplInfo{Name: name, Fields: fields, PkgPath: path, Imports: imports, Package: pkgInfo}
 			s.Implementations[name] = &implInfo
 
 		case *ast.Ident:
@@ -381,10 +422,10 @@ func (s *SpecParser) parseTypes(path string, decl *ast.GenDecl) {
 	}
 }
 
-func (s *SpecParser) parseFunctions(decl *ast.FuncDecl) {
+func (s *SpecParser) parseFunctions(decl *ast.FuncDecl, pkgInfo *PackageInfo, imports *ImportedPackages) {
 	if decl.Recv == nil {
 		// If the receiver is Nil then EITHER this function is not associated with a struct OR this function is a constructor for a struct
-		funcInfo := s.getFuncInfo(decl.Type)
+		funcInfo := s.getFuncInfo(decl.Type, pkgInfo, imports)
 		funcInfo.Name = decl.Name.Name
 		s.ExtraFunctions = append(s.ExtraFunctions, &funcInfo)
 		return
@@ -402,7 +443,7 @@ func (s *SpecParser) parseFunctions(decl *ast.FuncDecl) {
 		s.logger.Fatal("The receiver for a function should either be a star expression or an identifier")
 	}
 	name := decl.Name.Name
-	funcInfo := s.getFuncInfo(decl.Type)
+	funcInfo := s.getFuncInfo(decl.Type, pkgInfo, imports)
 	funcInfo.Name = name
 	runes := []rune(name)
 	funcInfo.Public = unicode.IsUpper(runes[0])
@@ -438,7 +479,7 @@ func (s *SpecParser) associateFunctions() {
 	}
 }
 
-func (s *SpecParser) parseConstBlock(path string, t *ast.GenDecl) {
+func (s *SpecParser) parseConstBlock(path string, t *ast.GenDecl, pkgInfo *PackageInfo, imports *ImportedPackages) {
 	var names []string
 	var eInfo *EnumInfo
 	for idx, spec := range t.Specs {
@@ -467,20 +508,51 @@ func (s *SpecParser) parseConstBlock(path string, t *ast.GenDecl) {
 	}
 }
 
-func (s *SpecParser) parsePackages(pkgs map[string]*ast.Package) {
+func parseImports(module *ModuleInfo, imports []*ast.ImportSpec) (*ImportedPackages, error) {
+	packages := &ImportedPackages{}
+	packages.Imports = make(map[string]ImportedPackage)
+	for _, imp := range imports {
+		pkg := ImportedPackage{}
+		pkg.ImportName = imp.Path.Value[1 : len(imp.Path.Value)-1]
+		if imp.Name != nil {
+			pkg.Name = imp.Name.Name
+		} else {
+			splits := strings.Split(pkg.ImportName, "/")
+			pkg.Name = splits[len(splits)-1]
+		}
+		pkg.IsStandard = isStandardPackage(pkg.ImportName)
+		if !pkg.IsStandard {
+			mod, ver, err := module.FindRequires(pkg.ImportName)
+			pkg.Module = mod
+			pkg.ModuleVersion = ver
+			if err != nil {
+				return nil, err
+			}
+		}
+		packages.Imports[pkg.Name] = pkg
+	}
+	return packages, nil
+}
+
+func (s *SpecParser) parsePackages(pkgs map[string]*PackageInfo) error {
 	for path, pkg := range pkgs {
-		for _, file := range pkg.Files {
+		for _, file := range pkg.Package.Files {
+			imports, err := parseImports(pkg.Module, file.Imports)
+			if err != nil {
+				return err
+			}
+
 			for _, decl := range file.Decls {
 				// Check if it is a GeneralDeclaration Block
 				switch t := decl.(type) {
 				case *ast.GenDecl:
 					if t.Tok == token.TYPE {
-						s.parseTypes(path, t)
+						s.parseTypes(path, t, pkg, imports)
 					} else if t.Tok == token.CONST {
-						s.parseConstBlock(path, t)
+						s.parseConstBlock(path, t, pkg, imports)
 					}
 				case *ast.FuncDecl:
-					s.parseFunctions(t)
+					s.parseFunctions(t, pkg, imports)
 				}
 			}
 		}
@@ -489,6 +561,7 @@ func (s *SpecParser) parsePackages(pkgs map[string]*ast.Package) {
 		s.Functions = make(map[string][]*FuncInfo)
 		s.ExtraFunctions = []*FuncInfo{}
 	}
+	return nil
 }
 
 func matchingMethod(f1 FuncInfo, f2 FuncInfo) bool {
@@ -554,19 +627,72 @@ func NewSpecParser(srcDirs ...string) *SpecParser {
 		Functions:       make(map[string][]*FuncInfo),
 		ExtraFunctions:  []*FuncInfo{},
 		RemoteTypes:     make(map[string]*ImplInfo),
-		PathPkgs:        make(map[string]string),
+		Packages:        make(map[string]*PackageInfo),
 		Enums:           make(map[string]*EnumInfo),
+		Modules:         make(map[string]*ModuleInfo),
 	}
+}
+
+func ReadModfile(srcDir string) (*ModuleInfo, error) {
+	srcDir = filepath.Clean(srcDir)
+	modfilePath := filepath.Join(srcDir, "go.mod")
+	modfileData, err := os.ReadFile(modfilePath)
+	if err != nil {
+		return nil, fmt.Errorf("unable to read workflow spec modfile %s due to %s", modfilePath, err.Error())
+	}
+
+	mod, err := modfile.Parse(modfilePath, modfileData, nil)
+	if err != nil {
+		return nil, fmt.Errorf("unable to parse %s due to %s", modfilePath, err.Error())
+	}
+
+	modInfo := &ModuleInfo{}
+	modInfo.Name = mod.Module.Mod.Path
+	modInfo.Path = srcDir
+	modInfo.Version = mod.Module.Mod.Version
+	modInfo.Requires = make(map[string]string)
+	for _, req := range mod.Require {
+		modInfo.Requires[req.Mod.Path] = req.Mod.Version
+	}
+	return modInfo, nil
+}
+
+/*
+Finds the required module that contains the specified import name. Does so by
+matching on the module prefix of the import name.  Returns an error if not found
+*/
+func (modInfo *ModuleInfo) FindRequires(importName string) (string, string, error) {
+	for reqName, reqVersion := range modInfo.Requires {
+		if strings.HasPrefix(importName, reqName) {
+			return reqName, reqVersion, nil
+		}
+	}
+
+	return "", "", fmt.Errorf("unable to find package in %v requires that imports %v", modInfo.Name, importName)
+}
+
+func (modInfo *ModuleInfo) String() string {
+	b := strings.Builder{}
+	b.WriteString("Module " + modInfo.Name + " " + modInfo.Version + "\n")
+	for reqName, reqVersion := range modInfo.Requires {
+		b.WriteString("  requires " + reqName + " " + reqVersion + "\n")
+	}
+	return b.String()
 }
 
 // Exported Parser function
 func (s *SpecParser) ParseSpec() error {
-	// s.logger.Println("Parsing specification")
 	var fset token.FileSet
-	all_pkgs := make(map[string]*ast.Package)
 	for _, srcdir := range s.srcDirs {
+		slog.Info("Parsing workflow spec module at " + srcdir)
+		// JM: parse modfiles first.  each srcdir should be a golang module
+		module, err := ReadModfile(srcdir)
+		if err != nil {
+			return err
+		}
+		s.Modules[module.Name] = module
 
-		err := filepath.Walk(srcdir, func(path string, info os.FileInfo, err error) error {
+		err = filepath.Walk(srcdir, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
@@ -575,13 +701,28 @@ func (s *SpecParser) ParseSpec() error {
 			}
 			pkgs, err := parser.ParseDir(&fset, path, nil, parser.ParseComments)
 			if err != nil {
-				return err
+				return fmt.Errorf("unable to parse directory %s due to %s", path, err.Error())
 			}
 
 			for k, v := range pkgs {
-				s.logger.Printf("Package found within directory %s with name %s", path, k)
-				all_pkgs[path] = v
-				s.PathPkgs[path] = k
+
+				pkg := &PackageInfo{}
+				pkg.ShortName = k
+				pkg.Package = v
+				pkg.Module = module
+				pkg.Path = filepath.Clean(path)
+
+				relPath, err := filepath.Rel(module.Path, pkg.Path)
+				if err != nil {
+					return fmt.Errorf("%s should exist within %s but got %s", pkg.Path, module.Path, err.Error())
+				}
+
+				pkg.Name = filepath.ToSlash(relPath)
+				pkg.ImportName = module.Name + "/" + pkg.Name
+
+				s.Packages[path] = pkg
+
+				s.logger.Printf("Found package %s (import %s)", pkg.ShortName, pkg.ImportName)
 			}
 			return nil
 		})
@@ -589,7 +730,10 @@ func (s *SpecParser) ParseSpec() error {
 			return err
 		}
 	}
-	s.parsePackages(all_pkgs)
+	err := s.parsePackages(s.Packages)
+	if err != nil {
+		return fmt.Errorf("unable to parse workflow packages due to %s", err.Error())
+	}
 
 	s.associateImplementations()
 	s.parseRemoteTypeStructs()
@@ -599,5 +743,10 @@ func (s *SpecParser) ParseSpec() error {
 	// s.PrintServices()
 	// s.PrintImplementations()
 	// s.PrintEnums()
+
+	for name, info := range s.Services {
+		s.logger.Printf("Found workflow service %s in %s\n", name, info.Package.ImportName)
+	}
+
 	return nil
 }

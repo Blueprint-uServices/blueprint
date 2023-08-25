@@ -53,7 +53,7 @@ func CreateProcess(wiring blueprint.WiringSpec, procName string, children ...str
 		}
 
 		// Instantiate and return the service
-		return process.Build()
+		return process.handler.IRNode, nil
 	})
 
 	return procName

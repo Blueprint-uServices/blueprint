@@ -1,20 +1,26 @@
 package workflow
 
 import (
+	"path/filepath"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow/parser"
 )
 
 // This Node represents a Golang Workflow spec service in the Blueprint IR.
 type WorkflowService struct {
+	// IR node types
 	golang.Node
 	golang.Service
 	service.ServiceNode
-	golang.ArtifactGenerator
-	golang.CodeGenerator
+
+	// Artifact generation
+	golang.ProvidesModule
+	golang.RequiresPackages
+	golang.Instantiable
 
 	InstanceName   string
 	ServiceType    string
@@ -61,24 +67,71 @@ func (node *WorkflowService) Name() string {
 }
 
 func (node *WorkflowService) GetInterface() *service.ServiceInterface {
-	return &node.ServiceDetails.Interface.ServiceInterface
+	return &node.ServiceDetails.Interface
 }
 
-func (node *WorkflowService) GenerateInstantiationCode(g *golang.GolangCodeGenerator) error {
-	code := `
-		di.Add(serviceName, scope, func(ctr) {
-			first = ctr.Get(arg0)
-			second = ctr.Get(arg1)
-			return new ServiceName(first, second)
-		})`
-	g.Def(node.InstanceName, code)
-	g.Import(node.ServiceDetails.Package.Name)
-	return nil
+func addToWorkspace(builder *golang.WorkspaceBuilder, info *parser.ModuleInfo) error {
+	if builder.Visited(info.Name) {
+		return nil
+	}
+	_, subdir := filepath.Split(info.Path)
+	return builder.AddLocalModule(subdir, info.Path)
 }
 
-func (node *WorkflowService) CollectArtifacts(g *golang.GolangArtifactGenerator) error {
-	return g.AddFiles(node.ServiceDetails.Package.Path)
+// Adds the workspace modules containing the interface declaration and implementation
+func (node *WorkflowService) AddToWorkspace(builder *golang.WorkspaceBuilder) error {
+	// Copy the interface module into the workspace
+	err := addToWorkspace(builder, node.ServiceDetails.InterfacePackage.Module)
+	if err != nil {
+		return err
+	}
+
+	// Copy the impl module into the workspace (if it's different)
+	return addToWorkspace(builder, node.ServiceDetails.ImplPackage.Module)
 }
 
-func (node *WorkflowService) ImplementsGolangNode()    {}
-func (node *WorkflowService) ImplementsGolangService() {}
+func addToModule(builder *golang.ModuleBuilder, info *parser.ModuleInfo) error {
+	if builder.Visited(info.Name) {
+		return nil
+	}
+	return builder.Require(info.Name, info.Version)
+}
+
+// Adds the 'requires' statements to the module
+func (node *WorkflowService) AddToModule(builder *golang.ModuleBuilder) error {
+	// Make sure we've copied the module into the workspace
+	node.AddToWorkspace(builder.Workspace)
+
+	// Add the requires statements
+	err := addToModule(builder, node.ServiceDetails.ImplPackage.Module)
+	if err != nil {
+		return err
+	}
+	return addToModule(builder, node.ServiceDetails.InterfacePackage.Module)
+}
+
+func (node *WorkflowService) AddInstantiation(builder *golang.DICodeBuilder) error {
+	// Only generate instantiation code for this instance once
+	if builder.Visited(node.InstanceName) {
+		return nil
+	}
+
+	// Make sure we've also added requires statements to the module
+	err := node.AddToModule(builder.Module)
+	if err != nil {
+		return err
+	}
+
+	implPkg := builder.Import(node.ServiceDetails.ImplPackage.Name)
+
+	return builder.Declare(node.InstanceName, `
+		func(ctr Container) (any, error) {
+			return `+implPkg+`.`+node.ServiceDetails.ImplConstructor.Name+`()
+		}
+	`)
+}
+
+func (node *WorkflowService) ImplementsGolangNode()         {}
+func (node *WorkflowService) ImplementsGolangService()      {}
+func (node *WorkflowService) ImplementsGolangInstantiable() {}
+func (node *WorkflowService) ImplementsGolangLocalModule()  {}

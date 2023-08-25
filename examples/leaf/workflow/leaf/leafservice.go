@@ -1,7 +1,7 @@
 package leaf
 
 import (
-	"context"
+	ctxx "context"
 )
 
 type LeafObject struct {
@@ -10,19 +10,19 @@ type LeafObject struct {
 }
 
 type LeafService interface {
-	HelloInt(ctx context.Context, a int64) (int64, error)
-	HelloObject(ctx context.Context, obj LeafObject) (LeafObject, error)
+	HelloInt(ctx ctxx.Context, a int64) (int64, error)
+	HelloObject(ctx *ctxx.Context, obj LeafObject) (LeafObject, error)
 }
 
 type LeafServiceImpl struct {
 	LeafService
 }
 
-func (l *LeafServiceImpl) HelloInt(ctx context.Context, a int64) (int64, error) {
+func (l *LeafServiceImpl) HelloInt(ctx ctxx.Context, a int64) (int64, error) {
 	return a, nil
 }
 
-func (l *LeafServiceImpl) HelloObject(ctx context.Context, obj LeafObject) (LeafObject, error) {
+func (l *LeafServiceImpl) HelloObject(ctx *ctxx.Context, obj LeafObject) (LeafObject, error) {
 	return obj, nil
 }
 

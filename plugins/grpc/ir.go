@@ -11,8 +11,6 @@ import (
 
 type GolangServer struct {
 	golang.Node
-	golang.ArtifactGenerator
-	golang.CodeGenerator
 
 	InstanceName string
 	Addr         *pointer.Address
@@ -21,8 +19,6 @@ type GolangServer struct {
 
 type GolangClient struct {
 	golang.Node
-	golang.ArtifactGenerator
-	golang.CodeGenerator
 	golang.Service
 
 	InstanceName   string

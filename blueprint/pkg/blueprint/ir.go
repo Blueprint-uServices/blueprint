@@ -22,12 +22,7 @@ type ApplicationNode struct {
 	IRNode
 
 	name     string
-	children map[string]IRNode
-}
-
-// For generating output artifacts (e.g. code)
-type ArtifactGenerator interface {
-	GenerateOutput(string) error
+	Children map[string]IRNode
 }
 
 func (node *ApplicationNode) Name() string {
@@ -40,7 +35,7 @@ func (node *ApplicationNode) String() string {
 	b.WriteString(node.name)
 	b.WriteString(" = BlueprintApplication() {\n")
 	var children []string
-	for _, node := range node.children {
+	for _, node := range node.Children {
 		children = append(children, node.String())
 	}
 	b.WriteString(Indent(strings.Join(children, "\n"), 2))

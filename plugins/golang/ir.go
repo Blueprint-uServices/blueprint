@@ -1,12 +1,17 @@
 package golang
 
 import (
+	"fmt"
+	"path/filepath"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow/parser"
 )
+
+var generatedModulePrefix = "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/process"
 
 // Base representation for any application-level golang object
 type Node interface {
@@ -14,68 +19,60 @@ type Node interface {
 	ImplementsGolangNode() // Idiomatically necessary in Go for typecasting correctly
 }
 
+// A golang node that is also a service
 type Service interface {
 	Node
 	service.ServiceNode
 	ImplementsGolangService() // Idiomatically necessary in Go for typecasting correctly
 }
 
-// Represents an application-level golang node that can generate, package, and instantiate code
-type CodeGenerator interface {
-	// Golang code nodes can create instances
-	GenerateInstantiationCode(*GolangCodeGenerator) error
+// A golang node that can generate and/or package code artifacts
+type ProvidesModule interface {
+	AddToWorkspace(*WorkspaceBuilder) error
 }
 
-// Represents an application-level golang node that wants to include files, code, and dependencies with the generated artifact
-type ArtifactGenerator interface {
-	// Golang artifact nodes can generate output artifacts like files and code
-	CollectArtifacts(*GolangArtifactGenerator) error
+type RequiresPackages interface {
+	AddToModule(*ModuleBuilder) error
 }
 
-type Package struct {
-	Name string
-	Path string
+type Instantiable interface {
+	AddInstantiation(*DICodeBuilder) error
 }
 
-type ServiceInterface struct {
-	service.ServiceInterface
-	Package Package
+// A golang process that instantiates Golang nodes.  This is Blueprint's main implementation of Golang processes
+type Process struct {
+	blueprint.IRNode
+	process.ProcessNode
+	process.ArtifactGenerator
+
+	InstanceName   string
+	ArgNodes       []blueprint.IRNode
+	ContainedNodes []blueprint.IRNode
 }
 
 // Code location and interfaces of a service
 type GolangServiceDetails struct {
-	Name        string                           // The name of the implementing struct
-	Package     Package                          // The package containing the implementing struct
-	Constructor service.ServiceMethodDeclaration // The constructor method for the implementing struct
-	Interface   ServiceInterface                 // The interface that is implemented
+	Interface        service.ServiceInterface         // The interface that is implemented
+	InterfacePackage *parser.PackageInfo              // The package containing the constructor method
+	ImplName         string                           // The type name of the implementing struct
+	ImplConstructor  service.ServiceMethodDeclaration // The constructor method for the implementing struct
+	ImplPackage      *parser.PackageInfo              // The package containing the constructor method
 }
 
 func (d GolangServiceDetails) String() string {
 	var b strings.Builder
-	b.WriteString(d.Interface.Name)
-
+	b.WriteString("import \"" + d.InterfacePackage.ImportName + "\"\n")
+	b.WriteString("var service " + d.InterfacePackage.ShortName + "." + d.Interface.Name + "\n")
+	b.WriteString("service = " + d.ImplConstructor.Name)
 	var constructorArgs []string
-	for _, arg := range d.Constructor.Args {
-		constructorArgs = append(constructorArgs, arg.Type)
+	for _, arg := range d.ImplConstructor.Args {
+		constructorArgs = append(constructorArgs, arg.Name)
 	}
 	b.WriteString("(")
 	b.WriteString(strings.Join(constructorArgs, ", "))
 	b.WriteString(")")
 
 	return b.String()
-}
-
-// This Node represents a Golang process that internally will instantiate a number of application-level services
-type Process struct {
-	blueprint.IRNode
-	process.ProcessNode
-	ArtifactGenerator
-
-	InstanceName           string
-	ArgNodes               []blueprint.IRNode
-	ContainedNodes         []blueprint.IRNode
-	ContainedArtifactNodes []ArtifactGenerator
-	ContainedInstanceNodes []CodeGenerator
 }
 
 // A Golang Process Node can either be given the child nodes ahead of time, or they can be added using AddArtifactNode / AddCodeNode
@@ -114,32 +111,69 @@ func (node *Process) AddArg(argnode blueprint.IRNode) {
 
 func (node *Process) AddChild(child blueprint.IRNode) error {
 	node.ContainedNodes = append(node.ContainedNodes, child)
-	if artifactNode, ok := child.(ArtifactGenerator); ok {
-		node.ContainedArtifactNodes = append(node.ContainedArtifactNodes, artifactNode)
-	}
-	if instanceNode, ok := child.(CodeGenerator); ok {
-		node.ContainedInstanceNodes = append(node.ContainedInstanceNodes, instanceNode)
-	}
 	return nil
 }
 
-func (node *Process) CollectArtifacts(ag *GolangArtifactGenerator) error {
-	// Collect all the artifacts of the contained nodes
-	for _, n := range node.ContainedArtifactNodes {
-		n.CollectArtifacts(ag)
+func (node *Process) Build(outputDir string) error {
+	if isDir(outputDir) {
+		return fmt.Errorf("cannot built to %s, directory already exists", outputDir)
+	}
+	err := checkDir(outputDir, true)
+	if err != nil {
+		return fmt.Errorf("unable to create %s for process %s due to %s", outputDir, node.Name(), err.Error())
 	}
 
-	// Now generate our own artifacts, using code generator
-	ca := NewGolangCodeAccumulator()
-	for _, n := range node.ContainedInstanceNodes {
-		n.GenerateInstantiationCode(ca)
+	// TODO: might end up building multiple times which is OK, so need a check here that we haven't already built this artifact, even if it was by a different (but identical) node
+	workspaceDir := filepath.Join(outputDir, node.Name())
+	workspace, err := NewWorkspaceBuilder(workspaceDir)
+	if err != nil {
+		return err
 	}
 
-	code := `
+	moduleName := generatedModulePrefix + "/" + node.Name()
+	module, err := NewModuleBuilder(workspace, node.Name(), moduleName)
+	if err != nil {
+		return err
+	}
 
-	`
+	code, err := NewDICodeBuilder(module, "main.go", "pkg/main", "init")
+	if err != nil {
+		return err
+	}
 
-	// TODO: correct output path
-	ag.AddCode(node.InstanceName, code)
+	for _, node := range node.ContainedNodes {
+		if instantiable, ok := node.(Instantiable); ok {
+			err := instantiable.AddInstantiation(code)
+			if err != nil {
+				return err
+			}
+		}
+		if packages, ok := node.(RequiresPackages); ok {
+			err := packages.AddToModule(module)
+			if err != nil {
+				return err
+			}
+		}
+		if modules, ok := node.(ProvidesModule); ok {
+			err := modules.AddToWorkspace(workspace)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// TODO:
+	//  generate the DI code and main function
+
+	err = module.Finish()
+	if err != nil {
+		return err
+	}
+
+	err = workspace.Finish()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

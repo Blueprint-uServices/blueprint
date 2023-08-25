@@ -1,5 +1,9 @@
 package parser
 
+import (
+	"golang.org/x/tools/go/packages"
+)
+
 type Type int
 
 const (
@@ -54,11 +58,33 @@ func (td TypeDetail) String(userdefined bool) string {
 	return ""
 }
 
+var standardPackages = make(map[string]struct{})
+
+func initStandardPackages() {
+	if len(standardPackages) > 0 {
+		return
+	}
+	pkgs, err := packages.Load(nil, "std")
+	if err != nil {
+		panic(err)
+	}
+
+	for _, p := range pkgs {
+		standardPackages[p.PkgPath] = struct{}{}
+	}
+}
+
+func isStandardPackage(pkg string) bool {
+	initStandardPackages()
+	_, ok := standardPackages[pkg]
+	return ok
+}
+
 type TypeInfo struct {
-	BaseType Type
-	ContainerType1 Type // For list element type and map key type
-	Detail TypeDetail // Info about BasicType and ContainerType1
-	ContainerType2 Type // map Value type
+	BaseType         Type
+	ContainerType1   Type       // For list element type and map key type
+	Detail           TypeDetail // Info about BasicType and ContainerType1
+	ContainerType2   Type       // map Value type
 	Container2Detail TypeDetail
 }
 
@@ -120,7 +146,7 @@ func isBasic(name string) bool {
 
 func getTypeDetail(name string) TypeDetail {
 	if name == "int64" || name == "int" || name == "int32" {
-		return TypeDetail{TypeName:INT64}
+		return TypeDetail{TypeName: INT64}
 	} else if name == "string" {
 		return TypeDetail{TypeName: STRING}
 	} else if name == "float64" || name == "float32" {
@@ -134,7 +160,7 @@ func getTypeDetail(name string) TypeDetail {
 	} else if name == "error" {
 		return TypeDetail{TypeName: ERROR}
 	} else {
-		return TypeDetail{UserType:name}
+		return TypeDetail{UserType: name}
 	}
 }
 

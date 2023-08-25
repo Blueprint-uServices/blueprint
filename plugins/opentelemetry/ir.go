@@ -19,8 +19,6 @@ type OpenTelemetryCollector struct {
 
 type OpenTelemetryCollectorClient struct {
 	golang.Node
-	golang.ArtifactGenerator
-	golang.CodeGenerator
 
 	ClientName string
 	ServerAddr *pointer.Address
@@ -28,8 +26,6 @@ type OpenTelemetryCollectorClient struct {
 
 type OpenTelemetryServerWrapper struct {
 	golang.Service
-	golang.ArtifactGenerator
-	golang.CodeGenerator
 
 	WrapperName string
 	Wrapped     golang.Service
@@ -38,8 +34,6 @@ type OpenTelemetryServerWrapper struct {
 
 type OpenTelemetryClientWrapper struct {
 	golang.Service
-	golang.ArtifactGenerator
-	golang.CodeGenerator
 
 	WrapperName string
 	Server      golang.Service

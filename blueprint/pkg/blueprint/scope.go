@@ -287,11 +287,11 @@ func (scope *blueprintScope) Build() (IRNode, error) {
 		scope.Deferred = scope.Deferred[1:]
 		err := next()
 		if err != nil {
-			node.children = scope.handler.Nodes
+			node.Children = scope.handler.Nodes
 			return node, err
 		}
 	}
-	node.children = scope.handler.Nodes
+	node.Children = scope.handler.Nodes
 	return node, nil
 }
 
