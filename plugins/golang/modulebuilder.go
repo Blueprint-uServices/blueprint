@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"text/template"
 )
 
 /*
@@ -64,6 +65,9 @@ When later generating the go.mod file, any dependencies that exist within the ge
 directive that points them to the local version of the module
 */
 func (module *ModuleBuilder) Require(dependencyName string, version string) error {
+	if version == "" {
+		version = "v0.0.0"
+	}
 	if existingVersion, exists := module.Requires[dependencyName]; exists {
 		if existingVersion != version {
 			return fmt.Errorf("module %s has two conflicting versions for dependency %s: %s and %s", module.Name, dependencyName, version, existingVersion)
@@ -74,19 +78,26 @@ func (module *ModuleBuilder) Require(dependencyName string, version string) erro
 	return nil
 }
 
-func (module *ModuleBuilder) Finish() error {
-	mod := `module ` + module.Name + `
+var goModTemplate = `module {{.Name}}
 
-go 1.19
+go 1.20
 
+{{ range $name, $version := .Requires }}require {{ $name }} {{ $version }}
+{{ end }}
 `
-	for reqName, reqVer := range module.Requires {
-		mod += `require ` + reqName + ` ` + reqVer + "\n"
+
+func (module *ModuleBuilder) Finish() error {
+
+	t, err := template.New("go.mod").Parse(goModTemplate)
+	if err != nil {
+		return err
 	}
 
-	// TODO: add redirects to modules in same workspace dir, e.g.
-	// replace gitlab.mpi-sws.org/cld/blueprint/plugins => ../../../plugins`
-
 	modFileName := filepath.Join(module.ModuleDir, "go.mod")
-	return os.WriteFile(modFileName, []byte(mod), 0755)
+	f, err := os.OpenFile(modFileName, os.O_CREATE, 0755)
+	if err != nil {
+		return err
+	}
+
+	return t.Execute(f, module)
 }
