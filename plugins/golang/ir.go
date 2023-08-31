@@ -1,54 +1,92 @@
 package golang
 
 import (
-	"fmt"
-	"path/filepath"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow/parser"
 )
 
-var generatedModulePrefix = "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/process"
+/*
+The golang plugin extends Blueprint's IR as follows:
 
-// Base representation for any application-level golang object
+It defines the following IR interfaces:
+
+ - golang.Node is the base interface for any node that lives within a golang process
+ - golang.Service is a golang node that has methods that can be directly called by other golang nodes
+
+The golang plugin also defines the following new IR node implementations:
+
+ - golang.Process is a node that represents a runnable Golang process.  It can contain any number of
+   other golang.Node IRNodes.  When it's compiled, the golang.Process will generate a go module with
+   a runnable main method that instantiates and initializes the contained go nodes.  To achieve this,
+   the golang.Process also collects module dependencies from its contained nodes.
+
+To support golang code generation, the following IR interfaces are provided, as defined in ir_codegen.go.
+The golang.Process depends on these interfaces for collecting and packaging code, however, usage of these interfaces
+is not intended to be private to just the golang.Process plugin.  Other plugins are permitted to
+use these interfaces.
+
+ - golang.Instantiable is for golang nodes that can generate instantiation source code snippets
+ - golang.RequiresPackage is for golang nodes that generate source files and have module dependencies
+ - golang.ProvidesModule is for golang nodes that generate or otherwise provide the full source code of modules
+*/
+
+/*
+golang.Node is the base IRNode interface that should be implemented by any IRNode that
+wishes to exist within a Golang namespace.
+*/
 type Node interface {
 	blueprint.IRNode
 	ImplementsGolangNode() // Idiomatically necessary in Go for typecasting correctly
 }
 
-// A golang node that is also a service
+/*
+golang.Service is a golang.Node that exposes an interface that can be directly invoked
+by other golang.Nodes.
+
+For example, services within a workflow spec are represented by golang.Service nodes
+because they have invokable methods.  Similarly plugins such as tracing, which
+wrap service nodes, are themselves also service nodes, because they have invokable methods.
+
+golang.Service extends the golang.Instantiable interface, which is part of the codegen
+process.  Thus any plugin that provides IRNodes that extend golang.Service must implement
+the code generation methods defined by the golang.Instantiable interface.
+*/
 type Service interface {
 	Node
+	Instantiable // Services must implement the Instantiable interface in order to create instances
 	service.ServiceNode
 	ImplementsGolangService() // Idiomatically necessary in Go for typecasting correctly
 }
 
-// A golang node that can generate and/or package code artifacts
-type ProvidesModule interface {
-	AddToWorkspace(*WorkspaceBuilder) error
-}
+/*
+// Representation of a golang service interface, which extends the service.Service interface
+// to include module and package info for all method arguments, and constructor info
+// */
+// type GolangServiceInterface struct {
+// 	service.ServiceInterface
+// 	ServiceName string
 
-type RequiresPackages interface {
-	AddToModule(*ModuleBuilder) error
-}
+// 	MethodImpls []*GolangMethod
+// }
 
-type Instantiable interface {
-	AddInstantiation(*DICodeBuilder) error
-}
+// type ServiceInterface interface {
+// 	Name() string
+// 	Methods() []MethodSignature
+// }
 
-// A golang process that instantiates Golang nodes.  This is Blueprint's main implementation of Golang processes
-type Process struct {
-	blueprint.IRNode
-	process.ProcessNode
-	process.ArtifactGenerator
+// type MethodSignature interface {
+// 	Name() string
+// 	Arguments() []Variable
+// 	Returns() []Variable
+// }
 
-	InstanceName   string
-	ArgNodes       []blueprint.IRNode
-	ContainedNodes []blueprint.IRNode
-}
+// type Variable interface {
+// 	Name() string
+// 	Type() string // a "well-known" type
+// }
 
 // Code location and interfaces of a service
 type GolangServiceDetails struct {
@@ -73,107 +111,4 @@ func (d GolangServiceDetails) String() string {
 	b.WriteString(")")
 
 	return b.String()
-}
-
-// A Golang Process Node can either be given the child nodes ahead of time, or they can be added using AddArtifactNode / AddCodeNode
-func newGolangProcessNode(name string) *Process {
-	node := Process{}
-	node.InstanceName = name
-	return &node
-}
-
-func (node *Process) Name() string {
-	return node.InstanceName
-}
-
-func (node *Process) String() string {
-	var b strings.Builder
-	b.WriteString(node.InstanceName)
-	b.WriteString(" = GolangProcessNode(")
-	var args []string
-	for _, arg := range node.ArgNodes {
-		args = append(args, arg.Name())
-	}
-	b.WriteString(strings.Join(args, ", "))
-	b.WriteString(") {\n")
-	var children []string
-	for _, child := range node.ContainedNodes {
-		children = append(children, child.String())
-	}
-	b.WriteString(blueprint.Indent(strings.Join(children, "\n"), 2))
-	b.WriteString("\n}")
-	return b.String()
-}
-
-func (node *Process) AddArg(argnode blueprint.IRNode) {
-	node.ArgNodes = append(node.ArgNodes, argnode)
-}
-
-func (node *Process) AddChild(child blueprint.IRNode) error {
-	node.ContainedNodes = append(node.ContainedNodes, child)
-	return nil
-}
-
-func (node *Process) Build(outputDir string) error {
-	if isDir(outputDir) {
-		return fmt.Errorf("cannot built to %s, directory already exists", outputDir)
-	}
-	err := checkDir(outputDir, true)
-	if err != nil {
-		return fmt.Errorf("unable to create %s for process %s due to %s", outputDir, node.Name(), err.Error())
-	}
-
-	// TODO: might end up building multiple times which is OK, so need a check here that we haven't already built this artifact, even if it was by a different (but identical) node
-	workspaceDir := filepath.Join(outputDir, node.Name())
-	workspace, err := NewWorkspaceBuilder(workspaceDir)
-	if err != nil {
-		return err
-	}
-
-	moduleName := generatedModulePrefix + "/" + node.Name()
-	module, err := NewModuleBuilder(workspace, node.Name(), moduleName)
-	if err != nil {
-		return err
-	}
-
-	code, err := NewDICodeBuilder(module, "main.go", "pkg/main", "init")
-	if err != nil {
-		return err
-	}
-
-	for _, node := range node.ContainedNodes {
-		if instantiable, ok := node.(Instantiable); ok {
-			err := instantiable.AddInstantiation(code)
-			if err != nil {
-				return err
-			}
-		}
-		if packages, ok := node.(RequiresPackages); ok {
-			err := packages.AddToModule(module)
-			if err != nil {
-				return err
-			}
-		}
-		if modules, ok := node.(ProvidesModule); ok {
-			err := modules.AddToWorkspace(workspace)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	// TODO:
-	//  generate the DI code and main function
-
-	err = module.Finish()
-	if err != nil {
-		return err
-	}
-
-	err = workspace.Finish()
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

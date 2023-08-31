@@ -56,7 +56,7 @@ func main() {
 
 	// Below here is a WIP on generating code
 	proc := application.Children["pa"].(*golang.Process)
-	err = proc.Build("tmp")
+	err = proc.GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)

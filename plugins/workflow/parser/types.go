@@ -81,6 +81,9 @@ func isStandardPackage(pkg string) bool {
 }
 
 type TypeInfo struct {
+	Module           string // Module declaring this type; "" for built-in and primitive types
+	ModuleVersion    string // Module version if not a built-in or primitive type
+	Package          string // Fully qualified package containing this type, used in import statements; "" for primitive types
 	BaseType         Type
 	ContainerType1   Type       // For list element type and map key type
 	Detail           TypeDetail // Info about BasicType and ContainerType1

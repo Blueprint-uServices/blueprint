@@ -59,11 +59,11 @@ func GetVariadicArg(argName string, argType string) ArgInfo {
 }
 
 type FuncInfo struct {
-	Name    string
+	Name    string // Name of the func
 	Args    []ArgInfo
 	Return  []ArgInfo
-	Imports *ImportedPackages
-	Package *PackageInfo
+	Imports *ImportedPackages // Package
+	Package *PackageInfo      // The package containing the func definition
 	Public  bool
 }
 
@@ -128,8 +128,8 @@ func (d ImplInfo) String() string {
 type ModuleInfo struct {
 	Name     string            // The fully qualified name of the module
 	Version  string            // The version of the module
-	Path     string            // Path on the local filesystem to the module
-	Requires map[string]string // Other modules required by this module
+	Path     string            // For a local module, the path on the local filesystem to the module; otherwise ""
+	Requires map[string]string // For a local module, other modules required by this module; otherwise empty
 }
 
 type PackageInfo struct {

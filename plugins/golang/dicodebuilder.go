@@ -2,32 +2,44 @@ package golang
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
+
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 )
 
-/*
-This is used for accumulating DI code definitions and generating a file that
-constructs and builds the objects
-*/
-type DICodeBuilder struct {
-	VisitTracker
-	FileName     string            // The short name of the file
-	Module       *ModuleBuilder    // The module containing this file
-	PackagePath  string            // The package path within the module
-	Package      string            // The package name in the package declaration within the file
-	FuncName     string            // The name of the function to generaet
-	Imports      map[string]string // Import declarations in the file; map of shortname to full package import name
-	Declarations map[string]string // The DI declarations
+type DICodeBuilderImpl struct {
+	DICodeBuilder
+	tracker      irutil.VisitTrackerImpl
+	FileName     string             // The short name of the file
+	FilePath     string             // The fully qualified path to the file
+	module       *ModuleBuilderImpl // The module containing this file
+	PackagePath  string             // The package path within the module
+	Package      string             // The package name in the package declaration within the file
+	FuncName     string             // The name of the function to generaet
+	Imports      map[string]string  // Import declarations in the file; map of shortname to full package import name
+	Declarations map[string]string  // The DI declarations
 }
 
 /*
-This method is used by plugins if they want to generate code that instantiates other nodes.
+Plugins rarely need to instantiate their own DICodeBuilder; this is typically only needed if an IRNode
+is a namespace (for example, if it is the main method of a Golang process).
 
-After the DI declarations of nodes have been added to the code builder, plugins must call
-Generate to finish building the file within the module.
+The DICodeBuilder can be used to accumulate code definitions from child nodes, if those child nodes implement
+the Instantiable interface.  The `DICodeBuilder“ then combines those code definitions and generates a method
+that instantiates those child nodes.
+
+The typical usage of a `DICodeBuilder` is to:
+
+ 1. Create a new `DICodeBuilder` with the `NewDICodeBuilder` method
+
+ 2. Collect code definitions from child nodes by calling `Instantiable.AddInstantiation` on those nodes
+
+ 3. Generate the final output by calling `DICodeBuilder.Finish`
 */
-func NewDICodeBuilder(module *ModuleBuilder, fileName, packagePath, funcName string) (*DICodeBuilder, error) {
+func NewDICodeBuilder(module *ModuleBuilderImpl, fileName, packagePath, funcName string) (*DICodeBuilderImpl, error) {
 	err := checkDir(module.ModuleDir, false)
 	if err != nil {
 		return nil, fmt.Errorf("unable to generate %s for module %s due to %s", fileName, module.ShortName, err.Error())
@@ -39,27 +51,29 @@ func NewDICodeBuilder(module *ModuleBuilder, fileName, packagePath, funcName str
 		return nil, fmt.Errorf("unable to generate %s for module %s due to %s", fileName, module.ShortName, err.Error())
 	}
 
-	builder := &DICodeBuilder{}
-	builder.visited = make(map[string]any)
+	builder := &DICodeBuilderImpl{}
 	builder.FileName = fileName
-	builder.Module = module
+	builder.FilePath = filepath.Join(packageDir, fileName)
+	builder.module = module
 	builder.PackagePath = packagePath
 	splits := strings.Split(packagePath, "/")
 	builder.Package = splits[len(splits)-1]
 	builder.Imports = make(map[string]string)
 	builder.Declarations = make(map[string]string)
 	builder.FuncName = funcName
+
+	// Add the runtime module as a dependency, in case it hasn't already
+	builder.module.workspace.AddLocalModuleRelative("runtime", "../../runtime")
+	builder.module.Require("gitlab.mpi-sws.org/cld/blueprint/runtime", "v0.0.0")
+
 	return builder, nil
 }
 
-/*
-Adds an import to the generated file; this is necessary for any types declared in other
-packages that are going to be used in a DI declaration.  This method returns the type
-alias that should be used in the generated code.  By default the type alias is just the
-package name, but if there are multiple different imports with the same package name, then
-aliases will be created
-*/
-func (code *DICodeBuilder) Import(packageName string) string {
+func (code *DICodeBuilderImpl) Module() ModuleBuilder {
+	return code.module
+}
+
+func (code *DICodeBuilderImpl) Import(packageName string) string {
 	splits := strings.Split(packageName, "/")
 	shortName := splits[len(splits)-1]
 	suffix := 0
@@ -73,22 +87,59 @@ func (code *DICodeBuilder) Import(packageName string) string {
 		name = fmt.Sprintf("%s%v", shortName, suffix)
 	}
 }
-
-/*
-Adds DI declaration code to the generated file
-*/
-func (code *DICodeBuilder) Declare(name, buildFunc string) error {
+func (code *DICodeBuilderImpl) Declare(name, buildFuncSrc string) error {
 	if _, exists := code.Declarations[name]; exists {
 		return fmt.Errorf("generated file %s encountered redeclaration of %s", code.FileName, name)
 	}
-	code.Declarations[name] = buildFunc
+	code.Declarations[name] = buildFuncSrc
 	return nil
 }
+
+func (code *DICodeBuilderImpl) Visited(name string) bool {
+	return code.tracker.Visited(name)
+}
+
+var diFuncTemplate = `package {{.Package}}
+
+import (
+	{{ range $importAs, $package := .Imports }}{{ $importAs }} "{{ $package }}"
+	{{ end }}
+	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/golang"
+)
+
+func {{ .FuncName }}(args map[string]string) golang.Graph {
+	g := golang.NewGraph()
+
+	{{ range $defName, $buildFunc := .Declarations }}
+	g.Define("{{ $defName }}" ,{{ $buildFunc }})
+	{{ end }}
+
+	return g
+}
+
+`
+
+// `module {{.Name}}
+
+// go 1.20
+
+// {{ range $name, $version := .Requires }}require {{ $name }} {{ $version }}
+// {{ end }}
+// `
 
 /*
 Generates the file within its module
 */
-func (code *DICodeBuilder) Finish() error {
-	// TODO generate go file with method that receives map as input, gives map as output
-	return nil
+func (code *DICodeBuilderImpl) Finish() error {
+	t, err := template.New(code.FuncName).Parse(diFuncTemplate)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.OpenFile(code.FilePath, os.O_CREATE, 0755)
+	if err != nil {
+		return err
+	}
+
+	return t.Execute(f, code)
 }
