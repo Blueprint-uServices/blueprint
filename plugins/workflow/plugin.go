@@ -2,14 +2,15 @@ package workflow
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 
 	cp "github.com/otiai10/copy"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow/parser"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow/parser2"
 )
 
 var workflowSpecPaths []string
@@ -26,6 +27,14 @@ func Init(path string) {
 
 func getSpec() (*parser.SpecParser, error) {
 	if spec == nil {
+		mods, err := parser2.ParseModules(workflowSpecPaths...)
+		if err != nil {
+			return nil, fmt.Errorf("parser2 error: %v", err.Error())
+		}
+		fmt.Println("Modules:")
+		fmt.Println(mods)
+		os.Exit(1)
+
 		var fqPaths []string
 		for _, path := range workflowSpecPaths {
 			fqPath, err := filepath.Abs(path)
@@ -37,7 +46,7 @@ func getSpec() (*parser.SpecParser, error) {
 
 		// TODO: tidy up legacy spec parser
 		spec = parser.NewSpecParser(fqPaths...)
-		err := spec.ParseSpec()
+		err = spec.ParseSpec()
 		if err != nil {
 			spec = nil
 			return nil, err
@@ -56,21 +65,21 @@ func CopyWorkflowSpec(dstPath string) error {
 	return nil
 }
 
-// Convert from parser representation to IR representation
-func argsToVars(as []parser.ArgInfo) (vs []service.Variable) {
-	for _, a := range as {
-		v := service.Variable{Name: a.Name, Type: a.Type.String()}
-		vs = append(vs, v)
-	}
-	return
-}
+// // Convert from parser representation to IR representation
+// func argsToVars(as []parser.ArgInfo) (vs []service.Variable) {
+// 	for _, a := range as {
+// 		v := service.Variable{Name: a.Name, Type: a.Type.String()}
+// 		vs = append(vs, v)
+// 	}
+// 	return
+// }
 
-func funcToDecl(f parser.FuncInfo) (d service.ServiceMethodDeclaration) {
-	d.Name = f.Name
-	d.Args = argsToVars(f.Args)
-	d.Ret = argsToVars(f.Return)
-	return
-}
+// func funcToDecl(f parser.FuncInfo) (d service.ServiceMethodDeclaration) {
+// 	d.Name = f.Name
+// 	d.Args = argsToVars(f.Args)
+// 	d.Ret = argsToVars(f.Return)
+// 	return
+// }
 
 // Finds the service with the specified type in the workflow spec.
 // This method searches the WorkflowSpecPath and returns an error if not found.
@@ -83,15 +92,15 @@ func findService(serviceType string) (*golang.GolangServiceDetails, error) {
 	if impl, exists := spec.Implementations[serviceType]; exists {
 		s := golang.GolangServiceDetails{}
 
-		for iface, _ := range impl.Interfaces {
-			service := spec.Services[iface]
-			s.Interface.Name = service.Name
-			for _, method := range service.Methods {
-				s.Interface.Methods = append(s.Interface.Methods, funcToDecl(method))
-			}
-			s.InterfacePackage = service.Package
-			break
-		}
+		// for iface, _ := range impl.Interfaces {
+		// 	service := spec.Services[iface]
+		// 	s.Interface.Name = service.Name
+		// 	for _, method := range service.Methods {
+		// 		s.Interface.Methods = append(s.Interface.Methods, funcToDecl(method))
+		// 	}
+		// 	s.InterfacePackage = service.Package
+		// 	break
+		// }
 
 		/*
 		 TODO:  the spec parser needs to correctly do the following:
@@ -102,9 +111,9 @@ func findService(serviceType string) (*golang.GolangServiceDetails, error) {
 		*/
 
 		s.ImplName = impl.Name
-		s.ImplConstructor.Name = impl.ConstructorInfos[0].Name
-		s.ImplConstructor.Args = argsToVars(impl.ConstructorInfos[0].Args)
-		s.ImplConstructor.Ret = argsToVars(impl.ConstructorInfos[0].Return)
+		// s.ImplConstructor.Name = impl.ConstructorInfos[0].Name
+		// s.ImplConstructor.Args = argsToVars(impl.ConstructorInfos[0].Args)
+		// s.ImplConstructor.Ret = argsToVars(impl.ConstructorInfos[0].Return)
 
 		s.ImplPackage = impl.Package
 

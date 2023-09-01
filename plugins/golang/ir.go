@@ -61,7 +61,7 @@ type Service interface {
 	ImplementsGolangService() // Idiomatically necessary in Go for typecasting correctly
 }
 
-/*
+// /*
 // Representation of a golang service interface, which extends the service.Service interface
 // to include module and package info for all method arguments, and constructor info
 // */
@@ -90,21 +90,21 @@ type Service interface {
 
 // Code location and interfaces of a service
 type GolangServiceDetails struct {
-	Interface        service.ServiceInterface         // The interface that is implemented
-	InterfacePackage *parser.PackageInfo              // The package containing the constructor method
-	ImplName         string                           // The type name of the implementing struct
-	ImplConstructor  service.ServiceMethodDeclaration // The constructor method for the implementing struct
-	ImplPackage      *parser.PackageInfo              // The package containing the constructor method
+	Interface        service.ServiceInterface // The interface that is implemented
+	InterfacePackage *parser.PackageInfo      // The package containing the constructor method
+	ImplName         string                   // The type name of the implementing struct
+	ImplConstructor  service.MethodSignature  // The constructor method for the implementing struct
+	ImplPackage      *parser.PackageInfo      // The package containing the constructor method
 }
 
 func (d GolangServiceDetails) String() string {
 	var b strings.Builder
 	b.WriteString("import \"" + d.InterfacePackage.ImportName + "\"\n")
-	b.WriteString("var service " + d.InterfacePackage.ShortName + "." + d.Interface.Name + "\n")
-	b.WriteString("service = " + d.ImplConstructor.Name)
+	b.WriteString("var service " + d.InterfacePackage.ShortName + "." + d.Interface.Name() + "\n")
+	b.WriteString("service = " + d.ImplConstructor.Name())
 	var constructorArgs []string
-	for _, arg := range d.ImplConstructor.Args {
-		constructorArgs = append(constructorArgs, arg.Name)
+	for _, arg := range d.ImplConstructor.Arguments() {
+		constructorArgs = append(constructorArgs, arg.Name())
 	}
 	b.WriteString("(")
 	b.WriteString(strings.Join(constructorArgs, ", "))

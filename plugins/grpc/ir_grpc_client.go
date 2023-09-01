@@ -50,7 +50,7 @@ func (n *GolangClient) Name() string {
 	return n.InstanceName
 }
 
-func (node *GolangClient) GetInterface() *service.ServiceInterface {
+func (node *GolangClient) GetInterface() service.ServiceInterface {
 	// TODO
 	return nil
 }

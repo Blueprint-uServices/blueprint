@@ -40,7 +40,7 @@ func (n WorkflowService) String() string {
 	var b strings.Builder
 	b.WriteString(n.InstanceName)
 	b.WriteString(" = ")
-	b.WriteString(n.ServiceDetails.Interface.Name)
+	// b.WriteString(n.ServiceDetails.Interface.Name())
 
 	var args []string
 	for _, arg := range n.Args {
@@ -74,8 +74,8 @@ func (node *WorkflowService) Name() string {
 	return node.InstanceName
 }
 
-func (node *WorkflowService) GetInterface() *service.ServiceInterface {
-	return &node.ServiceDetails.Interface
+func (node *WorkflowService) GetInterface() service.ServiceInterface {
+	return node.ServiceDetails.Interface
 }
 
 func addToWorkspace(builder golang.WorkspaceBuilder, info *parser.ModuleInfo) error {
