@@ -278,6 +278,13 @@ func (pkg *ParsedPackage) Parse() error {
 			fmt.Printf("Parsed %v.%v\n", struc.Name, method.String())
 		}
 	}
+	for _, f := range pkg.Funcs {
+		err := f.Parse()
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Parsed %v\n", f.String())
+	}
 	return nil
 }
 
@@ -294,6 +301,8 @@ func (f *ParsedFunc) Parse() error {
 			}
 			f.Arguments = append(f.Arguments, arg)
 		}
+	}
+	if f.Ast.Results != nil {
 		for _, r := range f.Ast.Results.List {
 			ret := Variable{}
 			if len(r.Names) > 0 {
