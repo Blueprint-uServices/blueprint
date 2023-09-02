@@ -25,7 +25,7 @@ comes entirely from an external module (ie. a module that exists only as a
 'require' directive of a go.mod)
 */
 type ParsedModuleSet struct {
-	Modules map[string]*ParsedModule
+	Modules map[string]*ParsedModule // Map from FQ module name to module object
 }
 
 /*
@@ -119,6 +119,11 @@ func ParseModules(srcDirs ...string) (*ParsedModuleSet, error) {
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	_, err := set.FindService("LeafService")
+	if err != nil {
+		fmt.Println(err.Error())
 	}
 
 	return set, nil
@@ -346,11 +351,15 @@ func (f *ParsedFile) ResolveIdent(name string) TypeName {
 
 func (f *ParsedFile) ResolveSelector(packageShortName string, name string) TypeName {
 	pkg, isImported := f.NamedImports[packageShortName]
-	if isImported {
-		return &UserType{Source: pkg.Source, Name: name}
-	} else {
+	if !isImported {
 		fmt.Printf("Unable to resolve type %v.%v in file %v\n", packageShortName, name, f.Name)
 		return nil
+	}
+
+	if IsBuiltinPackage(pkg.PackageName) {
+		return &BuiltinType{Package: pkg.PackageName, Name: name}
+	} else {
+		return &UserType{Source: pkg.Source, Name: name}
 	}
 }
 
