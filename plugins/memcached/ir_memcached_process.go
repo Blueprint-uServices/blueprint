@@ -5,10 +5,16 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
 )
+
+type MemcachedAddr struct {
+	address.Address
+	AddrName string
+	Server   *MemcachedProcess
+}
 
 type MemcachedProcess struct {
 	process.ProcessNode
@@ -16,11 +22,11 @@ type MemcachedProcess struct {
 	// TODO: artifact generation
 
 	InstanceName string
-	Addr         *pointer.Address
+	Addr         *MemcachedAddr
 }
 
 func newMemcachedProcess(name string, addr blueprint.IRNode) (*MemcachedProcess, error) {
-	addrNode, is_addr := addr.(*pointer.Address)
+	addrNode, is_addr := addr.(*MemcachedAddr)
 	if !is_addr {
 		return nil, fmt.Errorf("%s expected %s to be an address but found %s", name, addr.Name(), reflect.TypeOf(addr).String())
 	}
@@ -38,3 +44,29 @@ func (n *MemcachedProcess) String() string {
 func (n *MemcachedProcess) Name() string {
 	return n.InstanceName
 }
+
+func (addr *MemcachedAddr) Name() string {
+	return addr.AddrName
+}
+
+func (addr *MemcachedAddr) String() string {
+	return addr.AddrName + " = MemcachedAddr()"
+}
+
+func (addr *MemcachedAddr) GetDestination() blueprint.IRNode {
+	if addr.Server != nil {
+		return addr.Server
+	}
+	return nil
+}
+
+func (addr *MemcachedAddr) SetDestination(node blueprint.IRNode) error {
+	server, isServer := node.(*MemcachedProcess)
+	if !isServer {
+		return fmt.Errorf("address %v should point to a memcached server but got %v", addr.AddrName, node)
+	}
+	addr.Server = server
+	return nil
+}
+
+func (addr *MemcachedAddr) ImplementsAddressNode() {}

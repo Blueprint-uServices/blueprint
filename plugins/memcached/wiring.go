@@ -2,6 +2,7 @@ package memcached
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
 )
 
@@ -34,7 +35,13 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 	ptr := pointer.GetPointer(wiring, cacheName)
 
 	// Define the address and add the collectorAddr to the pointer dst
-	pointer.DefineAddress(wiring, addrName, procName, &blueprint.ApplicationNode{})
+	address.Define(wiring, addrName, procName, &blueprint.ApplicationNode{}, func(scope blueprint.Scope) (address.Address, error) {
+		addr := &MemcachedAddr{
+			AddrName: addrName,
+			Server:   nil,
+		}
+		return addr, nil
+	})
 	ptr.AddDstModifier(wiring, addrName)
 
 	// Add the client to the pointer

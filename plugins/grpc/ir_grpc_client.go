@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -17,12 +16,12 @@ type GolangClient struct {
 	golang.Service
 
 	InstanceName string
-	ServerAddr   *pointer.Address
+	ServerAddr   *GolangServerAddress
 	ServiceInfo  *gocode.ServiceInterface
 }
 
 func newGolangClient(name string, serverAddr blueprint.IRNode) (*GolangClient, error) {
-	addr, is_addr := serverAddr.(*pointer.Address)
+	addr, is_addr := serverAddr.(*GolangServerAddress)
 	if !is_addr {
 		return nil, fmt.Errorf("GRPC client %s expected %s to be an address, but got %s", name, serverAddr.Name(), reflect.TypeOf(serverAddr).String())
 	}
@@ -55,10 +54,10 @@ func (node *GolangClient) GetInterface() service.ServiceInterface {
 	return node.ServiceInfo
 }
 
-func (node *GolangClient) ImplementsGolangNode()    {}
-func (node *GolangClient) ImplementsGolangService() {}
-
 func (node *GolangClient) AddInstantiation(builder golang.DICodeBuilder) error {
 	// TODO
 	return nil
 }
+
+func (node *GolangClient) ImplementsGolangNode()    {}
+func (node *GolangClient) ImplementsGolangService() {}

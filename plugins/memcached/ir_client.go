@@ -6,7 +6,6 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
@@ -16,11 +15,11 @@ type MemcachedGoClient struct {
 	backend.Cache
 
 	InstanceName string
-	Addr         *pointer.Address
+	Addr         *MemcachedAddr
 }
 
 func newMemcachedGoClient(name string, addr blueprint.IRNode) (*MemcachedGoClient, error) {
-	addrNode, is_addr := addr.(*pointer.Address)
+	addrNode, is_addr := addr.(*MemcachedAddr)
 	if !is_addr {
 		return nil, fmt.Errorf("%s expected %s to be an address but found %s", name, addr.Name(), reflect.TypeOf(addr).String())
 	}
