@@ -1,4 +1,4 @@
-package golang
+package gocodegen
 
 import (
 	"fmt"
@@ -9,11 +9,12 @@ import (
 
 	cp "github.com/otiai10/copy"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/mod/modfile"
 )
 
 type WorkspaceBuilderImpl struct {
-	WorkspaceBuilder
+	golang.WorkspaceBuilder
 	tracker      irutil.VisitTrackerImpl
 	WorkspaceDir string            // The directory containing this workspace
 	ModuleDirs   map[string]string // map from FQ module name to directory name within WorkspaceDir
@@ -26,7 +27,7 @@ Creates a new WorkspaceBuilder at the specified output dir.
 Will return an error if the workspacedir already exists
 */
 func NewWorkspaceBuilder(workspaceDir string) (*WorkspaceBuilderImpl, error) {
-	if isDir(workspaceDir) {
+	if IsDir(workspaceDir) {
 		return nil, fmt.Errorf("workspace %s already exists", workspaceDir)
 	}
 	err := os.Mkdir(workspaceDir, 0755)
@@ -73,7 +74,7 @@ func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSr
 	}
 
 	moduleDstPath := filepath.Join(workspace.WorkspaceDir, shortName)
-	err = checkDir(moduleDstPath, true)
+	err = CheckDir(moduleDstPath, true)
 	if err != nil {
 		return err
 	}

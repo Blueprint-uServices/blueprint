@@ -1,4 +1,4 @@
-package golang
+package goproc
 
 import (
 	"fmt"
@@ -8,6 +8,8 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc/gocodegen"
 )
 
 /*
@@ -68,10 +70,10 @@ func (node *Process) AddChild(child blueprint.IRNode) error {
 }
 
 func (node *Process) GenerateArtifacts(outputDir string) error {
-	if isDir(outputDir) {
+	if gocodegen.IsDir(outputDir) {
 		return fmt.Errorf("cannot built to %s, directory already exists", outputDir)
 	}
-	err := checkDir(outputDir, true)
+	err := gocodegen.CheckDir(outputDir, true)
 	if err != nil {
 		return fmt.Errorf("unable to create %s for process %s due to %s", outputDir, node.Name(), err.Error())
 	}
@@ -79,36 +81,36 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	// TODO: might end up building multiple times which is OK, so need a check here that we haven't already built this artifact, even if it was by a different (but identical) node
 	cleanName := irutil.Clean(node.Name())
 	workspaceDir := filepath.Join(outputDir, cleanName)
-	workspace, err := NewWorkspaceBuilder(workspaceDir)
+	workspace, err := gocodegen.NewWorkspaceBuilder(workspaceDir)
 	if err != nil {
 		return err
 	}
 
 	moduleName := generatedModulePrefix + "/" + cleanName
-	module, err := NewModuleBuilder(workspace, cleanName, moduleName)
+	module, err := gocodegen.NewModuleBuilder(workspace, cleanName, moduleName)
 	if err != nil {
 		return err
 	}
 
-	code, err := NewDICodeBuilder(module, "graph.go", "pkg/main", "New"+strings.ToTitle(cleanName))
+	code, err := gocodegen.NewDICodeBuilder(module, "graph.go", "pkg/main", "New"+strings.ToTitle(cleanName))
 	if err != nil {
 		return err
 	}
 
 	for _, node := range node.ContainedNodes {
-		if instantiable, ok := node.(Instantiable); ok {
+		if instantiable, ok := node.(golang.Instantiable); ok {
 			err := instantiable.AddInstantiation(code)
 			if err != nil {
 				return err
 			}
 		}
-		if packages, ok := node.(RequiresPackages); ok {
+		if packages, ok := node.(golang.RequiresPackages); ok {
 			err := packages.AddToModule(module)
 			if err != nil {
 				return err
 			}
 		}
-		if modules, ok := node.(ProvidesModule); ok {
+		if modules, ok := node.(golang.ProvidesModule); ok {
 			err := modules.AddToWorkspace(workspace)
 			if err != nil {
 				return err

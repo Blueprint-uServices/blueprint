@@ -1,4 +1,4 @@
-package parser2
+package gocode
 
 import (
 	"fmt"
@@ -62,17 +62,6 @@ func IsBasicType(name string) bool {
 	initBasics()
 	_, ok := basics[name]
 	return ok
-}
-
-func GetType(expr ast.Expr, userTypes map[string]string, imports map[string]string) {
-	switch t := expr.(type) {
-	case *ast.Ident:
-		fmt.Printf("%v is an ast.Ident\n", t.Name)
-	case *ast.StructType:
-		fmt.Printf("it is an ast.StructType\n")
-	default:
-		break
-	}
 }
 
 // Structs representing the different kinds of TypeName that you can have in Go

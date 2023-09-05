@@ -8,6 +8,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 )
 
 // IRNode representing a client to a Golang server
@@ -15,9 +16,9 @@ type GolangClient struct {
 	golang.Node
 	golang.Service
 
-	InstanceName   string
-	ServerAddr     *pointer.Address
-	ServiceDetails golang.GolangServiceDetails
+	InstanceName string
+	ServerAddr   *pointer.Address
+	ServiceInfo  *gocode.ServiceInterface
 }
 
 func newGolangClient(name string, serverAddr blueprint.IRNode) (*GolangClient, error) {
@@ -51,8 +52,7 @@ func (n *GolangClient) Name() string {
 }
 
 func (node *GolangClient) GetInterface() service.ServiceInterface {
-	// TODO
-	return nil
+	return node.ServiceInfo
 }
 
 func (node *GolangClient) ImplementsGolangNode()    {}

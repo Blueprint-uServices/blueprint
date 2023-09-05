@@ -9,7 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow/parser"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 )
 
 // This Node represents a Golang Workflow spec service in the Blueprint IR.
@@ -19,21 +19,22 @@ type WorkflowService struct {
 	golang.Service
 	service.ServiceNode
 
-	// Artifact generation
+	// Interfaces for generating Golang artifacts
 	golang.ProvidesModule
 	golang.RequiresPackages
 	golang.Instantiable
 
-	InstanceName   string
-	ServiceType    string
-	ServiceDetails *golang.GolangServiceDetails
-	Args           []blueprint.IRNode
-}
+	InstanceName string // Name of this instance
+	ServiceType  string // The short-name serviceType used to initialize this workflow service
 
-type WorkflowServiceArg struct {
-	name string // The name given to the argument in the service constructor
+	// Details of the service, including its interface and constructor
+	ServiceInfo *WorkflowSpecService
 
-	node blueprint.IRNode // The IR representation of the argument node
+	// IR Nodes of arguments that will be passed in to the generated code
+	Args []blueprint.IRNode
+
+	// The workflow spec where this service originated
+	Spec *WorkflowSpec
 }
 
 func (n WorkflowService) String() string {
@@ -56,7 +57,11 @@ func (n WorkflowService) String() string {
 
 func newWorkflowService(name string, serviceType string, args []blueprint.IRNode) (*WorkflowService, error) {
 	// Look up the service details; errors out if the service doesn't exist
-	details, err := findService(serviceType)
+	spec, err := getSpec()
+	if err != nil {
+		return nil, err
+	}
+	details, err := spec.Get(serviceType)
 	if err != nil {
 		return nil, err
 	}
@@ -65,8 +70,10 @@ func newWorkflowService(name string, serviceType string, args []blueprint.IRNode
 
 	node.InstanceName = name
 	node.ServiceType = serviceType
-	node.ServiceDetails = details
+	node.ServiceInfo = details
 	node.Args = args
+	node.Spec = spec
+	// TODO: can eagerly typecheck args here
 	return node, nil
 }
 
@@ -75,34 +82,34 @@ func (node *WorkflowService) Name() string {
 }
 
 func (node *WorkflowService) GetInterface() service.ServiceInterface {
-	return node.ServiceDetails.Interface
+	return node.ServiceInfo.GetInterface()
 }
 
-func addToWorkspace(builder golang.WorkspaceBuilder, info *parser.ModuleInfo) error {
-	if builder.Visited(info.Name) {
+func addToWorkspace(builder golang.WorkspaceBuilder, mod *goparser.ParsedModule) error {
+	if builder.Visited(mod.Name) {
 		return nil
 	}
-	_, subdir := filepath.Split(info.Path)
-	return builder.AddLocalModule(subdir, info.Path)
+	_, subdir := filepath.Split(mod.SrcDir)
+	return builder.AddLocalModule(subdir, mod.SrcDir)
 }
 
 // Adds the workspace modules containing the interface declaration and implementation
 func (node *WorkflowService) AddToWorkspace(builder golang.WorkspaceBuilder) error {
 	// Copy the interface module into the workspace
-	err := addToWorkspace(builder, node.ServiceDetails.InterfacePackage.Module)
+	err := addToWorkspace(builder, node.ServiceInfo.iface.File.Package.Module)
 	if err != nil {
 		return err
 	}
 
 	// Copy the impl module into the workspace (if it's different)
-	return addToWorkspace(builder, node.ServiceDetails.ImplPackage.Module)
+	return addToWorkspace(builder, node.ServiceInfo.constructor.File.Package.Module)
 }
 
-func addToModule(builder golang.ModuleBuilder, info *parser.ModuleInfo) error {
-	if builder.Visited(info.Name) {
+func addToModule(builder golang.ModuleBuilder, mod *goparser.ParsedModule) error {
+	if builder.Visited(mod.Name) {
 		return nil
 	}
-	return builder.Require(info.Name, info.Version)
+	return builder.Require(mod.Name, mod.Version)
 }
 
 // Adds the 'requires' statements to the module
@@ -111,11 +118,11 @@ func (node *WorkflowService) AddToModule(builder golang.ModuleBuilder) error {
 	node.AddToWorkspace(builder.Workspace())
 
 	// Add the requires statements
-	err := addToModule(builder, node.ServiceDetails.ImplPackage.Module)
+	err := addToModule(builder, node.ServiceInfo.iface.File.Package.Module)
 	if err != nil {
 		return err
 	}
-	return addToModule(builder, node.ServiceDetails.InterfacePackage.Module)
+	return addToModule(builder, node.ServiceInfo.constructor.File.Package.Module)
 }
 
 type buildFuncArgs struct {
@@ -159,7 +166,7 @@ func (node *WorkflowService) AddInstantiation(builder golang.DICodeBuilder) erro
 
 	// Arguments to the code template
 	templateData := buildFuncArgs{
-		builder.Import(node.ServiceDetails.ImplPackage.ImportName),
+		builder.Import(node.ServiceInfo.constructor.File.Package.Name),
 		node,
 	}
 

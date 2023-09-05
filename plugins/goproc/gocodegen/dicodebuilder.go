@@ -1,4 +1,4 @@
-package golang
+package gocodegen
 
 import (
 	"fmt"
@@ -8,10 +8,11 @@ import (
 	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
 type DICodeBuilderImpl struct {
-	DICodeBuilder
+	golang.DICodeBuilder
 	tracker      irutil.VisitTrackerImpl
 	FileName     string             // The short name of the file
 	FilePath     string             // The fully qualified path to the file
@@ -40,13 +41,13 @@ The typical usage of a `DICodeBuilder` is to:
  3. Generate the final output by calling `DICodeBuilder.Finish`
 */
 func NewDICodeBuilder(module *ModuleBuilderImpl, fileName, packagePath, funcName string) (*DICodeBuilderImpl, error) {
-	err := checkDir(module.ModuleDir, false)
+	err := CheckDir(module.ModuleDir, false)
 	if err != nil {
 		return nil, fmt.Errorf("unable to generate %s for module %s due to %s", fileName, module.ShortName, err.Error())
 	}
 
 	packageDir := filepath.Join(module.ModuleDir, packagePath)
-	err = checkDir(packageDir, true)
+	err = CheckDir(packageDir, true)
 	if err != nil {
 		return nil, fmt.Errorf("unable to generate %s for module %s due to %s", fileName, module.ShortName, err.Error())
 	}
@@ -69,7 +70,7 @@ func NewDICodeBuilder(module *ModuleBuilderImpl, fileName, packagePath, funcName
 	return builder, nil
 }
 
-func (code *DICodeBuilderImpl) Module() ModuleBuilder {
+func (code *DICodeBuilderImpl) Module() golang.ModuleBuilder {
 	return code.module
 }
 

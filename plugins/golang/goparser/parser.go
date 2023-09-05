@@ -1,4 +1,4 @@
-package parser2
+package goparser
 
 import (
 	"fmt"
@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"golang.org/x/mod/modfile"
 )
 
@@ -56,7 +57,7 @@ type ParsedPackage struct {
 	SrcDir        string                      // Fully qualified location of the package on the filesystem
 	Files         map[string]*ParsedFile      // Map from filename to ParsedFile
 	Ast           *ast.Package                // The AST of the package
-	DeclaredTypes map[string]UserType         // Types declared within this package
+	DeclaredTypes map[string]gocode.UserType  // Types declared within this package
 	Structs       map[string]*ParsedStruct    // Structs parsed from this package
 	Interfaces    map[string]*ParsedInterface // Interfaces parsed from this package
 	Funcs         map[string]*ParsedFunc      // Functions parsed from this package (does not include funcs with receiver types)
@@ -86,13 +87,13 @@ type ParsedInterface struct {
 }
 
 type ParsedFunc struct {
-	Func
+	gocode.Func
 	File *ParsedFile
 	Ast  *ast.FuncType
 }
 
 type ParsedImport struct {
-	Source
+	gocode.Source
 	File *ParsedFile
 }
 
@@ -119,11 +120,6 @@ func ParseModules(srcDirs ...string) (*ParsedModuleSet, error) {
 		if err != nil {
 			return nil, err
 		}
-	}
-
-	_, err := set.FindService("LeafService")
-	if err != nil {
-		fmt.Println(err.Error())
 	}
 
 	return set, nil
@@ -186,7 +182,7 @@ func (mod *ParsedModule) Load() error {
 			}
 			p.Files = make(map[string]*ParsedFile)
 			p.Name = mod.Name + "/" + filepath.ToSlash(p.PackageDir)
-			p.DeclaredTypes = make(map[string]UserType)
+			p.DeclaredTypes = make(map[string]gocode.UserType)
 			p.Interfaces = make(map[string]*ParsedInterface)
 			p.Structs = make(map[string]*ParsedStruct)
 			p.Funcs = make(map[string]*ParsedFunc)
@@ -296,7 +292,7 @@ func (pkg *ParsedPackage) Parse() error {
 func (f *ParsedFunc) Parse() error {
 	if f.Ast.Params != nil {
 		for _, p := range f.Ast.Params.List {
-			arg := Variable{}
+			arg := gocode.Variable{}
 			if len(p.Names) > 0 {
 				arg.Name = p.Names[0].Name
 			}
@@ -309,7 +305,7 @@ func (f *ParsedFunc) Parse() error {
 	}
 	if f.Ast.Results != nil {
 		for _, r := range f.Ast.Results.List {
-			ret := Variable{}
+			ret := gocode.Variable{}
 			if len(r.Names) > 0 {
 				ret.Name = r.Names[0].Name
 			}
@@ -329,9 +325,9 @@ An ident can be:
   - a type declared locally within the file or package
   - a type imported with an `import . "package"` decl
 */
-func (f *ParsedFile) ResolveIdent(name string) TypeName {
-	if IsBasicType(name) {
-		return &BasicType{Name: name}
+func (f *ParsedFile) ResolveIdent(name string) gocode.TypeName {
+	if gocode.IsBasicType(name) {
+		return &gocode.BasicType{Name: name}
 	}
 
 	local, isLocalType := f.Package.DeclaredTypes[name]
@@ -341,7 +337,7 @@ func (f *ParsedFile) ResolveIdent(name string) TypeName {
 
 	if len(f.AnonymousImports) == 1 {
 		// Assume (possibly erroneously) that this name just comes from the anonymous imports
-		return &UserType{Source: f.AnonymousImports[0].Source, Name: name}
+		return &gocode.UserType{Source: f.AnonymousImports[0].Source, Name: name}
 	}
 
 	fmt.Printf("Unable to resolve ident %v in file %v\n", name, f.Name)
@@ -349,30 +345,30 @@ func (f *ParsedFile) ResolveIdent(name string) TypeName {
 	return nil
 }
 
-func (f *ParsedFile) ResolveSelector(packageShortName string, name string) TypeName {
+func (f *ParsedFile) ResolveSelector(packageShortName string, name string) gocode.TypeName {
 	pkg, isImported := f.NamedImports[packageShortName]
 	if !isImported {
 		fmt.Printf("Unable to resolve type %v.%v in file %v\n", packageShortName, name, f.Name)
 		return nil
 	}
 
-	if IsBuiltinPackage(pkg.PackageName) {
-		return &BuiltinType{Package: pkg.PackageName, Name: name}
+	if gocode.IsBuiltinPackage(pkg.PackageName) {
+		return &gocode.BuiltinType{Package: pkg.PackageName, Name: name}
 	} else {
-		return &UserType{Source: pkg.Source, Name: name}
+		return &gocode.UserType{Source: pkg.Source, Name: name}
 	}
 }
 
-func (f *ParsedFile) ResolveType(expr ast.Expr) TypeName {
+func (f *ParsedFile) ResolveType(expr ast.Expr) gocode.TypeName {
 	switch e := expr.(type) {
 	case *ast.Ident:
 		return f.ResolveIdent(e.Name)
 	case *ast.ArrayType:
-		return &Slice{SliceOf: f.ResolveType(e.Elt)}
+		return &gocode.Slice{SliceOf: f.ResolveType(e.Elt)}
 	case *ast.MapType:
-		return &Map{KeyType: f.ResolveType(e.Key), ValueType: f.ResolveType(e.Value)}
+		return &gocode.Map{KeyType: f.ResolveType(e.Key), ValueType: f.ResolveType(e.Value)}
 	case *ast.InterfaceType:
-		return &InterfaceType{InterfaceAst: e}
+		return &gocode.InterfaceType{InterfaceAst: e}
 	case *ast.SelectorExpr:
 		{
 			x, isIdent := e.X.(*ast.Ident)
@@ -384,20 +380,20 @@ func (f *ParsedFile) ResolveType(expr ast.Expr) TypeName {
 		}
 	case *ast.StarExpr:
 		// TODO: here indexexpr should be supported to handle templated types
-		return &Pointer{PointerTo: f.ResolveType(e.X)}
+		return &gocode.Pointer{PointerTo: f.ResolveType(e.X)}
 	case *ast.Ellipsis:
-		return &Ellipsis{EllipsisOf: f.ResolveType(e.Elt)}
+		return &gocode.Ellipsis{EllipsisOf: f.ResolveType(e.Elt)}
 	case *ast.ChanType:
 		switch e.Dir {
 		case ast.SEND:
-			return &SendChan{SendType: f.ResolveType(e.Value)}
+			return &gocode.SendChan{SendType: f.ResolveType(e.Value)}
 		case ast.RECV:
-			return &ReceiveChan{ReceiveType: f.ResolveType(e.Value)}
+			return &gocode.ReceiveChan{ReceiveType: f.ResolveType(e.Value)}
 		default:
-			return &Chan{ChanOf: f.ResolveType(e.Value)}
+			return &gocode.Chan{ChanOf: f.ResolveType(e.Value)}
 		}
 	case *ast.FuncType:
-		return &FuncType{FuncAst: e}
+		return &gocode.FuncType{FuncAst: e}
 	default:
 		fmt.Printf("unknown or invalid expr type %v\n", e)
 	}
@@ -438,7 +434,7 @@ func (f *ParsedFile) LoadImports() error {
 func (i *ParsedImport) FindSourceModule() error {
 	mod := i.File.Package.Module
 
-	if IsBuiltinPackage(i.PackageName) {
+	if gocode.IsBuiltinPackage(i.PackageName) {
 		fmt.Println("builtin import " + i.PackageName)
 		return nil
 	}
@@ -463,28 +459,6 @@ func (i *ParsedImport) FindSourceModule() error {
 
 	return fmt.Errorf("unable to find the source module of imported package %v", i.PackageName)
 }
-
-// func (mod *ParsedModule) LoadDeclaredTypes() {
-// 	for _, pkg := range mod.Packages {
-// 		for _, f := range pkg.Files {
-// 			f.LoadDeclaredTypes()
-// 		}
-// 	}
-// 	// Parse each module
-// 	//    Parse each file
-// 	//        See what is imported, resolve them with the module requires
-// 	//        Get and save just the names of types and functions declared in this file
-// 	//        Need to know what identifiers are declared within package vs. from outside
-// 	//
-// 	// Afterwards: for any type in any file, can lookup the fully qualified type, which might be:
-// 	//     builtin
-// 	//     local to the package
-// 	//     qualified by some import statement corresponding to another package in module
-// 	//     qualified by some import statement corresponding to another module
-// 	//     qualified by some import statement to a builtin type
-// 	//     imported with a '.' (only one such imported package allowed before we error out)
-
-// }
 
 /*
 Looks for:
@@ -512,7 +486,7 @@ func (f *ParsedFile) LoadStructsAndInterfaces() error {
 			}
 
 			// Save all types that are declared in the file
-			u := UserType{}
+			u := gocode.UserType{}
 			u.ModuleName = f.Package.Module.Name
 			u.ModuleVersion = f.Package.Module.Version
 			u.PackageName = f.Package.Name
@@ -635,6 +609,32 @@ func indent(str string, amount int) string {
 		lines[i] = strings.Repeat(" ", amount) + line
 	}
 	return strings.Join(lines, "\n")
+}
+
+func (pkg *ParsedPackage) Source() gocode.Source {
+	return gocode.Source{
+		ModuleName:    pkg.Module.Name,
+		ModuleVersion: pkg.Module.Version,
+		PackageName:   pkg.Name,
+	}
+}
+
+func (iface *ParsedInterface) Type() *gocode.UserType {
+	return &gocode.UserType{
+		Source: iface.File.Package.Source(),
+		Name:   iface.Name,
+	}
+}
+
+func (struc *ParsedStruct) Type() *gocode.UserType {
+	return &gocode.UserType{
+		Source: struc.File.Package.Source(),
+		Name:   struc.Name,
+	}
+}
+
+func (f *ParsedFunc) Source() gocode.Source {
+	return f.File.Package.Source()
 }
 
 func (set *ParsedModuleSet) String() string {

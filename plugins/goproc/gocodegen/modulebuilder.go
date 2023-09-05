@@ -1,4 +1,4 @@
-package golang
+package gocodegen
 
 import (
 	"fmt"
@@ -7,11 +7,12 @@ import (
 	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/mod/modfile"
 )
 
 type ModuleBuilderImpl struct {
-	ModuleBuilder
+	golang.ModuleBuilder
 	tracker   irutil.VisitTrackerImpl
 	ShortName string                // The shortname of this module
 	Name      string                // The FQ name of this module
@@ -42,7 +43,7 @@ func NewModuleBuilder(workspace *WorkspaceBuilderImpl, shortName string, moduleN
 	module.Requires = make(map[string]string)
 	module.workspace = workspace
 
-	err := checkDir(module.ModuleDir, true)
+	err := CheckDir(module.ModuleDir, true)
 	if err != nil {
 		return nil, fmt.Errorf("cannot generate new module %s due to %s", shortName, err.Error())
 	}
@@ -53,7 +54,7 @@ func NewModuleBuilder(workspace *WorkspaceBuilderImpl, shortName string, moduleN
 	return module, nil
 }
 
-func (module *ModuleBuilderImpl) Workspace() WorkspaceBuilder {
+func (module *ModuleBuilderImpl) Workspace() golang.WorkspaceBuilder {
 	return module.workspace
 }
 

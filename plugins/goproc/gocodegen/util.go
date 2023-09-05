@@ -1,4 +1,4 @@
-package golang
+package gocodegen
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 )
 
 // Returns true if the specified path exists and is a directory; false otherwise
-func isDir(path string) bool {
+func IsDir(path string) bool {
 	if info, err := os.Stat(path); err == nil && info.IsDir() {
 		return true
 	}
@@ -18,7 +18,7 @@ func isDir(path string) bool {
 Checks if the specified path exists and is a directory.
 If `createIfAbsent` is true, then this will attempt to create the directory
 */
-func checkDir(path string, createIfAbsent bool) error {
+func CheckDir(path string, createIfAbsent bool) error {
 	if info, err := os.Stat(path); err == nil {
 		if info.IsDir() {
 			return nil

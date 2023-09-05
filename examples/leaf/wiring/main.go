@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/memcached"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
@@ -17,7 +17,7 @@ func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) string {
 	procName := fmt.Sprintf("p%s", serviceName)
 	opentelemetry.Instrument(wiring, serviceName)
 	grpc.Deploy(wiring, serviceName)
-	return golang.CreateProcess(wiring, procName, serviceName)
+	return goproc.CreateProcess(wiring, procName, serviceName)
 }
 
 func main() {
@@ -32,7 +32,8 @@ func main() {
 	b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
 
 	b := workflow.Define(wiring, "b", "LeafServiceImpl", b_cache)
-	a := workflow.Define(wiring, "a", "NonLeafServiceImpl", b)
+	// a := workflow.Define(wiring, "a", "NonLeafServiceImpl", b) // Will fail, because no constructors returning the impl directly
+	a := workflow.Define(wiring, "a", "NonLeafService", b)
 
 	pa := serviceDefaults(wiring, a)
 	pb := serviceDefaults(wiring, b)
@@ -55,7 +56,7 @@ func main() {
 	slog.Info("Application: \n" + application.String())
 
 	// Below here is a WIP on generating code
-	proc := application.Children["pa"].(*golang.Process)
+	proc := application.Children["pa"].(*goproc.Process)
 	err = proc.GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())

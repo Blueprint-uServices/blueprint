@@ -3,17 +3,17 @@ package service
 // General representation of a service
 
 type ServiceInterface interface {
-	Name() string
-	Methods() []MethodSignature
+	GetName() string
+	GetMethods() []Method
 }
 
-type MethodSignature interface {
-	Name() string
-	Arguments() []Variable
-	Returns() []Variable
+type Method interface {
+	GetName() string
+	GetArguments() []Variable
+	GetReturns() []Variable
 }
 
 type Variable interface {
-	Name() string
-	Type() string // a "well-known" type
+	GetName() string
+	GetType() string // a "well-known" type
 }
