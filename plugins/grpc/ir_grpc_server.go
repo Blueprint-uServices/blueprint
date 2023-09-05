@@ -5,19 +5,23 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
-// IRNode representing an address to a grpc server
-type GolangServerAddress struct {
-	address.Address
+// IR node for the GRPC server.  Once a service is exposed over GRPC,
+// it no longer has an interface that is callable by other golang instances,
+// so it is not a golang.Service node any more.  However, it is still a service,
+// but now one exposed over GRPC.
+type GolangServer struct {
 	service.ServiceNode
-	AddrName string
-	Server   *GolangServer
+
+	InstanceName string
+	Addr         *GolangServerAddress
+	Wrapped      golang.Service
 }
 
+// Represents a service that is exposed over GRPC
 type GRPCInterface struct {
 	service.ServiceInterface
 	Wrapped service.ServiceInterface
@@ -29,15 +33,6 @@ func (grpc *GRPCInterface) GetName() string {
 
 func (grpc *GRPCInterface) GetMethods() []service.Method {
 	return grpc.Wrapped.GetMethods()
-}
-
-// IRNode representing a Golang server that wraps a golang service
-type GolangServer struct {
-	service.ServiceNode
-
-	InstanceName string
-	Addr         *GolangServerAddress
-	Wrapped      golang.Service
 }
 
 func newGolangServer(name string, serverAddr blueprint.IRNode, wrapped blueprint.IRNode) (*GolangServer, error) {
@@ -74,35 +69,4 @@ func (node *GolangServer) AddInstantiation(builder golang.DICodeBuilder) error {
 func (node *GolangServer) GetInterface() service.ServiceInterface {
 	return &GRPCInterface{Wrapped: node.Wrapped.GetInterface()}
 }
-
-func (addr *GolangServerAddress) Name() string {
-	return addr.AddrName
-}
-
-func (addr *GolangServerAddress) String() string {
-	return addr.AddrName + " = GolangServerAddress()"
-}
-
-func (addr *GolangServerAddress) GetDestination() blueprint.IRNode {
-	if addr.Server != nil {
-		return addr.Server
-	}
-	return nil
-}
-
-func (addr *GolangServerAddress) SetDestination(node blueprint.IRNode) error {
-	fmt.Printf("Setting destination of %v to %v\n", addr.AddrName, node.Name())
-	server, isServer := node.(*GolangServer)
-	if !isServer {
-		return fmt.Errorf("address %v should point to a Golang server but got %v", addr.AddrName, node)
-	}
-	addr.Server = server
-	return nil
-}
-
-func (addr *GolangServerAddress) GetInterface() service.ServiceInterface {
-	return addr.Server.GetInterface()
-}
-
-func (node *GolangServer) ImplementsGolangNode()         {}
-func (addr *GolangServerAddress) ImplementsAddressNode() {}
+func (node *GolangServer) ImplementsGolangNode() {}
