@@ -57,12 +57,12 @@ func main() {
 	slog.Info("Application: \n" + application.String())
 
 	// Below here is a WIP on generating code
-	// proc := application.Children["pa"].(*goproc.Process)
+	p := application.Children["pa"].(*goproc.Process)
 
 	// p := application.Children["proc"].(*goproc.Process)
-	// err = p.GenerateArtifacts("tmp")
-	// if err != nil {
-	// 	slog.Error(err.Error())
-	// 	os.Exit(1)
-	// }
+	err = p.GenerateArtifacts("tmp")
+	if err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
 }

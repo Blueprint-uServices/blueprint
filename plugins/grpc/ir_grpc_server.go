@@ -6,19 +6,34 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
 // IRNode representing an address to a grpc server
 type GolangServerAddress struct {
 	address.Address
+	service.ServiceNode
 	AddrName string
 	Server   *GolangServer
 }
 
+type GRPCInterface struct {
+	service.ServiceInterface
+	Wrapped service.ServiceInterface
+}
+
+func (grpc *GRPCInterface) GetName() string {
+	return "grpc(" + grpc.Wrapped.GetName() + ")"
+}
+
+func (grpc *GRPCInterface) GetMethods() []service.Method {
+	return grpc.Wrapped.GetMethods()
+}
+
 // IRNode representing a Golang server that wraps a golang service
 type GolangServer struct {
-	golang.Node
+	service.ServiceNode
 
 	InstanceName string
 	Addr         *GolangServerAddress
@@ -56,6 +71,10 @@ func (node *GolangServer) AddInstantiation(builder golang.DICodeBuilder) error {
 	return nil
 }
 
+func (node *GolangServer) GetInterface() service.ServiceInterface {
+	return &GRPCInterface{Wrapped: node.Wrapped.GetInterface()}
+}
+
 func (addr *GolangServerAddress) Name() string {
 	return addr.AddrName
 }
@@ -79,6 +98,10 @@ func (addr *GolangServerAddress) SetDestination(node blueprint.IRNode) error {
 	}
 	addr.Server = server
 	return nil
+}
+
+func (addr *GolangServerAddress) GetInterface() service.ServiceInterface {
+	return addr.Server.GetInterface()
 }
 
 func (node *GolangServer) ImplementsGolangNode()         {}

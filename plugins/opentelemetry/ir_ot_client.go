@@ -44,8 +44,8 @@ func (node *OpenTelemetryClientWrapper) String() string {
 }
 
 func (node *OpenTelemetryClientWrapper) GetInterface() service.ServiceInterface {
-	// TODO
-	return nil
+	// TODO: unwrap server interface to remove tracing stuff
+	return node.Server.GetInterface()
 }
 
 func (node *OpenTelemetryClientWrapper) AddInstantiation(builder golang.DICodeBuilder) error {

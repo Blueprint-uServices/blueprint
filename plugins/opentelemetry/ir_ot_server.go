@@ -45,7 +45,7 @@ func (node *OpenTelemetryServerWrapper) String() string {
 }
 
 func (node *OpenTelemetryServerWrapper) GetInterface() service.ServiceInterface {
-	// TODO
+	// TODO: extend wrapped interface with tracing stuff
 	return node.Wrapped.GetInterface()
 }
 

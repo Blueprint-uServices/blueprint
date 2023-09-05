@@ -39,6 +39,7 @@ func (n *MemcachedGoClient) Name() string {
 }
 
 func (n *MemcachedGoClient) GetInterface() *service.ServiceInterface {
+	// TODO: return memcached interface
 	return nil
 }
 

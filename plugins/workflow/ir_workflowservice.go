@@ -187,7 +187,7 @@ func (node *WorkflowService) AddInstantiation(builder golang.DICodeBuilder) erro
 			{
 				iface, isService := a.GetInterface().(*gocode.ServiceInterface)
 				if !isService {
-					return fmt.Errorf("%v interface should be a gocode.ServiceInterface", arg.Name())
+					return fmt.Errorf("%v interface should be a gocode.ServiceInterface but found %v", arg.Name(), a.GetInterface())
 				}
 				argTypeName := builder.Import(iface.UserType.PackageName) + "." + iface.UserType.Name
 				getArgArgs := getArgTemplateArgs{
@@ -211,6 +211,8 @@ func (node *WorkflowService) AddInstantiation(builder golang.DICodeBuilder) erro
 
 	constructor := node.ServiceInfo.Constructor
 	buildFuncArgs.ConstructorName = builder.Import(constructor.Source().PackageName) + "." + constructor.Name
+
+	// TODO: main method
 
 	// Generate the code
 	buf := &bytes.Buffer{}
