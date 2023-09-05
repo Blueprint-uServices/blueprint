@@ -2,6 +2,7 @@ package workflow
 
 import (
 	"bytes"
+	"fmt"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -9,6 +10,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 )
 
@@ -85,6 +87,10 @@ func (node *WorkflowService) GetInterface() service.ServiceInterface {
 	return node.ServiceInfo.GetInterface()
 }
 
+func (node *WorkflowService) GetGolangInterface() gocode.ServiceInterface {
+	return *node.ServiceInfo.GetInterface()
+}
+
 func addToWorkspace(builder golang.WorkspaceBuilder, mod *goparser.ParsedModule) error {
 	if builder.Visited(mod.Name) {
 		return nil
@@ -96,13 +102,13 @@ func addToWorkspace(builder golang.WorkspaceBuilder, mod *goparser.ParsedModule)
 // Adds the workspace modules containing the interface declaration and implementation
 func (node *WorkflowService) AddToWorkspace(builder golang.WorkspaceBuilder) error {
 	// Copy the interface module into the workspace
-	err := addToWorkspace(builder, node.ServiceInfo.iface.File.Package.Module)
+	err := addToWorkspace(builder, node.ServiceInfo.Iface.File.Package.Module)
 	if err != nil {
 		return err
 	}
 
 	// Copy the impl module into the workspace (if it's different)
-	return addToWorkspace(builder, node.ServiceInfo.constructor.File.Package.Module)
+	return addToWorkspace(builder, node.ServiceInfo.Constructor.File.Package.Module)
 }
 
 func addToModule(builder golang.ModuleBuilder, mod *goparser.ParsedModule) error {
@@ -118,28 +124,39 @@ func (node *WorkflowService) AddToModule(builder golang.ModuleBuilder) error {
 	node.AddToWorkspace(builder.Workspace())
 
 	// Add the requires statements
-	err := addToModule(builder, node.ServiceInfo.iface.File.Package.Module)
+	err := addToModule(builder, node.ServiceInfo.Iface.File.Package.Module)
 	if err != nil {
 		return err
 	}
-	return addToModule(builder, node.ServiceInfo.constructor.File.Package.Module)
+	return addToModule(builder, node.ServiceInfo.Constructor.File.Package.Module)
 }
 
-type buildFuncArgs struct {
-	ImplPkg string
-	Node    *WorkflowService
+type getArgTemplateArgs struct {
+	Name string // The argument to the ctr.Get call
+	Type string // The type to cast the argument to
+	Cast string // The name to cast the argument to
+}
+
+type buildFuncTemplateArgs struct {
+	ConstructorName string
+	Args            []getArgTemplateArgs
 }
 
 var buildFuncTemplate = `func(ctr golang.Container) (any, error) {
-	
-		{{ range $i, $argName := .Node.Args }}
-		arg{{ $i }}, err := ctr.Get("{{ $argName.Name }}")
+		
+		{{- range $i, $arg := .Args }}
+
+		arg{{ $i }}, err := ctr.Get("{{ $arg.Name }}")
 		if err != nil {
 			return nil, err
 		}
-		{{ end }}
+		{{ $arg.Cast }}, is{{ $arg.Cast }}Valid := arg{{ $i }}.({{ $arg.Type }})
+		if !is{{ $arg.Cast }}Valid {
+			return nil, fmt.Errorf("unable to cast %v to %v", "{{ $arg.Name }}", "{{ .Type }}")
+		}
+		{{- end }}
 
-		return {{ .ImplPkg }}.{{ .Node.ServiceDetails.ImplConstructor.Name }}({{ range $i, $argName := .Node.Args }}{{ if $i }},{{end}}arg{{ $i }}{{ end }}), nil
+		return {{ .ConstructorName }}({{ range $i, $arg := .Args }}{{ if $i }}, {{end}}{{ $arg.Cast}}{{end}})
 	}`
 
 func (node *WorkflowService) AddInstantiation(builder golang.DICodeBuilder) error {
@@ -154,25 +171,50 @@ func (node *WorkflowService) AddInstantiation(builder golang.DICodeBuilder) erro
 		return err
 	}
 
+	builder.Import("fmt")
+
 	// Instantiate the code template
 	t, err := template.New(node.InstanceName).Parse(buildFuncTemplate)
 	if err != nil {
 		return err
 	}
 
-	// node.Args[0].Name()
-
-	// node.ServiceDetails.ImplConstructor.Args[0].Type
-
-	// Arguments to the code template
-	templateData := buildFuncArgs{
-		builder.Import(node.ServiceInfo.constructor.File.Package.Name),
-		node,
+	buildFuncArgs := &buildFuncTemplateArgs{}
+	for i, arg := range node.Args {
+		// The only valid arguments are services or strings
+		switch a := arg.(type) {
+		case golang.Service:
+			{
+				iface, isService := a.GetInterface().(*gocode.ServiceInterface)
+				if !isService {
+					return fmt.Errorf("%v interface should be a gocode.ServiceInterface", arg.Name())
+				}
+				argTypeName := builder.Import(iface.UserType.PackageName) + "." + iface.UserType.Name
+				getArgArgs := getArgTemplateArgs{
+					Name: arg.Name(),
+					Type: argTypeName,
+					Cast: node.ServiceInfo.Constructor.Arguments[i].Name,
+				}
+				buildFuncArgs.Args = append(buildFuncArgs.Args, getArgArgs)
+			}
+		default:
+			{
+				getArgArgs := getArgTemplateArgs{
+					Name: arg.Name(),
+					Type: "string",
+					Cast: node.ServiceInfo.Constructor.Arguments[i].Name,
+				}
+				buildFuncArgs.Args = append(buildFuncArgs.Args, getArgArgs)
+			}
+		}
 	}
+
+	constructor := node.ServiceInfo.Constructor
+	buildFuncArgs.ConstructorName = builder.Import(constructor.Source().PackageName) + "." + constructor.Name
 
 	// Generate the code
 	buf := &bytes.Buffer{}
-	err = t.Execute(buf, templateData)
+	err = t.Execute(buf, buildFuncArgs)
 	if err != nil {
 		return err
 	}

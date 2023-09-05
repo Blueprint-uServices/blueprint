@@ -26,8 +26,8 @@ type WorkflowSpec struct {
 }
 
 type WorkflowSpecService struct {
-	iface       *goparser.ParsedInterface
-	constructor *goparser.ParsedFunc
+	Iface       *goparser.ParsedInterface
+	Constructor *goparser.ParsedFunc
 }
 
 /*
@@ -77,11 +77,11 @@ The abstract representation of the service's interface
 */
 func (service *WorkflowSpecService) GetInterface() *gocode.ServiceInterface {
 	methods := make(map[string]gocode.Func)
-	for name, method := range service.iface.Methods {
+	for name, method := range service.Iface.Methods {
 		methods[name] = method.Func
 	}
 	return &gocode.ServiceInterface{
-		UserType: *service.iface.Type(),
+		UserType: *service.Iface.Type(),
 		Methods:  methods,
 	}
 }
@@ -124,8 +124,8 @@ func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*
 	}
 
 	service := &WorkflowSpecService{
-		iface:       validIfaces[0],
-		constructor: constructors[0],
+		Iface:       validIfaces[0],
+		Constructor: constructors[0],
 	}
 	slog.Info(fmt.Sprintf("Located workflow spec service %v with constructor %v in package %v\n", struc.Name, constructors[0].Name, validIfaces[0].File.Package.Name))
 	return service, nil
@@ -144,8 +144,8 @@ func (spec *WorkflowSpec) makeServiceFromInterface(iface *goparser.ParsedInterfa
 		slog.Warn(fmt.Sprintf("multiple constructors of interface %v found; using %v", iface.Name, constructors[0].Name))
 	}
 	service := &WorkflowSpecService{
-		iface:       iface,
-		constructor: constructors[0],
+		Iface:       iface,
+		Constructor: constructors[0],
 	}
 	slog.Info(fmt.Sprintf("Located workflow spec service %v with constructor %v in package %v\n", iface.Name, constructors[0].Name, iface.File.Package.Name))
 	return service, nil

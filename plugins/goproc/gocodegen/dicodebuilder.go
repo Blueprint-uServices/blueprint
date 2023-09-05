@@ -80,7 +80,7 @@ func (code *DICodeBuilderImpl) Import(packageName string) string {
 	suffix := 0
 	name := shortName
 	for {
-		if _, nameInUse := code.Imports[name]; !nameInUse {
+		if pkg, nameInUse := code.Imports[name]; !nameInUse || pkg == packageName {
 			code.Imports[name] = packageName
 			return name
 		}

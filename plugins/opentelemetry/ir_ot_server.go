@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
@@ -41,6 +42,11 @@ func (node *OpenTelemetryServerWrapper) Name() string {
 
 func (node *OpenTelemetryServerWrapper) String() string {
 	return node.Name() + " = OTServerWrapper(" + node.Wrapped.Name() + ", " + node.Collector.Name() + ")"
+}
+
+func (node *OpenTelemetryServerWrapper) GetInterface() service.ServiceInterface {
+	// TODO
+	return node.Wrapped.GetInterface()
 }
 
 func (node *OpenTelemetryServerWrapper) AddInstantiation(builder golang.DICodeBuilder) error {
