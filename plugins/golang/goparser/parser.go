@@ -37,7 +37,7 @@ Things to bear in mind:
  * To make sure things are resolved correctly across modules, packages, and files, we need to parse things breadth-first (first modules, then packages, etc.)
  * import . "something" is likely to cause problems.  If only one package is imported like this, we can assume unresolved types come from that module; more than one we error
  * any interface is valid for a workflow service.  typechecking function arguments is only needed when there is something like serialization; then there is a restriction on arg types
-
+ * not implemented yet: we don't currently support structs or interfaces that extend other structs/interfaces
 */
 
 type ParsedModule struct {
@@ -73,10 +73,14 @@ type ParsedFile struct {
 }
 
 type ParsedStruct struct {
-	File    *ParsedFile
-	Ast     *ast.StructType
-	Name    string
-	Methods map[string]*ParsedFunc
+	File            *ParsedFile
+	Ast             *ast.StructType
+	Name            string
+	Methods         map[string]*ParsedFunc  // Methods declared directly on this struct, does not include promoted methods (not implemented yet)
+	FieldsList      []*ParsedField          // All fields in the order that they are declared
+	Fields          map[string]*ParsedField // Named fields declared in this struct only, does not include promoted fields (not implemented yet)
+	PromotedField   *ParsedField            // If there is a promoted field, stored here
+	AnonymousFields []*ParsedField          // Subsequent anonymous fields
 }
 
 type ParsedInterface struct {
@@ -95,6 +99,13 @@ type ParsedFunc struct {
 type ParsedImport struct {
 	gocode.Source
 	File *ParsedFile
+}
+
+type ParsedField struct {
+	gocode.Variable
+	Struct   *ParsedStruct
+	Position int
+	Ast      *ast.Field
 }
 
 func ParseModules(srcDirs ...string) (*ParsedModuleSet, error) {
@@ -116,9 +127,11 @@ func ParseModules(srcDirs ...string) (*ParsedModuleSet, error) {
 
 	// Parse the modules
 	for _, mod := range set.Modules {
-		err := mod.Parse()
-		if err != nil {
-			return nil, err
+		for _, pkg := range mod.Packages {
+			err := pkg.Parse()
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -203,19 +216,6 @@ func (mod *ParsedModule) Load() error {
 	return nil
 }
 
-func (mod *ParsedModule) Parse() error {
-	for _, pkg := range mod.Packages {
-		err := pkg.Parse()
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-	// for _, struc := range pkg.Structs {
-	// 	struc.Parse()
-	// }
-}
-
 func (pkg *ParsedPackage) Load() error {
 	// Create files
 	for filename, ast := range pkg.Ast.Files {
@@ -279,6 +279,15 @@ func (pkg *ParsedPackage) Parse() error {
 			fmt.Printf("Parsed %v.%v\n", struc.Name, method.String())
 		}
 	}
+	for _, struc := range pkg.Structs {
+		for _, field := range struc.FieldsList {
+			err := field.Parse()
+			if err != nil {
+				return err
+			}
+		}
+		fmt.Println(struc.String())
+	}
 	for _, f := range pkg.Funcs {
 		err := f.Parse()
 		if err != nil {
@@ -286,6 +295,15 @@ func (pkg *ParsedPackage) Parse() error {
 		}
 		fmt.Printf("Parsed %v\n", f.String())
 	}
+	return nil
+}
+
+func (f *ParsedField) Parse() error {
+	f.Type = f.Struct.File.ResolveType(f.Ast.Type)
+	if f.Type == nil {
+		return fmt.Errorf("unable to resolve the type of %v field %v", f.Struct.Name, f)
+	}
+	fmt.Printf("Parsed %v\n", f.String())
 	return nil
 }
 
@@ -467,7 +485,6 @@ Looks for:
   - other user types defined in the file
 
 Does not:
-  - parse the contents of structs or interfaces
   - look for function declarations
 */
 func (f *ParsedFile) LoadStructsAndInterfaces() error {
@@ -528,8 +545,30 @@ func (f *ParsedFile) LoadStructsAndInterfaces() error {
 					struc.File = f
 					struc.Name = typespec.Name.Name
 					struc.Methods = make(map[string]*ParsedFunc)
+					struc.FieldsList = nil
+					struc.Fields = make(map[string]*ParsedField)
+					struc.PromotedField = nil
+					struc.AnonymousFields = nil
 					f.Package.Structs[struc.Name] = struc
 					fmt.Println("Found struct " + u.Name)
+
+					if t.Fields != nil {
+						for i, fieldDecl := range t.Fields.List {
+							field := &ParsedField{}
+							if fieldDecl.Names != nil {
+								field.Name = fieldDecl.Names[0].Name
+								struc.Fields[field.Name] = field
+							} else if struc.PromotedField == nil {
+								struc.PromotedField = field
+							} else {
+								struc.AnonymousFields = append(struc.AnonymousFields, field)
+							}
+							field.Position = i
+							field.Struct = struc
+							field.Ast = fieldDecl
+							struc.FieldsList = append(struc.FieldsList, field)
+						}
+					}
 				}
 			default:
 				fmt.Println("Found userType " + u.Name)
@@ -684,4 +723,22 @@ func (f *ParsedFile) String() string {
 		b.WriteString(indent("import . \""+imp.PackageName+"\"", 2))
 	}
 	return b.String()
+}
+
+func (f *ParsedStruct) String() string {
+	b := strings.Builder{}
+	b.WriteString("type " + f.Name + " struct {\n")
+	for _, field := range f.FieldsList {
+		b.WriteString("  " + field.String() + "\n")
+	}
+	b.WriteString("}")
+	return b.String()
+}
+
+func (f *ParsedField) String() string {
+	if f.Name == "" {
+		return f.Type.String()
+	} else {
+		return f.Name + " " + f.Type.String()
+	}
 }

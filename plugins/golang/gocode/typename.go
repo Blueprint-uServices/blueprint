@@ -215,6 +215,10 @@ func (t *Pointer) String() string {
 	return fmt.Sprintf("*%s", t.PointerTo)
 }
 
+func (m *Map) String() string {
+	return fmt.Sprintf("map[%s]%s", m.KeyType, m.ValueType)
+}
+
 func (t *Chan) String() string {
 	return fmt.Sprintf("chan %s", t.ChanOf)
 }

@@ -15,36 +15,38 @@ These structs implement the generic interfaces described in the core 'service' p
 TypeName is defined separately in typename.go
 */
 
-/* Module, version, and package that contains a definition */
-type Source struct {
-	ModuleName    string
-	ModuleVersion string
-	PackageName   string
-}
+type (
+	/* Module, version, and package that contains a definition */
+	Source struct {
+		ModuleName    string
+		ModuleVersion string
+		PackageName   string
+	}
 
-type Variable struct {
-	service.Variable
-	Name string
-	Type TypeName
-}
+	Variable struct {
+		service.Variable
+		Name string
+		Type TypeName
+	}
 
-type Func struct {
-	service.Method
-	Name      string
-	Arguments []Variable
-	Returns   []Variable
-}
+	Func struct {
+		service.Method
+		Name      string
+		Arguments []Variable
+		Returns   []Variable
+	}
 
-type Constructor struct {
-	Func
-	Source
-}
+	Constructor struct {
+		Func
+		Source
+	}
 
-type ServiceInterface struct {
-	service.ServiceInterface
-	UserType // Has a Name and a Source location
-	Methods  map[string]Func
-}
+	ServiceInterface struct {
+		service.ServiceInterface
+		UserType // Has a Name and a Source location
+		Methods  map[string]Func
+	}
+)
 
 func (s *ServiceInterface) GetName() string {
 	return s.UserType.Name

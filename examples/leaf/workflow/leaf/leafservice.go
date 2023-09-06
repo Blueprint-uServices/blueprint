@@ -3,15 +3,19 @@ package leaf
 import (
 	ctxx "context"
 	"fmt"
-
-	. "gitlab.mpi-sws.org/cld/blueprint/examples/leaf/workflow/leaf/example"
 )
 
 type MyInt int64
 
+type NestedLeafObject struct {
+	Key   string
+	Value string
+}
+
 type LeafObject struct {
-	ID   int64
-	Name string
+	ID    int64
+	Name  string
+	Props map[string]NestedLeafObject
 }
 
 type LeafService interface {
@@ -24,7 +28,6 @@ type LeafServiceImpl struct {
 }
 
 func (l *LeafServiceImpl) HelloInt(ctx ctxx.Context, a int64) (int64, error) {
-	Hi()
 	fmt.Println("hello")
 	return a, nil
 }
