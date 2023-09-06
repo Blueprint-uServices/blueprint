@@ -1,8 +1,10 @@
 package opentelemetry
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
+	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
@@ -49,9 +51,36 @@ func (node *OpenTelemetryServerWrapper) GetInterface() service.ServiceInterface 
 	return node.Wrapped.GetInterface()
 }
 
+var serverBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
+
+		// TODO: generated OT server constructor
+
+		return nil, nil
+
+	}`
+
 func (node *OpenTelemetryServerWrapper) AddInstantiation(builder golang.DICodeBuilder) error {
-	// TODO
-	return nil
+	// Only generate instantiation code for this instance once
+	if builder.Visited(node.WrapperName) {
+		return nil
+	}
+
+	// TODO: generate the OT wrapper code
+
+	// Instantiate the code template
+	t, err := template.New(node.WrapperName).Parse(serverBuildFuncTemplate)
+	if err != nil {
+		return err
+	}
+
+	// Generate the code
+	buf := &bytes.Buffer{}
+	err = t.Execute(buf, node)
+	if err != nil {
+		return err
+	}
+
+	return builder.Declare(node.WrapperName, buf.String())
 }
 
 func (node *OpenTelemetryServerWrapper) ImplementsGolangNode()    {}

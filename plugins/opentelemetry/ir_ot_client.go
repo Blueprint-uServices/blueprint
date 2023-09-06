@@ -1,8 +1,10 @@
 package opentelemetry
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
+	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
@@ -48,6 +50,14 @@ func (node *OpenTelemetryClientWrapper) GetInterface() service.ServiceInterface 
 	return node.Server.GetInterface()
 }
 
+var clientBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
+
+		// TODO: generated OT client constructor
+
+		return nil, nil
+
+	}`
+
 func (node *OpenTelemetryClientWrapper) AddInstantiation(builder golang.DICodeBuilder) error {
 	// TODO add OT library dependency to module
 	// TODO generate client wrapper code and add to output module
@@ -57,7 +67,28 @@ func (node *OpenTelemetryClientWrapper) AddInstantiation(builder golang.DICodeBu
 	// builder.Import(...)
 	// TODO add code to instantiate the client wrapper
 	// builder.Declare(...)
-	return nil
+
+	// Only generate instantiation code for this instance once
+	if builder.Visited(node.WrapperName) {
+		return nil
+	}
+
+	// TODO: generate the OT wrapper code
+
+	// Instantiate the code template
+	t, err := template.New(node.WrapperName).Parse(clientBuildFuncTemplate)
+	if err != nil {
+		return err
+	}
+
+	// Generate the code
+	buf := &bytes.Buffer{}
+	err = t.Execute(buf, node)
+	if err != nil {
+		return err
+	}
+
+	return builder.Declare(node.WrapperName, buf.String())
 }
 
 func (node *OpenTelemetryClientWrapper) ImplementsGolangNode()    {}

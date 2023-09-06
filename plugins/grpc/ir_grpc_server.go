@@ -1,8 +1,10 @@
 package grpc
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
+	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
@@ -61,9 +63,36 @@ func (n *GolangServer) Name() string {
 	return n.InstanceName
 }
 
+var serverBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
+
+		// TODO: generated grpc server constructor
+
+		return nil, nil
+
+	}`
+
 func (node *GolangServer) AddInstantiation(builder golang.DICodeBuilder) error {
-	// TODO
-	return nil
+	// Only generate instantiation code for this instance once
+	if builder.Visited(node.InstanceName) {
+		return nil
+	}
+
+	// TODO: generate the grpc stubs
+
+	// Instantiate the code template
+	t, err := template.New(node.InstanceName).Parse(serverBuildFuncTemplate)
+	if err != nil {
+		return err
+	}
+
+	// Generate the code
+	buf := &bytes.Buffer{}
+	err = t.Execute(buf, node)
+	if err != nil {
+		return err
+	}
+
+	return builder.Declare(node.InstanceName, buf.String())
 }
 
 func (node *GolangServer) GetInterface() service.ServiceInterface {
