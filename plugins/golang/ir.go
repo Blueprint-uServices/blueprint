@@ -136,6 +136,16 @@ type (
 		irutil.VisitTracker
 
 		/*
+			Returns the fully-qualified path on the filesystem to this workspace
+		*/
+		Path() string
+
+		/*
+			This is equivalent to calling node.AddToModule, if node implements it
+		*/
+		Visit(node blueprint.IRNode) error
+
+		/*
 		   This method is used by plugins if they want to copy a locally-defined module into the generated workspace.
 
 		   The specified moduleSrcPath must point to a valid Go module with a go.mod file.
@@ -172,6 +182,16 @@ type (
 	*/
 	ModuleBuilder interface {
 		irutil.VisitTracker
+
+		/*
+			The path on the filesystem to the directory containing the module
+		*/
+		Path() string
+
+		/*
+			This is equivalent to calling node.AddToModule, if node implements it
+		*/
+		Visit(node blueprint.IRNode) error
 
 		/*
 			Adds a dependency to a given module and version.  The module can be an external dependency, or it can be

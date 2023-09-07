@@ -13,6 +13,7 @@ import (
 
 type OpenTelemetryClientWrapper struct {
 	golang.Service
+	golang.RequiresPackages
 
 	WrapperName string
 	Server      golang.Service
@@ -50,6 +51,21 @@ func (node *OpenTelemetryClientWrapper) GetInterface() service.ServiceInterface 
 	return node.Server.GetInterface()
 }
 
+func (node *OpenTelemetryClientWrapper) AddToModule(builder golang.ModuleBuilder) error {
+	// Only generate instantiation code for this instance once
+	if builder.Visited(node.WrapperName) {
+		return nil
+	}
+
+	// The client wrapper requires the server node code dependencies
+	builder.Visit(node.Server)
+
+	// TODO: here we would generate the tracing wrapper code and add it to the module
+	//       also we would add the OT library as a module dependency
+
+	return nil
+}
+
 var clientBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
 
 		// TODO: generated OT client constructor
@@ -59,21 +75,12 @@ var clientBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
 	}`
 
 func (node *OpenTelemetryClientWrapper) AddInstantiation(builder golang.DICodeBuilder) error {
-	// TODO add OT library dependency to module
-	// TODO generate client wrapper code and add to output module
-	// module := builder.Module()
-
-	// TODO import the client wrapper
-	// builder.Import(...)
-	// TODO add code to instantiate the client wrapper
-	// builder.Declare(...)
-
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.WrapperName) {
 		return nil
 	}
 
-	// TODO: generate the OT wrapper code
+	// TODO: generate the OT wrapper instantiation code
 
 	// Instantiate the code template
 	t, err := template.New(node.WrapperName).Parse(clientBuildFuncTemplate)

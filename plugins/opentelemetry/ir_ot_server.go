@@ -14,6 +14,7 @@ import (
 type OpenTelemetryServerWrapper struct {
 	golang.Service
 	golang.Instantiable
+	golang.RequiresPackages
 
 	WrapperName string
 	Wrapped     golang.Service
@@ -51,6 +52,21 @@ func (node *OpenTelemetryServerWrapper) GetInterface() service.ServiceInterface 
 	return node.Wrapped.GetInterface()
 }
 
+// Adds the 'requires' statements to the module
+func (node *OpenTelemetryServerWrapper) AddToModule(builder golang.ModuleBuilder) error {
+	// Only generate instantiation code for this instance once
+	if builder.Visited(node.WrapperName) {
+		return nil
+	}
+
+	// Make sure all code dependencies of the wrapped node are part of the module and workspace
+	builder.Visit(node.Wrapped)
+
+	// TODO: here we would generate the tracing wrapper code and add it to the module
+
+	return nil
+}
+
 var serverBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
 
 		// TODO: generated OT server constructor
@@ -65,7 +81,7 @@ func (node *OpenTelemetryServerWrapper) AddInstantiation(builder golang.DICodeBu
 		return nil
 	}
 
-	// TODO: generate the OT wrapper code
+	// TODO: generate the OT wrapper instantiation
 
 	// Instantiate the code template
 	t, err := template.New(node.WrapperName).Parse(serverBuildFuncTemplate)

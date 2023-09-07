@@ -9,6 +9,8 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc/grpccodegen"
 )
 
 // IR node for the GRPC server.  Once a service is exposed over GRPC,
@@ -17,6 +19,7 @@ import (
 // but now one exposed over GRPC.
 type GolangServer struct {
 	service.ServiceNode
+	golang.RequiresPackages
 
 	InstanceName string
 	Addr         *GolangServerAddress
@@ -63,6 +66,29 @@ func (n *GolangServer) Name() string {
 	return n.InstanceName
 }
 
+// This does the heavy lifting of generating proto files and wrapper classes
+func (node *GolangServer) AddToModule(builder golang.ModuleBuilder) error {
+	// Only generate instantiation code for this instance once
+	if builder.Visited(node.InstanceName) {
+		return nil
+	}
+
+	// We need all struct and interface code definitions to be part of the module
+	builder.Visit(node.Wrapped)
+
+	// Generate the .proto files
+	service, valid := node.Wrapped.GetInterface().(*gocode.ServiceInterface)
+	if !valid {
+		return fmt.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
+			node.Name(), node.Wrapped.GetInterface())
+	}
+	grpccodegen.GenerateGRPCProto(builder, service, "grpc")
+
+	// TODO: this should then invoke the grpc compiler on the proto file,
+	//       as well as generate grpc client and server wrappers
+	return nil
+}
+
 var serverBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
 
 		// TODO: generated grpc server constructor
@@ -76,8 +102,9 @@ func (node *GolangServer) AddInstantiation(builder golang.DICodeBuilder) error {
 	if builder.Visited(node.InstanceName) {
 		return nil
 	}
+	builder.Module().Visit(node)
 
-	// TODO: generate the grpc stubs
+	// TODO: generate the proper server wrapper instantiation code
 
 	// Instantiate the code template
 	t, err := template.New(node.InstanceName).Parse(serverBuildFuncTemplate)

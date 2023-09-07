@@ -108,6 +108,22 @@ type ParsedField struct {
 	Ast      *ast.Field
 }
 
+func ParseWorkspace(workspaceDir string) (*ParsedModuleSet, error) {
+	entries, err := os.ReadDir(workspaceDir)
+	if err != nil {
+		return nil, fmt.Errorf("unable to read workspace directory %v due to %v", workspaceDir, err.Error())
+	}
+
+	var moduleDirs []string
+	for _, e := range entries {
+		if e.IsDir() {
+			moduleDirs = append(moduleDirs, filepath.Join(workspaceDir, e.Name()))
+		}
+	}
+
+	return ParseModules(moduleDirs...)
+}
+
 func ParseModules(srcDirs ...string) (*ParsedModuleSet, error) {
 	// Create the module set
 	set := &ParsedModuleSet{}

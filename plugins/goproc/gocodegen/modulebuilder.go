@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"text/template"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/mod/modfile"
@@ -58,6 +59,20 @@ func (module *ModuleBuilderImpl) Workspace() golang.WorkspaceBuilder {
 	return module.workspace
 }
 
+func (module *ModuleBuilderImpl) Path() string {
+	return module.ModuleDir
+}
+
+func (module *ModuleBuilderImpl) Visit(node blueprint.IRNode) error {
+	if n, valid := node.(golang.RequiresPackages); valid {
+		err := n.AddToModule(module)
+		if err != nil {
+			return err
+		}
+	}
+	return module.Workspace().Visit(node)
+}
+
 func (module *ModuleBuilderImpl) Require(dependencyName string, version string) error {
 	if version == "" {
 		version = "v0.0.0"
@@ -68,6 +83,8 @@ func (module *ModuleBuilderImpl) Require(dependencyName string, version string) 
 		}
 	} else {
 		module.Requires[dependencyName] = version
+		// Eagerly build the modfile
+		return module.Finish()
 	}
 	return nil
 }

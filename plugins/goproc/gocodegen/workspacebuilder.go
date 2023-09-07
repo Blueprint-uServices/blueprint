@@ -8,6 +8,7 @@ import (
 	"text/template"
 
 	cp "github.com/otiai10/copy"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/mod/modfile"
@@ -27,10 +28,14 @@ Creates a new WorkspaceBuilder at the specified output dir.
 Will return an error if the workspacedir already exists
 */
 func NewWorkspaceBuilder(workspaceDir string) (*WorkspaceBuilderImpl, error) {
+	workspaceDir, err := filepath.Abs(workspaceDir)
+	if err != nil {
+		return nil, fmt.Errorf("invalid workspace dir %v", workspaceDir)
+	}
 	if IsDir(workspaceDir) {
 		return nil, fmt.Errorf("workspace %s already exists", workspaceDir)
 	}
-	err := os.Mkdir(workspaceDir, 0755)
+	err = os.Mkdir(workspaceDir, 0755)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create workspace %s due to %s", workspaceDir, err.Error())
 	}
@@ -39,6 +44,17 @@ func NewWorkspaceBuilder(workspaceDir string) (*WorkspaceBuilderImpl, error) {
 	workspace.ModuleDirs = make(map[string]string)
 	workspace.Modules = make(map[string]string)
 	return workspace, nil
+}
+
+func (workspace *WorkspaceBuilderImpl) Path() string {
+	return workspace.WorkspaceDir
+}
+
+func (workspace *WorkspaceBuilderImpl) Visit(node blueprint.IRNode) error {
+	if n, valid := node.(golang.ProvidesModule); valid {
+		return n.AddToWorkspace(workspace)
+	}
+	return nil
 }
 
 func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSrcPath string) error {

@@ -9,12 +9,15 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc/grpccodegen"
 )
 
 // IRNode representing a client to a Golang server
 type GolangClient struct {
 	golang.Node
 	golang.Service
+	golang.RequiresPackages
 
 	InstanceName string
 	ServerAddr   *GolangServerAddress
@@ -51,11 +54,42 @@ func (n *GolangClient) Name() string {
 }
 
 func (node *GolangClient) GetInterface() service.ServiceInterface {
+	return node.GetGoInterface()
+}
+
+func (node *GolangClient) GetGoInterface() *gocode.ServiceInterface {
 	grpc, isGrpc := node.ServerAddr.GetInterface().(*GRPCInterface)
 	if !isGrpc {
 		return nil
 	}
-	return grpc.Wrapped
+	wrapped, isValid := grpc.Wrapped.(*gocode.ServiceInterface)
+	if !isValid {
+		return nil
+	}
+	return wrapped
+}
+
+// This does the heavy lifting of generating proto files and wrapper classes
+func (node *GolangClient) AddToModule(builder golang.ModuleBuilder) error {
+	// Only generate instantiation code for this instance once
+	if builder.Visited(node.InstanceName) {
+		return nil
+	}
+
+	// We need all struct and interface code definitions to be part of the module
+	builder.Visit(node.ServerAddr.Server)
+
+	// Generate the .proto files
+	service := node.GetGoInterface()
+	if service == nil {
+		return fmt.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
+			node.Name(), node.ServerAddr.GetInterface())
+	}
+	grpccodegen.GenerateGRPCProto(builder, service, "grpc")
+
+	// TODO: this should then invoke the grpc compiler on the proto file,
+	//       as well as generate grpc client and server wrappers
+	return nil
 }
 
 var clientBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
@@ -72,7 +106,9 @@ func (node *GolangClient) AddInstantiation(builder golang.DICodeBuilder) error {
 		return nil
 	}
 
-	// TODO: generate the grpc stubs
+	builder.Module().Visit(node)
+
+	// TODO: generate the proper client wrapper instantiation code
 
 	// Instantiate the code template
 	t, err := template.New(node.InstanceName).Parse(clientBuildFuncTemplate)
