@@ -1,9 +1,55 @@
 package workflow
 
 import (
+	"fmt"
+	"path/filepath"
+	"runtime"
+
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
 )
+
+var workflowSpecModulePaths []string
+var workflowSpec *WorkflowSpec
+
+/*
+The Golang workflow plugin must be initialized in the wiring spec with the location of the workflow
+spec modules.
+
+Workflow specs can be included from more than one source module.
+
+The provided paths should be to the root of a go module (containing a go.mod file).  The arguments
+are assumed to be **relative** to the calling file.
+
+This can be called more than once, which will concatenate all provided srcModulePaths
+*/
+func Init(srcModulePaths ...string) {
+	_, callingFile, _, _ := runtime.Caller(1)
+	dir, _ := filepath.Split(callingFile)
+	for _, path := range srcModulePaths {
+		workflowPath := filepath.Join(dir, path)
+		workflowSpecModulePaths = append(workflowSpecModulePaths, workflowPath)
+	}
+	workflowSpec = nil
+}
+
+// Static initialization of the workflow spec
+func getSpec() (*WorkflowSpec, error) {
+	if workflowSpec != nil {
+		return workflowSpec, nil
+	}
+
+	if len(workflowSpecModulePaths) == 0 {
+		return nil, fmt.Errorf("workflow spec src directories haven't been specified; use workflow.Init(srcPath) to add your workflow spec")
+	}
+
+	spec, err := NewWorkflowSpec(workflowSpecModulePaths...)
+	if err != nil {
+		return nil, err
+	}
+	workflowSpec = spec
+	return workflowSpec, nil
+}
 
 /*
 This adds a service to the application, using a definition that was provided in the workflow spec.
@@ -17,7 +63,6 @@ This call creates several definitions within the wiring spec.  In particular, `s
 defined as a pointer to the actual service, and can thus be modified and
 */
 func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string {
-
 	// Define the service
 	handlerName := serviceName + ".handler"
 	wiring.Define(handlerName, &WorkflowService{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {

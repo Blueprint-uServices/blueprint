@@ -5,4 +5,5 @@ use (
 	./examples/leaf/wiring
 	./examples/leaf/workflow
 	./plugins
+	./runtime
 )

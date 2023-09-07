@@ -1,47 +1,27 @@
 package memcached
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
+	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
-
-type MemcachedProcess struct {
-	process.ProcessNode
-	backend.Cache
-
-	InstanceName string
-	Addr         *pointer.Address
-}
 
 type MemcachedGoClient struct {
 	golang.Service
 	backend.Cache
 
 	InstanceName string
-	Addr         *pointer.Address
-}
-
-func newMemcachedProcess(name string, addr blueprint.IRNode) (*MemcachedProcess, error) {
-	addrNode, is_addr := addr.(*pointer.Address)
-	if !is_addr {
-		return nil, fmt.Errorf("%s expected %s to be an address but found %s", name, addr.Name(), reflect.TypeOf(addr).String())
-	}
-
-	proc := &MemcachedProcess{}
-	proc.InstanceName = name
-	proc.Addr = addrNode
-	return proc, nil
+	Addr         *MemcachedAddr
 }
 
 func newMemcachedGoClient(name string, addr blueprint.IRNode) (*MemcachedGoClient, error) {
-	addrNode, is_addr := addr.(*pointer.Address)
+	addrNode, is_addr := addr.(*MemcachedAddr)
 	if !is_addr {
 		return nil, fmt.Errorf("%s expected %s to be an address but found %s", name, addr.Name(), reflect.TypeOf(addr).String())
 	}
@@ -50,14 +30,6 @@ func newMemcachedGoClient(name string, addr blueprint.IRNode) (*MemcachedGoClien
 	client.InstanceName = name
 	client.Addr = addrNode
 	return client, nil
-}
-
-func (n *MemcachedProcess) String() string {
-	return n.InstanceName + " = MemcachedProcess(" + n.Addr.Name() + ")"
-}
-
-func (n *MemcachedProcess) Name() string {
-	return n.InstanceName
 }
 
 func (n *MemcachedGoClient) String() string {
@@ -69,7 +41,40 @@ func (n *MemcachedGoClient) Name() string {
 }
 
 func (n *MemcachedGoClient) GetInterface() *service.ServiceInterface {
+	// TODO: return memcached interface
 	return nil
+}
+
+var clientBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
+
+		// TODO: generated memcached client constructor
+
+		return nil, nil
+
+	}`
+
+func (node *MemcachedGoClient) AddInstantiation(builder golang.DICodeBuilder) error {
+	// Only generate instantiation code for this instance once
+	if builder.Visited(node.InstanceName) {
+		return nil
+	}
+
+	// TODO: generate the grpc stubs
+
+	// Instantiate the code template
+	t, err := template.New(node.InstanceName).Parse(clientBuildFuncTemplate)
+	if err != nil {
+		return err
+	}
+
+	// Generate the code
+	buf := &bytes.Buffer{}
+	err = t.Execute(buf, node)
+	if err != nil {
+		return err
+	}
+
+	return builder.Declare(node.InstanceName, buf.String())
 }
 
 func (node *MemcachedGoClient) ImplementsGolangNode()    {}

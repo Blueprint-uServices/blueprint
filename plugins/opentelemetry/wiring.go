@@ -2,6 +2,7 @@ package opentelemetry
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
 	"golang.org/x/exp/slog"
 )
@@ -127,7 +128,13 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 	})
 
 	// Define the address and add it to the pointer dst
-	pointer.DefineAddress(wiring, collectorAddr, collectorProc, &blueprint.ApplicationNode{})
+	address.Define(wiring, collectorAddr, collectorProc, &blueprint.ApplicationNode{}, func(scope blueprint.Scope) (address.Address, error) {
+		addr := &OpenTelemetryCollectorAddr{
+			AddrName:  collectorAddr,
+			Collector: nil,
+		}
+		return addr, nil
+	})
 	ptr.AddDstModifier(wiring, collectorAddr)
 
 	// Return the name of the pointer

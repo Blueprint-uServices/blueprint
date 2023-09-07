@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 )
 
 type PointerDef struct {
@@ -100,18 +101,22 @@ func (ptr *PointerDef) InstantiateDst(scope blueprint.Scope) (blueprint.IRNode, 
 			return nil, err
 		}
 
-		addr, is_addr := node.(*Address)
+		addr, is_addr := node.(address.Address)
 		if is_addr {
-			if addr.DstNode != nil {
+			dstName, err := address.DestinationOf(scope, modifier)
+			if err != nil {
+				return nil, err
+			}
+			if addr.GetDestination() != nil {
 				// Destination has already been instantiated, stop instantiating now
-				scope.Info("Destination %s of %s has already been instantiated", addr.Destination, addr.name)
+				scope.Info("Destination %s of %s has already been instantiated", dstName, addr.Name())
 				return nil, nil
 			} else {
-				dst, err := scope.Get(addr.Destination)
+				dst, err := scope.Get(dstName)
 				if err != nil {
 					return nil, err
 				}
-				addr.DstNode = dst
+				addr.SetDestination(dst)
 			}
 		}
 	}

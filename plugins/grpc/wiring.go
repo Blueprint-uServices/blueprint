@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
 	"golang.org/x/exp/slog"
 )
@@ -58,7 +59,13 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 	})
 
 	// Define the address and add it to the pointer dst
-	pointer.DefineAddress(wiring, grpcAddr, grpcServer, &blueprint.ApplicationNode{})
+	address.Define(wiring, grpcAddr, grpcServer, &blueprint.ApplicationNode{}, func(scope blueprint.Scope) (address.Address, error) {
+		addr := &GolangServerAddress{
+			AddrName: grpcAddr,
+			Server:   nil,
+		}
+		return addr, nil
+	})
 	ptr.AddDstModifier(wiring, grpcAddr)
 
 }

@@ -13,10 +13,10 @@ type NonLeafServiceImpl struct {
 	leafService LeafService
 }
 
-func NewNonLeafServiceImpl(leafService LeafService) *NonLeafServiceImpl {
+func NewNonLeafServiceImpl(leafService LeafService) (NonLeafService, error) {
 	nonleaf := &NonLeafServiceImpl{}
 	nonleaf.leafService = leafService
-	return nonleaf
+	return nonleaf, nil
 }
 
 func (nl *NonLeafServiceImpl) Hello(ctx context.Context, a int64) (int64, error) {
