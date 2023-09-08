@@ -135,10 +135,14 @@ func (client *{{$receiver}}) {{$f.Name}}(
 	{{- range $i, $arg := $f.Arguments -}}
 		{{if $i}}, {{end}}{{$arg.Name}} {{$imports.NameOf $arg.Type}}
 	{{- end -}}
-) {}
+) (
+	{{- range $i, $ret := $f.Returns -}}
+	{{if $i}}, {{end}}{{$imports.NameOf $ret.Type}}
+	{{- end -}}
+) {
+	// TODO: WIP
+}
 {{end}}
-
-// TODO: WIP
 `
 
 // Func struct {
