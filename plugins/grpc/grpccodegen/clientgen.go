@@ -128,6 +128,7 @@ func New_{{.Name}}(serverAddress string) (*{{.Name}}, error) {
 	return wrapper, nil
 }
 
+{{$service := .Service.Name}}
 {{$receiver := .Name}}
 {{$imports := .Imports}}
 {{ range $_, $f := .Service.Methods }}
@@ -140,23 +141,29 @@ func (client *{{$receiver}}) {{$f.Name}}(
 	{{if $i}}, {{end}}{{$imports.NameOf $ret.Type}}
 	{{- end -}}
 ) {
-	// TODO: WIP
+	{{$ctx := (index $f.Arguments 0).Name}}
+
+	request := &{{$service}}_{{$f.Name}}_Request{}
+	{{$ctx}}, cancel := context.WithTimeout({{$ctx}},client.Timeout)
+	defer cancel()
+
+	// TODO: arg marshalling for args 1:n
+
+	response, err := client.Client.{{$f.Name}}({{$ctx}},request)
+
+	{{range $i, $ret := $f.Returns -}}
+	var ret{{$i}} {{$imports.NameOf $ret.Type}}
+	{{end}}
+
+	// TODO: returns marshalling
+
+	if err == nil {
+		err = ctx.Err()
+	}
+	return {{range $i, $ret := $f.Returns}}{{if $i}}, {{end}}ret{{$i}}{{end}}
 }
 {{end}}
 `
-
-// Func struct {
-// 	service.Method
-// 	Name      string
-// 	Arguments []Variable
-// 	Returns   []Variable
-// }
-
-// Variable struct {
-// 	service.Variable
-// 	Name string
-// 	Type TypeName
-// }
 
 /*
 Generates the file within its module
