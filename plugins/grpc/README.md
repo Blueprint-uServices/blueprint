@@ -13,9 +13,11 @@ The plugin makes use of the protocol buffers compiler `protoc` and its Golang ex
 
 
 
-## Internals
+## IR Internals
 
 The Blueprint GRPC plugin introduces three node types: a client, a server, and an address.
+
+## Code generation
 
 Code generation for GRPC comprises the following pieces:
 
@@ -24,3 +26,12 @@ Code generation for GRPC comprises the following pieces:
 - invoking the GRPC compiler to generate GRPC code from the proto file
 - generating a client implementation
 - generating a server implementation
+
+The above steps happen during module generation -- the GPRC plugin generates source files and adds them to the module being constructed.
+
+In addition, code generation has the following:
+
+- instantiation logic for client
+- instantiation logic for server
+
+The above steps happen during DI code generation -- e.g. as performed by the goproc plugin

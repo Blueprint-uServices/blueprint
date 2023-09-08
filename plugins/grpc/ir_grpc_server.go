@@ -92,8 +92,12 @@ func (node *GolangServer) AddToModule(builder golang.ModuleBuilder) error {
 		return err
 	}
 
-	// TODO: this should then invoke the grpc compiler on the proto file,
-	//       as well as generate grpc client and server wrappers
+	// Generate the RPC server handler
+	err = grpccodegen.GenerateServerHandler(builder, service, "grpc")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

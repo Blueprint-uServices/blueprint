@@ -88,8 +88,8 @@ func (node *GolangClient) AddToModule(builder golang.ModuleBuilder) error {
 			node.Name(), node.ServerAddr.GetInterface())
 	}
 
-	// Generate the client wrapper
-	err = grpccodegen.GenerateClientWrapper(builder, service, "grpc")
+	// Generate the RPC client
+	err = grpccodegen.GenerateClient(builder, service, "grpc")
 	if err != nil {
 		return err
 	}
