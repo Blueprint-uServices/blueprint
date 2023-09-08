@@ -14,6 +14,11 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+/*
+Generates the GRPC .proto file for the provided service interface, then compiles it using `protoc`.
+
+See the plugin README for the required GRPC and protocol buffers package dependencies.
+*/
 func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error {
 	// No need to generate the proto more than once
 	if builder.Visited(outputPackage + "/" + service.Name + ".proto") {
@@ -21,7 +26,7 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 	}
 
 	// Re-parse all of the modules, which can include generated code from other plugins
-	modules, err := goparser.ParseWorkspace(builder.Workspace().Path())
+	modules, err := goparser.ParseWorkspace(builder.Workspace().Info().Path)
 	if err != nil {
 		return err
 	}
@@ -38,7 +43,7 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 	outputPackageName := splits[len(splits)-1]
 	pb.Package = outputPackageName
 
-	outputDir := filepath.Join(builder.Path(), filepath.Join(splits...))
+	outputDir := filepath.Join(builder.Info().Path, filepath.Join(splits...))
 	err = os.MkdirAll(outputDir, 0755)
 	if err != nil {
 		return fmt.Errorf("unable to create grpc output dir %v due to %v", outputDir, err.Error())

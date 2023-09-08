@@ -4,6 +4,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 )
 
 /*
@@ -125,6 +126,10 @@ APIs used by the above IR nodes when they are generating code.
 The main implementation of these interfaces is in the [goprocess](../goprocess) plugin
 */
 type (
+	WorkspaceInfo struct {
+		Path string // fully-qualified path on the filesystem to this workspace
+	}
+
 	/*
 	   WorkspaceBuilder is used by plugins if they want to collect and combine Golang code and modules.
 
@@ -136,9 +141,9 @@ type (
 		irutil.VisitTracker
 
 		/*
-			Returns the fully-qualified path on the filesystem to this workspace
+			Metadata into about the workspace being built
 		*/
-		Path() string
+		Info() WorkspaceInfo
 
 		/*
 			This is equivalent to calling node.AddToModule, if node implements it
@@ -167,6 +172,12 @@ type (
 		GetLocalModule(modulePath string) (string, bool)
 	}
 
+	ModuleInfo struct {
+		Name    string // Fully-qualified module name being built
+		Version string // Version of the module being built
+		Path    string // The path on the filesystem to the directory containing the module
+	}
+
 	/*
 	   ModuleBuilder is used by IRNodes for plugins that want to generate Golang code and collect it into a module.
 
@@ -184,9 +195,9 @@ type (
 		irutil.VisitTracker
 
 		/*
-			The path on the filesystem to the directory containing the module
+			Metadata into about the module being built
 		*/
-		Path() string
+		Info() ModuleInfo
 
 		/*
 			This is equivalent to calling node.AddToModule, if node implements it
@@ -203,6 +214,11 @@ type (
 			to point the dependency directly to those local modules.
 		*/
 		Require(dependencyName string, version string) error
+
+		/*
+			The same as `Require` but where the dependency is extracted from the type
+		*/
+		RequireType(t gocode.TypeName) error
 
 		/*
 			Gets the WorkspaceBuilder that contains this ModuleBuilder

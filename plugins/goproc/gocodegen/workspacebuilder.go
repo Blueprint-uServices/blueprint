@@ -46,8 +46,10 @@ func NewWorkspaceBuilder(workspaceDir string) (*WorkspaceBuilderImpl, error) {
 	return workspace, nil
 }
 
-func (workspace *WorkspaceBuilderImpl) Path() string {
-	return workspace.WorkspaceDir
+func (workspace *WorkspaceBuilderImpl) Info() golang.WorkspaceInfo {
+	return golang.WorkspaceInfo{
+		Path: workspace.WorkspaceDir,
+	}
 }
 
 func (workspace *WorkspaceBuilderImpl) Visit(node blueprint.IRNode) error {

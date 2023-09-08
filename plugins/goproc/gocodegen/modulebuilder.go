@@ -9,6 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"golang.org/x/mod/modfile"
 )
 
@@ -59,8 +60,12 @@ func (module *ModuleBuilderImpl) Workspace() golang.WorkspaceBuilder {
 	return module.workspace
 }
 
-func (module *ModuleBuilderImpl) Path() string {
-	return module.ModuleDir
+func (module *ModuleBuilderImpl) Info() golang.ModuleInfo {
+	return golang.ModuleInfo{
+		Name:    module.Name,
+		Version: "v0.0.0",
+		Path:    module.ModuleDir,
+	}
 }
 
 func (module *ModuleBuilderImpl) Visit(node blueprint.IRNode) error {
@@ -77,6 +82,9 @@ func (module *ModuleBuilderImpl) Require(dependencyName string, version string) 
 	if version == "" {
 		version = "v0.0.0"
 	}
+	if dependencyName == module.Name {
+		return nil
+	}
 	if existingVersion, exists := module.Requires[dependencyName]; exists {
 		if existingVersion != version {
 			return fmt.Errorf("module %s requires two conflicting versions for dependency %s: %s and %s", module.Name, dependencyName, version, existingVersion)
@@ -85,6 +93,13 @@ func (module *ModuleBuilderImpl) Require(dependencyName string, version string) 
 		module.Requires[dependencyName] = version
 		// Eagerly build the modfile
 		return module.Finish()
+	}
+	return nil
+}
+
+func (module *ModuleBuilderImpl) RequireType(t gocode.TypeName) error {
+	if ut, isUt := t.(*gocode.UserType); isUt {
+		return module.Require(ut.ModuleName, ut.ModuleVersion)
 	}
 	return nil
 }
