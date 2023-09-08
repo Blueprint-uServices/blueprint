@@ -74,15 +74,23 @@ func (node *GolangServer) AddToModule(builder golang.ModuleBuilder) error {
 	}
 
 	// We need all struct and interface code definitions to be part of the module
-	builder.Visit(node.Wrapped)
+	err := builder.Visit(node.Wrapped)
+	if err != nil {
+		return err
+	}
 
-	// Generate the .proto files
 	service, valid := node.Wrapped.GetInterface().(*gocode.ServiceInterface)
 	if !valid {
 		return fmt.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
 			node.Name(), node.Wrapped.GetInterface())
 	}
-	grpccodegen.GenerateGRPCProto(builder, service, "grpc")
+
+	// Generate the .proto files
+	err = grpccodegen.GenerateGRPCProto(builder, service, "grpc")
+	if err != nil {
+		fmt.Println("error compiling grpc proto on server")
+		return err
+	}
 
 	// TODO: this should then invoke the grpc compiler on the proto file,
 	//       as well as generate grpc client and server wrappers
@@ -102,7 +110,10 @@ func (node *GolangServer) AddInstantiation(builder golang.DICodeBuilder) error {
 	if builder.Visited(node.InstanceName) {
 		return nil
 	}
-	builder.Module().Visit(node)
+	err := builder.Module().Visit(node)
+	if err != nil {
+		return err
+	}
 
 	// TODO: generate the proper server wrapper instantiation code
 

@@ -3,6 +3,7 @@ package grpccodegen
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -10,9 +11,15 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
+	"golang.org/x/exp/slog"
 )
 
 func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error {
+	// No need to generate the proto more than once
+	if builder.Visited(outputPackage + "/" + service.Name + ".proto") {
+		return nil
+	}
+
 	// Re-parse all of the modules, which can include generated code from other plugins
 	modules, err := goparser.ParseWorkspace(builder.Workspace().Path())
 	if err != nil {
@@ -30,7 +37,6 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 	splits := strings.Split(outputPackage, "/")
 	outputPackageName := splits[len(splits)-1]
 	pb.Package = outputPackageName
-	pb.GoPackage = outputPackage
 
 	outputDir := filepath.Join(builder.Path(), filepath.Join(splits...))
 	err = os.MkdirAll(outputDir, 0755)
@@ -38,43 +44,68 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 		return fmt.Errorf("unable to create grpc output dir %v due to %v", outputDir, err.Error())
 	}
 
-	outputFilename := service.Name + ".proto"
-	return pb.WriteProtoFile(filepath.Join(outputDir, outputFilename))
+	// Write the proto file
+	outputFilename := filepath.Join(outputDir, service.Name+".proto")
+	err = pb.WriteProtoFile(outputFilename)
+	if err != nil {
+		return err
+	}
+
+	// Compile the proto file
+	fmt.Println("compiling proto file")
+	return CompileProtoFile(outputFilename)
 }
 
-type GRPCField struct {
-	Type     string // The GRPC type
-	Name     string
-	Position int
+func CompileProtoFile(protoFileName string) error {
+	proto_path, _ := filepath.Split(protoFileName)
+	cmd := exec.Command("protoc", protoFileName, "--go_out="+proto_path, "--go-grpc_out="+proto_path, "--go_opt=paths=source_relative", "--go-grpc_opt=paths=source_relative", "--proto_path="+proto_path)
+	var out strings.Builder
+	cmd.Stdout = &out
+	cmd.Stderr = &out
+	slog.Info(fmt.Sprintf("%v", cmd))
+	err := cmd.Run()
+	if err != nil {
+		slog.Info(out.String())
+		return err
+	}
+	return nil
 }
 
-type GRPCMessageDecl struct {
-	Builder   *GRPCProtoBuilder
-	Name      string
-	FieldList []*GRPCField
-}
+/* A basic structural representation of the GRPC messages and services */
+type (
+	GRPCField struct {
+		Type     string // The GRPC type
+		Name     string
+		Position int
+	}
 
-type GRPCMethodDecl struct {
-	Service  *GRPCServiceDecl
-	Name     string
-	Request  *GRPCMessageDecl
-	Response *GRPCMessageDecl
-}
+	GRPCMessageDecl struct {
+		Builder   *GRPCProtoBuilder
+		Name      string
+		FieldList []*GRPCField
+	}
 
-type GRPCServiceDecl struct {
-	Builder *GRPCProtoBuilder
-	Name    string
-	Methods map[string]*GRPCMethodDecl
-}
+	GRPCMethodDecl struct {
+		Service  *GRPCServiceDecl
+		Name     string
+		Request  *GRPCMessageDecl
+		Response *GRPCMessageDecl
+	}
 
-type GRPCProtoBuilder struct {
-	Code      *goparser.ParsedModuleSet
-	Package   string
-	GoPackage string
-	Services  map[string]*GRPCServiceDecl
-	Messages  map[string]*GRPCMessageDecl
-	Structs   map[gocode.UserType]*GRPCMessageDecl // Mapping from golang struct to the corresponding message
-}
+	GRPCServiceDecl struct {
+		Builder *GRPCProtoBuilder
+		Name    string
+		Methods map[string]*GRPCMethodDecl
+	}
+
+	GRPCProtoBuilder struct {
+		Code     *goparser.ParsedModuleSet
+		Package  string
+		Services map[string]*GRPCServiceDecl
+		Messages map[string]*GRPCMessageDecl
+		Structs  map[gocode.UserType]*GRPCMessageDecl // Mapping from golang struct to the corresponding message
+	}
+)
 
 func NewProtoBuilder(code *goparser.ParsedModuleSet) *GRPCProtoBuilder {
 	b := &GRPCProtoBuilder{}
@@ -83,6 +114,42 @@ func NewProtoBuilder(code *goparser.ParsedModuleSet) *GRPCProtoBuilder {
 	b.Messages = make(map[string]*GRPCMessageDecl)
 	b.Structs = make(map[gocode.UserType]*GRPCMessageDecl)
 	return b
+}
+
+var protoFileTemplate = `syntax="proto3";
+option go_package="./;{{ .Package }}";
+package {{ .Package }};
+
+{{ range $k, $msg := .Messages }}
+message {{$msg.Name}} {
+    {{- range $k, $field := $msg.FieldList}}
+    {{$field.Type}} {{$field.Name}} = {{$field.Position}};
+    {{- end}}
+}
+{{ end -}}
+
+{{ range $k, $service := .Services }}
+service {{$service.Name}} {
+    {{- range $k, $method := $service.Methods}}
+    rpc {{$method.Name}} ({{$method.Request.Name}}) returns ({{$method.Response.Name}}) {}
+    {{- end}}
+}
+{{ end }}
+`
+
+func (b *GRPCProtoBuilder) WriteProtoFile(outputFilePath string) error {
+	t, err := template.New("protofile").Parse(protoFileTemplate)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.OpenFile(outputFilePath, os.O_CREATE, 0755)
+	if err != nil {
+		return err
+	}
+
+	return t.Execute(f, b)
+
 }
 
 func (b *GRPCProtoBuilder) newMessage(name string) *GRPCMessageDecl {
@@ -151,7 +218,7 @@ func (b *GRPCProtoBuilder) AddService(iface *gocode.ServiceInterface) error {
 			req.FieldList = append(req.FieldList, &GRPCField{
 				Type:     grpcType,
 				Name:     arg.Name,
-				Position: i,
+				Position: i + 1,
 			})
 		}
 
@@ -170,8 +237,8 @@ func (b *GRPCProtoBuilder) AddService(iface *gocode.ServiceInterface) error {
 
 			rsp.FieldList = append(rsp.FieldList, &GRPCField{
 				Type:     grpcType,
-				Name:     ret.Name,
-				Position: i,
+				Name:     fmt.Sprintf("ret%v", i+1),
+				Position: i + 1,
 			})
 		}
 	}
@@ -228,7 +295,7 @@ func (b *GRPCProtoBuilder) GetOrAddMessage(t *gocode.UserType) (*GRPCMessageDecl
 		msg.FieldList = append(msg.FieldList, &GRPCField{
 			Type:     fieldType,
 			Name:     field.Name,
-			Position: field.Position,
+			Position: len(msg.FieldList) + 1,
 		})
 	}
 
@@ -319,40 +386,4 @@ func (b *GRPCProtoBuilder) getGRPCType(t gocode.TypeName) (string, error) {
 			return "", fmt.Errorf("GRPC cannot serialize %v", t.String())
 		}
 	}
-}
-
-var protoFileTemplate = `syntax="proto3";
-option go_package="{{ .GoPackage }}";
-package {{ .Package }};
-
-{{ range $k, $msg := .Messages }}
-message {{$msg.Name}} {
-    {{- range $k, $field := $msg.FieldList}}
-    {{$field.Type}} {{$field.Name}} = {{$field.Position}}
-    {{- end}}
-}
-{{ end -}}
-
-{{ range $k, $service := .Services }}
-service {{$service.Name}} {
-    {{- range $k, $method := $service.Methods}}
-    rpc {{$method.Name}} ({{$method.Request.Name}}) returns ({{$method.Response.Name}}) {}
-    {{- end}}
-}
-{{ end }}
-`
-
-func (b *GRPCProtoBuilder) WriteProtoFile(outputFilePath string) error {
-	t, err := template.New("protofile").Parse(protoFileTemplate)
-	if err != nil {
-		return err
-	}
-
-	f, err := os.OpenFile(outputFilePath, os.O_CREATE, 0755)
-	if err != nil {
-		return err
-	}
-
-	return t.Execute(f, b)
-
 }

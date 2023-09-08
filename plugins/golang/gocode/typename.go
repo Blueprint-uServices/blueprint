@@ -166,6 +166,13 @@ type (
 	}
 
 	/*
+		The 'any' type which is just interface{}
+	*/
+	AnyType struct {
+		TypeName
+	}
+
+	/*
 		A function signature.  For now Blueprint doesn't support
 		functions in service method declarations, so we don't
 		bother unravelling and representing the function
@@ -235,6 +242,10 @@ func (t *InterfaceType) String() string {
 	return "interface{.}"
 }
 
+func (t *AnyType) String() string {
+	return "any"
+}
+
 func (t *FuncType) String() string {
 	return "func(.){.}"
 }
@@ -253,6 +264,7 @@ func (t *Map) IsTypeName()           {}
 func (t *Chan) IsTypeName()          {}
 func (t *ReceiveChan) IsTypeName()   {}
 func (t *SendChan) IsTypeName()      {}
+func (t *AnyType) IsTypeName()       {}
 func (t *InterfaceType) IsTypeName() {}
 func (t *FuncType) IsTypeName()      {}
 func (t *StructType) IsTypeName()    {}

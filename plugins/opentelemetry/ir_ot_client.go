@@ -58,7 +58,10 @@ func (node *OpenTelemetryClientWrapper) AddToModule(builder golang.ModuleBuilder
 	}
 
 	// The client wrapper requires the server node code dependencies
-	builder.Visit(node.Server)
+	err := builder.Visit(node.Server)
+	if err != nil {
+		return err
+	}
 
 	// TODO: here we would generate the tracing wrapper code and add it to the module
 	//       also we would add the OT library as a module dependency

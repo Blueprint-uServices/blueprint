@@ -108,6 +108,9 @@ type ParsedField struct {
 	Ast      *ast.Field
 }
 
+/*
+Parse all modules in the specified directory
+*/
 func ParseWorkspace(workspaceDir string) (*ParsedModuleSet, error) {
 	entries, err := os.ReadDir(workspaceDir)
 	if err != nil {
@@ -124,6 +127,9 @@ func ParseWorkspace(workspaceDir string) (*ParsedModuleSet, error) {
 	return ParseModules(moduleDirs...)
 }
 
+/*
+Parse the specified module directories
+*/
 func ParseModules(srcDirs ...string) (*ParsedModuleSet, error) {
 	// Create the module set
 	set := &ParsedModuleSet{}
@@ -356,12 +362,17 @@ func (f *ParsedFunc) Parse() error {
 /*
 An ident can be:
   - a basic type, like int64, float32 etc.
+  - any
   - a type declared locally within the file or package
   - a type imported with an `import . "package"` decl
 */
 func (f *ParsedFile) ResolveIdent(name string) gocode.TypeName {
 	if gocode.IsBasicType(name) {
 		return &gocode.BasicType{Name: name}
+	}
+
+	if name == "any" {
+		return &gocode.AnyType{}
 	}
 
 	local, isLocalType := f.Package.DeclaredTypes[name]

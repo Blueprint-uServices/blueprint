@@ -64,7 +64,7 @@ func NewDICodeBuilder(module *ModuleBuilderImpl, fileName, packagePath, funcName
 	builder.FuncName = funcName
 
 	// Add the runtime module as a dependency, in case it hasn't already
-	builder.module.workspace.AddLocalModuleRelative("runtime", "../../runtime")
+	builder.module.workspace.AddLocalModuleRelative("runtime", "../../../runtime")
 	builder.module.Require("gitlab.mpi-sws.org/cld/blueprint/runtime", "v0.0.0")
 
 	return builder, nil

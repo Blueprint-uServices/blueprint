@@ -60,7 +60,10 @@ func (node *OpenTelemetryServerWrapper) AddToModule(builder golang.ModuleBuilder
 	}
 
 	// Make sure all code dependencies of the wrapped node are part of the module and workspace
-	builder.Visit(node.Wrapped)
+	err := builder.Visit(node.Wrapped)
+	if err != nil {
+		return err
+	}
 
 	// TODO: here we would generate the tracing wrapper code and add it to the module
 
