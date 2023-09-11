@@ -282,14 +282,12 @@ func (pkg *ParsedPackage) Load() error {
 }
 
 func (pkg *ParsedPackage) Parse() error {
-	fmt.Println("Parsing " + pkg.Name)
 	for _, iface := range pkg.Interfaces {
 		for _, method := range iface.Methods {
 			err := method.Parse()
 			if err != nil {
 				return err
 			}
-			fmt.Printf("Parsed %v.%v\n", iface.Name, method.String())
 		}
 	}
 	for _, struc := range pkg.Structs {
@@ -298,7 +296,6 @@ func (pkg *ParsedPackage) Parse() error {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("Parsed %v.%v\n", struc.Name, method.String())
 		}
 	}
 	for _, struc := range pkg.Structs {
@@ -308,14 +305,12 @@ func (pkg *ParsedPackage) Parse() error {
 				return err
 			}
 		}
-		fmt.Println(struc.String())
 	}
 	for _, f := range pkg.Funcs {
 		err := f.Parse()
 		if err != nil {
 			return err
 		}
-		fmt.Printf("Parsed %v\n", f.String())
 	}
 	return nil
 }
@@ -325,7 +320,6 @@ func (f *ParsedField) Parse() error {
 	if f.Type == nil {
 		return fmt.Errorf("unable to resolve the type of %v field %v", f.Struct.Name, f)
 	}
-	fmt.Printf("Parsed %v\n", f.String())
 	return nil
 }
 
@@ -466,10 +460,8 @@ func (f *ParsedFile) LoadImports() error {
 
 		if importedAs == "." {
 			f.AnonymousImports = append(f.AnonymousImports, i)
-			fmt.Println("Import anonymous package " + i.PackageName)
 		} else {
 			f.NamedImports[importedAs] = i
-			fmt.Println("Import " + importedAs + " \"" + i.PackageName + "\"")
 		}
 
 	}
@@ -480,7 +472,6 @@ func (i *ParsedImport) FindSourceModule() error {
 	mod := i.File.Package.Module
 
 	if gocode.IsBuiltinPackage(i.PackageName) {
-		fmt.Println("builtin import " + i.PackageName)
 		return nil
 	}
 
@@ -488,7 +479,6 @@ func (i *ParsedImport) FindSourceModule() error {
 		// Is a module-local import
 		i.ModuleName = mod.Name
 		i.ModuleVersion = mod.Version
-		fmt.Println("module local import " + i.PackageName)
 		return nil
 	}
 
@@ -497,7 +487,6 @@ func (i *ParsedImport) FindSourceModule() error {
 		if strings.HasPrefix(i.PackageName, req.Mod.Path) {
 			i.ModuleName = req.Mod.Path
 			i.ModuleVersion = req.Mod.Version
-			fmt.Println("import " + i.PackageName + " from module " + i.ModuleName)
 			return nil
 		}
 	}
@@ -548,7 +537,6 @@ func (f *ParsedFile) LoadStructsAndInterfaces() error {
 					iface.Name = typespec.Name.Name
 					iface.Methods = make(map[string]*ParsedFunc)
 					f.Package.Interfaces[iface.Name] = iface
-					fmt.Println("Found interface " + u.Name)
 
 					// Can load interface funcs immediately
 					for _, methodDecl := range t.Methods.List {
@@ -562,7 +550,6 @@ func (f *ParsedFile) LoadStructsAndInterfaces() error {
 						method.File = f
 						method.Name = methodDecl.Names[0].Name
 						iface.Methods[method.Name] = method
-						fmt.Printf("Found method %v.%v\n", iface.Name, method.Name)
 					}
 				}
 			case *ast.StructType:
@@ -577,7 +564,6 @@ func (f *ParsedFile) LoadStructsAndInterfaces() error {
 					struc.PromotedField = nil
 					struc.AnonymousFields = nil
 					f.Package.Structs[struc.Name] = struc
-					fmt.Println("Found struct " + u.Name)
 
 					if t.Fields != nil {
 						for i, fieldDecl := range t.Fields.List {
@@ -597,8 +583,6 @@ func (f *ParsedFile) LoadStructsAndInterfaces() error {
 						}
 					}
 				}
-			default:
-				fmt.Println("Found userType " + u.Name)
 			}
 		}
 	}
@@ -630,7 +614,6 @@ func (f *ParsedFile) LoadFuncs() error {
 			// This function is not associated with a struct, but it might still be a constructor
 			// We will associate constructors to structs later
 			f.Package.Funcs[fun.Name] = fun
-			fmt.Println("Package func " + fun.Name)
 			continue
 		}
 
@@ -663,7 +646,6 @@ func (f *ParsedFile) LoadFuncs() error {
 			return fmt.Errorf("function declared for receiver %v that does not exist in package", receiverName)
 		}
 		struc.Methods[fun.Name] = fun
-		fmt.Printf("Method %v.%v\n", receiverName, fun.Name)
 	}
 
 	return nil
