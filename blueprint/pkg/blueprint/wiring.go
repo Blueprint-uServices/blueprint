@@ -125,6 +125,7 @@ func (wiring *wiringSpecImpl) Define(name string, nodeType any, build BuildFunc)
 	def := wiring.getDef(name, true)
 	def.NodeType = nodeType
 	def.Build = build
+	def.Properties["callsite"] = []any{getWiringCallsite()}
 }
 
 // Primarily for use by plugins to build nodes; this will recursively resolve any aliases until a def is reached
