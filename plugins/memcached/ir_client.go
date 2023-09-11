@@ -53,7 +53,7 @@ var clientBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
 
 	}`
 
-func (node *MemcachedGoClient) AddInstantiation(builder golang.DICodeBuilder) error {
+func (node *MemcachedGoClient) AddInstantiation(builder golang.GraphBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil

@@ -109,7 +109,7 @@ var serverBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
 
 	}`
 
-func (node *GolangServer) AddInstantiation(builder golang.DICodeBuilder) error {
+func (node *GolangServer) AddInstantiation(builder golang.GraphBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil

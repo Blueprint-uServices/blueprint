@@ -9,11 +9,19 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc/gocodegen"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
 )
 
 /*
 This file contains the implementation of the golang.Process IRNode.
+
+The `GenerateArtifacts` method generates the main method based on the process's contained nodes.
+
+Most of the heavy lifting of code generation is done by the following:
+* gogen/workspacebuilder
+* gogen/modulebuilder
+* gogen/graphbuilder
+
 */
 
 var generatedModulePrefix = "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/process"
@@ -70,10 +78,10 @@ func (node *Process) AddChild(child blueprint.IRNode) error {
 }
 
 func (node *Process) GenerateArtifacts(outputDir string) error {
-	if gocodegen.IsDir(outputDir) {
+	if gogen.IsDir(outputDir) {
 		return fmt.Errorf("cannot built to %s, directory already exists", outputDir)
 	}
-	err := gocodegen.CheckDir(outputDir, true)
+	err := gogen.CheckDir(outputDir, true)
 	if err != nil {
 		return fmt.Errorf("unable to create %s for process %s due to %s", outputDir, node.Name(), err.Error())
 	}
@@ -81,18 +89,18 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	// TODO: might end up building multiple times which is OK, so need a check here that we haven't already built this artifact, even if it was by a different (but identical) node
 	cleanName := irutil.Clean(node.Name())
 	workspaceDir := filepath.Join(outputDir, cleanName)
-	workspace, err := gocodegen.NewWorkspaceBuilder(workspaceDir)
+	workspace, err := gogen.NewWorkspaceBuilder(workspaceDir)
 	if err != nil {
 		return err
 	}
 
 	moduleName := generatedModulePrefix + "/" + cleanName
-	module, err := gocodegen.NewModuleBuilder(workspace, cleanName, moduleName)
+	module, err := gogen.NewModuleBuilder(workspace, cleanName, moduleName)
 	if err != nil {
 		return err
 	}
 
-	code, err := gocodegen.NewDICodeBuilder(module, "graph.go", "pkg/main", "New"+strings.ToTitle(cleanName))
+	code, err := gogen.NewGraphBuilder(module, "graph.go", "pkg/main", "New"+strings.ToTitle(cleanName))
 	if err != nil {
 		return err
 	}

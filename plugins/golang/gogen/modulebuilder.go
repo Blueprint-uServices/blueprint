@@ -1,4 +1,4 @@
-package gocodegen
+package gogen
 
 import (
 	"fmt"
@@ -13,6 +13,12 @@ import (
 	"golang.org/x/mod/modfile"
 )
 
+/*
+Implements the ModuleBuilder interface defined in golang/ir.go
+
+The ModuleBuilder is used by plugins that generate golang source files, and need a module to put that
+code into.
+*/
 type ModuleBuilderImpl struct {
 	golang.ModuleBuilder
 	tracker   irutil.VisitTrackerImpl

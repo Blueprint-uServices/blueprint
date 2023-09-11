@@ -40,12 +40,12 @@ func NewImports(packageName string) *Imports {
 	return imports
 }
 
-func (imports *Imports) AddPackage(pkg string) {
+func (imports *Imports) AddPackage(pkg string) string {
 	if pkg == imports.localPackage {
-		return
+		return ""
 	}
-	if _, exists := imports.packages[pkg]; exists {
-		return
+	if importName, exists := imports.packages[pkg]; exists {
+		return importName
 	}
 
 	splits := strings.Split(pkg, "/")
@@ -64,7 +64,7 @@ func (imports *Imports) AddPackage(pkg string) {
 			} else {
 				imports.named[pkg] = importName
 			}
-			return
+			return importName
 		}
 	}
 }

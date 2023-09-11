@@ -45,7 +45,7 @@ var collectorClientBuildFuncTemplate = `func(ctr golang.Container) (any, error) 
 
 	}`
 
-func (node *OpenTelemetryCollectorClient) AddInstantiation(builder golang.DICodeBuilder) error {
+func (node *OpenTelemetryCollectorClient) AddInstantiation(builder golang.GraphBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.ClientName) {
 		return nil

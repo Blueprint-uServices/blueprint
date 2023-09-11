@@ -105,7 +105,7 @@ var clientBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
 
 	}`
 
-func (node *GolangClient) AddInstantiation(builder golang.DICodeBuilder) error {
+func (node *GolangClient) AddInstantiation(builder golang.GraphBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil

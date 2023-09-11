@@ -1,4 +1,4 @@
-package gocodegen
+package gogen
 
 import (
 	"errors"

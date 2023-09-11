@@ -74,7 +74,7 @@ type (
 	   level.  In constract a Golang GRPC client is a service and is instantiable because it does expose methods
 	   that can be directly invoked.
 
-	   The DICodeBuilder struct provides functionality for plugins to declare:
+	   The GraphBuilder struct provides functionality for plugins to declare:
 
 	   	(a) how to instantiate instances of things
 	   	(b) relevant types and method signatures for use by other plugins
@@ -84,7 +84,7 @@ type (
 		   AddInstantion will be invoked during compilation to enable an IRNode to add its instantiation code
 		   to a generated golang file.
 		*/
-		AddInstantiation(DICodeBuilder) error
+		AddInstantiation(GraphBuilder) error
 	}
 
 	/*
@@ -227,7 +227,7 @@ type (
 	}
 
 	/*
-	   DICodeBuilder is used by IRNodes that implement the Instantiable interface.  The DICodeBuilder provides
+	   GraphBuilder is used by IRNodes that implement the Instantiable interface.  The GraphBuilder provides
 	   the following methods that can be used by plugins to provide instantiation code:
 
 	     - `Import` declares that a particular package should be imported, as it will be used by the
@@ -267,7 +267,7 @@ type (
 	   be hard-coded, instead they would typically be provided by calling or inspecting the IR
 	   dependencies of this node.
 	*/
-	DICodeBuilder interface {
+	GraphBuilder interface {
 		irutil.VisitTracker
 
 		/*
@@ -281,13 +281,22 @@ type (
 		Import(packageName string) string
 
 		/*
+			If the provided type is a user type or a builtin type, adds an import statement
+			similar to the `Import` method.
+
+			Returns the name that should be used in code for the type.  For example, if it's
+			a type from an imported package, then would return mypackage.Foo.
+		*/
+		ImportType(typeName gocode.TypeName) string
+
+		/*
 			Provides the source code of a buildFunc that will be invoked at runtime by the
 			generated code, to build the named instance
 		*/
 		Declare(instanceName string, buildFuncSrc string) error
 
 		/*
-			Gets the ModuleBuilder that contains this DICodeBuilder
+			Gets the ModuleBuilder that contains this GraphBuilder
 		*/
 		Module() ModuleBuilder
 	}

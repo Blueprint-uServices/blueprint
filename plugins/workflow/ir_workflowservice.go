@@ -154,7 +154,7 @@ var buildFuncTemplate = `func(ctr golang.Container) (any, error) {
 		return {{ .ConstructorName }}({{ range $i, $arg := .Args }}{{ if $i }}, {{end}}{{ $arg.Cast}}{{end}})
 	}`
 
-func (node *WorkflowService) AddInstantiation(builder golang.DICodeBuilder) error {
+func (node *WorkflowService) AddInstantiation(builder golang.GraphBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil

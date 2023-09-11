@@ -1,4 +1,4 @@
-package gocodegen
+package gogen
 
 import (
 	"fmt"
@@ -14,6 +14,11 @@ import (
 	"golang.org/x/mod/modfile"
 )
 
+/*
+Implements the WorkspaceBuilder interface defined in golang/ir.go
+
+The WorkspaceBuilder is used for accumulating local module directories into a golang workspace.
+*/
 type WorkspaceBuilderImpl struct {
 	golang.WorkspaceBuilder
 	tracker      irutil.VisitTrackerImpl
