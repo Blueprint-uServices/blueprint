@@ -82,11 +82,13 @@ func (def *WiringDef) String() string {
 	b.WriteString("(")
 	var propStrings []string
 	for propKey, values := range def.Properties {
-		var propValues []string
-		for _, v := range values {
-			propValues = append(propValues, fmt.Sprintf("%s", v))
+		if propKey != "callsite" {
+			var propValues []string
+			for _, v := range values {
+				propValues = append(propValues, fmt.Sprintf("%s", v))
+			}
+			propStrings = append(propStrings, fmt.Sprintf("%s=%s", propKey, strings.Join(propValues, ",")))
 		}
-		propStrings = append(propStrings, fmt.Sprintf("%s=%s", propKey, strings.Join(propValues, ",")))
 	}
 	b.WriteString(strings.Join(propStrings, ", "))
 	b.WriteString(")")

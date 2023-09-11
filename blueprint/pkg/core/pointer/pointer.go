@@ -112,7 +112,7 @@ func (ptr *PointerDef) InstantiateDst(scope blueprint.Scope) (blueprint.IRNode, 
 				scope.Info("Destination %s of %s has already been instantiated", dstName, addr.Name())
 				return nil, nil
 			} else {
-				dst, err := scope.Get(dstName)
+				dst, err := scope.Instantiate(dstName)
 				if err != nil {
 					return nil, err
 				}

@@ -27,6 +27,7 @@ Most scope implementations should extend the BasicScope struct
 type Scope interface {
 	Name() string                                         // The name of this scope
 	Get(name string) (IRNode, error)                      // Get a node from this scope or a parent scope, possibly building it
+	Instantiate(name string) (IRNode, error)              // The same as Get, but without creating a dependency (an edge) into the current scope
 	GetProperty(name string, key string) (any, error)     // Get a property from this scope
 	GetProperties(name string, key string) ([]any, error) // Get a property from this scope
 	Put(name string, node IRNode) error                   // Put a node into this scope
@@ -145,7 +146,15 @@ func (scope *SimpleScope) Name() string {
 	return scope.ScopeName
 }
 
+func (scope *SimpleScope) Instantiate(name string) (IRNode, error) {
+	return scope.get(name, false)
+}
+
 func (scope *SimpleScope) Get(name string) (IRNode, error) {
+	return scope.get(name, true)
+}
+
+func (scope *SimpleScope) get(name string, addEdge bool) (IRNode, error) {
 	// If it already exists, return it
 	if node, ok := scope.Seen[name]; ok {
 		return node, nil
@@ -160,7 +169,7 @@ func (scope *SimpleScope) Get(name string) (IRNode, error) {
 	// If it's an alias, get the aliased node
 	if def.Name != name {
 		scope.Info("Resolved %s to %s", name, def.Name)
-		node, err := scope.Get(def.Name)
+		node, err := scope.get(def.Name, addEdge)
 		scope.Seen[name] = node
 		return node, err
 	}
@@ -171,12 +180,17 @@ func (scope *SimpleScope) Get(name string) (IRNode, error) {
 			return nil, scope.Error("Scope does not accept node %s of type %s but there is no parent scope to get them from", name, reflect.TypeOf(def.NodeType).String())
 		}
 		scope.Info("Getting %s of type %s from parent scope %s", name, reflect.TypeOf(def.NodeType).String(), scope.ParentScope.Name())
-		node, err := scope.ParentScope.Get(name)
+		var node IRNode
+		if addEdge {
+			node, err = scope.ParentScope.Get(name)
+		} else {
+			node, err = scope.ParentScope.Instantiate(name)
+		}
 		if err != nil {
 			return nil, err
 		}
 		if _, already_added := scope.Added[node.Name()]; !already_added {
-			if _, is_metadata := node.(IRMetadata); !is_metadata {
+			if _, is_metadata := node.(IRMetadata); !is_metadata && addEdge {
 				// Don't bother adding edges for metadata
 				scope.Handler.AddEdge(name, node)
 			}
