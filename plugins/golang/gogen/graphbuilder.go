@@ -74,6 +74,7 @@ func NewGraphBuilder(module *ModuleBuilderImpl, fileName, packagePath, funcName 
 	builder.module.workspace.AddLocalModuleRelative("runtime", "../../../runtime")
 	builder.module.Require("gitlab.mpi-sws.org/cld/blueprint/runtime", "v0.0.0")
 	builder.Imports.AddPackage("gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/golang")
+	builder.Imports.AddPackage("context")
 
 	return builder, nil
 }
@@ -114,8 +115,8 @@ var diFuncTemplate = `package {{.Package}}
 
 {{.Imports}}
 
-func {{ .FuncName }}(args map[string]string) golang.Graph {
-	g := golang.NewGraph()
+func {{ .FuncName }}(ctx context.Context, args map[string]string) golang.Container {
+	g := golang.NewGraph(ctx)
 
 	for k := range args {
 		g.Define(k, func(ctr golang.Container) (any, error) { return args[k], nil })

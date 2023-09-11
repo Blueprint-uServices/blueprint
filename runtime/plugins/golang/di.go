@@ -1,7 +1,9 @@
 package golang
 
 import (
+	"context"
 	"fmt"
+	"sync"
 
 	"golang.org/x/exp/slog"
 )
@@ -14,6 +16,8 @@ type Graph interface {
 
 type Container interface {
 	Get(name string) (any, error)
+	Context() context.Context   // In case the buildfunc wants to start background goroutines
+	WaitGroup() *sync.WaitGroup // Waitgroup used by this container; plugins can call Add if they create goroutines
 }
 
 type BuildFunc func(ctr Container) (any, error)
@@ -27,14 +31,18 @@ type diImpl struct {
 	Graph
 	Container
 
+	ctx        context.Context
+	wg         *sync.WaitGroup
 	buildFuncs map[string]BuildFunc
 	built      map[string]any
 }
 
-func NewGraph() Graph {
+func NewGraph(ctx context.Context) Graph {
 	graph := &diImpl{}
 	graph.buildFuncs = make(map[string]BuildFunc)
 	graph.built = make(map[string]any)
+	graph.ctx = ctx
+	graph.wg = &sync.WaitGroup{}
 	return graph
 }
 
@@ -60,4 +68,12 @@ func (graph *diImpl) Get(name string) (any, error) {
 	} else {
 		return nil, fmt.Errorf("unknown %v", name)
 	}
+}
+
+func (graph *diImpl) Context() context.Context {
+	return graph.ctx
+}
+
+func (graph *diImpl) WaitGroup() *sync.WaitGroup {
+	return graph.wg
 }
