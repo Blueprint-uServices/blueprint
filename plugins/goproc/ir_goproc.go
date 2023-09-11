@@ -8,7 +8,6 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
 )
 
@@ -100,33 +99,37 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 		return err
 	}
 
-	code, err := gogen.NewGraphBuilder(module, "graph.go", "pkg/main", "New"+strings.ToTitle(cleanName))
+	fileName := strings.ToLower(cleanName) + ".go"
+	packagePath := "goproc"
+	constructorName := "New" + strings.ToTitle(cleanName)
+
+	code, err := gogen.NewGraphBuilder(module, fileName, packagePath, constructorName)
 	if err != nil {
 		return err
 	}
 
 	for _, node := range node.ContainedNodes {
-		if instantiable, ok := node.(golang.Instantiable); ok {
-			err := instantiable.AddInstantiation(code)
-			if err != nil {
-				return err
-			}
-		}
-		if packages, ok := node.(golang.RequiresPackages); ok {
-			err := packages.AddToModule(module)
-			if err != nil {
-				return err
-			}
-		}
-		if modules, ok := node.(golang.ProvidesModule); ok {
-			err := modules.AddToWorkspace(workspace)
-			if err != nil {
-				return err
-			}
+		err := workspace.Visit(node)
+		if err != nil {
+			return err
 		}
 	}
 
-	err = code.Finish()
+	for _, node := range node.ContainedNodes {
+		err := module.Visit(node)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, node := range node.ContainedNodes {
+		err := code.Visit(node)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = code.Build()
 	if err != nil {
 		return err
 	}

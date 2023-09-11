@@ -271,6 +271,11 @@ type (
 		irutil.VisitTracker
 
 		/*
+			This is equivalent to calling node.AddToModule, if node implements it
+		*/
+		Visit(node blueprint.IRNode) error
+
+		/*
 			Adds an import statement to the generated file; this is necessary for any types
 			declared in other packages that are going to be used in a DI declaration.
 

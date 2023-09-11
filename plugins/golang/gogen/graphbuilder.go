@@ -7,6 +7,7 @@ import (
 	"strings"
 	"text/template"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -77,6 +78,13 @@ func NewGraphBuilder(module *ModuleBuilderImpl, fileName, packagePath, funcName 
 	return builder, nil
 }
 
+func (code *GraphBuilderImpl) Visit(node blueprint.IRNode) error {
+	if instantiable, ok := node.(golang.Instantiable); ok {
+		return instantiable.AddInstantiation(code)
+	}
+	return nil
+}
+
 func (code *GraphBuilderImpl) Module() golang.ModuleBuilder {
 	return code.module
 }
@@ -124,7 +132,7 @@ func {{ .FuncName }}(args map[string]string) golang.Graph {
 /*
 Generates the file within its module
 */
-func (code *GraphBuilderImpl) Finish() error {
+func (code *GraphBuilderImpl) Build() error {
 	t, err := template.New(code.FuncName).Parse(diFuncTemplate)
 	if err != nil {
 		return err
