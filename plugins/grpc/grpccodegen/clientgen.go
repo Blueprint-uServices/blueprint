@@ -137,24 +137,17 @@ func New_{{.Name}}(serverAddress string) (*{{.Name}}, error) {
 {{$receiver := .Name}}
 {{$imports := .Imports}}
 {{ range $_, $f := .Service.Methods }}
-func (client *{{$receiver}}) {{$f.Name}}(
-	{{- range $i, $arg := $f.Arguments -}}
-		{{if $i}}, {{end}}{{$arg.Name}} {{$imports.NameOf $arg.Type}}
-	{{- end -}}
-) (
-	{{- range $i, $ret := $f.Returns -}}
-	{{if $i}}, {{end}}{{$imports.NameOf $ret.Type}}
-	{{- end -}}
-) {
-	{{$ctx := (index $f.Arguments 0).Name}}
+func (client *{{$receiver}}) {{$f.Name}}(ctx context.Context
+	{{- range $i, $arg := $f.Arguments}}, {{$arg.Name}} {{$imports.NameOf $arg.Type}}{{end -}}
+	) ({{range $i, $ret := $f.Returns}}{{$imports.NameOf $ret.Type}}, {{end}}error) {
 
 	request := &{{$service}}_{{$f.Name}}_Request{}
-	{{$ctx}}, cancel := context.WithTimeout({{$ctx}},client.Timeout)
+	ctx, cancel := context.WithTimeout(ctx, client.Timeout)
 	defer cancel()
 
 	// TODO: arg marshalling for args 1:n
 
-	response, err := client.Client.{{$f.Name}}({{$ctx}},request)
+	response, err := client.Client.{{$f.Name}}(ctx, request)
 
 	{{range $i, $ret := $f.Returns -}}
 	var ret{{$i}} {{$imports.NameOf $ret.Type}}
@@ -165,7 +158,7 @@ func (client *{{$receiver}}) {{$f.Name}}(
 	if err == nil {
 		err = ctx.Err()
 	}
-	return {{range $i, $ret := $f.Returns}}{{if $i}}, {{end}}ret{{$i}}{{end}}
+	return {{range $i, $ret := $f.Returns}}ret{{$i}}, {{end}}err
 }
 {{end}}
 `

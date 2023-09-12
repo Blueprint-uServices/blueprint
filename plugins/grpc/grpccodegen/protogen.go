@@ -185,6 +185,33 @@ func (b *GRPCServiceDecl) newMethod(name string) *GRPCMethodDecl {
 	return m
 }
 
+func (b *GRPCProtoBuilder) makeFieldList(vars []gocode.Variable) ([]*GRPCField, error) {
+	var fieldList []*GRPCField
+	for i, arg := range vars {
+		argType := arg.Type
+		if ptrType, isPtrType := argType.(*gocode.Pointer); isPtrType {
+			// Pointer arguments are allowed
+			argType = ptrType.PointerTo
+		}
+
+		grpcType, err := b.getGRPCType(argType)
+		if err != nil {
+			return nil, fmt.Errorf("cannot serialize %v of type %v for GRPC due to %v", arg.Name, arg.Type, err.Error())
+		}
+
+		name := arg.Name
+		if name == "" {
+			name = fmt.Sprintf("ret%v", i)
+		}
+		fieldList = append(fieldList, &GRPCField{
+			Type:     grpcType,
+			Name:     name,
+			Position: i + 1,
+		})
+	}
+	return fieldList, nil
+}
+
 /*
 Adds a service declaration for the provided golang service interface.
 
@@ -197,55 +224,19 @@ and return values.
 func (b *GRPCProtoBuilder) AddService(iface *gocode.ServiceInterface) error {
 	serviceDecl := b.newService(iface.Name) // TODO: (not implemented yet) possibility of name collisions
 	for _, method := range iface.Methods {
+		argList, err := b.makeFieldList(method.Arguments)
+		if err != nil {
+			return err
+		}
+
+		retList, err := b.makeFieldList(method.Returns)
+		if err != nil {
+			return err
+		}
+
 		methodDecl := serviceDecl.newMethod(method.Name)
-
-		// Expect first argument to be context.Context, and last return value to be error
-		if len(method.Arguments) == 0 || method.Arguments[0].Type.String() != "context.Context" {
-			return fmt.Errorf("invalid method %v.%v due to missing context.Context argument", iface.Name, method.Name)
-		}
-		if len(method.Returns) == 0 || method.Returns[len(method.Returns)-1].Type.String() != "error" {
-			return fmt.Errorf("invalid method %v.%v due to missing error return value", iface.Name, method.Name)
-		}
-
-		req := methodDecl.Request
-		for i, arg := range method.Arguments[1:] {
-			argType := arg.Type
-			if ptrType, isPtrType := argType.(*gocode.Pointer); isPtrType {
-				// Pointer arguments are allowed
-				argType = ptrType.PointerTo
-			}
-
-			grpcType, err := b.getGRPCType(argType)
-			if err != nil {
-				return fmt.Errorf("cannot serialize %v.%v argument %v for GRPC due to %v", iface.Name, method.Name, arg.Name, err.Error())
-			}
-
-			req.FieldList = append(req.FieldList, &GRPCField{
-				Type:     grpcType,
-				Name:     arg.Name,
-				Position: i + 1,
-			})
-		}
-
-		rsp := methodDecl.Response
-		for i, ret := range method.Returns[:len(method.Returns)-1] {
-			retType := ret.Type
-			if ptrType, isPtrType := retType.(*gocode.Pointer); isPtrType {
-				// Pointer retvals are allowed
-				retType = ptrType.PointerTo
-			}
-
-			grpcType, err := b.getGRPCType(retType)
-			if err != nil {
-				return fmt.Errorf("cannot serialize %v.%v retval %v for GRPC due to %v", iface.Name, method.Name, ret.Name, err.Error())
-			}
-
-			rsp.FieldList = append(rsp.FieldList, &GRPCField{
-				Type:     grpcType,
-				Name:     fmt.Sprintf("ret%v", i+1),
-				Position: i + 1,
-			})
-		}
+		methodDecl.Request.FieldList = argList
+		methodDecl.Response.FieldList = retList
 	}
 	return nil
 }

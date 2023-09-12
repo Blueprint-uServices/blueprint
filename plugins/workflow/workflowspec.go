@@ -73,12 +73,17 @@ func (spec *WorkflowSpec) Print() {
 }
 
 /*
-The abstract representation of the service's interface
+The abstract representation of the service's interface, which excludes the
+first argument (context.Context) and last retval (error) from all method signatures.
 */
 func (service *WorkflowSpecService) GetInterface() *gocode.ServiceInterface {
 	methods := make(map[string]gocode.Func)
 	for name, method := range service.Iface.Methods {
-		methods[name] = method.Func
+		methods[name] = gocode.Func{
+			Name:      method.Name,
+			Arguments: method.Arguments[1:],
+			Returns:   method.Returns[:len(method.Returns)-1],
+		}
 	}
 	return &gocode.ServiceInterface{
 		UserType: *service.Iface.Type(),

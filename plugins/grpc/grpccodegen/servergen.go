@@ -109,11 +109,12 @@ package {{.PackageShortName}}
 {{.Imports}}
 
 type {{.Name}} struct {
-	Service *{{.Imports.NameOf .Service}}
+	Unimplemented{{.Service.Name}}Server
+	Service {{.Imports.NameOf .Service}}
 	Address string
 }
 
-func New_{{.Name}}(service *{{.Imports.NameOf .Service}}, serverAddress string) (*{{.Name}}, error) {
+func New_{{.Name}}(service {{.Imports.NameOf .Service}}, serverAddress string) (*{{.Name}}, error) {
 	handler := &{{.Name}}{}
 	handler.Service = service
 	handler.Address = serverAddress
@@ -130,14 +131,34 @@ func (handler *{{.Name}}) Run() error {
 	return grpcServer.Serve(lis)
 }
 
-// TODO: server methods and run
+{{$service := .Service.Name}}
+{{$receiver := .Name}}
+{{$imports := .Imports}}
+{{ range $_, $f := .Service.Methods }}
+func (handler *{{$receiver}}) {{$f.Name -}}
+		(ctx context.Context, req *{{$service}}_{{$f.Name}}_Request) (*{{$service}}_{{$f.Name}}_Response, error) {
+	{{range $i, $ret := $f.Returns }}ret{{$i}}, {{end}}err := handler.Service.{{$f.Name -}}
+		(ctx {{- range $j, $arg := $f.Arguments}}, req.{{toTitle $arg.Name}}{{end -}})
+
+	// TODO: request and response marshalling
+	rsp := &{{$service}}_{{$f.Name}}_Response{
+		{{range $j, $ret := $f.Returns -}}
+			Ret{{$j}}: ret{{$j}},
+		{{- end}}
+	}
+
+	return rsp, err
+}
+{{end}}
 `
 
 /*
 Generates the file within its module
 */
 func (client *serverTemplateArgs) GenerateCode(outputFilePath string) error {
-	t, err := template.New("GRPCServerTemplate").Parse(serverTemplate)
+	t, err := template.New("GRPCServerTemplate").Funcs(template.FuncMap{
+		"toTitle": strings.Title,
+	}).Parse(serverTemplate)
 	if err != nil {
 		return err
 	}
