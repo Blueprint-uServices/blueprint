@@ -11,13 +11,18 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc/grpccodegen"
+	"golang.org/x/exp/slog"
 )
 
-// IRNode representing a client to a Golang server
+/*
+IRNode representing a client to a Golang server.
+This node does not introduce any new runtime interfaces or types that can be used by other IRNodes
+GRPC code generation happens during the ModuleBuilder GenerateFuncs pass
+*/
 type GolangClient struct {
 	golang.Node
 	golang.Service
-	golang.RequiresPackages
+	golang.GeneratesFuncs
 
 	InstanceName  string
 	ServerAddr    *GolangServerAddress
@@ -62,23 +67,25 @@ func (node *GolangClient) GetGoInterface() *gocode.ServiceInterface {
 	return wrapped
 }
 
-// This does the heavy lifting of generating proto files and wrapper classes
-func (node *GolangClient) AddToModule(builder golang.ModuleBuilder) error {
+// Generates proto files and the RPC client
+func (node *GolangClient) GenerateFuncs(builder golang.ModuleBuilder) error {
 	// Only generate instantiation code for this instance once
-	if builder.Visited(node.InstanceName) {
+	if builder.Visited(node.InstanceName + ".generateFuncs") {
 		return nil
 	}
-
-	// Generating and compiling the .proto files is done by the server
-	err := builder.Visit(node.ServerAddr.Server)
-	if err != nil {
-		return err
-	}
+	slog.Info(fmt.Sprintf("GenerateFuncs %v\n", node))
 
 	service := node.GetGoInterface()
 	if service == nil {
 		return fmt.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
 			node.Name(), node.ServerAddr.GetInterface())
+	}
+
+	// Generate the .proto files
+	err := grpccodegen.GenerateGRPCProto(builder, service, "grpc")
+	if err != nil {
+		fmt.Println("error compiling grpc proto on server")
+		return err
 	}
 
 	// Generate the RPC client
@@ -113,11 +120,6 @@ func (node *GolangClient) AddInstantiation(builder golang.GraphBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil
-	}
-
-	err := builder.Module().Visit(node)
-	if err != nil {
-		return err
 	}
 
 	fqPackageName := builder.Module().Info().Name + "/" + node.OutputPackage

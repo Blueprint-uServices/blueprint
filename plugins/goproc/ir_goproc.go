@@ -11,6 +11,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
+	"golang.org/x/exp/slog"
 )
 
 /*
@@ -153,6 +154,8 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 
 	// TODO: might end up building multiple times which is OK, so need a check here that we haven't already built this artifact, even if it was by a different (but identical) node
 
+	slog.Info(fmt.Sprintf("Building %s to %s\n", node.Name(), outputDir))
+
 	// Generate the workspace and copy all local artifacts
 	cleanName := irutil.Clean(node.Name())
 	workspaceDir := filepath.Join(outputDir, cleanName)
@@ -161,11 +164,9 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 		return err
 	}
 
-	for _, node := range node.ContainedNodes {
-		err := workspace.Visit(node)
-		if err != nil {
-			return err
-		}
+	err = workspace.Visit(node.ContainedNodes)
+	if err != nil {
+		return err
 	}
 
 	// Generate the module and add all dependencies
@@ -176,11 +177,9 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	}
 	module.Require("golang.org/x/exp", "v0.0.0-20230728194245-b0cb94b80691")
 
-	for _, node := range node.ContainedNodes {
-		err := module.Visit(node)
-		if err != nil {
-			return err
-		}
+	err = module.Visit(node.ContainedNodes)
+	if err != nil {
+		return err
 	}
 
 	// Generate the graph of gonodes contained in this process
@@ -188,16 +187,14 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	packagePath := "goproc"
 	constructorName := "New" + strings.ToTitle(cleanName)
 
-	code, err := gogen.NewGraphBuilder(module, graphFileName, packagePath, constructorName)
+	graph, err := gogen.NewGraphBuilder(module, graphFileName, packagePath, constructorName)
 	if err != nil {
 		return err
 	}
 
-	for _, node := range node.ContainedNodes {
-		err := code.Visit(node)
-		if err != nil {
-			return err
-		}
+	err = graph.Visit(node.ContainedNodes)
+	if err != nil {
+		return err
 	}
 
 	// Generate the main.go
@@ -232,7 +229,7 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	}
 
 	// Build workspace, module, and graph
-	err = code.Build()
+	err = graph.Build()
 	if err != nil {
 		return err
 	}

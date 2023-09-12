@@ -9,12 +9,15 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"golang.org/x/exp/slog"
 )
 
 type OpenTelemetryServerWrapper struct {
 	golang.Service
 	golang.Instantiable
 	golang.RequiresPackages
+	golang.GeneratesInterfaces
+	golang.GeneratesFuncs
 
 	WrapperName string
 	Wrapped     golang.Service
@@ -52,20 +55,42 @@ func (node *OpenTelemetryServerWrapper) GetInterface() service.ServiceInterface 
 	return node.Wrapped.GetInterface()
 }
 
-// Adds the 'requires' statements to the module
-func (node *OpenTelemetryServerWrapper) AddToModule(builder golang.ModuleBuilder) error {
+// Part of code generation compilation pass; adds library dependencies to the generated module
+func (node *OpenTelemetryServerWrapper) AddRequires(builder golang.ModuleBuilder) error {
 	// Only generate instantiation code for this instance once
-	if builder.Visited(node.WrapperName) {
+	if builder.Visited(node.WrapperName + ".AddRequires") {
 		return nil
 	}
+	slog.Info(fmt.Sprintf("AddRequires %v\n", node))
 
-	// Make sure all code dependencies of the wrapped node are part of the module and workspace
-	err := builder.Visit(node.Wrapped)
-	if err != nil {
-		return err
+	// TODO: Require OpenTelemetry libraries
+
+	return nil
+}
+
+// Part of code generation compilation pass; creates the interface definition code for the wrapper,
+// and any new generated structs that are exposed and can be used by other IRNodes
+func (node *OpenTelemetryServerWrapper) GenerateInterfaces(builder golang.ModuleBuilder) error {
+	// Only generate instantiation code for this instance once
+	if builder.Visited(node.WrapperName + ".GenerateInterfaces") {
+		return nil
 	}
+	slog.Info(fmt.Sprintf("GenerateInterfaces %v\n", node))
 
-	// TODO: here we would generate the tracing wrapper code and add it to the module
+	// TODO: Generate the extended service interface that includes extra arguments and any structs that are used in that interface
+
+	return nil
+}
+
+// Part of code generation compilation pass; provides implementation of interfaces from GenerateInterfaces
+func (node *OpenTelemetryServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
+	// Only generate instantiation code for this instance once
+	if builder.Visited(node.WrapperName + ".GenerateFuncs") {
+		return nil
+	}
+	slog.Info(fmt.Sprintf("GenerateFuncs %v\n", node))
+
+	// TODO: Generate the wrapper implementation
 
 	return nil
 }
@@ -78,6 +103,7 @@ var serverBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
 
 	}`
 
+// Part of code generation compilation pass; provides instantiation snippet
 func (node *OpenTelemetryServerWrapper) AddInstantiation(builder golang.GraphBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.WrapperName) {

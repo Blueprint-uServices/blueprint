@@ -79,9 +79,14 @@ func NewGraphBuilder(module *ModuleBuilderImpl, fileName, packagePath, funcName 
 	return builder, nil
 }
 
-func (code *GraphBuilderImpl) Visit(node blueprint.IRNode) error {
-	if instantiable, ok := node.(golang.Instantiable); ok {
-		return instantiable.AddInstantiation(code)
+func (graph *GraphBuilderImpl) Visit(nodes []blueprint.IRNode) error {
+	for _, node := range nodes {
+		if n, valid := node.(golang.Instantiable); valid {
+			err := n.AddInstantiation(graph)
+			if err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }

@@ -74,14 +74,32 @@ func (module *ModuleBuilderImpl) Info() golang.ModuleInfo {
 	}
 }
 
-func (module *ModuleBuilderImpl) Visit(node blueprint.IRNode) error {
-	if n, valid := node.(golang.RequiresPackages); valid {
-		err := n.AddToModule(module)
-		if err != nil {
-			return err
+func (module *ModuleBuilderImpl) Visit(nodes []blueprint.IRNode) error {
+	for _, node := range nodes {
+		if n, valid := node.(golang.RequiresPackages); valid {
+			err := n.AddRequires(module)
+			if err != nil {
+				return err
+			}
 		}
 	}
-	return module.Workspace().Visit(node)
+	for _, node := range nodes {
+		if n, valid := node.(golang.GeneratesInterfaces); valid {
+			err := n.GenerateInterfaces(module)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	for _, node := range nodes {
+		if n, valid := node.(golang.GeneratesFuncs); valid {
+			err := n.GenerateFuncs(module)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func (module *ModuleBuilderImpl) Require(dependencyName string, version string) error {

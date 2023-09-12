@@ -57,9 +57,14 @@ func (workspace *WorkspaceBuilderImpl) Info() golang.WorkspaceInfo {
 	}
 }
 
-func (workspace *WorkspaceBuilderImpl) Visit(node blueprint.IRNode) error {
-	if n, valid := node.(golang.ProvidesModule); valid {
-		return n.AddToWorkspace(workspace)
+func (workspace *WorkspaceBuilderImpl) Visit(nodes []blueprint.IRNode) error {
+	for _, node := range nodes {
+		if n, valid := node.(golang.ProvidesModule); valid {
+			err := n.AddToWorkspace(workspace)
+			if err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }

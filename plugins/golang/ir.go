@@ -88,19 +88,56 @@ type (
 	}
 
 	/*
-	   This is an interface for IRNodes for plugins that want to generate source code files rather than entire modules.
-	   The code for this IRNode, as well as other IRNodes, gets accumulated by a `ModuleBuilder` which will then
-	   package that code into a single Golang module.
+	   This is an interface for IRNodes for plugins that want to contribute source files to a generated module
+	   rather than just copying in their own source modules.
 
-	   The main concern of the ModuleBuilder is to enable plugins to correctly add any dependencies to the module
-	   being built.
+	   There are three interfaces for contributing source code to generated modules:
+	   1. RequiresPackage for adding module dependencies to the generated module's go.mod file
+	   2. GeneratesInterfaces for generating struct and interface type declarations
+	   3. GeneratesFuncs for generating functions and struct method bodies
 	*/
 	RequiresPackages interface {
 		/*
-		   AddModule will be invoked during compilation to enable an IRNode to write generated code files to
-		   an output module and to add module dependencies
+		   AddModule will be invoked during compilation to enable an IRNode to add any module Requires statements
+		   to the generated module
 		*/
-		AddToModule(ModuleBuilder) error
+		AddRequires(ModuleBuilder) error
+	}
+
+	/*
+			Some IRNodes generate new interfaces and struct definitions by extending the interfaces declared by other IRNodes.
+			They should implement this interface to do so
+
+		   There are three interfaces for contributing source code to generated modules:
+		   1. RequiresPackage for adding module dependencies to the generated module's go.mod file
+		   2. GeneratesInterfaces for generating struct and interface type declarations
+		   3. GeneratesFuncs for generating functions and struct method bodies
+	*/
+	GeneratesInterfaces interface {
+		/*
+		   GenerateInterfaces will be invoked during compilation to enable an IRNode to write generated code files to
+		   an output module, containing interface and struct definitions
+		*/
+		GenerateInterfaces(ModuleBuilder) error
+	}
+
+	/*
+			Some IRNodes generate implementations of service interfaces.  This interface should be used to do so.  This is
+			separate from the GeneratesTypes interface because all structs and interfaces need to be declared before
+			method bodies can be written, because method bodies might need to use structs and interfaces defined in different
+			packages
+
+		   There are three interfaces for contributing source code to generated modules:
+		   1. RequiresPackage for adding module dependencies to the generated module's go.mod file
+		   2. GeneratesInterfaces for generating struct and interface type declarations
+		   3. GeneratesFuncs for generating functions and struct method bodies
+	*/
+	GeneratesFuncs interface {
+		/*
+		   GenerateFuncs will be invoked during compilation to enable an IRNode to write generated code files to
+		   an output module, containing interface and struct definitions
+		*/
+		GenerateFuncs(ModuleBuilder) error
 	}
 
 	/*
@@ -146,9 +183,9 @@ type (
 		Info() WorkspaceInfo
 
 		/*
-			This is equivalent to calling node.AddToModule, if node implements it
+			This is equivalent to calling node.AddToModule, if node implements it, for the specified nodes
 		*/
-		Visit(node blueprint.IRNode) error
+		Visit(nodes []blueprint.IRNode) error
 
 		/*
 		   This method is used by plugins if they want to copy a locally-defined module into the generated workspace.
@@ -202,7 +239,7 @@ type (
 		/*
 			This is equivalent to calling node.AddToModule, if node implements it
 		*/
-		Visit(node blueprint.IRNode) error
+		Visit(nodes []blueprint.IRNode) error
 
 		/*
 			Adds a dependency to a given module and version.  The module can be an external dependency, or it can be
@@ -273,7 +310,7 @@ type (
 		/*
 			This is equivalent to calling node.AddToModule, if node implements it
 		*/
-		Visit(node blueprint.IRNode) error
+		Visit(nodes []blueprint.IRNode) error
 
 		/*
 			Adds an import statement to the generated file; this is necessary for any types

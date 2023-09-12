@@ -95,7 +95,7 @@ func addToWorkspace(builder golang.WorkspaceBuilder, mod *goparser.ParsedModule)
 	return builder.AddLocalModule(subdir, mod.SrcDir)
 }
 
-// Adds the workspace modules containing the interface declaration and implementation
+// Part of workspace generation; Adds the workspace modules containing the interface declaration and implementation
 func (node *WorkflowService) AddToWorkspace(builder golang.WorkspaceBuilder) error {
 	// Copy the interface module into the workspace
 	err := addToWorkspace(builder, node.ServiceInfo.Iface.File.Package.Module)
@@ -114,11 +114,8 @@ func addToModule(builder golang.ModuleBuilder, mod *goparser.ParsedModule) error
 	return builder.Require(mod.Name, mod.Version)
 }
 
-// Adds the 'requires' statements to the module
-func (node *WorkflowService) AddToModule(builder golang.ModuleBuilder) error {
-	// Make sure we've copied the module into the workspace
-	node.AddToWorkspace(builder.Workspace())
-
+// Part of module generation; Adds the 'requires' statements to the module
+func (node *WorkflowService) AddRequires(builder golang.ModuleBuilder) error {
 	// Add the requires statements
 	err := addToModule(builder, node.ServiceInfo.Iface.File.Package.Module)
 	if err != nil {
@@ -158,12 +155,6 @@ func (node *WorkflowService) AddInstantiation(builder golang.GraphBuilder) error
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil
-	}
-
-	// Make sure we've also added requires statements to the module
-	err := node.AddToModule(builder.Module())
-	if err != nil {
-		return err
 	}
 
 	builder.Import("fmt")

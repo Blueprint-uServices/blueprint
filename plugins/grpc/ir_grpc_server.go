@@ -13,13 +13,15 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc/grpccodegen"
 )
 
-// IR node for the GRPC server.  Once a service is exposed over GRPC,
-// it no longer has an interface that is callable by other golang instances,
-// so it is not a golang.Service node any more.  However, it is still a service,
-// but now one exposed over GRPC.
+/*
+IRNode representing a Golang GPRC server.
+This node does not introduce any new runtime interfaces or types that can be used by other IRNodes
+GRPC code generation happens during the ModuleBuilder GenerateFuncs pass
+*/
 type GolangServer struct {
 	service.ServiceNode
-	golang.RequiresPackages
+	golang.GeneratesFuncs
+	golang.Instantiable
 
 	InstanceName string
 	Addr         *GolangServerAddress
@@ -66,17 +68,11 @@ func (n *GolangServer) Name() string {
 	return n.InstanceName
 }
 
-// This does the heavy lifting of generating proto files and wrapper classes
-func (node *GolangServer) AddToModule(builder golang.ModuleBuilder) error {
+// Generates proto files and the RPC server handler
+func (node *GolangServer) GenerateFuncs(builder golang.ModuleBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil
-	}
-
-	// We need all struct and interface code definitions to be part of the module
-	err := builder.Visit(node.Wrapped)
-	if err != nil {
-		return err
 	}
 
 	service, valid := node.Wrapped.GetInterface().(*gocode.ServiceInterface)
@@ -86,7 +82,7 @@ func (node *GolangServer) AddToModule(builder golang.ModuleBuilder) error {
 	}
 
 	// Generate the .proto files
-	err = grpccodegen.GenerateGRPCProto(builder, service, "grpc")
+	err := grpccodegen.GenerateGRPCProto(builder, service, "grpc")
 	if err != nil {
 		fmt.Println("error compiling grpc proto on server")
 		return err
@@ -113,10 +109,6 @@ func (node *GolangServer) AddInstantiation(builder golang.GraphBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil
-	}
-	err := builder.Module().Visit(node)
-	if err != nil {
-		return err
 	}
 
 	// TODO: generate the proper server wrapper instantiation code

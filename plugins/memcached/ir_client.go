@@ -53,6 +53,7 @@ var clientBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
 
 	}`
 
+// Part of code generation compilation pass; provides instantiation snippet
 func (node *MemcachedGoClient) AddInstantiation(builder golang.GraphBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
