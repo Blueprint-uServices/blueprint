@@ -33,18 +33,18 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 
 	// Construct and validate the GRPC proto builder for the service
 	pb := NewProtoBuilder(modules)
-	err = pb.AddService(service)
-	if err != nil {
-		return err
-	}
-
-	// Filename munging
 	splits := strings.Split(outputPackage, "/")
 	outputPackageName := splits[len(splits)-1]
 	pb.Module = builder.Info()
 	pb.Package = outputPackageName
 	pb.PackageName = pb.Module.Name + "/" + outputPackage
 
+	err = pb.AddService(service)
+	if err != nil {
+		return err
+	}
+
+	// Filename munging
 	outputDir := filepath.Join(builder.Info().Path, filepath.Join(splits...))
 	err = os.MkdirAll(outputDir, 0755)
 	if err != nil {
