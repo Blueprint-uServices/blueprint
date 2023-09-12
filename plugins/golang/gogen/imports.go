@@ -120,7 +120,7 @@ func (imports *Imports) String() string {
 	return b.String()
 }
 
-func (imports *Imports) qualify(pkg string, name string) string {
+func (imports *Imports) Qualify(pkg string, name string) string {
 	if pkg == imports.localPackage {
 		return name
 	}
@@ -134,11 +134,11 @@ func (imports *Imports) NameOf(typeName gocode.TypeName) string {
 	switch t := typeName.(type) {
 	case *gocode.BuiltinType:
 		{
-			return imports.qualify(t.Package, t.Name)
+			return imports.Qualify(t.Package, t.Name)
 		}
 	case *gocode.UserType:
 		{
-			return imports.qualify(t.PackageName, t.Name)
+			return imports.Qualify(t.PackageName, t.Name)
 		}
 	case *gocode.Pointer:
 		{

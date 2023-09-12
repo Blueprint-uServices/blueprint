@@ -23,6 +23,7 @@ type GolangClient struct {
 	golang.Node
 	golang.Service
 	golang.GeneratesFuncs
+	golang.Instantiable
 
 	InstanceName  string
 	ServerAddr    *GolangServerAddress

@@ -21,6 +21,7 @@ type LeafObject struct {
 type LeafService interface {
 	HelloInt(ctx ctxx.Context, a int64) (int64, error)
 	HelloObject(ctx ctxx.Context, obj *LeafObject) (*LeafObject, error)
+	HelloMate(ctx ctxx.Context, a int, b int32, c string, d map[string]LeafObject) (string, int32, int, map[string]LeafObject, error)
 }
 
 type LeafServiceImpl struct {
@@ -34,6 +35,10 @@ func (l *LeafServiceImpl) HelloInt(ctx ctxx.Context, a int64) (int64, error) {
 
 func (l *LeafServiceImpl) HelloObject(ctx ctxx.Context, obj *LeafObject) (*LeafObject, error) {
 	return obj, nil
+}
+
+func (l *LeafServiceImpl) HelloMate(ctx ctxx.Context, a int, b int32, c string, d map[string]LeafObject) (string, int32, int, map[string]LeafObject, error) {
+	return c, b, a, d, nil
 }
 
 func (l *LeafServiceImpl) NonServiceFunction() int64 {

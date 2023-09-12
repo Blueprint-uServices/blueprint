@@ -41,7 +41,9 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 	// Filename munging
 	splits := strings.Split(outputPackage, "/")
 	outputPackageName := splits[len(splits)-1]
+	pb.Module = builder.Info()
 	pb.Package = outputPackageName
+	pb.PackageName = pb.Module.Name + "/" + outputPackage
 
 	outputDir := filepath.Join(builder.Info().Path, filepath.Join(splits...))
 	err = os.MkdirAll(outputDir, 0755)
@@ -58,7 +60,14 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 
 	// Compile the proto file
 	fmt.Println("compiling proto file")
-	return CompileProtoFile(outputFilename)
+	err = CompileProtoFile(outputFilename)
+	if err != nil {
+		return err
+	}
+
+	// Generate the marshalling code
+	marshallFile := filepath.Join(outputDir, service.Name+"_conversions.go")
+	return pb.GenerateMarshallingCode(marshallFile)
 }
 
 func CompileProtoFile(protoFileName string) error {
@@ -79,14 +88,17 @@ func CompileProtoFile(protoFileName string) error {
 /* A basic structural representation of the GRPC messages and services */
 type (
 	GRPCField struct {
-		Type     string // The GRPC type
-		Name     string
-		Position int
+		SrcType   gocode.TypeName // The source type
+		ProtoType string          // The GRPC type in proto
+		GRPCType  gocode.TypeName // The GRPC type in golang
+		Name      string
+		Position  int
 	}
 
 	GRPCMessageDecl struct {
 		Builder   *GRPCProtoBuilder
 		Name      string
+		GRPCType  *gocode.UserType // The GRPC-generated type for this message
 		FieldList []*GRPCField
 	}
 
@@ -104,11 +116,13 @@ type (
 	}
 
 	GRPCProtoBuilder struct {
-		Code     *goparser.ParsedModuleSet
-		Package  string
-		Services map[string]*GRPCServiceDecl
-		Messages map[string]*GRPCMessageDecl
-		Structs  map[gocode.UserType]*GRPCMessageDecl // Mapping from golang struct to the corresponding message
+		Code        *goparser.ParsedModuleSet
+		Package     string // Package shortname
+		Module      golang.ModuleInfo
+		PackageName string // Fully qualified package
+		Services    map[string]*GRPCServiceDecl
+		Messages    map[string]*GRPCMessageDecl
+		Structs     map[gocode.UserType]*GRPCMessageDecl // Mapping from golang struct to the corresponding message
 	}
 )
 
@@ -128,7 +142,7 @@ package {{ .Package }};
 {{ range $k, $msg := .Messages }}
 message {{$msg.Name}} {
     {{- range $k, $field := $msg.FieldList}}
-    {{$field.Type}} {{$field.Name}} = {{$field.Position}};
+    {{$field.ProtoType}} {{$field.Name}} = {{$field.Position}};
     {{- end}}
 }
 {{ end -}}
@@ -162,6 +176,14 @@ func (b *GRPCProtoBuilder) newMessage(name string) *GRPCMessageDecl {
 	s.Builder = b
 	s.Name = name
 	s.FieldList = nil
+	s.GRPCType = &gocode.UserType{
+		Source: gocode.Source{
+			ModuleName:    b.Module.Name,
+			ModuleVersion: b.Module.Version,
+			PackageName:   b.PackageName,
+		},
+		Name: name,
+	}
 	b.Messages[name] = s // Not implemented yet: name collision possible for same-named struct from different packages
 	return s
 }
@@ -188,13 +210,7 @@ func (b *GRPCServiceDecl) newMethod(name string) *GRPCMethodDecl {
 func (b *GRPCProtoBuilder) makeFieldList(vars []gocode.Variable) ([]*GRPCField, error) {
 	var fieldList []*GRPCField
 	for i, arg := range vars {
-		argType := arg.Type
-		if ptrType, isPtrType := argType.(*gocode.Pointer); isPtrType {
-			// Pointer arguments are allowed
-			argType = ptrType.PointerTo
-		}
-
-		grpcType, err := b.getGRPCType(argType)
+		protoType, grpcType, err := b.getGRPCType(arg.Type)
 		if err != nil {
 			return nil, fmt.Errorf("cannot serialize %v of type %v for GRPC due to %v", arg.Name, arg.Type, err.Error())
 		}
@@ -204,9 +220,11 @@ func (b *GRPCProtoBuilder) makeFieldList(vars []gocode.Variable) ([]*GRPCField, 
 			name = fmt.Sprintf("ret%v", i)
 		}
 		fieldList = append(fieldList, &GRPCField{
-			Type:     grpcType,
-			Name:     name,
-			Position: i + 1,
+			SrcType:   arg.Type,
+			ProtoType: protoType,
+			GRPCType:  grpcType,
+			Name:      name,
+			Position:  i + 1,
 		})
 	}
 	return fieldList, nil
@@ -283,15 +301,17 @@ func (b *GRPCProtoBuilder) GetOrAddMessage(t *gocode.UserType) (*GRPCMessageDecl
 		}
 
 		// Gets the type name of this field, possibly internally creating the GRPC message if it's a struct
-		fieldType, err := b.getGRPCType(field.Type)
+		fieldProto, fieldGRPC, err := b.getGRPCType(field.Type)
 		if err != nil {
 			return nil, err
 		}
 
 		msg.FieldList = append(msg.FieldList, &GRPCField{
-			Type:     fieldType,
-			Name:     field.Name,
-			Position: len(msg.FieldList) + 1,
+			SrcType:   field.Type,
+			ProtoType: fieldProto,
+			GRPCType:  fieldGRPC,
+			Name:      field.Name,
+			Position:  len(msg.FieldList) + 1,
 		})
 	}
 
@@ -308,9 +328,19 @@ var basicToGrpc = map[string]string{
 	"float32": "float", "float64": "double",
 }
 
+var grpcToBasic = map[string]string{
+	"bool":   "bool",
+	"string": "string",
+	"sint32": "int32", "sint64": "int64",
+	"uint32": "uint32", "uint64": "uint64",
+	"uint8":   "byte",
+	"float32": "float",
+	"float64": "double",
+}
+
 var acceptableMapKeys map[string]struct{}
 
-func getMapKeyType(t gocode.TypeName) (string, bool) {
+func getMapKeyType(t gocode.TypeName) (string, gocode.TypeName, bool) {
 	if acceptableMapKeys == nil {
 		keys := []string{
 			"int32", "int64", "uint32", "uint64", "sint32", "sint64",
@@ -324,62 +354,77 @@ func getMapKeyType(t gocode.TypeName) (string, bool) {
 	if basic, isBasic := t.(*gocode.BasicType); isBasic {
 		if grpcType, hasGrpcType := basicToGrpc[basic.Name]; hasGrpcType {
 			if _, isValid := acceptableMapKeys[grpcType]; isValid {
-				return grpcType, true
+				return grpcType, t, true
 			}
 		}
 	}
-	return "", false
+	return "", nil, false
 }
 
-func (b *GRPCProtoBuilder) getGRPCType(t gocode.TypeName) (string, error) {
+// Returns the name of the type for the .proto declaration and the corresponding golang type,
+// which may be different from the source type
+func (b *GRPCProtoBuilder) getGRPCType(t gocode.TypeName) (string, gocode.TypeName, error) {
 	switch arg := t.(type) {
 	case *gocode.UserType:
 		{
 			msg, err := b.GetOrAddMessage(arg)
 			if err != nil {
-				return "", err
+				return "", nil, err
 			}
-			return msg.Name, nil
+			return msg.Name, msg.GRPCType, nil
 		}
 	case *gocode.BasicType:
 		{
 			if grpcType, hasGrpcType := basicToGrpc[arg.Name]; hasGrpcType {
-				return grpcType, nil
+				return grpcType, &gocode.BasicType{Name: grpcToBasic[grpcType]}, nil
 			}
-			return "", fmt.Errorf("%v is not supported by GRPC", arg.Name)
+			return "", nil, fmt.Errorf("%v is not supported by GRPC", arg.Name)
+		}
+	case *gocode.Pointer:
+		{
+			protoType, pointerToGrpcType, err := b.getGRPCType(arg.PointerTo)
+			if err != nil {
+				return "", nil, err
+			}
+			grpcType := &gocode.Pointer{PointerTo: pointerToGrpcType}
+			return protoType, grpcType, nil
 		}
 	case *gocode.Map:
 		{
-			keyType, isValidKey := getMapKeyType(arg.KeyType)
+			keyProto, keyGRPC, isValidKey := getMapKeyType(arg.KeyType)
 			if !isValidKey {
-				return "", fmt.Errorf("GRPC cannot use %v as a map key", arg.KeyType)
+				return "", nil, fmt.Errorf("GRPC cannot use %v as a map key", arg.KeyType)
 			}
-			valueType, err := b.getGRPCType(arg.ValueType)
+			valueProto, valueGRPC, err := b.getGRPCType(arg.ValueType)
 			if err != nil {
-				return "", err
+				return "", nil, err
 			}
-			return fmt.Sprintf("map<%v,%v>", keyType, valueType), nil
+			protoType := fmt.Sprintf("map<%v,%v>", keyProto, valueProto)
+			grpcType := &gocode.Map{KeyType: keyGRPC, ValueType: valueGRPC}
+			return protoType, grpcType, nil
 		}
 	case *gocode.Slice:
 		{
 			// []byte is a special case where the type is 'bytes', everything else is a repeated
 			if basic, isBasic := arg.SliceOf.(*gocode.BasicType); isBasic && basic.Name == "byte" {
-				return "bytes", nil
+				return "bytes", t, nil
 			}
 			// map is a special case that can't be repeated
 			if _, isMap := arg.SliceOf.(*gocode.Map); isMap {
-				return "", fmt.Errorf("GRPC does not support arrays of maps %v", t.String())
+				return "", nil, fmt.Errorf("GRPC does not support arrays of maps %v", t.String())
 			}
-			name, err := b.getGRPCType(arg.SliceOf)
+			sliceProto, sliceGRPC, err := b.getGRPCType(arg.SliceOf)
 			if err != nil {
-				return "", err
+				return "", nil, err
 			}
-			return fmt.Sprintf("repeated %v", name), nil
+			protoType := fmt.Sprintf("repeated %v", sliceProto)
+			grpcType := &gocode.Slice{SliceOf: sliceGRPC}
+			return protoType, grpcType, nil
 		}
 	default:
 		{
 			// all others are invalid or not yet supported
-			return "", fmt.Errorf("GRPC cannot serialize %v", t.String())
+			return "", nil, fmt.Errorf("GRPC cannot serialize %v", t.String())
 		}
 	}
 }

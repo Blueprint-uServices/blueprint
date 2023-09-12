@@ -46,7 +46,7 @@ var clientRequiredModules = map[string]string{
 	"google.golang.org/grpc": "v1.41.0",
 }
 var clientImportedPackages = []string{
-	"context", "errors", "time",
+	"context", "time",
 	"google.golang.org/grpc",
 	"google.golang.org/grpc/credentials/insecure",
 }
@@ -110,6 +110,7 @@ package {{.PackageShortName}}
 {{.Imports}}
 
 type {{.Name}} struct {
+	{{.Imports.NameOf .Service}}
 	Client {{.Service.Name}}Client // The actual GRPC-generated client
 	Timeout time.Duration
 }
@@ -141,19 +142,17 @@ func (client *{{$receiver}}) {{$f.Name}}(ctx context.Context
 	{{- range $i, $arg := $f.Arguments}}, {{$arg.Name}} {{$imports.NameOf $arg.Type}}{{end -}}
 	) ({{range $i, $ret := $f.Returns}}{{$imports.NameOf $ret.Type}}, {{end}}error) {
 
-	request := &{{$service}}_{{$f.Name}}_Request{}
+	req := &{{$service}}_{{$f.Name}}_Request{}
 	ctx, cancel := context.WithTimeout(ctx, client.Timeout)
 	defer cancel()
 
-	// TODO: arg marshalling for args 1:n
+	req.marshall(
+		{{- range $i, $arg := $f.Arguments}}{{if $i}}, {{end}}{{$arg.Name}}{{end -}}
+	)
 
-	response, err := client.Client.{{$f.Name}}(ctx, request)
+	rsp, err := client.Client.{{$f.Name}}(ctx, req)
 
-	{{range $i, $ret := $f.Returns -}}
-	var ret{{$i}} {{$imports.NameOf $ret.Type}}
-	{{end}}
-
-	// TODO: returns marshalling
+	{{range $i, $ret := $f.Returns}}{{if $i}}, {{end}}ret{{$i}}{{end}} := rsp.unmarshall()
 
 	if err == nil {
 		err = ctx.Err()
