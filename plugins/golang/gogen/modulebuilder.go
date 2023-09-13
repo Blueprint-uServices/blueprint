@@ -154,7 +154,7 @@ func (module *ModuleBuilderImpl) Finish() error {
 
 	// Create the go.mod file
 	modFileName := filepath.Join(module.ModuleDir, "go.mod")
-	f, err := os.OpenFile(modFileName, os.O_CREATE, 0755)
+	f, err := os.OpenFile(modFileName, os.O_CREATE|os.O_RDWR, 0755)
 	if err != nil {
 		return err
 	}
