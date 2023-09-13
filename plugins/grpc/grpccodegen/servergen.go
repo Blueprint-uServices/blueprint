@@ -46,7 +46,7 @@ var serverRequiredModules = map[string]string{
 	"google.golang.org/grpc": "v1.41.0",
 }
 var serverImportedPackages = []string{
-	"context", "errors", "net",
+	"context", "net",
 	"google.golang.org/grpc",
 }
 
@@ -137,17 +137,18 @@ func (handler *{{.Name}}) Run() error {
 {{ range $_, $f := .Service.Methods }}
 func (handler *{{$receiver}}) {{$f.Name -}}
 		(ctx context.Context, req *{{$service}}_{{$f.Name}}_Request) (*{{$service}}_{{$f.Name}}_Response, error) {
+	{{range $i, $arg := $f.Arguments}}{{if $i}}, {{end}}{{$arg.Name}}{{end}} := req.unmarshall()
 	{{range $i, $ret := $f.Returns }}ret{{$i}}, {{end}}err := handler.Service.{{$f.Name -}}
-		(ctx {{- range $j, $arg := $f.Arguments}}, req.{{toTitle $arg.Name}}{{end -}})
-
-	// TODO: request and response marshalling
-	rsp := &{{$service}}_{{$f.Name}}_Response{
-		{{range $j, $ret := $f.Returns -}}
-			Ret{{$j}}: ret{{$j}},
-		{{- end}}
+		(ctx {{- range $i, $arg := $f.Arguments}}, {{$arg.Name}}{{end}})
+	if err != nil {
+		return nil, err
 	}
 
-	return rsp, err
+	rsp := &{{$service}}_{{$f.Name}}_Response{}
+	rsp.marshall(
+		{{- range $i, $arg := $f.Returns}}{{if $i}}, {{end}}ret{{$i}}{{end -}}
+	)
+	return rsp, nil
 }
 {{end}}
 `

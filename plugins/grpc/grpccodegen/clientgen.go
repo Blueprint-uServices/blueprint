@@ -134,30 +134,34 @@ func New_{{.Name}}(serverAddress string) (*{{.Name}}, error) {
 	return c, nil
 }
 
-{{$service := .Service.Name}}
-{{$receiver := .Name}}
-{{$imports := .Imports}}
-{{ range $_, $f := .Service.Methods }}
+{{$service := .Service.Name -}}
+{{$receiver := .Name -}}
+{{$imports := .Imports -}}
+{{- range $_, $f := .Service.Methods }}
 func (client *{{$receiver}}) {{$f.Name}}(ctx context.Context
 	{{- range $i, $arg := $f.Arguments}}, {{$arg.Name}} {{$imports.NameOf $arg.Type}}{{end -}}
-	) ({{range $i, $ret := $f.Returns}}{{$imports.NameOf $ret.Type}}, {{end}}error) {
-
+	) ({{range $i, $ret := $f.Returns}}ret{{$i}} {{$imports.NameOf $ret.Type}}, {{end}}err error) {
+	// Create and marshall the GRPC Request object
 	req := &{{$service}}_{{$f.Name}}_Request{}
-	ctx, cancel := context.WithTimeout(ctx, client.Timeout)
-	defer cancel()
-
 	req.marshall(
 		{{- range $i, $arg := $f.Arguments}}{{if $i}}, {{end}}{{$arg.Name}}{{end -}}
 	)
 
+	// Configure the client-side request timeout
+	ctx, cancel := context.WithTimeout(ctx, client.Timeout)
+	defer cancel()
+
+	// Make the remote call
 	rsp, err := client.Client.{{$f.Name}}(ctx, req)
-
-	{{range $i, $ret := $f.Returns}}{{if $i}}, {{end}}ret{{$i}}{{end}} := rsp.unmarshall()
-
 	if err == nil {
 		err = ctx.Err()
 	}
-	return {{range $i, $ret := $f.Returns}}ret{{$i}}, {{end}}err
+	if err != nil {
+		return
+	}
+
+	{{range $i, $ret := $f.Returns}}{{if $i}}, {{end}}ret{{$i}}{{end}} = rsp.unmarshall()
+	return
 }
 {{end}}
 `

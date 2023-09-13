@@ -744,6 +744,18 @@ func (f *ParsedStruct) String() string {
 	return b.String()
 }
 
+func (f *ParsedFunc) String() string {
+	b := strings.Builder{}
+	b.WriteString(f.Name + "(")
+	var args []string
+	for _, arg := range f.Arguments {
+		args = append(args, arg.String())
+	}
+	b.WriteString(strings.Join(args, ", "))
+	b.WriteString(")")
+	return b.String()
+}
+
 func (f *ParsedField) String() string {
 	if f.Name == "" {
 		return f.Type.String()

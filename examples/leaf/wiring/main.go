@@ -7,7 +7,6 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/memcached"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 	"golang.org/x/exp/slog"
@@ -29,8 +28,9 @@ func main() {
 	// Create the wiring spec
 	workflow.Init("../workflow")
 
-	b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
-	b := workflow.Define(wiring, "b", "LeafServiceImpl", b_cache)
+	// b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
+	// b := workflow.Define(wiring, "b", "LeafServiceImpl", b_cache)
+	b := workflow.Define(wiring, "b", "LeafServiceImpl")
 
 	// b := workflow.Define(wiring, "b", "LeafServiceImpl")
 	// a := workflow.Define(wiring, "a", "NonLeafServiceImpl", b) // Will fail, because no constructors returning the impl directly
@@ -57,10 +57,12 @@ func main() {
 	slog.Info("Application: \n" + application.String())
 
 	// Below here is a WIP on generating code
-	p := application.Children["pa"].(*goproc.Process)
-
-	// p := application.Children["proc"].(*goproc.Process)
-	err = p.GenerateArtifacts("tmp")
+	err = application.Children["pa"].(*goproc.Process).GenerateArtifacts("tmp")
+	if err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
+	err = application.Children["pb"].(*goproc.Process).GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)

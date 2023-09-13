@@ -75,7 +75,16 @@ func newWorkflowService(name string, serviceType string, args []blueprint.IRNode
 	node.ServiceInfo = details
 	node.Args = args
 	node.Spec = spec
+
 	// TODO: can eagerly typecheck args here
+	if len(details.Constructor.Arguments) != len(args) {
+		var argStrings []string
+		for _, arg := range args {
+			argStrings = append(argStrings, arg.Name())
+		}
+		return nil, fmt.Errorf("mismatched # arguments for %s, constructor is %v but args are (%v)", name, details.Constructor, strings.Join(argStrings, ", "))
+	}
+
 	return node, nil
 }
 

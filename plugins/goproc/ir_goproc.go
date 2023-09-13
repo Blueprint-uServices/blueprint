@@ -144,9 +144,6 @@ func main() {
 }`
 
 func (node *Process) GenerateArtifacts(outputDir string) error {
-	if gogen.IsDir(outputDir) {
-		return fmt.Errorf("cannot built to %s, directory already exists", outputDir)
-	}
 	err := gogen.CheckDir(outputDir, true)
 	if err != nil {
 		return fmt.Errorf("unable to create %s for process %s due to %s", outputDir, node.Name(), err.Error())
