@@ -263,6 +263,11 @@ type (
 		Workspace() WorkspaceBuilder
 	}
 
+	GraphInfo struct {
+		PackageName string // Fully qualified package name being built
+		FilePath    string // Path to the file being built
+	}
+
 	/*
 	   GraphBuilder is used by IRNodes that implement the Instantiable interface.  The GraphBuilder provides
 	   the following methods that can be used by plugins to provide instantiation code:
@@ -308,6 +313,11 @@ type (
 		irutil.VisitTracker
 
 		/*
+			Metadata into about the graph being built
+		*/
+		Info() GraphInfo
+
+		/*
 			This is equivalent to calling node.AddToModule, if node implements it
 		*/
 		Visit(nodes []blueprint.IRNode) error
@@ -336,6 +346,13 @@ type (
 			generated code, to build the named instance
 		*/
 		Declare(instanceName string, buildFuncSrc string) error
+
+		/*
+			This is like Declare, but instead of having to manually construct the source
+			code, the GraphBuilder will automatically create the build func src code,
+			invoking the specified constructor and passing the provided nodes as args
+		*/
+		DeclareConstructor(name string, constructor *gocode.Constructor, args []blueprint.IRNode) error
 
 		/*
 			Gets the ModuleBuilder that contains this GraphBuilder

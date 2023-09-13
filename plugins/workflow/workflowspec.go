@@ -91,6 +91,13 @@ func (service *WorkflowSpecService) GetInterface() *gocode.ServiceInterface {
 	}
 }
 
+func (service *WorkflowSpecService) GetConstructor() *gocode.Constructor {
+	return &gocode.Constructor{
+		Source: service.Constructor.Source(),
+		Func:   service.Constructor.Func,
+	}
+}
+
 func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*WorkflowSpecService, error) {
 	ifaces := spec.findInterfacesFor(struc)
 	if len(ifaces) == 0 {

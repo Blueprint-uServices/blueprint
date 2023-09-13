@@ -20,6 +20,11 @@ type Container interface {
 	WaitGroup() *sync.WaitGroup // Waitgroup used by this container; plugins can call Add if they create goroutines
 }
 
+/* For nodes that want to run background goroutines */
+type Runnable interface {
+	Run(ctx context.Context) error
+}
+
 type BuildFunc func(ctr Container) (any, error)
 
 /*
@@ -31,17 +36,20 @@ type diImpl struct {
 	Graph
 	Container
 
-	ctx        context.Context
-	wg         *sync.WaitGroup
-	buildFuncs map[string]BuildFunc
-	built      map[string]any
+	ctx          context.Context
+	cancel       context.CancelFunc
+	cancelParent context.CancelFunc
+	wg           *sync.WaitGroup
+	buildFuncs   map[string]BuildFunc
+	built        map[string]any
 }
 
-func NewGraph(ctx context.Context) Graph {
+func NewGraph(ctx context.Context, cancel context.CancelFunc) Graph {
 	graph := &diImpl{}
 	graph.buildFuncs = make(map[string]BuildFunc)
 	graph.built = make(map[string]any)
-	graph.ctx = ctx
+	graph.ctx, graph.cancel = context.WithCancel(ctx)
+	graph.cancelParent = cancel
 	graph.wg = &sync.WaitGroup{}
 	return graph
 }
@@ -64,6 +72,20 @@ func (graph *diImpl) Get(name string) (any, error) {
 			return nil, err
 		}
 		graph.built[name] = built
+
+		if runnable, isRunnable := built.(Runnable); isRunnable {
+			graph.wg.Add(1)
+			go func() {
+				err := runnable.Run(graph.ctx)
+				if err != nil {
+					slog.Error("error running node " + name)
+					graph.cancel()
+					graph.cancelParent()
+				}
+				graph.wg.Done()
+			}()
+		}
+
 		return built, nil
 	} else {
 		return nil, fmt.Errorf("unknown %v", name)

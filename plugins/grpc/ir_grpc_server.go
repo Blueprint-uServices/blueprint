@@ -1,10 +1,8 @@
 package grpc
 
 import (
-	"bytes"
 	"fmt"
 	"reflect"
-	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
@@ -26,6 +24,8 @@ type GolangServer struct {
 	InstanceName string
 	Addr         *GolangServerAddress
 	Wrapped      golang.Service
+
+	outputPackage string
 }
 
 // Represents a service that is exposed over GRPC
@@ -57,6 +57,7 @@ func newGolangServer(name string, serverAddr blueprint.IRNode, wrapped blueprint
 	node.InstanceName = name
 	node.Addr = addr
 	node.Wrapped = service
+	node.outputPackage = "grpc"
 	return node, nil
 }
 
@@ -82,14 +83,14 @@ func (node *GolangServer) GenerateFuncs(builder golang.ModuleBuilder) error {
 	}
 
 	// Generate the .proto files
-	err := grpccodegen.GenerateGRPCProto(builder, service, "grpc")
+	err := grpccodegen.GenerateGRPCProto(builder, service, node.outputPackage)
 	if err != nil {
 		fmt.Println("error compiling grpc proto on server")
 		return err
 	}
 
 	// Generate the RPC server handler
-	err = grpccodegen.GenerateServerHandler(builder, service, "grpc")
+	err = grpccodegen.GenerateServerHandler(builder, service, node.outputPackage)
 	if err != nil {
 		return err
 	}
@@ -97,36 +98,34 @@ func (node *GolangServer) GenerateFuncs(builder golang.ModuleBuilder) error {
 	return nil
 }
 
-var serverBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
-
-		// TODO: generated grpc server constructor
-
-		return nil, nil
-
-	}`
-
 func (node *GolangServer) AddInstantiation(builder golang.GraphBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil
 	}
 
-	// TODO: generate the proper server wrapper instantiation code
-
-	// Instantiate the code template
-	t, err := template.New(node.InstanceName).Parse(serverBuildFuncTemplate)
-	if err != nil {
-		return err
+	service, valid := node.Wrapped.GetInterface().(*gocode.ServiceInterface)
+	if !valid {
+		return fmt.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
+			node.Name(), node.Wrapped.GetInterface())
 	}
 
-	// Generate the code
-	buf := &bytes.Buffer{}
-	err = t.Execute(buf, node)
-	if err != nil {
-		return err
+	constructor := &gocode.Constructor{
+		Source: gocode.Source{
+			ModuleName:    builder.Module().Info().Name,
+			ModuleVersion: builder.Module().Info().Version,
+			PackageName:   builder.Module().Info().Name + "/" + node.outputPackage,
+		},
+		Func: gocode.Func{
+			Name: fmt.Sprintf("New_%v_GRPCServerHandler", service.Name),
+			Arguments: []gocode.Variable{
+				{Name: "service", Type: service},
+				{Name: "serverAddr", Type: &gocode.BasicType{Name: "string"}},
+			},
+		},
 	}
 
-	return builder.Declare(node.InstanceName, buf.String())
+	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped, node.Addr})
 }
 
 func (node *GolangServer) GetInterface() service.ServiceInterface {

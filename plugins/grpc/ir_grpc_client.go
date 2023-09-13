@@ -1,10 +1,8 @@
 package grpc
 
 import (
-	"bytes"
 	"fmt"
 	"reflect"
-	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
@@ -25,9 +23,10 @@ type GolangClient struct {
 	golang.GeneratesFuncs
 	golang.Instantiable
 
-	InstanceName  string
-	ServerAddr    *GolangServerAddress
-	OutputPackage string
+	InstanceName string
+	ServerAddr   *GolangServerAddress
+
+	outputPackage string
 }
 
 func newGolangClient(name string, serverAddr blueprint.IRNode) (*GolangClient, error) {
@@ -39,7 +38,7 @@ func newGolangClient(name string, serverAddr blueprint.IRNode) (*GolangClient, e
 	node := &GolangClient{}
 	node.InstanceName = name
 	node.ServerAddr = addr
-	node.OutputPackage = "grpc"
+	node.outputPackage = "grpc"
 
 	return node, nil
 }
@@ -83,14 +82,14 @@ func (node *GolangClient) GenerateFuncs(builder golang.ModuleBuilder) error {
 	}
 
 	// Generate the .proto files
-	err := grpccodegen.GenerateGRPCProto(builder, service, "grpc")
+	err := grpccodegen.GenerateGRPCProto(builder, service, node.outputPackage)
 	if err != nil {
 		fmt.Println("error compiling grpc proto on server")
 		return err
 	}
 
 	// Generate the RPC client
-	err = grpccodegen.GenerateClient(builder, service, node.OutputPackage)
+	err = grpccodegen.GenerateClient(builder, service, node.outputPackage)
 	if err != nil {
 		return err
 	}
@@ -98,54 +97,27 @@ func (node *GolangClient) GenerateFuncs(builder golang.ModuleBuilder) error {
 	return nil
 }
 
-type instantiateClientArgs struct {
-	Client                 *GolangClient
-	GeneratedPackageImport string
-}
-
-var instantiateClientTemplate = `func(ctr golang.Container) (any, error) {
-		addr, err := ctr.Get("{{.Client.ServerAddr.AddrName}}")
-		if err != nil {
-			return nil, err
-		}
-
-		addrString, isString := addr.(string)
-		if !isString {
-			return nil, fmt.Errorf("Expected string value for {{.Client.ServerAddr.AddrName}} but got %v", addr)
-		}
-
-		return {{.GeneratedPackageImport}}.New_{{.Client.GetGoInterface.Name}}_GRPCClient(addrString)
-	}`
-
 func (node *GolangClient) AddInstantiation(builder golang.GraphBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil
 	}
 
-	fqPackageName := builder.Module().Info().Name + "/" + node.OutputPackage
-	importedAs := builder.Import(fqPackageName)
-
-	// TODO: generate the proper client wrapper instantiation code
-	args := instantiateClientArgs{
-		Client:                 node,
-		GeneratedPackageImport: importedAs,
+	constructor := &gocode.Constructor{
+		Source: gocode.Source{
+			ModuleName:    builder.Module().Info().Name,
+			ModuleVersion: builder.Module().Info().Version,
+			PackageName:   builder.Module().Info().Name + "/" + node.outputPackage,
+		},
+		Func: gocode.Func{
+			Name: fmt.Sprintf("New_%v_GRPCClient", node.GetGoInterface().Name),
+			Arguments: []gocode.Variable{
+				{Name: "addr", Type: &gocode.BasicType{Name: "string"}},
+			},
+		},
 	}
 
-	// Instantiate the code template
-	t, err := template.New(node.InstanceName).Parse(instantiateClientTemplate)
-	if err != nil {
-		return err
-	}
-
-	// Generate the code
-	buf := &bytes.Buffer{}
-	err = t.Execute(buf, args)
-	if err != nil {
-		return err
-	}
-
-	return builder.Declare(node.InstanceName, buf.String())
+	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.ServerAddr})
 }
 
 func (node *GolangClient) ImplementsGolangNode()    {}

@@ -85,6 +85,8 @@ func (client *serverTemplateArgs) initImports() error {
 		client.Imports.AddPackage(pkg)
 	}
 
+	client.importType(&client.Service.UserType)
+
 	for _, f := range client.Service.Methods {
 		for _, v := range f.Arguments {
 			err := client.importType(v.Type)
@@ -121,19 +123,29 @@ func New_{{.Name}}(service {{.Imports.NameOf .Service}}, serverAddress string) (
 	return handler, nil
 }
 
-func (handler *{{.Name}}) Run() error {
+// Blueprint: Run is called automatically in a separate goroutine by plugins/golang/di.go
+func (handler *{{.Name}}) Run(ctx context.Context) error {
 	lis, err := net.Listen("tcp", handler.Address)
 	if err != nil {
 		return err
 	}
-	grpcServer := grpc.NewServer()
-	Register{{.Service.Name}}Server(grpcServer, handler)
-	return grpcServer.Serve(lis)
+
+	s := grpc.NewServer()
+	Register{{.Service.Name}}Server(s, handler)
+
+	go func() {
+		select {
+		case <-ctx.Done():
+			s.GracefulStop()
+		}
+	}()
+
+	return s.Serve(lis)
 }
 
-{{$service := .Service.Name}}
-{{$receiver := .Name}}
-{{$imports := .Imports}}
+{{$service := .Service.Name -}}
+{{$receiver := .Name -}}
+{{$imports := .Imports -}}
 {{ range $_, $f := .Service.Methods }}
 func (handler *{{$receiver}}) {{$f.Name -}}
 		(ctx context.Context, req *{{$service}}_{{$f.Name}}_Request) (*{{$service}}_{{$f.Name}}_Response, error) {
@@ -157,9 +169,7 @@ func (handler *{{$receiver}}) {{$f.Name -}}
 Generates the file within its module
 */
 func (client *serverTemplateArgs) GenerateCode(outputFilePath string) error {
-	t, err := template.New("GRPCServerTemplate").Funcs(template.FuncMap{
-		"toTitle": strings.Title,
-	}).Parse(serverTemplate)
+	t, err := template.New("GRPCServerTemplate").Parse(serverTemplate)
 	if err != nil {
 		return err
 	}
