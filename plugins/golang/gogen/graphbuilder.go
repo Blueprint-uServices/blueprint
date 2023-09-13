@@ -151,11 +151,8 @@ var buildFuncTemplate = `func(ctr golang.Container) (any, error) {
 			return nil, fmt.Errorf("Blueprint runtime error: expected {{.Node.Name}} to implement {{.NodeType}}")
 		}
 		{{end}}
-		{{.InstanceName}}, err := {{.Graph.ImportType .Constructor}}({{range $i, $arg := .Args}}{{if $i}}, {{end}}{{.Var.Name}}{{end}})
-		if err != nil {
-			return nil, err
-		}
-}`
+		return {{.Graph.ImportType .Constructor}}({{range $i, $arg := .Args}}{{if $i}}, {{end}}{{.Var.Name}}{{end}})
+	}`
 
 func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *gocode.Constructor, args []blueprint.IRNode) error {
 	if len(constructor.Arguments) != len(args) {
@@ -214,18 +211,25 @@ var diFuncTemplate = `package {{.Package}}
 
 {{.Imports}}
 
-func {{ .FuncName }}(ctx context.Context, args map[string]string) golang.Container {
-	g := golang.NewGraph(ctx)
+func {{ .FuncName }}(ctx context.Context, cancel context.CancelFunc, args map[string]string) (golang.Container, error) {
+	g := golang.NewGraph(ctx, cancel)
 
+	var err error
 	for k := range args {
-		g.Define(k, func(ctr golang.Container) (any, error) { return args[k], nil })
+		err = g.Define(k, func(ctr golang.Container) (any, error) { return args[k], nil })
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	{{ range $defName, $buildFunc := .Declarations }}
-	g.Define("{{ $defName }}", {{ $buildFunc }})
+	err = g.Define("{{ $defName }}", {{ $buildFunc }})
+	if err != nil {
+		return nil, err
+	}
 	{{ end }}
 
-	return g
+	return g.Build(), nil
 }
 `
 

@@ -102,7 +102,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"golang.org/x/exp/slog"
 	"context"
@@ -133,11 +132,19 @@ func main() {
 		{{- end}}
 	}
 
-	ctx := context.Background()
-	graph := {{.GraphConstructor}}(ctx, graphArgs)
+	ctx, cancel := context.WithCancel(context.Background())
+	graph, err := {{.GraphConstructor}}(ctx, cancel, graphArgs)
+	if err != nil {
+		slog.Error(err.Error())
+		return
+	}
 
 	{{range $i, $node := .Instantiate -}}
-	graph.Get("{{$node}}")
+	_, err = graph.Get("{{$node}}")
+	if err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
 	{{end}}
 
 	graph.WaitGroup().Wait()

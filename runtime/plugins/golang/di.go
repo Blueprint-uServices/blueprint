@@ -12,6 +12,7 @@ import (
 
 type Graph interface {
 	Define(name string, build BuildFunc) error
+	Build() Container
 }
 
 type Container interface {
@@ -36,20 +37,19 @@ type diImpl struct {
 	Graph
 	Container
 
-	ctx          context.Context
-	cancel       context.CancelFunc
-	cancelParent context.CancelFunc
-	wg           *sync.WaitGroup
-	buildFuncs   map[string]BuildFunc
-	built        map[string]any
+	ctx        context.Context
+	cancel     context.CancelFunc
+	wg         *sync.WaitGroup
+	buildFuncs map[string]BuildFunc
+	built      map[string]any
 }
 
 func NewGraph(ctx context.Context, cancel context.CancelFunc) Graph {
 	graph := &diImpl{}
 	graph.buildFuncs = make(map[string]BuildFunc)
 	graph.built = make(map[string]any)
-	graph.ctx, graph.cancel = context.WithCancel(ctx)
-	graph.cancelParent = cancel
+	graph.ctx = ctx
+	graph.cancel = cancel
 	graph.wg = &sync.WaitGroup{}
 	return graph
 }
@@ -60,6 +60,10 @@ func (graph *diImpl) Define(name string, build BuildFunc) error {
 	}
 	graph.buildFuncs[name] = build
 	return nil
+}
+
+func (graph *diImpl) Build() Container {
+	return graph
 }
 
 func (graph *diImpl) Get(name string) (any, error) {
@@ -80,7 +84,6 @@ func (graph *diImpl) Get(name string) (any, error) {
 				if err != nil {
 					slog.Error("error running node " + name)
 					graph.cancel()
-					graph.cancelParent()
 				}
 				graph.wg.Done()
 			}()
