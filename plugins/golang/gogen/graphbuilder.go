@@ -144,7 +144,7 @@ func (code *GraphBuilderImpl) Build() error {
 		return err
 	}
 
-	f, err := os.OpenFile(code.FilePath, os.O_CREATE, 0755)
+	f, err := os.OpenFile(code.FilePath, os.O_CREATE|os.O_RDWR, 0755)
 	if err != nil {
 		return err
 	}

@@ -177,7 +177,7 @@ func (workspace *WorkspaceBuilderImpl) Finish() error {
 
 	// Create the go.work file
 	workFileName := filepath.Join(workspace.WorkspaceDir, "go.work")
-	f, err := os.OpenFile(workFileName, os.O_CREATE, 0755)
+	f, err := os.OpenFile(workFileName, os.O_CREATE|os.O_RDWR, 0755)
 	if err != nil {
 		return err
 	}

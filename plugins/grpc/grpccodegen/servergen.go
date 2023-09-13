@@ -163,7 +163,7 @@ func (client *serverTemplateArgs) GenerateCode(outputFilePath string) error {
 		return err
 	}
 
-	f, err := os.OpenFile(outputFilePath, os.O_CREATE, 0755)
+	f, err := os.OpenFile(outputFilePath, os.O_CREATE|os.O_RDWR, 0755)
 	if err != nil {
 		return err
 	}
