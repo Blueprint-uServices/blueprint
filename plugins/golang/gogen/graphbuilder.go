@@ -148,7 +148,7 @@ var buildFuncTemplate = `func(ctr golang.Container) (any, error) {
 		// {{.Var.Name}} is expected to be a {{.Var.Type}}
 		{{.Var.Name}}, is{{.Var.Name}}Valid := {{.NodeName}}.({{.Graph.ImportType .NodeType}})
 		if !is{{.Var.Name}}Valid {
-			return nil, fmt.Errorf("Blueprint runtime error: expected {{.Node.Name}} to implement {{.NodeType}}")
+			return nil, fmt.Errorf("blueprint gogen/graphbuilder.go expected {{.Node.Name}} to implement {{.NodeType}}")
 		}
 		{{end}}
 		return {{.Graph.ImportType .Constructor}}({{range $i, $arg := .Args}}{{if $i}}, {{end}}{{.Var.Name}}{{end}})

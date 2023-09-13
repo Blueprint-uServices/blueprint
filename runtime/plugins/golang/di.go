@@ -3,6 +3,7 @@ package golang
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"sync"
 
 	"golang.org/x/exp/slog"
@@ -73,17 +74,23 @@ func (graph *diImpl) Get(name string) (any, error) {
 	if build, exists := graph.buildFuncs[name]; exists {
 		built, err := build(graph)
 		if err != nil {
+			slog.Error("Error building " + name)
 			return nil, err
+		} else {
+			slog.Info(fmt.Sprintf("Built %v (%v)", name, reflect.TypeOf(built)))
 		}
 		graph.built[name] = built
 
 		if runnable, isRunnable := built.(Runnable); isRunnable {
+			slog.Info("Running " + name)
 			graph.wg.Add(1)
 			go func() {
 				err := runnable.Run(graph.ctx)
 				if err != nil {
-					slog.Error("error running node " + name)
+					slog.Error(fmt.Sprintf("error running node %v: %v", name, err.Error()))
 					graph.cancel()
+				} else {
+					slog.Info(name + " exited")
 				}
 				graph.wg.Done()
 			}()

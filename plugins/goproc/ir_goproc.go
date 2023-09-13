@@ -38,7 +38,6 @@ type Process struct {
 	InstanceName   string
 	ArgNodes       []blueprint.IRNode
 	ContainedNodes []blueprint.IRNode
-	Instantiations []blueprint.IRNode
 }
 
 // A Golang Process Node can either be given the child nodes ahead of time, or they can be added using AddArtifactNode / AddCodeNode
@@ -78,10 +77,6 @@ func (node *Process) AddArg(argnode blueprint.IRNode) {
 func (node *Process) AddChild(child blueprint.IRNode) error {
 	node.ContainedNodes = append(node.ContainedNodes, child)
 	return nil
-}
-
-func (node *Process) Instantiate(child blueprint.IRNode) {
-	node.Instantiations = append(node.Instantiations, child)
 }
 
 type mainArg struct {
@@ -213,7 +208,8 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 			Var:  irutil.Clean(arg.Name()),
 		})
 	}
-	for _, child := range node.Instantiations {
+	// For now explicitly instantiate every child node
+	for _, child := range node.ContainedNodes {
 		mainFileArgs.Instantiate = append(mainFileArgs.Instantiate, child.Name())
 	}
 	mainFileName := filepath.Join(module.ModuleDir, "main.go")
