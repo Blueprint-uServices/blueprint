@@ -123,7 +123,7 @@ func New_{{.Name}}(service {{.Imports.NameOf .Service}}, serverAddress string) (
 	return handler, nil
 }
 
-// Blueprint: Run is called automatically in a separate goroutine by plugins/golang/di.go
+// Blueprint: Run is called automatically in a separate goroutine by runtime/plugins/golang/di.go
 func (handler *{{.Name}}) Run(ctx context.Context) error {
 	lis, err := net.Listen("tcp", handler.Address)
 	if err != nil {
