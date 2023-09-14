@@ -216,7 +216,8 @@ func {{ .FuncName }}(ctx context.Context, cancel context.CancelFunc, args map[st
 
 	var err error
 	for k := range args {
-		err = g.Define(k, func(ctr golang.Container) (any, error) { return args[k], nil })
+		v := args[k]
+		err = g.Define(k, func(ctr golang.Container) (any, error) { return v, nil })
 		if err != nil {
 			return nil, err
 		}

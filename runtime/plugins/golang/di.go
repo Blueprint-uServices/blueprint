@@ -77,7 +77,12 @@ func (graph *diImpl) Get(name string) (any, error) {
 			slog.Error("Error building " + name)
 			return nil, err
 		} else {
-			slog.Info(fmt.Sprintf("Built %v (%v)", name, reflect.TypeOf(built)))
+			switch v := built.(type) {
+			case string:
+				slog.Info(fmt.Sprintf("Built %v (%v) = %v", name, reflect.TypeOf(built), v))
+			default:
+				slog.Info(fmt.Sprintf("Built %v (%v)", name, reflect.TypeOf(built)))
+			}
 		}
 		graph.built[name] = built
 

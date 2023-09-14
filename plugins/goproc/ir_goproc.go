@@ -107,6 +107,8 @@ func checkArg(name, value string) {
 	if value == "" {
 		slog.Error("No value set for required cmd line argument " + name)
 		os.Exit(1)
+	} else {
+		slog.Info(fmt.Sprintf("Arg %v = %v", name, value))
 	}
 }
 
