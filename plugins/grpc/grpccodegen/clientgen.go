@@ -86,6 +86,8 @@ func (client *clientArgs) initImports() error {
 		client.Imports.AddPackage(pkg)
 	}
 
+	client.importType(&client.Service.UserType)
+
 	for _, f := range client.Service.Methods {
 		for _, v := range f.Arguments {
 			err := client.importType(v.Type)
