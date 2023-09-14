@@ -81,13 +81,31 @@ func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, servic
 		return newWorkflowService(serviceName, serviceType, arg_nodes)
 	})
 
+	// Define the client dependencies
+	dependencies := serviceName + ".dependencies"
+	wiring.Define(dependencies, &WorkflowSpecNode{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+		return includeWorkflowDependencies(serviceName, serviceType)
+	})
+
 	// Mandate that this service with this name must be unique within the application (although, this can be changed by scopes)
 	dstName := serviceName + ".dst"
 	wiring.Alias(dstName, handlerName)
 	pointer.RequireUniqueness(wiring, dstName, &blueprint.ApplicationNode{})
 
-	// Lastly define the pointer
-	pointer.CreatePointer(wiring, serviceName, &WorkflowService{}, dstName)
+	// Define the pointer
+	ptr := pointer.CreatePointer(wiring, serviceName, &WorkflowService{}, dstName)
+
+	// Make sure that the client-side of the pointer has the dependencies (the interfaces) of the service
+	includeDependencies := serviceName + ".includedependencies"
+	clientNext := ptr.AddSrcModifier(wiring, includeDependencies)
+	wiring.Define(includeDependencies, &WorkflowService{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+		_, err := scope.Get(dependencies)
+		if err != nil {
+			return nil, err
+		}
+
+		return scope.Get(clientNext)
+	})
 
 	return serviceName
 }

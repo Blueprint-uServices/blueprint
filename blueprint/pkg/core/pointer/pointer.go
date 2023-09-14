@@ -27,7 +27,7 @@ func (ptr PointerDef) String() string {
 	return b.String()
 }
 
-func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst string) {
+func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst string) *PointerDef {
 	ptr := &PointerDef{}
 	ptr.name = name
 	ptr.srcModifiers = nil
@@ -55,6 +55,8 @@ func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst st
 	})
 
 	wiring.SetProperty(name, "ptr", ptr)
+
+	return ptr
 }
 
 func IsPointer(wiring blueprint.WiringSpec, name string) bool {

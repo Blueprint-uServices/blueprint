@@ -156,7 +156,11 @@ var buildFuncTemplate = `func(ctr golang.Container) (any, error) {
 
 func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *gocode.Constructor, args []blueprint.IRNode) error {
 	if len(constructor.Arguments) != len(args) {
-		return fmt.Errorf("mismatched args for %v %v", name, constructor)
+		argNames := []string{}
+		for _, arg := range args {
+			argNames = append(argNames, arg.Name())
+		}
+		return fmt.Errorf("mismatched args for %v.  Expected: %v.  Got: (%v)", name, constructor, strings.Join(argNames, ", "))
 	}
 
 	graph.Import("fmt")

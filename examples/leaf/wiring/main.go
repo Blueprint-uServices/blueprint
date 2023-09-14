@@ -39,11 +39,13 @@ func main() {
 	pb := serviceDefaults(wiring, b)
 	// proc := goproc.CreateProcess(wiring, "proc", a, b)
 
+	client := goproc.CreateClientProcess(wiring, "client", a)
+
 	// Let's print out all of the nodes currently defined in the wiring spec
 	slog.Info("Wiring Spec: \n" + wiring.String())
 
 	bp := wiring.GetBlueprint()
-	bp.Instantiate(pa, pb)
+	bp.Instantiate(pa, pb, client)
 	// bp.Instantiate(proc)
 
 	application, err := bp.Build()
@@ -62,6 +64,11 @@ func main() {
 		os.Exit(1)
 	}
 	err = application.Children["pb"].(*goproc.Process).GenerateArtifacts("tmp")
+	if err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
+	err = application.Children["client"].(*goproc.Process).GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)

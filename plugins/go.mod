@@ -9,11 +9,12 @@ require (
 	golang.org/x/mod v0.11.0
 )
 
-require golang.org/x/sys v0.1.0 // indirect
+require golang.org/x/sys v0.5.0 // indirect
 
 require (
 	gitlab.mpi-sws.org/cld/blueprint/blueprint v0.0.0
-	golang.org/x/tools v0.2.0
+	golang.org/x/text v0.13.0
+	golang.org/x/tools v0.6.0
 )
 
 replace gitlab.mpi-sws.org/cld/blueprint/blueprint => ../blueprint

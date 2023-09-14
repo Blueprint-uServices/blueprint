@@ -10,8 +10,11 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
 	"golang.org/x/exp/slog"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 /*
@@ -98,6 +101,7 @@ package main
 import (
 	"flag"
 	"os"
+	"fmt"
 	"golang.org/x/exp/slog"
 	"context"
 	"{{.GraphPackage}}"
@@ -186,7 +190,7 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	// Generate the graph of gonodes contained in this process
 	graphFileName := strings.ToLower(cleanName) + ".go"
 	packagePath := "goproc"
-	constructorName := "New" + strings.ToTitle(cleanName)
+	constructorName := "New" + cases.Title(language.BritishEnglish).String(cleanName)
 
 	graph, err := gogen.NewGraphBuilder(module, graphFileName, packagePath, constructorName)
 	if err != nil {
@@ -212,7 +216,9 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	}
 	// For now explicitly instantiate every child node
 	for _, child := range node.ContainedNodes {
-		mainFileArgs.Instantiate = append(mainFileArgs.Instantiate, child.Name())
+		if _, isInstantiable := child.(golang.Instantiable); isInstantiable {
+			mainFileArgs.Instantiate = append(mainFileArgs.Instantiate, child.Name())
+		}
 	}
 	mainFileName := filepath.Join(module.ModuleDir, "main.go")
 	t, err := template.New("main.go").Parse(mainTemplate)
