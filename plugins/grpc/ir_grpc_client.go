@@ -9,7 +9,6 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc/grpccodegen"
-	"golang.org/x/exp/slog"
 )
 
 /*
@@ -73,7 +72,6 @@ func (node *GolangClient) GenerateFuncs(builder golang.ModuleBuilder) error {
 	if builder.Visited(node.InstanceName + ".generateFuncs") {
 		return nil
 	}
-	slog.Info(fmt.Sprintf("GenerateFuncs %v\n", node))
 
 	service := node.GetGoInterface()
 	if service == nil {
@@ -84,7 +82,6 @@ func (node *GolangClient) GenerateFuncs(builder golang.ModuleBuilder) error {
 	// Generate the .proto files
 	err := grpccodegen.GenerateGRPCProto(builder, service, node.outputPackage)
 	if err != nil {
-		fmt.Println("error compiling grpc proto on server")
 		return err
 	}
 
@@ -104,11 +101,7 @@ func (node *GolangClient) AddInstantiation(builder golang.GraphBuilder) error {
 	}
 
 	constructor := &gocode.Constructor{
-		Source: gocode.Source{
-			ModuleName:    builder.Module().Info().Name,
-			ModuleVersion: builder.Module().Info().Version,
-			PackageName:   builder.Module().Info().Name + "/" + node.outputPackage,
-		},
+		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
 			Name: fmt.Sprintf("New_%v_GRPCClient", node.GetGoInterface().Name),
 			Arguments: []gocode.Variable{

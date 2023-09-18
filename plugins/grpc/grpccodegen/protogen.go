@@ -59,7 +59,6 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 	}
 
 	// Compile the proto file
-	fmt.Println("compiling proto file")
 	err = CompileProtoFile(outputFilename)
 	if err != nil {
 		return err
@@ -70,17 +69,31 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 	return pb.GenerateMarshallingCode(marshallFile)
 }
 
+func rel(path string) string {
+	pwd, err := os.Getwd()
+	if err != nil {
+		return path
+	}
+	s, err := filepath.Rel(pwd, path)
+	if err != nil {
+		return path
+	}
+	return s
+}
+
 func CompileProtoFile(protoFileName string) error {
 	proto_path, _ := filepath.Split(protoFileName)
-	cmd := exec.Command("protoc", protoFileName, "--go_out="+proto_path, "--go-grpc_out="+proto_path, "--go_opt=paths=source_relative", "--go-grpc_opt=paths=source_relative", "--proto_path="+proto_path)
+	cmd := exec.Command("protoc", protoFileName, "--go_out="+proto_path, "--go-grpc_out="+proto_path, "--proto_path="+proto_path)
 	var out strings.Builder
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	slog.Info(fmt.Sprintf("%v", cmd))
+	slog.Info(fmt.Sprintf("protoc %v --go_out=%v --go-grpc_out=%v --proto_path=%v", rel(protoFileName), rel(proto_path), rel(proto_path), rel(proto_path)))
 	err := cmd.Run()
 	if err != nil {
-		slog.Info(out.String())
+		slog.Error(out.String())
 		return err
+	} else {
+		slog.Info("protoc compilation success")
 	}
 	return nil
 }
@@ -176,14 +189,7 @@ func (b *GRPCProtoBuilder) newMessage(name string) *GRPCMessageDecl {
 	s.Builder = b
 	s.Name = name
 	s.FieldList = nil
-	s.GRPCType = &gocode.UserType{
-		Source: gocode.Source{
-			ModuleName:    b.Module.Name,
-			ModuleVersion: b.Module.Version,
-			PackageName:   b.PackageName,
-		},
-		Name: name,
-	}
+	s.GRPCType = &gocode.UserType{Name: name, Package: b.PackageName}
 	b.Messages[name] = s // Not implemented yet: name collision possible for same-named struct from different packages
 	return s
 }
@@ -265,18 +271,10 @@ func (b *GRPCProtoBuilder) GetOrAddMessage(t *gocode.UserType) (*GRPCMessageDecl
 		return msgDecl, nil
 	}
 
-	for _, mod := range b.Code.Modules {
-		fmt.Println("module: " + mod.Name)
-	}
-
 	// Find the struct definition in the module
-	mod, hasModule := b.Code.Modules[t.ModuleName]
-	if !hasModule {
-		return nil, fmt.Errorf("could not find module containing %v, expected %v", t.String(), t.ModuleName)
-	}
-	pkg, hasPackage := mod.Packages[t.PackageName]
-	if !hasPackage {
-		return nil, fmt.Errorf("could not find package containing %v, expected %v", t.String(), t.PackageName)
+	pkg := b.Code.GetPackage(t.Package)
+	if pkg == nil {
+		return nil, fmt.Errorf("could not find package %v for type %v", t.Package, t)
 	}
 	struc, hasStruct := pkg.Structs[t.Name]
 	if !hasStruct {
@@ -285,7 +283,7 @@ func (b *GRPCProtoBuilder) GetOrAddMessage(t *gocode.UserType) (*GRPCMessageDecl
 		if _, hasTypeDef := pkg.DeclaredTypes[t.Name]; hasTypeDef {
 			return nil, fmt.Errorf("expected %v to be a struct but it is an unsupported type", t.String())
 		} else {
-			return nil, fmt.Errorf("could not find %v within %v", t.Name, t.PackageName)
+			return nil, fmt.Errorf("could not find %v within %v", t.Name, t.Package)
 		}
 	}
 

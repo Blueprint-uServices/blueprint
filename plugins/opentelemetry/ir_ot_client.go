@@ -14,7 +14,6 @@ import (
 
 type OpenTelemetryClientWrapper struct {
 	golang.Service
-	golang.RequiresPackages
 	golang.GeneratesInterfaces
 	golang.GeneratesFuncs
 
@@ -52,19 +51,6 @@ func (node *OpenTelemetryClientWrapper) String() string {
 func (node *OpenTelemetryClientWrapper) GetInterface() service.ServiceInterface {
 	// TODO: unwrap server interface to remove tracing stuff
 	return node.Server.GetInterface()
-}
-
-// Part of code generation compilation pass; adds library dependencies to the generated module
-func (node *OpenTelemetryClientWrapper) AddRequires(builder golang.ModuleBuilder) error {
-	// Only generate instantiation code for this instance once
-	if builder.Visited(node.WrapperName + ".AddRequires") {
-		return nil
-	}
-	slog.Info(fmt.Sprintf("AddRequires %v\n", node))
-
-	// TODO: Require OpenTelemetry libraries
-
-	return nil
 }
 
 // Part of code generation compilation pass; creates the interface definition code for the wrapper,

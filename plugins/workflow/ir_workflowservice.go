@@ -47,7 +47,6 @@ type WorkflowService struct {
 	golang.Service
 
 	// Additional interfaces for generating Golang artifacts
-	golang.RequiresPackages
 	golang.Instantiable
 
 	// IR Nodes of arguments that will be passed in to the generated code
@@ -149,23 +148,6 @@ func (node *WorkflowService) AddToWorkspace(builder golang.WorkspaceBuilder) err
 
 	// Copy the impl module into the workspace (if it's different)
 	return addToWorkspace(builder, node.ServiceInfo.Constructor.File.Package.Module)
-}
-
-func addToModule(builder golang.ModuleBuilder, mod *goparser.ParsedModule) error {
-	if builder.Visited(mod.Name) {
-		return nil
-	}
-	return builder.Require(mod.Name, mod.Version)
-}
-
-// Part of module generation; Adds the 'requires' statements to the module
-func (node *WorkflowService) AddRequires(builder golang.ModuleBuilder) error {
-	// Add the requires statements
-	err := addToModule(builder, node.ServiceInfo.Iface.File.Package.Module)
-	if err != nil {
-		return err
-	}
-	return addToModule(builder, node.ServiceInfo.Constructor.File.Package.Module)
 }
 
 func (node *WorkflowService) AddInstantiation(builder golang.GraphBuilder) error {

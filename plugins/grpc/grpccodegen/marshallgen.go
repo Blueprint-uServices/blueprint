@@ -62,16 +62,16 @@ func (msg *{{$method.Response.GRPCType.Name}}) unmarshall() (
 {{end -}}
 
 {{ range $t, $struct := .Structs}}
-// Utility function to pack {{$imports.Qualify $t.PackageName $t.Name}} into a GRPC {{$struct.GRPCType.Name}} message
-func (msg *{{$struct.GRPCType.Name}}) marshall(obj *{{$imports.Qualify $t.PackageName $t.Name}}) *{{$struct.GRPCType.Name}} {
+// Utility function to pack {{$imports.Qualify $t.Package $t.Name}} into a GRPC {{$struct.GRPCType.Name}} message
+func (msg *{{$struct.GRPCType.Name}}) marshall(obj *{{$imports.Qualify $t.Package $t.Name}}) *{{$struct.GRPCType.Name}} {
 	{{- range $j, $field := $struct.FieldList}}
 	{{$field.Marshall $imports "obj."}}
 	{{- end}}
 	return msg
 }
 
-// Utility function to unpack {{$imports.Qualify $t.PackageName $t.Name}} from a GRPC {{$struct.GRPCType.Name}} message
-func (msg *{{$struct.GRPCType.Name}}) unmarshall(obj *{{$imports.Qualify $t.PackageName $t.Name}}) {
+// Utility function to unpack {{$imports.Qualify $t.Package $t.Name}} from a GRPC {{$struct.GRPCType.Name}} message
+func (msg *{{$struct.GRPCType.Name}}) unmarshall(obj *{{$imports.Qualify $t.Package $t.Name}}) {
 	{{- range $j, $field := $struct.FieldList}}
 	{{$field.Unmarshall $imports "obj."}}
 	{{- end}}
@@ -91,9 +91,7 @@ This extends the code in protogen.go and is called from protogen.go
 */
 
 func (b *GRPCProtoBuilder) GenerateMarshallingCode(outputFilePath string) error {
-	t, err := template.New("marshallGRPC").Funcs(template.FuncMap{
-		"toTitle": strings.Title,
-	}).Parse(marshallFileTemplate)
+	t, err := template.New("marshallGRPC").Parse(marshallFileTemplate)
 	if err != nil {
 		return err
 	}

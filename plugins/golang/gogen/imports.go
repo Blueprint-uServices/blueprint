@@ -2,9 +2,11 @@ package gogen
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"golang.org/x/exp/slog"
 )
 
 /*
@@ -71,13 +73,9 @@ func (imports *Imports) AddPackage(pkg string) string {
 
 func (imports *Imports) AddType(typeName gocode.TypeName) {
 	switch t := typeName.(type) {
-	case *gocode.BuiltinType:
-		{
-			imports.AddPackage(t.Package)
-		}
 	case *gocode.UserType:
 		{
-			imports.AddPackage(t.PackageName)
+			imports.AddPackage(t.Package)
 		}
 	case *gocode.Pointer:
 		{
@@ -131,14 +129,15 @@ func (imports *Imports) Qualify(pkg string, name string) string {
 }
 
 func (imports *Imports) NameOf(typeName gocode.TypeName) string {
+	imports.AddType(typeName)
 	switch t := typeName.(type) {
-	case *gocode.BuiltinType:
+	case *gocode.BasicType:
 		{
-			return imports.Qualify(t.Package, t.Name)
+			return t.Name
 		}
 	case *gocode.UserType:
 		{
-			return imports.Qualify(t.PackageName, t.Name)
+			return imports.Qualify(t.Package, t.Name)
 		}
 	case *gocode.Pointer:
 		{
@@ -166,6 +165,7 @@ func (imports *Imports) NameOf(typeName gocode.TypeName) string {
 		}
 	default:
 		{
+			slog.Warn(fmt.Sprintf("Importing unknown type %v %v", typeName, reflect.TypeOf(typeName)))
 			return typeName.String()
 		}
 	}

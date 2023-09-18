@@ -3,14 +3,17 @@ package gogen
 import (
 	"fmt"
 	"os"
+	"os/exec"
+	"strings"
+
 	"path/filepath"
 	"runtime"
-	"text/template"
 
 	cp "github.com/otiai10/copy"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"golang.org/x/exp/slog"
 	"golang.org/x/mod/modfile"
 )
 
@@ -69,6 +72,41 @@ func (workspace *WorkspaceBuilderImpl) Visit(nodes []blueprint.IRNode) error {
 	return nil
 }
 
+func (workspace *WorkspaceBuilderImpl) CreateModule(moduleName string, moduleVersion string) (string, error) {
+	// Don't currently support multiple versions of the same module
+	if _, moduleExists := workspace.ModuleDirs[moduleName]; moduleExists {
+		return "", fmt.Errorf("module %v %v already exists in output workspace %v", moduleName, moduleVersion, workspace.WorkspaceDir)
+	}
+
+	// Find an unused subdirectory for the module
+	splits := strings.Split(moduleName, "/")
+	moduleShortName := splits[len(splits)-1]
+	moduleSubDir := moduleShortName
+	for i := 0; ; i += 1 {
+		if _, subDirInUse := workspace.Modules[moduleSubDir]; !subDirInUse {
+			break
+		}
+		moduleSubDir = fmt.Sprintf("%s%v", moduleShortName, i)
+	}
+
+	// Create output directory
+	moduleDir := filepath.Join(workspace.WorkspaceDir, moduleShortName)
+	err := CheckDir(moduleDir, true)
+	if err != nil {
+		return "", fmt.Errorf("cannot generate new module %s due to %s", moduleShortName, err.Error())
+	}
+
+	// Save the module
+	workspace.Modules[moduleShortName] = moduleName
+	workspace.ModuleDirs[moduleName] = moduleShortName
+
+	// Create the go.mod file
+	modfileContents := fmt.Sprintf("module %v\n\ngo 1.20", moduleName)
+	modfile := filepath.Join(moduleDir, "go.mod")
+	err = os.WriteFile(modfile, []byte(modfileContents), 0755)
+	return moduleDir, err
+}
+
 func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSrcPath string) error {
 	// First open and parse the go.mod file to make sure it exists and is valid
 	modfileName := filepath.Join(moduleSrcPath, "go.mod")
@@ -107,12 +145,7 @@ func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSr
 		return err
 	}
 
-	err = cp.Copy(moduleSrcPath, moduleDstPath)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return cp.Copy(moduleSrcPath, moduleDstPath)
 }
 
 func (workspace *WorkspaceBuilderImpl) GetLocalModule(modulePath string) (string, bool) {
@@ -170,20 +203,9 @@ The method will do the following:
   - updates the go.mod files of all contained modules with 'replace' directives for any required modules that exist in the workspace
 */
 func (workspace *WorkspaceBuilderImpl) Finish() error {
-	t, err := template.New("go.work").Parse(goWorkTemplate)
-	if err != nil {
-		return err
-	}
-
-	// Create the go.work file
+	// Generate the go.work file
 	workFileName := filepath.Join(workspace.WorkspaceDir, "go.work")
-	f, err := os.OpenFile(workFileName, os.O_CREATE|os.O_RDWR, 0755)
-	if err != nil {
-		return err
-	}
-
-	// Generate the file
-	err = t.Execute(f, workspace)
+	err := ExecuteTemplateToFile("go.work", goWorkTemplate, workspace, workFileName)
 	if err != nil {
 		return err
 	}
@@ -198,50 +220,74 @@ func (workspace *WorkspaceBuilderImpl) Finish() error {
 		return fmt.Errorf("generated an invalid go.work file for workspace %v due to %v", workspace.WorkspaceDir, err.Error())
 	}
 
-	// Rewrite the go.mod files
-	for moduleSubDir, _ := range workspace.Modules {
-		// Read in the go.mod file to update
-		modFile, err := workspace.readModfile(moduleSubDir)
-		if err != nil {
-			return err
-		}
+	// Rewrite the go.mod files to redirect to local modules
+	for moduleSubDir, moduleName := range workspace.Modules {
+		workspace.updateModfile(moduleSubDir, moduleName)
+	}
 
-		// Drop all existing replace directives
-		modFile.Replace = nil
-
-		// Check all of the 'require' statements, add 'replace' as needed to redirect to the local subdir.  Also validate the version while we're at it
-		for _, requireStmt := range modFile.Require {
-			if dependencySubDir, dependencyIsLocal := workspace.ModuleDirs[requireStmt.Mod.Path]; dependencyIsLocal {
-				// Read the go.mod of the dependency
-				targetModFile, err := workspace.readModfile(dependencySubDir)
-				if err != nil {
-					return err
-				}
-
-				requiredVersion := requireStmt.Mod.Version
-				localVersion := targetModFile.Module.Mod.Version
-				if localVersion != requiredVersion {
-					return fmt.Errorf("dependency version mismatch for module %v which requires module %v version %v but version %v was found in workspace %v", moduleSubDir, dependencySubDir, requiredVersion, localVersion, workspace.WorkspaceDir)
-				}
-
-				replacePath := "../" + dependencySubDir
-				modFile.AddReplace(requireStmt.Mod.Path, requireStmt.Mod.Version, replacePath, "")
-			}
-		}
-
-		// Format the new modfile
-		data, err := modFile.Format()
-		if err != nil {
-			return err
-		}
-
-		// Overwrite it
-		modFileName := filepath.Join(workspace.WorkspaceDir, moduleSubDir, "go.mod")
-		err = os.WriteFile(modFileName, data, 0755)
-		if err != nil {
-			return err
-		}
+	// Resolve imported packages
+	for moduleSubDir := range workspace.Modules {
+		workspace.goModTidy(moduleSubDir)
 	}
 
 	return nil
+}
+
+/*
+Updates the go.mod file for the module in the specified sub directory, to add replace directives
+to all other modules located in the workspace
+*/
+func (workspace *WorkspaceBuilderImpl) updateModfile(moduleSubDir string, moduleName string) error {
+	// Read in the go.mod file to update
+	modFile, err := workspace.readModfile(moduleSubDir)
+	if err != nil {
+		return err
+	}
+
+	// Drop all existing replace directives
+	modFile.Replace = nil
+
+	// Now we add replace directives
+	for otherModuleSubDir, otherModuleName := range workspace.Modules {
+		if moduleName == otherModuleName {
+			continue
+		}
+		otherModfile, err := workspace.readModfile(otherModuleSubDir)
+		if err != nil {
+			return err
+		}
+
+		// Add a replace for everything, regardless of whether the module uses it
+		modFile.AddReplace(otherModfile.Module.Mod.Path, "", "../"+otherModuleSubDir, "")
+	}
+
+	// Format and overwrite the new modfile
+	data, err := modFile.Format()
+	if err != nil {
+		return err
+	}
+	modFileName := filepath.Join(workspace.WorkspaceDir, moduleSubDir, "go.mod")
+	return os.WriteFile(modFileName, data, 0755)
+}
+
+func rel(path string) string {
+	pwd, err := os.Getwd()
+	if err != nil {
+		return path
+	}
+	s, err := filepath.Rel(pwd, path)
+	if err != nil {
+		return path
+	}
+	return s
+}
+
+func (workspace *WorkspaceBuilderImpl) goModTidy(moduleSubDir string) error {
+	cmd := exec.Command("go", "mod", "tidy")
+	cmd.Dir = filepath.Join(workspace.WorkspaceDir, moduleSubDir)
+	var out strings.Builder
+	cmd.Stdout = &out
+	cmd.Stderr = &out
+	slog.Info(fmt.Sprintf("go mod tidy (%v)", rel(cmd.Dir)))
+	return cmd.Run()
 }

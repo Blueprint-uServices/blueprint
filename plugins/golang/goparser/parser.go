@@ -25,87 +25,98 @@ it is not possible to use workflow spec nodes whose interface or implementation
 comes entirely from an external module (ie. a module that exists only as a
 'require' directive of a go.mod)
 */
-type ParsedModuleSet struct {
-	Modules map[string]*ParsedModule // Map from FQ module name to module object
-}
+type (
+	ParsedModuleSet struct {
+		Modules map[string]*ParsedModule // Map from FQ module name to module object
+	}
 
-/*
-Things to bear in mind:
- * A struct from one module can implement an interface from another
- * Declared things are local to a package not a file
- * Yet, imported packages are per-file
- * To make sure things are resolved correctly across modules, packages, and files, we need to parse things breadth-first (first modules, then packages, etc.)
- * import . "something" is likely to cause problems.  If only one package is imported like this, we can assume unresolved types come from that module; more than one we error
- * any interface is valid for a workflow service.  typechecking function arguments is only needed when there is something like serialization; then there is a restriction on arg types
- * not implemented yet: we don't currently support structs or interfaces that extend other structs/interfaces
-*/
+	/*
+	   Things to bear in mind:
+	    * A struct from one module can implement an interface from another
+	    * Declared things are local to a package not a file
+	    * Yet, imported packages are per-file
+	    * To make sure things are resolved correctly across modules, packages, and files, we need to parse things breadth-first (first modules, then packages, etc.)
+	    * import . "something" is likely to cause problems.  If only one package is imported like this, we can assume unresolved types come from that module; more than one we error
+	    * any interface is valid for a workflow service.  typechecking function arguments is only needed when there is something like serialization; then there is a restriction on arg types
+	    * not implemented yet: we don't currently support structs or interfaces that extend other structs/interfaces
+	*/
 
-type ParsedModule struct {
-	ModuleSet *ParsedModuleSet
-	Name      string                    // Fully qualified name of the module
-	Version   string                    // Version of the module
-	SrcDir    string                    // Fully qualified location of the module on the filesystem
-	Modfile   *modfile.File             // The modfile File struct is sufficiently simple that we just use it directly
-	Packages  map[string]*ParsedPackage // Map from fully qualified package name to ParsedPackage
-}
+	ParsedModule struct {
+		ModuleSet *ParsedModuleSet
+		Name      string                    // Fully qualified name of the module
+		Version   string                    // Version of the module
+		SrcDir    string                    // Fully qualified location of the module on the filesystem
+		Modfile   *modfile.File             // The modfile File struct is sufficiently simple that we just use it directly
+		Packages  map[string]*ParsedPackage // Map from fully qualified package name to ParsedPackage
+	}
 
-type ParsedPackage struct {
-	Module        *ParsedModule
-	Name          string                      // Fully qualified name of the package including module name
-	ShortName     string                      // Shortname of the package (ie, the name used in an import statement)
-	PackageDir    string                      // Subdirectory within the module containing the package
-	SrcDir        string                      // Fully qualified location of the package on the filesystem
-	Files         map[string]*ParsedFile      // Map from filename to ParsedFile
-	Ast           *ast.Package                // The AST of the package
-	DeclaredTypes map[string]gocode.UserType  // Types declared within this package
-	Structs       map[string]*ParsedStruct    // Structs parsed from this package
-	Interfaces    map[string]*ParsedInterface // Interfaces parsed from this package
-	Funcs         map[string]*ParsedFunc      // Functions parsed from this package (does not include funcs with receiver types)
-}
+	ParsedPackage struct {
+		Module        *ParsedModule
+		Name          string                      // Fully qualified name of the package including module name
+		ShortName     string                      // Shortname of the package (ie, the name used in an import statement)
+		PackageDir    string                      // Subdirectory within the module containing the package
+		SrcDir        string                      // Fully qualified location of the package on the filesystem
+		Files         map[string]*ParsedFile      // Map from filename to ParsedFile
+		Ast           *ast.Package                // The AST of the package
+		DeclaredTypes map[string]gocode.UserType  // Types declared within this package
+		Structs       map[string]*ParsedStruct    // Structs parsed from this package
+		Interfaces    map[string]*ParsedInterface // Interfaces parsed from this package
+		Funcs         map[string]*ParsedFunc      // Functions parsed from this package (does not include funcs with receiver types)
+	}
 
-type ParsedFile struct {
-	Package          *ParsedPackage
-	Name             string                   // Filename
-	Path             string                   // Fully qualified path to the file
-	AnonymousImports []*ParsedImport          // Import declarations that were imported with .
-	NamedImports     map[string]*ParsedImport // Import declarations - map from shortname to fully qualified package import name
-	Ast              *ast.File                // The AST of the file
-}
+	ParsedFile struct {
+		Package          *ParsedPackage
+		Name             string                   // Filename
+		Path             string                   // Fully qualified path to the file
+		AnonymousImports []*ParsedImport          // Import declarations that were imported with .
+		NamedImports     map[string]*ParsedImport // Import declarations - map from shortname to fully qualified package import name
+		Ast              *ast.File                // The AST of the file
+	}
 
-type ParsedStruct struct {
-	File            *ParsedFile
-	Ast             *ast.StructType
-	Name            string
-	Methods         map[string]*ParsedFunc  // Methods declared directly on this struct, does not include promoted methods (not implemented yet)
-	FieldsList      []*ParsedField          // All fields in the order that they are declared
-	Fields          map[string]*ParsedField // Named fields declared in this struct only, does not include promoted fields (not implemented yet)
-	PromotedField   *ParsedField            // If there is a promoted field, stored here
-	AnonymousFields []*ParsedField          // Subsequent anonymous fields
-}
+	ParsedStruct struct {
+		File            *ParsedFile
+		Ast             *ast.StructType
+		Name            string
+		Methods         map[string]*ParsedFunc  // Methods declared directly on this struct, does not include promoted methods (not implemented yet)
+		FieldsList      []*ParsedField          // All fields in the order that they are declared
+		Fields          map[string]*ParsedField // Named fields declared in this struct only, does not include promoted fields (not implemented yet)
+		PromotedField   *ParsedField            // If there is a promoted field, stored here
+		AnonymousFields []*ParsedField          // Subsequent anonymous fields
+	}
 
-type ParsedInterface struct {
-	File    *ParsedFile
-	Ast     *ast.InterfaceType
-	Name    string
-	Methods map[string]*ParsedFunc
-}
+	ParsedInterface struct {
+		File    *ParsedFile
+		Ast     *ast.InterfaceType
+		Name    string
+		Methods map[string]*ParsedFunc
+	}
 
-type ParsedFunc struct {
-	gocode.Func
-	File *ParsedFile
-	Ast  *ast.FuncType
-}
+	ParsedFunc struct {
+		gocode.Func
+		File *ParsedFile
+		Ast  *ast.FuncType
+	}
 
-type ParsedImport struct {
-	gocode.Source
-	File *ParsedFile
-}
+	ParsedImport struct {
+		File    *ParsedFile
+		Package string
+	}
 
-type ParsedField struct {
-	gocode.Variable
-	Struct   *ParsedStruct
-	Position int
-	Ast      *ast.Field
+	ParsedField struct {
+		gocode.Variable
+		Struct   *ParsedStruct
+		Position int
+		Ast      *ast.Field
+	}
+)
+
+func (set *ParsedModuleSet) GetPackage(name string) *ParsedPackage {
+	for _, mod := range set.Modules {
+		if pkg, exists := mod.Packages[name]; exists {
+			return pkg
+		}
+	}
+	return nil
 }
 
 /*
@@ -376,7 +387,7 @@ func (f *ParsedFile) ResolveIdent(name string) gocode.TypeName {
 
 	if len(f.AnonymousImports) == 1 {
 		// Assume (possibly erroneously) that this name just comes from the anonymous imports
-		return &gocode.UserType{Source: f.AnonymousImports[0].Source, Name: name}
+		return &gocode.UserType{Package: f.AnonymousImports[0].Package, Name: name}
 	}
 
 	fmt.Printf("Unable to resolve ident %v in file %v\n", name, f.Name)
@@ -391,11 +402,7 @@ func (f *ParsedFile) ResolveSelector(packageShortName string, name string) gocod
 		return nil
 	}
 
-	if gocode.IsBuiltinPackage(pkg.PackageName) {
-		return &gocode.BuiltinType{Package: pkg.PackageName, Name: name}
-	} else {
-		return &gocode.UserType{Source: pkg.Source, Name: name}
-	}
+	return &gocode.UserType{Package: pkg.Package, Name: name}
 }
 
 func (f *ParsedFile) ResolveType(expr ast.Expr) gocode.TypeName {
@@ -443,8 +450,7 @@ func (f *ParsedFile) LoadImports() error {
 	for _, imp := range f.Ast.Imports {
 		i := &ParsedImport{}
 		i.File = f
-		i.PackageName = imp.Path.Value[1 : len(imp.Path.Value)-1] // Strip quotation marks
-		i.FindSourceModule()                                      // Set the source module
+		i.Package = imp.Path.Value[1 : len(imp.Path.Value)-1] // Strip quotation marks
 
 		// Imports can be one of the following:
 		// - import "my.package"
@@ -452,7 +458,7 @@ func (f *ParsedFile) LoadImports() error {
 		// - import . "my.package"
 		var importedAs string
 		if imp.Name == nil {
-			splits := strings.Split(i.PackageName, "/")
+			splits := strings.Split(i.Package, "/")
 			importedAs = splits[len(splits)-1]
 		} else {
 			importedAs = imp.Name.Name
@@ -466,32 +472,6 @@ func (f *ParsedFile) LoadImports() error {
 
 	}
 	return nil
-}
-
-func (i *ParsedImport) FindSourceModule() error {
-	mod := i.File.Package.Module
-
-	if gocode.IsBuiltinPackage(i.PackageName) {
-		return nil
-	}
-
-	if strings.HasPrefix(i.PackageName, mod.Name) {
-		// Is a module-local import
-		i.ModuleName = mod.Name
-		i.ModuleVersion = mod.Version
-		return nil
-	}
-
-	// Try to match it to a modfile requires statement
-	for _, req := range mod.Modfile.Require {
-		if strings.HasPrefix(i.PackageName, req.Mod.Path) {
-			i.ModuleName = req.Mod.Path
-			i.ModuleVersion = req.Mod.Version
-			return nil
-		}
-	}
-
-	return fmt.Errorf("unable to find the source module of imported package %v", i.PackageName)
 }
 
 /*
@@ -519,11 +499,7 @@ func (f *ParsedFile) LoadStructsAndInterfaces() error {
 			}
 
 			// Save all types that are declared in the file
-			u := gocode.UserType{}
-			u.ModuleName = f.Package.Module.Name
-			u.ModuleVersion = f.Package.Module.Version
-			u.PackageName = f.Package.Name
-			u.Name = typespec.Name.Name
+			u := gocode.UserType{Package: f.Package.Name, Name: typespec.Name.Name}
 			f.Package.DeclaredTypes[u.Name] = u
 
 			// Also specifically save interface and struct AST info which we later want to parse.
@@ -659,30 +635,18 @@ func indent(str string, amount int) string {
 	return strings.Join(lines, "\n")
 }
 
-func (pkg *ParsedPackage) Source() gocode.Source {
-	return gocode.Source{
-		ModuleName:    pkg.Module.Name,
-		ModuleVersion: pkg.Module.Version,
-		PackageName:   pkg.Name,
-	}
-}
-
 func (iface *ParsedInterface) Type() *gocode.UserType {
 	return &gocode.UserType{
-		Source: iface.File.Package.Source(),
-		Name:   iface.Name,
+		Name:    iface.Name,
+		Package: iface.File.Package.Name,
 	}
 }
 
 func (struc *ParsedStruct) Type() *gocode.UserType {
 	return &gocode.UserType{
-		Source: struc.File.Package.Source(),
-		Name:   struc.Name,
+		Name:    struc.Name,
+		Package: struc.File.Package.Name,
 	}
-}
-
-func (f *ParsedFunc) Source() gocode.Source {
-	return f.File.Package.Source()
 }
 
 func (set *ParsedModuleSet) String() string {
@@ -725,11 +689,11 @@ func (f *ParsedFile) String() string {
 	b.WriteString("Imports=")
 	for as, imp := range f.NamedImports {
 		b.WriteString("\n")
-		b.WriteString(indent("import "+as+" \""+imp.PackageName+"\"", 2))
+		b.WriteString(indent("import "+as+" \""+imp.Package+"\"", 2))
 	}
 	for _, imp := range f.AnonymousImports {
 		b.WriteString("\n")
-		b.WriteString(indent("import . \""+imp.PackageName+"\"", 2))
+		b.WriteString(indent("import . \""+imp.Package+"\"", 2))
 	}
 	return b.String()
 }

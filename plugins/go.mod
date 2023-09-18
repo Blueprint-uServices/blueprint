@@ -17,4 +17,3 @@ require (
 	golang.org/x/tools v0.6.0
 )
 
-replace gitlab.mpi-sws.org/cld/blueprint/blueprint => ../blueprint

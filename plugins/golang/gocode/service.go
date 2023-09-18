@@ -16,13 +16,6 @@ TypeName is defined separately in typename.go
 */
 
 type (
-	/* Module, version, and package that contains a definition */
-	Source struct {
-		ModuleName    string
-		ModuleVersion string
-		PackageName   string
-	}
-
 	Variable struct {
 		service.Variable
 		Name string
@@ -38,11 +31,11 @@ type (
 
 	Constructor struct {
 		Func
-		Source
+		Package string
 	}
 
+	// Implements service.ServiceInterface
 	ServiceInterface struct {
-		service.ServiceInterface
 		UserType // Has a Name and a Source location
 		Methods  map[string]Func
 	}
