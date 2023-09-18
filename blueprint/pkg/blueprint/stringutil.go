@@ -65,6 +65,7 @@ func GetSourceFileInfo(fileName string) *SourceFileInfo {
 type WiringCallsite struct {
 	Source     *SourceFileInfo
 	LineNumber int
+	Func       string
 	FuncName   string
 }
 
@@ -73,7 +74,7 @@ type WiringCallstack struct {
 }
 
 func (cs WiringCallsite) String() string {
-	return fmt.Sprintf("%s (%s:%v)", cs.FuncName, cs.Source.ModuleFilename, cs.LineNumber)
+	return fmt.Sprintf("%s:%v %s", cs.Source.ModuleFilename, cs.LineNumber, cs.Func)
 }
 
 func (stack *WiringCallstack) String() string {
@@ -96,9 +97,11 @@ func getWiringCallsite() *WiringCallstack {
 	for {
 		frame, more := frames.Next()
 
+		splits := strings.Split(frame.Function, "/")
 		callsite := WiringCallsite{
 			Source:     GetSourceFileInfo(frame.File),
 			LineNumber: frame.Line,
+			Func:       splits[len(splits)-1],
 			FuncName:   frame.Function,
 		}
 

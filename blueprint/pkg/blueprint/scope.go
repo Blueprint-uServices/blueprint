@@ -55,6 +55,8 @@ type SimpleScope struct {
 	Seen        map[string]IRNode  // Cache of built nodes
 	Added       map[string]any     // Nodes that have been passed to the handler
 	Deferred    []func() error     // Deferred functions to execute
+
+	stack []*WiringDef // Used when building; the stack of wiring defs currently being built
 }
 
 /*
@@ -165,6 +167,12 @@ func (scope *SimpleScope) get(name string, addEdge bool) (IRNode, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Track the defs being built
+	scope.stack = append(scope.stack, def)
+	defer func() {
+		scope.stack = scope.stack[:len(scope.stack)-1]
+	}()
 
 	// If it's an alias, get the aliased node
 	if def.Name != name {
@@ -311,17 +319,36 @@ func (scope *blueprintScope) Build() (IRNode, error) {
 
 // Augments debug messages with information about the scope
 func (scope *SimpleScope) Info(message string, args ...any) {
-	slog.Info(fmt.Sprintf(fmt.Sprintf("%s %s: %s", scope.ScopeType, scope.Name(), message), args...))
+	if len(scope.stack) > 0 {
+		src := scope.stack[len(scope.stack)-1]
+		callstack := src.Properties["callsite"][0].(*WiringCallstack)
+		slog.Info(fmt.Sprintf(fmt.Sprintf("%s %s: %s (%s)", scope.ScopeType, scope.Name(), message, callstack.Stack[0].String()), args...))
+	} else {
+		slog.Info(fmt.Sprintf(fmt.Sprintf("%s %s: %s", scope.ScopeType, scope.Name(), message), args...))
+	}
 }
 
 // Augments debug messages with information about the scope
 func (scope *SimpleScope) Debug(message string, args ...any) {
-	slog.Debug(fmt.Sprintf(fmt.Sprintf("%s %s: %s", scope.ScopeType, scope.Name(), message), args...))
+	if len(scope.stack) > 0 {
+		src := scope.stack[len(scope.stack)-1]
+		callstack := src.Properties["callsite"][0].(*WiringCallstack)
+		slog.Info(callstack.String())
+		slog.Debug(fmt.Sprintf(fmt.Sprintf("%s %s: %s (%s)", scope.ScopeType, scope.Name(), message, callstack.Stack[0].String()), args...))
+	} else {
+		slog.Debug(fmt.Sprintf(fmt.Sprintf("%s %s: %s", scope.ScopeType, scope.Name(), message), args...))
+	}
 }
 
 // Augments debug messages with information about the scope
 func (scope *SimpleScope) Error(message string, args ...any) error {
 	formattedMessage := fmt.Sprintf(message, args...)
-	slog.Error(fmt.Sprintf("%s %s: %s", scope.ScopeType, scope.Name(), formattedMessage))
+	if len(scope.stack) > 0 {
+		src := scope.stack[len(scope.stack)-1]
+		callstack := src.Properties["callsite"][0].(*WiringCallstack)
+		slog.Error(fmt.Sprintf("%s %s: %s (%s)", scope.ScopeType, scope.Name(), formattedMessage, callstack.Stack[0].String()))
+	} else {
+		slog.Error(fmt.Sprintf("%s %s: %s", scope.ScopeType, scope.Name(), formattedMessage))
+	}
 	return fmt.Errorf(formattedMessage)
 }
