@@ -88,23 +88,6 @@ type (
 	}
 
 	/*
-	   This is an interface for IRNodes for plugins that want to contribute source files to a generated module
-	   rather than just copying in their own source modules.
-
-	   There are three interfaces for contributing source code to generated modules:
-	   1. RequiresPackage for adding module dependencies to the generated module's go.mod file
-	   2. GeneratesInterfaces for generating struct and interface type declarations
-	   3. GeneratesFuncs for generating functions and struct method bodies
-	*/
-	RequiresPackages interface {
-		/*
-		   AddModule will be invoked during compilation to enable an IRNode to add any module Requires statements
-		   to the generated module
-		*/
-		AddRequires(ModuleBuilder) error
-	}
-
-	/*
 			Some IRNodes generate new interfaces and struct definitions by extending the interfaces declared by other IRNodes.
 			They should implement this interface to do so
 
@@ -201,6 +184,17 @@ type (
 		AddLocalModuleRelative(shortName string, relativeModuleSrcPath string) error
 
 		/*
+			This method is used by plugins if they want to create a module in the workspace to then generate code into.
+
+			The specified moduleName must be a golang style module name.
+
+			This will create the directory for the module and an empty go.mod file.
+
+			Returns the path to the module in the output directory
+		*/
+		CreateModule(moduleName string, moduleVersion string) (string, error)
+
+		/*
 		   If the specified module exists locally within the workspace, gets the subdirectory within the workspace that it exists in, the module
 		   version, and returns true.
 
@@ -240,22 +234,6 @@ type (
 			This is equivalent to calling node.AddToModule, if node implements it
 		*/
 		Visit(nodes []blueprint.IRNode) error
-
-		/*
-			Adds a dependency to a given module and version.  The module can be an external dependency, or it can be
-			a local module that resides within the same workspace.
-
-			These dependencies will be added to the go.mod file that gets generated.
-
-			For any local modules that reside within the same workspace, the go.mod will use `replace` directives
-			to point the dependency directly to those local modules.
-		*/
-		Require(dependencyName string, version string) error
-
-		/*
-			The same as `Require` but where the dependency is extracted from the type
-		*/
-		RequireType(t gocode.TypeName) error
 
 		/*
 			Gets the WorkspaceBuilder that contains this ModuleBuilder

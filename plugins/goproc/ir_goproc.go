@@ -2,10 +2,8 @@ package goproc
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
-	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
@@ -173,60 +171,57 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	}
 
 	// TODO: might end up building multiple times which is OK, so need a check here that we haven't already built this artifact, even if it was by a different (but identical) node
-
 	slog.Info(fmt.Sprintf("Building %s to %s\n", node.Name(), outputDir))
 
-	// Generate the workspace and copy all local artifacts
-	cleanName := irutil.Clean(node.Name())
-	workspaceDir := filepath.Join(outputDir, cleanName)
+	procName := irutil.Clean(node.Name())
+	workspaceDir := filepath.Join(outputDir, procName)
 	workspace, err := gogen.NewWorkspaceBuilder(workspaceDir)
 	if err != nil {
 		return err
 	}
 
+	moduleName := generatedModulePrefix + "/" + procName
+	module, err := gogen.NewModuleBuilder(workspace, moduleName)
+	if err != nil {
+		return err
+	}
+
+	graphFileName := strings.ToLower(procName) + ".go"
+	procPackage := "goproc"
+	constructorName := "New" + cases.Title(language.BritishEnglish).String(procName)
+	graph, err := gogen.NewGraphBuilder(module, graphFileName, procPackage, constructorName)
+	if err != nil {
+		return err
+	}
+
+	// Generate the workspace and copy all local artifacts
 	err = workspace.Visit(node.ContainedNodes)
 	if err != nil {
 		return err
 	}
 
 	// Generate the module and add all dependencies
-	moduleName := generatedModulePrefix + "/" + cleanName
-	module, err := gogen.NewModuleBuilder(workspace, cleanName, moduleName)
-	if err != nil {
-		return err
-	}
-	module.Require("golang.org/x/exp", "v0.0.0-20230728194245-b0cb94b80691")
-
 	err = module.Visit(node.ContainedNodes)
 	if err != nil {
 		return err
 	}
 
 	// Generate the graph of gonodes contained in this process
-	graphFileName := strings.ToLower(cleanName) + ".go"
-	packagePath := "goproc"
-	constructorName := "New" + cases.Title(language.BritishEnglish).String(cleanName)
-
-	graph, err := gogen.NewGraphBuilder(module, graphFileName, packagePath, constructorName)
-	if err != nil {
-		return err
-	}
-
 	err = graph.Visit(node.ContainedNodes)
 	if err != nil {
 		return err
 	}
 
 	// Generate the main.go
-	mainFileArgs := mainTemplateArgs{
+	mainArgs := mainTemplateArgs{
 		Name:             node.Name(),
-		GraphPackage:     fmt.Sprintf("%s/%s", module.Name, packagePath),
-		GraphConstructor: fmt.Sprintf("%s.%s", packagePath, constructorName),
+		GraphPackage:     fmt.Sprintf("%s/%s", module.Name, procPackage),
+		GraphConstructor: fmt.Sprintf("%s.%s", procPackage, constructorName),
 		Args:             nil,
 		Instantiate:      nil,
 	}
 	for _, arg := range node.ArgNodes {
-		mainFileArgs.Args = append(mainFileArgs.Args, mainArg{
+		mainArgs.Args = append(mainArgs.Args, mainArg{
 			Name: arg.Name(),
 			Doc:  arg.String(),
 			Var:  irutil.Clean(arg.Name()),
@@ -235,32 +230,18 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	// For now explicitly instantiate every child node
 	for _, child := range node.ContainedNodes {
 		if _, isInstantiable := child.(golang.Instantiable); isInstantiable {
-			mainFileArgs.Instantiate = append(mainFileArgs.Instantiate, child.Name())
+			mainArgs.Instantiate = append(mainArgs.Instantiate, child.Name())
 		}
 	}
+
 	mainFileName := filepath.Join(module.ModuleDir, "main.go")
-	t, err := template.New("main.go").Parse(mainTemplate)
-	if err != nil {
-		return err
-	}
-
-	f, err := os.OpenFile(mainFileName, os.O_CREATE|os.O_RDWR, 0755)
-	if err != nil {
-		return err
-	}
-
-	err = t.Execute(f, mainFileArgs)
+	err = gogen.ExecuteTemplateToFile("goprocMain", mainTemplate, mainArgs, mainFileName)
 	if err != nil {
 		return err
 	}
 
 	// Build workspace, module, and graph
 	err = graph.Build()
-	if err != nil {
-		return err
-	}
-
-	err = module.Finish()
 	if err != nil {
 		return err
 	}

@@ -85,7 +85,6 @@ func (node *GolangServer) GenerateFuncs(builder golang.ModuleBuilder) error {
 	// Generate the .proto files
 	err := grpccodegen.GenerateGRPCProto(builder, service, node.outputPackage)
 	if err != nil {
-		fmt.Println("error compiling grpc proto on server")
 		return err
 	}
 
@@ -111,11 +110,7 @@ func (node *GolangServer) AddInstantiation(builder golang.GraphBuilder) error {
 	}
 
 	constructor := &gocode.Constructor{
-		Source: gocode.Source{
-			ModuleName:    builder.Module().Info().Name,
-			ModuleVersion: builder.Module().Info().Version,
-			PackageName:   builder.Module().Info().Name + "/" + node.outputPackage,
-		},
+		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
 			Name: fmt.Sprintf("New_%v_GRPCServerHandler", service.Name),
 			Arguments: []gocode.Variable{

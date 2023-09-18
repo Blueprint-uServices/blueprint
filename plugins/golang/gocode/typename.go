@@ -78,23 +78,13 @@ type (
 	}
 
 	/*
-		A type that exists within a package like "os" or "context" that have to be imported
-		but don't need to be added as a go.mod dependency
-	*/
-	BuiltinType struct {
-		TypeName
-		Package string // Fully qualified package name
-		Name    string // Name of the type within the package
-	}
-
-	/*
 		A type that is declared in a module, thus requiring an import statement and a
 		go.mod requires statement
 	*/
 	UserType struct {
 		TypeName
-		Source
-		Name string // Name of the type within the package
+		Package string
+		Name    string // Name of the type within the package
 	}
 
 	/*
@@ -202,12 +192,8 @@ func (t *BasicType) String() string {
 	return t.Name
 }
 
-func (t *BuiltinType) String() string {
-	return fmt.Sprintf("%s.%s", shortName(t.Package), t.Name)
-}
-
 func (t *UserType) String() string {
-	return fmt.Sprintf("%s.%s", shortName(t.PackageName), t.Name)
+	return fmt.Sprintf("%s.%s", shortName(t.Package), t.Name)
 }
 
 func (t *Slice) String() string {
@@ -255,7 +241,6 @@ func (t *StructType) String() string {
 }
 
 func (t *BasicType) IsTypeName()     {}
-func (t *BuiltinType) IsTypeName()   {}
 func (t *UserType) IsTypeName()      {}
 func (t *Slice) IsTypeName()         {}
 func (t *Ellipsis) IsTypeName()      {}

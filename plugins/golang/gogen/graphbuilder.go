@@ -51,13 +51,13 @@ Create a new GraphBuilder
 func NewGraphBuilder(module *ModuleBuilderImpl, fileName, packagePath, funcName string) (*GraphBuilderImpl, error) {
 	err := CheckDir(module.ModuleDir, false)
 	if err != nil {
-		return nil, fmt.Errorf("unable to generate %s for module %s due to %s", fileName, module.ShortName, err.Error())
+		return nil, fmt.Errorf("unable to generate %s for module %s due to %s", fileName, module.Name, err.Error())
 	}
 
 	packageDir := filepath.Join(module.ModuleDir, packagePath)
 	err = CheckDir(packageDir, true)
 	if err != nil {
-		return nil, fmt.Errorf("unable to generate %s for module %s due to %s", fileName, module.ShortName, err.Error())
+		return nil, fmt.Errorf("unable to generate %s for module %s due to %s", fileName, module.Name, err.Error())
 	}
 
 	builder := &GraphBuilderImpl{}
@@ -73,9 +73,6 @@ func NewGraphBuilder(module *ModuleBuilderImpl, fileName, packagePath, funcName 
 
 	// Add the runtime module as a dependency, in case it hasn't already
 	builder.module.workspace.AddLocalModuleRelative("runtime", "../../../runtime")
-	builder.module.Require("gitlab.mpi-sws.org/cld/blueprint/runtime", "v0.0.0")
-	builder.Imports.AddPackage("gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/golang")
-	builder.Imports.AddPackage("context")
 
 	return builder, nil
 }
@@ -101,16 +98,6 @@ func (graph *GraphBuilderImpl) Visit(nodes []blueprint.IRNode) error {
 
 func (code *GraphBuilderImpl) Module() golang.ModuleBuilder {
 	return code.module
-}
-
-func (code *GraphBuilderImpl) Import(packageName string) string {
-	return code.Imports.AddPackage(packageName)
-}
-
-func (code *GraphBuilderImpl) ImportType(typeName gocode.TypeName) string {
-	code.Module().RequireType(typeName)
-	code.Imports.AddType(typeName)
-	return code.Imports.NameOf(typeName)
 }
 
 func (graph *GraphBuilderImpl) Declare(name, buildFuncSrc string) error {
@@ -146,12 +133,12 @@ var buildFuncTemplate = `func(ctr golang.Container) (any, error) {
 		}
 
 		// {{.Var.Name}} is expected to be a {{.Var.Type}}
-		{{.Var.Name}}, is{{.Var.Name}}Valid := {{.NodeName}}.({{.Graph.ImportType .NodeType}})
+		{{.Var.Name}}, is{{.Var.Name}}Valid := {{.NodeName}}.({{.Graph.Imports.NameOf .NodeType}})
 		if !is{{.Var.Name}}Valid {
 			return nil, fmt.Errorf("blueprint gogen/graphbuilder.go expected {{.Node.Name}} to implement {{.NodeType}}")
 		}
 		{{end}}
-		return {{.Graph.ImportType .Constructor}}({{range $i, $arg := .Args}}{{if $i}}, {{end}}{{.Var.Name}}{{end}})
+		return {{.Graph.Imports.NameOf .Constructor}}({{range $i, $arg := .Args}}{{if $i}}, {{end}}{{.Var.Name}}{{end}})
 	}`
 
 func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *gocode.Constructor, args []blueprint.IRNode) error {
@@ -163,14 +150,14 @@ func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *goco
 		return fmt.Errorf("mismatched args for %v.  Expected: %v.  Got: (%v)", name, constructor, strings.Join(argNames, ", "))
 	}
 
-	graph.Import("fmt")
+	graph.Imports.AddPackage("fmt")
 
 	templateName := fmt.Sprintf("di.Declare(%v)", name)
 	templateArgs := buildFuncArgs{
 		Graph:        graph,
 		Name:         name,
 		InstanceName: irutil.Clean(name),
-		Constructor:  &gocode.UserType{Source: constructor.Source, Name: constructor.Name},
+		Constructor:  &gocode.UserType{Package: constructor.Package, Name: constructor.Name},
 	}
 	for i, Var := range constructor.Arguments {
 		arg := buildFuncConstructorArg{
@@ -242,6 +229,9 @@ func {{ .FuncName }}(ctx context.Context, cancel context.CancelFunc, args map[st
 Generates the file within its module
 */
 func (code *GraphBuilderImpl) Build() error {
+	code.Imports.AddPackage("gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/golang")
+	code.Imports.AddPackage("context")
+
 	t, err := template.New(code.FuncName).Parse(diFuncTemplate)
 	if err != nil {
 		return err

@@ -93,8 +93,8 @@ func (service *WorkflowSpecService) GetInterface() *gocode.ServiceInterface {
 
 func (service *WorkflowSpecService) GetConstructor() *gocode.Constructor {
 	return &gocode.Constructor{
-		Source: service.Constructor.Source(),
-		Func:   service.Constructor.Func,
+		Func:    service.Constructor.Func,
+		Package: service.Constructor.File.Package.Name,
 	}
 }
 
@@ -173,8 +173,8 @@ func isInterfaceAValidService(iface *goparser.ParsedInterface) (bool, error) {
 		if len(method.Arguments) == 0 {
 			return false, fmt.Errorf("first argument of %v.%v must be context.Context", iface.Name, method.Name)
 		}
-		arg0, isBuiltIn := method.Arguments[0].Type.(*gocode.BuiltinType)
-		if !isBuiltIn || arg0.Package != "context" || arg0.Name != "Context" {
+		arg0, isUserType := method.Arguments[0].Type.(*gocode.UserType)
+		if !isUserType || arg0.Package != "context" || arg0.Name != "Context" {
 			return false, fmt.Errorf("first argument of %v.%v must be context.Context", iface.Name, method.Name)
 		}
 		if len(method.Returns) == 0 {
