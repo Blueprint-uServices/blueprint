@@ -6,6 +6,7 @@ import (
 	"strings"
 	"text/template"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
 )
@@ -141,7 +142,7 @@ func (f *GRPCField) Marshall(imports *gogen.Imports, obj string) (string, error)
 			case *gocode.BasicType:
 				return fmt.Sprintf("msg.%s = %s(*%s%s)", strings.Title(f.Name), pt.Name, obj, f.Name), nil
 			default:
-				return "", fmt.Errorf("unsupported pointer type %v", pt)
+				return "", blueprint.Errorf("unsupported pointer type %v", pt)
 			}
 		}
 	case *gocode.Map:
@@ -158,7 +159,7 @@ func (f *GRPCField) Marshall(imports *gogen.Imports, obj string) (string, error)
 			case *gocode.BasicType:
 				return fmt.Sprintf("msg.%s = %s%s", strings.Title(f.Name), obj, f.Name), nil
 			default:
-				return "", fmt.Errorf("unsupported/unimplemented map value type %v", vt)
+				return "", blueprint.Errorf("unsupported/unimplemented map value type %v", vt)
 			}
 		}
 	case *gocode.Slice:
@@ -171,7 +172,7 @@ func (f *GRPCField) Marshall(imports *gogen.Imports, obj string) (string, error)
 			case *gocode.BasicType:
 				return fmt.Sprintf("msg.%s = %s%s", strings.Title(f.Name), obj, f.Name), nil
 			default:
-				return "", fmt.Errorf("unsupported/unimplemented slice type %v", st)
+				return "", blueprint.Errorf("unsupported/unimplemented slice type %v", st)
 			}
 		}
 	}
@@ -196,7 +197,7 @@ func (f *GRPCField) Unmarshall(imports *gogen.Imports, obj string) (string, erro
 			case *gocode.BasicType:
 				return fmt.Sprintf("%s%s = &%v(msg.%s)", obj, f.Name, f.SrcType, strings.Title(f.Name)), nil
 			default:
-				return "", fmt.Errorf("unsupported pointer type %v", pt)
+				return "", blueprint.Errorf("unsupported pointer type %v", pt)
 			}
 		}
 	case *gocode.Map:
@@ -214,7 +215,7 @@ func (f *GRPCField) Unmarshall(imports *gogen.Imports, obj string) (string, erro
 			case *gocode.BasicType:
 				return fmt.Sprintf("msg.%s = %s%s", strings.Title(f.Name), obj, f.Name), nil
 			default:
-				return "", fmt.Errorf("unsupported map value type %v", t)
+				return "", blueprint.Errorf("unsupported map value type %v", t)
 			}
 		}
 	case *gocode.Slice:
@@ -229,7 +230,7 @@ func (f *GRPCField) Unmarshall(imports *gogen.Imports, obj string) (string, erro
 			case *gocode.BasicType:
 				return fmt.Sprintf("%s%s = msg.%s", obj, f.Name, strings.Title(f.Name)), nil
 			default:
-				return "", fmt.Errorf("unsupported/unimplemented slice type %v", st)
+				return "", blueprint.Errorf("unsupported/unimplemented slice type %v", st)
 			}
 		}
 	}

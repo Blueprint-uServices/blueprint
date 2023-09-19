@@ -1,7 +1,6 @@
 package goproc
 
 import (
-	"fmt"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
@@ -27,7 +26,7 @@ func CreateProcess(wiring blueprint.WiringSpec, procName string, children ...str
 
 		childNames, err := scope.GetProperties(procName, "Children")
 		if err != nil {
-			return nil, fmt.Errorf("unable to build Golang process as the \"Children\" property is not defined: %s", err.Error())
+			return nil, blueprint.Errorf("unable to build Golang process as the \"Children\" property is not defined: %s", err.Error())
 		}
 		var childNameStrings []string
 		for _, childName := range childNames {
@@ -72,7 +71,7 @@ func CreateClientProcess(wiring blueprint.WiringSpec, procName string, children 
 
 		childNames, err := scope.GetProperties(procName, "Children")
 		if err != nil {
-			return nil, fmt.Errorf("unable to build Golang process as the \"Children\" property is not defined: %s", err.Error())
+			return nil, blueprint.Errorf("unable to build Golang process as the \"Children\" property is not defined: %s", err.Error())
 		}
 		var childNameStrings []string
 		for _, childName := range childNames {

@@ -1,11 +1,11 @@
 package grpccodegen
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
@@ -29,7 +29,7 @@ func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 	outputDir := filepath.Join(builder.Info().Path, filepath.Join(splits...))
 	err := os.MkdirAll(outputDir, 0755)
 	if err != nil {
-		return fmt.Errorf("unable to create grpc output dir %v due to %v", outputDir, err.Error())
+		return blueprint.Errorf("unable to create grpc output dir %v due to %v", outputDir, err.Error())
 	}
 
 	client.Imports = gogen.NewImports(client.PackageName)

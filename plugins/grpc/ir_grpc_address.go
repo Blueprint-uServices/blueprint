@@ -1,8 +1,6 @@
 package grpc
 
 import (
-	"fmt"
-
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
@@ -34,7 +32,7 @@ func (addr *GolangServerAddress) GetDestination() blueprint.IRNode {
 func (addr *GolangServerAddress) SetDestination(node blueprint.IRNode) error {
 	server, isServer := node.(*GolangServer)
 	if !isServer {
-		return fmt.Errorf("address %v should point to a Golang server but got %v", addr.AddrName, node)
+		return blueprint.Errorf("address %v should point to a Golang server but got %v", addr.AddrName, node)
 	}
 	addr.Server = server
 	return nil

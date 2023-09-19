@@ -277,7 +277,7 @@ type (
 
 	   		serviceA, isValid := handler.(ServiceA)
 	   		if !isValid {
-	   			return nil, fmt.Errorf("serviceA.handler does not implement ServiceA interface")
+	   			return nil, blueprint.Errorf("serviceA.handler does not implement ServiceA interface")
 	   		}
 
 	   		return newServiceATracingWrapper(serviceA), nil

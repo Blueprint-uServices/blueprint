@@ -31,7 +31,7 @@ type GolangClient struct {
 func newGolangClient(name string, serverAddr blueprint.IRNode) (*GolangClient, error) {
 	addr, is_addr := serverAddr.(*GolangServerAddress)
 	if !is_addr {
-		return nil, fmt.Errorf("GRPC client %s expected %s to be an address, but got %s", name, serverAddr.Name(), reflect.TypeOf(serverAddr).String())
+		return nil, blueprint.Errorf("GRPC client %s expected %s to be an address, but got %s", name, serverAddr.Name(), reflect.TypeOf(serverAddr).String())
 	}
 
 	node := &GolangClient{}
@@ -75,7 +75,7 @@ func (node *GolangClient) GenerateFuncs(builder golang.ModuleBuilder) error {
 
 	service := node.GetGoInterface()
 	if service == nil {
-		return fmt.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
+		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
 			node.Name(), node.ServerAddr.GetInterface())
 	}
 

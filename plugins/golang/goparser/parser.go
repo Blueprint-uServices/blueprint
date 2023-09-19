@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"golang.org/x/mod/modfile"
 )
@@ -125,7 +126,7 @@ Parse all modules in the specified directory
 func ParseWorkspace(workspaceDir string) (*ParsedModuleSet, error) {
 	entries, err := os.ReadDir(workspaceDir)
 	if err != nil {
-		return nil, fmt.Errorf("unable to read workspace directory %v due to %v", workspaceDir, err.Error())
+		return nil, blueprint.Errorf("unable to read workspace directory %v due to %v", workspaceDir, err.Error())
 	}
 
 	var moduleDirs []string
@@ -176,12 +177,12 @@ func (set *ParsedModuleSet) AddModule(srcDir string) (*ParsedModule, error) {
 	modfilePath := filepath.Join(srcDir, "go.mod")
 	modfileData, err := os.ReadFile(modfilePath)
 	if err != nil {
-		return nil, fmt.Errorf("unable to read workflow spec modfile %s due to %s", modfilePath, err.Error())
+		return nil, blueprint.Errorf("unable to read workflow spec modfile %s due to %s", modfilePath, err.Error())
 	}
 
 	modf, err := modfile.Parse(modfilePath, modfileData, nil)
 	if err != nil {
-		return nil, fmt.Errorf("unable to parse %s due to %s", modfilePath, err.Error())
+		return nil, blueprint.Errorf("unable to parse %s due to %s", modfilePath, err.Error())
 	}
 
 	mod := &ParsedModule{}
@@ -193,7 +194,7 @@ func (set *ParsedModuleSet) AddModule(srcDir string) (*ParsedModule, error) {
 	mod.Packages = make(map[string]*ParsedPackage)
 
 	if existing, exists := set.Modules[mod.Name]; exists {
-		return nil, fmt.Errorf("duplicate definition of module %v at %v and %v", mod.Name, existing.SrcDir, srcDir)
+		return nil, blueprint.Errorf("duplicate definition of module %v at %v and %v", mod.Name, existing.SrcDir, srcDir)
 	}
 	set.Modules[mod.Name] = mod
 
@@ -213,7 +214,7 @@ func (mod *ParsedModule) Load() error {
 
 		pkgs, err := parser.ParseDir(&fset, path, nil, parser.ParseComments)
 		if err != nil {
-			return fmt.Errorf("unable to parse package %v due to %s", path, err.Error())
+			return blueprint.Errorf("unable to parse package %v due to %s", path, err.Error())
 		}
 
 		for name, pkg := range pkgs {
@@ -224,7 +225,7 @@ func (mod *ParsedModule) Load() error {
 			p.SrcDir = path
 			p.PackageDir, err = filepath.Rel(mod.SrcDir, path)
 			if err != nil {
-				return fmt.Errorf("%s should exist within %s but got %s", path, mod.SrcDir, err.Error())
+				return blueprint.Errorf("%s should exist within %s but got %s", path, mod.SrcDir, err.Error())
 			}
 			p.Files = make(map[string]*ParsedFile)
 			p.Name = mod.Name + "/" + filepath.ToSlash(p.PackageDir)
@@ -234,7 +235,7 @@ func (mod *ParsedModule) Load() error {
 			p.Funcs = make(map[string]*ParsedFunc)
 
 			if existing, exists := mod.Packages[p.Name]; exists {
-				return fmt.Errorf("duplicate definition of package %v at %v and %v", p.Name, path, existing.SrcDir)
+				return blueprint.Errorf("duplicate definition of package %v at %v and %v", p.Name, path, existing.SrcDir)
 			}
 			mod.Packages[p.Name] = p
 
@@ -329,7 +330,7 @@ func (pkg *ParsedPackage) Parse() error {
 func (f *ParsedField) Parse() error {
 	f.Type = f.Struct.File.ResolveType(f.Ast.Type)
 	if f.Type == nil {
-		return fmt.Errorf("unable to resolve the type of %v field %v", f.Struct.Name, f)
+		return blueprint.Errorf("unable to resolve the type of %v field %v", f.Struct.Name, f)
 	}
 	return nil
 }
@@ -343,7 +344,7 @@ func (f *ParsedFunc) Parse() error {
 			}
 			arg.Type = f.File.ResolveType(p.Type)
 			if arg.Type == nil {
-				return fmt.Errorf("%v unable to resolve type of argument %v", f.Name, p.Type)
+				return blueprint.Errorf("%v unable to resolve type of argument %v", f.Name, p.Type)
 			}
 			f.Arguments = append(f.Arguments, arg)
 		}
@@ -356,7 +357,7 @@ func (f *ParsedFunc) Parse() error {
 			}
 			ret.Type = f.File.ResolveType(r.Type)
 			if ret.Type == nil {
-				return fmt.Errorf("%v unable to resolve type of retval %v", f.Name, r.Type)
+				return blueprint.Errorf("%v unable to resolve type of retval %v", f.Name, r.Type)
 			}
 			f.Returns = append(f.Returns, ret)
 		}
@@ -495,7 +496,7 @@ func (f *ParsedFile) LoadStructsAndInterfaces() error {
 		for _, spec := range d.Specs {
 			typespec, ok := spec.(*ast.TypeSpec)
 			if !ok {
-				return fmt.Errorf("parsing error, expected typespec in decls of %v", f.Name)
+				return blueprint.Errorf("parsing error, expected typespec in decls of %v", f.Name)
 			}
 
 			// Save all types that are declared in the file
@@ -518,7 +519,7 @@ func (f *ParsedFile) LoadStructsAndInterfaces() error {
 					for _, methodDecl := range t.Methods.List {
 						funcType, isFuncType := methodDecl.Type.(*ast.FuncType)
 						if !isFuncType {
-							return fmt.Errorf("expected a function declaration in interface " + iface.Name)
+							return blueprint.Errorf("expected a function declaration in interface " + iface.Name)
 						}
 
 						method := &ParsedFunc{}
@@ -605,7 +606,7 @@ func (f *ParsedFile) LoadFuncs() error {
 					}
 				default:
 					{
-						return fmt.Errorf("unable to parse receiver type of function %v", fun.Name)
+						return blueprint.Errorf("unable to parse receiver type of function %v", fun.Name)
 					}
 				}
 			}
@@ -619,7 +620,7 @@ func (f *ParsedFile) LoadFuncs() error {
 		// Associate the func with the receiver struct
 		struc, exists := f.Package.Structs[receiverName]
 		if !exists {
-			return fmt.Errorf("function declared for receiver %v that does not exist in package", receiverName)
+			return blueprint.Errorf("function declared for receiver %v that does not exist in package", receiverName)
 		}
 		struc.Methods[fun.Name] = fun
 	}

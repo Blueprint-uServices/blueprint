@@ -51,13 +51,13 @@ Create a new GraphBuilder
 func NewGraphBuilder(module *ModuleBuilderImpl, fileName, packagePath, funcName string) (*GraphBuilderImpl, error) {
 	err := CheckDir(module.ModuleDir, false)
 	if err != nil {
-		return nil, fmt.Errorf("unable to generate %s for module %s due to %s", fileName, module.Name, err.Error())
+		return nil, blueprint.Errorf("unable to generate %s for module %s due to %s", fileName, module.Name, err.Error())
 	}
 
 	packageDir := filepath.Join(module.ModuleDir, packagePath)
 	err = CheckDir(packageDir, true)
 	if err != nil {
-		return nil, fmt.Errorf("unable to generate %s for module %s due to %s", fileName, module.Name, err.Error())
+		return nil, blueprint.Errorf("unable to generate %s for module %s due to %s", fileName, module.Name, err.Error())
 	}
 
 	builder := &GraphBuilderImpl{}
@@ -102,7 +102,7 @@ func (code *GraphBuilderImpl) Module() golang.ModuleBuilder {
 
 func (graph *GraphBuilderImpl) Declare(name, buildFuncSrc string) error {
 	if _, exists := graph.Declarations[name]; exists {
-		return fmt.Errorf("generated file %s encountered redeclaration of %s", graph.FileName, name)
+		return blueprint.Errorf("generated file %s encountered redeclaration of %s", graph.FileName, name)
 	}
 	graph.Declarations[name] = buildFuncSrc
 	return nil
@@ -147,7 +147,7 @@ func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *goco
 		for _, arg := range args {
 			argNames = append(argNames, arg.Name())
 		}
-		return fmt.Errorf("mismatched args for %v.  Expected: %v.  Got: (%v)", name, constructor, strings.Join(argNames, ", "))
+		return blueprint.Errorf("mismatched args for %v.  Expected: %v.  Got: (%v)", name, constructor, strings.Join(argNames, ", "))
 	}
 
 	graph.Imports.AddPackage("fmt")
@@ -171,7 +171,7 @@ func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *goco
 		if service, argNodeIsAService := args[i].(golang.Service); argNodeIsAService {
 			iface, hasGoInterface := service.GetInterface().(*gocode.ServiceInterface)
 			if !hasGoInterface {
-				return fmt.Errorf("argument %v %v to constructor %v of %v should be a gocode.ServiceInterface, but got %v", i, args[i].Name(), constructor.Name, name, service.GetInterface())
+				return blueprint.Errorf("argument %v %v to constructor %v of %v should be a gocode.ServiceInterface, but got %v", i, args[i].Name(), constructor.Name, name, service.GetInterface())
 			}
 			arg.NodeType = &iface.UserType
 		}

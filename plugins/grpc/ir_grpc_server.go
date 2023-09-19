@@ -45,12 +45,12 @@ func (grpc *GRPCInterface) GetMethods() []service.Method {
 func newGolangServer(name string, serverAddr blueprint.IRNode, wrapped blueprint.IRNode) (*GolangServer, error) {
 	addr, is_addr := serverAddr.(*GolangServerAddress)
 	if !is_addr {
-		return nil, fmt.Errorf("GRPC server %s expected %s to be an address, but got %s", name, serverAddr.Name(), reflect.TypeOf(serverAddr).String())
+		return nil, blueprint.Errorf("GRPC server %s expected %s to be an address, but got %s", name, serverAddr.Name(), reflect.TypeOf(serverAddr).String())
 	}
 
 	service, is_service := wrapped.(golang.Service)
 	if !is_service {
-		return nil, fmt.Errorf("GRPC server %s expected %s to be a golang service, but got %s", name, wrapped.Name(), reflect.TypeOf(wrapped).String())
+		return nil, blueprint.Errorf("GRPC server %s expected %s to be a golang service, but got %s", name, wrapped.Name(), reflect.TypeOf(wrapped).String())
 	}
 
 	node := &GolangServer{}
@@ -78,7 +78,7 @@ func (node *GolangServer) GenerateFuncs(builder golang.ModuleBuilder) error {
 
 	service, valid := node.Wrapped.GetInterface().(*gocode.ServiceInterface)
 	if !valid {
-		return fmt.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
+		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
 			node.Name(), node.Wrapped.GetInterface())
 	}
 
@@ -105,7 +105,7 @@ func (node *GolangServer) AddInstantiation(builder golang.GraphBuilder) error {
 
 	service, valid := node.Wrapped.GetInterface().(*gocode.ServiceInterface)
 	if !valid {
-		return fmt.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
+		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
 			node.Name(), node.Wrapped.GetInterface())
 	}
 

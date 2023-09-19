@@ -25,12 +25,12 @@ type OpenTelemetryClientWrapper struct {
 func newOpenTelemetryClientWrapper(name string, server blueprint.IRNode, collector blueprint.IRNode) (*OpenTelemetryClientWrapper, error) {
 	serverNode, is_callable := server.(golang.Service)
 	if !is_callable {
-		return nil, fmt.Errorf("opentelemetry client wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
+		return nil, blueprint.Errorf("opentelemetry client wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
 	}
 
 	collectorClient, is_collector_client := collector.(*OpenTelemetryCollectorClient)
 	if !is_collector_client {
-		return nil, fmt.Errorf("opentelemetry client  wrapper requires %s to be an opentelemetry collector client", collector.Name())
+		return nil, blueprint.Errorf("opentelemetry client  wrapper requires %s to be an opentelemetry collector client", collector.Name())
 	}
 
 	node := &OpenTelemetryClientWrapper{}

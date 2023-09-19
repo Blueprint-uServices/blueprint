@@ -38,14 +38,14 @@ Will return an error if the workspacedir already exists
 func NewWorkspaceBuilder(workspaceDir string) (*WorkspaceBuilderImpl, error) {
 	workspaceDir, err := filepath.Abs(workspaceDir)
 	if err != nil {
-		return nil, fmt.Errorf("invalid workspace dir %v", workspaceDir)
+		return nil, blueprint.Errorf("invalid workspace dir %v", workspaceDir)
 	}
 	if IsDir(workspaceDir) {
-		return nil, fmt.Errorf("workspace %s already exists", workspaceDir)
+		return nil, blueprint.Errorf("workspace %s already exists", workspaceDir)
 	}
 	err = os.Mkdir(workspaceDir, 0755)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create workspace %s due to %s", workspaceDir, err.Error())
+		return nil, blueprint.Errorf("unable to create workspace %s due to %s", workspaceDir, err.Error())
 	}
 	workspace := &WorkspaceBuilderImpl{}
 	workspace.WorkspaceDir = workspaceDir
@@ -75,7 +75,7 @@ func (workspace *WorkspaceBuilderImpl) Visit(nodes []blueprint.IRNode) error {
 func (workspace *WorkspaceBuilderImpl) CreateModule(moduleName string, moduleVersion string) (string, error) {
 	// Don't currently support multiple versions of the same module
 	if _, moduleExists := workspace.ModuleDirs[moduleName]; moduleExists {
-		return "", fmt.Errorf("module %v %v already exists in output workspace %v", moduleName, moduleVersion, workspace.WorkspaceDir)
+		return "", blueprint.Errorf("module %v %v already exists in output workspace %v", moduleName, moduleVersion, workspace.WorkspaceDir)
 	}
 
 	// Find an unused subdirectory for the module
@@ -93,7 +93,7 @@ func (workspace *WorkspaceBuilderImpl) CreateModule(moduleName string, moduleVer
 	moduleDir := filepath.Join(workspace.WorkspaceDir, moduleShortName)
 	err := CheckDir(moduleDir, true)
 	if err != nil {
-		return "", fmt.Errorf("cannot generate new module %s due to %s", moduleShortName, err.Error())
+		return "", blueprint.Errorf("cannot generate new module %s due to %s", moduleShortName, err.Error())
 	}
 
 	// Save the module
@@ -112,12 +112,12 @@ func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSr
 	modfileName := filepath.Join(moduleSrcPath, "go.mod")
 	modfileData, err := os.ReadFile(modfileName)
 	if err != nil {
-		return fmt.Errorf("unable to read go.mod for %s at %s due to %s", shortName, modfileName, err.Error())
+		return blueprint.Errorf("unable to read go.mod for %s at %s due to %s", shortName, modfileName, err.Error())
 	}
 
 	mod, err := modfile.Parse(modfileName, modfileData, nil)
 	if err != nil {
-		return fmt.Errorf("unable to parse go.mod for %s at %s due to %s", shortName, modfileName, err.Error())
+		return blueprint.Errorf("unable to parse go.mod for %s at %s due to %s", shortName, modfileName, err.Error())
 	}
 
 	modulePath := mod.Module.Mod.Path
@@ -125,7 +125,7 @@ func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSr
 	// Check we haven't already declared a different module with the same name
 	if existingShortName, exists := workspace.ModuleDirs[modulePath]; exists {
 		if existingShortName != shortName {
-			return fmt.Errorf("redeclaration of module %s as %s - already exists in %s", modulePath, shortName, existingShortName)
+			return blueprint.Errorf("redeclaration of module %s as %s - already exists in %s", modulePath, shortName, existingShortName)
 		}
 		// TODO: here, check module versions are the same
 	} else {
@@ -133,7 +133,7 @@ func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSr
 	}
 	if existingModulePath, exists := workspace.Modules[shortName]; exists {
 		if existingModulePath != modulePath {
-			return fmt.Errorf("cannot copy module %s to %s as it already contains module %s", modulePath, shortName, existingModulePath)
+			return blueprint.Errorf("cannot copy module %s to %s as it already contains module %s", modulePath, shortName, existingModulePath)
 		}
 	} else {
 		workspace.Modules[shortName] = modulePath
@@ -171,11 +171,11 @@ func (workspace *WorkspaceBuilderImpl) readModfile(moduleSubDir string) (*modfil
 	modFileName := filepath.Join(workspace.WorkspaceDir, moduleSubDir, "go.mod")
 	modFileData, err := os.ReadFile(modFileName)
 	if err != nil {
-		return nil, fmt.Errorf("workspace unable to read %s due to %s", modFileName, err.Error())
+		return nil, blueprint.Errorf("workspace unable to read %s due to %s", modFileName, err.Error())
 	}
 	f, err := modfile.Parse(modFileName, modFileData, nil)
 	if err != nil {
-		return nil, fmt.Errorf("workspace unable to parse %s due to %s", modFileName, err.Error())
+		return nil, blueprint.Errorf("workspace unable to parse %s due to %s", modFileName, err.Error())
 	}
 	if f.Module.Mod.Version == "" {
 		f.Module.Mod.Version = "v0.0.0"
@@ -217,7 +217,7 @@ func (workspace *WorkspaceBuilderImpl) Finish() error {
 	}
 	_, err = modfile.ParseWork(workFileName, fWritten, nil)
 	if err != nil {
-		return fmt.Errorf("generated an invalid go.work file for workspace %v due to %v", workspace.WorkspaceDir, err.Error())
+		return blueprint.Errorf("generated an invalid go.work file for workspace %v due to %v", workspace.WorkspaceDir, err.Error())
 	}
 
 	// Rewrite the go.mod files to redirect to local modules

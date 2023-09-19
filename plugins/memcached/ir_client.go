@@ -2,7 +2,6 @@ package memcached
 
 import (
 	"bytes"
-	"fmt"
 	"reflect"
 	"text/template"
 
@@ -23,7 +22,7 @@ type MemcachedGoClient struct {
 func newMemcachedGoClient(name string, addr blueprint.IRNode) (*MemcachedGoClient, error) {
 	addrNode, is_addr := addr.(*MemcachedAddr)
 	if !is_addr {
-		return nil, fmt.Errorf("%s expected %s to be an address but found %s", name, addr.Name(), reflect.TypeOf(addr).String())
+		return nil, blueprint.Errorf("%s expected %s to be an address but found %s", name, addr.Name(), reflect.TypeOf(addr).String())
 	}
 
 	client := &MemcachedGoClient{}

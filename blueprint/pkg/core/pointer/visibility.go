@@ -1,8 +1,6 @@
 package pointer
 
 import (
-	"fmt"
-
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 )
 
@@ -35,12 +33,12 @@ The name argument should be an alias that this call will redefine.
 func RequireUniqueness(wiring blueprint.WiringSpec, alias string, visibility any) error {
 	name, is_alias := wiring.GetAlias(alias)
 	if !is_alias {
-		return fmt.Errorf("cannot configure the uniqueness of %s because it points directly to a node; uniqueness can only be set for aliases", alias)
+		return blueprint.Errorf("cannot configure the uniqueness of %s because it points directly to a node; uniqueness can only be set for aliases", alias)
 	}
 
 	def := wiring.GetDef(name)
 	if def == nil {
-		return fmt.Errorf("cannot configure the uniqueness of %s because it does not exist", name)
+		return blueprint.Errorf("cannot configure the uniqueness of %s because it does not exist", name)
 	}
 
 	mdName := name + ".visibility"
@@ -61,11 +59,11 @@ func RequireUniqueness(wiring blueprint.WiringSpec, alias string, visibility any
 
 		mdNode, ok := md.(*VisibilityMetadata)
 		if !ok {
-			return nil, fmt.Errorf("expected %v to be uniqueness metadata but got %v", mdName, mdNode)
+			return nil, blueprint.Errorf("expected %v to be uniqueness metadata but got %v", mdName, mdNode)
 		}
 
 		if mdNode.node != nil {
-			return nil, fmt.Errorf("reachability error detected for %s; %s is configured to be unique but cannot be simultaneously reached from scopes %s and %s; fix by disabling uniqueness for %s or exposing %s over RPC", name, name, scope.Name(), mdNode.scope.Name(), name, name)
+			return nil, blueprint.Errorf("reachability error detected for %s; %s is configured to be unique but cannot be simultaneously reached from scopes %s and %s; fix by disabling uniqueness for %s or exposing %s over RPC", name, name, scope.Name(), mdNode.scope.Name(), name, name)
 		}
 
 		node, err := scope.Get(name)
