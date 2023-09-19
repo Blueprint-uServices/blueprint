@@ -167,7 +167,7 @@ func main() {
 func (node *Process) GenerateArtifacts(outputDir string) error {
 	err := gogen.CheckDir(outputDir, true)
 	if err != nil {
-		return fmt.Errorf("unable to create %s for process %s due to %s", outputDir, node.Name(), err.Error())
+		return blueprint.Errorf("unable to create %s for process %s due to %s", outputDir, node.Name(), err.Error())
 	}
 
 	// TODO: might end up building multiple times which is OK, so need a check here that we haven't already built this artifact, even if it was by a different (but identical) node

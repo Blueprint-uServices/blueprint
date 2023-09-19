@@ -48,7 +48,6 @@ type wiringSpecImpl struct {
 }
 
 func NewWiringSpec(name string) WiringSpec {
-	InitBlueprintCompilerLogging()
 
 	spec := wiringSpecImpl{}
 	spec.name = name

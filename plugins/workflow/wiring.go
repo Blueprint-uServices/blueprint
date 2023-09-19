@@ -1,7 +1,6 @@
 package workflow
 
 import (
-	"fmt"
 	"path/filepath"
 	"runtime"
 
@@ -40,7 +39,7 @@ func getSpec() (*WorkflowSpec, error) {
 	}
 
 	if len(workflowSpecModulePaths) == 0 {
-		return nil, fmt.Errorf("workflow spec src directories haven't been specified; use workflow.Init(srcPath) to add your workflow spec")
+		return nil, blueprint.Errorf("workflow spec src directories haven't been specified; use workflow.Init(srcPath) to add your workflow spec")
 	}
 
 	spec, err := NewWorkflowSpec(workflowSpecModulePaths...)

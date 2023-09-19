@@ -8,6 +8,7 @@ import (
 	"strings"
 	"text/template"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
@@ -48,7 +49,7 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 	outputDir := filepath.Join(builder.Info().Path, filepath.Join(splits...))
 	err = os.MkdirAll(outputDir, 0755)
 	if err != nil {
-		return fmt.Errorf("unable to create grpc output dir %v due to %v", outputDir, err.Error())
+		return blueprint.Errorf("unable to create grpc output dir %v due to %v", outputDir, err.Error())
 	}
 
 	// Write the proto file
@@ -218,7 +219,7 @@ func (b *GRPCProtoBuilder) makeFieldList(vars []gocode.Variable) ([]*GRPCField, 
 	for i, arg := range vars {
 		protoType, grpcType, err := b.getGRPCType(arg.Type)
 		if err != nil {
-			return nil, fmt.Errorf("cannot serialize %v of type %v for GRPC due to %v", arg.Name, arg.Type, err.Error())
+			return nil, blueprint.Errorf("cannot serialize %v of type %v for GRPC due to %v", arg.Name, arg.Type, err.Error())
 		}
 
 		name := arg.Name
@@ -274,16 +275,16 @@ func (b *GRPCProtoBuilder) GetOrAddMessage(t *gocode.UserType) (*GRPCMessageDecl
 	// Find the struct definition in the module
 	pkg := b.Code.GetPackage(t.Package)
 	if pkg == nil {
-		return nil, fmt.Errorf("could not find package %v for type %v", t.Package, t)
+		return nil, blueprint.Errorf("could not find package %v for type %v", t.Package, t)
 	}
 	struc, hasStruct := pkg.Structs[t.Name]
 	if !hasStruct {
 		// It's possible that the type does exist but it wasn't declared as a struct, e.g. it is
 		// an enum or a type alias. Non-struct types are not-yet-implemented
 		if _, hasTypeDef := pkg.DeclaredTypes[t.Name]; hasTypeDef {
-			return nil, fmt.Errorf("expected %v to be a struct but it is an unsupported type", t.String())
+			return nil, blueprint.Errorf("expected %v to be a struct but it is an unsupported type", t.String())
 		} else {
-			return nil, fmt.Errorf("could not find %v within %v", t.Name, t.Package)
+			return nil, blueprint.Errorf("could not find %v within %v", t.Name, t.Package)
 		}
 	}
 
@@ -376,7 +377,7 @@ func (b *GRPCProtoBuilder) getGRPCType(t gocode.TypeName) (string, gocode.TypeNa
 			if grpcType, hasGrpcType := basicToGrpc[arg.Name]; hasGrpcType {
 				return grpcType, &gocode.BasicType{Name: grpcToBasic[grpcType]}, nil
 			}
-			return "", nil, fmt.Errorf("%v is not supported by GRPC", arg.Name)
+			return "", nil, blueprint.Errorf("%v is not supported by GRPC", arg.Name)
 		}
 	case *gocode.Pointer:
 		{
@@ -391,7 +392,7 @@ func (b *GRPCProtoBuilder) getGRPCType(t gocode.TypeName) (string, gocode.TypeNa
 		{
 			keyProto, keyGRPC, isValidKey := getMapKeyType(arg.KeyType)
 			if !isValidKey {
-				return "", nil, fmt.Errorf("GRPC cannot use %v as a map key", arg.KeyType)
+				return "", nil, blueprint.Errorf("GRPC cannot use %v as a map key", arg.KeyType)
 			}
 			valueProto, valueGRPC, err := b.getGRPCType(arg.ValueType)
 			if err != nil {
@@ -409,7 +410,7 @@ func (b *GRPCProtoBuilder) getGRPCType(t gocode.TypeName) (string, gocode.TypeNa
 			}
 			// map is a special case that can't be repeated
 			if _, isMap := arg.SliceOf.(*gocode.Map); isMap {
-				return "", nil, fmt.Errorf("GRPC does not support arrays of maps %v", t.String())
+				return "", nil, blueprint.Errorf("GRPC does not support arrays of maps %v", t.String())
 			}
 			sliceProto, sliceGRPC, err := b.getGRPCType(arg.SliceOf)
 			if err != nil {
@@ -422,7 +423,7 @@ func (b *GRPCProtoBuilder) getGRPCType(t gocode.TypeName) (string, gocode.TypeNa
 	default:
 		{
 			// all others are invalid or not yet supported
-			return "", nil, fmt.Errorf("GRPC cannot serialize %v", t.String())
+			return "", nil, blueprint.Errorf("GRPC cannot serialize %v", t.String())
 		}
 	}
 }

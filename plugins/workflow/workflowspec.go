@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 	"golang.org/x/exp/slog"
@@ -65,7 +66,7 @@ func (spec *WorkflowSpec) Get(name string) (*WorkflowSpecService, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("unable to find service %v in workflow spec", name)
+	return nil, blueprint.Errorf("unable to find service %v in workflow spec", name)
 }
 
 func (spec *WorkflowSpec) Print() {
@@ -101,7 +102,7 @@ func (service *WorkflowSpecService) GetConstructor() *gocode.Constructor {
 func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*WorkflowSpecService, error) {
 	ifaces := spec.findInterfacesFor(struc)
 	if len(ifaces) == 0 {
-		return nil, fmt.Errorf("unable to find service interfaces for %v", struc.Name)
+		return nil, blueprint.Errorf("unable to find service interfaces for %v", struc.Name)
 	}
 
 	// The struct might implement many interfaces, but some of them might not be services
@@ -118,9 +119,9 @@ func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*
 	// Make sure we still have a valid interface
 	if len(validIfaces) == 0 {
 		if len(errors) == 1 {
-			return nil, fmt.Errorf("%v implements %v interfaces but none were valid, errors %v", struc.Name, len(ifaces), errors)
+			return nil, blueprint.Errorf("%v implements %v interfaces but none were valid, errors %v", struc.Name, len(ifaces), errors)
 		}
-		return nil, fmt.Errorf("%v implements %v but it is not a valid service due to %v", struc.Name, ifaces[0].Name, errors[0])
+		return nil, blueprint.Errorf("%v implements %v but it is not a valid service due to %v", struc.Name, ifaces[0].Name, errors[0])
 	}
 	if len(validIfaces) > 1 {
 		slog.Warn(fmt.Sprintf("Warning: struct %v implements more than one service interface; using %v", struc.Name, validIfaces[0]))
@@ -129,7 +130,7 @@ func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*
 	// Find constructors
 	constructors := spec.findConstructorsOfStruct(struc)
 	if len(constructors) == 0 {
-		return nil, fmt.Errorf("no constructors for %v could be found, ie. funcs returning (*%v, error)", struc.Name, struc.Type().String())
+		return nil, blueprint.Errorf("no constructors for %v could be found, ie. funcs returning (*%v, error)", struc.Name, struc.Type().String())
 	}
 	if len(constructors) > 1 {
 		slog.Warn(fmt.Sprintf("multiple constructors of struct %v found; using %v", struc.Name, constructors[0].Name))
@@ -146,11 +147,11 @@ func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*
 func (spec *WorkflowSpec) makeServiceFromInterface(iface *goparser.ParsedInterface) (*WorkflowSpecService, error) {
 	valid, err := isInterfaceAValidService(iface)
 	if !valid {
-		return nil, fmt.Errorf("interface %v is not a valid service because %v", iface.Name, err.Error())
+		return nil, blueprint.Errorf("interface %v is not a valid service because %v", iface.Name, err.Error())
 	}
 	constructors := spec.findConstructorsOfIface(iface)
 	if len(constructors) == 0 {
-		return nil, fmt.Errorf("found interface %v in %v but could not find any constructor methods", iface.Name, iface.File.Package.Name)
+		return nil, blueprint.Errorf("found interface %v in %v but could not find any constructor methods", iface.Name, iface.File.Package.Name)
 	}
 	if len(constructors) > 1 {
 		slog.Warn(fmt.Sprintf("multiple constructors of interface %v found; using %v", iface.Name, constructors[0].Name))
@@ -171,18 +172,18 @@ first argument and return error as final retval
 func isInterfaceAValidService(iface *goparser.ParsedInterface) (bool, error) {
 	for _, method := range iface.Methods {
 		if len(method.Arguments) == 0 {
-			return false, fmt.Errorf("first argument of %v.%v must be context.Context", iface.Name, method.Name)
+			return false, blueprint.Errorf("first argument of %v.%v must be context.Context", iface.Name, method.Name)
 		}
 		arg0, isUserType := method.Arguments[0].Type.(*gocode.UserType)
 		if !isUserType || arg0.Package != "context" || arg0.Name != "Context" {
-			return false, fmt.Errorf("first argument of %v.%v must be context.Context", iface.Name, method.Name)
+			return false, blueprint.Errorf("first argument of %v.%v must be context.Context", iface.Name, method.Name)
 		}
 		if len(method.Returns) == 0 {
-			return false, fmt.Errorf("last retval of %v.%v must be error", iface.Name, method.Name)
+			return false, blueprint.Errorf("last retval of %v.%v must be error", iface.Name, method.Name)
 		}
 		retL, isBasic := method.Returns[len(method.Returns)-1].Type.(*gocode.BasicType)
 		if !isBasic || retL.Name != "error" {
-			return false, fmt.Errorf("last retval of %v.%v must be error", iface.Name, method.Name)
+			return false, blueprint.Errorf("last retval of %v.%v must be error", iface.Name, method.Name)
 		}
 		// TODO: could potentially validate the serializability of args here
 		// TODO: handling chans for asynchronous calls
@@ -219,7 +220,7 @@ outer:
 			}
 		}
 		// no match found
-		return false, fmt.Errorf("struct %v does not implement %v because it lacks %v", struc.Name, iface.Name, method1.Func.String())
+		return false, blueprint.Errorf("struct %v does not implement %v because it lacks %v", struc.Name, iface.Name, method1.Func.String())
 	}
 	return true, nil
 }
@@ -254,17 +255,17 @@ func (spec *WorkflowSpec) findConstructorsOfStruct(struc *goparser.ParsedStruct)
 
 func validateConstructorSignature(f *goparser.ParsedFunc) error {
 	if len(f.Returns) == 0 {
-		return fmt.Errorf("%v has no return values", f.Func)
+		return blueprint.Errorf("%v has no return values", f.Func)
 	}
 	if len(f.Returns) == 1 {
-		return fmt.Errorf("%v must return two values but only returns one", f.Func)
+		return blueprint.Errorf("%v must return two values but only returns one", f.Func)
 	}
 	if len(f.Returns) > 2 {
-		return fmt.Errorf("%v has too many return values", f.Func)
+		return blueprint.Errorf("%v has too many return values", f.Func)
 	}
 
 	if ret1, isRet1Basic := f.Returns[1].Type.(*gocode.BasicType); !isRet1Basic || ret1.Name != "error" {
-		return fmt.Errorf("second retval of %v must be error", f.Func)
+		return blueprint.Errorf("second retval of %v must be error", f.Func)
 	}
 	return nil
 }

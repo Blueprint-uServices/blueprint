@@ -1,7 +1,6 @@
 package workflow
 
 import (
-	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -69,7 +68,7 @@ func newWorkflowService(name string, serviceType string, args []blueprint.IRNode
 		for _, arg := range args {
 			argStrings = append(argStrings, arg.Name())
 		}
-		return nil, fmt.Errorf("mismatched # arguments for %s, constructor is %v but args are (%v)", name, node.ServiceInfo.Constructor, strings.Join(argStrings, ", "))
+		return nil, blueprint.Errorf("mismatched # arguments for %s, constructor is %v but args are (%v)", name, node.ServiceInfo.Constructor, strings.Join(argStrings, ", "))
 	}
 	node.Args = args
 

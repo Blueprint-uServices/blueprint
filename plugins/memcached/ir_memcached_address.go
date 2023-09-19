@@ -1,8 +1,6 @@
 package memcached
 
 import (
-	"fmt"
-
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 )
@@ -31,7 +29,7 @@ func (addr *MemcachedAddr) GetDestination() blueprint.IRNode {
 func (addr *MemcachedAddr) SetDestination(node blueprint.IRNode) error {
 	server, isServer := node.(*MemcachedProcess)
 	if !isServer {
-		return fmt.Errorf("address %v should point to a memcached server but got %v", addr.AddrName, node)
+		return blueprint.Errorf("address %v should point to a memcached server but got %v", addr.AddrName, node)
 	}
 	addr.Server = server
 	return nil

@@ -106,7 +106,7 @@ Look up a WiringDef; default implementation directly consults the WiringSpec.
 func (handler *DefaultScopeHandler) LookupDef(name string) (*WiringDef, error) {
 	def := handler.Scope.Wiring.GetDef(name)
 	if def == nil {
-		return nil, fmt.Errorf("%s does not exist in the wiring spec of scope %s", name, handler.Scope.Name())
+		return nil, Errorf("%s does not exist in the wiring spec of scope %s", name, handler.Scope.Name())
 	}
 	return def, nil
 }

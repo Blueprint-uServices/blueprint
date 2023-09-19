@@ -1,8 +1,6 @@
 package opentelemetry
 
 import (
-	"fmt"
-
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 )
@@ -31,7 +29,7 @@ func (addr *OpenTelemetryCollectorAddr) GetDestination() blueprint.IRNode {
 func (addr *OpenTelemetryCollectorAddr) SetDestination(node blueprint.IRNode) error {
 	collector, isCollector := node.(*OpenTelemetryCollector)
 	if !isCollector {
-		return fmt.Errorf("address %v should point to an OpenTelemetry collector but got %v", addr.AddrName, node)
+		return blueprint.Errorf("address %v should point to an OpenTelemetry collector but got %v", addr.AddrName, node)
 	}
 	addr.Collector = collector
 	return nil
