@@ -71,6 +71,12 @@ func (imports *Imports) AddPackage(pkg string) string {
 	}
 }
 
+func (imports *Imports) AddPackages(pkgs ...string) {
+	for _, pkg := range pkgs {
+		imports.AddPackage(pkg)
+	}
+}
+
 func (imports *Imports) AddType(typeName gocode.TypeName) {
 	switch t := typeName.(type) {
 	case *gocode.UserType:

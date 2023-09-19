@@ -68,15 +68,16 @@ func (node *GolangClient) GetGoInterface() *gocode.ServiceInterface {
 
 // Generates proto files and the RPC client
 func (node *GolangClient) GenerateFuncs(builder golang.ModuleBuilder) error {
-	// Only generate instantiation code for this instance once
-	if builder.Visited(node.InstanceName + ".generateFuncs") {
-		return nil
-	}
-
+	// Get the service that we are wrapping
 	service := node.GetGoInterface()
 	if service == nil {
 		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
 			node.Name(), node.ServerAddr.GetInterface())
+	}
+
+	// Only generate grpc client instantiation code for this service once
+	if builder.Visited(service.Name + ".grpc.client") {
+		return nil
 	}
 
 	// Generate the .proto files

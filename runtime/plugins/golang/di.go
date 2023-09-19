@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"sync"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"golang.org/x/exp/slog"
 )
 
@@ -104,7 +103,7 @@ func (graph *diImpl) Get(name string) (any, error) {
 
 		return built, nil
 	} else {
-		return nil, blueprint.Errorf("unknown %v", name)
+		return nil, fmt.Errorf("unknown %v", name)
 	}
 }
 

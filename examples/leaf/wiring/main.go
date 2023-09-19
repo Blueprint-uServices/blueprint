@@ -8,6 +8,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/workload"
 	"golang.org/x/exp/slog"
 )
 
@@ -39,7 +40,8 @@ func main() {
 	pb := serviceDefaults(wiring, b)
 	// proc := goproc.CreateProcess(wiring, "proc", a, b)
 
-	client := goproc.CreateClientProcess(wiring, "client", a)
+	// client := goproc.CreateClientProcess(wiring, "client", a)
+	client := workload.Generator(wiring, a)
 
 	// Let's print out all of the nodes currently defined in the wiring spec
 	slog.Info("Wiring Spec: \n" + wiring.String())
@@ -68,7 +70,7 @@ func main() {
 		slog.Error(err.Error())
 		os.Exit(1)
 	}
-	err = application.Children["client"].(*goproc.Process).GenerateArtifacts("tmp")
+	err = application.Children[client].(*goproc.Process).GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)

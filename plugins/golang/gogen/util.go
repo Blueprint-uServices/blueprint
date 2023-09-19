@@ -1,10 +1,8 @@
 package gogen
 
 import (
-	"bytes"
 	"errors"
 	"os"
-	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 )
@@ -40,33 +38,4 @@ func CheckDir(path string, createIfAbsent bool) error {
 	} else {
 		return blueprint.Errorf("unexpected error for directory %s due to %s", path, err.Error())
 	}
-}
-
-func ExecuteTemplate(name string, body string, args any) (string, error) {
-	t, err := template.New(name).Parse(body)
-	if err != nil {
-		return "", err
-	}
-
-	buf := &bytes.Buffer{}
-	err = t.Execute(buf, args)
-	if err != nil {
-		return "", err
-	}
-
-	return buf.String(), nil
-}
-
-func ExecuteTemplateToFile(name string, body string, args any, filename string) error {
-	f, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR, 0755)
-	if err != nil {
-		return err
-	}
-
-	t, err := template.New(name).Parse(body)
-	if err != nil {
-		return err
-	}
-
-	return t.Execute(f, args)
 }
