@@ -9,6 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"golang.org/x/exp/slog"
 )
 
@@ -51,6 +52,11 @@ func (node *OpenTelemetryClientWrapper) String() string {
 func (node *OpenTelemetryClientWrapper) GetInterface() service.ServiceInterface {
 	// TODO: unwrap server interface to remove tracing stuff
 	return node.Server.GetInterface()
+}
+
+func (n *OpenTelemetryClientWrapper) GetGoInterface() *gocode.ServiceInterface {
+	// TODO: return memcached interface
+	return nil
 }
 
 // Part of code generation compilation pass; creates the interface definition code for the wrapper,

@@ -72,11 +72,7 @@ func (n *GolangServer) Name() string {
 // Generates proto files and the RPC server handler
 func (node *GolangServer) GenerateFuncs(builder golang.ModuleBuilder) error {
 	// Get the service that we are wrapping
-	service, valid := node.Wrapped.GetInterface().(*gocode.ServiceInterface)
-	if !valid {
-		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
-			node.Name(), node.Wrapped.GetInterface())
-	}
+	service := node.Wrapped.GetGoInterface()
 
 	// Only generate grpc server instantiation code for this service once
 	if builder.Visited(service.Name + ".grpc.server") {
@@ -104,11 +100,7 @@ func (node *GolangServer) AddInstantiation(builder golang.GraphBuilder) error {
 		return nil
 	}
 
-	service, valid := node.Wrapped.GetInterface().(*gocode.ServiceInterface)
-	if !valid {
-		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
-			node.Name(), node.Wrapped.GetInterface())
-	}
+	service := node.Wrapped.GetGoInterface()
 
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,

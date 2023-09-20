@@ -155,11 +155,7 @@ func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *goco
 		}
 
 		if service, argNodeIsAService := args[i].(golang.Service); argNodeIsAService {
-			iface, hasGoInterface := service.GetInterface().(*gocode.ServiceInterface)
-			if !hasGoInterface {
-				return blueprint.Errorf("argument %v %v to constructor %v of %v should be a gocode.ServiceInterface, but got %v", i, args[i].Name(), constructor.Name, name, service.GetInterface())
-			}
-			arg.NodeType = &iface.UserType
+			arg.NodeType = &service.GetGoInterface().UserType
 		}
 
 		templateArgs.Args = append(templateArgs.Args, arg)
