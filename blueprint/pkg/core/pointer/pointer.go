@@ -118,7 +118,10 @@ func (ptr *PointerDef) InstantiateDst(scope blueprint.Scope) (blueprint.IRNode, 
 				if err != nil {
 					return nil, err
 				}
-				addr.SetDestination(dst)
+				err = addr.SetDestination(dst)
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 	}
