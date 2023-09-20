@@ -46,7 +46,12 @@ func main() {
 	// Let's print out all of the nodes currently defined in the wiring spec
 	slog.Info("Wiring Spec: \n" + wiring.String())
 
-	bp := wiring.GetBlueprint()
+	bp, err := wiring.GetBlueprint()
+	if err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
+
 	bp.Instantiate(pa, pb, client)
 	// bp.Instantiate(proc)
 

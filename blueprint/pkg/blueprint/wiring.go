@@ -30,7 +30,11 @@ type WiringSpec interface {
 
 	String() string // Returns a string representation of everything that has been defined
 
-	GetBlueprint() *Blueprint // After defining everything, this method provides the means to then build everything.
+	// Errors while building a wiring spec are accumulated within the wiring spec, rather than as return values to calls
+	AddError(err error) // Used by plugins to signify an error; the error will be returned by a call to Err or GetBlueprint
+	Err() error         // Gets an error if there is currently one
+
+	GetBlueprint() (*Blueprint, error) // After defining everything, this method provides the means to then build everything.
 }
 
 type WiringDef struct {
@@ -45,14 +49,15 @@ type wiringSpecImpl struct {
 	name    string
 	defs    map[string]*WiringDef
 	aliases map[string]string
+	errors  []error
 }
 
 func NewWiringSpec(name string) WiringSpec {
-
 	spec := wiringSpecImpl{}
 	spec.name = name
 	spec.defs = make(map[string]*WiringDef)
 	spec.aliases = make(map[string]string)
+	spec.errors = nil
 	return &spec
 }
 
@@ -194,7 +199,31 @@ func (wiring *wiringSpecImpl) String() string {
 	return fmt.Sprintf("%s = WiringSpec {\n%s\n}", wiring.name, Indent(strings.Join(defStrings, "\n"), 2))
 }
 
-func (wiring *wiringSpecImpl) GetBlueprint() *Blueprint {
+func (wiring *wiringSpecImpl) AddError(err error) {
+	wiring.errors = append(wiring.errors, err)
+}
+
+type WiringError struct {
+	Errors []error
+}
+
+func (e WiringError) Error() string {
+	var errStrings []string
+	for i, err := range e.Errors {
+		errStrings = append(errStrings, fmt.Sprintf("Error %v: %v", i, err.Error()))
+	}
+	return strings.Join(errStrings, "\n")
+}
+
+func (wiring *wiringSpecImpl) Err() error {
+	if wiring.errors == nil {
+		return nil
+	} else {
+		return &WiringError{wiring.errors}
+	}
+}
+
+func (wiring *wiringSpecImpl) GetBlueprint() (*Blueprint, error) {
 	blueprint := Blueprint{}
 
 	scope, err := newBlueprintScope(wiring, wiring.name)
@@ -204,7 +233,7 @@ func (wiring *wiringSpecImpl) GetBlueprint() *Blueprint {
 	}
 	blueprint.applicationScope = scope
 	blueprint.wiring = wiring
-	return &blueprint
+	return &blueprint, wiring.Err()
 }
 
 // Instantiates one or more specific named nodes

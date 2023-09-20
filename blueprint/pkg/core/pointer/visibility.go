@@ -30,15 +30,17 @@ This is independent of whether it can be addressed by any node within that granu
 
 The name argument should be an alias that this call will redefine.
 */
-func RequireUniqueness(wiring blueprint.WiringSpec, alias string, visibility any) error {
+func RequireUniqueness(wiring blueprint.WiringSpec, alias string, visibility any) {
 	name, is_alias := wiring.GetAlias(alias)
 	if !is_alias {
-		return blueprint.Errorf("cannot configure the uniqueness of %s because it points directly to a node; uniqueness can only be set for aliases", alias)
+		wiring.AddError(blueprint.Errorf("cannot configure the uniqueness of %s because it points directly to a node; uniqueness can only be set for aliases", alias))
+		return
 	}
 
 	def := wiring.GetDef(name)
 	if def == nil {
-		return blueprint.Errorf("cannot configure the uniqueness of %s because it does not exist", name)
+		wiring.AddError(blueprint.Errorf("cannot configure the uniqueness of %s because it does not exist", name))
+		return
 	}
 
 	mdName := name + ".visibility"
@@ -77,6 +79,4 @@ func RequireUniqueness(wiring blueprint.WiringSpec, alias string, visibility any
 	})
 
 	wiring.Alias(alias, checkName)
-
-	return nil
 }
