@@ -90,16 +90,11 @@ func New_{{.Name}}(serverAddress string) (*{{.Name}}, error) {
 
 {{$service := .Service.Name -}}
 {{$receiver := .Name -}}
-{{$imports := .Imports -}}
 {{- range $_, $f := .Service.Methods }}
-func (client *{{$receiver}}) {{$f.Name}}(ctx context.Context
-	{{- range $i, $arg := $f.Arguments}}, {{$arg.Name}} {{$imports.NameOf $arg.Type}}{{end -}}
-	) ({{range $i, $ret := $f.Returns}}ret{{$i}} {{$imports.NameOf $ret.Type}}, {{end}}err error) {
+func (client *{{$receiver}}) {{SignatureWithRetVars $f}} {
 	// Create and marshall the GRPC Request object
 	req := &{{$service}}_{{$f.Name}}_Request{}
-	req.marshall(
-		{{- range $i, $arg := $f.Arguments}}{{if $i}}, {{end}}{{$arg.Name}}{{end -}}
-	)
+	req.marshall({{ArgVars $f}})
 
 	// Configure the client-side request timeout
 	ctx, cancel := context.WithTimeout(ctx, client.Timeout)
@@ -114,7 +109,7 @@ func (client *{{$receiver}}) {{$f.Name}}(ctx context.Context
 		return
 	}
 
-	{{range $i, $ret := $f.Returns}}{{if $i}}, {{end}}ret{{$i}}{{end}} = rsp.unmarshall()
+	{{RetVars $f}} = rsp.unmarshall()
 	return
 }
 {{end}}
