@@ -1,6 +1,10 @@
 package gogen
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
+
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
@@ -49,6 +53,16 @@ func (module *ModuleBuilderImpl) Info() golang.ModuleInfo {
 		Version: "v0.0.0",
 		Path:    module.ModuleDir,
 	}
+}
+
+func (module *ModuleBuilderImpl) CreatePackage(packageName string) (golang.PackageInfo, error) {
+	splits := strings.Split(packageName, "/")
+	info := golang.PackageInfo{
+		Name:      packageName,
+		ShortName: splits[len(splits)-1],
+		Path:      filepath.Join(module.ModuleDir, filepath.Join(splits...)),
+	}
+	return info, os.MkdirAll(info.Path, 0755)
 }
 
 func (module *ModuleBuilderImpl) Visit(nodes []blueprint.IRNode) error {

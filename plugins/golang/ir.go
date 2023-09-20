@@ -209,6 +209,12 @@ type (
 		Path    string // The path on the filesystem to the directory containing the module
 	}
 
+	PackageInfo struct {
+		ShortName string // Shortname of the package
+		Name      string // Fully-qualified package name
+		Path      string // Fully-qualified path to the package
+	}
+
 	/*
 	   ModuleBuilder is used by IRNodes for plugins that want to generate Golang code and collect it into a module.
 
@@ -231,6 +237,14 @@ type (
 		Info() ModuleInfo
 
 		/*
+			This creates a package within the module, with the specified package name.
+			It will create the necessary output directories and returns information
+			about the created package.  The provided packageName should take the form a/b/c
+			This call will succeed even if the package already exists on the filesystem.
+		*/
+		CreatePackage(packageName string) (PackageInfo, error)
+
+		/*
 			This is equivalent to calling node.AddToModule, if node implements it
 		*/
 		Visit(nodes []blueprint.IRNode) error
@@ -239,11 +253,6 @@ type (
 			Gets the WorkspaceBuilder that contains this ModuleBuilder
 		*/
 		Workspace() WorkspaceBuilder
-	}
-
-	GraphInfo struct {
-		PackageName string // Fully qualified package name being built
-		FilePath    string // Path to the file being built
 	}
 
 	/*
@@ -289,11 +298,6 @@ type (
 	*/
 	GraphBuilder interface {
 		irutil.VisitTracker
-
-		/*
-			Metadata into about the graph being built
-		*/
-		Info() GraphInfo
 
 		/*
 			This is equivalent to calling node.AddToModule, if node implements it
