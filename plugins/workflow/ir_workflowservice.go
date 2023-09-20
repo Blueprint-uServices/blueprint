@@ -7,6 +7,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 )
 
@@ -113,6 +114,10 @@ func (node *WorkflowService) Name() string {
 }
 
 func (node *WorkflowService) GetInterface() service.ServiceInterface {
+	return node.GetGoInterface()
+}
+
+func (node *WorkflowService) GetGoInterface() *gocode.ServiceInterface {
 	return node.ServiceInfo.GetInterface()
 }
 

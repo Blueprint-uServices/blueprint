@@ -55,8 +55,9 @@ type (
 	*/
 	Service interface {
 		Node
-		Instantiable              // Services must implement the Instantiable interface in order to create instances
-		service.ServiceNode       // The GetServiceInterface() method should return a gocode.ServiceInterface instance
+		Instantiable // Services must implement the Instantiable interface in order to create instances
+		service.ServiceNode
+		GetGoInterface() *gocode.ServiceInterface
 		ImplementsGolangService() // Idiomatically necessary in Go for typecasting correctly
 	}
 )

@@ -9,6 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 )
 
 type MemcachedGoClient struct {
@@ -39,7 +40,12 @@ func (n *MemcachedGoClient) Name() string {
 	return n.InstanceName
 }
 
-func (n *MemcachedGoClient) GetInterface() *service.ServiceInterface {
+func (n *MemcachedGoClient) GetInterface() service.ServiceInterface {
+	// TODO: return memcached interface
+	return nil
+}
+
+func (n *MemcachedGoClient) GetGoInterface() *gocode.ServiceInterface {
 	// TODO: return memcached interface
 	return nil
 }
