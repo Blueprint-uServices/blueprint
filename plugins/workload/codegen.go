@@ -42,10 +42,10 @@ package {{.PackageShortName}}
 {{.Imports}}
 
 type {{.Name}} struct {
-	Service {{.Imports.NameOf .Service.UserType}}
+	Service {{NameOf .Service.UserType}}
 }
 
-func New_{{.Name}}(service {{.Imports.NameOf .Service.UserType}}) (*{{.Name}}, error) {
+func New_{{.Name}}(service {{NameOf .Service.UserType}}) (*{{.Name}}, error) {
 	wlgen := &{{.Name}}{}
 	wlgen.Service = service
 	return wlgen, nil
@@ -78,16 +78,14 @@ func toString(values ...any) string {
 {{$imports := .Imports -}}
 {{ range $_, $f := .Service.Methods }}
 func (wlgen *{{$receiver}}) Call_{{$f.Name}}(ctx context.Context) error {
-	{{range $i, $arg := $f.Arguments -}}
-	var {{$arg.Name}} {{$imports.NameOf $arg.Type}}
-	{{end}}
-	fmt.Printf("{{$service.UserType.Name}}.{{$f.Name}}(%v)", toString({{range $i, $arg := $f.Arguments}}{{if $i}}, {{end}}{{$arg.Name}}{{end}}))
-	{{range $i, $ret := $f.Returns}}ret{{$i}}, {{end}}err := wlgen.Service.{{$f.Name}}(ctx{{range $i, $arg := $f.Arguments}}, {{$arg.Name}}{{end}})
+	{{DeclareArgVars $f}}
+	fmt.Printf("{{$service.UserType.Name}}.{{$f.Name}}(%v)", toString({{ArgVars $f}}))
+	{{RetVars $f "err"}} :=  wlgen.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
 	if err != nil {
 		fmt.Printf(" = error\n")
 		return err
 	} else {
-		fmt.Printf(" = %v\n", toString({{range $i, $ret := $f.Returns}}{{if $i}}, {{end}}ret{{$i}}{{end}}))
+		fmt.Printf(" = %v\n", toString({{RetVars $f}}))
 	}
 	return nil
 }

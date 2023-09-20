@@ -66,6 +66,10 @@ func GetSourceFileInfo(fileName string) *SourceFileInfo {
 	}
 	fileInfoCache[fileName] = info
 
+	if fileName == "" {
+		return info
+	}
+
 	// Find the module directory
 	modDir := findFileInParentDirectory(dir, "go.mod")
 	if modDir == "" {

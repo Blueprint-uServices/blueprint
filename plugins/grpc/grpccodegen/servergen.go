@@ -97,21 +97,17 @@ func (handler *{{.Name}}) Run(ctx context.Context) error {
 
 {{$service := .Service.Name -}}
 {{$receiver := .Name -}}
-{{$imports := .Imports -}}
 {{ range $_, $f := .Service.Methods }}
 func (handler *{{$receiver}}) {{$f.Name -}}
 		(ctx context.Context, req *{{$service}}_{{$f.Name}}_Request) (*{{$service}}_{{$f.Name}}_Response, error) {
-	{{range $i, $arg := $f.Arguments}}{{if $i}}, {{end}}{{$arg.Name}}{{end}} := req.unmarshall()
-	{{range $i, $ret := $f.Returns }}ret{{$i}}, {{end}}err := handler.Service.{{$f.Name -}}
-		(ctx {{- range $i, $arg := $f.Arguments}}, {{$arg.Name}}{{end}})
+	{{ArgVars $f}} := req.unmarshall()
+	{{RetVars $f "err"}} := handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
 	if err != nil {
 		return nil, err
 	}
 
 	rsp := &{{$service}}_{{$f.Name}}_Response{}
-	rsp.marshall(
-		{{- range $i, $arg := $f.Returns}}{{if $i}}, {{end}}ret{{$i}}{{end -}}
-	)
+	rsp.marshall({{RetVars $f}})
 	return rsp, nil
 }
 {{end}}

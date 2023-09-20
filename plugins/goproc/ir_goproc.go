@@ -103,17 +103,18 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 
 	"{{.GraphPackage}}"
 	"golang.org/x/exp/slog"
 )
 
+var missingArgs []string
 func checkArg(name, value string) {
 	if value == "" {
-		slog.Error("No value set for required cmd line argument " + name)
-		os.Exit(1)
+		missingArgs = append(missingArgs, name)
 	} else {
-		slog.Info(fmt.Sprintf("Arg %v = %v", name, value))
+		slog.Info(fmt.Sprintf("%v = %v", name, value))
 	}
 }
 
@@ -128,6 +129,10 @@ func main() {
 	{{range $i, $arg := .Args -}}
 	checkArg("{{$arg.Name}}", *{{$arg.Var}})
 	{{end}}
+	if len(missingArgs) > 0 {
+		slog.Error(fmt.Sprintf("Missing required arguments: \n  %v", strings.Join(missingArgs, "\n  ")))
+		os.Exit(1)
+	}
 	
 	graphArgs := map[string]string{
 		{{- range $i, $arg := .Args}}
@@ -171,7 +176,7 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	}
 
 	// TODO: might end up building multiple times which is OK, so need a check here that we haven't already built this artifact, even if it was by a different (but identical) node
-	slog.Info(fmt.Sprintf("Building %s to %s\n", node.Name(), outputDir))
+	slog.Info(fmt.Sprintf("Building %s to %s", node.Name(), outputDir))
 
 	procName := irutil.Clean(node.Name())
 	workspaceDir := filepath.Join(outputDir, procName)
