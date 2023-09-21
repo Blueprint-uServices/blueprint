@@ -2,7 +2,6 @@ package gocode
 
 import (
 	"fmt"
-	"go/ast"
 	"strings"
 
 	"golang.org/x/tools/go/packages"
@@ -152,7 +151,6 @@ type (
 	*/
 	InterfaceType struct {
 		TypeName
-		InterfaceAst *ast.InterfaceType
 	}
 
 	/*
@@ -170,7 +168,6 @@ type (
 	*/
 	FuncType struct {
 		TypeName
-		FuncAst *ast.FuncType
 	}
 
 	/*

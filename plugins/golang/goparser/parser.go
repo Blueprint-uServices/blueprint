@@ -415,7 +415,7 @@ func (f *ParsedFile) ResolveType(expr ast.Expr) gocode.TypeName {
 	case *ast.MapType:
 		return &gocode.Map{KeyType: f.ResolveType(e.Key), ValueType: f.ResolveType(e.Value)}
 	case *ast.InterfaceType:
-		return &gocode.InterfaceType{InterfaceAst: e}
+		return &gocode.InterfaceType{}
 	case *ast.SelectorExpr:
 		{
 			x, isIdent := e.X.(*ast.Ident)
@@ -440,7 +440,7 @@ func (f *ParsedFile) ResolveType(expr ast.Expr) gocode.TypeName {
 			return &gocode.Chan{ChanOf: f.ResolveType(e.Value)}
 		}
 	case *ast.FuncType:
-		return &gocode.FuncType{FuncAst: e}
+		return &gocode.FuncType{}
 	default:
 		fmt.Printf("unknown or invalid expr type %v\n", e)
 	}
@@ -647,6 +647,28 @@ func (struc *ParsedStruct) Type() *gocode.UserType {
 	return &gocode.UserType{
 		Name:    struc.Name,
 		Package: struc.File.Package.Name,
+	}
+}
+
+func (iface *ParsedInterface) ServiceInterface() *gocode.ServiceInterface {
+	methods := make(map[string]gocode.Func)
+	for name, method := range iface.Methods {
+		methods[name] = gocode.Func{
+			Name:      method.Name,
+			Arguments: method.Arguments[1:],
+			Returns:   method.Returns[:len(method.Returns)-1],
+		}
+	}
+	return &gocode.ServiceInterface{
+		UserType: *iface.Type(),
+		Methods:  methods,
+	}
+}
+
+func (f *ParsedFunc) AsConstructor() *gocode.Constructor {
+	return &gocode.Constructor{
+		Func:    f.Func,
+		Package: f.File.Package.Name,
 	}
 }
 

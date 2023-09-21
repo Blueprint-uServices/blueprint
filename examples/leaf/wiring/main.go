@@ -7,6 +7,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workload"
 	"golang.org/x/exp/slog"
@@ -29,8 +30,8 @@ func main() {
 	workflow.Init("../workflow")
 
 	// b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
-	// b := workflow.Define(wiring, "b", "LeafServiceImpl", b_cache)
-	b := workflow.Define(wiring, "b", "LeafServiceImpl")
+	b_cache := simplecache.Define(wiring, "b_cache")
+	b := workflow.Define(wiring, "b", "LeafServiceImpl", b_cache)
 
 	// b := workflow.Define(wiring, "b", "LeafServiceImpl")
 	// a := workflow.Define(wiring, "a", "NonLeafServiceImpl", b) // Will fail, because no constructors returning the impl directly

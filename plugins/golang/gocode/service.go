@@ -2,6 +2,7 @@ package gocode
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
@@ -79,6 +80,22 @@ func (v *Variable) GetName() string {
 
 func (v *Variable) GetType() string {
 	return v.Type.String()
+}
+
+func sameTypes(a []Variable, b []Variable) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, va := range a {
+		if !reflect.DeepEqual(va.Type, b[i].Type) {
+			return false
+		}
+	}
+	return true
+}
+
+func (f Func) Equals(g Func) bool {
+	return f.Name == g.Name && sameTypes(f.Arguments, g.Arguments) && sameTypes(f.Returns, g.Returns)
 }
 
 func (v *Variable) String() string {

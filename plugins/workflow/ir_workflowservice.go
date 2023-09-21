@@ -89,7 +89,7 @@ func includeWorkflowDependencies(name string, serviceType string) (*WorkflowSpec
 
 func (node *WorkflowSpecNode) init(name string, serviceType string) error {
 	// Look up the service details; errors out if the service doesn't exist
-	spec, err := getSpec()
+	spec, err := GetSpec()
 	if err != nil {
 		return err
 	}
@@ -118,7 +118,7 @@ func (node *WorkflowService) GetInterface() service.ServiceInterface {
 }
 
 func (node *WorkflowService) GetGoInterface() *gocode.ServiceInterface {
-	return node.ServiceInfo.GetInterface()
+	return node.ServiceInfo.Iface.ServiceInterface()
 }
 
 func addToWorkspace(builder golang.WorkspaceBuilder, mod *goparser.ParsedModule) error {
@@ -150,6 +150,9 @@ func (node *WorkflowService) AddToWorkspace(builder golang.WorkspaceBuilder) err
 		return err
 	}
 
+	// Add blueprint runtime to the workspace
+	builder.AddLocalModuleRelative("runtime", "../../../runtime")
+
 	// Copy the impl module into the workspace (if it's different)
 	return addToWorkspace(builder, node.ServiceInfo.Constructor.File.Package.Module)
 }
@@ -160,7 +163,7 @@ func (node *WorkflowService) AddInstantiation(builder golang.GraphBuilder) error
 		return nil
 	}
 
-	return builder.DeclareConstructor(node.InstanceName, node.ServiceInfo.GetConstructor(), node.Args)
+	return builder.DeclareConstructor(node.InstanceName, node.ServiceInfo.Constructor.AsConstructor(), node.Args)
 }
 
 func (n *WorkflowService) String() string {
