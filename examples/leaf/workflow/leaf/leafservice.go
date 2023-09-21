@@ -3,6 +3,8 @@ package leaf
 import (
 	ctxx "context"
 	"fmt"
+
+	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
 
 type MyInt int64
@@ -27,11 +29,15 @@ type LeafService interface {
 
 type LeafServiceImpl struct {
 	LeafService
+	Cache backend.Cache
 }
 
 func (l *LeafServiceImpl) HelloInt(ctx ctxx.Context, a int64) (int64, error) {
 	fmt.Println("hello")
-	return a, nil
+	l.Cache.Put(ctx, "helloint", a)
+	var b int64
+	l.Cache.Get(ctx, "helloint", &b)
+	return b, nil
 }
 
 func (l *LeafServiceImpl) HelloObject(ctx ctxx.Context, obj *LeafObject) (*LeafObject, error) {
@@ -46,6 +52,6 @@ func (l *LeafServiceImpl) NonServiceFunction() int64 {
 	return 3
 }
 
-func NewLeafServiceImpl() (*LeafServiceImpl, error) {
-	return &LeafServiceImpl{}, nil
+func NewLeafServiceImpl(cache backend.Cache) (*LeafServiceImpl, error) {
+	return &LeafServiceImpl{Cache: cache}, nil
 }

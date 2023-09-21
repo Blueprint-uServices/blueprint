@@ -69,36 +69,6 @@ func (spec *WorkflowSpec) Get(name string) (*WorkflowSpecService, error) {
 	return nil, blueprint.Errorf("unable to find service %v in workflow spec", name)
 }
 
-func (spec *WorkflowSpec) Print() {
-
-}
-
-/*
-The abstract representation of the service's interface, which excludes the
-first argument (context.Context) and last retval (error) from all method signatures.
-*/
-func (service *WorkflowSpecService) GetInterface() *gocode.ServiceInterface {
-	methods := make(map[string]gocode.Func)
-	for name, method := range service.Iface.Methods {
-		methods[name] = gocode.Func{
-			Name:      method.Name,
-			Arguments: method.Arguments[1:],
-			Returns:   method.Returns[:len(method.Returns)-1],
-		}
-	}
-	return &gocode.ServiceInterface{
-		UserType: *service.Iface.Type(),
-		Methods:  methods,
-	}
-}
-
-func (service *WorkflowSpecService) GetConstructor() *gocode.Constructor {
-	return &gocode.Constructor{
-		Func:    service.Constructor.Func,
-		Package: service.Constructor.File.Package.Name,
-	}
-}
-
 func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*WorkflowSpecService, error) {
 	ifaces := spec.findInterfacesFor(struc)
 	if len(ifaces) == 0 {
@@ -212,15 +182,14 @@ func (spec *WorkflowSpec) findInterfacesFor(struc *goparser.ParsedStruct) []*gop
 Determines if the given struct implements the given interface
 */
 func implements(struc *goparser.ParsedStruct, iface *goparser.ParsedInterface) (bool, error) {
-outer:
-	for _, method1 := range iface.Methods {
-		for _, method2 := range struc.Methods {
-			if reflect.DeepEqual(method1.Func, method2.Func) {
-				continue outer
-			}
+	for name, method1 := range iface.Methods {
+		method2, exists := struc.Methods[name]
+		if !exists {
+			return false, blueprint.Errorf("struct %v does not implement %v because it lacks %v", struc.Name, iface.Name, method1.Func.String())
 		}
-		// no match found
-		return false, blueprint.Errorf("struct %v does not implement %v because it lacks %v", struc.Name, iface.Name, method1.Func.String())
+		if !method1.Func.Equals(method2.Func) {
+			return false, blueprint.Errorf("struct %v does not implement %v because it has a different method signature for %v", struc.Name, iface.Name, method2.Func.String())
+		}
 	}
 	return true, nil
 }

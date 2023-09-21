@@ -126,14 +126,18 @@ func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSr
 	if existingShortName, exists := workspace.ModuleDirs[modulePath]; exists {
 		if existingShortName != shortName {
 			return blueprint.Errorf("redeclaration of module %s as %s - already exists in %s", modulePath, shortName, existingShortName)
+		} else {
+			// TODO: here, check module versions are the same
+			return nil
 		}
-		// TODO: here, check module versions are the same
 	} else {
 		workspace.ModuleDirs[modulePath] = shortName
 	}
 	if existingModulePath, exists := workspace.Modules[shortName]; exists {
 		if existingModulePath != modulePath {
 			return blueprint.Errorf("cannot copy module %s to %s as it already contains module %s", modulePath, shortName, existingModulePath)
+		} else {
+			return nil
 		}
 	} else {
 		workspace.Modules[shortName] = modulePath

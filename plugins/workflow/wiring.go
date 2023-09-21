@@ -1,6 +1,7 @@
 package workflow
 
 import (
+	"fmt"
 	"path/filepath"
 	"runtime"
 
@@ -28,12 +29,13 @@ func Init(srcModulePaths ...string) {
 	for _, path := range srcModulePaths {
 		workflowPath := filepath.Join(dir, path)
 		workflowSpecModulePaths = append(workflowSpecModulePaths, workflowPath)
+		fmt.Println("add workflow " + workflowPath)
 	}
 	workflowSpec = nil
 }
 
 // Static initialization of the workflow spec
-func getSpec() (*WorkflowSpec, error) {
+func GetSpec() (*WorkflowSpec, error) {
 	if workflowSpec != nil {
 		return workflowSpec, nil
 	}
