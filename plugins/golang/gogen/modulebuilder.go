@@ -1,6 +1,7 @@
 package gogen
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -8,6 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"golang.org/x/exp/slog"
 )
 
 /*
@@ -58,10 +60,12 @@ func (module *ModuleBuilderImpl) Info() golang.ModuleInfo {
 func (module *ModuleBuilderImpl) CreatePackage(packageName string) (golang.PackageInfo, error) {
 	splits := strings.Split(packageName, "/")
 	info := golang.PackageInfo{
-		Name:      packageName,
-		ShortName: splits[len(splits)-1],
-		Path:      filepath.Join(module.ModuleDir, filepath.Join(splits...)),
+		PackageName: module.Name + "/" + packageName,
+		Name:        packageName,
+		ShortName:   splits[len(splits)-1],
+		Path:        filepath.Join(module.ModuleDir, filepath.Join(splits...)),
 	}
+	slog.Info(fmt.Sprintf("Creating package %v/%v", module.Name, packageName))
 	return info, os.MkdirAll(info.Path, 0755)
 }
 

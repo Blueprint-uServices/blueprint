@@ -211,9 +211,10 @@ type (
 	}
 
 	PackageInfo struct {
-		ShortName string // Shortname of the package
-		Name      string // Fully-qualified package name
-		Path      string // Fully-qualified path to the package
+		ShortName   string // Shortname of the package
+		Name        string // Fully package name within the module
+		PackageName string // Fully qualified package name including module name
+		Path        string // Fully-qualified path to the package
 	}
 
 	/*
@@ -254,6 +255,13 @@ type (
 			Gets the WorkspaceBuilder that contains this ModuleBuilder
 		*/
 		Workspace() WorkspaceBuilder
+	}
+
+	GraphInfo struct {
+		Package  PackageInfo
+		FileName string // Name of the file within the pacakge
+		FilePath string // Fully-qualified path to the file on the filesystem
+		FuncName string // Name of the function that builds the graph
 	}
 
 	/*
@@ -304,6 +312,11 @@ type (
 			This is equivalent to calling node.AddToModule, if node implements it
 		*/
 		Visit(nodes []blueprint.IRNode) error
+
+		/*
+			Metadata info about the graph being built
+		*/
+		Info() GraphInfo
 
 		/*
 			Adds an import statement to the generated file; this is necessary for any types

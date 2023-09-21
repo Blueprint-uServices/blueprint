@@ -6,6 +6,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"golang.org/x/exp/slog"
 )
 
 type OpenTelemetryCollectorClient struct {
@@ -65,6 +66,7 @@ func (node *OpenTelemetryCollectorClient) AddInstantiation(builder golang.GraphB
 		return err
 	}
 
+	slog.Info("instantiating ot client")
 	return builder.Declare(node.ClientName, buf.String())
 }
 

@@ -1,11 +1,13 @@
 package grpccodegen
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
+	"golang.org/x/exp/slog"
 )
 
 /*
@@ -31,6 +33,7 @@ func GenerateServerHandler(builder golang.ModuleBuilder, service *gocode.Service
 		"google.golang.org/grpc",
 	)
 
+	slog.Info(fmt.Sprintf("Generating %v/%v_GRPCServer.go", server.Package.PackageName, service.Name))
 	outputFile := filepath.Join(server.Package.Path, service.Name+"_GRPCServer.go")
 	return gogen.ExecuteTemplateToFile("GRPCServer", serverTemplate, server, outputFile)
 }

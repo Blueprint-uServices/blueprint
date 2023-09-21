@@ -1,11 +1,13 @@
 package grpccodegen
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
+	"golang.org/x/exp/slog"
 )
 
 /*
@@ -32,7 +34,8 @@ func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 		"google.golang.org/grpc/credentials/insecure",
 	)
 
-	outputFile := filepath.Join(client.Package.Path, service.Name+"_GRPCClient.go")
+	slog.Info(fmt.Sprintf("Generating %v/%v.go", client.Package.PackageName, client.Name))
+	outputFile := filepath.Join(client.Package.Path, client.Name+".go")
 	return gogen.ExecuteTemplateToFile("GRPCClient", clientTemplate, client, outputFile)
 }
 

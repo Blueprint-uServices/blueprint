@@ -10,6 +10,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"golang.org/x/exp/slog"
 )
 
 type MemcachedGoClient struct {
@@ -80,6 +81,7 @@ func (node *MemcachedGoClient) AddInstantiation(builder golang.GraphBuilder) err
 		return err
 	}
 
+	slog.Info("instantiating memcached client")
 	return builder.Declare(node.InstanceName, buf.String())
 }
 

@@ -1,6 +1,7 @@
 package gogen
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -8,6 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"golang.org/x/exp/slog"
 )
 
 /*
@@ -60,9 +62,12 @@ func NewGraphBuilder(module *ModuleBuilderImpl, fileName, packagePath, funcName 
 	}
 
 	// Add the runtime module as a dependency, in case it hasn't already
-	err = graph.module.workspace.AddLocalModuleRelative("runtime", "../../../runtime")
-	if err != nil {
-		return nil, err
+	if !graph.module.workspace.Visited("runtime") {
+		slog.Info("Copying local module runtime to workspace")
+		err = graph.module.workspace.AddLocalModuleRelative("runtime", "../../../runtime")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	graph.Imports.AddPackages(
@@ -83,6 +88,15 @@ func (graph *GraphBuilderImpl) Visit(nodes []blueprint.IRNode) error {
 		}
 	}
 	return nil
+}
+
+func (graph *GraphBuilderImpl) Info() golang.GraphInfo {
+	return golang.GraphInfo{
+		Package:  graph.Package,
+		FileName: graph.FileName,
+		FilePath: graph.FilePath,
+		FuncName: graph.FuncName,
+	}
 }
 
 func (code *GraphBuilderImpl) Module() golang.ModuleBuilder {
@@ -204,5 +218,6 @@ func {{ .FuncName }}(ctx context.Context, cancel context.CancelFunc, args map[st
 Generates the file within its module
 */
 func (code *GraphBuilderImpl) Build() error {
+	slog.Info(fmt.Sprintf("Generating %v", filepath.Join(code.Package.PackageName, code.FileName)))
 	return ExecuteTemplateToFile("graph_"+code.FuncName, diFuncTemplate, code, code.FilePath)
 }

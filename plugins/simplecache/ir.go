@@ -8,6 +8,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
+	"golang.org/x/exp/slog"
 )
 
 type SimpleCache struct {
@@ -68,7 +69,12 @@ func (node *SimpleCache) GetGoInterface() *gocode.ServiceInterface {
 
 /* The cache interface and simplecache implementation exist in the runtime package */
 func (node *SimpleCache) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return builder.AddLocalModuleRelative("runtime", "../../runtime")
+	// Add blueprint runtime to the workspace
+	if !builder.Visited("runtime") {
+		slog.Info("Copying local module runtime to workspace")
+		return builder.AddLocalModuleRelative("runtime", "../../../runtime")
+	}
+	return nil
 }
 
 func (node *SimpleCache) AddInstantiation(builder golang.GraphBuilder) error {
@@ -77,6 +83,7 @@ func (node *SimpleCache) AddInstantiation(builder golang.GraphBuilder) error {
 		return nil
 	}
 
+	slog.Info(fmt.Sprintf("Instantiating SimpleCache %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 	return builder.DeclareConstructor(node.InstanceName, node.Constructor, nil)
 }
 

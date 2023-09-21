@@ -6,6 +6,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"golang.org/x/exp/slog"
 )
 
 /*
@@ -59,6 +60,7 @@ func (node *WorkloadgenClient) AddInstantiation(builder golang.GraphBuilder) err
 		},
 	}
 
+	slog.Info(fmt.Sprintf("Instantiating WorkloadGen %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped})
 }
 

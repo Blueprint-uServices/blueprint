@@ -103,8 +103,8 @@ func (workspace *WorkspaceBuilderImpl) CreateModule(moduleName string, moduleVer
 	// Create the go.mod file
 	modfileContents := fmt.Sprintf("module %v\n\ngo 1.20", moduleName)
 	modfile := filepath.Join(moduleDir, "go.mod")
-	err = os.WriteFile(modfile, []byte(modfileContents), 0755)
-	return moduleDir, err
+
+	return moduleDir, os.WriteFile(modfile, []byte(modfileContents), 0755)
 }
 
 func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSrcPath string) error {

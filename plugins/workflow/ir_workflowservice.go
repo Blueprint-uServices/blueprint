@@ -1,6 +1,7 @@
 package workflow
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -9,6 +10,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
+	"golang.org/x/exp/slog"
 )
 
 /*
@@ -126,6 +128,7 @@ func addToWorkspace(builder golang.WorkspaceBuilder, mod *goparser.ParsedModule)
 		return nil
 	}
 	_, subdir := filepath.Split(mod.SrcDir)
+	slog.Info(fmt.Sprintf("Copying local module %v to workspace", subdir))
 	return builder.AddLocalModule(subdir, mod.SrcDir)
 }
 
@@ -151,7 +154,13 @@ func (node *WorkflowService) AddToWorkspace(builder golang.WorkspaceBuilder) err
 	}
 
 	// Add blueprint runtime to the workspace
-	builder.AddLocalModuleRelative("runtime", "../../../runtime")
+	if !builder.Visited("runtime") {
+		slog.Info("Copying local module runtime to workspace")
+		err = builder.AddLocalModuleRelative("runtime", "../../../runtime")
+		if err != nil {
+			return err
+		}
+	}
 
 	// Copy the impl module into the workspace (if it's different)
 	return addToWorkspace(builder, node.ServiceInfo.Constructor.File.Package.Module)
@@ -163,6 +172,7 @@ func (node *WorkflowService) AddInstantiation(builder golang.GraphBuilder) error
 		return nil
 	}
 
+	slog.Info(fmt.Sprintf("Instantiating %v %v in %v/%v", node.ServiceType, node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 	return builder.DeclareConstructor(node.InstanceName, node.ServiceInfo.Constructor.AsConstructor(), node.Args)
 }
 

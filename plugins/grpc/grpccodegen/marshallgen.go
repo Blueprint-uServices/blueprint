@@ -113,15 +113,6 @@ func (b *GRPCProtoBuilder) GenerateMarshallingCode(outputFilePath string) error 
 	}
 
 	return t.Execute(f, args)
-
-	// Marshall and unmarshall functions for all structs in b.Structs
-	// Marshall and unmarshall functions for all req and rsp objects that correspond to b.Services.Methods
-
-	// special handling for methods: primitive types included and are pointers
-
-	// primitive types are directly copyable, as are slices and maps of primitive types
-	// user types might need to new(); on grpc side always, on user side if its a pointer type
-
 }
 
 func (f *GRPCField) Marshall(imports *gogen.Imports, obj string) (string, error) {

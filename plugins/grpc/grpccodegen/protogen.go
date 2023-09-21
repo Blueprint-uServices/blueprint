@@ -66,6 +66,7 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 	}
 
 	// Generate the marshalling code
+	slog.Info(fmt.Sprintf("Generating %v/%v_conversions.go", pb.PackageName, service.Name))
 	marshallFile := filepath.Join(outputDir, service.Name+"_conversions.go")
 	return pb.GenerateMarshallingCode(marshallFile)
 }

@@ -116,6 +116,7 @@ func (node *OpenTelemetryClientWrapper) AddInstantiation(builder golang.GraphBui
 		return err
 	}
 
+	slog.Info("instantiating ot client client")
 	return builder.Declare(node.WrapperName, buf.String())
 }
 

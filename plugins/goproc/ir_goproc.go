@@ -27,7 +27,7 @@ Most of the heavy lifting of code generation is done by the following:
 
 */
 
-var generatedModulePrefix = "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/process"
+var generatedModulePrefix = "blueprint/goproc"
 
 // An IRNode representing a golang process.
 // This is Blueprint's main implementation of Golang processes
@@ -176,16 +176,17 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	}
 
 	// TODO: might end up building multiple times which is OK, so need a check here that we haven't already built this artifact, even if it was by a different (but identical) node
-	slog.Info(fmt.Sprintf("Building %s to %s", node.Name(), outputDir))
 
 	procName := irutil.Clean(node.Name())
 	workspaceDir := filepath.Join(outputDir, procName)
+	slog.Info(fmt.Sprintf("Building goproc %s to %s", node.Name(), workspaceDir))
 	workspace, err := gogen.NewWorkspaceBuilder(workspaceDir)
 	if err != nil {
 		return err
 	}
 
 	moduleName := generatedModulePrefix + "/" + procName
+	slog.Info(fmt.Sprintf("Creating module %v", moduleName))
 	module, err := gogen.NewModuleBuilder(workspace, moduleName)
 	if err != nil {
 		return err
@@ -239,6 +240,7 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 		}
 	}
 
+	slog.Info(fmt.Sprintf("Generating %v/main.go", module.Name))
 	mainFileName := filepath.Join(module.ModuleDir, "main.go")
 	err = gogen.ExecuteTemplateToFile("goprocMain", mainTemplate, mainArgs, mainFileName)
 	if err != nil {
