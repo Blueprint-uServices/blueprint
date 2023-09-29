@@ -21,10 +21,10 @@ func CreateProcess(wiring blueprint.WiringSpec, procName string, children ...str
 		AddChildToProcess(wiring, procName, childName)
 	}
 
-	wiring.Define(procName, &Process{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		process := NewGolangProcessScope(scope, wiring, procName)
+	wiring.Define(procName, &Process{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		process := NewGolangProcessNamespace(namespace, wiring, procName)
 
-		childNames, err := scope.GetProperties(procName, "Children")
+		childNames, err := namespace.GetProperties(procName, "Children")
 		if err != nil {
 			return nil, blueprint.Errorf("unable to build Golang process as the \"Children\" property is not defined: %s", err.Error())
 		}
@@ -66,10 +66,10 @@ func CreateClientProcess(wiring blueprint.WiringSpec, procName string, children 
 		AddChildToProcess(wiring, procName, childName)
 	}
 
-	wiring.Define(procName, &Process{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		process := NewGolangProcessScope(scope, wiring, procName)
+	wiring.Define(procName, &Process{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		process := NewGolangProcessNamespace(namespace, wiring, procName)
 
-		childNames, err := scope.GetProperties(procName, "Children")
+		childNames, err := namespace.GetProperties(procName, "Children")
 		if err != nil {
 			return nil, blueprint.Errorf("unable to build Golang process as the \"Children\" property is not defined: %s", err.Error())
 		}
@@ -95,41 +95,41 @@ func CreateClientProcess(wiring blueprint.WiringSpec, procName string, children 
 }
 
 // Used during building to accumulate golang application-level nodes
-// Non-golang nodes will just be recursively fetched from the parent scope
-type ProcessScope struct {
-	blueprint.SimpleScope
-	handler *processScopeHandler
+// Non-golang nodes will just be recursively fetched from the parent namespace
+type ProcessNamespace struct {
+	blueprint.SimpleNamespace
+	handler *processNamespaceHandler
 }
 
-type processScopeHandler struct {
-	blueprint.DefaultScopeHandler
+type processNamespaceHandler struct {
+	blueprint.DefaultNamespaceHandler
 
 	IRNode *Process
 }
 
-// Creates a process `name` within the provided parent scope
-func NewGolangProcessScope(parentScope blueprint.Scope, wiring blueprint.WiringSpec, name string) *ProcessScope {
-	scope := &ProcessScope{}
-	scope.handler = &processScopeHandler{}
-	scope.handler.Init(&scope.SimpleScope)
-	scope.handler.IRNode = newGolangProcessNode(name)
-	scope.Init(name, "GolangProcess", parentScope, wiring, scope.handler)
-	return scope
+// Creates a process `name` within the provided parent namespace
+func NewGolangProcessNamespace(parentNamespace blueprint.Namespace, wiring blueprint.WiringSpec, name string) *ProcessNamespace {
+	namespace := &ProcessNamespace{}
+	namespace.handler = &processNamespaceHandler{}
+	namespace.handler.Init(&namespace.SimpleNamespace)
+	namespace.handler.IRNode = newGolangProcessNode(name)
+	namespace.Init(name, "GolangProcess", parentNamespace, wiring, namespace.handler)
+	return namespace
 }
 
 // Golang processes can only contain golang nodes
-func (scope *processScopeHandler) Accepts(nodeType any) bool {
+func (namespace *processNamespaceHandler) Accepts(nodeType any) bool {
 	_, ok := nodeType.(golang.Node)
 	return ok
 }
 
-// When a node is added to this scope, we just attach it to the IRNode representing the process
-func (handler *processScopeHandler) AddNode(name string, node blueprint.IRNode) error {
+// When a node is added to this namespace, we just attach it to the IRNode representing the process
+func (handler *processNamespaceHandler) AddNode(name string, node blueprint.IRNode) error {
 	return handler.IRNode.AddChild(node)
 }
 
-// When an edge is added to this scope, we just attach it as an argument to the IRNode representing the process
-func (handler *processScopeHandler) AddEdge(name string, node blueprint.IRNode) error {
+// When an edge is added to this namespace, we just attach it as an argument to the IRNode representing the process
+func (handler *processNamespaceHandler) AddEdge(name string, node blueprint.IRNode) error {
 	handler.IRNode.AddArg(node)
 	return nil
 }

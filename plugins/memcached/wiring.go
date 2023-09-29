@@ -16,8 +16,8 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 	addrName := cacheName + ".addr"
 
 	// First define the process
-	wiring.Define(procName, &MemcachedProcess{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		addr, err := scope.Get(addrName)
+	wiring.Define(procName, &MemcachedProcess{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		addr, err := namespace.Get(addrName)
 		if err != nil {
 			return nil, err
 		}
@@ -25,7 +25,7 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 		return newMemcachedProcess(procName, addr)
 	})
 
-	// Mandate that this cache with this name must be unique within the application (although, this can be changed by scopes)
+	// Mandate that this cache with this name must be unique within the application (although, this can be changed by namespaces)
 	dstName := cacheName + ".dst"
 	wiring.Alias(dstName, procName)
 	pointer.RequireUniqueness(wiring, dstName, &blueprint.ApplicationNode{})
@@ -35,7 +35,7 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 	ptr := pointer.GetPointer(wiring, cacheName)
 
 	// Define the address and add the collectorAddr to the pointer dst
-	address.Define(wiring, addrName, procName, &blueprint.ApplicationNode{}, func(scope blueprint.Scope) (address.Address, error) {
+	address.Define(wiring, addrName, procName, &blueprint.ApplicationNode{}, func(namespace blueprint.Namespace) (address.Address, error) {
 		addr := &MemcachedAddr{
 			AddrName: addrName,
 			Server:   nil,
@@ -48,8 +48,8 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 	clientNext := ptr.AddSrcModifier(wiring, clientName)
 
 	// Define the memcached go client
-	wiring.Define(clientName, &MemcachedGoClient{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		server, err := scope.Get(clientNext)
+	wiring.Define(clientName, &MemcachedGoClient{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		server, err := namespace.Get(clientNext)
 		if err != nil {
 			return nil, err
 		}

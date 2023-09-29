@@ -8,9 +8,9 @@ import (
 type VisibilityMetadata struct {
 	blueprint.IRMetadata
 
-	name  string
-	node  blueprint.IRNode
-	scope blueprint.Scope
+	name      string
+	node      blueprint.IRNode
+	namespace blueprint.Namespace
 }
 
 func (md *VisibilityMetadata) Name() string {
@@ -44,17 +44,17 @@ func RequireUniqueness(wiring blueprint.WiringSpec, alias string, visibility any
 	}
 
 	mdName := name + ".visibility"
-	wiring.Define(mdName, visibility, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+	wiring.Define(mdName, visibility, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
 		md := &VisibilityMetadata{}
 		md.name = mdName
 		md.node = nil
-		md.scope = nil
+		md.namespace = nil
 		return md, nil
 	})
 
 	checkName := name + ".uniqueness_check"
-	wiring.Define(checkName, def.NodeType, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		md, err := scope.Get(mdName)
+	wiring.Define(checkName, def.NodeType, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		md, err := namespace.Get(mdName)
 		if err != nil {
 			return nil, err
 		}
@@ -65,16 +65,16 @@ func RequireUniqueness(wiring blueprint.WiringSpec, alias string, visibility any
 		}
 
 		if mdNode.node != nil {
-			return nil, blueprint.Errorf("reachability error detected for %s; %s is configured to be unique but cannot be simultaneously reached from scopes %s and %s; fix by disabling uniqueness for %s or exposing %s over RPC", name, name, scope.Name(), mdNode.scope.Name(), name, name)
+			return nil, blueprint.Errorf("reachability error detected for %s; %s is configured to be unique but cannot be simultaneously reached from namespaces %s and %s; fix by disabling uniqueness for %s or exposing %s over RPC", name, name, namespace.Name(), mdNode.namespace.Name(), name, name)
 		}
 
-		node, err := scope.Get(name)
+		node, err := namespace.Get(name)
 		if err != nil {
 			return nil, err
 		}
 
 		mdNode.node = node
-		mdNode.scope = scope
+		mdNode.namespace = namespace
 		return node, nil
 	})
 
