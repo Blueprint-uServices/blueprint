@@ -10,16 +10,19 @@ import (
 
 type HealthCheckerServerWrapper struct {
 	golang.Service
+	golang.GeneratesFuncs
+	golang.Instantiable
 
-	WrapperName string
-	Wrapped     golang.Service
+	InstanceName string
+	Wrapped      golang.Service
+
+	outputPackage string
 }
 
-func (node *HealthCheckerServerWrapper) ImplementsGolangNode()    {}
-func (node *HealthCheckerServerWrapper) ImplementsGolangService() {}
+func (node *HealthCheckerServerWrapper) ImplementsGolangNode() {}
 
 func (node *HealthCheckerServerWrapper) Name() string {
-	return node.WrapperName
+	return node.InstanceName
 }
 
 func (node *HealthCheckerServerWrapper) String() string {
@@ -33,7 +36,7 @@ func newHealthCheckerServerWrapper(name string, server blueprint.IRNode) (*Healt
 	}
 
 	node := &HealthCheckerServerWrapper{}
-	node.WrapperName = name
+	node.InstanceName = name
 	node.Wrapped = serverNode
 	return node, nil
 }

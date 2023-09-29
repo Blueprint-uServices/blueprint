@@ -21,7 +21,7 @@ func AddHealthCheckAPI(wiring blueprint.WiringSpec, serviceName string) {
 	serverNext := ptr.AddDstModifier(wiring, serverWrapper)
 
 	// Define the server wrapper
-	wiring.Define(serverWrapper, &HealthCheckerServerWrapper{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+	wiring.Define(serverWrapper, &HealthCheckerServerWrapper{}, func(scope blueprint.Namespace) (blueprint.IRNode, error) {
 		server, err := scope.Get(serverNext)
 		if err != nil {
 			return nil, err
