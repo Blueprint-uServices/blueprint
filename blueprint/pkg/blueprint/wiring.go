@@ -10,11 +10,11 @@ import (
 )
 
 type Blueprint struct {
-	applicationScope *blueprintScope
-	wiring           *wiringSpecImpl
+	applicationNamespace *blueprintNamespace
+	wiring               *wiringSpecImpl
 }
 
-type BuildFunc func(Scope) (IRNode, error)
+type BuildFunc func(Namespace) (IRNode, error)
 
 type WiringSpec interface {
 	Define(name string, nodeType any, build BuildFunc) // Adds a named node definition to the spec that can be built with the provided build function
@@ -226,12 +226,12 @@ func (wiring *wiringSpecImpl) Err() error {
 func (wiring *wiringSpecImpl) GetBlueprint() (*Blueprint, error) {
 	blueprint := Blueprint{}
 
-	scope, err := newBlueprintScope(wiring, wiring.name)
+	namespace, err := newBlueprintNamespace(wiring, wiring.name)
 	if err != nil {
 		slog.Error("Unable to build workflow spec, exiting", "error", err)
 		os.Exit(1)
 	}
-	blueprint.applicationScope = scope
+	blueprint.applicationNamespace = namespace
 	blueprint.wiring = wiring
 	return &blueprint, wiring.Err()
 }
@@ -240,9 +240,9 @@ func (wiring *wiringSpecImpl) GetBlueprint() (*Blueprint, error) {
 func (blueprint *Blueprint) Instantiate(names ...string) {
 	for _, name := range names {
 		nameToGet := name
-		blueprint.applicationScope.Defer(func() error {
-			blueprint.applicationScope.Info("Instantiating %v", nameToGet)
-			_, err := blueprint.applicationScope.Get(nameToGet)
+		blueprint.applicationNamespace.Defer(func() error {
+			blueprint.applicationNamespace.Info("Instantiating %v", nameToGet)
+			_, err := blueprint.applicationNamespace.Get(nameToGet)
 			return err
 		})
 	}
@@ -253,16 +253,16 @@ func (blueprint *Blueprint) Instantiate(names ...string) {
 func (blueprint *Blueprint) InstantiateAll() {
 	for name := range blueprint.wiring.defs {
 		nameToGet := name
-		blueprint.applicationScope.Defer(func() error {
-			blueprint.applicationScope.Info("Instantiating %v", nameToGet)
-			_, err := blueprint.applicationScope.Get(nameToGet)
+		blueprint.applicationNamespace.Defer(func() error {
+			blueprint.applicationNamespace.Info("Instantiating %v", nameToGet)
+			_, err := blueprint.applicationNamespace.Get(nameToGet)
 			return err
 		})
 	}
 }
 
 func (blueprint *Blueprint) Build() (*ApplicationNode, error) {
-	node, err := blueprint.applicationScope.Build()
+	node, err := blueprint.applicationNamespace.Build()
 	if err != nil {
 		return node.(*ApplicationNode), err
 	}

@@ -66,12 +66,12 @@ defined as a pointer to the actual service, and can thus be modified and
 func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string {
 	// Define the service
 	handlerName := serviceName + ".handler"
-	wiring.Define(handlerName, &WorkflowService{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+	wiring.Define(handlerName, &WorkflowService{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
 		// Get all of the argument nodes; can error out if the arguments weren't actually defined
 		// For arguments that are pointer types, this will only get the caller-side of the pointer
 		var arg_nodes []blueprint.IRNode
 		for _, arg_name := range serviceArgs {
-			node, err := scope.Get(arg_name)
+			node, err := namespace.Get(arg_name)
 			if err != nil {
 				return nil, err
 			}
@@ -84,11 +84,11 @@ func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, servic
 
 	// Define the client dependencies
 	dependencies := serviceName + ".dependencies"
-	wiring.Define(dependencies, &WorkflowSpecNode{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+	wiring.Define(dependencies, &WorkflowSpecNode{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
 		return includeWorkflowDependencies(serviceName, serviceType)
 	})
 
-	// Mandate that this service with this name must be unique within the application (although, this can be changed by scopes)
+	// Mandate that this service with this name must be unique within the application (although, this can be changed by namespaces)
 	dstName := serviceName + ".dst"
 	wiring.Alias(dstName, handlerName)
 	pointer.RequireUniqueness(wiring, dstName, &blueprint.ApplicationNode{})
@@ -99,13 +99,13 @@ func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, servic
 	// Make sure that the client-side of the pointer has the dependencies (the interfaces) of the service
 	includeDependencies := serviceName + ".includedependencies"
 	clientNext := ptr.AddSrcModifier(wiring, includeDependencies)
-	wiring.Define(includeDependencies, &WorkflowService{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		_, err := scope.Get(dependencies)
+	wiring.Define(includeDependencies, &WorkflowService{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		_, err := namespace.Get(dependencies)
 		if err != nil {
 			return nil, err
 		}
 
-		return scope.Get(clientNext)
+		return namespace.Get(clientNext)
 	})
 
 	return serviceName
@@ -115,7 +115,7 @@ func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, servic
 TODOs:
 
 -  can also implement a different version of Define that requests all clients specified in serviceArgs are unique.  This is achievable
-   by just opening a scope when getting the args
+   by just opening a namespace when getting the args
 
 
 */

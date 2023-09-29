@@ -40,13 +40,13 @@ func InstrumentUsingCustomCollector(wiring blueprint.WiringSpec, serviceName str
 	clientNext := ptr.AddSrcModifier(wiring, clientWrapper)
 
 	// Define the client wrapper
-	wiring.Define(clientWrapper, &OpenTelemetryClientWrapper{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		collectorClient, err := scope.Get(collectorName)
+	wiring.Define(clientWrapper, &OpenTelemetryClientWrapper{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		collectorClient, err := namespace.Get(collectorName)
 		if err != nil {
 			return nil, err
 		}
 
-		server, err := scope.Get(clientNext)
+		server, err := namespace.Get(clientNext)
 		if err != nil {
 			return nil, err
 		}
@@ -58,13 +58,13 @@ func InstrumentUsingCustomCollector(wiring blueprint.WiringSpec, serviceName str
 	serverNext := ptr.AddDstModifier(wiring, serverWrapper)
 
 	// Define the server wrapper
-	wiring.Define(serverWrapper, &OpenTelemetryServerWrapper{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		collectorClient, err := scope.Get(collectorName)
+	wiring.Define(serverWrapper, &OpenTelemetryServerWrapper{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		collectorClient, err := namespace.Get(collectorName)
 		if err != nil {
 			return nil, err
 		}
 
-		server, err := scope.Get(serverNext)
+		server, err := namespace.Get(serverNext)
 		if err != nil {
 			return nil, err
 		}
@@ -94,8 +94,8 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 	// Define the collector address
 
 	// Define the collector server
-	wiring.Define(collectorProc, &OpenTelemetryCollector{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		addr, err := scope.Get(collectorAddr)
+	wiring.Define(collectorProc, &OpenTelemetryCollector{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		addr, err := namespace.Get(collectorAddr)
 		if err != nil {
 			return nil, err
 		}
@@ -118,8 +118,8 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 	clientNext := ptr.AddSrcModifier(wiring, collectorClient)
 
 	// Define the collector client
-	wiring.Define(collectorClient, &OpenTelemetryCollectorClient{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		collectorServer, err := scope.Get(clientNext)
+	wiring.Define(collectorClient, &OpenTelemetryCollectorClient{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		collectorServer, err := namespace.Get(clientNext)
 		if err != nil {
 			return nil, err
 		}
@@ -128,7 +128,7 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 	})
 
 	// Define the address and add it to the pointer dst
-	address.Define(wiring, collectorAddr, collectorProc, &blueprint.ApplicationNode{}, func(scope blueprint.Scope) (address.Address, error) {
+	address.Define(wiring, collectorAddr, collectorProc, &blueprint.ApplicationNode{}, func(namespace blueprint.Namespace) (address.Address, error) {
 		addr := &OpenTelemetryCollectorAddr{
 			AddrName:  collectorAddr,
 			Collector: nil,

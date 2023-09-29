@@ -15,8 +15,8 @@ func Generator(wiring blueprint.WiringSpec, service string) string {
 	goproc.CreateProcess(wiring, workloadProcName, workloadClientName)
 
 	// Define the workload generator client node
-	wiring.Define(workloadClientName, &WorkloadgenClient{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		client, err := scope.Get(service)
+	wiring.Define(workloadClientName, &WorkloadgenClient{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		client, err := namespace.Get(service)
 		if err != nil {
 			return nil, err
 		}

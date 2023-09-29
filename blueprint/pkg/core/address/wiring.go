@@ -9,20 +9,20 @@ Defines an address called `addressName` that points to the definition `pointsto`
 
 The provided buildFunc should build an IRNode that implements the address.Address interface
 */
-func Define(wiring blueprint.WiringSpec, addressName string, pointsTo string, reachability any, build func(scope blueprint.Scope) (Address, error)) {
+func Define(wiring blueprint.WiringSpec, addressName string, pointsTo string, reachability any, build func(namespace blueprint.Namespace) (Address, error)) {
 	def := wiring.GetDef(pointsTo)
 	if def == nil {
 		wiring.AddError(blueprint.Errorf("trying to define address %s that points to %s but %s is not defined", addressName, pointsTo, pointsTo))
 	}
 
-	wiring.Define(addressName, reachability, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		return build(scope)
+	wiring.Define(addressName, reachability, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		return build(namespace)
 	})
 	wiring.SetProperty(addressName, "pointsTo", pointsTo)
 }
 
-func DestinationOf(scope blueprint.Scope, addressName string) (string, error) {
-	prop, err := scope.GetProperty(addressName, "pointsTo")
+func DestinationOf(namespace blueprint.Namespace, addressName string) (string, error) {
+	prop, err := namespace.GetProperty(addressName, "pointsTo")
 	if err != nil {
 		return "", err
 	}

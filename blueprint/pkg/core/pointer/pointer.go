@@ -39,15 +39,15 @@ func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst st
 
 	wiring.Alias(ptr.srcTail, ptr.dstHead)
 
-	wiring.Define(name, ptrType, func(scope blueprint.Scope) (blueprint.IRNode, error) {
-		node, err := scope.Get(ptr.srcHead)
+	wiring.Define(name, ptrType, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		node, err := namespace.Get(ptr.srcHead)
 		if err != nil {
 			return nil, err
 		}
 
-		scope.Defer(func() error {
+		namespace.Defer(func() error {
 			// TODO: this only needs to happen once
-			_, err := ptr.InstantiateDst(scope)
+			_, err := ptr.InstantiateDst(namespace)
 			return err
 		})
 
@@ -95,26 +95,26 @@ func (ptr *PointerDef) AddDstModifier(wiring blueprint.WiringSpec, modifierName 
 	return nextDst
 }
 
-func (ptr *PointerDef) InstantiateDst(scope blueprint.Scope) (blueprint.IRNode, error) {
-	scope.Info("Instantiating pointer %s.dst from scope %s", ptr.name, scope.Name())
+func (ptr *PointerDef) InstantiateDst(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+	namespace.Info("Instantiating pointer %s.dst from namespace %s", ptr.name, namespace.Name())
 	for _, modifier := range ptr.dstModifiers {
-		node, err := scope.Get(modifier)
+		node, err := namespace.Get(modifier)
 		if err != nil {
 			return nil, err
 		}
 
 		addr, is_addr := node.(address.Address)
 		if is_addr {
-			dstName, err := address.DestinationOf(scope, modifier)
+			dstName, err := address.DestinationOf(namespace, modifier)
 			if err != nil {
 				return nil, err
 			}
 			if addr.GetDestination() != nil {
 				// Destination has already been instantiated, stop instantiating now
-				scope.Info("Destination %s of %s has already been instantiated", dstName, addr.Name())
+				namespace.Info("Destination %s of %s has already been instantiated", dstName, addr.Name())
 				return nil, nil
 			} else {
-				dst, err := scope.Instantiate(dstName)
+				dst, err := namespace.Instantiate(dstName)
 				if err != nil {
 					return nil, err
 				}
@@ -126,5 +126,5 @@ func (ptr *PointerDef) InstantiateDst(scope blueprint.Scope) (blueprint.IRNode, 
 		}
 	}
 
-	return scope.Get(ptr.dst)
+	return namespace.Get(ptr.dst)
 }
