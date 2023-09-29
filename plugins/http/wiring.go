@@ -28,7 +28,7 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 	clientNext := ptr.AddSrcModifier(wiring, httpClient)
 
 	// Define the client wrapper
-	wiring.Define(httpClient, &GolangHttpClient{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+	wiring.Define(httpClient, &GolangHttpClient{}, func(scope blueprint.Namespace) (blueprint.IRNode, error) {
 		server, err := scope.Get(clientNext)
 		if err != nil {
 			return nil, err
@@ -40,7 +40,7 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 	serverNext := ptr.AddDstModifier(wiring, httpServer)
 
 	// Define the server
-	wiring.Define(httpServer, &GolangHttpServer{}, func(scope blueprint.Scope) (blueprint.IRNode, error) {
+	wiring.Define(httpServer, &GolangHttpServer{}, func(scope blueprint.Namespace) (blueprint.IRNode, error) {
 		addr, err := scope.Get(httpAddr)
 		if err != nil {
 			return nil, err
@@ -55,7 +55,7 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 	})
 
 	// Define the address and add it to the pointer dst
-	address.Define(wiring, httpAddr, httpServer, &blueprint.ApplicationNode{}, func(scope blueprint.Scope) (address.Address, error) {
+	address.Define(wiring, httpAddr, httpServer, &blueprint.ApplicationNode{}, func(scope blueprint.Namespace) (address.Address, error) {
 		addr := &GolangHttpServerAddress{
 			AddrName: httpAddr,
 			Server:   nil,
