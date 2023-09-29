@@ -65,6 +65,8 @@ func newTemplateExecutor(args any) *templateExecutor {
 	e.Funcs["RetVarsAndTypes"] = e.RetVarsAndTypes
 	e.Funcs["Signature"] = e.Signature
 	e.Funcs["SignatureWithRetVars"] = e.SignatureWithRetVars
+	e.Funcs["JsonField"] = e.JsonField
+	e.Funcs["Title"] = e.TitleCase
 
 	return e
 }
@@ -136,6 +138,14 @@ func (e *templateExecutor) Signature(f gocode.Func) (string, error) {
 func (e *templateExecutor) SignatureWithRetVars(f gocode.Func) (string, error) {
 	tmpl := `{{.Name}}({{ArgVarsAndTypes . "ctx context.Context"}}) ({{RetVarsAndTypes . "err error"}})`
 	return e.exec("SignatureWithRetVars", tmpl, f)
+}
+
+func (e *templateExecutor) JsonField(name string) (string, error) {
+	return "`json:\"" + name + "\"`", nil
+}
+
+func (e *templateExecutor) TitleCase(arg string) (string, error) {
+	return strings.Title(arg), nil
 }
 
 // Looks for any field of type *Imports on the provided obj
