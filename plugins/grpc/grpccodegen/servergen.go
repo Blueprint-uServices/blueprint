@@ -91,7 +91,7 @@ func (handler *{{.Name}}) Run(ctx context.Context) error {
 {{ range $_, $f := .Service.Methods }}
 func (handler *{{$receiver}}) {{$f.Name -}}
 		(ctx context.Context, req *{{$service}}_{{$f.Name}}_Request) (*{{$service}}_{{$f.Name}}_Response, error) {
-	{{ArgVars $f}} := req.unmarshall()
+	{{ArgVarsEquals $f}} req.unmarshall()
 	{{RetVars $f "err"}} := handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
 	if err != nil {
 		return nil, err
