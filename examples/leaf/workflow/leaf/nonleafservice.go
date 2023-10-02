@@ -26,6 +26,11 @@ func (nl *NonLeafServiceImpl) Hello(ctx context.Context, a int64) (int64, error)
 		return retval, err
 	}
 
+	err = nl.leafService.HelloNothing(ctx)
+	if err != nil {
+		return 0, err
+	}
+
 	var b int32
 	b = int32(a * 2)
 

@@ -22,6 +22,7 @@ type LeafObject struct {
 }
 
 type LeafService interface {
+	HelloNothing(ctx ctxx.Context) error
 	HelloInt(ctx ctxx.Context, a int64) (int64, error)
 	HelloObject(ctx ctxx.Context, obj *LeafObject) (*LeafObject, error)
 	HelloMate(ctx ctxx.Context, a int, b int32, c string, d map[string]LeafObject, elems []string, elems2 []NestedLeafObject) (string, []string, int32, int, map[string]LeafObject, error)
@@ -30,6 +31,11 @@ type LeafService interface {
 type LeafServiceImpl struct {
 	LeafService
 	Cache backend.Cache
+}
+
+func (l *LeafServiceImpl) HelloNothing(ctx ctxx.Context) error {
+	fmt.Println("hello nothing!")
+	return nil
 }
 
 func (l *LeafServiceImpl) HelloInt(ctx ctxx.Context, a int64) (int64, error) {

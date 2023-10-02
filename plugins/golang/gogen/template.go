@@ -2,6 +2,7 @@ package gogen
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"reflect"
 	"strings"
@@ -59,8 +60,10 @@ func newTemplateExecutor(args any) *templateExecutor {
 	e.Funcs["NameOf"] = e.NameOf
 	e.Funcs["DeclareArgVars"] = e.DeclareArgVars
 	e.Funcs["ArgVars"] = e.ArgVars
+	e.Funcs["ArgVarsEquals"] = e.ArgVarsEquals
 	e.Funcs["ArgVarsAndTypes"] = e.ArgVarsAndTypes
 	e.Funcs["RetVars"] = e.RetVars
+	e.Funcs["RetVarsEquals"] = e.RetVarsEquals
 	e.Funcs["RetTypes"] = e.RetTypes
 	e.Funcs["RetVarsAndTypes"] = e.RetVarsAndTypes
 	e.Funcs["Signature"] = e.Signature
@@ -96,38 +99,79 @@ func (e *templateExecutor) DeclareArgVars(f gocode.Func) (string, error) {
 }
 
 func (e *templateExecutor) ArgVars(f gocode.Func, prefix ...string) (string, error) {
-	tmpl := "{{range $i, $arg := .Arguments}}{{if $i}}, {{end}}{{$arg.Name}}{{end}}"
-	s, err := e.exec("ArgVars", tmpl, f)
-	prefix = append(prefix, s)
-	return strings.Join(prefix, ", "), err
+	for _, arg := range f.Arguments {
+		prefix = append(prefix, arg.Name)
+	}
+	return strings.Join(prefix, ", "), nil
+}
+
+func (e *templateExecutor) ArgVarsEquals(f gocode.Func, prefix ...string) (string, error) {
+	if len(f.Arguments) == 0 && len(prefix) == 0 {
+		return "", nil
+	}
+	for _, arg := range f.Arguments {
+		prefix = append(prefix, arg.Name)
+	}
+	return fmt.Sprintf("%v :=", strings.Join(prefix, ", ")), nil
 }
 
 func (e *templateExecutor) ArgVarsAndTypes(f gocode.Func, prefix ...string) (string, error) {
-	tmpl := "{{range $i, $arg := .Arguments}}{{if $i}}, {{end}}{{$arg.Name}} {{NameOf $arg.Type}}{{end}}"
-	s, err := e.exec("ArgVarsAndTypes", tmpl, f)
-	prefix = append(prefix, s)
-	return strings.Join(prefix, ", "), err
+	for _, arg := range f.Arguments {
+		argType, err := e.NameOf(arg.Type)
+		if err != nil {
+			return "", err
+		}
+		prefix = append(prefix, arg.Name+" "+argType)
+	}
+	return strings.Join(prefix, ", "), nil
 }
 
 func (e *templateExecutor) RetVars(f gocode.Func, suffix ...string) (string, error) {
-	tmpl := "{{range $i, $_ := .Returns}}{{if $i}}, {{end}}ret{{$i}}{{end}}"
-	s, err := e.exec("RetVars", tmpl, f)
-	suffix = append([]string{s}, suffix...)
-	return strings.Join(suffix, ", "), err
+	var retvars []string
+	for i := range f.Returns {
+		retvars = append(retvars, fmt.Sprintf("ret%v", i))
+	}
+	retvars = append(retvars, suffix...)
+	return strings.Join(retvars, ", "), nil
+}
+
+func (e *templateExecutor) RetVarsEquals(f gocode.Func, suffix ...string) (string, error) {
+	if len(f.Returns) == 0 && len(suffix) == 0 {
+		return "", nil
+	}
+
+	var retvars []string
+	for i := range f.Returns {
+		retvars = append(retvars, fmt.Sprintf("ret%v", i))
+	}
+	retvars = append(retvars, suffix...)
+	return fmt.Sprintf("%v = ", strings.Join(retvars, ", ")), nil
 }
 
 func (e *templateExecutor) RetTypes(f gocode.Func, suffix ...string) (string, error) {
-	tmpl := "{{range $i, $ret := .Returns}}{{if $i}}, {{end}}{{NameOf $ret.Type}}{{end}}"
-	s, err := e.exec("RetTypes", tmpl, f)
-	suffix = append([]string{s}, suffix...)
-	return strings.Join(suffix, ", "), err
+	var rettypes []string
+	for _, ret := range f.Returns {
+		rettype, err := e.NameOf(ret.Type)
+		if err != nil {
+			return "", err
+		}
+		rettypes = append(rettypes, rettype)
+	}
+	rettypes = append(rettypes, suffix...)
+	return strings.Join(rettypes, ", "), nil
 }
 
 func (e *templateExecutor) RetVarsAndTypes(f gocode.Func, suffix ...string) (string, error) {
-	tmpl := "{{range $i, $ret := .Returns}}{{if $i}}, {{end}}ret{{$i}} {{NameOf $ret.Type}}{{end}}"
-	s, err := e.exec("RetVarsAndTypes", tmpl, f)
-	suffix = append([]string{s}, suffix...)
-	return strings.Join(suffix, ", "), err
+	var rettypes []string
+	for i, ret := range f.Returns {
+		rettype, err := e.NameOf(ret.Type)
+		if err != nil {
+			return "", err
+		}
+		rettypes = append(rettypes, fmt.Sprintf("ret%v %v", i, rettype))
+	}
+	rettypes = append(rettypes, suffix...)
+	return strings.Join(rettypes, ", "), nil
 }
 
 func (e *templateExecutor) Signature(f gocode.Func) (string, error) {

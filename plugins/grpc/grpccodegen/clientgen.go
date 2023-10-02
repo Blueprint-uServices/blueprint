@@ -100,7 +100,7 @@ func (client *{{$receiver}}) {{SignatureWithRetVars $f}} {
 		return
 	}
 
-	{{RetVars $f}} = rsp.unmarshall()
+	{{RetVarsEquals $f}} rsp.unmarshall()
 	return
 }
 {{end}}
