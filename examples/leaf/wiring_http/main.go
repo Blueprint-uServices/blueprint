@@ -8,6 +8,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/healthchecker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplenosqldb"
@@ -16,6 +17,7 @@ import (
 
 func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) string {
 	procName := fmt.Sprintf("p%s", serviceName)
+	healthchecker.AddHealthCheckAPI(wiring, serviceName)
 	http.Deploy(wiring, serviceName)
 	return goproc.CreateProcess(wiring, procName, serviceName)
 }
@@ -53,12 +55,13 @@ func main() {
 	}
 
 	slog.Info("Application: \n" + application.String())
-	err = application.Children["pa"].(*goproc.Process).GenerateArtifacts("tmp")
+
+	err = application.Children["pb"].(*goproc.Process).GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
 	}
-	err = application.Children["pb"].(*goproc.Process).GenerateArtifacts("tmp")
+	err = application.Children["pa"].(*goproc.Process).GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
