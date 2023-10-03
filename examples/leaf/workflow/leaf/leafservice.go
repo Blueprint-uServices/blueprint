@@ -1,10 +1,12 @@
 package leaf
 
 import (
+	"context"
 	ctxx "context"
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type MyInt int64
@@ -18,6 +20,7 @@ type NestedLeafObject struct {
 type LeafObject struct {
 	ID    int64
 	Name  string
+	Count int
 	Props map[string]NestedLeafObject
 }
 
@@ -30,7 +33,16 @@ type LeafService interface {
 
 type LeafServiceImpl struct {
 	LeafService
-	Cache backend.Cache
+	Cache      backend.Cache
+	Collection backend.NoSQLCollection
+}
+
+func NewLeafServiceImpl(cache backend.Cache, db backend.NoSQLDatabase) (*LeafServiceImpl, error) {
+	collection, err := db.GetCollection(context.Background(), "leafdb", "leafcollection")
+	if err != nil {
+		return nil, err
+	}
+	return &LeafServiceImpl{Cache: cache, Collection: collection}, nil
 }
 
 func (l *LeafServiceImpl) HelloNothing(ctx ctxx.Context) error {
@@ -43,7 +55,33 @@ func (l *LeafServiceImpl) HelloInt(ctx ctxx.Context, a int64) (int64, error) {
 	l.Cache.Put(ctx, "helloint", a)
 	var b int64
 	l.Cache.Get(ctx, "helloint", &b)
-	return b, nil
+
+	filter := bson.D{{"id", 7}}
+	cursor, err := l.Collection.FindMany(ctx, filter)
+	if err != nil {
+		return 0, err
+	}
+
+	var objs []LeafObject
+	err = cursor.All(ctx, &objs)
+	if err != nil {
+		return 0, err
+	}
+
+	if len(objs) == 0 {
+		obj := LeafObject{ID: 7, Name: "MyObject"}
+		err = l.Collection.InsertOne(ctx, obj)
+		if err != nil {
+			return 0, err
+		}
+		objs = append(objs, obj)
+	}
+	fmt.Printf("%v\n", objs[0])
+
+	update := bson.D{{"$inc", bson.D{{"count", 1}}}}
+	l.Collection.UpdateOne(ctx, filter, update)
+
+	return int64(objs[0].Count), nil
 }
 
 func (l *LeafServiceImpl) HelloObject(ctx ctxx.Context, obj *LeafObject) (*LeafObject, error) {
@@ -56,8 +94,4 @@ func (l *LeafServiceImpl) HelloMate(ctx ctxx.Context, a int, b int32, c string, 
 
 func (l *LeafServiceImpl) NonServiceFunction() int64 {
 	return 3
-}
-
-func NewLeafServiceImpl(cache backend.Cache) (*LeafServiceImpl, error) {
-	return &LeafServiceImpl{Cache: cache}, nil
 }

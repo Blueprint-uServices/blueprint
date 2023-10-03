@@ -5,12 +5,14 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 )
 
-type Cache struct {
-	blueprint.IRNode
-	service.ServiceNode
-}
+type (
+	Cache interface {
+		blueprint.IRNode
+		service.ServiceNode
+	}
 
-func (c *Cache) GetInterface() *service.ServiceInterface {
-	// TODO: return the cache interface.  might need to change serviceinterface a bit
-	return nil
-}
+	NoSQLDB interface {
+		blueprint.IRNode
+		service.ServiceNode
+	}
+)
