@@ -22,13 +22,9 @@ func Define(wiring blueprint.WiringSpec, addressName string, pointsTo string, re
 }
 
 func DestinationOf(namespace blueprint.Namespace, addressName string) (string, error) {
-	prop, err := namespace.GetProperty(addressName, "pointsTo")
-	if err != nil {
-		return "", err
-	}
-	pointsTo, isString := prop.(string)
-	if !isString {
-		return "", blueprint.Errorf("expected the pointsTo property of %v to be a string but got %v", addressName, prop)
+	var pointsTo string
+	if err := namespace.GetProperty(addressName, "pointsTo", &pointsTo); err != nil {
+		return "", blueprint.Errorf("expected pointsTo property of %v to be a string; %v", addressName, err.Error())
 	}
 	return pointsTo, nil
 }

@@ -23,10 +23,10 @@ type WiringSpec interface {
 	Alias(name string, pointsto string)   // Defines an alias to another defined node; these can be recursive
 	GetAlias(alias string) (string, bool) // Gets the value of the specified alias, if it exists
 
-	SetProperty(name string, key string, value any) // Sets a static property value in the wiring spec, replacing any existing value specified
-	AddProperty(name string, key string, value any) // Adds a static property value in the wiring spec
-	GetProperty(name string, key string) any        // Gets a static property value from the wiring spec
-	GetProperties(name string, key string) []any    // Gets all static property values from the wiring spec
+	SetProperty(name string, key string, value any)       // Sets a static property value in the wiring spec, replacing any existing value specified
+	AddProperty(name string, key string, value any)       // Adds a static property value in the wiring spec
+	GetProperty(name string, key string, dst any) error   // Gets a static property value from the wiring spec
+	GetProperties(name string, key string, dst any) error // Gets all static property values from the wiring spec
 
 	String() string // Returns a string representation of everything that has been defined
 
@@ -65,17 +65,17 @@ func (def *WiringDef) AddProperty(key string, value any) {
 	def.Properties[key] = append(def.Properties[key], value)
 }
 
-func (def *WiringDef) GetProperty(key string) any {
+func (def *WiringDef) GetProperty(key string, dst any) error {
 	vs := def.Properties[key]
 	if len(vs) == 1 {
-		return vs[0]
+		return copyResult(vs[0], dst)
 	} else {
-		return nil
+		return setZero(dst)
 	}
 }
 
-func (def *WiringDef) GetProperties(key string) []any {
-	return def.Properties[key]
+func (def *WiringDef) GetProperties(key string, dst any) error {
+	return copyResult(def.Properties[key], dst)
 }
 
 func (def *WiringDef) String() string {
@@ -171,19 +171,19 @@ func (wiring *wiringSpecImpl) AddProperty(name string, propKey string, propValue
 }
 
 // Primarily for use by plugins to get configuration values
-func (wiring *wiringSpecImpl) GetProperty(name string, key string) any {
+func (wiring *wiringSpecImpl) GetProperty(name string, key string, dst any) error {
 	def := wiring.getDef(name, false)
 	if def != nil {
-		return def.GetProperty(key)
+		return def.GetProperty(key, dst)
 	}
 	return nil
 }
 
 // Primarily for use by plugins to get configuration values
-func (wiring *wiringSpecImpl) GetProperties(name string, key string) []any {
+func (wiring *wiringSpecImpl) GetProperties(name string, key string, dst any) error {
 	def := wiring.getDef(name, false)
 	if def != nil {
-		return def.GetProperties(key)
+		return def.GetProperties(key, dst)
 	}
 	return nil
 }

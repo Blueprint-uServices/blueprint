@@ -60,22 +60,14 @@ func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst st
 }
 
 func IsPointer(wiring blueprint.WiringSpec, name string) bool {
-	prop := wiring.GetProperty(name, "ptr")
-	if prop == nil {
-		return false
-	}
-	_, is_ptr := prop.(*PointerDef)
-	return is_ptr
+	var ptr *PointerDef
+	return wiring.GetProperty(name, "ptr", &ptr) == nil
 }
 
 func GetPointer(wiring blueprint.WiringSpec, name string) *PointerDef {
-	prop := wiring.GetProperty(name, "ptr")
-	if prop != nil {
-		if ptr, is_ptr := prop.(*PointerDef); is_ptr {
-			return ptr
-		}
-	}
-	return nil
+	var ptr *PointerDef
+	wiring.GetProperty(name, "ptr", &ptr)
+	return ptr
 }
 
 func (ptr *PointerDef) AddSrcModifier(wiring blueprint.WiringSpec, modifierName string) string {

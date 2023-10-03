@@ -24,22 +24,18 @@ func CreateProcess(wiring blueprint.WiringSpec, procName string, children ...str
 	wiring.Define(procName, &Process{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
 		process := NewGolangProcessNamespace(namespace, wiring, procName)
 
-		childNames, err := namespace.GetProperties(procName, "Children")
-		if err != nil {
-			return nil, blueprint.Errorf("unable to build Golang process as the \"Children\" property is not defined: %s", err.Error())
+		var childNames []string
+		if err := namespace.GetProperties(procName, "Children", &childNames); err != nil {
+			return nil, blueprint.Errorf("unable to build Golang process as the \"Children\" property is invalid: %s", err.Error())
 		}
-		var childNameStrings []string
-		for _, childName := range childNames {
-			childNameStrings = append(childNameStrings, childName.(string))
-		}
-		process.Info("%v children to build (%s)", len(childNames), strings.Join(childNameStrings, ", "))
+		process.Info("%v children to build (%s)", len(childNames), strings.Join(childNames, ", "))
 
 		// Instantiate all of the child nodes.  If the child node hasn't actually been defined, then this will error out
 		for _, childName := range childNames {
-			ptr := pointer.GetPointer(wiring, childName.(string))
+			ptr := pointer.GetPointer(wiring, childName)
 			if ptr == nil {
 				// for non-pointer types, just get the child node
-				_, err := process.Get(childName.(string))
+				_, err := process.Get(childName)
 				if err != nil {
 					return nil, err
 				}
@@ -69,19 +65,15 @@ func CreateClientProcess(wiring blueprint.WiringSpec, procName string, children 
 	wiring.Define(procName, &Process{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
 		process := NewGolangProcessNamespace(namespace, wiring, procName)
 
-		childNames, err := namespace.GetProperties(procName, "Children")
-		if err != nil {
+		var childNames []string
+		if err := namespace.GetProperties(procName, "Children", &childNames); err != nil {
 			return nil, blueprint.Errorf("unable to build Golang process as the \"Children\" property is not defined: %s", err.Error())
 		}
-		var childNameStrings []string
-		for _, childName := range childNames {
-			childNameStrings = append(childNameStrings, childName.(string))
-		}
-		process.Info("%v children to build (%s)", len(childNames), strings.Join(childNameStrings, ", "))
+		process.Info("%v children to build (%s)", len(childNames), strings.Join(childNames, ", "))
 
 		// Instantiate all of the child nodes.  If the child node hasn't actually been defined, then this will error out
 		for _, childName := range childNames {
-			_, err := process.Get(childName.(string))
+			_, err := process.Get(childName)
 			if err != nil {
 				return nil, err
 			}

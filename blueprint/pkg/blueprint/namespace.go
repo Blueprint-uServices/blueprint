@@ -18,15 +18,14 @@ its own custom namespace.  Implementing a custom Namespace is useful to achieve 
 For example, to build a GoProcess that contains Golang object instances, there will be a Namespace that accumulates
 Golang object instance nodes during the building process, and then creates a GoProcess namespace node.
 
-
 Most namespace implementations should extend the BasicNamespace struct
 */
 type Namespace interface {
 	Name() string                                         // The name of this namespace
 	Get(name string) (IRNode, error)                      // Get a node from this namespace or a parent namespace, possibly building it
 	Instantiate(name string) (IRNode, error)              // The same as Get, but without creating a dependency (an edge) into the current namespace
-	GetProperty(name string, key string) (any, error)     // Get a property from this namespace
-	GetProperties(name string, key string) ([]any, error) // Get a property from this namespace
+	GetProperty(name string, key string, dst any) error   // Get a property from this namespace; dst should be a pointer to value
+	GetProperties(name string, key string, dst any) error // Get a slice property from this namespace; dst should be a pointer to a slice
 	Put(name string, node IRNode) error                   // Put a node into this namespace
 	Defer(f func() error)                                 // Enqueue a function to be executed once finished building the current nodes
 
@@ -258,20 +257,20 @@ func (namespace *SimpleNamespace) Defer(f func() error) {
 	}
 }
 
-func (namespace *SimpleNamespace) GetProperty(name string, key string) (any, error) {
+func (namespace *SimpleNamespace) GetProperty(name string, key string, dst any) error {
 	def, err := namespace.Handler.LookupDef(name)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return def.GetProperty(key), nil
+	return def.GetProperty(key, dst)
 }
 
-func (namespace *SimpleNamespace) GetProperties(name string, key string) ([]any, error) {
+func (namespace *SimpleNamespace) GetProperties(name string, key string, dst any) error {
 	def, err := namespace.Handler.LookupDef(name)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return def.GetProperties(key), nil
+	return def.GetProperties(key, dst)
 }
 
 type blueprintNamespace struct {
