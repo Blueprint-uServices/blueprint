@@ -24,7 +24,7 @@ func GenerateServerHandler(builder golang.ModuleBuilder, service *gocode.Service
 	server := &serverArgs{
 		Package: pkg,
 		Service: service,
-		Name:    service.Name + "_GRPCServerHandler",
+		Name:    service.BaseName + "_GRPCServerHandler",
 		Imports: gogen.NewImports(pkg.Name),
 	}
 

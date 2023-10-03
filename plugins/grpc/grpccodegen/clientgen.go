@@ -24,7 +24,7 @@ func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 	client := &clientArgs{
 		Package: pkg,
 		Service: service,
-		Name:    service.Name + "_GRPCClient",
+		Name:    service.BaseName + "_GRPCClient",
 		Imports: gogen.NewImports(pkg.Name),
 	}
 

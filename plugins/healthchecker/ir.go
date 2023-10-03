@@ -53,7 +53,7 @@ func (node *HealthCheckerServerWrapper) GetGoInterface() *gocode.ServiceInterfac
 	if !valid {
 		slog.Error(blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.Wrapped.GetInterface()).Error())
 	}
-	i := gocode.CopyServiceInterface(fmt.Sprintf("%v_HealthCheckHandler", iface.BaseName), node.outputPackage, iface)
+	i := gocode.CopyServiceInterface(fmt.Sprintf("%v_HealthCheckHandler", iface.BaseName), "", iface)
 	health_check_method := &gocode.Func{}
 	health_check_method.Name = "Health"
 	health_check_method.Returns = append(health_check_method.Returns, gocode.Variable{Type: &gocode.BasicType{Name: "string"}})

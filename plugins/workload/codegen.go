@@ -16,7 +16,7 @@ func GenerateWorkloadgenCode(builder golang.ModuleBuilder, service *gocode.Servi
 	}
 
 	wlgen := &wlgenArgs{
-		Name:    service.Name + "_WorkloadGenerator",
+		Name:    service.BaseName + "_WorkloadGenerator",
 		Package: pkg,
 		Service: service,
 		Imports: gogen.NewImports(pkg.Name),

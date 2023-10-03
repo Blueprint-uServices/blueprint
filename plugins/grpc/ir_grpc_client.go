@@ -107,7 +107,7 @@ func (node *GolangClient) AddInstantiation(builder golang.GraphBuilder) error {
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
-			Name: fmt.Sprintf("New_%v_GRPCClient", iface.Name),
+			Name: fmt.Sprintf("New_%v_GRPCClient", iface.BaseName),
 			Arguments: []gocode.Variable{
 				{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}},
 				{Name: "addr", Type: &gocode.BasicType{Name: "string"}},

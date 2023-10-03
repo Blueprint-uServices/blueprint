@@ -23,7 +23,7 @@ func GenerateServerHandler(builder golang.ModuleBuilder, service *gocode.Service
 	server := &serverArgs{
 		Package: pkg,
 		Service: service,
-		Name:    service.Name + "_HTTPServerHandler",
+		Name:    service.BaseName + "_HTTPServerHandler",
 		Imports: gogen.NewImports(pkg.Name),
 	}
 
@@ -53,6 +53,7 @@ type {{.Name}} struct {
 	Service {{.Imports.NameOf .Service.UserType}}
 	Address string
 }
+slog.Info(fmt.Sprintf("BaseName is %v", service.BaseName))
 
 func New_{{.Name}}(ctx context.Context, service {{.Imports.NameOf .Service.UserType}}, serverAddress string) (*{{.Name}}, error) {
 	handler := &{{.Name}}{}
