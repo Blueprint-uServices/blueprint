@@ -21,9 +21,9 @@ func NewNonLeafServiceImpl(leafService LeafService) (NonLeafService, error) {
 }
 
 func (nl *NonLeafServiceImpl) Hello(ctx context.Context, a int64) (int64, error) {
-	retval, err := nl.leafService.HelloInt(ctx, a)
+	a, err := nl.leafService.HelloInt(ctx, a)
 	if err != nil {
-		return retval, err
+		return a, err
 	}
 
 	err = nl.leafService.HelloNothing(ctx)

@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"unicode"
 
 	"golang.org/x/mod/modfile"
 )
@@ -16,6 +17,11 @@ func Indent(str string, amount int) string {
 		lines[i] = strings.Repeat(" ", amount) + line
 	}
 	return strings.Join(lines, "\n")
+}
+
+func Capitalize(s string) string {
+	r := []rune(s)
+	return string(append([]rune{unicode.ToUpper(r[0])}, r[1:]...))
 }
 
 type SourceFileInfo struct {

@@ -3,7 +3,6 @@ package simplecache
 import (
 	"context"
 	"fmt"
-	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
@@ -26,24 +25,11 @@ func (cache *SimpleCache) Put(ctx context.Context, key string, value interface{}
 }
 
 func (cache *SimpleCache) Get(ctx context.Context, key string, val interface{}) error {
-	receiver_ptr := reflect.ValueOf(val)
-	if receiver_ptr.Kind() != reflect.Pointer || receiver_ptr.IsNil() {
-		return fmt.Errorf("invalid cache Get type %v", reflect.TypeOf(val))
+	if v, exists := cache.values[key]; exists {
+		return backend.CopyResult(v, val)
+	} else {
+		return backend.SetZero(val)
 	}
-	receiver_value := reflect.Indirect(receiver_ptr)
-
-	v, exists := cache.values[key]
-	if !exists {
-		receiver_value.SetZero()
-		return nil
-	}
-
-	actual_value := reflect.ValueOf(v)
-	if !actual_value.Type().AssignableTo(receiver_value.Type()) {
-		return fmt.Errorf("cache Get %v received incompatible types %v and %v", key, actual_value.Type(), receiver_value.Type())
-	}
-	receiver_value.Set(actual_value)
-	return nil
 }
 
 func (cache *SimpleCache) Mset(ctx context.Context, keys []string, values []interface{}) error {

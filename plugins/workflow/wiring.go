@@ -9,7 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
 )
 
-var workflowSpecModulePaths []string
+var workflowSpecModulePaths map[string]struct{}
 var workflowSpec *WorkflowSpec
 
 /*
@@ -24,11 +24,14 @@ are assumed to be **relative** to the calling file.
 This can be called more than once, which will concatenate all provided srcModulePaths
 */
 func Init(srcModulePaths ...string) {
+	if workflowSpecModulePaths == nil {
+		workflowSpecModulePaths = make(map[string]struct{})
+	}
 	_, callingFile, _, _ := runtime.Caller(1)
 	dir, _ := filepath.Split(callingFile)
 	for _, path := range srcModulePaths {
-		workflowPath := filepath.Join(dir, path)
-		workflowSpecModulePaths = append(workflowSpecModulePaths, workflowPath)
+		workflowPath := filepath.Clean(filepath.Join(dir, path))
+		workflowSpecModulePaths[workflowPath] = struct{}{}
 		fmt.Println("add workflow " + workflowPath)
 	}
 	workflowSpec = nil
@@ -44,7 +47,11 @@ func GetSpec() (*WorkflowSpec, error) {
 		return nil, blueprint.Errorf("workflow spec src directories haven't been specified; use workflow.Init(srcPath) to add your workflow spec")
 	}
 
-	spec, err := NewWorkflowSpec(workflowSpecModulePaths...)
+	var modulePaths []string
+	for modulePath := range workflowSpecModulePaths {
+		modulePaths = append(modulePaths, modulePath)
+	}
+	spec, err := NewWorkflowSpec(modulePaths...)
 	if err != nil {
 		return nil, err
 	}
