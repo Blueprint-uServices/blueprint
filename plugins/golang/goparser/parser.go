@@ -7,6 +7,7 @@ import (
 	"go/token"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
@@ -441,8 +442,10 @@ func (f *ParsedFile) ResolveType(expr ast.Expr) gocode.TypeName {
 		}
 	case *ast.FuncType:
 		return &gocode.FuncType{}
+	case *ast.StructType:
+		return &gocode.StructType{}
 	default:
-		fmt.Printf("unknown or invalid expr type %v\n", e)
+		fmt.Printf("unknown or invalid expr type %v %v\n", reflect.TypeOf(expr), expr)
 	}
 	return nil
 }
