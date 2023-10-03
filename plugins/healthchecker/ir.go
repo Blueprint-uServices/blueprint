@@ -53,7 +53,7 @@ func (node *HealthCheckerServerWrapper) GetGoInterface() *gocode.ServiceInterfac
 	if !valid {
 		slog.Error(blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.Wrapped.GetInterface()).Error())
 	}
-	i := gocode.CopyServiceInterface(fmt.Sprintf("%v_HealthCheckHandler", iface.BaseName), "", iface)
+	i := gocode.CopyServiceInterface(fmt.Sprintf("%v_HealthCheckHandler", iface.BaseName), node.outputPackage, iface)
 	health_check_method := &gocode.Func{}
 	health_check_method.Name = "Health"
 	health_check_method.Returns = append(health_check_method.Returns, gocode.Variable{Type: &gocode.BasicType{Name: "string"}})
@@ -91,7 +91,7 @@ func (node *HealthCheckerServerWrapper) AddInstantiation(builder golang.GraphBui
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
-			Name: fmt.Sprintf("New_%v_HealthCheckerHandler", service.Name),
+			Name: fmt.Sprintf("New_%v_HealthCheckHandler", service.Name),
 			Arguments: []gocode.Variable{
 				{Name: "service", Type: service},
 			},
@@ -147,7 +147,7 @@ func New_{{.Name}}(service {{.Imports.NameOf .Service.UserType}}) (*{{.Name}}, e
 {{$service := .Service.Name -}}
 {{$receiver := .Name -}}
 {{ range $_, $f := .Service.Methods }}
-func (handler *{{$receiver}}) {{$f.Name -}} (ctx context.Context, {{ArgVarsAndTypes $f}}) ({{RetTypes $f}}, error) {
+func (handler *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetTypes $f "error"}}) {
 	return handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
 }
 {{end}}
