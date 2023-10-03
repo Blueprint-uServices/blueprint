@@ -38,6 +38,7 @@ type (
 	// Implements service.ServiceInterface
 	ServiceInterface struct {
 		UserType // Has a Name and a Source location
+		BaseName string
 		Methods  map[string]Func
 	}
 )
@@ -52,6 +53,19 @@ func (s *ServiceInterface) GetMethods() []service.Method {
 		methods = append(methods, &method)
 	}
 	return methods
+}
+
+func (s *ServiceInterface) AddMethod(f Func) {
+	s.Methods[f.Name] = f
+}
+
+func CopyServiceInterface(name string, pkg string, s *ServiceInterface) *ServiceInterface {
+	new_s := &ServiceInterface{UserType{Name: name, Package: pkg}, s.BaseName, make(map[string]Func)}
+
+	for method_name, method := range s.Methods {
+		new_s.Methods[method_name] = method
+	}
+	return new_s
 }
 
 func (f *Func) GetName() string {

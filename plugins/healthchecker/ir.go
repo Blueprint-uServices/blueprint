@@ -21,26 +21,7 @@ type HealthCheckerServerWrapper struct {
 	InstanceName string
 	Wrapped      golang.Service
 
-	outputPackage   string
-	methodInterface HealthCheckerInterface
-}
-
-type HealthCheckerInterface struct {
-	*gocode.ServiceInterface
-	Wrapped service.ServiceInterface
-}
-
-func (i *HealthCheckerInterface) GetName() string {
-	return "healthcheck(" + i.Wrapped.GetName() + ")"
-}
-
-func (i *HealthCheckerInterface) GetMethods() []service.Method {
-	methods := i.Wrapped.GetMethods()
-	health_check_method := &gocode.Func{}
-	health_check_method.Arguments = append(health_check_method.Arguments, gocode.Variable{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}})
-	health_check_method.Returns = append(health_check_method.Returns, gocode.Variable{Type: &gocode.BasicType{Name: "error"}})
-	methods = append(methods, health_check_method)
-	return methods
+	outputPackage string
 }
 
 func (node *HealthCheckerServerWrapper) ImplementsGolangNode() {}
@@ -67,9 +48,21 @@ func newHealthCheckerServerWrapper(name string, server blueprint.IRNode) (*Healt
 	return node, nil
 }
 
+func (node *HealthCheckerServerWrapper) GetGoInterface() *gocode.ServiceInterface {
+	iface, valid := node.Wrapped.GetInterface().(*gocode.ServiceInterface)
+	if !valid {
+		slog.Error(blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.Wrapped.GetInterface()).Error())
+	}
+	i := gocode.CopyServiceInterface(fmt.Sprintf("%v_HealthCheckHandler", iface.BaseName), node.outputPackage, iface)
+	health_check_method := &gocode.Func{}
+	health_check_method.Name = "Health"
+	health_check_method.Returns = append(health_check_method.Returns, gocode.Variable{Type: &gocode.BasicType{Name: "string"}})
+	i.AddMethod(*health_check_method)
+	return i
+}
+
 func (node *HealthCheckerServerWrapper) GetInterface() service.ServiceInterface {
-	node.methodInterface = HealthCheckerInterface{Wrapped: node.Wrapped.GetInterface()}
-	return &node.methodInterface
+	return node.GetGoInterface()
 }
 
 func (node *HealthCheckerServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
@@ -154,8 +147,13 @@ func New_{{.Name}}(service {{.Imports.NameOf .Service.UserType}}) (*{{.Name}}, e
 {{$service := .Service.Name -}}
 {{$receiver := .Name -}}
 {{ range $_, $f := .Service.Methods }}
-func (handler *{{$receiver}}) {{$f.Name -}} (ctx context.Context, {{ArgVars $f}}) ({{RetVars $f}}, error) {
+func (handler *{{$receiver}}) {{$f.Name -}} (ctx context.Context, {{ArgVarsAndTypes $f}}) ({{RetTypes $f}}, error) {
 	return handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
 }
 {{end}}
+
+{{$receiver := .Name -}}
+func (handler *{{$receiver}}) Health(ctx context.Context) (string, error) {
+	return "Healthy", nil
+}
 `
