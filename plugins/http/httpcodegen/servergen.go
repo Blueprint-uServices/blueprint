@@ -100,7 +100,7 @@ func (handler *{{$receiver}}) {{$f.Name -}}
 	}
 	{{end}}
 	ctx := context.Background()
-	{{RetVars $f "err"}} := handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
+	{{RetVars $f "err"}} {{HasNewReturnVars $f}} handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return

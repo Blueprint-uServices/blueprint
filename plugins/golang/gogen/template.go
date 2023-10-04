@@ -70,6 +70,7 @@ func newTemplateExecutor(args any) *templateExecutor {
 	e.Funcs["SignatureWithRetVars"] = e.SignatureWithRetVars
 	e.Funcs["JsonField"] = e.JsonField
 	e.Funcs["Title"] = e.TitleCase
+	e.Funcs["HasNewReturnVars"] = e.HasNewReturnVars
 
 	return e
 }
@@ -190,6 +191,13 @@ func (e *templateExecutor) JsonField(name string) (string, error) {
 
 func (e *templateExecutor) TitleCase(arg string) (string, error) {
 	return strings.Title(arg), nil
+}
+
+func (e *templateExecutor) HasNewReturnVars(f gocode.Func) (string, error) {
+	if len(f.Returns) != 0 {
+		return ":=", nil
+	}
+	return "=", nil
 }
 
 // Looks for any field of type *Imports on the provided obj
