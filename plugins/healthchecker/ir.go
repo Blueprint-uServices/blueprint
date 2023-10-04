@@ -51,7 +51,7 @@ func (node *HealthCheckerServerWrapper) GetGoInterface() *gocode.ServiceInterfac
 	if !valid {
 		slog.Error(blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.Wrapped.GetInterface()).Error())
 	}
-	i := gocode.CopyServiceInterface(fmt.Sprintf("%v_HealthCheckHandler", iface.BaseName), node.outputPackage, iface)
+	i := gocode.CopyServiceInterface(fmt.Sprintf("%v_HealthChecker", iface.BaseName), node.outputPackage, iface)
 	health_check_method := &gocode.Func{}
 	health_check_method.Name = "Health"
 	health_check_method.Returns = append(health_check_method.Returns, gocode.Variable{Type: &gocode.BasicType{Name: "string"}})
@@ -64,10 +64,7 @@ func (node *HealthCheckerServerWrapper) GetInterface() service.ServiceInterface 
 }
 
 func (node *HealthCheckerServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
-	service, valid := node.Wrapped.GetInterface().(*gocode.ServiceInterface)
-	if !valid {
-		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.Wrapped.GetInterface())
-	}
+	service := node.GetGoInterface()
 	err := generateServerHandler(builder, service, node.outputPackage)
 	if err != nil {
 		return err
@@ -89,7 +86,7 @@ func (node *HealthCheckerServerWrapper) AddInstantiation(builder golang.GraphBui
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
-			Name: fmt.Sprintf("New_%v_HealthCheckHandler", service.Name),
+			Name: fmt.Sprintf("New_%v_HealthCheckHandler", service.BaseName),
 			Arguments: []gocode.Variable{
 				{Name: "service", Type: service},
 			},
