@@ -16,8 +16,8 @@ func Generator(wiring blueprint.WiringSpec, service string) string {
 
 	// Define the workload generator client node
 	wiring.Define(workloadClientName, &WorkloadgenClient{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		client, err := namespace.Get(service)
-		if err != nil {
+		var client blueprint.IRNode
+		if err := namespace.Get(service, &client); err != nil {
 			return nil, err
 		}
 

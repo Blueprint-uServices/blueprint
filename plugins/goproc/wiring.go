@@ -35,8 +35,8 @@ func CreateProcess(wiring blueprint.WiringSpec, procName string, children ...str
 			ptr := pointer.GetPointer(wiring, childName)
 			if ptr == nil {
 				// for non-pointer types, just get the child node
-				_, err := process.Get(childName)
-				if err != nil {
+				var child blueprint.IRNode
+				if err := process.Get(childName, &child); err != nil {
 					return nil, err
 				}
 			} else {
@@ -73,8 +73,8 @@ func CreateClientProcess(wiring blueprint.WiringSpec, procName string, children 
 
 		// Instantiate all of the child nodes.  If the child node hasn't actually been defined, then this will error out
 		for _, childName := range childNames {
-			_, err := process.Get(childName)
-			if err != nil {
+			var child blueprint.IRNode
+			if err := process.Get(childName, &child); err != nil {
 				return nil, err
 			}
 		}

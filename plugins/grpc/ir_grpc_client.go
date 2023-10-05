@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"fmt"
-	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
@@ -29,12 +28,7 @@ type GolangClient struct {
 	outputPackage string
 }
 
-func newGolangClient(name string, serverAddr blueprint.IRNode) (*GolangClient, error) {
-	addr, is_addr := serverAddr.(*GolangServerAddress)
-	if !is_addr {
-		return nil, blueprint.Errorf("GRPC client %s expected %s to be an address, but got %s", name, serverAddr.Name(), reflect.TypeOf(serverAddr).String())
-	}
-
+func newGolangClient(name string, addr *GolangServerAddress) (*GolangClient, error) {
 	node := &GolangClient{}
 	node.InstanceName = name
 	node.ServerAddr = addr

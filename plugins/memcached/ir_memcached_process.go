@@ -1,9 +1,6 @@
 package memcached
 
 import (
-	"reflect"
-
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
 )
@@ -17,15 +14,10 @@ type MemcachedProcess struct {
 	Addr         *MemcachedAddr
 }
 
-func newMemcachedProcess(name string, addr blueprint.IRNode) (*MemcachedProcess, error) {
-	addrNode, is_addr := addr.(*MemcachedAddr)
-	if !is_addr {
-		return nil, blueprint.Errorf("%s expected %s to be an address but found %s", name, addr.Name(), reflect.TypeOf(addr).String())
-	}
-
+func newMemcachedProcess(name string, addr *MemcachedAddr) (*MemcachedProcess, error) {
 	proc := &MemcachedProcess{}
 	proc.InstanceName = name
-	proc.Addr = addrNode
+	proc.Addr = addr
 	return proc, nil
 }
 
