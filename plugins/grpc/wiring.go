@@ -4,6 +4,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
 
@@ -32,12 +33,12 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 
 	// Define the client wrapper
 	wiring.Define(grpcClient, &GolangClient{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		server, err := namespace.Get(clientNext)
-		if err != nil {
-			return nil, err
+		var addr *GolangServerAddress
+		if err := namespace.Get(clientNext, &addr); err != nil {
+			return nil, blueprint.Errorf("GRPC client %s expected %s to be an address, but encountered %s", grpcClient, clientNext, err)
 		}
 
-		return newGolangClient(grpcClient, server)
+		return newGolangClient(grpcClient, addr)
 	})
 
 	// Add the server wrapper to the pointer dst
@@ -45,14 +46,14 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 
 	// Define the server
 	wiring.Define(grpcServer, &GolangServer{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := namespace.Get(grpcAddr)
-		if err != nil {
-			return nil, err
+		var addr *GolangServerAddress
+		if err := namespace.Get(grpcAddr, &addr); err != nil {
+			return nil, blueprint.Errorf("GRPC server %s expected %s to be an address, but encountered %s", grpcServer, grpcAddr, err)
 		}
 
-		wrapped, err := namespace.Get(serverNext)
-		if err != nil {
-			return nil, err
+		var wrapped golang.Service
+		if err := namespace.Get(serverNext, &wrapped); err != nil {
+			return nil, blueprint.Errorf("GRPC server %s expected %s to be a golang.Service, but encountered %s", grpcServer, serverNext, err)
 		}
 
 		return newGolangServer(grpcServer, addr, wrapped)

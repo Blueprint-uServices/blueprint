@@ -54,28 +54,18 @@ func RequireUniqueness(wiring blueprint.WiringSpec, alias string, visibility any
 
 	checkName := name + ".uniqueness_check"
 	wiring.Define(checkName, def.NodeType, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		md, err := namespace.Get(mdName)
-		if err != nil {
-			return nil, err
+		var md *VisibilityMetadata
+		if err := namespace.Get(mdName, &md); err != nil {
+			return nil, blueprint.Errorf("expected %v to be uniqueness metadata but got %v", mdName, err)
 		}
 
-		mdNode, ok := md.(*VisibilityMetadata)
-		if !ok {
-			return nil, blueprint.Errorf("expected %v to be uniqueness metadata but got %v", mdName, mdNode)
+		if md.node != nil {
+			return nil, blueprint.Errorf("reachability error detected for %s; %s is configured to be unique but cannot be simultaneously reached from namespaces %s and %s; fix by disabling uniqueness for %s or exposing %s over RPC", name, name, namespace.Name(), md.namespace.Name(), name, name)
 		}
 
-		if mdNode.node != nil {
-			return nil, blueprint.Errorf("reachability error detected for %s; %s is configured to be unique but cannot be simultaneously reached from namespaces %s and %s; fix by disabling uniqueness for %s or exposing %s over RPC", name, name, namespace.Name(), mdNode.namespace.Name(), name, name)
-		}
-
-		node, err := namespace.Get(name)
-		if err != nil {
-			return nil, err
-		}
-
-		mdNode.node = node
-		mdNode.namespace = namespace
-		return node, nil
+		md.namespace = namespace
+		err := namespace.Get(name, &md.node)
+		return md.node, err
 	})
 
 	wiring.Alias(alias, checkName)

@@ -3,7 +3,6 @@ package http
 import (
 	"errors"
 	"fmt"
-	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
@@ -25,12 +24,7 @@ type GolangHttpClient struct {
 	outputPackage string
 }
 
-func newGolangHttpClient(name string, serverAddr blueprint.IRNode) (*GolangHttpClient, error) {
-	addr, is_addr := serverAddr.(*GolangHttpServerAddress)
-	if !is_addr {
-		return nil, errors.New(fmt.Sprintf("HTTP client %s expected %s to be an address, but got %s", name, serverAddr.Name(), reflect.TypeOf(serverAddr).String()))
-	}
-
+func newGolangHttpClient(name string, addr *GolangHttpServerAddress) (*GolangHttpClient, error) {
 	node := &GolangHttpClient{}
 	node.InstanceName = name
 	node.ServerAddr = addr

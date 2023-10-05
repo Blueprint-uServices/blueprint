@@ -78,11 +78,11 @@ func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, servic
 		// For arguments that are pointer types, this will only get the caller-side of the pointer
 		var arg_nodes []blueprint.IRNode
 		for _, arg_name := range serviceArgs {
-			node, err := namespace.Get(arg_name)
-			if err != nil {
+			var arg blueprint.IRNode
+			if err := namespace.Get(arg_name, &arg); err != nil {
 				return nil, err
 			}
-			arg_nodes = append(arg_nodes, node)
+			arg_nodes = append(arg_nodes, arg)
 		}
 
 		// Instantiate and return the service
@@ -107,12 +107,14 @@ func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, servic
 	includeDependencies := serviceName + ".includedependencies"
 	clientNext := ptr.AddSrcModifier(wiring, includeDependencies)
 	wiring.Define(includeDependencies, &WorkflowService{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		_, err := namespace.Get(dependencies)
-		if err != nil {
+		var deps blueprint.IRNode
+		if err := namespace.Get(dependencies, &deps); err != nil {
 			return nil, err
 		}
 
-		return namespace.Get(clientNext)
+		var node blueprint.IRNode
+		err := namespace.Get(clientNext, &node)
+		return node, err
 	})
 
 	return serviceName

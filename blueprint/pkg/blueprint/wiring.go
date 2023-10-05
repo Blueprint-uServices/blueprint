@@ -242,8 +242,8 @@ func (blueprint *Blueprint) Instantiate(names ...string) {
 		nameToGet := name
 		blueprint.applicationNamespace.Defer(func() error {
 			blueprint.applicationNamespace.Info("Instantiating %v", nameToGet)
-			_, err := blueprint.applicationNamespace.Get(nameToGet)
-			return err
+			var node IRNode
+			return blueprint.applicationNamespace.Get(nameToGet, &node)
 		})
 	}
 }
@@ -255,8 +255,8 @@ func (blueprint *Blueprint) InstantiateAll() {
 		nameToGet := name
 		blueprint.applicationNamespace.Defer(func() error {
 			blueprint.applicationNamespace.Info("Instantiating %v", nameToGet)
-			_, err := blueprint.applicationNamespace.Get(nameToGet)
-			return err
+			var node IRNode
+			return blueprint.applicationNamespace.Get(nameToGet, &node)
 		})
 	}
 }

@@ -40,13 +40,12 @@ func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst st
 	wiring.Alias(ptr.srcTail, ptr.dstHead)
 
 	wiring.Define(name, ptrType, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		node, err := namespace.Get(ptr.srcHead)
-		if err != nil {
+		var node blueprint.IRNode
+		if err := namespace.Get(ptr.srcHead, &node); err != nil {
 			return nil, err
 		}
 
 		namespace.Defer(func() error {
-			// TODO: this only needs to happen once
 			_, err := ptr.InstantiateDst(namespace)
 			return err
 		})
@@ -90,13 +89,11 @@ func (ptr *PointerDef) AddDstModifier(wiring blueprint.WiringSpec, modifierName 
 func (ptr *PointerDef) InstantiateDst(namespace blueprint.Namespace) (blueprint.IRNode, error) {
 	namespace.Info("Instantiating pointer %s.dst from namespace %s", ptr.name, namespace.Name())
 	for _, modifier := range ptr.dstModifiers {
-		node, err := namespace.Get(modifier)
-		if err != nil {
-			return nil, err
-		}
+		var addr address.Address
+		err := namespace.Get(modifier, &addr)
 
-		addr, is_addr := node.(address.Address)
-		if is_addr {
+		// Want to find the final dstModifier that points to an address, then instantiate the address
+		if err == nil {
 			dstName, err := address.DestinationOf(namespace, modifier)
 			if err != nil {
 				return nil, err
@@ -106,8 +103,8 @@ func (ptr *PointerDef) InstantiateDst(namespace blueprint.Namespace) (blueprint.
 				namespace.Info("Destination %s of %s has already been instantiated", dstName, addr.Name())
 				return nil, nil
 			} else {
-				dst, err := namespace.Instantiate(dstName)
-				if err != nil {
+				var dst blueprint.IRNode
+				if err := namespace.Instantiate(dstName, &dst); err != nil {
 					return nil, err
 				}
 				err = addr.SetDestination(dst)
@@ -118,5 +115,7 @@ func (ptr *PointerDef) InstantiateDst(namespace blueprint.Namespace) (blueprint.
 		}
 	}
 
-	return namespace.Get(ptr.dst)
+	var node blueprint.IRNode
+	err := namespace.Get(ptr.dst, &node)
+	return node, err
 }

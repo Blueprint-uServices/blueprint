@@ -2,10 +2,8 @@ package memcached
 
 import (
 	"bytes"
-	"reflect"
 	"text/template"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
@@ -22,15 +20,10 @@ type MemcachedGoClient struct {
 	Addr         *MemcachedAddr
 }
 
-func newMemcachedGoClient(name string, addr blueprint.IRNode) (*MemcachedGoClient, error) {
-	addrNode, is_addr := addr.(*MemcachedAddr)
-	if !is_addr {
-		return nil, blueprint.Errorf("%s expected %s to be an address but found %s", name, addr.Name(), reflect.TypeOf(addr).String())
-	}
-
+func newMemcachedGoClient(name string, addr *MemcachedAddr) (*MemcachedGoClient, error) {
 	client := &MemcachedGoClient{}
 	client.InstanceName = name
-	client.Addr = addrNode
+	client.Addr = addr
 	return client, nil
 }
 

@@ -17,11 +17,10 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 
 	// First define the process
 	wiring.Define(procName, &MemcachedProcess{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := namespace.Get(addrName)
-		if err != nil {
-			return nil, err
+		var addr *MemcachedAddr
+		if err := namespace.Get(addrName, &addr); err != nil {
+			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", procName, addrName, err)
 		}
-
 		return newMemcachedProcess(procName, addr)
 	})
 
@@ -49,12 +48,11 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 
 	// Define the memcached go client
 	wiring.Define(clientName, &MemcachedGoClient{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		server, err := namespace.Get(clientNext)
-		if err != nil {
-			return nil, err
+		var addr *MemcachedAddr
+		if err := namespace.Get(clientNext, &addr); err != nil {
+			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", clientName, clientNext, err)
 		}
-
-		return newMemcachedGoClient(clientName, server)
+		return newMemcachedGoClient(clientName, addr)
 	})
 
 	return cacheName

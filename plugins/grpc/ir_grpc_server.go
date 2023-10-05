@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"fmt"
-	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
@@ -44,17 +43,7 @@ func (grpc *GRPCInterface) GetMethods() []service.Method {
 	return grpc.Wrapped.GetMethods()
 }
 
-func newGolangServer(name string, serverAddr blueprint.IRNode, wrapped blueprint.IRNode) (*GolangServer, error) {
-	addr, is_addr := serverAddr.(*GolangServerAddress)
-	if !is_addr {
-		return nil, blueprint.Errorf("GRPC server %s expected %s to be an address, but got %s", name, serverAddr.Name(), reflect.TypeOf(serverAddr).String())
-	}
-
-	service, is_service := wrapped.(golang.Service)
-	if !is_service {
-		return nil, blueprint.Errorf("GRPC server %s expected %s to be a golang service, but got %s", name, wrapped.Name(), reflect.TypeOf(wrapped).String())
-	}
-
+func newGolangServer(name string, addr *GolangServerAddress, service golang.Service) (*GolangServer, error) {
 	node := &GolangServer{}
 	node.InstanceName = name
 	node.Addr = addr

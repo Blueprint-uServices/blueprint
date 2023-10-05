@@ -22,8 +22,8 @@ Most namespace implementations should extend the BasicNamespace struct
 */
 type Namespace interface {
 	Name() string                                         // The name of this namespace
-	Get(name string) (IRNode, error)                      // Get a node from this namespace or a parent namespace, possibly building it
-	Instantiate(name string) (IRNode, error)              // The same as Get, but without creating a dependency (an edge) into the current namespace
+	Get(name string, dst any) error                       // Get an IRNode from this namespace or a parent namespace, possibly building it.  Places the IRNode in the pointer dst.  dst can be an IRNode or any implementation of an IRNode
+	Instantiate(name string, dst any) error               // The same as Get, but without creating a dependency (an edge) into the current namespace.  Places the IRNode in the pointer dst.  dst can be an IRNode or any implementation of an IRNode
 	GetProperty(name string, key string, dst any) error   // Get a property from this namespace; dst should be a pointer to value
 	GetProperties(name string, key string, dst any) error // Get a slice property from this namespace; dst should be a pointer to a slice
 	Put(name string, node IRNode) error                   // Put a node into this namespace
@@ -144,24 +144,24 @@ func (namespace *SimpleNamespace) Name() string {
 	return namespace.NamespaceName
 }
 
-func (namespace *SimpleNamespace) Instantiate(name string) (IRNode, error) {
-	return namespace.get(name, false)
+func (namespace *SimpleNamespace) Instantiate(name string, dst any) error {
+	return namespace.get(name, false, dst)
 }
 
-func (namespace *SimpleNamespace) Get(name string) (IRNode, error) {
-	return namespace.get(name, true)
+func (namespace *SimpleNamespace) Get(name string, dst any) error {
+	return namespace.get(name, true, dst)
 }
 
-func (namespace *SimpleNamespace) get(name string, addEdge bool) (IRNode, error) {
+func (namespace *SimpleNamespace) get(name string, addEdge bool, dst any) error {
 	// If it already exists, return it
 	if node, ok := namespace.Seen[name]; ok {
-		return node, nil
+		return copyResult(node, dst)
 	}
 
 	// Look up the definition
 	def, err := namespace.Handler.LookupDef(name)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// Track the defs being built
@@ -173,25 +173,29 @@ func (namespace *SimpleNamespace) get(name string, addEdge bool) (IRNode, error)
 	// If it's an alias, get the aliased node
 	if def.Name != name {
 		namespace.Info("Resolved %s to %s", name, def.Name)
-		node, err := namespace.get(def.Name, addEdge)
+		var node IRNode
+		err := namespace.get(def.Name, addEdge, &node)
 		namespace.Seen[name] = node
-		return node, err
+		if err != nil {
+			return err
+		}
+		return copyResult(node, dst)
 	}
 
 	// See if the node should be created here or in the parent
 	if !namespace.Handler.Accepts(def.NodeType) {
 		if namespace.ParentNamespace == nil {
-			return nil, namespace.Error("Namespace does not accept node %s of type %s but there is no parent namespace to get them from", name, reflect.TypeOf(def.NodeType).String())
+			return namespace.Error("Namespace does not accept node %s of type %s but there is no parent namespace to get them from", name, reflect.TypeOf(def.NodeType).String())
 		}
 		namespace.Info("Getting %s of type %s from parent namespace %s", name, reflect.TypeOf(def.NodeType).String(), namespace.ParentNamespace.Name())
 		var node IRNode
 		if addEdge {
-			node, err = namespace.ParentNamespace.Get(name)
+			err = namespace.ParentNamespace.Get(name, &node)
 		} else {
-			node, err = namespace.ParentNamespace.Instantiate(name)
+			err = namespace.ParentNamespace.Instantiate(name, &node)
 		}
 		if err != nil {
-			return nil, err
+			return err
 		}
 		if _, already_added := namespace.Added[node.Name()]; !already_added {
 			if _, is_metadata := node.(IRMetadata); !is_metadata && addEdge {
@@ -201,7 +205,7 @@ func (namespace *SimpleNamespace) get(name string, addEdge bool) (IRNode, error)
 			namespace.Added[node.Name()] = true
 		}
 		namespace.Seen[name] = node
-		return node, nil
+		return copyResult(node, dst)
 	}
 
 	if def.Name == name {
@@ -214,7 +218,7 @@ func (namespace *SimpleNamespace) get(name string, addEdge bool) (IRNode, error)
 	node, err := def.Build(namespace)
 	if err != nil {
 		namespace.Error("Unable to build %v: %s", name, err.Error())
-		return nil, err
+		return err
 	}
 
 	if _, already_added := namespace.Added[node.Name()]; !already_added {
@@ -223,8 +227,7 @@ func (namespace *SimpleNamespace) get(name string, addEdge bool) (IRNode, error)
 	}
 	namespace.Info("Finished building %s of type %s", name, reflect.TypeOf(node).String())
 	namespace.Seen[name] = node
-
-	return node, nil
+	return copyResult(node, dst)
 }
 
 func (namespace *SimpleNamespace) Put(name string, node IRNode) error {

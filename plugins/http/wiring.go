@@ -1,9 +1,13 @@
 package http
 
 import (
+	"errors"
+	"fmt"
+
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
 
@@ -29,11 +33,11 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 
 	// Define the client wrapper
 	wiring.Define(httpClient, &GolangHttpClient{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		server, err := ns.Get(clientNext)
-		if err != nil {
-			return nil, err
+		var addr *GolangHttpServerAddress
+		if err := ns.Get(clientNext, &addr); err != nil {
+			return nil, errors.New(fmt.Sprintf("HTTP client %s expected %s to be an address, but encountered %s", httpClient, clientNext, err))
 		}
-		return newGolangHttpClient(httpClient, server)
+		return newGolangHttpClient(httpClient, addr)
 	})
 
 	// Add the server wrapper to the pointer dst
@@ -41,14 +45,14 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 
 	// Define the server
 	wiring.Define(httpServer, &GolangHttpServer{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := ns.Get(httpAddr)
-		if err != nil {
-			return nil, err
+		var addr *GolangHttpServerAddress
+		if err := ns.Get(httpAddr, &addr); err != nil {
+			return nil, errors.New(fmt.Sprintf("HTTP server %s expected %s to be an address, but encountered %s", httpServer, httpAddr, err))
 		}
 
-		wrapped, err := ns.Get(serverNext)
-		if err != nil {
-			return nil, err
+		var wrapped golang.Service
+		if err := ns.Get(serverNext, &wrapped); err != nil {
+			return nil, errors.New(fmt.Sprintf("HTTP server %s expected %s to be a golang.Service, but encountered %s", httpServer, serverNext, err))
 		}
 
 		return newGolangHttpServer(httpServer, addr, wrapped)
