@@ -1,11 +1,9 @@
 package http
 
 import (
-	"errors"
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -41,20 +39,25 @@ func (n *GolangHttpClient) Name() string {
 	return n.InstanceName
 }
 
-func (n *GolangHttpClient) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
-	return n.GetGoInterface(visitor)
-}
-
-func (n *GolangHttpClient) GetGoInterface(visitor irutil.BuildContext) *gocode.ServiceInterface {
-	http, isHttp := n.ServerAddr.GetInterface(visitor).(*HttpInterface)
+func (node *GolangHttpClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	iface, err := node.ServerAddr.GetInterface(ctx)
+	if err != nil {
+		return nil, err
+	}
+	http, isHttp := iface.(*HttpInterface)
 	if !isHttp {
-		return nil
+		return nil, fmt.Errorf("http client expected an HTTP interface from %v but found %v", node.ServerAddr.Name(), iface)
 	}
 	wrapped, isValid := http.Wrapped.(*gocode.ServiceInterface)
 	if !isValid {
-		return nil
+		return nil, fmt.Errorf("http client expected the server's HTTP interface to wrap a gocode interface but found %v", http)
 	}
-	return wrapped
+	return wrapped, nil
+}
+
+// Just makes sure that the interface exposed by the server is included in the built module
+func (node *GolangHttpClient) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.ServerAddr.Server.Wrapped.AddInterfaces(builder)
 }
 
 func (node *GolangHttpClient) GenerateFuncs(builder golang.ModuleBuilder) error {
@@ -62,12 +65,12 @@ func (node *GolangHttpClient) GenerateFuncs(builder golang.ModuleBuilder) error 
 		return nil
 	}
 
-	service := node.GetGoInterface(builder)
-	if service == nil {
-		return errors.New(fmt.Sprintf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.ServerAddr.GetInterface(builder)))
+	iface, err := golang.GetGoInterface(builder, node)
+	if err != nil {
+		return err
 	}
 
-	return httpcodegen.GenerateClient(builder, service, node.outputPackage)
+	return httpcodegen.GenerateClient(builder, iface, node.outputPackage)
 }
 
 func (node *GolangHttpClient) AddInstantiation(builder golang.GraphBuilder) error {
@@ -76,10 +79,15 @@ func (node *GolangHttpClient) AddInstantiation(builder golang.GraphBuilder) erro
 		return nil
 	}
 
+	iface, err := golang.GetGoInterface(builder, node)
+	if err != nil {
+		return err
+	}
+
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
-			Name: fmt.Sprintf("New_%v_HTTPClient", node.GetGoInterface(builder).Name),
+			Name: fmt.Sprintf("New_%v_HTTPClient", iface.Name),
 			Arguments: []gocode.Variable{
 				{Name: "addr", Type: &gocode.BasicType{Name: "string"}},
 			},

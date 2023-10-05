@@ -6,31 +6,16 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 	"golang.org/x/exp/slog"
 )
 
-/*
-A base IRNode that is responsible for including workflow spec modules in
-generated code.
-
-This is used by both the caller side of a service and the service itself,
-since both sides need to know the workflow spec's interfaces.
-
-It hooks into artifact generation, but only to add copy the workflow
-spec module into the output directory.  It does not have any
-runtime instances or nodes.
-*/
-type WorkflowSpecNode struct {
+// This Node represents a Golang Workflow spec service in the Blueprint IR.
+type WorkflowService struct {
 	// IR node types
-	golang.Node
-
-	// Interfaces for generating Golang artifacts
-	golang.ProvidesModule
+	golang.Service
 
 	InstanceName string // Name of this instance
 	ServiceType  string // The short-name serviceType used to initialize this workflow service
@@ -40,17 +25,6 @@ type WorkflowSpecNode struct {
 
 	// The workflow spec where this service originated
 	Spec *WorkflowSpec
-}
-
-// This Node represents a Golang Workflow spec service in the Blueprint IR.
-type WorkflowService struct {
-	WorkflowSpecNode
-
-	// Additional IR node types
-	golang.Service
-
-	// Additional interfaces for generating Golang artifacts
-	golang.Instantiable
 
 	// IR Nodes of arguments that will be passed in to the generated code
 	Args []blueprint.IRNode
@@ -60,13 +34,25 @@ type WorkflowService struct {
 A node representing the server-side of a workflow service.
 */
 func newWorkflowService(name string, serviceType string, args []blueprint.IRNode) (*WorkflowService, error) {
-	node := &WorkflowService{}
-	err := node.init(name, serviceType)
+	// Look up the service details; errors out if the service doesn't exist
+	spec, err := GetSpec()
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO: can eagerly typecheck args here
+	details, err := spec.Get(serviceType)
+	if err != nil {
+		return nil, err
+	}
+
+	node := &WorkflowService{
+		InstanceName: name,
+		ServiceType:  serviceType,
+		ServiceInfo:  details,
+		Spec:         spec,
+	}
+
+	// TODO: could optionally eagerly typecheck args here
 	if len(node.ServiceInfo.Constructor.Arguments) != len(args) {
 		var argStrings []string
 		for _, arg := range args {
@@ -79,67 +65,16 @@ func newWorkflowService(name string, serviceType string, args []blueprint.IRNode
 	return node, nil
 }
 
-/*
-A node representnig the client-side of a workflow service.
-
-All this node does is include the interface definitions of the service
-*/
-func includeWorkflowDependencies(name string, serviceType string) (*WorkflowSpecNode, error) {
-	node := &WorkflowSpecNode{}
-	err := node.init(name+".client_dependencies", serviceType)
-	return node, err
-}
-
-func (node *WorkflowSpecNode) init(name string, serviceType string) error {
-	// Look up the service details; errors out if the service doesn't exist
-	spec, err := GetSpec()
-	if err != nil {
-		return err
-	}
-	details, err := spec.Get(serviceType)
-	if err != nil {
-		return err
-	}
-
-	node.InstanceName = name
-	node.ServiceType = serviceType
-	node.ServiceInfo = details
-	node.Spec = spec
-	return nil
-}
-
-func (node *WorkflowSpecNode) Name() string {
-	return node.InstanceName
-}
-
 func (node *WorkflowService) Name() string {
 	return node.InstanceName
 }
 
-func (node *WorkflowService) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
-	return node.GetGoInterface(visitor)
+func (node *WorkflowService) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	return node.ServiceInfo.Iface.ServiceInterface(ctx), nil
 }
 
-func (node *WorkflowService) GetGoInterface(visitor irutil.BuildContext) *gocode.ServiceInterface {
-	return node.ServiceInfo.Iface.ServiceInterface(visitor)
-}
-
-func addToWorkspace(builder golang.WorkspaceBuilder, mod *goparser.ParsedModule) error {
-	if builder.Visited(mod.Name) {
-		return nil
-	}
-	_, subdir := filepath.Split(mod.SrcDir)
-	slog.Info(fmt.Sprintf("Copying local module %v to workspace", subdir))
-	return builder.AddLocalModule(subdir, mod.SrcDir)
-}
-
-/*
-Part of artifact generation.  Used by both the client and server side.
-Adds the modules containing the workflow's interfaces to the workspace
-*/
-func (node *WorkflowSpecNode) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	// Add the interfaces to the workspace
-	return addToWorkspace(builder, node.ServiceInfo.Iface.File.Package.Module)
+func (node *WorkflowService) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.AddToWorkspace(builder.Workspace())
 }
 
 /*
@@ -148,23 +83,28 @@ to the workspace.  Most likely the constructor resides in the same module as
 the interfaces, but in case it doesn't, it will add the correct module
 */
 func (node *WorkflowService) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	// Add the interfaces to the workspace
-	err := node.WorkflowSpecNode.AddToWorkspace(builder)
+	// Add blueprint runtime to the workspace
+	err := golang.AddRuntimeModule(builder)
 	if err != nil {
 		return err
 	}
 
-	// Add blueprint runtime to the workspace
-	if !builder.Visited("runtime") {
-		slog.Info("Copying local module runtime to workspace")
-		err = builder.AddLocalModuleRelative("runtime", "../../../runtime")
-		if err != nil {
-			return err
-		}
+	modulesToAdd := []*goparser.ParsedModule{
+		node.ServiceInfo.Iface.File.Package.Module,
+		node.ServiceInfo.Constructor.File.Package.Module,
 	}
 
-	// Copy the impl module into the workspace (if it's different)
-	return addToWorkspace(builder, node.ServiceInfo.Constructor.File.Package.Module)
+	for _, mod := range modulesToAdd {
+		if !builder.Visited(mod.Name) {
+			_, subdir := filepath.Split(mod.SrcDir)
+			slog.Info(fmt.Sprintf("Copying local module %v to workspace", subdir))
+			err := builder.AddLocalModule(subdir, mod.SrcDir)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func (node *WorkflowService) AddInstantiation(builder golang.GraphBuilder) error {
@@ -195,10 +135,5 @@ func (n *WorkflowService) String() string {
 	return b.String()
 }
 
-func (n *WorkflowSpecNode) String() string {
-	return "import " + n.ServiceInfo.Iface.Name
-}
-
-func (node *WorkflowSpecNode) ImplementsGolangNode()   {}
 func (node *WorkflowService) ImplementsGolangNode()    {}
 func (node *WorkflowService) ImplementsGolangService() {}

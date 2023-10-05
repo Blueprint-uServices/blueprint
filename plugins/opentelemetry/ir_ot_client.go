@@ -7,16 +7,13 @@ import (
 	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"golang.org/x/exp/slog"
 )
 
 type OpenTelemetryClientWrapper struct {
 	golang.Service
-	golang.GeneratesInterfaces
 	golang.GeneratesFuncs
 
 	WrapperName string
@@ -50,24 +47,24 @@ func (node *OpenTelemetryClientWrapper) String() string {
 	return node.Name() + " = OTClientWrapper(" + node.Server.Name() + ", " + node.Collector.Name() + ")"
 }
 
-func (node *OpenTelemetryClientWrapper) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
+func (node *OpenTelemetryClientWrapper) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
 	// TODO: unwrap server interface to remove tracing stuff
-	return node.Server.GetInterface(visitor)
-}
-
-func (n *OpenTelemetryClientWrapper) GetGoInterface() *gocode.ServiceInterface {
-	// TODO: return memcached interface
-	return nil
+	return node.Server.GetInterface(ctx)
 }
 
 // Part of code generation compilation pass; creates the interface definition code for the wrapper,
 // and any new generated structs that are exposed and can be used by other IRNodes
-func (node *OpenTelemetryClientWrapper) GenerateInterfaces(builder golang.ModuleBuilder) error {
+func (node *OpenTelemetryClientWrapper) AddInterfaces(builder golang.ModuleBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.WrapperName + ".GenerateInterfaces") {
 		return nil
 	}
 	slog.Info(fmt.Sprintf("GenerateInterfaces %v\n", node))
+
+	err := node.Server.AddInterfaces(builder)
+	if err != nil {
+		return err
+	}
 
 	// TODO: Generate the extended service interface that includes extra arguments and any structs that are used in that interface
 

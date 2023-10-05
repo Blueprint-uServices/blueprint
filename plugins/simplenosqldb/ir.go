@@ -3,11 +3,12 @@ package simplenosqldb
 import (
 	"fmt"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 	"golang.org/x/exp/slog"
 )
@@ -22,8 +23,8 @@ type SimpleNoSQLDB struct {
 
 	InstanceName string
 
-	Iface       *gocode.ServiceInterface // The NoSQLDB interface
-	Constructor *gocode.Constructor      // Constructor for this SimpleNoSQLDB implementation
+	Iface       *goparser.ParsedInterface // The NoSQLDB interface
+	Constructor *gocode.Constructor       // Constructor for this SimpleNoSQLDB implementation
 }
 
 func newSimpleNoSQLDB(name string) (*SimpleNoSQLDB, error) {
@@ -51,7 +52,7 @@ func (node *SimpleNoSQLDB) init(name string) error {
 	}
 
 	node.InstanceName = name
-	node.Iface = details.Iface.ServiceInterface(&irutil.NullBuildContext{})
+	node.Iface = details.Iface
 	node.Constructor = details.Constructor.AsConstructor()
 	return nil
 }
@@ -60,22 +61,18 @@ func (node *SimpleNoSQLDB) Name() string {
 	return node.InstanceName
 }
 
-func (node *SimpleNoSQLDB) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
-	return node.GetGoInterface(visitor)
-}
-
-func (node *SimpleNoSQLDB) GetGoInterface(visitor irutil.BuildContext) *gocode.ServiceInterface {
-	return node.Iface
+func (node *SimpleNoSQLDB) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	return node.Iface.ServiceInterface(ctx), nil
 }
 
 /* The nosqldb interface and SimpleNoSQLDB implementation exist in the runtime package */
 func (node *SimpleNoSQLDB) AddToWorkspace(builder golang.WorkspaceBuilder) error {
 	// Add blueprint runtime to the workspace
-	if !builder.Visited("runtime") {
-		slog.Info("Copying local module runtime to workspace")
-		return builder.AddLocalModuleRelative("runtime", "../../../runtime")
-	}
-	return nil
+	return golang.AddRuntimeModule(builder)
+}
+
+func (node *SimpleNoSQLDB) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.AddToWorkspace(builder.Workspace())
 }
 
 func (node *SimpleNoSQLDB) AddInstantiation(builder golang.GraphBuilder) error {

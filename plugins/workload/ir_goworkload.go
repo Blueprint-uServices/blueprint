@@ -34,14 +34,24 @@ func NewWorkloadGenerator(name string, node blueprint.IRNode) (*WorkloadgenClien
 	workload.outputPackage = "workloadgen"
 	return workload, nil
 }
+
+func (node *WorkloadgenClient) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.Wrapped.AddInterfaces(builder)
+}
+
 func (node *WorkloadgenClient) GenerateFuncs(builder golang.ModuleBuilder) error {
+	iface, err := golang.GetGoInterface(builder, node.Wrapped)
+	if err != nil {
+		return err
+	}
+
 	// Only generate the workload code for this instance once
-	if builder.Visited(node.Wrapped.GetInterface(builder).GetName() + ".workloadgen") {
+	if builder.Visited(iface.GetName() + ".workloadgen") {
 		return nil
 	}
 
 	// Generate the code
-	return GenerateWorkloadgenCode(builder, node.Wrapped.GetGoInterface(builder), "workloadgen")
+	return GenerateWorkloadgenCode(builder, iface, "workloadgen")
 }
 
 // Provides the golang code to instantiate the workloadgen client
@@ -51,12 +61,16 @@ func (node *WorkloadgenClient) AddInstantiation(builder golang.GraphBuilder) err
 		return nil
 	}
 
-	service := node.Wrapped.GetGoInterface(builder)
+	iface, err := golang.GetGoInterface(builder, node.Wrapped)
+	if err != nil {
+		return err
+	}
+
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
-			Name:      fmt.Sprintf("New_%v_WorkloadGenerator", service.Name),
-			Arguments: []gocode.Variable{{Name: "service", Type: service}},
+			Name:      fmt.Sprintf("New_%v_WorkloadGenerator", iface.Name),
+			Arguments: []gocode.Variable{{Name: "service", Type: iface}},
 		},
 	}
 

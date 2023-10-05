@@ -11,7 +11,6 @@ import (
 
 	cp "github.com/otiai10/copy"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 	"golang.org/x/mod/modfile"
@@ -23,8 +22,7 @@ Implements the WorkspaceBuilder interface defined in golang/ir.go
 The WorkspaceBuilder is used for accumulating local module directories into a golang workspace.
 */
 type WorkspaceBuilderImpl struct {
-	golang.WorkspaceBuilder
-	tracker      irutil.VisitTrackerImpl
+	blueprint.VisitTrackerImpl
 	WorkspaceDir string            // The directory containing this workspace
 	ModuleDirs   map[string]string // map from FQ module name to directory name within WorkspaceDir
 	Modules      map[string]string // map from directory name to FQ module name within WorkspaceDir
@@ -58,18 +56,6 @@ func (workspace *WorkspaceBuilderImpl) Info() golang.WorkspaceInfo {
 	return golang.WorkspaceInfo{
 		Path: workspace.WorkspaceDir,
 	}
-}
-
-func (workspace *WorkspaceBuilderImpl) Visit(nodes []blueprint.IRNode) error {
-	for _, node := range nodes {
-		if n, valid := node.(golang.ProvidesModule); valid {
-			err := n.AddToWorkspace(workspace)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
 }
 
 func (workspace *WorkspaceBuilderImpl) CreateModule(moduleName string, moduleVersion string) (string, error) {
@@ -187,10 +173,6 @@ func (workspace *WorkspaceBuilderImpl) readModfile(moduleSubDir string) (*modfil
 	return f, nil
 }
 
-func (workspace *WorkspaceBuilderImpl) Visited(name string) bool {
-	return workspace.tracker.Visited(name)
-}
-
 var goWorkTemplate = `go 1.20
 
 use (
@@ -295,3 +277,5 @@ func (workspace *WorkspaceBuilderImpl) goModTidy(moduleSubDir string) error {
 	slog.Info(fmt.Sprintf("go mod tidy (%v)", rel(cmd.Dir)))
 	return cmd.Run()
 }
+
+func (workspace *WorkspaceBuilderImpl) ImplementsBuildContext() {}

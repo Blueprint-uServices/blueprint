@@ -6,7 +6,6 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 )
 
@@ -42,8 +41,8 @@ func (addr *GolangHttpServerAddress) SetDestination(node blueprint.IRNode) error
 	return nil
 }
 
-func (addr *GolangHttpServerAddress) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
-	return addr.Server.GetInterface(visitor)
+func (addr *GolangHttpServerAddress) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	return addr.Server.GetInterface(ctx)
 }
 
 func (addr *GolangHttpServerAddress) ImplementsAddressNode() {}
