@@ -7,17 +7,14 @@ import (
 	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"golang.org/x/exp/slog"
 )
 
 type OpenTelemetryServerWrapper struct {
 	golang.Service
 	golang.Instantiable
-	golang.GeneratesInterfaces
 	golang.GeneratesFuncs
 
 	WrapperName string
@@ -51,24 +48,24 @@ func (node *OpenTelemetryServerWrapper) String() string {
 	return node.Name() + " = OTServerWrapper(" + node.Wrapped.Name() + ", " + node.Collector.Name() + ")"
 }
 
-func (node *OpenTelemetryServerWrapper) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
+func (node *OpenTelemetryServerWrapper) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
 	// TODO: extend wrapped interface with tracing stuff
-	return node.Wrapped.GetInterface(visitor)
-}
-
-func (n *OpenTelemetryServerWrapper) GetGoInterface(visitor irutil.BuildContext) *gocode.ServiceInterface {
-	// TODO: return memcached interface
-	return nil
+	return node.Wrapped.GetInterface(ctx)
 }
 
 // Part of code generation compilation pass; creates the interface definition code for the wrapper,
 // and any new generated structs that are exposed and can be used by other IRNodes
-func (node *OpenTelemetryServerWrapper) GenerateInterfaces(builder golang.ModuleBuilder) error {
+func (node *OpenTelemetryServerWrapper) AddInterfaces(builder golang.ModuleBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.WrapperName + ".GenerateInterfaces") {
 		return nil
 	}
 	slog.Info(fmt.Sprintf("GenerateInterfaces %v\n", node))
+
+	err := node.Wrapped.AddInterfaces(builder)
+	if err != nil {
+		return err
+	}
 
 	// TODO: Generate the extended service interface that includes extra arguments and any structs that are used in that interface
 

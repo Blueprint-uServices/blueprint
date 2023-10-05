@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -63,21 +62,24 @@ func (n *GolangServer) Name() string {
 // Generates proto files and the RPC server handler
 func (node *GolangServer) GenerateFuncs(builder golang.ModuleBuilder) error {
 	// Get the service that we are wrapping
-	service := node.Wrapped.GetGoInterface(builder)
+	iface, err := golang.GetGoInterface(builder, node.Wrapped)
+	if err != nil {
+		return err
+	}
 
 	// Only generate grpc server instantiation code for this service once
-	if builder.Visited(service.Name + ".grpc.server") {
+	if builder.Visited(iface.Name + ".grpc.server") {
 		return nil
 	}
 
 	// Generate the .proto files
-	err := grpccodegen.GenerateGRPCProto(builder, service, node.outputPackage)
+	err = grpccodegen.GenerateGRPCProto(builder, iface, node.outputPackage)
 	if err != nil {
 		return err
 	}
 
 	// Generate the RPC server handler
-	err = grpccodegen.GenerateServerHandler(builder, service, node.outputPackage)
+	err = grpccodegen.GenerateServerHandler(builder, iface, node.outputPackage)
 	if err != nil {
 		return err
 	}
@@ -91,14 +93,17 @@ func (node *GolangServer) AddInstantiation(builder golang.GraphBuilder) error {
 		return nil
 	}
 
-	service := node.Wrapped.GetGoInterface(builder)
+	iface, err := golang.GetGoInterface(builder.Module(), node.Wrapped)
+	if err != nil {
+		return err
+	}
 
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
-			Name: fmt.Sprintf("New_%v_GRPCServerHandler", service.Name),
+			Name: fmt.Sprintf("New_%v_GRPCServerHandler", iface.Name),
 			Arguments: []gocode.Variable{
-				{Name: "service", Type: service},
+				{Name: "service", Type: iface},
 				{Name: "serverAddr", Type: &gocode.BasicType{Name: "string"}},
 			},
 		},
@@ -108,7 +113,8 @@ func (node *GolangServer) AddInstantiation(builder golang.GraphBuilder) error {
 	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped, node.Addr})
 }
 
-func (node *GolangServer) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
-	return &GRPCInterface{Wrapped: node.Wrapped.GetInterface(visitor)}
+func (node *GolangServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	iface, err := node.Wrapped.GetInterface(ctx)
+	return &GRPCInterface{Wrapped: iface}, err
 }
 func (node *GolangServer) ImplementsGolangNode() {}

@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -24,7 +23,7 @@ type GolangHttpServer struct {
 	outputPackage string
 }
 
-//Represents a service that is exposed over HTTP
+// Represents a service that is exposed over HTTP
 type HttpInterface struct {
 	service.ServiceInterface
 	Wrapped service.ServiceInterface
@@ -67,12 +66,12 @@ func (n *GolangHttpServer) Name() string {
 
 // Generates the HTTP Server handler
 func (node *GolangHttpServer) GenerateFuncs(builder golang.ModuleBuilder) error {
-	service, valid := node.Wrapped.GetInterface(builder).(*gocode.ServiceInterface)
-	if !valid {
-		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.Wrapped.GetInterface(builder))
+	iface, err := golang.GetGoInterface(builder, node.Wrapped)
+	if err != nil {
+		return err
 	}
 
-	err := httpcodegen.GenerateServerHandler(builder, service, node.outputPackage)
+	err = httpcodegen.GenerateServerHandler(builder, iface, node.outputPackage)
 	if err != nil {
 		return err
 	}
@@ -85,17 +84,17 @@ func (node *GolangHttpServer) AddInstantiation(builder golang.GraphBuilder) erro
 		return nil
 	}
 
-	service, valid := node.Wrapped.GetInterface(builder).(*gocode.ServiceInterface)
-	if !valid {
-		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.Wrapped.GetInterface(builder))
+	iface, err := golang.GetGoInterface(builder, node.Wrapped)
+	if err != nil {
+		return err
 	}
 
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
-			Name: fmt.Sprintf("New_%v_HTTPServerHandler", service.Name),
+			Name: fmt.Sprintf("New_%v_HTTPServerHandler", iface.Name),
 			Arguments: []gocode.Variable{
-				{Name: "service", Type: service},
+				{Name: "service", Type: iface},
 				{Name: "serverAddr", Type: &gocode.BasicType{Name: "string"}},
 			},
 		},
@@ -103,8 +102,9 @@ func (node *GolangHttpServer) AddInstantiation(builder golang.GraphBuilder) erro
 	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped, node.Addr})
 }
 
-func (node *GolangHttpServer) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
-	return &HttpInterface{Wrapped: node.Wrapped.GetInterface(visitor)}
+func (node *GolangHttpServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	iface, err := node.Wrapped.GetInterface(ctx)
+	return &HttpInterface{Wrapped: iface}, err
 }
 
 func (node *GolangHttpServer) ImplementsGolangNode() {}

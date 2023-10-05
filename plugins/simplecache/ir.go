@@ -3,10 +3,11 @@ package simplecache
 import (
 	"fmt"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"golang.org/x/exp/slog"
@@ -22,8 +23,8 @@ type SimpleCache struct {
 
 	InstanceName string
 
-	Iface       *gocode.ServiceInterface // The Cache interface
-	Constructor *gocode.Constructor      // Constructor for this Cache implementation
+	Iface       *goparser.ParsedInterface // The Cache interface
+	Constructor *gocode.Constructor       // Constructor for this Cache implementation
 }
 
 func newSimpleCache(name string) (*SimpleCache, error) {
@@ -51,7 +52,7 @@ func (node *SimpleCache) init(name string) error {
 	}
 
 	node.InstanceName = name
-	node.Iface = details.Iface.ServiceInterface(&irutil.NullBuildContext{})
+	node.Iface = details.Iface
 	node.Constructor = details.Constructor.AsConstructor()
 	return nil
 }
@@ -60,22 +61,17 @@ func (node *SimpleCache) Name() string {
 	return node.InstanceName
 }
 
-func (node *SimpleCache) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
-	return node.GetGoInterface(visitor)
-}
-
-func (node *SimpleCache) GetGoInterface(visitor irutil.BuildContext) *gocode.ServiceInterface {
-	return node.Iface
+func (node *SimpleCache) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	return node.Iface.ServiceInterface(ctx), nil
 }
 
 /* The cache interface and simplecache implementation exist in the runtime package */
 func (node *SimpleCache) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	// Add blueprint runtime to the workspace
-	if !builder.Visited("runtime") {
-		slog.Info("Copying local module runtime to workspace")
-		return builder.AddLocalModuleRelative("runtime", "../../../runtime")
-	}
-	return nil
+	return golang.AddRuntimeModule(builder)
+}
+
+func (node *SimpleCache) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.AddToWorkspace(builder.Workspace())
 }
 
 func (node *SimpleCache) AddInstantiation(builder golang.GraphBuilder) error {

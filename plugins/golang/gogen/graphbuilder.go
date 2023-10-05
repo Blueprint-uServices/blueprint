@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"golang.org/x/exp/slog"
@@ -31,8 +30,7 @@ The typical usage of a `GraphBuilder` is to:
  3. Generate the final output by calling `GraphBuilder.Finish`
 */
 type GraphBuilderImpl struct {
-	golang.GraphBuilder
-	tracker      irutil.VisitTrackerImpl
+	blueprint.VisitTrackerImpl
 	module       *ModuleBuilderImpl // The module containing this file
 	Package      golang.PackageInfo
 	FileName     string            // The short name of the file
@@ -62,12 +60,9 @@ func NewGraphBuilder(module *ModuleBuilderImpl, fileName, packagePath, funcName 
 	}
 
 	// Add the runtime module as a dependency, in case it hasn't already
-	if !graph.module.workspace.Visited("runtime") {
-		slog.Info("Copying local module runtime to workspace")
-		err = graph.module.workspace.AddLocalModuleRelative("runtime", "../../../runtime")
-		if err != nil {
-			return nil, err
-		}
+	err = golang.AddRuntimeModule(module.Workspace())
+	if err != nil {
+		return nil, err
 	}
 
 	graph.Imports.AddPackages(
@@ -78,18 +73,6 @@ func NewGraphBuilder(module *ModuleBuilderImpl, fileName, packagePath, funcName 
 	return graph, nil
 }
 
-func (graph *GraphBuilderImpl) Visit(nodes []blueprint.IRNode) error {
-	for _, node := range nodes {
-		if n, valid := node.(golang.Instantiable); valid {
-			err := n.AddInstantiation(graph)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
 func (graph *GraphBuilderImpl) Info() golang.GraphInfo {
 	return golang.GraphInfo{
 		Package:  graph.Package,
@@ -97,6 +80,14 @@ func (graph *GraphBuilderImpl) Info() golang.GraphInfo {
 		FilePath: graph.FilePath,
 		FuncName: graph.FuncName,
 	}
+}
+
+func (graph *GraphBuilderImpl) Import(packageName string) string {
+	return graph.Imports.AddPackage(packageName)
+}
+
+func (graph *GraphBuilderImpl) ImportType(typeName gocode.TypeName) string {
+	return graph.Imports.NameOf(typeName)
 }
 
 func (code *GraphBuilderImpl) Module() golang.ModuleBuilder {
@@ -156,7 +147,7 @@ func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *goco
 	templateArgs := buildFuncArgs{
 		Graph:        graph,
 		Name:         name,
-		InstanceName: irutil.Clean(name),
+		InstanceName: blueprint.CleanName(name),
 		Constructor:  &gocode.UserType{Package: constructor.Package, Name: constructor.Name},
 	}
 	for i, Var := range constructor.Arguments {
@@ -164,12 +155,12 @@ func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *goco
 			Graph:    graph,
 			Var:      Var,
 			Node:     args[i],
-			NodeName: irutil.Clean(args[i].Name()),
+			NodeName: blueprint.CleanName(args[i].Name()),
 			NodeType: &gocode.BasicType{Name: "string"},
 		}
 
-		if service, argNodeIsAService := args[i].(golang.Service); argNodeIsAService {
-			arg.NodeType = &service.GetGoInterface(graph).UserType
+		if argIface, err := golang.GetGoInterface(graph.Module(), args[i]); err == nil {
+			arg.NodeType = &argIface.UserType
 		}
 
 		templateArgs.Args = append(templateArgs.Args, arg)
@@ -181,10 +172,6 @@ func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *goco
 	}
 
 	return graph.Declare(name, code)
-}
-
-func (code *GraphBuilderImpl) Visited(name string) bool {
-	return code.tracker.Visited(name)
 }
 
 var diFuncTemplate = `package {{.Package.ShortName}}
@@ -221,3 +208,5 @@ func (code *GraphBuilderImpl) Build() error {
 	slog.Info(fmt.Sprintf("Generating %v", filepath.Join(code.Package.PackageName, code.FileName)))
 	return ExecuteTemplateToFile("graph_"+code.FuncName, diFuncTemplate, code, code.FilePath)
 }
+
+func (code *GraphBuilderImpl) ImplementsBuildContext() {}

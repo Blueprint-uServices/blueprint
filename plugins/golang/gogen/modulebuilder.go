@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
@@ -19,8 +18,7 @@ The ModuleBuilder is used by plugins that generate golang source files, and need
 code into.
 */
 type ModuleBuilderImpl struct {
-	golang.ModuleBuilder
-	tracker   irutil.VisitTrackerImpl
+	blueprint.VisitTrackerImpl
 	Name      string                // The FQ name of this module
 	workspace *WorkspaceBuilderImpl // The workspace that this module exists within
 	ModuleDir string                // The directory containing this module
@@ -45,10 +43,6 @@ func NewModuleBuilder(workspace *WorkspaceBuilderImpl, moduleName string) (*Modu
 	return module, nil
 }
 
-func (module *ModuleBuilderImpl) Workspace() golang.WorkspaceBuilder {
-	return module.workspace
-}
-
 func (module *ModuleBuilderImpl) Info() golang.ModuleInfo {
 	return golang.ModuleInfo{
 		Name:    module.Name,
@@ -69,10 +63,14 @@ func (module *ModuleBuilderImpl) CreatePackage(packageName string) (golang.Packa
 	return info, os.MkdirAll(info.Path, 0755)
 }
 
-func (module *ModuleBuilderImpl) Visit(nodes []blueprint.IRNode) error {
+func (module *ModuleBuilderImpl) Workspace() golang.WorkspaceBuilder {
+	return module.workspace
+}
+
+func (module *ModuleBuilderImpl) Build(nodes []blueprint.IRNode) error {
 	for _, node := range nodes {
-		if n, valid := node.(golang.GeneratesInterfaces); valid {
-			err := n.GenerateInterfaces(module)
+		if n, valid := node.(golang.ProvidesInterface); valid {
+			err := n.AddInterfaces(module)
 			if err != nil {
 				return err
 			}
@@ -89,6 +87,4 @@ func (module *ModuleBuilderImpl) Visit(nodes []blueprint.IRNode) error {
 	return nil
 }
 
-func (module *ModuleBuilderImpl) Visited(name string) bool {
-	return module.tracker.Visited(name)
-}
+func (module *ModuleBuilderImpl) ImplementsBuildContext() {}

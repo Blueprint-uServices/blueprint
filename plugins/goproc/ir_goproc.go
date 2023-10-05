@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
@@ -177,7 +176,8 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 
 	// TODO: might end up building multiple times which is OK, so need a check here that we haven't already built this artifact, even if it was by a different (but identical) node
 
-	procName := irutil.Clean(node.Name())
+	// Create the workspace
+	procName := blueprint.CleanName(node.Name())
 	workspaceDir := filepath.Join(outputDir, procName)
 	slog.Info(fmt.Sprintf("Building goproc %s to %s", node.Name(), workspaceDir))
 	workspace, err := gogen.NewWorkspaceBuilder(workspaceDir)
@@ -185,6 +185,16 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 		return err
 	}
 
+	// Add relevant nodes to the workspace
+	for _, node := range node.ContainedNodes {
+		if n, valid := node.(golang.ProvidesModule); valid {
+			if err := n.AddToWorkspace(workspace); err != nil {
+				return err
+			}
+		}
+	}
+
+	// Create the module
 	moduleName := generatedModulePrefix + "/" + procName
 	slog.Info(fmt.Sprintf("Creating module %v", moduleName))
 	module, err := gogen.NewModuleBuilder(workspace, moduleName)
@@ -192,6 +202,25 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 		return err
 	}
 
+	// Add and/or generate interfaces
+	for _, node := range node.ContainedNodes {
+		if n, valid := node.(golang.ProvidesInterface); valid {
+			if err := n.AddInterfaces(module); err != nil {
+				return err
+			}
+		}
+	}
+
+	// Generate constructors and function declarations
+	for _, node := range node.ContainedNodes {
+		if n, valid := node.(golang.GeneratesFuncs); valid {
+			if err := n.GenerateFuncs(module); err != nil {
+				return err
+			}
+		}
+	}
+
+	// Create the method to instantiate the graph
 	graphFileName := strings.ToLower(procName) + ".go"
 	procPackage := "goproc"
 	constructorName := "New" + cases.Title(language.BritishEnglish).String(procName)
@@ -200,22 +229,13 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 		return err
 	}
 
-	// Generate the workspace and copy all local artifacts
-	err = workspace.Visit(node.ContainedNodes)
-	if err != nil {
-		return err
-	}
-
-	// Generate the module and add all dependencies
-	err = module.Visit(node.ContainedNodes)
-	if err != nil {
-		return err
-	}
-
-	// Generate the graph of gonodes contained in this process
-	err = graph.Visit(node.ContainedNodes)
-	if err != nil {
-		return err
+	// Add constructor invocations
+	for _, node := range node.ContainedNodes {
+		if n, valid := node.(golang.Instantiable); valid {
+			if err := n.AddInstantiation(graph); err != nil {
+				return err
+			}
+		}
 	}
 
 	// Generate the main.go
@@ -230,7 +250,7 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 		mainArgs.Args = append(mainArgs.Args, mainArg{
 			Name: arg.Name(),
 			Doc:  arg.String(),
-			Var:  irutil.Clean(arg.Name()),
+			Var:  blueprint.CleanName(arg.Name()),
 		})
 	}
 	// For now explicitly instantiate every child node

@@ -1,4 +1,18 @@
-package irutil
+package blueprint
+
+/*
+Base interface used during build time; plugins that generate artifacts use this
+*/
+type (
+	VisitTracker interface {
+		Visited(name string) bool
+	}
+
+	BuildContext interface {
+		VisitTracker
+		ImplementsBuildContext()
+	}
+)
 
 /*
 In Blueprint, it is possible for there to be multiple different IRNode instances, across that application,
@@ -10,10 +24,6 @@ In methods where code gets generated (e.g. in golang Instantiable), before gener
 invoke `VisitTracker.Visited` with a unique identifier (e.g. representing the node, instance, or plugin).
 The first invocation for the identifier returns true; subsequent invocations return false.
 */
-type VisitTracker interface {
-	Visited(name string) bool
-}
-
 type VisitTrackerImpl struct {
 	visited map[string]any
 }

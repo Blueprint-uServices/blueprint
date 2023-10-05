@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -18,10 +17,8 @@ This node does not introduce any new runtime interfaces or types that can be use
 GRPC code generation happens during the ModuleBuilder GenerateFuncs pass
 */
 type GolangClient struct {
-	golang.Node
 	golang.Service
 	golang.GeneratesFuncs
-	golang.Instantiable
 
 	InstanceName string
 	ServerAddr   *GolangServerAddress
@@ -46,44 +43,48 @@ func (n *GolangClient) Name() string {
 	return n.InstanceName
 }
 
-func (node *GolangClient) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
-	return node.GetGoInterface(visitor)
-}
-
-func (node *GolangClient) GetGoInterface(visitor irutil.BuildContext) *gocode.ServiceInterface {
-	grpc, isGrpc := node.ServerAddr.GetInterface(visitor).(*GRPCInterface)
+func (node *GolangClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	iface, err := node.ServerAddr.GetInterface(ctx)
+	if err != nil {
+		return nil, err
+	}
+	grpc, isGrpc := iface.(*GRPCInterface)
 	if !isGrpc {
-		return nil
+		return nil, fmt.Errorf("grpc client expected a GRPC interface from %v but found %v", node.ServerAddr.Name(), iface)
 	}
 	wrapped, isValid := grpc.Wrapped.(*gocode.ServiceInterface)
 	if !isValid {
-		return nil
+		return nil, fmt.Errorf("grpc client expected the server's GRPC interface to wrap a gocode interface but found %v", grpc)
 	}
-	return wrapped
+	return wrapped, nil
+}
+
+// Just makes sure that the interface exposed by the server is included in the built module
+func (node *GolangClient) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.ServerAddr.Server.Wrapped.AddInterfaces(builder)
 }
 
 // Generates proto files and the RPC client
 func (node *GolangClient) GenerateFuncs(builder golang.ModuleBuilder) error {
 	// Get the service that we are wrapping
-	service := node.GetGoInterface(builder)
-	if service == nil {
-		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
-			node.Name(), node.ServerAddr.GetInterface(builder))
+	iface, err := golang.GetGoInterface(builder, node)
+	if err != nil {
+		return err
 	}
 
 	// Only generate grpc client instantiation code for this service once
-	if builder.Visited(service.Name + ".grpc.client") {
+	if builder.Visited(iface.Name + ".grpc.client") {
 		return nil
 	}
 
 	// Generate the .proto files
-	err := grpccodegen.GenerateGRPCProto(builder, service, node.outputPackage)
+	err = grpccodegen.GenerateGRPCProto(builder, iface, node.outputPackage)
 	if err != nil {
 		return err
 	}
 
 	// Generate the RPC client
-	err = grpccodegen.GenerateClient(builder, service, node.outputPackage)
+	err = grpccodegen.GenerateClient(builder, iface, node.outputPackage)
 	if err != nil {
 		return err
 	}
@@ -97,10 +98,16 @@ func (node *GolangClient) AddInstantiation(builder golang.GraphBuilder) error {
 		return nil
 	}
 
+	// Get the service that we are wrapping
+	iface, err := golang.GetGoInterface(builder, node)
+	if err != nil {
+		return err
+	}
+
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
-			Name: fmt.Sprintf("New_%v_GRPCClient", node.GetGoInterface(builder).Name),
+			Name: fmt.Sprintf("New_%v_GRPCClient", iface.Name),
 			Arguments: []gocode.Variable{
 				{Name: "addr", Type: &gocode.BasicType{Name: "string"}},
 			},

@@ -2,7 +2,6 @@ package golang
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 )
@@ -28,7 +27,8 @@ is not intended to be private to just the golang.Process plugin.  Other plugins 
 use these interfaces.
 
   - golang.Instantiable is for golang nodes that can generate instantiation source code snippets
-  - golang.RequiresPackage is for golang nodes that generate source files and have module dependencies
+  - golang.ProvidesInterface is for golang nodes that include interfaces or generate new ones
+  - golang.GeneratesFuncs is for golang nodes that generate function implementations
   - golang.ProvidesModule is for golang nodes that generate or otherwise provide the full source code of modules
 */
 type (
@@ -55,9 +55,9 @@ type (
 	*/
 	Service interface {
 		Node
-		Instantiable // Services must implement the Instantiable interface in order to create instances
+		Instantiable      // Services must implement the Instantiable interface in order to create instances
+		ProvidesInterface // Services must include any interfaces that they implement or define
 		service.ServiceNode
-		GetGoInterface(visitor irutil.BuildContext) *gocode.ServiceInterface
 		ImplementsGolangService() // Idiomatically necessary in Go for typecasting correctly
 	}
 )
@@ -89,32 +89,44 @@ type (
 	}
 
 	/*
-			Some IRNodes generate new interfaces and struct definitions by extending the interfaces declared by other IRNodes.
-			They should implement this interface to do so
+		Service nodes need to include interface definitions that callers of the code depend on.  The most basic
+		example is that a workflow service needs to include the code where it's defined.
 
-		   There are three interfaces for contributing source code to generated modules:
-		   1. RequiresPackage for adding module dependencies to the generated module's go.mod file
-		   2. GeneratesInterfaces for generating struct and interface type declarations
-		   3. GeneratesFuncs for generating functions and struct method bodies
+		Some nodes, primarily modifier nodes, will also generate new interfaces by extending the interfaces
+		of other IRNodes.  For example, tracing nodes might add context arguments; the healthchecker node
+		might add new functions.
+
+		Here is where interfaces should be included or generated.
+
+		There are three interfaces for contributing source code to generated modules:
+		1. RequiresPackage for adding module dependencies to the generated module's go.mod file
+		2. ProvidesInterface for generating struct and interface type declarations
+		3. GeneratesFuncs for generating functions and struct method bodies
 	*/
-	GeneratesInterfaces interface {
+	ProvidesInterface interface {
 		/*
-		   GenerateInterfaces will be invoked during compilation to enable an IRNode to write generated code files to
-		   an output module, containing interface and struct definitions
+			AddInterfaces will be invoked during compilation to enable an IRNode to include the code where its
+			interface is defined, e.g. in an external module (like a workflow spec node) or by auto-generating
+			code that defines the interface (like a modifier node).
+
+			AddInterfaces might be called in situations where ONLY the interfaces are needed, but not the
+			implementation.  For example, the client-side of an RPC call needs to know the remote interfaces,
+			but does not need to know the server-side implementation.  That logic belongs in the GenerateFuncs
+			interface and method
 		*/
-		GenerateInterfaces(ModuleBuilder) error
+		AddInterfaces(ModuleBuilder) error
 	}
 
 	/*
-			Some IRNodes generate implementations of service interfaces.  This interface should be used to do so.  This is
-			separate from the GeneratesTypes interface because all structs and interfaces need to be declared before
-			method bodies can be written, because method bodies might need to use structs and interfaces defined in different
-			packages
+		Some IRNodes generate implementations of service interfaces.  This interface should be used to do so.  This is
+		separate from the GeneratesTypes interface because all structs and interfaces need to be declared before
+		method bodies can be written, because method bodies might need to use structs and interfaces defined in different
+		packages
 
-		   There are three interfaces for contributing source code to generated modules:
-		   1. RequiresPackage for adding module dependencies to the generated module's go.mod file
-		   2. GeneratesInterfaces for generating struct and interface type declarations
-		   3. GeneratesFuncs for generating functions and struct method bodies
+		There are three interfaces for contributing source code to generated modules:
+		1. RequiresPackage for adding module dependencies to the generated module's go.mod file
+		2. ProvidesInterface for generating struct and interface type declarations
+		3. GeneratesFuncs for generating functions and struct method bodies
 	*/
 	GeneratesFuncs interface {
 		/*
@@ -159,7 +171,7 @@ type (
 	   using the methods on `WorkspaceBuilder`.
 	*/
 	WorkspaceBuilder interface {
-		irutil.BuildContext
+		blueprint.BuildContext
 
 		/*
 			Metadata into about the workspace being built
@@ -226,7 +238,7 @@ type (
 	   file
 	*/
 	ModuleBuilder interface {
-		irutil.BuildContext
+		blueprint.BuildContext
 
 		/*
 			Metadata into about the module being built
@@ -296,7 +308,7 @@ type (
 	   dependencies of this node.
 	*/
 	GraphBuilder interface {
-		irutil.BuildContext
+		blueprint.BuildContext
 
 		/*
 			Metadata info about the graph being built

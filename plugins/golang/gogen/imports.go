@@ -114,7 +114,7 @@ func (imports *Imports) AddType(typeName gocode.TypeName) {
 func (imports *Imports) String() string {
 	var b strings.Builder
 	b.WriteString("import (\n")
-	for pkg, _ := range imports.anonymous {
+	for pkg := range imports.anonymous {
 		b.WriteString(fmt.Sprintf("\t\"%s\"\n", pkg))
 	}
 	for pkg, importName := range imports.named {

@@ -2,13 +2,13 @@ package memcached
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"golang.org/x/exp/slog"
 )
 
@@ -35,14 +35,21 @@ func (n *MemcachedGoClient) Name() string {
 	return n.InstanceName
 }
 
-func (n *MemcachedGoClient) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
+func (n *MemcachedGoClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
 	// TODO: return memcached interface
-	return nil
+	return nil, fmt.Errorf("memcached not yet implemented")
 }
 
-func (n *MemcachedGoClient) GetGoInterface(visitor irutil.BuildContext) *gocode.ServiceInterface {
-	// TODO: return memcached interface
-	return nil
+func (node *MemcachedGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
+	// Add blueprint runtime to the workspace which contains the cache interface
+
+	// TODO: add memcached client (if it doesn't live in runtime)
+
+	return golang.AddRuntimeModule(builder)
+}
+
+func (node *MemcachedGoClient) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.AddToWorkspace(builder.Workspace())
 }
 
 var clientBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
