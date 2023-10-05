@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"text/template"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
@@ -17,15 +16,10 @@ type OpenTelemetryCollectorClient struct {
 	ServerAddr *OpenTelemetryCollectorAddr
 }
 
-func newOpenTelemetryCollectorClient(name string, addr blueprint.IRNode) (*OpenTelemetryCollectorClient, error) {
-	addrNode, is_addr := addr.(*OpenTelemetryCollectorAddr)
-	if !is_addr {
-		return nil, blueprint.Errorf("unable to create OpenTelemetryCollectorClient node because %s is not an address", addr.Name())
-	}
-
+func newOpenTelemetryCollectorClient(name string, addr *OpenTelemetryCollectorAddr) (*OpenTelemetryCollectorClient, error) {
 	node := &OpenTelemetryCollectorClient{}
 	node.ClientName = name
-	node.ServerAddr = addrNode
+	node.ServerAddr = addr
 	return node, nil
 }
 

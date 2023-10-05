@@ -3,7 +3,6 @@ package opentelemetry
 import (
 	"bytes"
 	"fmt"
-	"reflect"
 	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
@@ -21,21 +20,11 @@ type OpenTelemetryClientWrapper struct {
 	Collector   *OpenTelemetryCollectorClient
 }
 
-func newOpenTelemetryClientWrapper(name string, server blueprint.IRNode, collector blueprint.IRNode) (*OpenTelemetryClientWrapper, error) {
-	serverNode, is_callable := server.(golang.Service)
-	if !is_callable {
-		return nil, blueprint.Errorf("opentelemetry client wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
-	}
-
-	collectorClient, is_collector_client := collector.(*OpenTelemetryCollectorClient)
-	if !is_collector_client {
-		return nil, blueprint.Errorf("opentelemetry client  wrapper requires %s to be an opentelemetry collector client", collector.Name())
-	}
-
+func newOpenTelemetryClientWrapper(name string, server golang.Service, collector *OpenTelemetryCollectorClient) (*OpenTelemetryClientWrapper, error) {
 	node := &OpenTelemetryClientWrapper{}
 	node.WrapperName = name
-	node.Server = serverNode
-	node.Collector = collectorClient
+	node.Server = server
+	node.Collector = collector
 	return node, nil
 }
 

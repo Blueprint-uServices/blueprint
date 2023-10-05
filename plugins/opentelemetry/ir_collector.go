@@ -1,7 +1,6 @@
 package opentelemetry
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
 )
 
@@ -13,16 +12,11 @@ type OpenTelemetryCollector struct {
 	Addr          *OpenTelemetryCollectorAddr
 }
 
-func newOpenTelemetryCollector(name string, addr blueprint.IRNode) (*OpenTelemetryCollector, error) {
-	addrNode, is_addr := addr.(*OpenTelemetryCollectorAddr)
-	if !is_addr {
-		return nil, blueprint.Errorf("unable to create OpenTelemetryCollector node because %s is not an address", addr.Name())
-	}
-
-	node := &OpenTelemetryCollector{}
-	node.CollectorName = name
-	node.Addr = addrNode
-	return node, nil
+func newOpenTelemetryCollector(name string, addr *OpenTelemetryCollectorAddr) (*OpenTelemetryCollector, error) {
+	return &OpenTelemetryCollector{
+		CollectorName: name,
+		Addr:          addr,
+	}, nil
 }
 
 func (node *OpenTelemetryCollector) Name() string {
