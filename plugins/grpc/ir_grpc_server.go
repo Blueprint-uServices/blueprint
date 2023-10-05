@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -73,7 +74,7 @@ func (n *GolangServer) Name() string {
 // Generates proto files and the RPC server handler
 func (node *GolangServer) GenerateFuncs(builder golang.ModuleBuilder) error {
 	// Get the service that we are wrapping
-	service := node.Wrapped.GetGoInterface()
+	service := node.Wrapped.GetGoInterface(builder)
 
 	// Only generate grpc server instantiation code for this service once
 	if builder.Visited(service.Name + ".grpc.server") {
@@ -101,7 +102,7 @@ func (node *GolangServer) AddInstantiation(builder golang.GraphBuilder) error {
 		return nil
 	}
 
-	service := node.Wrapped.GetGoInterface()
+	service := node.Wrapped.GetGoInterface(builder)
 
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
@@ -118,7 +119,7 @@ func (node *GolangServer) AddInstantiation(builder golang.GraphBuilder) error {
 	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped, node.Addr})
 }
 
-func (node *GolangServer) GetInterface() service.ServiceInterface {
-	return &GRPCInterface{Wrapped: node.Wrapped.GetInterface()}
+func (node *GolangServer) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
+	return &GRPCInterface{Wrapped: node.Wrapped.GetInterface(visitor)}
 }
 func (node *GolangServer) ImplementsGolangNode() {}

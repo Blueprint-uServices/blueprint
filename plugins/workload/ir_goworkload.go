@@ -36,12 +36,12 @@ func NewWorkloadGenerator(name string, node blueprint.IRNode) (*WorkloadgenClien
 }
 func (node *WorkloadgenClient) GenerateFuncs(builder golang.ModuleBuilder) error {
 	// Only generate the workload code for this instance once
-	if builder.Visited(node.Wrapped.GetInterface().GetName() + ".workloadgen") {
+	if builder.Visited(node.Wrapped.GetInterface(builder).GetName() + ".workloadgen") {
 		return nil
 	}
 
 	// Generate the code
-	return GenerateWorkloadgenCode(builder, node.Wrapped.GetGoInterface(), "workloadgen")
+	return GenerateWorkloadgenCode(builder, node.Wrapped.GetGoInterface(builder), "workloadgen")
 }
 
 // Provides the golang code to instantiate the workloadgen client
@@ -51,7 +51,7 @@ func (node *WorkloadgenClient) AddInstantiation(builder golang.GraphBuilder) err
 		return nil
 	}
 
-	service := node.Wrapped.GetGoInterface()
+	service := node.Wrapped.GetGoInterface(builder)
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{

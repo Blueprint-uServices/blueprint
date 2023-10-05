@@ -7,6 +7,7 @@ import (
 	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -50,12 +51,12 @@ func (node *OpenTelemetryServerWrapper) String() string {
 	return node.Name() + " = OTServerWrapper(" + node.Wrapped.Name() + ", " + node.Collector.Name() + ")"
 }
 
-func (node *OpenTelemetryServerWrapper) GetInterface() service.ServiceInterface {
+func (node *OpenTelemetryServerWrapper) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
 	// TODO: extend wrapped interface with tracing stuff
-	return node.Wrapped.GetInterface()
+	return node.Wrapped.GetInterface(visitor)
 }
 
-func (n *OpenTelemetryServerWrapper) GetGoInterface() *gocode.ServiceInterface {
+func (n *OpenTelemetryServerWrapper) GetGoInterface(visitor irutil.BuildContext) *gocode.ServiceInterface {
 	// TODO: return memcached interface
 	return nil
 }

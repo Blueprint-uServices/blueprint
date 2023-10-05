@@ -57,7 +57,7 @@ type (
 		Node
 		Instantiable // Services must implement the Instantiable interface in order to create instances
 		service.ServiceNode
-		GetGoInterface() *gocode.ServiceInterface
+		GetGoInterface(visitor irutil.BuildContext) *gocode.ServiceInterface
 		ImplementsGolangService() // Idiomatically necessary in Go for typecasting correctly
 	}
 )
@@ -159,17 +159,12 @@ type (
 	   using the methods on `WorkspaceBuilder`.
 	*/
 	WorkspaceBuilder interface {
-		irutil.VisitTracker
+		irutil.BuildContext
 
 		/*
 			Metadata into about the workspace being built
 		*/
 		Info() WorkspaceInfo
-
-		/*
-			This is equivalent to calling node.AddToModule, if node implements it, for the specified nodes
-		*/
-		Visit(nodes []blueprint.IRNode) error
 
 		/*
 		   This method is used by plugins if they want to copy a locally-defined module into the generated workspace.
@@ -231,7 +226,7 @@ type (
 	   file
 	*/
 	ModuleBuilder interface {
-		irutil.VisitTracker
+		irutil.BuildContext
 
 		/*
 			Metadata into about the module being built
@@ -245,11 +240,6 @@ type (
 			This call will succeed even if the package already exists on the filesystem.
 		*/
 		CreatePackage(packageName string) (PackageInfo, error)
-
-		/*
-			This is equivalent to calling node.AddToModule, if node implements it
-		*/
-		Visit(nodes []blueprint.IRNode) error
 
 		/*
 			Gets the WorkspaceBuilder that contains this ModuleBuilder
@@ -306,12 +296,7 @@ type (
 	   dependencies of this node.
 	*/
 	GraphBuilder interface {
-		irutil.VisitTracker
-
-		/*
-			This is equivalent to calling node.AddToModule, if node implements it
-		*/
-		Visit(nodes []blueprint.IRNode) error
+		irutil.BuildContext
 
 		/*
 			Metadata info about the graph being built

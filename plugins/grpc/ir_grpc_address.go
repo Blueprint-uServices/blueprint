@@ -3,6 +3,7 @@ package grpc
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 )
 
@@ -38,8 +39,8 @@ func (addr *GolangServerAddress) SetDestination(node blueprint.IRNode) error {
 	return nil
 }
 
-func (addr *GolangServerAddress) GetInterface() service.ServiceInterface {
-	return addr.Server.GetInterface()
+func (addr *GolangServerAddress) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
+	return addr.Server.GetInterface(visitor)
 }
 
 func (addr *GolangServerAddress) ImplementsAddressNode() {}

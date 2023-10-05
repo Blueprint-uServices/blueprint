@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -46,12 +47,12 @@ func (n *GolangHttpClient) Name() string {
 	return n.InstanceName
 }
 
-func (n *GolangHttpClient) GetInterface() service.ServiceInterface {
-	return n.GetGoInterface()
+func (n *GolangHttpClient) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
+	return n.GetGoInterface(visitor)
 }
 
-func (n *GolangHttpClient) GetGoInterface() *gocode.ServiceInterface {
-	http, isHttp := n.ServerAddr.GetInterface().(*HttpInterface)
+func (n *GolangHttpClient) GetGoInterface(visitor irutil.BuildContext) *gocode.ServiceInterface {
+	http, isHttp := n.ServerAddr.GetInterface(visitor).(*HttpInterface)
 	if !isHttp {
 		return nil
 	}
@@ -67,9 +68,9 @@ func (node *GolangHttpClient) GenerateFuncs(builder golang.ModuleBuilder) error 
 		return nil
 	}
 
-	service := node.GetGoInterface()
+	service := node.GetGoInterface(builder)
 	if service == nil {
-		return errors.New(fmt.Sprintf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.ServerAddr.GetInterface()))
+		return errors.New(fmt.Sprintf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.ServerAddr.GetInterface(builder)))
 	}
 
 	return httpcodegen.GenerateClient(builder, service, node.outputPackage)
@@ -84,7 +85,7 @@ func (node *GolangHttpClient) AddInstantiation(builder golang.GraphBuilder) erro
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
-			Name: fmt.Sprintf("New_%v_HTTPClient", node.GetGoInterface().Name),
+			Name: fmt.Sprintf("New_%v_HTTPClient", node.GetGoInterface(builder).Name),
 			Arguments: []gocode.Variable{
 				{Name: "addr", Type: &gocode.BasicType{Name: "string"}},
 			},

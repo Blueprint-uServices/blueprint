@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"golang.org/x/mod/modfile"
 )
@@ -653,7 +654,7 @@ func (struc *ParsedStruct) Type() *gocode.UserType {
 	}
 }
 
-func (iface *ParsedInterface) ServiceInterface() *gocode.ServiceInterface {
+func (iface *ParsedInterface) ServiceInterface(visitor irutil.BuildContext) *gocode.ServiceInterface {
 	methods := make(map[string]gocode.Func)
 	for name, method := range iface.Methods {
 		methods[name] = gocode.Func{
