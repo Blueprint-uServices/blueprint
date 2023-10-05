@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -66,9 +67,9 @@ func (n *GolangHttpServer) Name() string {
 
 // Generates the HTTP Server handler
 func (node *GolangHttpServer) GenerateFuncs(builder golang.ModuleBuilder) error {
-	service, valid := node.Wrapped.GetInterface().(*gocode.ServiceInterface)
+	service, valid := node.Wrapped.GetInterface(builder).(*gocode.ServiceInterface)
 	if !valid {
-		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.Wrapped.GetInterface())
+		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.Wrapped.GetInterface(builder))
 	}
 
 	err := httpcodegen.GenerateServerHandler(builder, service, node.outputPackage)
@@ -84,9 +85,9 @@ func (node *GolangHttpServer) AddInstantiation(builder golang.GraphBuilder) erro
 		return nil
 	}
 
-	service, valid := node.Wrapped.GetInterface().(*gocode.ServiceInterface)
+	service, valid := node.Wrapped.GetInterface(builder).(*gocode.ServiceInterface)
 	if !valid {
-		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.Wrapped.GetInterface())
+		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.Wrapped.GetInterface(builder))
 	}
 
 	constructor := &gocode.Constructor{
@@ -102,8 +103,8 @@ func (node *GolangHttpServer) AddInstantiation(builder golang.GraphBuilder) erro
 	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped, node.Addr})
 }
 
-func (node *GolangHttpServer) GetInterface() service.ServiceInterface {
-	return &HttpInterface{Wrapped: node.Wrapped.GetInterface()}
+func (node *GolangHttpServer) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
+	return &HttpInterface{Wrapped: node.Wrapped.GetInterface(visitor)}
 }
 
 func (node *GolangHttpServer) ImplementsGolangNode() {}

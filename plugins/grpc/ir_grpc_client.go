@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -51,12 +52,12 @@ func (n *GolangClient) Name() string {
 	return n.InstanceName
 }
 
-func (node *GolangClient) GetInterface() service.ServiceInterface {
-	return node.GetGoInterface()
+func (node *GolangClient) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
+	return node.GetGoInterface(visitor)
 }
 
-func (node *GolangClient) GetGoInterface() *gocode.ServiceInterface {
-	grpc, isGrpc := node.ServerAddr.GetInterface().(*GRPCInterface)
+func (node *GolangClient) GetGoInterface(visitor irutil.BuildContext) *gocode.ServiceInterface {
+	grpc, isGrpc := node.ServerAddr.GetInterface(visitor).(*GRPCInterface)
 	if !isGrpc {
 		return nil
 	}
@@ -70,10 +71,10 @@ func (node *GolangClient) GetGoInterface() *gocode.ServiceInterface {
 // Generates proto files and the RPC client
 func (node *GolangClient) GenerateFuncs(builder golang.ModuleBuilder) error {
 	// Get the service that we are wrapping
-	service := node.GetGoInterface()
+	service := node.GetGoInterface(builder)
 	if service == nil {
 		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v",
-			node.Name(), node.ServerAddr.GetInterface())
+			node.Name(), node.ServerAddr.GetInterface(builder))
 	}
 
 	// Only generate grpc client instantiation code for this service once
@@ -105,7 +106,7 @@ func (node *GolangClient) AddInstantiation(builder golang.GraphBuilder) error {
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
-			Name: fmt.Sprintf("New_%v_GRPCClient", node.GetGoInterface().Name),
+			Name: fmt.Sprintf("New_%v_GRPCClient", node.GetGoInterface(builder).Name),
 			Arguments: []gocode.Variable{
 				{Name: "addr", Type: &gocode.BasicType{Name: "string"}},
 			},

@@ -3,6 +3,7 @@ package simplecache
 import (
 	"fmt"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -50,7 +51,7 @@ func (node *SimpleCache) init(name string) error {
 	}
 
 	node.InstanceName = name
-	node.Iface = details.Iface.ServiceInterface()
+	node.Iface = details.Iface.ServiceInterface(&irutil.NullBuildContext{})
 	node.Constructor = details.Constructor.AsConstructor()
 	return nil
 }
@@ -59,11 +60,11 @@ func (node *SimpleCache) Name() string {
 	return node.InstanceName
 }
 
-func (node *SimpleCache) GetInterface() service.ServiceInterface {
-	return node.GetGoInterface()
+func (node *SimpleCache) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
+	return node.GetGoInterface(visitor)
 }
 
-func (node *SimpleCache) GetGoInterface() *gocode.ServiceInterface {
+func (node *SimpleCache) GetGoInterface(visitor irutil.BuildContext) *gocode.ServiceInterface {
 	return node.Iface
 }
 

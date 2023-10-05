@@ -169,7 +169,7 @@ func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *goco
 		}
 
 		if service, argNodeIsAService := args[i].(golang.Service); argNodeIsAService {
-			arg.NodeType = &service.GetGoInterface().UserType
+			arg.NodeType = &service.GetGoInterface(graph).UserType
 		}
 
 		templateArgs.Args = append(templateArgs.Args, arg)

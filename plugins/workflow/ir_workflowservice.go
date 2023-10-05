@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -115,12 +116,12 @@ func (node *WorkflowService) Name() string {
 	return node.InstanceName
 }
 
-func (node *WorkflowService) GetInterface() service.ServiceInterface {
-	return node.GetGoInterface()
+func (node *WorkflowService) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
+	return node.GetGoInterface(visitor)
 }
 
-func (node *WorkflowService) GetGoInterface() *gocode.ServiceInterface {
-	return node.ServiceInfo.Iface.ServiceInterface()
+func (node *WorkflowService) GetGoInterface(visitor irutil.BuildContext) *gocode.ServiceInterface {
+	return node.ServiceInfo.Iface.ServiceInterface(visitor)
 }
 
 func addToWorkspace(builder golang.WorkspaceBuilder, mod *goparser.ParsedModule) error {

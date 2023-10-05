@@ -7,6 +7,7 @@ import (
 	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/irutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -49,9 +50,9 @@ func (node *OpenTelemetryClientWrapper) String() string {
 	return node.Name() + " = OTClientWrapper(" + node.Server.Name() + ", " + node.Collector.Name() + ")"
 }
 
-func (node *OpenTelemetryClientWrapper) GetInterface() service.ServiceInterface {
+func (node *OpenTelemetryClientWrapper) GetInterface(visitor irutil.BuildContext) service.ServiceInterface {
 	// TODO: unwrap server interface to remove tracing stuff
-	return node.Server.GetInterface()
+	return node.Server.GetInterface(visitor)
 }
 
 func (n *OpenTelemetryClientWrapper) GetGoInterface() *gocode.ServiceInterface {
