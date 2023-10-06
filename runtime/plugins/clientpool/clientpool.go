@@ -1,7 +1,9 @@
 package clientpool
 
 import (
+	"context"
 	"sync"
+	"sync/atomic"
 )
 
 type ClientPool[T any] struct {
@@ -32,23 +34,23 @@ func NewClientPool[T any](maxClients int64, fn func() (T, error)) *ClientPool[T]
 // 	}()
 // }
 
-func (this *ClientPool[T]) Pop() (T, error) {
+func (this *ClientPool[T]) Pop(ctx context.Context) (client T, err error) {
 	this.lock.Lock()
 	if this.curClients < this.maxClients {
 		defer this.lock.Unlock()
-		client, err := this.fn()
-		if err != nil {
-			return client, err
+		if client, err = this.fn(); err == nil {
+			this.curClients += 1
 		}
-		this.curClients += 1
-		return client, nil
+		return
 	}
 	this.lock.Unlock()
-	this.waiting += 1
+	atomic.AddInt64(&this.waiting, 1)
 	select {
-	case client := <-this.wait_channel:
-		this.waiting -= 1
-		return client, nil
+	case <-ctx.Done():
+		return
+	case client = <-this.wait_channel:
+		atomic.AddInt64(&this.waiting, -1)
+		return
 	}
 }
 
