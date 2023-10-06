@@ -54,18 +54,18 @@ func NewClientPoolNamespace(parent blueprint.Namespace, wiring blueprint.WiringS
 	return namespace
 }
 
-// Golang processes can only contain golang nodes
+// Golang clientpools can only contain golang nodes
 func (namespace *clientpoolNamespaceHandler) Accepts(nodeType any) bool {
 	_, ok := nodeType.(golang.Node)
 	return ok
 }
 
-// When a node is added to this namespace, we just attach it to the IRNode representing the process
+// When a node is added to this namespace, we just attach it to the IRNode representing the clientpool
 func (handler *clientpoolNamespaceHandler) AddNode(name string, node blueprint.IRNode) error {
 	return handler.IRNode.AddChild(node)
 }
 
-// When an edge is added to this namespace, we just attach it as an argument to the IRNode representing the process
+// When an edge is added to this namespace, we just attach it as an argument to the IRNode representing the clientpool
 func (handler *clientpoolNamespaceHandler) AddEdge(name string, node blueprint.IRNode) error {
 	handler.IRNode.AddArg(node)
 	return nil
