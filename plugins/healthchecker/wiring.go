@@ -3,6 +3,7 @@ package healthchecker
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
 
@@ -21,10 +22,10 @@ func AddHealthCheckAPI(wiring blueprint.WiringSpec, serviceName string) {
 	serverNext := ptr.AddDstModifier(wiring, serverWrapper)
 
 	// Define the server wrapper
-	wiring.Define(serverWrapper, &HealthCheckerServerWrapper{}, func(scope blueprint.Namespace) (blueprint.IRNode, error) {
-		server, err := scope.Get(serverNext)
-		if err != nil {
-			return nil, err
+	wiring.Define(serverWrapper, &HealthCheckerServerWrapper{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
+		var server golang.Service
+		if err := ns.Get(serverNext, &server); err != nil {
+			return nil, blueprint.Errorf("Healthchecker %s expected %s to be a golang.Service, but encountered %s", serverWrapper, serverNext, err)
 		}
 
 		return newHealthCheckerServerWrapper(serverWrapper, server)

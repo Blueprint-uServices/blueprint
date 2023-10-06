@@ -8,7 +8,6 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
-	"golang.org/x/exp/slog"
 )
 
 type HealthCheckerServerWrapper struct {
@@ -46,26 +45,29 @@ func newHealthCheckerServerWrapper(name string, server blueprint.IRNode) (*Healt
 	return node, nil
 }
 
-func (node *HealthCheckerServerWrapper) GetGoInterface() *gocode.ServiceInterface {
-	iface, valid := node.Wrapped.GetInterface().(*gocode.ServiceInterface)
-	if !valid {
-		slog.Error(blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.Wrapped.GetInterface()).Error())
+func (node *HealthCheckerServerWrapper) genInterface(ctx blueprint.BuildContext) (*gocode.ServiceInterface, error) {
+	iface, err := golang.GetGoInterface(ctx, node.Wrapped)
+	if err != nil {
+		return nil, err
 	}
 	i := gocode.CopyServiceInterface(fmt.Sprintf("%v_HealthChecker", iface.BaseName), node.outputPackage, iface)
 	health_check_method := &gocode.Func{}
 	health_check_method.Name = "Health"
 	health_check_method.Returns = append(health_check_method.Returns, gocode.Variable{Type: &gocode.BasicType{Name: "string"}})
 	i.AddMethod(*health_check_method)
-	return i
+	return i, nil
 }
 
-func (node *HealthCheckerServerWrapper) GetInterface() service.ServiceInterface {
-	return node.GetGoInterface()
+func (node *HealthCheckerServerWrapper) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	return node.genInterface(ctx)
 }
 
 func (node *HealthCheckerServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
-	service := node.GetGoInterface()
-	err := generateServerHandler(builder, service, node.outputPackage)
+	service, err := golang.GetGoInterface(builder, node)
+	if err != nil {
+		return err
+	}
+	err = generateServerHandler(builder, service, node.outputPackage)
 	if err != nil {
 		return err
 	}
@@ -78,17 +80,17 @@ func (node *HealthCheckerServerWrapper) AddInstantiation(builder golang.GraphBui
 		return nil
 	}
 
-	service, valid := node.Wrapped.GetInterface().(*gocode.ServiceInterface)
-	if !valid {
-		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.Wrapped.GetInterface())
+	iface, err := golang.GetGoInterface(builder, node.Wrapped)
+	if err != nil {
+		return err
 	}
 
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
-			Name: fmt.Sprintf("New_%v_HealthCheckHandler", service.BaseName),
+			Name: fmt.Sprintf("New_%v_HealthCheckHandler", iface.BaseName),
 			Arguments: []gocode.Variable{
-				{Name: "service", Type: service},
+				{Name: "service", Type: iface},
 			},
 		},
 	}
