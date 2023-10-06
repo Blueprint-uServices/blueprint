@@ -140,7 +140,7 @@ func main() {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	graph, err := {{.GraphConstructor}}(ctx, cancel, graphArgs, nil)
+	graph, err := {{.GraphConstructor}}(ctx, cancel, graphArgs, nil, "{{.Name}}")
 	if err != nil {
 		slog.Error(err.Error())
 		return

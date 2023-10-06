@@ -161,10 +161,9 @@ func (pool *ClientPool) getTemplateArgs(module golang.ModuleBuilder) (*templateA
 	args.Imports = gogen.NewImports(args.PackageName)
 
 	args.Imports.AddPackages(
-		"context",
+		"context", "fmt",
 		"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/clientpool",
 		"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/golang",
-		"golang.org/x/exp/slog",
 	)
 	return args, nil
 }
@@ -200,9 +199,10 @@ type {{.PoolName}} struct {
 }
 
 func {{.PoolConstructor}}(parent golang.Container) *{{.PoolName}} {
+	i := 0
 	createClient := func() ({{NameOf .Service.UserType}}, error) {
-		slog.Info("{{.PoolName}} creating new {{.WrappedClient}} instance ({{NameOf .Service.UserType}})")
-		graph, err := {{.ClientConstructor}}(parent.Context(), parent.CancelFunc(), nil, parent)
+		graph, err := {{.ClientConstructor}}(parent.Context(), parent.CancelFunc(), nil, parent, fmt.Sprintf("{{.InstanceName}}.%v", i))
+		i++
 		if err != nil {
 			return nil, err
 		}

@@ -40,6 +40,7 @@ type diImpl struct {
 	Graph
 	Container
 
+	name       string
 	ctx        context.Context
 	cancel     context.CancelFunc
 	wg         *sync.WaitGroup
@@ -48,8 +49,9 @@ type diImpl struct {
 	parent     Container
 }
 
-func NewGraph(ctx context.Context, cancel context.CancelFunc, parent Container) Graph {
+func NewGraph(ctx context.Context, cancel context.CancelFunc, parent Container, name string) Graph {
 	graph := &diImpl{}
+	graph.name = name
 	graph.buildFuncs = make(map[string]BuildFunc)
 	graph.built = make(map[string]any)
 	graph.ctx = ctx
@@ -61,7 +63,7 @@ func NewGraph(ctx context.Context, cancel context.CancelFunc, parent Container) 
 
 func (graph *diImpl) Define(name string, build BuildFunc) error {
 	if _, exists := graph.buildFuncs[name]; exists {
-		slog.Warn("redefining " + name + "; this might indicate a bad wiring spec")
+		slog.Warn(fmt.Sprintf("%v redefining %v; this might indicate a bad wiring spec", graph.name, name))
 	}
 	graph.buildFuncs[name] = build
 	return nil
@@ -78,28 +80,28 @@ func (graph *diImpl) Get(name string, receiver any) error {
 	if build, exists := graph.buildFuncs[name]; exists {
 		built, err := build(graph)
 		if err != nil {
-			slog.Error("Error building " + name)
+			slog.Error(fmt.Sprintf("%v error building %v", graph.name, name))
 			return err
 		} else {
 			switch v := built.(type) {
 			case string:
-				slog.Info(fmt.Sprintf("Built %v (%v) = %v", name, reflect.TypeOf(built), v))
+				slog.Info(fmt.Sprintf("%v built %v (%v) = %v", graph.name, name, reflect.TypeOf(built), v))
 			default:
-				slog.Info(fmt.Sprintf("Built %v (%v)", name, reflect.TypeOf(built)))
+				slog.Info(fmt.Sprintf("%v built %v (%v)", graph.name, name, reflect.TypeOf(built)))
 			}
 		}
 		graph.built[name] = built
 
 		if runnable, isRunnable := built.(Runnable); isRunnable {
-			slog.Info("Running " + name)
+			slog.Info(fmt.Sprintf("%v running %v", graph.name, name))
 			graph.wg.Add(1)
 			go func() {
 				err := runnable.Run(graph.ctx)
 				if err != nil {
-					slog.Error(fmt.Sprintf("error running node %v: %v", name, err.Error()))
+					slog.Error(fmt.Sprintf("%v error running node %v: %v", graph.name, name, err.Error()))
 					graph.cancel()
 				} else {
-					slog.Info(name + " exited")
+					slog.Info(fmt.Sprintf("%v %v exited", graph.name, name))
 				}
 				graph.wg.Done()
 			}()
@@ -110,7 +112,7 @@ func (graph *diImpl) Get(name string, receiver any) error {
 	if graph.parent != nil {
 		return graph.parent.Get(name, receiver)
 	}
-	return fmt.Errorf("unknown %v", name)
+	return fmt.Errorf("%v unknown %v", graph.name, name)
 }
 
 func (graph *diImpl) Context() context.Context {
