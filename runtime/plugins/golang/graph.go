@@ -19,7 +19,8 @@ type Graph interface {
 
 type Container interface {
 	Get(name string, receiver any) error
-	Context() context.Context   // In case the buildfunc wants to start background goroutines
+	Context() context.Context // In case the buildfunc wants to start background goroutines
+	CancelFunc() context.CancelFunc
 	WaitGroup() *sync.WaitGroup // Waitgroup used by this container; plugins can call Add if they create goroutines
 }
 
@@ -114,6 +115,10 @@ func (graph *diImpl) Get(name string, receiver any) error {
 
 func (graph *diImpl) Context() context.Context {
 	return graph.ctx
+}
+
+func (graph *diImpl) CancelFunc() context.CancelFunc {
+	return graph.cancel
 }
 
 func (graph *diImpl) WaitGroup() *sync.WaitGroup {
