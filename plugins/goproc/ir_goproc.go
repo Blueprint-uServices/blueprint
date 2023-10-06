@@ -140,15 +140,15 @@ func main() {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	graph, err := {{.GraphConstructor}}(ctx, cancel, graphArgs)
+	graph, err := {{.GraphConstructor}}(ctx, cancel, graphArgs, nil)
 	if err != nil {
 		slog.Error(err.Error())
 		return
 	}
 
+	var node any
 	{{range $i, $node := .Instantiate -}}
-	_, err = graph.Get("{{$node}}")
-	if err != nil {
+	if err = graph.Get("{{$node}}", &node); err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
 	}
