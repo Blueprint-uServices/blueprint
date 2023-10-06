@@ -172,21 +172,19 @@ var diFuncTemplate = `package {{.Package.ShortName}}
 
 {{.Imports}}
 
-func {{ .FuncName }}(ctx context.Context, cancel context.CancelFunc, args map[string]string, parent golang.Container) (golang.Container, error) {
-	g := golang.NewGraph(ctx, cancel, parent)
+func {{ .FuncName }}(ctx context.Context, cancel context.CancelFunc, args map[string]string, parent golang.Container, name string) (golang.Container, error) {
+	g := golang.NewGraph(ctx, cancel, parent, name)
 
 	var err error
 	for k := range args {
 		v := args[k]
-		err = g.Define(k, func(ctr golang.Container) (any, error) { return v, nil })
-		if err != nil {
+		if err = g.Define(k, func(ctr golang.Container) (any, error) { return v, nil }); err != nil {
 			return nil, err
 		}
 	}
 
 	{{ range $defName, $buildFunc := .Declarations }}
-	err = g.Define("{{ $defName }}", {{ $buildFunc }})
-	if err != nil {
+	if err = g.Define("{{ $defName }}", {{ $buildFunc }}); err != nil {
 		return nil, err
 	}
 	{{ end }}
