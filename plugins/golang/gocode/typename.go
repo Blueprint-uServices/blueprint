@@ -178,6 +178,14 @@ type (
 	StructType struct {
 		TypeName
 	}
+
+	/*
+		A struct with generics. For now blueprint doesn't support generics in service declarations
+	*/
+	GenericType struct {
+		TypeName
+		BaseType TypeName
+	}
 )
 
 func shortName(Package string) string {

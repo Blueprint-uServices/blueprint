@@ -31,7 +31,7 @@ The typical usage of a `GraphBuilder` is to:
 */
 type GraphBuilderImpl struct {
 	blueprint.VisitTrackerImpl
-	module       *ModuleBuilderImpl // The module containing this file
+	module       golang.ModuleBuilder // The module containing this file
 	Package      golang.PackageInfo
 	FileName     string            // The short name of the file
 	FilePath     string            // The fully qualified path to the file
@@ -43,7 +43,7 @@ type GraphBuilderImpl struct {
 /*
 Create a new GraphBuilder
 */
-func NewGraphBuilder(module *ModuleBuilderImpl, fileName, packagePath, funcName string) (*GraphBuilderImpl, error) {
+func NewGraphBuilder(module golang.ModuleBuilder, fileName, packagePath, funcName string) (*GraphBuilderImpl, error) {
 	pkg, err := module.CreatePackage(packagePath)
 	if err != nil {
 		return nil, err

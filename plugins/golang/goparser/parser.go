@@ -444,6 +444,8 @@ func (f *ParsedFile) ResolveType(expr ast.Expr) gocode.TypeName {
 		return &gocode.FuncType{}
 	case *ast.StructType:
 		return &gocode.StructType{}
+	case *ast.IndexExpr:
+		return &gocode.GenericType{BaseType: f.ResolveType(e.X)}
 	default:
 		fmt.Printf("unknown or invalid expr type %v %v\n", reflect.TypeOf(expr), expr)
 	}
