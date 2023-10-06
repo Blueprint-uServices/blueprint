@@ -31,6 +31,10 @@ func (node *HealthCheckerServerWrapper) String() string {
 	return node.Name() + " = HealthCheckerServerWrapper(" + node.Wrapped.Name() + ")"
 }
 
+func (node *HealthCheckerServerWrapper) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.Wrapped.AddInterfaces(builder)
+}
+
 func newHealthCheckerServerWrapper(name string, server blueprint.IRNode) (*HealthCheckerServerWrapper, error) {
 	serverNode, is_callable := server.(golang.Service)
 	if !is_callable {
@@ -50,7 +54,11 @@ func (node *HealthCheckerServerWrapper) genInterface(ctx blueprint.BuildContext)
 	if err != nil {
 		return nil, err
 	}
-	i := gocode.CopyServiceInterface(fmt.Sprintf("%v_HealthChecker", iface.BaseName), node.outputPackage, iface)
+	module_ctx, valid := ctx.(golang.ModuleBuilder)
+	if !valid {
+		return nil, blueprint.Errorf("Healthchecker expected build context to be a ModuleBuilder, got %v", ctx)
+	}
+	i := gocode.CopyServiceInterface(fmt.Sprintf("%v_HealthChecker", iface.BaseName), module_ctx.Info().Name+"/"+node.outputPackage, iface)
 	health_check_method := &gocode.Func{}
 	health_check_method.Name = "Health"
 	health_check_method.Returns = append(health_check_method.Returns, gocode.Variable{Type: &gocode.BasicType{Name: "string"}})
@@ -63,11 +71,15 @@ func (node *HealthCheckerServerWrapper) GetInterface(ctx blueprint.BuildContext)
 }
 
 func (node *HealthCheckerServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
-	service, err := golang.GetGoInterface(builder, node)
+	service, err := golang.GetGoInterface(builder, node.Wrapped)
 	if err != nil {
 		return err
 	}
-	err = generateServerHandler(builder, service, node.outputPackage)
+	iface, err := golang.GetGoInterface(builder, node)
+	if err != nil {
+		return err
+	}
+	err = generateServerHandler(builder, iface, service, node.outputPackage)
 	if err != nil {
 		return err
 	}

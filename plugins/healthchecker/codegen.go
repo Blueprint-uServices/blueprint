@@ -10,7 +10,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func generateServerHandler(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error {
+func generateServerHandler(builder golang.ModuleBuilder, iface *gocode.ServiceInterface, wrapped_service *gocode.ServiceInterface, outputPackage string) error {
 	// TODO: Implement
 	pkg, err := builder.CreatePackage(outputPackage)
 	if err != nil {
@@ -19,22 +19,24 @@ func generateServerHandler(builder golang.ModuleBuilder, service *gocode.Service
 
 	server := &serverArgs{
 		Package:   pkg,
-		Service:   service,
-		Name:      service.BaseName + "_HealthCheckHandler",
-		IfaceName: service.Name,
+		Service:   wrapped_service,
+		Iface:     iface,
+		Name:      wrapped_service.BaseName + "_HealthCheckHandler",
+		IfaceName: iface.Name,
 		Imports:   gogen.NewImports(pkg.Name),
 	}
 
 	server.Imports.AddPackages("context")
 
-	slog.Info(fmt.Sprintf("Generating %v/%v", server.Package.PackageName, service.Name))
-	outputFile := filepath.Join(server.Package.Path, service.Name+".go")
+	slog.Info(fmt.Sprintf("Generating %v/%v", server.Package.PackageName, iface.Name))
+	outputFile := filepath.Join(server.Package.Path, iface.Name+".go")
 	return gogen.ExecuteTemplateToFile("HealthChecker", serverTemplate, server, outputFile)
 }
 
 type serverArgs struct {
 	Package   golang.PackageInfo
 	Service   *gocode.ServiceInterface
+	Iface     *gocode.ServiceInterface
 	Name      string
 	IfaceName string
 	Imports   *gogen.Imports
@@ -46,7 +48,7 @@ package {{.Package.ShortName}}
 {{.Imports}}
 
 type {{.IfaceName}} interface {
-	{{range $_, $f := .Service.Methods -}}
+	{{range $_, $f := .Iface.Methods -}}
 	{{Signature $f}}
 	{{end}}
 }
@@ -64,14 +66,11 @@ func New_{{.Name}}(service {{.Imports.NameOf .Service.UserType}}) (*{{.Name}}, e
 {{$service := .Service.Name -}}
 {{$receiver := .Name -}}
 {{ range $_, $f := .Service.Methods }}
-{{- if (ne $f.Name "Health") -}}
 func (handler *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetTypes $f "error"}}) {
 	return handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
 }
-{{- else -}}
+{{end}}
 func (handler *{{$receiver}}) Health(ctx context.Context) (string, error) {
 	return "Healthy", nil
 }
-{{end}}
-{{end -}}
 `
