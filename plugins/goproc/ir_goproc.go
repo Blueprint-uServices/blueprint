@@ -140,15 +140,15 @@ func main() {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	graph, err := {{.GraphConstructor}}(ctx, cancel, graphArgs)
+	graph, err := {{.GraphConstructor}}(ctx, cancel, graphArgs, nil)
 	if err != nil {
 		slog.Error(err.Error())
 		return
 	}
 
+	var node any
 	{{range $i, $node := .Instantiate -}}
-	_, err = graph.Get("{{$node}}")
-	if err != nil {
+	if err = graph.Get("{{$node}}", &node); err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
 	}
@@ -238,6 +238,11 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 		}
 	}
 
+	// Generate the graph code
+	if err = graph.Build(); err != nil {
+		return err
+	}
+
 	// Generate the main.go
 	mainArgs := mainTemplateArgs{
 		Name:             node.Name(),
@@ -263,12 +268,6 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	slog.Info(fmt.Sprintf("Generating %v/main.go", module.Name))
 	mainFileName := filepath.Join(module.ModuleDir, "main.go")
 	err = gogen.ExecuteTemplateToFile("goprocMain", mainTemplate, mainArgs, mainFileName)
-	if err != nil {
-		return err
-	}
-
-	// Build workspace, module, and graph
-	err = graph.Build()
 	if err != nil {
 		return err
 	}
