@@ -19,7 +19,7 @@ func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 	client := &clientArgs{
 		Package: pkg,
 		Service: service,
-		Name:    service.Name + "_HTTPClient",
+		Name:    service.BaseName + "_HTTPClient",
 		Imports: gogen.NewImports(pkg.Name),
 	}
 

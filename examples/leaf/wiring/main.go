@@ -8,6 +8,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/healthchecker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplenosqldb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
@@ -19,6 +20,7 @@ func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) string {
 	procName := fmt.Sprintf("p%s", serviceName)
 	// opentelemetry.Instrument(wiring, serviceName)
 	clientpool.Create(wiring, serviceName, 5)
+	healthchecker.AddHealthCheckAPI(wiring, serviceName)
 	grpc.Deploy(wiring, serviceName)
 	return goproc.CreateProcess(wiring, procName, serviceName)
 }

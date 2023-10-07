@@ -666,6 +666,7 @@ func (iface *ParsedInterface) ServiceInterface(ctx blueprint.BuildContext) *goco
 	}
 	return &gocode.ServiceInterface{
 		UserType: *iface.Type(),
+		BaseName: (*iface.Type()).Name,
 		Methods:  methods,
 	}
 }

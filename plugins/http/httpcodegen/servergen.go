@@ -23,7 +23,7 @@ func GenerateServerHandler(builder golang.ModuleBuilder, service *gocode.Service
 	server := &serverArgs{
 		Package: pkg,
 		Service: service,
-		Name:    service.Name + "_HTTPServerHandler",
+		Name:    service.BaseName + "_HTTPServerHandler",
 		Imports: gogen.NewImports(pkg.Name),
 	}
 
