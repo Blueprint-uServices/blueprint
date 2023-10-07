@@ -50,7 +50,7 @@ type {{.Name}} struct {
 	ServerAddress string
 }
 
-func New_{{.Name}}(serverAddress string) (*{{.Name}}, error) {
+func New_{{.Name}}(ctx context.Context, serverAddress string) (*{{.Name}}, error) {
 	duration, err := time.ParseDuration("1s")
 	if err != nil {
 		return nil, err

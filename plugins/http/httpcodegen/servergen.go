@@ -54,7 +54,7 @@ type {{.Name}} struct {
 	Address string
 }
 
-func New_{{.Name}}(service {{.Imports.NameOf .Service.UserType}}, serverAddress string) (*{{.Name}}, error) {
+func New_{{.Name}}(ctx context.Context, service {{.Imports.NameOf .Service.UserType}}, serverAddress string) (*{{.Name}}, error) {
 	handler := &{{.Name}}{}
 	handler.Service = service
 	handler.Address = serverAddress
