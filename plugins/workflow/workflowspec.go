@@ -222,6 +222,11 @@ func (spec *WorkflowSpec) findConstructorsOfStruct(struc *goparser.ParsedStruct)
 	return constructors
 }
 
+/*
+Currently Blueprint is strict about the method signatures of constructors:
+  - the first argument must be context.Context
+  - the final retval must be error
+*/
 func validateConstructorSignature(f *goparser.ParsedFunc) error {
 	if len(f.Returns) == 0 {
 		return blueprint.Errorf("%v has no return values", f.Func)
@@ -236,6 +241,15 @@ func validateConstructorSignature(f *goparser.ParsedFunc) error {
 	if ret1, isRet1Basic := f.Returns[1].Type.(*gocode.BasicType); !isRet1Basic || ret1.Name != "error" {
 		return blueprint.Errorf("second retval of %v must be error", f.Func)
 	}
+
+	if len(f.Arguments) == 0 {
+		return blueprint.Errorf("%v has no arguments", f.Func)
+	}
+
+	if arg0, isArg0User := f.Arguments[0].Type.(*gocode.UserType); !isArg0User || arg0.Name != "Context" || arg0.Package != "context" {
+		return blueprint.Errorf("first argument of %v must be context.Context", f.Func)
+	}
+
 	return nil
 }
 

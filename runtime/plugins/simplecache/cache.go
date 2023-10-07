@@ -13,7 +13,7 @@ type SimpleCache struct {
 	values map[string]any
 }
 
-func NewSimpleCache() (*SimpleCache, error) {
+func NewSimpleCache(ctx context.Context) (*SimpleCache, error) {
 	cache := &SimpleCache{}
 	cache.values = make(map[string]any)
 	return cache, nil

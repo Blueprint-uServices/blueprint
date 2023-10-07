@@ -43,7 +43,7 @@ var teacollections = []TeaCollection{
 func MakeTestDB(t *testing.T) (context.Context, *SimpleCollection) {
 	verbose = true
 	ctx := context.Background()
-	db, err := NewSimpleNoSQLDB()
+	db, err := NewSimpleNoSQLDB(ctx)
 	assert.NoError(t, err)
 
 	coll, err := db.GetCollection(ctx, "testdb", "testcollection")
@@ -61,7 +61,7 @@ func MakeTestDB(t *testing.T) (context.Context, *SimpleCollection) {
 func MakeTestDB2(t *testing.T) (context.Context, *SimpleCollection) {
 	verbose = true
 	ctx := context.Background()
-	db, err := NewSimpleNoSQLDB()
+	db, err := NewSimpleNoSQLDB(ctx)
 	assert.NoError(t, err)
 
 	coll, err := db.GetCollection(ctx, "testdb", "testcollection2")

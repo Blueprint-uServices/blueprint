@@ -14,7 +14,7 @@ type NonLeafServiceImpl struct {
 	leafService LeafService
 }
 
-func NewNonLeafServiceImpl(leafService LeafService) (NonLeafService, error) {
+func NewNonLeafServiceImpl(ctx context.Context, leafService LeafService) (NonLeafService, error) {
 	nonleaf := &NonLeafServiceImpl{}
 	nonleaf.leafService = leafService
 	return nonleaf, nil

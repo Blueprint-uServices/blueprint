@@ -8,8 +8,8 @@ import (
 )
 
 func TestGet(t *testing.T) {
-	cache, _ := NewSimpleCache()
 	ctx := context.Background()
+	cache, _ := NewSimpleCache(ctx)
 
 	err := cache.Put(ctx, "hello", "world")
 	assert.NoError(t, err)
@@ -32,8 +32,8 @@ func TestGet(t *testing.T) {
 }
 
 func TestIncr(t *testing.T) {
-	cache, _ := NewSimpleCache()
 	ctx := context.Background()
+	cache, _ := NewSimpleCache(ctx)
 
 	for j := 0; j < 10; j++ {
 		jv, err := cache.Incr(ctx, "nothing")
@@ -43,8 +43,8 @@ func TestIncr(t *testing.T) {
 }
 
 func TestMget(t *testing.T) {
-	cache, _ := NewSimpleCache()
 	ctx := context.Background()
+	cache, _ := NewSimpleCache(ctx)
 
 	keys := []string{"a", "b"}
 	values := []interface{}{int64(5), "hello"}

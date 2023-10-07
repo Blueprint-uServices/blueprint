@@ -1,7 +1,6 @@
 package leaf
 
 import (
-	"context"
 	ctxx "context"
 	"fmt"
 
@@ -37,8 +36,8 @@ type LeafServiceImpl struct {
 	Collection backend.NoSQLCollection
 }
 
-func NewLeafServiceImpl(cache backend.Cache, db backend.NoSQLDatabase) (*LeafServiceImpl, error) {
-	collection, err := db.GetCollection(context.Background(), "leafdb", "leafcollection")
+func NewLeafServiceImpl(ctx ctxx.Context, cache backend.Cache, db backend.NoSQLDatabase) (*LeafServiceImpl, error) {
+	collection, err := db.GetCollection(ctx, "leafdb", "leafcollection")
 	if err != nil {
 		return nil, err
 	}
