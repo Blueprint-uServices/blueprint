@@ -102,6 +102,7 @@ func (node *HealthCheckerServerWrapper) AddInstantiation(builder golang.GraphBui
 		Func: gocode.Func{
 			Name: fmt.Sprintf("New_%v_HealthCheckHandler", iface.BaseName),
 			Arguments: []gocode.Variable{
+				{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}},
 				{Name: "service", Type: iface},
 			},
 		},

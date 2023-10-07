@@ -57,7 +57,7 @@ type {{.Name}} struct {
 	Service {{.Imports.NameOf .Service.UserType}}
 }
 
-func New_{{.Name}}(service {{.Imports.NameOf .Service.UserType}}) (*{{.Name}}, error) {
+func New_{{.Name}}(ctx context.Context, service {{.Imports.NameOf .Service.UserType}}) (*{{.Name}}, error) {
 	handler := &{{.Name}}{}
 	handler.Service = service
 	return handler, nil
