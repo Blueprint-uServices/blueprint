@@ -46,7 +46,7 @@ type {{.Name}} struct {
 	Service {{NameOf .Service.UserType}}
 }
 
-func New_{{.Name}}(service {{NameOf .Service.UserType}}) (*{{.Name}}, error) {
+func New_{{.Name}}(ctx context.Context, service {{NameOf .Service.UserType}}) (*{{.Name}}, error) {
 	wlgen := &{{.Name}}{}
 	wlgen.Service = service
 	return wlgen, nil

@@ -60,7 +60,7 @@ type {{.Name}} struct {
 	Timeout time.Duration
 }
 
-func New_{{.Name}}(serverAddress string) (*{{.Name}}, error) {
+func New_{{.Name}}(ctx context.Context, serverAddress string) (*{{.Name}}, error) {
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	duration, err := time.ParseDuration("1s")

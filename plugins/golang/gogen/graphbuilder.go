@@ -126,16 +126,16 @@ var buildFuncTemplate = `func(ctr golang.Container) (any, error) {
 			return nil, err
 		}
 		{{end}}
-		return {{.Graph.Imports.NameOf .Constructor}}({{range $i, $arg := .Args}}{{if $i}}, {{end}}{{.Var.Name}}{{end}})
+		return {{.Graph.Imports.NameOf .Constructor}}(ctr.Context(), {{range $i, $arg := .Args}}{{if $i}}, {{end}}{{.Var.Name}}{{end}})
 	}`
 
 func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *gocode.Constructor, args []blueprint.IRNode) error {
-	if len(constructor.Arguments) != len(args) {
+	if len(constructor.Arguments) != len(args)+1 {
 		argNames := []string{}
 		for _, arg := range args {
 			argNames = append(argNames, arg.Name())
 		}
-		return blueprint.Errorf("mismatched args for %v.  Expected: %v.  Got: (%v)", name, constructor, strings.Join(argNames, ", "))
+		return blueprint.Errorf("mismatched args for %v.  Expected: %v.  Got: (ctx, %v)", name, constructor, strings.Join(argNames, ", "))
 	}
 
 	templateArgs := buildFuncArgs{
@@ -144,7 +144,7 @@ func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *goco
 		InstanceName: blueprint.CleanName(name),
 		Constructor:  &gocode.UserType{Package: constructor.Package, Name: constructor.Name},
 	}
-	for i, Var := range constructor.Arguments {
+	for i, Var := range constructor.Arguments[1:] {
 		arg := buildFuncConstructorArg{
 			Graph:    graph,
 			Var:      Var,

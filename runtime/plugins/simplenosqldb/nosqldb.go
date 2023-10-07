@@ -27,7 +27,7 @@ type (
 	}
 )
 
-func NewSimpleNoSQLDB() (*SimpleNoSQLDB, error) {
+func NewSimpleNoSQLDB(ctx context.Context) (*SimpleNoSQLDB, error) {
 	db := &SimpleNoSQLDB{}
 	db.collections = make(map[string]map[string]*SimpleCollection)
 	return db, nil

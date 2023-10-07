@@ -94,6 +94,7 @@ func (node *GolangHttpServer) AddInstantiation(builder golang.GraphBuilder) erro
 		Func: gocode.Func{
 			Name: fmt.Sprintf("New_%v_HTTPServerHandler", iface.Name),
 			Arguments: []gocode.Variable{
+				{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}},
 				{Name: "service", Type: iface},
 				{Name: "serverAddr", Type: &gocode.BasicType{Name: "string"}},
 			},

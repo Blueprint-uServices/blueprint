@@ -89,6 +89,7 @@ func (node *GolangHttpClient) AddInstantiation(builder golang.GraphBuilder) erro
 		Func: gocode.Func{
 			Name: fmt.Sprintf("New_%v_HTTPClient", iface.Name),
 			Arguments: []gocode.Variable{
+				{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}},
 				{Name: "addr", Type: &gocode.BasicType{Name: "string"}},
 			},
 		},
