@@ -32,6 +32,14 @@ func (node *HealthCheckerServerWrapper) String() string {
 }
 
 func (node *HealthCheckerServerWrapper) AddInterfaces(builder golang.ModuleBuilder) error {
+	iface, err := node.genInterface(builder)
+	if err != nil {
+		return err
+	}
+	err = generateClientSideInterfaces(builder, iface, node.outputPackage)
+	if err != nil {
+		return err
+	}
 	return node.Wrapped.AddInterfaces(builder)
 }
 
