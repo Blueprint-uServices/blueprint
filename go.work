@@ -4,6 +4,8 @@ use (
 	./blueprint
 	./examples/leaf/wiring
 	./examples/leaf/workflow
+	./examples/sockshop/wiring
+	./examples/sockshop/workflow
 	./plugins
 	./runtime
 )
