@@ -10,6 +10,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/healthchecker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplenosqldb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
@@ -17,6 +18,7 @@ import (
 
 func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) string {
 	procName := fmt.Sprintf("p%s", serviceName)
+	retries.AddRetries(wiring, serviceName, 10)
 	healthchecker.AddHealthCheckAPI(wiring, serviceName)
 	http.Deploy(wiring, serviceName)
 	return goproc.CreateProcess(wiring, procName, serviceName)
