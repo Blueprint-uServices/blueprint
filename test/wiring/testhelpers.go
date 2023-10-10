@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"golang.org/x/exp/slog"
 )
 
 func newWiringSpec(name string) blueprint.WiringSpec {
@@ -32,6 +33,29 @@ func build(t *testing.T, wiring blueprint.WiringSpec, toInstantiate ...string) (
 	return bp.Build()
 }
 
+func assertBuildFailure(t *testing.T, wiring blueprint.WiringSpec, toInstantiate ...string) error {
+	app, err := build(t, wiring, toInstantiate...)
+
+	if !assert.Error(t, err) {
+		slog.Info("Expected a build error, but did not get one")
+		slog.Info("Wiring Spec: \n" + wiring.String())
+		slog.Info("Application: \n" + app.String())
+	}
+	return err
+}
+
+func assertBuildSuccess(t *testing.T, wiring blueprint.WiringSpec, toInstantiate ...string) *blueprint.ApplicationNode {
+	app, err := build(t, wiring, toInstantiate...)
+
+	if !assert.NoError(t, err) {
+		slog.Info("Unexpected error building application")
+		slog.Info("Wiring Spec: \n" + wiring.String())
+		slog.Info("Application: \n" + app.String())
+		slog.Error(err.Error())
+	}
+	return app
+}
+
 func splits(str string) []string {
 	ss := strings.Split(str, "\n")
 	for i := range ss {
@@ -49,5 +73,9 @@ and testing IR objects
 func assertIR(t *testing.T, app *blueprint.ApplicationNode, expected string) bool {
 	a := splits(app.String())
 	b := splits(expected)
-	return assert.Equal(t, b, a)
+	if !assert.Equal(t, b, a) {
+		slog.Info("Application: \n" + app.String())
+		return false
+	}
+	return true
 }

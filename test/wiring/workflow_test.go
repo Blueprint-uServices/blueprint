@@ -29,11 +29,7 @@ func TestBasicServices(t *testing.T) {
 	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
 	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
 
-	app, err := build(t, wiring, leaf, nonleaf)
-	if !assert.NoError(t, err) {
-		slog.Info("Wiring Spec: \n" + wiring.String())
-		slog.Info("Application: \n" + app.String())
-	}
+	app := assertBuildSuccess(t, wiring, leaf, nonleaf)
 
 	assertIR(t, app,
 		`TestBasicServices = BlueprintApplication() {
@@ -42,6 +38,23 @@ func TestBasicServices(t *testing.T) {
 			nonleaf.handler.visibility
 			nonleaf = TestNonLeafService(leaf)
 		}`)
+}
+
+func TestImplicitInstantiation(t *testing.T) {
+	wiring := newWiringSpec("TestImplicitInstantiation")
+
+	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+
+	app := assertBuildSuccess(t, wiring, nonleaf)
+
+	assertIR(t, app,
+		`TestImplicitInstantiation = BlueprintApplication() {
+			nonleaf.handler.visibility
+			leaf.handler.visibility
+			leaf = TestLeafService()
+			nonleaf = TestNonLeafService(leaf)
+		  }`)
 }
 
 func TestBadServiceConstructor(t *testing.T) {

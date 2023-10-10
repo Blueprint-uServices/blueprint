@@ -22,7 +22,7 @@ func CreateProcess(wiring blueprint.WiringSpec, procName string, children ...str
 	}
 
 	wiring.Define(procName, &Process{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		process := NewGolangProcessNamespace(namespace, wiring, procName)
+		process := newGolangProcessNamespace(namespace, wiring, procName)
 
 		var childNames []string
 		if err := namespace.GetProperties(procName, "Children", &childNames); err != nil {
@@ -63,7 +63,7 @@ func CreateClientProcess(wiring blueprint.WiringSpec, procName string, children 
 	}
 
 	wiring.Define(procName, &Process{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		process := NewGolangProcessNamespace(namespace, wiring, procName)
+		process := newGolangProcessNamespace(namespace, wiring, procName)
 
 		var childNames []string
 		if err := namespace.GetProperties(procName, "Children", &childNames); err != nil {
@@ -100,7 +100,7 @@ type processNamespaceHandler struct {
 }
 
 // Creates a process `name` within the provided parent namespace
-func NewGolangProcessNamespace(parentNamespace blueprint.Namespace, wiring blueprint.WiringSpec, name string) *ProcessNamespace {
+func newGolangProcessNamespace(parentNamespace blueprint.Namespace, wiring blueprint.WiringSpec, name string) *ProcessNamespace {
 	namespace := &ProcessNamespace{}
 	namespace.handler = &processNamespaceHandler{}
 	namespace.handler.Init(&namespace.SimpleNamespace)
