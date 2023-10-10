@@ -1,15 +1,15 @@
 package workflow
 
 import (
-	"fmt"
 	"path/filepath"
 	"runtime"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+	"golang.org/x/exp/slog"
 )
 
-var workflowSpecModulePaths map[string]struct{}
+var workflowSpecModulePaths = make(map[string]struct{})
 var workflowSpec *WorkflowSpec
 
 /*
@@ -24,17 +24,20 @@ are assumed to be **relative** to the calling file.
 This can be called more than once, which will concatenate all provided srcModulePaths
 */
 func Init(srcModulePaths ...string) {
-	if workflowSpecModulePaths == nil {
-		workflowSpecModulePaths = make(map[string]struct{})
-	}
 	_, callingFile, _, _ := runtime.Caller(1)
 	dir, _ := filepath.Split(callingFile)
 	for _, path := range srcModulePaths {
 		workflowPath := filepath.Clean(filepath.Join(dir, path))
-		workflowSpecModulePaths[workflowPath] = struct{}{}
-		fmt.Println("add workflow " + workflowPath)
+		if _, exists := workflowSpecModulePaths[workflowPath]; !exists {
+			slog.Info("Added workflow spec path " + workflowPath)
+			workflowSpecModulePaths[workflowPath] = struct{}{}
+		}
 	}
 	workflowSpec = nil
+}
+
+func Reset() {
+	workflowSpecModulePaths = make(map[string]struct{})
 }
 
 // Static initialization of the workflow spec

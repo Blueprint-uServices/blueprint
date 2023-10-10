@@ -6,4 +6,6 @@ use (
 	./examples/leaf/workflow
 	./plugins
 	./runtime
+	./test/wiring
+	./test/workflow
 )

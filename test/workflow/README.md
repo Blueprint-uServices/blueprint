@@ -1,0 +1,1 @@
+Workflow specs used for testing different plugins.  Each plugin may want to define its own workflow specs, which should live in different subfolders; or they may reuse common ones.

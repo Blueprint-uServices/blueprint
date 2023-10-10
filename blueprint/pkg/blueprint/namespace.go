@@ -83,14 +83,12 @@ type DefaultNamespaceHandler struct {
 	SimpleNamespaceHandler
 	Namespace *SimpleNamespace
 
-	Nodes map[string]IRNode
-	Edges map[string]IRNode
+	Nodes []IRNode
+	Edges []IRNode
 }
 
 func (handler *DefaultNamespaceHandler) Init(namespace *SimpleNamespace) {
 	handler.Namespace = namespace
-	handler.Nodes = make(map[string]IRNode)
-	handler.Edges = make(map[string]IRNode)
 }
 
 /*
@@ -120,14 +118,14 @@ func (handler *DefaultNamespaceHandler) Accepts(nodeType any) bool {
 // This is called after getting a node from the parent namespace.  By default it just saves the node
 // as an edge.  Namespace implementations can override this method to do other things.
 func (handler *DefaultNamespaceHandler) AddEdge(name string, node IRNode) error {
-	handler.Edges[node.Name()] = node
+	handler.Edges = append(handler.Edges, node)
 	return nil
 }
 
 // This is called after building a node in the current namespace.  By default it just saves the node
 // on the namespace.  Namespace implementations can override this method to do other things.
 func (handler *DefaultNamespaceHandler) AddNode(name string, node IRNode) error {
-	handler.Nodes[node.Name()] = node
+	handler.Nodes = append(handler.Nodes, node)
 	return nil
 }
 

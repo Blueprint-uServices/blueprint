@@ -72,17 +72,21 @@ func main() {
 	slog.Info("Application: \n" + application.String())
 
 	// Below here is a WIP on generating code
-	err = application.Children["pa"].(*goproc.Process).GenerateArtifacts("tmp")
+	nodes := make(map[string]blueprint.IRNode)
+	for _, node := range application.Children {
+		nodes[node.Name()] = node
+	}
+	err = nodes["pa"].(*goproc.Process).GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
 	}
-	err = application.Children["pb"].(*goproc.Process).GenerateArtifacts("tmp")
+	err = nodes["pb"].(*goproc.Process).GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
 	}
-	err = application.Children[client].(*goproc.Process).GenerateArtifacts("tmp")
+	err = nodes[client].(*goproc.Process).GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)

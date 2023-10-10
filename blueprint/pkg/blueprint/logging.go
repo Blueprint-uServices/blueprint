@@ -19,10 +19,14 @@ type BlueprintLoggerHandlerOptions struct {
 // Implementation of Blueprint's custom Handler of slog.Logger
 type BlueprintLoggerHandler struct {
 	slog.Handler
-	l *log.Logger
+	l       *log.Logger
+	enabled bool
 }
 
 func (h *BlueprintLoggerHandler) Handle(ctx context.Context, r slog.Record) error {
+	if !h.enabled {
+		return nil
+	}
 	level := r.Level.String() + ":"
 
 	timeStr := r.Time.Format("[15:04:05.000]")
@@ -57,10 +61,13 @@ func newBlueprintLoggerHandler(out io.Writer, opts BlueprintLoggerHandlerOptions
 	h := &BlueprintLoggerHandler{
 		Handler: slog.NewTextHandler(out, &opts.SlogOpts),
 		l:       log.New(out, "", 0),
+		enabled: true,
 	}
 
 	return h
 }
+
+var loggerhandler *BlueprintLoggerHandler
 
 // Initializes the logger when this package is first loaded. This function is guaranteed to be invoked only once so the logger will be initialized only once.
 func init() {
@@ -70,6 +77,19 @@ func init() {
 	}
 	blOpts := BlueprintLoggerHandlerOptions{SlogOpts: opts}
 
-	logger := slog.New(newBlueprintLoggerHandler(os.Stdout, blOpts))
+	loggerhandler = newBlueprintLoggerHandler(os.Stdout, blOpts)
+	logger := slog.New(loggerhandler)
 	slog.SetDefault(logger)
+}
+
+func EnableCompilerLogging() {
+	if loggerhandler != nil {
+		loggerhandler.enabled = true
+	}
+}
+
+func DisableCompilerLogging() {
+	if loggerhandler != nil {
+		loggerhandler.enabled = false
+	}
 }

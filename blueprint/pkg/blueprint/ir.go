@@ -22,7 +22,7 @@ type ApplicationNode struct {
 	IRNode
 
 	name     string
-	Children map[string]IRNode
+	Children []IRNode
 }
 
 func (node *ApplicationNode) Name() string {

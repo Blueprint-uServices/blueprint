@@ -1,0 +1,1 @@
+Wiring spec tests for different Blueprint plugins.  Each plugin's tests reside in a file called [plugin]_test.go
