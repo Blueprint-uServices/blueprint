@@ -33,6 +33,10 @@ func (addr *GolangXTraceAddress) SetDestination(node blueprint.IRNode) error {
 	return nil
 }
 
+func (addr *GolangXTraceAddress) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	return addr.Server.GetInterface(ctx)
+}
+
 func (addr *GolangXTraceAddress) String() string {
 	return addr.AddrName + " = GolangXTraceAddress()"
 }

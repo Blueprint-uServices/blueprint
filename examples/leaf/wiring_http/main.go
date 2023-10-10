@@ -15,6 +15,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplenosqldb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/xtrace"
 )
 
 func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) string {
@@ -22,6 +23,7 @@ func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) string {
 	retries.AddRetries(wiring, serviceName, 10)
 	healthchecker.AddHealthCheckAPI(wiring, serviceName)
 	circuitbreaker.AddCircuitBreaker(wiring, serviceName, 1000, 0.1, "1s")
+	xtrace.Instrument(wiring, serviceName)
 	http.Deploy(wiring, serviceName)
 	return goproc.CreateProcess(wiring, procName, serviceName)
 }

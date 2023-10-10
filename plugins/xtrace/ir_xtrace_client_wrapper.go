@@ -182,16 +182,16 @@ func New_{{.Name}}(ctx context.Context, client {{.Imports.NameOf .Service.UserTy
 {{$receiver := .Name -}}
 {{range $_, $f := .Service.Methods}}
 func (handler *{{receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
-	ctx = handler.XTClient.Log(ctx, "{{$f.Name}} client call start")
-	baggage_raw := handler.XTClient.Get(ctx)
+	ctx, _ = handler.XTClient.Log(ctx, "{{$f.Name}} client call start")
+	baggage_raw, _ := handler.XTClient.Get(ctx)
 	baggage := tracingplane.EncodeBase64(baggage_raw)
 
 	var ret_baggage string
 	{{RetVars $f "ret_baggage" "err"}} = handler.Client.{{$f.Name}}({{ArgVarsAndTypes "ctx"}}, baggage)
 	ret_baggage_raw, _ := tracingplane.DecodeBase64(ret_baggage)
-	ctx = handler.XTClient.Merge(ctx, ret_baggage_raw)
+	ctx, _ = handler.XTClient.Merge(ctx, ret_baggage_raw)
 	if err != nil {
-		ctx = handler.XTClient.WithLogTags(ctx, err.Error(), "Error")
+		ctx, _ = handler.XTClient.WithLogTags(ctx, err.Error(), "Error")
 	}
 	return
 }

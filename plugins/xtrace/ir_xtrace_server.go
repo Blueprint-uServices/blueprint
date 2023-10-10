@@ -1,6 +1,12 @@
 package xtrace
 
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
+import (
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+)
 
 type XTraceServer struct {
 	process.ProcessNode
@@ -8,13 +14,36 @@ type XTraceServer struct {
 
 	ServerName string
 	Addr       *GolangXTraceAddress
+	Iface      *goparser.ParsedInterface
 }
 
 func newXTraceServer(name string, addr *GolangXTraceAddress) (*XTraceServer, error) {
-	return &XTraceServer{
+	server := &XTraceServer{
 		ServerName: name,
 		Addr:       addr,
-	}, nil
+	}
+	err := server.init(name)
+	if err != nil {
+		return nil, err
+	}
+	return server, nil
+}
+
+func (node *XTraceServer) init(name string) error {
+	workflow.Init("../../runtime")
+
+	spec, err := workflow.GetSpec()
+	if err != nil {
+		return err
+	}
+
+	details, err := spec.Get("XTracerImpl")
+	if err != nil {
+		return err
+	}
+
+	node.Iface = details.Iface
+	return nil
 }
 
 func (node *XTraceServer) Name() string {
@@ -23,6 +52,10 @@ func (node *XTraceServer) Name() string {
 
 func (node *XTraceServer) String() string {
 	return node.Name() + " = XTraceServer(" + node.Addr.Name() + ")"
+}
+
+func (node *XTraceServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	return node.Iface.ServiceInterface(ctx), nil
 }
 
 func (node *XTraceServer) GenerateArtifacts(outputDir string) error {

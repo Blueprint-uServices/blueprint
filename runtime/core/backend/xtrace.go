@@ -7,12 +7,12 @@ import (
 )
 
 type XTracer interface {
-	Log(ctx context.Context, msg string) context.Context
-	LogWithTags(ctx context.Context, msg string, tags ...string) context.Context
-	StartTask(ctx context.Context, tags ...string) context.Context
-	StopTask(ctx context.Context) context.Context
-	Merge(ctx context.Context, other tracingplane.BaggageContext) context.Context
-	Set(ctx context.Context, baggage tracingplane.BaggageContext) context.Context
-	Get(ctx context.Context) tracingplane.BaggageContext
-	IsTracing(ctx context.Context) bool
+	Log(ctx context.Context, msg string) (context.Context, error)
+	LogWithTags(ctx context.Context, msg string, tags ...string) (context.Context, error)
+	StartTask(ctx context.Context, tags ...string) (context.Context, error)
+	StopTask(ctx context.Context) (context.Context, error)
+	Merge(ctx context.Context, other tracingplane.BaggageContext) (context.Context, error)
+	Set(ctx context.Context, baggage tracingplane.BaggageContext) (context.Context, error)
+	Get(ctx context.Context) (tracingplane.BaggageContext, error)
+	IsTracing(ctx context.Context) (bool, error)
 }

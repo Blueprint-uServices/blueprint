@@ -8,6 +8,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Instruments the service with an entry + exit point xtrace wrapper to generate xtrace compatible logs
 func Instrument(wiring blueprint.WiringSpec, serviceName string) {
 	DefineXTraceServer(wiring)
 	clientWrapper := serviceName + ".client.xtrace"

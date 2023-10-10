@@ -218,23 +218,23 @@ func New_{{.Name}}(ctx context.Context, service {{.Imports.NameOf .Service.UserT
 {{$service := .Service.Name -}}
 {{$receiver := .Name -}}
 {{range $_, $f := .Service.Methods}}
-func (handler *{{receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}, baggage string) ({{RetVarsAndTypes $f "ret_baggage string" "err error"}}) {
+func (handler *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}, baggage string) ({{RetVarsAndTypes $f "ret_baggage string" "err error"}}) {
 	if baggage != "" {
 		remote_baggage, _ := tracingplane.DecodeBase64(baggage)
-		ctx = handler.XTraceClient.Set(ctx, remote_baggage)
+		ctx, _ = handler.XTClient.Set(ctx, remote_baggage)
 	}
 
-	if !handler.XTraceClient.IsTracing(ctx) {
-		ctx = handler.XTClient.StartTask(ctx, "{{$f.Name}}")
+	if res, _ := handler.XTClient.IsTracing(ctx); !res {
+		ctx, _ = handler.XTClient.StartTask(ctx, "{{$f.Name}}")
 	}
-	ctx = handler.XTClient.Log(ctx, "{{$f.Name}} start")
+	ctx, _ = handler.XTClient.Log(ctx, "{{$f.Name}} start")
 
 	{{RetVars $f "err"}} = handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
 	if err != nil {
-		ctx = handler.XTClient.LogWithTags(ctx, err.Error(), "Error")
+		ctx, _ = handler.XTClient.LogWithTags(ctx, err.Error(), "Error")
 	}
-	ctx = handler.XTClient.Log(ctx, "{{$f.Name}} end")
-	ret_baggage_raw := handler.XTClient.Get(ctx)
+	ctx, _ = handler.XTClient.Log(ctx, "{{$f.Name}} end")
+	ret_baggage_raw, _ := handler.XTClient.Get(ctx)
 	ret_baggage = tracingplane.EncodeBase64(ret_baggage_raw)
 	return
 }
