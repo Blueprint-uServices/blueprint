@@ -2,6 +2,7 @@ package query
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -345,13 +346,13 @@ func parseValueOperator(e bson.E) (Filter, error) {
 		}
 	case "$in":
 		{
-			a, isA := e.Value.(bson.A)
-			if !isA {
-				return nil, fmt.Errorf("$in requires a bson.A value but got %v", e)
+			v := reflect.ValueOf(e.Value)
+			if v.Kind() != reflect.Slice {
+				return nil, fmt.Errorf("$in requires a bson.A value or a slice, but got %v", e)
 			}
 			var filters []Filter
-			for _, v := range a {
-				filter, err := parseValue(v)
+			for i := 0; i < v.Len(); i++ {
+				filter, err := parseValue(v.Index(i).Interface())
 				if err != nil {
 					return nil, err
 				}

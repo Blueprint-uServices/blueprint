@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Packaging struct {
@@ -460,6 +461,19 @@ func TestArrayContains(t *testing.T) {
 
 	{
 		filter := bson.D{{"sizes", bson.D{{"$in", bson.A{16, 32}}}}}
+		cursor, err := db.FindMany(ctx, filter)
+		assert.NoError(t, err)
+
+		getteas := []Tea{}
+		err = cursor.All(ctx, &getteas)
+		assert.NoError(t, err)
+
+		assert.Len(t, getteas, 4)
+		assert.ElementsMatch(t, getteas, teas[1:5])
+	}
+
+	{
+		filter := bson.D{{"sizes", bson.D{{"$in", []int{16, 32}}}}}
 		cursor, err := db.FindMany(ctx, filter)
 		assert.NoError(t, err)
 
@@ -1135,4 +1149,69 @@ func TestPush(t *testing.T) {
 		assert.ElementsMatch(t, getteas[0].Sizes, []int32{4, 8, 16, 12})
 		assert.ElementsMatch(t, getteas[0].Vendor, []string{"newvendor"})
 	}
+}
+
+type ObjectIDTest struct {
+	ID   primitive.ObjectID `bson:"_id,omitempty"`
+	Type string
+}
+
+func TestObjectIDGetsSet(t *testing.T) {
+	ctx, db := MakeTestDB(t)
+
+	{
+		filter := bson.D{{"type", "English Breakfast"}}
+		cursor, err := db.FindOne(ctx, filter)
+		assert.NoError(t, err)
+
+		var id ObjectIDTest
+		assert.Equal(t, id.ID, primitive.NilObjectID)
+
+		err = cursor.One(ctx, &id)
+		assert.NoError(t, err)
+		assert.NotEqual(t, id.ID, primitive.NilObjectID)
+		assert.Equal(t, id.Type, "English Breakfast")
+	}
+}
+
+func TestUpdateByObjectID(t *testing.T) {
+	ctx, db := MakeTestDB(t)
+
+	{
+		typeFilter := bson.D{{"type", "English Breakfast"}}
+		cursor, err := db.FindOne(ctx, typeFilter)
+		assert.NoError(t, err)
+
+		var id ObjectIDTest
+		err = cursor.One(ctx, &id)
+		assert.NoError(t, err)
+		assert.Equal(t, id.Type, "English Breakfast")
+
+		idFilter := bson.D{{"_id", id.ID}}
+		cursor, err = db.FindOne(ctx, idFilter)
+		assert.NoError(t, err)
+
+		err = cursor.One(ctx, &id)
+		assert.NoError(t, err)
+		assert.Equal(t, id.Type, "English Breakfast")
+
+		updateTo := bson.D{{"$set", bson.D{{"type", "Scottish Breakfast"}}}}
+		err = db.UpdateOne(ctx, idFilter, updateTo)
+		assert.NoError(t, err)
+
+		cursor, err = db.FindOne(ctx, idFilter)
+		assert.NoError(t, err)
+
+		err = cursor.One(ctx, &id)
+		assert.NoError(t, err)
+		assert.Equal(t, id.Type, "Scottish Breakfast")
+
+		cursor, err = db.FindOne(ctx, typeFilter)
+		assert.NoError(t, err)
+
+		err = cursor.One(ctx, &id)
+		assert.NoError(t, err)
+		assert.Equal(t, id.Type, "")
+	}
+
 }

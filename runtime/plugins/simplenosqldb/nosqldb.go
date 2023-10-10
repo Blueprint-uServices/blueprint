@@ -8,6 +8,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb/query"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 /*
@@ -49,7 +50,7 @@ func (impl *SimpleNoSQLDB) GetCollection(ctx context.Context, db_name string, co
 	return collection, nil
 }
 
-func (c *SimpleCursor) Decode(ctx context.Context, obj interface{}) error {
+func (c *SimpleCursor) One(ctx context.Context, obj interface{}) error {
 	if len(c.results) == 0 {
 		return backend.SetZero(obj)
 	} else {
@@ -85,15 +86,26 @@ func (c *SimpleCursor) All(ctx context.Context, obj interface{}) error {
 }
 
 func (db *SimpleCollection) InsertOne(ctx context.Context, document interface{}) error {
-	if d, isD := document.(bson.D); isD {
-		db.items = append(db.items, d)
-	} else {
-		d, err := toBson(document)
+	d, isD := document.(bson.D)
+	if !isD {
+		var err error
+		d, err = toBson(document)
 		if err != nil {
 			return err
 		}
-		db.items = append(db.items, d)
 	}
+	hasId := false
+	for _, e := range d {
+		if e.Key == "_id" {
+			hasId = true
+			break
+		}
+	}
+	if !hasId {
+		d = append(bson.D{{"_id", primitive.NewObjectID()}}, d...)
+	}
+
+	db.items = append(db.items, d)
 	return nil
 }
 

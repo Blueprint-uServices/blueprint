@@ -15,7 +15,7 @@ type NoSQLDatabase interface {
 }
 
 type NoSQLCursor interface {
-	Decode(ctx context.Context, obj interface{}) error
+	One(ctx context.Context, obj interface{}) error
 	All(ctx context.Context, obj interface{}) error //similar logic to Decode, but for multiple documents
 }
 
