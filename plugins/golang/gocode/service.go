@@ -88,6 +88,14 @@ func (f *Func) GetReturns() []service.Variable {
 	return variables
 }
 
+func (f *Func) AddArgument(variable Variable) {
+	f.Arguments = append(f.Arguments, variable)
+}
+
+func (f *Func) AddRetVar(variable Variable) {
+	f.Returns = append(f.Returns, variable)
+}
+
 func (v *Variable) GetName() string {
 	return v.Name
 }
