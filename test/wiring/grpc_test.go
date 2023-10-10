@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
@@ -179,4 +180,101 @@ func TestClientProc(t *testing.T) {
 			  nonleaf.grpc_client = GRPCClient(nonleaf.grpc.addr)
 			}
 		  }`)
+}
+
+func TestImplicitServicesInSameProcWithGRPC(t *testing.T) {
+	wiring := newWiringSpec("TestImplicitServicesInSameProcWithGRPC")
+
+	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+
+	grpc.Deploy(wiring, leaf)
+	grpc.Deploy(wiring, nonleaf)
+
+	leafclient := goproc.CreateClientProcess(wiring, "leafclient", nonleaf)
+
+	app := assertBuildSuccess(t, wiring, leafclient)
+
+	assertIR(t, app,
+		`TestImplicitServicesInSameProcWithGRPC = BlueprintApplication() {
+			nonleaf.grpc.addr = GolangServerAddress()
+			leafclient = GolangProcessNode(nonleaf.grpc.addr, leaf.grpc.addr) {
+			  nonleaf.grpc_client = GRPCClient(nonleaf.grpc.addr)
+			  leaf.grpc_client = GRPCClient(leaf.grpc.addr)
+			  nonleaf = TestNonLeafService(leaf.grpc_client)
+			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.addr)
+			  leaf = TestLeafService()
+			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.addr)
+			}
+			nonleaf.handler.visibility
+			leaf.grpc.addr = GolangServerAddress()
+			leaf.handler.visibility
+		  }`)
+}
+
+func TestImplicitServicesInSameProcPartialGRPC(t *testing.T) {
+	wiring := newWiringSpec("TestImplicitServicesInSameProcPartialGRPC")
+
+	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+
+	grpc.Deploy(wiring, nonleaf)
+
+	leafclient := goproc.CreateClientProcess(wiring, "leafclient", nonleaf)
+
+	app := assertBuildSuccess(t, wiring, leafclient)
+
+	assertIR(t, app,
+		`TestImplicitServicesInSameProcPartialGRPC = BlueprintApplication() {
+			nonleaf.grpc.addr = GolangServerAddress()
+			leafclient = GolangProcessNode(nonleaf.grpc.addr) {
+			  nonleaf.grpc_client = GRPCClient(nonleaf.grpc.addr)
+			  leaf = TestLeafService()
+			  nonleaf = TestNonLeafService(leaf)
+			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.addr)
+			}
+			nonleaf.handler.visibility
+			leaf.handler.visibility
+		  }`)
+}
+
+func TestImplicitCacheInSameProc(t *testing.T) {
+	wiring := newWiringSpec("TestImplicitCacheInSameProc")
+
+	leaf_cache := simplecache.Define(wiring, "leaf_cache")
+	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
+	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+
+	grpc.Deploy(wiring, leaf)
+	grpc.Deploy(wiring, nonleaf)
+
+	leafproc := goproc.CreateProcess(wiring, "leafproc", leaf)
+	nonleafproc := goproc.CreateProcess(wiring, "nonleafproc", nonleaf)
+
+	leafclient := goproc.CreateClientProcess(wiring, "leafclient", nonleaf)
+
+	app := assertBuildSuccess(t, wiring, leafproc, nonleafproc, leafclient)
+
+	assertIR(t, app,
+		`TestImplicitCacheInSameProc = BlueprintApplication() {
+			leaf.grpc.addr = GolangServerAddress()
+			leaf.handler.visibility
+			leaf_cache.backend.visibility
+			leafproc = GolangProcessNode(leaf.grpc.addr) {
+			  leaf_cache = SimpleCache()
+			  leaf = TestLeafService(leaf_cache)
+			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.addr)
+			}
+			nonleaf.grpc.addr = GolangServerAddress()
+			nonleaf.handler.visibility
+			nonleafproc = GolangProcessNode(nonleaf.grpc.addr, leaf.grpc.addr) {
+			  leaf.grpc_client = GRPCClient(leaf.grpc.addr)
+			  nonleaf = TestNonLeafService(leaf.grpc_client)
+			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.addr)
+			}
+			leafclient = GolangProcessNode(nonleaf.grpc.addr) {
+			  nonleaf.grpc_client = GRPCClient(nonleaf.grpc.addr)
+			}
+		  }`)
+
 }
