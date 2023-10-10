@@ -7,6 +7,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Modifies the given service such that all clients to that service retry `max_retries` number of times on error.
 func AddRetries(wiring blueprint.WiringSpec, serviceName string, max_retries int64) {
 	clientWrapper := serviceName + ".client.retrier"
 
