@@ -746,6 +746,13 @@ func (f *ParsedFunc) String() string {
 	}
 	b.WriteString(strings.Join(args, ", "))
 	b.WriteString(")")
+	var rets []string
+	for _, arg := range f.Returns {
+		rets = append(rets, arg.String())
+	}
+	b.WriteString("(")
+	b.WriteString(strings.Join(rets, ", "))
+	b.WriteString(")")
 	return b.String()
 }
 
