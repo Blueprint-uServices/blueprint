@@ -3,6 +3,7 @@ package memcached
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 )
 
 type MemcachedAddr struct {
@@ -33,6 +34,10 @@ func (addr *MemcachedAddr) SetDestination(node blueprint.IRNode) error {
 	}
 	addr.Server = server
 	return nil
+}
+
+func (addr *MemcachedAddr) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	return addr.Server.GetInterface(ctx)
 }
 
 func (addr *MemcachedAddr) ImplementsAddressNode() {}
