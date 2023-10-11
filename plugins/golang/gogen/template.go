@@ -60,12 +60,16 @@ func newTemplateExecutor(args any) *templateExecutor {
 	e.Funcs["NameOf"] = e.NameOf
 	e.Funcs["DeclareArgVars"] = e.DeclareArgVars
 	e.Funcs["ArgVars"] = e.ArgVars
+	e.Funcs["ArgVarsCutoff"] = e.ArgVarsCutoff
 	e.Funcs["ArgVarsEquals"] = e.ArgVarsEquals
 	e.Funcs["ArgVarsAndTypes"] = e.ArgVarsAndTypes
+	e.Funcs["ArgVarsAndTypesCutoff"] = e.ArgVarsAndTypesCutoff
 	e.Funcs["RetVars"] = e.RetVars
+	e.Funcs["RetVarsCutoff"] = e.RetVarsCutoff
 	e.Funcs["RetVarsEquals"] = e.RetVarsEquals
 	e.Funcs["RetTypes"] = e.RetTypes
 	e.Funcs["RetVarsAndTypes"] = e.RetVarsAndTypes
+	e.Funcs["RetVarsAndTypesCutoff"] = e.RetVarsAndTypesCutoff
 	e.Funcs["Signature"] = e.Signature
 	e.Funcs["SignatureWithRetVars"] = e.SignatureWithRetVars
 	e.Funcs["JsonField"] = e.JsonField
@@ -100,10 +104,14 @@ func (e *templateExecutor) DeclareArgVars(f gocode.Func) (string, error) {
 }
 
 func (e *templateExecutor) ArgVars(f gocode.Func, prefix ...string) (string, error) {
+	return e.ArgVarsCutoff(f, 0, prefix...)
+}
+
+func (e *templateExecutor) ArgVarsCutoff(f gocode.Func, cutoff int, prefix ...string) (string, error) {
 	for _, arg := range f.Arguments {
 		prefix = append(prefix, arg.Name)
 	}
-	return strings.Join(prefix, ", "), nil
+	return strings.Join(prefix[:len(prefix)-cutoff], ", "), nil
 }
 
 func (e *templateExecutor) ArgVarsEquals(f gocode.Func, prefix ...string) (string, error) {
@@ -117,6 +125,10 @@ func (e *templateExecutor) ArgVarsEquals(f gocode.Func, prefix ...string) (strin
 }
 
 func (e *templateExecutor) ArgVarsAndTypes(f gocode.Func, prefix ...string) (string, error) {
+	return e.ArgVarsAndTypesCutoff(f, 0, prefix...)
+}
+
+func (e *templateExecutor) ArgVarsAndTypesCutoff(f gocode.Func, cutoff int, prefix ...string) (string, error) {
 	for _, arg := range f.Arguments {
 		argType, err := e.NameOf(arg.Type)
 		if err != nil {
@@ -124,14 +136,19 @@ func (e *templateExecutor) ArgVarsAndTypes(f gocode.Func, prefix ...string) (str
 		}
 		prefix = append(prefix, arg.Name+" "+argType)
 	}
-	return strings.Join(prefix, ", "), nil
+	return strings.Join(prefix[:len(prefix)-cutoff], ", "), nil
 }
 
 func (e *templateExecutor) RetVars(f gocode.Func, suffix ...string) (string, error) {
+	return e.RetVarsCutoff(f, 0, suffix...)
+}
+
+func (e *templateExecutor) RetVarsCutoff(f gocode.Func, cutoff int, suffix ...string) (string, error) {
 	var retvars []string
 	for i := range f.Returns {
 		retvars = append(retvars, fmt.Sprintf("ret%v", i))
 	}
+	retvars = retvars[:len(retvars)-cutoff]
 	retvars = append(retvars, suffix...)
 	return strings.Join(retvars, ", "), nil
 }
@@ -163,6 +180,10 @@ func (e *templateExecutor) RetTypes(f gocode.Func, suffix ...string) (string, er
 }
 
 func (e *templateExecutor) RetVarsAndTypes(f gocode.Func, suffix ...string) (string, error) {
+	return e.RetVarsAndTypesCutoff(f, 0, suffix...)
+}
+
+func (e *templateExecutor) RetVarsAndTypesCutoff(f gocode.Func, cutoff int, suffix ...string) (string, error) {
 	var rettypes []string
 	for i, ret := range f.Returns {
 		rettype, err := e.NameOf(ret.Type)
@@ -171,6 +192,7 @@ func (e *templateExecutor) RetVarsAndTypes(f gocode.Func, suffix ...string) (str
 		}
 		rettypes = append(rettypes, fmt.Sprintf("ret%v %v", i, rettype))
 	}
+	rettypes = rettypes[:len(rettypes)-cutoff]
 	rettypes = append(rettypes, suffix...)
 	return strings.Join(rettypes, ", "), nil
 }
