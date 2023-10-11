@@ -21,6 +21,7 @@ func Instrument(wiring blueprint.WiringSpec, serviceName string) {
 	}
 
 	clientNext := ptr.AddSrcModifier(wiring, clientWrapper)
+	slog.Info("Next client is ", clientNext)
 
 	wiring.Define(clientWrapper, &XtraceClientWrapper{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
 		var wrapped golang.Service
