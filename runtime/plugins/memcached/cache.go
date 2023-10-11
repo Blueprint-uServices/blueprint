@@ -14,7 +14,7 @@ type Memcached struct {
 	Client *memcache.Client
 }
 
-func NewMemcachedClient(serverAddress string) (*Memcached, error) {
+func NewMemcachedClient(ctx context.Context, serverAddress string) (*Memcached, error) {
 	cache := &Memcached{}
 	client := memcache.New(serverAddress)
 	client.MaxIdleConns = 1000

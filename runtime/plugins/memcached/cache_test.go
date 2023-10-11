@@ -16,7 +16,7 @@ func equal(d1 someData, d2 someData) bool {
 
 func TestMemcachedPut(t *testing.T) {
 	ctx := context.Background()
-	memcached, err := NewMemcachedClient("localhost:11211")
+	memcached, err := NewMemcachedClient(ctx, "localhost:11211")
 	if err != nil {
 		t.Error(err)
 	}
@@ -37,7 +37,7 @@ func TestMemcachedPut(t *testing.T) {
 
 func TestMemcachedGet(t *testing.T) {
 	ctx := context.Background()
-	memcached, err := NewMemcachedClient("localhost:11211")
+	memcached, err := NewMemcachedClient(ctx, "localhost:11211")
 	if err != nil {
 		t.Error(err)
 	}
@@ -53,7 +53,7 @@ func TestMemcachedGet(t *testing.T) {
 
 func TestMemcachedIncr(t *testing.T) {
 	ctx := context.Background()
-	memcached, err := NewMemcachedClient("localhost:11211")
+	memcached, err := NewMemcachedClient(ctx, "localhost:11211")
 	err = memcached.Put(ctx, "intKey", 5)
 	if err != nil {
 		t.Error(err)
@@ -69,7 +69,7 @@ func TestMemcachedIncr(t *testing.T) {
 
 func TestMemcachedDelete(t *testing.T) {
 	ctx := context.Background()
-	memcached, err := NewMemcachedClient("localhost:11211")
+	memcached, err := NewMemcachedClient(ctx, "localhost:11211")
 	if err != nil {
 		t.Error(err)
 	}
@@ -105,7 +105,7 @@ func TestMemcachedMget(t *testing.T) {
 	ctx := context.Background()
 	keys := []string{"testData", "intKey"}
 	vals := []interface{}{&val1, &val2}
-	memcached, err := NewMemcachedClient("localhost:11211")
+	memcached, err := NewMemcachedClient(ctx, "localhost:11211")
 	if err != nil {
 		t.Error(err)
 	}
@@ -123,7 +123,7 @@ func TestMemcachedMget(t *testing.T) {
 
 func TestMemcachedMset(t *testing.T) {
 	ctx := context.Background()
-	memcached, err := NewMemcachedClient("localhost:11211")
+	memcached, err := NewMemcachedClient(ctx, "localhost:11211")
 	if err != nil {
 		t.Error(err)
 	}

@@ -1,14 +1,15 @@
 package memcached
 
 import (
-	"bytes"
 	"fmt"
-	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 	"golang.org/x/exp/slog"
 )
 
@@ -18,10 +19,17 @@ type MemcachedGoClient struct {
 
 	InstanceName string
 	Addr         *MemcachedAddr
+
+	Iface       *goparser.ParsedInterface
+	Constructor *gocode.Constructor
 }
 
 func newMemcachedGoClient(name string, addr *MemcachedAddr) (*MemcachedGoClient, error) {
 	client := &MemcachedGoClient{}
+	err := client.init(name)
+	if err != nil {
+		return nil, err
+	}
 	client.InstanceName = name
 	client.Addr = addr
 	return client, nil
@@ -35,30 +43,37 @@ func (n *MemcachedGoClient) Name() string {
 	return n.InstanceName
 }
 
+func (node *MemcachedGoClient) init(name string) error {
+	workflow.Init("../../runtime")
+
+	spec, err := workflow.GetSpec()
+	if err != nil {
+		return err
+	}
+
+	details, err := spec.Get("Memcached")
+	if err != nil {
+		return err
+	}
+
+	node.InstanceName = name
+	node.Iface = details.Iface
+	node.Constructor = details.Constructor.AsConstructor()
+
+	return nil
+}
+
 func (n *MemcachedGoClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
-	// TODO: return memcached interface
-	return nil, fmt.Errorf("memcached not yet implemented")
+	return n.Iface.ServiceInterface(ctx), nil
 }
 
 func (node *MemcachedGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	// Add blueprint runtime to the workspace which contains the cache interface
-
-	// TODO: add memcached client (if it doesn't live in runtime)
-
 	return golang.AddRuntimeModule(builder)
 }
 
 func (node *MemcachedGoClient) AddInterfaces(builder golang.ModuleBuilder) error {
 	return node.AddToWorkspace(builder.Workspace())
 }
-
-var clientBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
-
-		// TODO: generated memcached client constructor
-
-		return nil, nil
-
-	}`
 
 // Part of code generation compilation pass; provides instantiation snippet
 func (node *MemcachedGoClient) AddInstantiation(builder golang.GraphBuilder) error {
@@ -67,23 +82,9 @@ func (node *MemcachedGoClient) AddInstantiation(builder golang.GraphBuilder) err
 		return nil
 	}
 
-	// TODO: generate the grpc stubs
+	slog.Info(fmt.Sprintf("Instantiating MemcachedClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	// Instantiate the code template
-	t, err := template.New(node.InstanceName).Parse(clientBuildFuncTemplate)
-	if err != nil {
-		return err
-	}
-
-	// Generate the code
-	buf := &bytes.Buffer{}
-	err = t.Execute(buf, node)
-	if err != nil {
-		return err
-	}
-
-	slog.Info("instantiating memcached client")
-	return builder.Declare(node.InstanceName, buf.String())
+	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []blueprint.IRNode{node.Addr})
 }
 
 func (node *MemcachedGoClient) ImplementsGolangNode()    {}
