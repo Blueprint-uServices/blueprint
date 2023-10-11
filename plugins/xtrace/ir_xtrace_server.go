@@ -17,6 +17,19 @@ type XTraceServer struct {
 	Iface      *goparser.ParsedInterface
 }
 
+type XTraceInterface struct {
+	service.ServiceInterface
+	Wrapped service.ServiceInterface
+}
+
+func (xt *XTraceInterface) GetName() string {
+	return "xt(" + xt.Wrapped.GetName() + ")"
+}
+
+func (xt *XTraceInterface) GetMethods() []service.Method {
+	return xt.Wrapped.GetMethods()
+}
+
 func newXTraceServer(name string, addr *GolangXTraceAddress) (*XTraceServer, error) {
 	server := &XTraceServer{
 		ServerName: name,
@@ -55,7 +68,8 @@ func (node *XTraceServer) String() string {
 }
 
 func (node *XTraceServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
-	return node.Iface.ServiceInterface(ctx), nil
+	iface := node.Iface.ServiceInterface(ctx)
+	return &XTraceInterface{Wrapped: iface}, nil
 }
 
 func (node *XTraceServer) GenerateArtifacts(outputDir string) error {

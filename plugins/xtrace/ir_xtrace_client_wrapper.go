@@ -148,7 +148,7 @@ func generateClientHandler(builder golang.ModuleBuilder, wrapped *gocode.Service
 
 	slog.Info(fmt.Sprintf("Generating %v/%v", server.Package.PackageName, impl.Name))
 	outputFile := filepath.Join(server.Package.Path, impl.Name+".go")
-	return gogen.ExecuteTemplateToFile("XTrace", clientTemplate, server, outputFile)
+	return gogen.ExecuteTemplateToFile("XTrace", clientSideTemplate, server, outputFile)
 }
 
 type clientArgs struct {
@@ -181,13 +181,13 @@ func New_{{.Name}}(ctx context.Context, client {{.Imports.NameOf .Service.UserTy
 {{$service := .Service.Name -}}
 {{$receiver := .Name -}}
 {{range $_, $f := .Service.Methods}}
-func (handler *{{receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
+func (handler *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
 	ctx, _ = handler.XTClient.Log(ctx, "{{$f.Name}} client call start")
 	baggage_raw, _ := handler.XTClient.Get(ctx)
 	baggage := tracingplane.EncodeBase64(baggage_raw)
 
 	var ret_baggage string
-	{{RetVars $f "ret_baggage" "err"}} = handler.Client.{{$f.Name}}({{ArgVarsAndTypes "ctx"}}, baggage)
+	{{RetVars $f "ret_baggage" "err"}} = handler.Client.{{$f.Name}}({{ArgVars $f "ctx"}}, baggage)
 	ret_baggage_raw, _ := tracingplane.DecodeBase64(ret_baggage)
 	ctx, _ = handler.XTClient.Merge(ctx, ret_baggage_raw)
 	if err != nil {
