@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/bradfitz/gomemcache/memcache"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
+	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
 
 type Memcached struct {
