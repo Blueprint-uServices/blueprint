@@ -202,6 +202,7 @@ func (handler *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.C
 	if err != nil {
 		ctx, _ = handler.XTClient.LogWithTags(ctx, err.Error(), "Error")
 	}
+	ctx, _ = handler.XTClient.Log(ctx, "{{$f.Name}} client call end")
 	return
 }
 {{end}}
