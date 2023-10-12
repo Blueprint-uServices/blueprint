@@ -48,7 +48,7 @@ func NewProcWorkspaceBuilder(workspaceDir string) (*ProcWorkspaceBuilderImpl, er
 		return nil, blueprint.Errorf("unable to create workspace %s due to %s", workspaceDir, err.Error())
 	}
 	workspace := &ProcWorkspaceBuilderImpl{}
-	workspace.WorkspaceDir = workspaceDir
+	workspace.WorkspaceDir = filepath.Clean(workspaceDir)
 	workspace.ProcDirs = make(map[string]string)
 	workspace.BuildScripts = make(map[string]BuildScript)
 	workspace.BuildFileName = "build.sh"
@@ -80,7 +80,7 @@ func (builder *ProcWorkspaceBuilderImpl) CreateProcessDir(name string) (string, 
 }
 
 func (builder *ProcWorkspaceBuilderImpl) AddBuildScript(path string) error {
-	pathInWorkspace, err := filepath.Rel(builder.WorkspaceDir, path)
+	pathInWorkspace, err := filepath.Rel(builder.WorkspaceDir, filepath.Clean(path))
 	if err != nil {
 		return blueprint.Errorf("procworkspace only supports build scripts located within the workspace; got %v which does not reside in %v; error: %v", path, builder.WorkspaceDir, err.Error())
 	}
@@ -94,8 +94,8 @@ func (builder *ProcWorkspaceBuilderImpl) AddBuildScript(path string) error {
 	info := BuildScript{
 		HostPath:        path,
 		PathInWorkspace: filepath.ToSlash(pathInWorkspace),
-		DirInWorkspace:  filepath.ToSlash(dirInWorkspace),
-		FileName:        fileName,
+		DirInWorkspace:  filepath.ToSlash(filepath.Clean(dirInWorkspace)),
+		FileName:        filepath.Clean(fileName),
 	}
 	builder.BuildScripts[pathInWorkspace] = info
 	return nil

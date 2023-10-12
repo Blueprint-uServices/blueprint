@@ -95,9 +95,10 @@ type (
 
 	ProcGraphInfo struct {
 		Workspace ProcWorkspaceInfo
-		FileName  string // Name of the file within the package
-		FilePath  string // Fully-qualified path to the file on the local filesystem
-		FuncName  string // Name of the function that builds the graph
+		Name      string // Name of the graph
+		FileName  string // Name of the file
+		FileDir   string // Dir within the workspace containing the file
+		FilePath  string // Path to the file within the workspace
 	}
 
 	/*
@@ -110,9 +111,31 @@ type (
 
 		Info() ProcGraphInfo
 
-		DeclareCommand(name string, cmd string, args []blueprint.IRNode) error
+		/*
+			A plugin can provide the shell command(s) to run its process.
 
-		// Generates a script somewhere that, when you run it, runs the graph??
-		Build()
+			Name is just the name of the IRNode representing the process.  Other IRNodes
+			that want to instantiate the process will use this name to look it up.
+
+			If the process has dependencies on other IRNodes, they can be provided with
+			the deps argument.  The generated code will ensure that the dependencies
+			get instantiated first before the runfunc is executed.
+
+			runfunc is a bash function declaration for running the process.
+			The runfunc should adhere to the following:
+			 - should be defined with syntax like function my_func() { ... }
+			 - for any dependencies (config values, addresses, pids, etc.) they can be
+			   accessed from environment variable with the corresponding name.  e.g.
+			   a.grpc.addr will be in A_GRPC_ADDR.  The mapping from node name to
+			   env variable name is implemented by process.EnvVar(name)
+			 - the function must set an environment variable for Name with the result
+			   of the runfunc.  Typically, this means setting the PID of a started process
+			   e.g. MY_GOLANG_PROC=$!
+			 - the function must return a return code that will be checked
+			 - when it is invoked, the runfunc will be invoked from the root of the
+			   proc workspace
+			 - the runfunc will be renamed to prevent name clashes between IRNodes
+		*/
+		DeclareRunCommand(name string, runfunc string, deps ...blueprint.IRNode) error
 	}
 )
