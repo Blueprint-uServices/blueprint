@@ -73,10 +73,24 @@ type (
 		/*
 			Provides a build script that may be invoked to further collect or build process
 			dependencies.
-			For containers, the build script will be invoked from within the container.
-			The script will be invoked from workspace's root directory.
+			This will typically be invoked from e.g. within a Container (e.g a Dockerfile),
+			rather than on the host machine environment.
+
+			path must refer to a script that resides within a process dir in this workspace;
+			if not an error will be returned.
+
+			When it does get invoked, the script will be invoked from the process dir in
+			which it resides.
 		*/
 		AddBuildScript(path string) error
+
+		/*
+			Indicates that we have completed building the workspace, and any finalization tasks
+			(e.g. generating build scripts) can run.
+
+			Only the plugin that created the workspace builder should call this method.
+		*/
+		Finish() error
 	}
 
 	ProcGraphInfo struct {
