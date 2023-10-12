@@ -30,7 +30,7 @@ func build(t *testing.T, wiring blueprint.WiringSpec, toInstantiate ...string) (
 
 	bp.Instantiate(toInstantiate...)
 
-	return bp.Build()
+	return bp.BuildIR()
 }
 
 func assertBuildFailure(t *testing.T, wiring blueprint.WiringSpec, toInstantiate ...string) error {

@@ -31,6 +31,11 @@ Most of the heavy lifting of code generation is done by the following:
 
 var generatedModulePrefix = "blueprint/goproc"
 
+func init() {
+	/* any unattached golang nodes will be instantiated in a "default" process */
+	blueprint.RegisterDefaultBuilder[golang.Node](buildDefaultProcess)
+}
+
 // An IRNode representing a golang process.
 // This is Blueprint's main implementation of Golang processes
 type Process struct {
@@ -42,12 +47,14 @@ type Process struct {
 	InstanceName   string
 	ArgNodes       []blueprint.IRNode
 	ContainedNodes []blueprint.IRNode
+	GenerateMain   bool
 }
 
 // A Golang Process Node can either be given the child nodes ahead of time, or they can be added using AddArtifactNode / AddCodeNode
 func newGolangProcessNode(name string) *Process {
 	node := Process{}
 	node.InstanceName = name
+	node.GenerateMain = true
 	return &node
 }
 
@@ -183,7 +190,10 @@ func (node *Process) AddProcessArtifacts(builder process.WorkspaceBuilder) error
 	if err != nil {
 		return err
 	}
+	return node.generateArtifacts(outputDir, procName)
+}
 
+func (node *Process) generateArtifacts(outputDir, procName string) error {
 	workspaceDir := filepath.Join(outputDir, procName)
 	slog.Info(fmt.Sprintf("Building goproc %s to %s", node.Name(), workspaceDir))
 	workspace, err := gogen.NewWorkspaceBuilder(workspaceDir)
@@ -250,40 +260,37 @@ func (node *Process) AddProcessArtifacts(builder process.WorkspaceBuilder) error
 	}
 
 	// Generate the main.go
-	mainArgs := mainTemplateArgs{
-		Name:             node.Name(),
-		GraphPackage:     fmt.Sprintf("%s/%s", module.Name, procPackage),
-		GraphConstructor: fmt.Sprintf("%s.%s", procPackage, constructorName),
-		Args:             nil,
-		Instantiate:      nil,
-	}
-	for _, arg := range node.ArgNodes {
-		mainArgs.Args = append(mainArgs.Args, mainArg{
-			Name: arg.Name(),
-			Doc:  arg.String(),
-			Var:  blueprint.CleanName(arg.Name()),
-		})
-	}
-	// For now explicitly instantiate every child node
-	for _, child := range node.ContainedNodes {
-		if _, isInstantiable := child.(golang.Instantiable); isInstantiable {
-			mainArgs.Instantiate = append(mainArgs.Instantiate, child.Name())
+	if node.GenerateMain {
+		mainArgs := mainTemplateArgs{
+			Name:             node.Name(),
+			GraphPackage:     fmt.Sprintf("%s/%s", module.Name, procPackage),
+			GraphConstructor: fmt.Sprintf("%s.%s", procPackage, constructorName),
+			Args:             nil,
+			Instantiate:      nil,
+		}
+		for _, arg := range node.ArgNodes {
+			mainArgs.Args = append(mainArgs.Args, mainArg{
+				Name: arg.Name(),
+				Doc:  arg.String(),
+				Var:  blueprint.CleanName(arg.Name()),
+			})
+		}
+		// For now explicitly instantiate every child node
+		for _, child := range node.ContainedNodes {
+			if _, isInstantiable := child.(golang.Instantiable); isInstantiable {
+				mainArgs.Instantiate = append(mainArgs.Instantiate, child.Name())
+			}
+		}
+
+		slog.Info(fmt.Sprintf("Generating %v/main.go", module.Name))
+		mainFileName := filepath.Join(module.ModuleDir, "main.go")
+		err = gogen.ExecuteTemplateToFile("goprocMain", mainTemplate, mainArgs, mainFileName)
+		if err != nil {
+			return err
 		}
 	}
 
-	slog.Info(fmt.Sprintf("Generating %v/main.go", module.Name))
-	mainFileName := filepath.Join(module.ModuleDir, "main.go")
-	err = gogen.ExecuteTemplateToFile("goprocMain", mainTemplate, mainArgs, mainFileName)
-	if err != nil {
-		return err
-	}
-
-	err = workspace.Finish()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return workspace.Finish()
 }
 
 func (node *Process) AddProcessInstance(builder process.GraphBuilder) error {
@@ -296,4 +303,15 @@ func (node *Process) AddProcessInstance(builder process.GraphBuilder) error {
 	// builder.DeclareCommand()
 
 	return nil
+}
+
+/*
+If the Blueprint application contains any floating golang nodes, they get
+built by this function.
+*/
+func buildDefaultProcess(outputDir string, nodes []blueprint.IRNode) error {
+	proc := newGolangProcessNode("default")
+	proc.GenerateMain = false
+	proc.ContainedNodes = nodes
+	return proc.generateArtifacts(outputDir, "default")
 }
