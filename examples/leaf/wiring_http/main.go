@@ -11,8 +11,8 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/healthchecker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/memcached"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplenosqldb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/xtrace"
@@ -36,7 +36,8 @@ func main() {
 	workflow.Init("../workflow")
 
 	b_database := simplenosqldb.Define(wiring, "b_database")
-	b_cache := simplecache.Define(wiring, "b_cache")
+	//b_cache := simplecache.Define(wiring, "b_cache")
+	b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
 	b := workflow.Define(wiring, "b", "LeafServiceImpl", b_cache, b_database)
 
 	a := workflow.Define(wiring, "a", "NonLeafService", b)
