@@ -15,7 +15,7 @@ type (
 	}
 
 	ProvidesContainerInstance interface {
-		AddContainerInstance(DockerApp)
+		AddContainerInstance(DockerApp) error
 	}
 )
 

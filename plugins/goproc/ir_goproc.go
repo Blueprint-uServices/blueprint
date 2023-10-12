@@ -18,8 +18,8 @@ import (
 )
 
 /*
-golang.Process is a node that represents a runnable Golang process.  It can contain any number of
-other golang.Node IRNodes.  When it's compiled, the golang.Process will generate a go module with
+goproc.Process is a node that represents a runnable Golang process.  It can contain any number of
+other golang.Node IRNodes.  When it's compiled, the goproc.Process will generate a go module with
 a runnable main method that instantiates and initializes the contained go nodes.  To achieve this,
 the golang.Process also collects module dependencies from its contained nodes.
 
@@ -35,8 +35,8 @@ Most of the heavy lifting of code generation is done by the following:
 var generatedModulePrefix = "blueprint/goproc"
 
 func init() {
-	/* any unattached golang nodes will be instantiated in a "default" process */
-	blueprint.RegisterDefaultBuilder[golang.Node](buildDefaultProcess)
+	/* any unattached golang nodes will be instantiated in a "default" golang workspace */
+	blueprint.RegisterDefaultBuilder[golang.Node](buildDefaultGolangWorkspace)
 }
 
 // An IRNode representing a golang process.
@@ -199,6 +199,7 @@ func (node *Process) AddProcessArtifacts(builder process.ProcWorkspaceBuilder) e
 }
 
 func (node *Process) generateArtifacts(outputDir string, generateMain bool) error {
+	// Create subdirectory for the golang workspace
 	workspaceDir := filepath.Join(outputDir, node.ProcName)
 	slog.Info(fmt.Sprintf("Building goproc %s to %s", node.Name(), workspaceDir))
 	workspace, err := gogen.NewWorkspaceBuilder(workspaceDir)
@@ -257,6 +258,9 @@ func (node *Process) generateArtifacts(outputDir string, generateMain bool) erro
 			}
 		}
 	}
+
+	// TODO: it's possible some metadata / address nodes are residing in this namespace.  They don't
+	// get passed in as args, but need to be added to the graph nonetheless
 
 	// Generate the graph code
 	if err = graph.Build(); err != nil {
@@ -352,7 +356,7 @@ func (node *Process) AddProcessInstance(builder process.ProcGraphBuilder) error 
 If the Blueprint application contains any floating golang nodes, they get
 built by this function.
 */
-func buildDefaultProcess(outputDir string, nodes []blueprint.IRNode) error {
+func buildDefaultGolangWorkspace(outputDir string, nodes []blueprint.IRNode) error {
 	proc := newGolangProcessNode("default")
 	proc.ContainedNodes = nodes
 	return proc.generateArtifacts(outputDir, false)

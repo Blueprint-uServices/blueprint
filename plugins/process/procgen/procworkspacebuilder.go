@@ -135,3 +135,5 @@ func (builder *ProcWorkspaceBuilderImpl) Finish() error {
 	}
 	return tmpl.Execute(f, builder)
 }
+
+func (builder *ProcWorkspaceBuilderImpl) ImplementsBuildContext() {}

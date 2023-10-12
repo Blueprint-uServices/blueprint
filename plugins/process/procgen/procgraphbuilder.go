@@ -80,7 +80,7 @@ func getFuncBody(runcmd string) string {
 	}
 }
 
-func (builder *ProcGraphBuilderImpl) DeclareProcessRunCommand(name string, runfunc string, deps ...blueprint.IRNode) error {
+func (builder *ProcGraphBuilderImpl) DeclareRunCommand(name string, runfunc string, deps ...blueprint.IRNode) error {
 	runfunc = getFuncBody(runfunc)
 	if runfunc == "" {
 		return blueprint.Errorf("invalid runfunc for process %v %v", name, runfunc)
@@ -111,3 +111,5 @@ WORKSPACE_DIR=$(pwd)
 func (builder *ProcGraphBuilderImpl) Build() error {
 	return ExecuteTemplateToFile("runfile", runfileTemplate, builder, builder.info.FilePath)
 }
+
+func (builder *ProcGraphBuilderImpl) ImplementsBuildContext() {}
