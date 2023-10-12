@@ -47,14 +47,12 @@ type Process struct {
 	InstanceName   string
 	ArgNodes       []blueprint.IRNode
 	ContainedNodes []blueprint.IRNode
-	GenerateMain   bool
 }
 
 // A Golang Process Node can either be given the child nodes ahead of time, or they can be added using AddArtifactNode / AddCodeNode
 func newGolangProcessNode(name string) *Process {
 	node := Process{}
 	node.InstanceName = name
-	node.GenerateMain = true
 	return &node
 }
 
@@ -190,10 +188,10 @@ func (node *Process) AddProcessArtifacts(builder process.ProcWorkspaceBuilder) e
 	if err != nil {
 		return err
 	}
-	return node.generateArtifacts(outputDir, procName)
+	return node.generateArtifacts(outputDir, procName, true)
 }
 
-func (node *Process) generateArtifacts(outputDir, procName string) error {
+func (node *Process) generateArtifacts(outputDir, procName string, generateMain bool) error {
 	workspaceDir := filepath.Join(outputDir, procName)
 	slog.Info(fmt.Sprintf("Building goproc %s to %s", node.Name(), workspaceDir))
 	workspace, err := gogen.NewWorkspaceBuilder(workspaceDir)
@@ -260,7 +258,10 @@ func (node *Process) generateArtifacts(outputDir, procName string) error {
 	}
 
 	// Generate the main.go
-	if node.GenerateMain {
+	// By default, main.go will be generated
+	// However, it is not generated if the goproc is being built by the default
+	// process builder (vs. within a container)
+	if generateMain {
 		mainArgs := mainTemplateArgs{
 			Name:             node.Name(),
 			GraphPackage:     fmt.Sprintf("%s/%s", module.Name, procPackage),
@@ -311,7 +312,6 @@ built by this function.
 */
 func buildDefaultProcess(outputDir string, nodes []blueprint.IRNode) error {
 	proc := newGolangProcessNode("default")
-	proc.GenerateMain = false
 	proc.ContainedNodes = nodes
-	return proc.generateArtifacts(outputDir, "default")
+	return proc.generateArtifacts(outputDir, "default", false)
 }
