@@ -32,10 +32,10 @@ type (
 
 	/*
 		For process nodes that want to provide code or other artifacts for their process.
-		Methods on the WorkspaceBuilder argument are used for collecting the artifacts
+		Methods on the ProcWorkspaceBuilder argument are used for collecting the artifacts
 	*/
 	ProvidesProcessArtifacts interface {
-		AddProcessArtifacts(WorkspaceBuilder) error
+		AddProcessArtifacts(ProcWorkspaceBuilder) error
 	}
 
 	/*
@@ -48,7 +48,7 @@ type (
 )
 
 type (
-	WorkspaceInfo struct {
+	ProcWorkspaceInfo struct {
 		Path string // fully-qualified path on the filesystem to the workspace
 	}
 
@@ -57,10 +57,10 @@ type (
 
 		Process nodes can provide their artifacts using the methods on this interface
 	*/
-	WorkspaceBuilder interface {
+	ProcWorkspaceBuilder interface {
 		blueprint.BuildContext
 
-		Info() WorkspaceInfo
+		Info() ProcWorkspaceInfo
 
 		/*
 			Creates a subdirectory in the workspace dir for a process node to collect
