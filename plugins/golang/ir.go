@@ -14,7 +14,7 @@ It defines the following IR interfaces:
   - golang.Node is the base interface for any node that lives within a golang process
   - golang.Service is a golang node that has methods that can be directly called by other golang nodes
 
-To support golang code generation, the following IR interfaces are provided, as defined in ir_codegen.go.
+To support golang code generation, the following IR interfaces are provided.
 The golang.Process depends on these interfaces for collecting and packaging code, however, usage of these interfaces
 is not intended to be private to just the golang.Process plugin.  Other plugins are permitted to
 use these interfaces.

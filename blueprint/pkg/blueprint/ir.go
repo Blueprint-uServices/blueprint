@@ -72,8 +72,13 @@ func (app *ApplicationNode) Compile(outputDir string) error {
 	// Group the nodes that we must build, according to their type
 	nodesToBuild := make(map[reflect.Type][]IRNode)
 	for _, node := range app.Children {
-		key := reflect.TypeOf(node)
-		nodesToBuild[key] = append(nodesToBuild[key], node)
+		switch node.(type) {
+		case IRMetadata: // skip metadata nodes
+			continue
+		default:
+			key := reflect.TypeOf(node)
+			nodesToBuild[key] = append(nodesToBuild[key], node)
+		}
 	}
 
 	// Invoke the default builders for each node type
@@ -84,7 +89,7 @@ func (app *ApplicationNode) Compile(outputDir string) error {
 				return Errorf("encountered error while building to %v, aborting: %v", outputDir, err)
 			}
 		} else {
-			slog.Info(fmt.Sprintf("No default builder registered for type %v\n", t))
+			slog.Info(fmt.Sprintf("No default builder registered for type %v", t))
 		}
 	}
 	return nil
