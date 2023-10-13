@@ -2,15 +2,16 @@ package xtrace
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/process"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
 type XTraceServer struct {
-	process.ProcessNode
-	process.ArtifactGenerator
+	process.Node
+	process.InstantiableProcess
+	process.ProvidesProcessArtifacts
 
 	ServerName string
 	Addr       *GolangXTraceAddress
@@ -72,7 +73,12 @@ func (node *XTraceServer) GetInterface(ctx blueprint.BuildContext) (service.Serv
 	return &XTraceInterface{Wrapped: iface}, nil
 }
 
-func (node *XTraceServer) GenerateArtifacts(outputDir string) error {
-	// TODO: generate artifacts for the XTraceServer process
+func (node *XTraceServer) AddProcessArtifacts(builder process.WorkspaceBuilder) error {
+	// TODO: generate artifacts
+	return nil
+}
+
+func (node *XTraceServer) AddProcessInstance(builder process.GraphBuilder) error {
+	// TODO: instantiate the process
 	return nil
 }

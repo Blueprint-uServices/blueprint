@@ -6,16 +6,19 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/process"
 	"golang.org/x/exp/slog"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
 
 /*
-This file contains the implementation of the golang.Process IRNode.
+golang.Process is a node that represents a runnable Golang process.  It can contain any number of
+other golang.Node IRNodes.  When it's compiled, the golang.Process will generate a go module with
+a runnable main method that instantiates and initializes the contained go nodes.  To achieve this,
+the golang.Process also collects module dependencies from its contained nodes.
 
 The `GenerateArtifacts` method generates the main method based on the process's contained nodes.
 
@@ -32,8 +35,9 @@ var generatedModulePrefix = "blueprint/goproc"
 // This is Blueprint's main implementation of Golang processes
 type Process struct {
 	blueprint.IRNode
-	process.ProcessNode
-	process.ArtifactGenerator
+	process.Node
+	process.ProvidesProcessArtifacts
+	process.InstantiableProcess
 
 	InstanceName   string
 	ArgNodes       []blueprint.IRNode
@@ -168,16 +172,18 @@ func main() {
 	slog.Info("{{.Name}} exiting")
 }`
 
-func (node *Process) GenerateArtifacts(outputDir string) error {
-	err := gogen.CheckDir(outputDir, true)
-	if err != nil {
-		return blueprint.Errorf("unable to create %s for process %s due to %s", outputDir, node.Name(), err.Error())
+func (node *Process) AddProcessArtifacts(builder process.WorkspaceBuilder) error {
+	if builder.Visited(node.Name()) {
+		return nil
 	}
 
-	// TODO: might end up building multiple times which is OK, so need a check here that we haven't already built this artifact, even if it was by a different (but identical) node
-
-	// Create the workspace
+	// Create the workspace dir
 	procName := blueprint.CleanName(node.Name())
+	outputDir, err := builder.CreateProcessDir(procName)
+	if err != nil {
+		return err
+	}
+
 	workspaceDir := filepath.Join(outputDir, procName)
 	slog.Info(fmt.Sprintf("Building goproc %s to %s", node.Name(), workspaceDir))
 	workspace, err := gogen.NewWorkspaceBuilder(workspaceDir)
@@ -276,6 +282,18 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func (node *Process) AddProcessInstance(builder process.GraphBuilder) error {
+	if builder.Visited(node.InstanceName) {
+		return nil
+	}
+
+	// TODO: add cmd args
+	// go run proc/module/main.go --argnamenormal=$ARG_NAME_CLEAN
+	// builder.DeclareCommand()
 
 	return nil
 }
