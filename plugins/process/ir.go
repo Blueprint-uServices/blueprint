@@ -40,10 +40,10 @@ type (
 
 	/*
 		For process nodes that can be instantiated.
-		Methods on the GraphBuilder argument are used for declaring commands to start processes
+		Methods on the ProcGraphBuilder argument are used for declaring commands to start processes
 	*/
 	InstantiableProcess interface {
-		AddProcessInstance(GraphBuilder) error
+		AddProcessInstance(ProcGraphBuilder) error
 	}
 )
 
@@ -79,22 +79,22 @@ type (
 		AddBuildScript(path string) error
 	}
 
-	GraphInfo struct {
-		Workspace WorkspaceInfo
+	ProcGraphInfo struct {
+		Workspace ProcWorkspaceInfo
 		FileName  string // Name of the file within the package
 		FilePath  string // Fully-qualified path to the file on the local filesystem
 		FuncName  string // Name of the function that builds the graph
 	}
 
 	/*
-		The GraphBuilder accumulates the commands needed to start processes.
+		The ProcGraphBuilder accumulates the commands needed to start processes.
 		It then creates the script needed to start all processes, that is typically
 		used as the run command for a container image.
 	*/
-	GraphBuilder interface {
+	ProcGraphBuilder interface {
 		blueprint.BuildContext
 
-		Info() GraphInfo
+		Info() ProcGraphInfo
 
 		DeclareCommand(name string, cmd string, args []blueprint.IRNode) error
 

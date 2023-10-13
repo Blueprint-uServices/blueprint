@@ -26,12 +26,12 @@ func (node *OpenTelemetryCollector) String() string {
 	return node.Name() + " = OTCollector(" + node.Addr.Name() + ")"
 }
 
-func (n *OpenTelemetryCollector) AddProcessArtifacts(builder process.WorkspaceBuilder) error {
+func (n *OpenTelemetryCollector) AddProcessArtifacts(builder process.ProcWorkspaceBuilder) error {
 	// TODO: generate artifacts
 	return nil
 }
 
-func (n *OpenTelemetryCollector) AddProcessInstance(builder process.GraphBuilder) error {
+func (n *OpenTelemetryCollector) AddProcessInstance(builder process.ProcGraphBuilder) error {
 	// TODO: instantiate the process
 	return nil
 }

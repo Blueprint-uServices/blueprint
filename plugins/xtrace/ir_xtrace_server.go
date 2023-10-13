@@ -73,12 +73,12 @@ func (node *XTraceServer) GetInterface(ctx blueprint.BuildContext) (service.Serv
 	return &XTraceInterface{Wrapped: iface}, nil
 }
 
-func (node *XTraceServer) AddProcessArtifacts(builder process.WorkspaceBuilder) error {
+func (node *XTraceServer) AddProcessArtifacts(builder process.ProcWorkspaceBuilder) error {
 	// TODO: generate artifacts
 	return nil
 }
 
-func (node *XTraceServer) AddProcessInstance(builder process.GraphBuilder) error {
+func (node *XTraceServer) AddProcessInstance(builder process.ProcGraphBuilder) error {
 	// TODO: instantiate the process
 	return nil
 }

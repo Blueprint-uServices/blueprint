@@ -179,7 +179,7 @@ func main() {
 	slog.Info("{{.Name}} exiting")
 }`
 
-func (node *Process) AddProcessArtifacts(builder process.WorkspaceBuilder) error {
+func (node *Process) AddProcessArtifacts(builder process.ProcWorkspaceBuilder) error {
 	if builder.Visited(node.Name()) {
 		return nil
 	}
@@ -293,7 +293,7 @@ func (node *Process) generateArtifacts(outputDir, procName string) error {
 	return workspace.Finish()
 }
 
-func (node *Process) AddProcessInstance(builder process.GraphBuilder) error {
+func (node *Process) AddProcessInstance(builder process.ProcGraphBuilder) error {
 	if builder.Visited(node.InstanceName) {
 		return nil
 	}

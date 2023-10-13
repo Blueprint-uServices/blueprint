@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/process"
 )
 
@@ -16,7 +17,7 @@ The ProcWorkspaceBuilder is used for accumulating process artifacts
 type ProcWorkspaceBuilderImpl struct {
 	blueprint.VisitTrackerImpl
 	WorkspaceDir string
-	ProcDirs     map[string]string // map from proc name to directory
+	ProcDirs     map[string]struct{} // map from proc name to directory
 }
 
 /*
@@ -29,7 +30,7 @@ func NewProcWorkspaceBuilder(workspaceDir string) (*ProcWorkspaceBuilderImpl, er
 	if err != nil {
 		return nil, blueprint.Errorf("invalid workspace dir %v", workspaceDir)
 	}
-	if IsDir(workspaceDir) {
+	if ioutil.IsDir(workspaceDir) {
 		return nil, blueprint.Errorf("workspace %s already exists", workspaceDir)
 	}
 	err = os.Mkdir(workspaceDir, 0755)
@@ -38,10 +39,25 @@ func NewProcWorkspaceBuilder(workspaceDir string) (*ProcWorkspaceBuilderImpl, er
 	}
 	workspace := &ProcWorkspaceBuilderImpl{}
 	workspace.WorkspaceDir = workspaceDir
-	workspace.ProcDirs = make(map[string]string)
+	workspace.ProcDirs = make(map[string]struct{})
 	return workspace, nil
 }
 
-func (workspace *ProcWorkspaceBuilderImpl) Info() process.ProcWorkspaceInfo {
-	return process.ProcWorkspaceInfo{Path: workspace.WorkspaceDir}
+func (builder *ProcWorkspaceBuilderImpl) Info() process.ProcWorkspaceInfo {
+	return process.ProcWorkspaceInfo{Path: builder.WorkspaceDir}
+}
+
+// Creates a subdirectory and saves its metadata
+func (builder *ProcWorkspaceBuilderImpl) CreateProcessDir(name string) (string, error) {
+	// Only alphanumeric and underscores are allowed in a proc name
+	name = blueprint.CleanName(name)
+
+	// Can't redefine a procdir that already exists
+	if _, exists := builder.ProcDirs[name]; exists {
+		return "", blueprint.Errorf("process dir %v already exists in output procworkspace %v", name, builder.WorkspaceDir)
+	}
+
+	// Create the dir
+	return "", nil
+
 }

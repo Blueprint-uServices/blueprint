@@ -74,12 +74,12 @@ func (node *MemcachedProcess) GetInterface(ctx blueprint.BuildContext) (service.
 	return &MemcachedInterface{Wrapped: iface}, nil
 }
 
-func (n *MemcachedProcess) AddProcessArtifacts(builder process.WorkspaceBuilder) error {
+func (n *MemcachedProcess) AddProcessArtifacts(builder process.ProcWorkspaceBuilder) error {
 	// TODO: generate artifacts for the memcached process
 	return nil
 }
 
-func (n *MemcachedProcess) AddProcessInstance(builder process.GraphBuilder) error {
+func (n *MemcachedProcess) AddProcessInstance(builder process.ProcGraphBuilder) error {
 	// TODO: instantiate the process
 	return nil
 }
