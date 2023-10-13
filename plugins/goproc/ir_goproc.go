@@ -2,20 +2,26 @@ package goproc
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/process"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/process/procgen"
 	"golang.org/x/exp/slog"
+	"golang.org/x/mod/modfile"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
 
 /*
-This file contains the implementation of the golang.Process IRNode.
+goproc.Process is a node that represents a runnable Golang process.  It can contain any number of
+other golang.Node IRNodes.  When it's compiled, the goproc.Process will generate a go module with
+a runnable main method that instantiates and initializes the contained go nodes.  To achieve this,
+the golang.Process also collects module dependencies from its contained nodes.
 
 The `GenerateArtifacts` method generates the main method based on the process's contained nodes.
 
@@ -28,14 +34,27 @@ Most of the heavy lifting of code generation is done by the following:
 
 var generatedModulePrefix = "blueprint/goproc"
 
+func init() {
+	RegisterBuilders()
+}
+
+func RegisterBuilders() {
+	/* any unattached golang nodes will be instantiated in a "default" golang workspace */
+	blueprint.RegisterDefaultNamespace[golang.Node]("goproc", buildDefaultGolangWorkspace)
+	blueprint.RegisterDefaultBuilder[*Process]("goproc", buildDefaultGolangProcess)
+}
+
 // An IRNode representing a golang process.
 // This is Blueprint's main implementation of Golang processes
 type Process struct {
 	blueprint.IRNode
-	process.ProcessNode
-	process.ArtifactGenerator
+	process.Node
+	process.ProvidesProcessArtifacts
+	process.InstantiableProcess
 
 	InstanceName   string
+	ProcName       string
+	ModuleName     string
 	ArgNodes       []blueprint.IRNode
 	ContainedNodes []blueprint.IRNode
 }
@@ -44,6 +63,8 @@ type Process struct {
 func newGolangProcessNode(name string) *Process {
 	node := Process{}
 	node.InstanceName = name
+	node.ProcName = blueprint.CleanName(name)
+	node.ModuleName = generatedModulePrefix + "/" + node.ProcName
 	return &node
 }
 
@@ -168,17 +189,21 @@ func main() {
 	slog.Info("{{.Name}} exiting")
 }`
 
-func (node *Process) GenerateArtifacts(outputDir string) error {
-	err := gogen.CheckDir(outputDir, true)
-	if err != nil {
-		return blueprint.Errorf("unable to create %s for process %s due to %s", outputDir, node.Name(), err.Error())
+func (node *Process) AddProcessArtifacts(builder process.ProcWorkspaceBuilder) error {
+	if builder.Visited(node.Name()) {
+		return nil
 	}
 
-	// TODO: might end up building multiple times which is OK, so need a check here that we haven't already built this artifact, even if it was by a different (but identical) node
+	// Create the workspace dir
+	outputDir, err := builder.CreateProcessDir(node.ProcName)
+	if err != nil {
+		return err
+	}
+	return node.generateArtifacts(outputDir, true)
+}
 
-	// Create the workspace
-	procName := blueprint.CleanName(node.Name())
-	workspaceDir := filepath.Join(outputDir, procName)
+func (node *Process) generateArtifacts(workspaceDir string, generateMain bool) error {
+	// Create subdirectory for the golang workspace
 	slog.Info(fmt.Sprintf("Building goproc %s to %s", node.Name(), workspaceDir))
 	workspace, err := gogen.NewWorkspaceBuilder(workspaceDir)
 	if err != nil {
@@ -195,9 +220,8 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	}
 
 	// Create the module
-	moduleName := generatedModulePrefix + "/" + procName
-	slog.Info(fmt.Sprintf("Creating module %v", moduleName))
-	module, err := gogen.NewModuleBuilder(workspace, moduleName)
+	slog.Info(fmt.Sprintf("Creating module %v", node.ModuleName))
+	module, err := gogen.NewModuleBuilder(workspace, node.ModuleName)
 	if err != nil {
 		return err
 	}
@@ -221,9 +245,9 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 	}
 
 	// Create the method to instantiate the graph
-	graphFileName := strings.ToLower(procName) + ".go"
+	graphFileName := strings.ToLower(node.ProcName) + ".go"
 	procPackage := "goproc"
-	constructorName := "New" + cases.Title(language.BritishEnglish).String(procName)
+	constructorName := "New" + cases.Title(language.BritishEnglish).String(node.ProcName)
 	graph, err := gogen.NewGraphBuilder(module, graphFileName, procPackage, constructorName)
 	if err != nil {
 		return err
@@ -238,44 +262,145 @@ func (node *Process) GenerateArtifacts(outputDir string) error {
 		}
 	}
 
+	// TODO: it's possible some metadata / address nodes are residing in this namespace.  They don't
+	// get passed in as args, but need to be added to the graph nonetheless
+
 	// Generate the graph code
 	if err = graph.Build(); err != nil {
 		return err
 	}
 
 	// Generate the main.go
-	mainArgs := mainTemplateArgs{
-		Name:             node.Name(),
-		GraphPackage:     fmt.Sprintf("%s/%s", module.Name, procPackage),
-		GraphConstructor: fmt.Sprintf("%s.%s", procPackage, constructorName),
-		Args:             nil,
-		Instantiate:      nil,
-	}
-	for _, arg := range node.ArgNodes {
-		mainArgs.Args = append(mainArgs.Args, mainArg{
-			Name: arg.Name(),
-			Doc:  arg.String(),
-			Var:  blueprint.CleanName(arg.Name()),
-		})
-	}
-	// For now explicitly instantiate every child node
-	for _, child := range node.ContainedNodes {
-		if _, isInstantiable := child.(golang.Instantiable); isInstantiable {
-			mainArgs.Instantiate = append(mainArgs.Instantiate, child.Name())
+	// By default, main.go will be generated
+	// However, it is not generated if the goproc is being built by the default
+	// process builder (vs. within a container)
+	if generateMain {
+		mainArgs := mainTemplateArgs{
+			Name:             node.Name(),
+			GraphPackage:     fmt.Sprintf("%s/%s", module.Name, procPackage),
+			GraphConstructor: fmt.Sprintf("%s.%s", procPackage, constructorName),
+			Args:             nil,
+			Instantiate:      nil,
+		}
+		for _, arg := range node.ArgNodes {
+			mainArgs.Args = append(mainArgs.Args, mainArg{
+				Name: arg.Name(),
+				Doc:  arg.String(),
+				Var:  blueprint.CleanName(arg.Name()),
+			})
+		}
+		// For now explicitly instantiate every child node
+		for _, child := range node.ContainedNodes {
+			if _, isInstantiable := child.(golang.Instantiable); isInstantiable {
+				mainArgs.Instantiate = append(mainArgs.Instantiate, child.Name())
+			}
+		}
+
+		slog.Info(fmt.Sprintf("Generating %v/main.go", module.Name))
+		mainFileName := filepath.Join(module.ModuleDir, "main.go")
+		err = gogen.ExecuteTemplateToFile("goprocMain", mainTemplate, mainArgs, mainFileName)
+		if err != nil {
+			return err
 		}
 	}
 
-	slog.Info(fmt.Sprintf("Generating %v/main.go", module.Name))
-	mainFileName := filepath.Join(module.ModuleDir, "main.go")
-	err = gogen.ExecuteTemplateToFile("goprocMain", mainTemplate, mainArgs, mainFileName)
+	return workspace.Finish()
+}
+
+type runFuncTemplateArgs struct {
+	Name           string
+	GoWorkspaceDir string
+	GoMainFile     string
+	Args           []blueprint.IRNode
+}
+
+var runFuncTemplate = `
+run_{{RunFuncName .Name}} {
+	export CGO_ENABLED=1
+	cd {{.GoWorkspaceDir}}
+	go run {{.GoMainFile}}
+	{{- range $i, $arg := .Args}} --{{$arg.Name}}=${{EnvVarName $arg.Name}}{{end}} &
+	{{EnvVarName .Name}}=$!
+	return $?
+}`
+
+func (node *Process) AddProcessInstance(builder process.ProcGraphBuilder) error {
+	if builder.Visited(node.InstanceName) {
+		return nil
+	}
+
+	mainFile, err := node.findMainFile(builder)
 	if err != nil {
 		return err
 	}
 
-	err = workspace.Finish()
+	workspacePath := builder.Info().Workspace.Path
+	procDir := filepath.Join(workspacePath, node.ProcName)
+	mainFilePath, err := filepath.Rel(procDir, mainFile)
 	if err != nil {
 		return err
 	}
 
+	templateArgs := runFuncTemplateArgs{
+		Name:           node.InstanceName,
+		GoWorkspaceDir: filepath.ToSlash(node.ProcName),
+		GoMainFile:     filepath.ToSlash(mainFilePath),
+		Args:           node.ArgNodes,
+	}
+
+	runfunc, err := procgen.ExecuteTemplate("rungoproc", runFuncTemplate, templateArgs)
+	if err != nil {
+		return err
+	}
+
+	return builder.DeclareRunCommand(node.InstanceName, runfunc, node.ArgNodes...)
+}
+
+/*
+If the Blueprint application contains any floating golang nodes, they get
+built by this function.
+*/
+func buildDefaultGolangWorkspace(outputDir string, nodes []blueprint.IRNode) error {
+	proc := newGolangProcessNode("default")
+	proc.ContainedNodes = nodes
+	return proc.generateArtifacts(outputDir, false)
+}
+
+/*
+If the Blueprint application contains any floating goproc.Process nodes, they
+get built by this function.
+*/
+func buildDefaultGolangProcess(outputDir string, node blueprint.IRNode) error {
+	if proc, isProc := node.(*Process); isProc {
+		if err := proc.generateArtifacts(outputDir, true); err != nil {
+			return err
+		}
+	}
 	return nil
+}
+
+func (node *Process) findMainFile(builder process.ProcGraphBuilder) (string, error) {
+	goWorkspaceDir := filepath.Join(builder.Info().Workspace.Path, node.ProcName)
+	entries, err := os.ReadDir(goWorkspaceDir)
+	if err != nil {
+		return "", err
+	}
+	for _, e := range entries {
+		if e.IsDir() {
+			modDir := filepath.Join(goWorkspaceDir, e.Name())
+			modFileName := filepath.Join(modDir, "go.mod")
+			modFileData, err := os.ReadFile(modFileName)
+			if err != nil {
+				continue
+			}
+			f, err := modfile.Parse(modFileName, modFileData, nil)
+			if err != nil {
+				continue
+			}
+			if f.Module.Mod.Path == node.ModuleName {
+				return filepath.Join(modDir, "main.go"), nil
+			}
+		}
+	}
+	return "", blueprint.Errorf("unable to find main.go file for golang process %v in %v", node.InstanceName, goWorkspaceDir)
 }
