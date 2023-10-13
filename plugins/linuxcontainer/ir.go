@@ -19,7 +19,12 @@ will generate a run script that instantiates all contained processes.
 */
 
 func init() {
-	blueprint.RegisterDefaultBuilder[process.Node](buildDefaultProcessWorkspace)
+	RegisterBuilders()
+}
+
+// to trigger module initialization and register builders
+func RegisterBuilders() {
+	blueprint.RegisterDefaultNamespace[process.Node]("linuxcontainer", buildDefaultProcessWorkspace)
 }
 
 type Container struct {

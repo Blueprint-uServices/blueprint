@@ -36,7 +36,8 @@ var generatedModulePrefix = "blueprint/goproc"
 
 func init() {
 	/* any unattached golang nodes will be instantiated in a "default" golang workspace */
-	blueprint.RegisterDefaultBuilder[golang.Node](buildDefaultGolangWorkspace)
+	blueprint.RegisterDefaultNamespace[golang.Node]("goproc", buildDefaultGolangWorkspace)
+	blueprint.RegisterDefaultBuilder[*Process]("goproc", buildDefaultGolangProcess)
 }
 
 // An IRNode representing a golang process.
@@ -360,6 +361,19 @@ func buildDefaultGolangWorkspace(outputDir string, nodes []blueprint.IRNode) err
 	proc := newGolangProcessNode("default")
 	proc.ContainedNodes = nodes
 	return proc.generateArtifacts(outputDir, false)
+}
+
+/*
+If the Blueprint application contains any floating goproc.Process nodes, they
+get built by this function.
+*/
+func buildDefaultGolangProcess(outputDir string, node blueprint.IRNode) error {
+	if proc, isProc := node.(*Process); isProc {
+		if err := proc.generateArtifacts(outputDir, true); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (node *Process) findMainFile(builder process.ProcGraphBuilder) (string, error) {
