@@ -315,11 +315,11 @@ type runFuncTemplateArgs struct {
 }
 
 var runFuncTemplate = `
-function run_{{RunFuncName .Name}} {
-	export $CGO_ENABLED=1
+run_{{RunFuncName .Name}} {
+	export CGO_ENABLED=1
 	cd {{.GoWorkspaceDir}}
 	go run {{.GoMainFile}}
-	{{- range $i, $arg := .Args}} --{{$arg.Name}}={{EnvVarName $arg.Name}}{{end}}
+	{{- range $i, $arg := .Args}} --{{$arg.Name}}=${{EnvVarName $arg.Name}}{{end}} &
 	{{EnvVarName .Name}}=$!
 	return $?
 }`
@@ -343,7 +343,7 @@ func (node *Process) AddProcessInstance(builder process.ProcGraphBuilder) error 
 
 	templateArgs := runFuncTemplateArgs{
 		Name:           node.InstanceName,
-		GoWorkspaceDir: filepath.ToSlash(procDir),
+		GoWorkspaceDir: filepath.ToSlash(node.ProcName),
 		GoMainFile:     filepath.ToSlash(mainFilePath),
 		Args:           node.ArgNodes,
 	}

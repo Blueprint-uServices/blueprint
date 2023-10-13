@@ -146,6 +146,14 @@ func (r *registry) BuildAll(outputDir string, nodes []IRNode) error {
 		}
 	}
 
+	// Exclude config nodes (for now)
+	for i := 0; i < len(nodes); i++ {
+		if _, isAddress := nodes[i].(IRConfig); isAddress {
+			nodes = append(nodes[:i], nodes[i+1:]...)
+			i--
+		}
+	}
+
 	// Build namespaces first
 	for _, builder := range r.namespace {
 		var err error

@@ -17,6 +17,11 @@ type IRMetadata interface {
 	ImplementsIRMetadata()
 }
 
+type IRConfig interface {
+	IRNode
+	ImplementsIRConfig()
+}
+
 // The IR Node that represents the whole application
 type ApplicationNode struct {
 	IRNode

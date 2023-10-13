@@ -51,7 +51,7 @@ var runCommandTemplate = `{{RunFuncName .Name}}() {
 
 	{{end -}}
 
-	function run_{{RunFuncName .Name}}() {
+	run_{{RunFuncName .Name}}() {
 		{{.RunFuncBody}}
 	}
 
@@ -93,7 +93,10 @@ func (builder *ProcGraphBuilderImpl) DeclareRunCommand(name string, runfunc stri
 	}
 
 	actualRunFunc, err := ExecuteTemplate("runfunc", runCommandTemplate, templateArgs)
-	builder.RunFuncs[name] = actualRunFunc
+
+	funcName := strings.ToLower(blueprint.CleanName(name))
+
+	builder.RunFuncs[funcName] = actualRunFunc
 	return err
 }
 
@@ -102,9 +105,16 @@ var runfileTemplate = `#!/bin/bash
 PROCNAME="{{.Info.Name}}"
 WORKSPACE_DIR=$(pwd)
 
-{{range $i, $f := .RunFuncs}}
+{{range $name, $f := .RunFuncs}}
 {{$f}}
-{{end}}`
+{{end}}
+
+
+{{range $name, $f := .RunFuncs}}
+{{$name}}
+{{end}}
+
+`
 
 func (builder *ProcGraphBuilderImpl) Build() error {
 	filePath := filepath.Join(builder.workspace.Info().Path, builder.info.FilePath)
