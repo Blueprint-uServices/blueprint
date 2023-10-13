@@ -116,6 +116,13 @@ func (node *Container) generateArtifacts(procWorkspaceDir string, generateDocker
 		}
 	}
 
+	for _, child := range node.ArgNodes {
+		if err := graph.AddArg(child); err != nil {
+			return err
+		}
+
+	}
+
 	// TODO: it's possible some metadata / address nodes are residing in this namespace.  They don't
 	// get passed in as args, but need to be added to the graph nonetheless
 

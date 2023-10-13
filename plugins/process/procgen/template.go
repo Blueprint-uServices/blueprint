@@ -6,7 +6,7 @@ import (
 	"strings"
 	"text/template"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/process"
 )
 
 /*
@@ -70,11 +70,11 @@ func (e *templateExecutor) Get(name string) (string, error) {
 }
 
 func (e *templateExecutor) EnvVarName(name string) (string, error) {
-	return strings.ToUpper(blueprint.CleanName(name)), nil
+	return process.EnvVar(name), nil
 }
 
 func (e *templateExecutor) RunFuncName(name string) (string, error) {
-	return strings.ToLower(blueprint.CleanName(name)), nil
+	return process.FuncName(name), nil
 }
 
 func (e *templateExecutor) TitleCase(arg string) (string, error) {

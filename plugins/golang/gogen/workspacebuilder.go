@@ -202,9 +202,10 @@ func (workspace *WorkspaceBuilderImpl) Finish() error {
 	}
 
 	// Resolve imported packages
-	for moduleSubDir := range workspace.Modules {
-		workspace.goModTidy(moduleSubDir)
-	}
+	// TODO: figure out a faster way of doing go mod tidy; for now disable
+	// for moduleSubDir := range workspace.Modules {
+	// 	workspace.goModTidy(moduleSubDir)
+	// }
 
 	return nil
 }

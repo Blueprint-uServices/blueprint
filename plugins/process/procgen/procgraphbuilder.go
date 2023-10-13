@@ -13,6 +13,8 @@ type ProcGraphBuilderImpl struct {
 	workspace process.ProcWorkspaceBuilder
 	info      process.ProcGraphInfo
 	RunFuncs  map[string]string
+	AllNodes  map[string]blueprint.IRNode // All of the nodes used as dependencies
+	Args      map[string]blueprint.IRNode // Nodes that will be passed as arguments.
 }
 
 func NewProcGraphBuilderImpl(workspace process.ProcWorkspaceBuilder, name string, fileName string) (*ProcGraphBuilderImpl, error) {
@@ -28,6 +30,8 @@ func NewProcGraphBuilderImpl(workspace process.ProcWorkspaceBuilder, name string
 			FilePath:  filepath.ToSlash(filepath.Clean(fileName)),
 		},
 		RunFuncs: make(map[string]string),
+		AllNodes: make(map[string]blueprint.IRNode),
+		Args:     make(map[string]blueprint.IRNode),
 	}
 
 	return builder, nil
@@ -57,15 +61,15 @@ var runCommandTemplate = `{{RunFuncName .Name}}() {
 
 	if run_{{RunFuncName .Name}}; then
 		if [ -z "${ {{- EnvVarName .Name}}+x}" ]; then
-			echo "${PROCNAME} error starting {{.Name}}: function {{RunFuncName .Name}} did not set {{EnvVarName .Name}}"
+			echo "${WORKSPACE_NAME} error starting {{.Name}}: function {{RunFuncName .Name}} did not set {{EnvVarName .Name}}"
 			return 1
 		else
-			echo "${PROCNAME} started {{.Name}}"
+			echo "${WORKSPACE_NAME} started {{.Name}}"
 			return 0
 		fi
 	else
 		exitcode=$?
-		echo "${PROCNAME} aborting {{.Name}} due to exitcode ${exitcode} from {{RunFuncName .Name}}"
+		echo "${WORKSPACE_NAME} aborting {{.Name}} due to exitcode ${exitcode} from {{RunFuncName .Name}}"
 		return $exitcode
 	fi
 }`
@@ -86,6 +90,10 @@ func (builder *ProcGraphBuilderImpl) DeclareRunCommand(name string, runfunc stri
 		return blueprint.Errorf("invalid runfunc for process %v %v", name, runfunc)
 	}
 
+	for _, dep := range deps {
+		builder.AllNodes[dep.Name()] = dep
+	}
+
 	templateArgs := runCommandArgs{
 		Name:         name,
 		Dependencies: deps,
@@ -94,29 +102,89 @@ func (builder *ProcGraphBuilderImpl) DeclareRunCommand(name string, runfunc stri
 
 	actualRunFunc, err := ExecuteTemplate("runfunc", runCommandTemplate, templateArgs)
 
-	funcName := strings.ToLower(blueprint.CleanName(name))
-
-	builder.RunFuncs[funcName] = actualRunFunc
+	builder.RunFuncs[name] = actualRunFunc
 	return err
+}
+
+/*
+Indicate that the provided node is an argument that will be passed in as an environment variable
+from the calling environment
+*/
+func (builder *ProcGraphBuilderImpl) AddArg(node blueprint.IRNode) error {
+	builder.Args[node.Name()] = node
+	return nil
 }
 
 var runfileTemplate = `#!/bin/bash
 
-PROCNAME="{{.Info.Name}}"
+WORKSPACE_NAME="{{.Info.Name}}"
 WORKSPACE_DIR=$(pwd)
+
+usage() { 
+	echo "Usage: $0 [-h]" 1>&2
+	echo "  Required environment variables:"
+	
+	{{range $name, $arg := .Args -}}
+	if [ -z "${ {{- EnvVarName .Name}}+x}" ]; then
+		echo "    {{EnvVarName .Name}} (missing)"
+	else
+		echo "    {{EnvVarName .Name}}=${{EnvVarName .Name}}"
+	fi
+	{{end}}	
+	exit 1; 
+}
+
+while getopts "h" flag; do
+	case $flag in
+		*)
+		usage
+		;;
+	esac
+done
 
 {{range $name, $f := .RunFuncs}}
 {{$f}}
 {{end}}
 
+run_all() {
+	echo "Running {{.Info.Name}}"
 
-{{range $name, $f := .RunFuncs}}
-{{$name}}
-{{end}}
+	# Check that all necessary environment variables are set
+	echo "Required environment variables:"
+	missing_vars=0
+	{{- range $name, $arg := .Args}}
+	if [ -z "${ {{- EnvVarName .Name}}+x}" ]; then
+		echo "  {{EnvVarName .Name}} (missing)"
+		missing_vars=$((missing_vars+1))
+	else
+		echo "  {{EnvVarName .Name}}=${{EnvVarName .Name}}"
+	fi
+	{{end}}	
 
+	if [ "$missing_vars" -gt 0 ]; then
+		echo "Aborting due to missing environment variables"
+		return 1
+	fi
+
+	{{range $name, $f := .RunFuncs -}}
+	{{RunFuncName $name}}
+	{{end}}
+	wait
+}
+
+run_all
 `
 
 func (builder *ProcGraphBuilderImpl) Build() error {
+	// Figure out which nodes are used as dependencies but aren't declared locally; add them as args
+	for name, node := range builder.AllNodes {
+		if _, isLocal := builder.RunFuncs[name]; !isLocal {
+			if err := builder.AddArg(node); err != nil {
+				return err
+			}
+		}
+	}
+
 	filePath := filepath.Join(builder.workspace.Info().Path, builder.info.FilePath)
 	return ExecuteTemplateToFile("runfile", runfileTemplate, builder, filePath)
 }

@@ -9,3 +9,7 @@ import (
 func EnvVar(name string) string {
 	return strings.ToUpper(blueprint.CleanName(name))
 }
+
+func FuncName(name string) string {
+	return strings.ToLower(blueprint.CleanName(name))
+}
