@@ -184,7 +184,8 @@ func {{ .FuncName }}(ctx context.Context, cancel context.CancelFunc, args map[st
 	}
 
 	{{ range $defName, $buildFunc := .Declarations }}
-	if err = g.Define("{{ $defName }}", {{ $buildFunc }}); err != nil {
+	err = g.Define("{{ $defName }}", {{ $buildFunc }})
+	if err != nil {
 		return nil, err
 	}
 	{{ end }}

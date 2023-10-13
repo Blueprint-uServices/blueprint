@@ -55,8 +55,7 @@ func New_{{.Name}}(ctx context.Context, service {{NameOf .Service.UserType}}) (*
 // Blueprint: Run is called automatically in a separate goroutine by runtime/plugins/golang/di.go
 func (wlgen *{{.Name}}) Run(ctx context.Context) error {
 	{{ range $_, $f := .Service.Methods -}}
-	err := wlgen.Call_{{$f.Name}}(ctx)
-	if err != nil {
+	if err := wlgen.Call_{{$f.Name}}(ctx); err != nil {
 		return err
 	}
 	{{end}}

@@ -17,6 +17,11 @@ type IRMetadata interface {
 	ImplementsIRMetadata()
 }
 
+type IRConfig interface {
+	IRNode
+	ImplementsIRConfig()
+}
+
 // The IR Node that represents the whole application
 type ApplicationNode struct {
 	IRNode
@@ -41,4 +46,8 @@ func (node *ApplicationNode) String() string {
 	b.WriteString(Indent(strings.Join(children, "\n"), 2))
 	b.WriteString("\n}")
 	return b.String()
+}
+
+func (app *ApplicationNode) Compile(outputDir string) error {
+	return defaultBuilders.BuildAll(outputDir, app.Children)
 }

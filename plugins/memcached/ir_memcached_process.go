@@ -3,16 +3,17 @@ package memcached
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/process"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/process"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
 type MemcachedProcess struct {
-	process.ProcessNode
+	process.Node
 	backend.Cache
-	process.ArtifactGenerator
+	process.InstantiableProcess
+	process.ProvidesProcessArtifacts
 
 	InstanceName string
 	Addr         *MemcachedAddr
@@ -73,7 +74,12 @@ func (node *MemcachedProcess) GetInterface(ctx blueprint.BuildContext) (service.
 	return &MemcachedInterface{Wrapped: iface}, nil
 }
 
-func (n *MemcachedProcess) GenerateArtifacts(outputDir string) error {
+func (n *MemcachedProcess) AddProcessArtifacts(builder process.ProcWorkspaceBuilder) error {
 	// TODO: generate artifacts for the memcached process
+	return nil
+}
+
+func (n *MemcachedProcess) AddProcessInstance(builder process.ProcGraphBuilder) error {
+	// TODO: instantiate the process
 	return nil
 }

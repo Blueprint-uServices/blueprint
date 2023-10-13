@@ -261,7 +261,7 @@ func (blueprint *Blueprint) InstantiateAll() {
 	}
 }
 
-func (blueprint *Blueprint) Build() (*ApplicationNode, error) {
+func (blueprint *Blueprint) BuildIR() (*ApplicationNode, error) {
 	node, err := blueprint.applicationNamespace.Build()
 	if err != nil {
 		return node.(*ApplicationNode), err
