@@ -2,7 +2,6 @@ package linuxcontainer
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
@@ -86,9 +85,8 @@ func (node *Container) AddContainerInstance(app docker.DockerApp) error {
 	return nil
 }
 
-func (node *Container) generateArtifacts(outputDir string, generateDockerfile bool) error {
+func (node *Container) generateArtifacts(procWorkspaceDir string, generateDockerfile bool) error {
 	// Create subdirectory for the processes in this ctr image
-	procWorkspaceDir := filepath.Join(outputDir, node.ImageName)
 	slog.Info(fmt.Sprintf("Building linux ctr %s to %s", node.Name(), procWorkspaceDir))
 	workspace, err := procgen.NewProcWorkspaceBuilder(procWorkspaceDir)
 	if err != nil {

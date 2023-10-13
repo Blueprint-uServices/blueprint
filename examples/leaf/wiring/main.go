@@ -9,6 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/healthchecker"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplenosqldb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
@@ -28,6 +29,9 @@ func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) string {
 func main() {
 
 	fmt.Println("Constructing Wiring Spec")
+
+	// Initialize blueprint compiler
+	linuxcontainer.RegisterBuilders()
 
 	wiring := blueprint.NewWiringSpec("leaf_example")
 

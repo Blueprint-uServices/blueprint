@@ -36,17 +36,6 @@ Creates a new ProcWorkspaceBuilder at the specified output dir.
 Will return an error if the workspacedir already exists
 */
 func NewProcWorkspaceBuilder(workspaceDir string) (*ProcWorkspaceBuilderImpl, error) {
-	workspaceDir, err := filepath.Abs(workspaceDir)
-	if err != nil {
-		return nil, blueprint.Errorf("invalid workspace dir %v", workspaceDir)
-	}
-	if ioutil.IsDir(workspaceDir) {
-		return nil, blueprint.Errorf("workspace %s already exists", workspaceDir)
-	}
-	err = os.Mkdir(workspaceDir, 0755)
-	if err != nil {
-		return nil, blueprint.Errorf("unable to create workspace %s due to %s", workspaceDir, err.Error())
-	}
 	workspace := &ProcWorkspaceBuilderImpl{}
 	workspace.WorkspaceDir = filepath.Clean(workspaceDir)
 	workspace.ProcDirs = make(map[string]string)

@@ -35,6 +35,10 @@ Most of the heavy lifting of code generation is done by the following:
 var generatedModulePrefix = "blueprint/goproc"
 
 func init() {
+	RegisterBuilders()
+}
+
+func RegisterBuilders() {
 	/* any unattached golang nodes will be instantiated in a "default" golang workspace */
 	blueprint.RegisterDefaultNamespace[golang.Node]("goproc", buildDefaultGolangWorkspace)
 	blueprint.RegisterDefaultBuilder[*Process]("goproc", buildDefaultGolangProcess)
@@ -191,7 +195,6 @@ func (node *Process) AddProcessArtifacts(builder process.ProcWorkspaceBuilder) e
 	}
 
 	// Create the workspace dir
-
 	outputDir, err := builder.CreateProcessDir(node.ProcName)
 	if err != nil {
 		return err
@@ -199,9 +202,8 @@ func (node *Process) AddProcessArtifacts(builder process.ProcWorkspaceBuilder) e
 	return node.generateArtifacts(outputDir, true)
 }
 
-func (node *Process) generateArtifacts(outputDir string, generateMain bool) error {
+func (node *Process) generateArtifacts(workspaceDir string, generateMain bool) error {
 	// Create subdirectory for the golang workspace
-	workspaceDir := filepath.Join(outputDir, node.ProcName)
 	slog.Info(fmt.Sprintf("Building goproc %s to %s", node.Name(), workspaceDir))
 	workspace, err := gogen.NewWorkspaceBuilder(workspaceDir)
 	if err != nil {
@@ -343,6 +345,7 @@ func (node *Process) AddProcessInstance(builder process.ProcGraphBuilder) error 
 		Name:           node.InstanceName,
 		GoWorkspaceDir: filepath.ToSlash(procDir),
 		GoMainFile:     filepath.ToSlash(mainFilePath),
+		Args:           node.ArgNodes,
 	}
 
 	runfunc, err := procgen.ExecuteTemplate("rungoproc", runFuncTemplate, templateArgs)
@@ -399,5 +402,5 @@ func (node *Process) findMainFile(builder process.ProcGraphBuilder) (string, err
 			}
 		}
 	}
-	return "", blueprint.Errorf("unable to find main.go file for golang process %v", node.InstanceName)
+	return "", blueprint.Errorf("unable to find main.go file for golang process %v in %v", node.InstanceName, goWorkspaceDir)
 }

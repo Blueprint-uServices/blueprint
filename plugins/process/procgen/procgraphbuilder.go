@@ -27,6 +27,7 @@ func NewProcGraphBuilderImpl(workspace process.ProcWorkspaceBuilder, name string
 			FileDir:   filepath.ToSlash(filepath.Clean(dir)),
 			FilePath:  filepath.ToSlash(filepath.Clean(fileName)),
 		},
+		RunFuncs: make(map[string]string),
 	}
 
 	return builder, nil
@@ -42,13 +43,13 @@ type runCommandArgs struct {
 	RunFuncBody  string
 }
 
-var runCommandTemplate = `
-{{RunFuncName .Name}}() {
+var runCommandTemplate = `{{RunFuncName .Name}}() {
 	cd $WORKSPACE_DIR
 	
-	{{ range $i, $dep := .Dependencies}}
+	{{ range $i, $dep := .Dependencies -}}
 	{{Get $dep.Name}}
-	{{end}}
+
+	{{end -}}
 
 	function run_{{RunFuncName .Name}}() {
 		{{.RunFuncBody}}
@@ -67,8 +68,7 @@ var runCommandTemplate = `
 		echo "${PROCNAME} aborting {{.Name}} due to exitcode ${exitcode} from {{RunFuncName .Name}}"
 		return $exitcode
 	fi
-}
-`
+}`
 
 func getFuncBody(runcmd string) string {
 	from := strings.Index(runcmd, "{") + 1
@@ -89,7 +89,7 @@ func (builder *ProcGraphBuilderImpl) DeclareRunCommand(name string, runfunc stri
 	templateArgs := runCommandArgs{
 		Name:         name,
 		Dependencies: deps,
-		RunFuncBody:  runfunc,
+		RunFuncBody:  blueprint.Reindent(runfunc, 8),
 	}
 
 	actualRunFunc, err := ExecuteTemplate("runfunc", runCommandTemplate, templateArgs)
@@ -104,12 +104,11 @@ WORKSPACE_DIR=$(pwd)
 
 {{range $i, $f := .RunFuncs}}
 {{$f}}
-{{end}}
-
-`
+{{end}}`
 
 func (builder *ProcGraphBuilderImpl) Build() error {
-	return ExecuteTemplateToFile("runfile", runfileTemplate, builder, builder.info.FilePath)
+	filePath := filepath.Join(builder.workspace.Info().Path, builder.info.FilePath)
+	return ExecuteTemplateToFile("runfile", runfileTemplate, builder, filePath)
 }
 
 func (builder *ProcGraphBuilderImpl) ImplementsBuildContext() {}
