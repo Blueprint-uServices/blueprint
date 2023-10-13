@@ -116,6 +116,7 @@ func (builder *ProcGraphBuilderImpl) AddArg(node blueprint.IRNode) error {
 }
 
 var runfileTemplate = `#!/bin/bash
+cd "$(dirname "$0")"
 
 WORKSPACE_NAME="{{.Info.Name}}"
 WORKSPACE_DIR=$(pwd)
