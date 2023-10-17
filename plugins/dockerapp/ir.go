@@ -19,18 +19,7 @@ type Deployment struct {
 	ContainedNodes []blueprint.IRNode
 }
 
-type DockerComposeBuilder interface {
-	AddImage()
-	AddDockerfile()
-	ConfigureContainer(name string)
-}
-
-type DockerContainerBuilder interface {
-	ExposePort(internalPort string) string
-	SetConfig(name string, value string)
-}
-
-func newDeployment(name string) *Deployment {
+func newContainerDeployment(name string) *Deployment {
 	return &Deployment{DeploymentName: name}
 }
 

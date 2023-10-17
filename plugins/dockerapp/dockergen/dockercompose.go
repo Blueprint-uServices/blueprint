@@ -1,28 +1,33 @@
 package dockergen
 
-import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
-)
+import "path/filepath"
 
 /*
-Implements the ContainerWorkspace defined in docker/ir.go
-
-A basic implementation that:
- (a) gathers any locally-defined container artifacts
- (b) gathers container instance declarations
-(c) generates a docker-compose file
+Generates the docker-compose file of a docker app
 */
 
-type DockerComposeWorkspace struct {
-	blueprint.VisitTrackerImpl
+type DockerComposeFile struct {
+	WorkspaceName string
+	WorkspaceDir  string
+	FileName      string
+	FilePath      string
+}
 
-	info docker.ContainerWorkspaceInfo
+func NewDockerComposeFile(workspaceName, workspaceDir, fileName string) *DockerComposeFile {
+	return &DockerComposeFile{
+		WorkspaceName: workspaceName,
+		WorkspaceDir:  workspaceDir,
+		FileName:      fileName,
+		FilePath:      filepath.Join(workspaceDir, fileName),
+	}
+}
 
-	ImageDirs map[string]string // map from image name to directory
+func (d *DockerComposeFile) Generate() error {
+	return ExecuteTemplateToFile("docker-compose", dockercomposeTemplate, d, d.FilePath)
 
 }
 
-type DockerComposeContainerInstance struct {
-	Hostname string
-}
+var dockercomposeTemplate = `
+version: '3'
+services:
+`

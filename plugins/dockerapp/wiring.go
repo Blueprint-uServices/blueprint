@@ -73,7 +73,7 @@ func newDockerComposeNamespace(parentNamespace blueprint.Namespace, wiring bluep
 	namespace := &DockerComposeNamespace{}
 	namespace.handler = &dockerComposeNamespaceHandler{}
 	namespace.handler.Init(&namespace.SimpleNamespace)
-	namespace.handler.IRNode = newDeployment(name)
+	namespace.handler.IRNode = newContainerDeployment(name)
 	namespace.Init(name, "DockerApp", parentNamespace, wiring, namespace.handler)
 	return namespace
 }

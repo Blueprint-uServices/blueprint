@@ -23,6 +23,7 @@ type DockerWorkspaceImpl struct {
 
 func NewDockerWorkspace(name string, dir string) *DockerWorkspaceImpl {
 	ws := &DockerWorkspaceImpl{}
+	ws.info.Target = "docker"
 	ws.BasicWorkspace = *NewBasicWorkspace(name, dir)
 	ws.Dockerfile = linuxgen.NewDockerfile(dir)
 	return ws

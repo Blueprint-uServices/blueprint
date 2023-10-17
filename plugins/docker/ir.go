@@ -83,6 +83,15 @@ type (
 			Returns an error if an instance already exists with this name.
 		*/
 		DeclareLocalImage(instanceName string, imageName string) error
+
+		/*
+			Indicates that the caller has finished adding images and instances,
+			and the workspace can generate any subsequent artifacts
+			e.g. the final docker-compose file can be generated
+		*/
+		Finish() error
+
+		ImplementsContainerWorkspace()
 	}
 
 	/*

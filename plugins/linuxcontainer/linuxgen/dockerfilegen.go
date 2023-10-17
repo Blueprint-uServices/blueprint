@@ -18,7 +18,8 @@ func (d *Dockerfile) Generate() error {
 	return ExecuteTemplateToFile("Dockerfile", dockerfileTemplate, d, d.FilePath)
 }
 
-var dockerfileTemplate = `FROM gcr.io/distroless/base-debian10
+var dockerfileTemplate = `# syntax=docker/dockerfile:1
+FROM gcr.io/distroless/base-debian10
 WORKDIR /
 
 ENTRYPOINT ["/run.sh"]`

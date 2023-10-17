@@ -1,6 +1,23 @@
 package dockerapp
 
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
+import (
+	"fmt"
+
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerapp/workspace"
+	"golang.org/x/exp/slog"
+)
+
+func init() {
+	RegisterBuilders()
+}
+
+// to trigger module initialization and register builders
+func RegisterBuilders() {
+	blueprint.RegisterDefaultNamespace[docker.Container]("containerdeployment", buildDefaultContainerWorkspace)
+}
 
 /*
 Docker compose is the default docker app deployer.  It simply
@@ -12,25 +29,38 @@ type DockerCompose interface {
 }
 
 func (node *Deployment) GenerateArtifacts(dir string) error {
-	// builder, err := dockergen.NewDockerComposeBuilder(dir)
-	// if err != nil {
-	// 	return err
-	// }
+	slog.Info(fmt.Sprintf("Collecting container instances for %s in %s", node.Name(), dir))
+	workspace := workspace.NewDockerComposeWorkspace(node.Name(), dir)
+	return node.generateArtifacts(workspace)
+}
 
-	// for _, node := range node.ContainedNodes {
-	// 	if n, valid := node.(docker.BuildsContainerImage); valid {
-	// 		if err := n.PrepareDockerfile(builder); err != nil {
-	// 			return err
-	// 		}
-	// 	}
-	// }
+/*
+The basic build process of a docker-compose deployment
+*/
+func (node *Deployment) generateArtifacts(workspace docker.ContainerWorkspace) error {
+	// Add any locally-built container images
+	for _, child := range node.ContainedNodes {
+		if n, valid := child.(docker.ProvidesContainerImage); valid {
+			if err := n.AddContainerArtifacts(workspace); err != nil {
+				return err
+			}
+		}
+	}
 
-	// for _, node := range node.ContainedNodes {
-	// 	if n, valid := node.(docker.Container); valid {
-	// 		if err := n.AddToDockerCompose(builder); err != nil {
-	// 			return err
-	// 		}
-	// 	}
-	// }
-	return nil
+	// Collect all container instances
+	for _, child := range node.ContainedNodes {
+		if n, valid := child.(docker.ProvidesContainerInstance); valid {
+			if err := n.AddContainerInstance(workspace); err != nil {
+				return err
+			}
+		}
+	}
+
+	return workspace.Finish()
+}
+
+func buildDefaultContainerWorkspace(outputDir string, nodes []blueprint.IRNode) error {
+	ctr := newContainerDeployment("default")
+	ctr.ContainedNodes = nodes
+	return ctr.GenerateArtifacts(outputDir)
 }
