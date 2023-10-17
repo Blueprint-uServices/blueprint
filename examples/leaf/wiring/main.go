@@ -6,6 +6,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerapp"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/healthchecker"
@@ -18,12 +19,14 @@ import (
 )
 
 func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) string {
-	procName := fmt.Sprintf("p%s", serviceName)
+	procName := fmt.Sprintf("proc%s", serviceName)
+	ctrName := fmt.Sprintf("ctr%s", serviceName)
 	// opentelemetry.Instrument(wiring, serviceName)
 	clientpool.Create(wiring, serviceName, 5)
 	healthchecker.AddHealthCheckAPI(wiring, serviceName)
 	grpc.Deploy(wiring, serviceName)
-	return goproc.CreateProcess(wiring, procName, serviceName)
+	goproc.CreateProcess(wiring, procName, serviceName)
+	return linuxcontainer.CreateContainer(wiring, ctrName, procName)
 }
 
 func main() {
@@ -32,6 +35,7 @@ func main() {
 
 	// Initialize blueprint compiler
 	linuxcontainer.RegisterBuilders()
+	dockerapp.RegisterBuilders()
 
 	wiring := blueprint.NewWiringSpec("leaf_example")
 

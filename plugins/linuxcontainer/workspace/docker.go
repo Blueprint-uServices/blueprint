@@ -30,6 +30,9 @@ func NewDockerWorkspace(name string, dir string) *DockerWorkspaceImpl {
 }
 
 func (ws *DockerWorkspaceImpl) AddDockerfileCommands(procName, commands string) error {
+	// TODO
+
+	ws.Dockerfile.Commands += commands
 	return nil
 }
 

@@ -50,19 +50,9 @@ func (d *DockerComposeWorkspace) Info() docker.ContainerWorkspaceInfo {
 func (d *DockerComposeWorkspace) CreateImageDir(imageName string) (string, error) {
 	// Only alphanumeric and underscores are allowed in an proc name
 	imageName = blueprint.CleanName(imageName)
-
-	// Can't redefine an image that already exists
-	if _, exists := d.ImageDirs[imageName]; exists {
-		return "", blueprint.Errorf("image dir %v already exists in output container workspace %v", imageName, d.info.Path)
-	}
-
-	// Create the dir
-	imageDir := filepath.Join(d.info.Path, imageName)
-	if err := ioutil.CheckDir(imageDir, true); err != nil {
-		return "", blueprint.Errorf("cannot generate image to output workspace %v due to %v", imageName, err.Error())
-	}
+	imageDir, err := ioutil.CreateNodeDir(d.info.Path, imageName)
 	d.ImageDirs[imageName] = imageDir
-	return imageDir, nil
+	return imageDir, err
 }
 
 func (d *DockerComposeWorkspace) DeclarePrebuiltInstance(instanceName string, image string) error {

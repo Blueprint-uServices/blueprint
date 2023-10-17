@@ -42,9 +42,8 @@ func NewBasicWorkspace(name string, dir string) *BasicWorkspace {
 			Path:   filepath.Clean(dir),
 			Target: "basic",
 		},
-		ProcDirs: make(map[string]string),
-		Build:    linuxgen.NewBuildScript(dir, "build.sh"),
-		Run:      linuxgen.NewRunScript(name, dir, "run.sh"),
+		Build: linuxgen.NewBuildScript(dir, "build.sh"),
+		Run:   linuxgen.NewRunScript(name, dir, "run.sh"),
 	}
 }
 
@@ -55,22 +54,7 @@ func (workspace *BasicWorkspace) Info() linux.ProcessWorkspaceInfo {
 // Creates a subdirectory for a process to output its artifacts.
 // Saves the metadata about the process
 func (ws *BasicWorkspace) CreateProcessDir(name string) (string, error) {
-	// Only alphanumeric and underscores are allowed in a proc name
-	name = blueprint.CleanName(name)
-
-	// Can't redefine a procdir that already exists
-	if _, exists := ws.ProcDirs[name]; exists {
-		return "", blueprint.Errorf("process dir %v already exists in output procworkspace %v", name, ws.info.Path)
-	}
-
-	// Create the dir
-	procDir := filepath.Join(ws.info.Path, name)
-	if err := ioutil.CheckDir(procDir, true); err != nil {
-		return "", blueprint.Errorf("cannot generate process to output workspace %v due to %v", name, err.Error())
-	}
-	ws.ProcDirs[name] = procDir
-
-	return procDir, nil
+	return ioutil.CreateNodeDir(ws.info.Path, name)
 }
 
 // Adds a build script provided by a process

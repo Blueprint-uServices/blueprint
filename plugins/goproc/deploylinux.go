@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/linuxgen"
 	"golang.org/x/mod/modfile"
@@ -56,10 +57,16 @@ func (node *Process) AddProcessArtifacts(builder linux.ProcessWorkspace) error {
 		return err
 	}
 
-	// switch builder.(type) {
-	// case *linuxgen.ProcessWorkspaceImpl: p
-	// }
-	return node.GenerateArtifacts(outputDir)
+	// Generate the regular artifacts for the process
+	if err := node.GenerateArtifacts(outputDir); err != nil {
+		return err
+	}
+
+	// If it's a docker container, we can also add Dockerfile build commands
+	if dockerWorkspace, isDocker := builder.(docker.ProcessWorkspace); isDocker {
+		return dockerWorkspace.AddDockerfileCommands(node.Name(), "Hello world")
+	}
+	return nil
 }
 
 /*

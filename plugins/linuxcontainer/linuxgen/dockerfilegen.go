@@ -5,6 +5,7 @@ import "path/filepath"
 type Dockerfile struct {
 	WorkspaceDir string
 	FilePath     string
+	Commands     string
 }
 
 func NewDockerfile(workspaceDir string) *Dockerfile {
@@ -22,4 +23,6 @@ var dockerfileTemplate = `# syntax=docker/dockerfile:1
 FROM gcr.io/distroless/base-debian10
 WORKDIR /
 
-ENTRYPOINT ["/run.sh"]`
+ENTRYPOINT ["/run.sh"]
+
+{{.Commands}}`

@@ -5,6 +5,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
@@ -41,9 +42,8 @@ type Process struct {
 	core.ProcessNode
 
 	/* The implemented build targets for golang.Process nodes */
-	BasicGoProc  /* Can be deployed as a basic go process; implemented in deploy.go */
-	LinuxGoProc  /* Can be deployed to linux; implemented in deploylinux.go */
-	DockerGoProc /* Can be deployed with custom build commands to Docker; implemented in deploydocker.go */
+	BasicGoProc /* Can be deployed as a basic go process; implemented in deploy.go */
+	LinuxGoProc /* Can be deployed to linux; implemented in deploylinux.go */
 
 	InstanceName   string
 	ProcName       string
@@ -109,7 +109,11 @@ get built by this function.
 */
 func buildDefaultGolangProcess(outputDir string, node blueprint.IRNode) error {
 	if proc, isProc := node.(*Process); isProc {
-		if err := proc.GenerateArtifacts(outputDir); err != nil {
+		procDir, err := ioutil.CreateNodeDir(outputDir, node.Name())
+		if err != nil {
+			return err
+		}
+		if err := proc.GenerateArtifacts(procDir); err != nil {
 			return err
 		}
 	}
