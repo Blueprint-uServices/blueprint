@@ -20,7 +20,7 @@ dependencies (e.g. installing Go); it is expected that the user will do this.
 */
 
 type LinuxGoProc interface {
-	linux.Node
+	linux.Process
 	linux.ProvidesProcessArtifacts
 	linux.InstantiableProcess
 }

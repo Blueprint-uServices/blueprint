@@ -20,7 +20,7 @@ func init() {
 
 // to trigger module initialization and register builders
 func RegisterBuilders() {
-	blueprint.RegisterDefaultNamespace[linux.Node]("linuxcontainer", buildDefaultProcessWorkspace)
+	blueprint.RegisterDefaultNamespace[linux.Process]("linuxcontainer", buildDefaultProcessWorkspace)
 }
 
 type Container struct {

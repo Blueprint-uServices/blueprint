@@ -8,6 +8,11 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 )
 
+/*
+A proc graph is a collection of processes.  The proc graph builder
+creates a script that will run all of the processes.
+*/
+
 type ProcGraphBuilderImpl struct {
 	blueprint.VisitTrackerImpl
 	workspace linux.ProcWorkspaceBuilder

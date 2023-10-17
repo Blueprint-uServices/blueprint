@@ -9,7 +9,7 @@ import (
 )
 
 /*
-Implements the ProcWorkspaceBuilder interface defined in process/ir.go
+Implements the ProcWorkspaceBuilder interface defined in linux/ir.go
 
 The ProcWorkspaceBuilder is used for accumulating process artifacts
 */

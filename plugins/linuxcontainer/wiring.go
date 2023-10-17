@@ -84,7 +84,7 @@ func newLinuxNamespace(parentNamespace blueprint.Namespace, wiring blueprint.Wir
 
 // Golang processes can only contain golang nodes
 func (namespace *linuxNamespaceHandler) Accepts(nodeType any) bool {
-	_, ok := nodeType.(linux.Node)
+	_, ok := nodeType.(linux.Process)
 	return ok
 }
 

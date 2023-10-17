@@ -2,37 +2,22 @@ package linux
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
 )
 
 /*
-process.Node is the base interface for any process
-
-To support process artifact generation, the following IR interfaces are provided.
-- process.ProvidesProcessArtifacts is for process nodes that collect files or
-  run commands to collect together runnable process artifacts
-- process.InstantiableProcess is for process nodes that can be run via a command
-
-Most processes will implement both IR interfaces, but some might not need any
-artifacts
+The base IRNode interface for linux processes
 */
+type Process interface {
+	core.ProcessNode
+	ImplementsLinuxProcess()
+}
 
-// This Node represents a process
+/*
+Code and artifact generation interfaces that IRNodes can implement to provide linux
+processes.
+*/
 type (
-
-	/*
-		The base IRNode interface for linux processes
-	*/
-	Node interface {
-		blueprint.IRNode
-		ImplementsLinuxProcess()
-	}
-)
-
-type (
-
-	/*
-		Any process node that wants to deploy to linux will need to implement this interface
-	*/
 
 	/*
 		For process nodes that want to provide code or other artifacts for their process.
@@ -51,6 +36,9 @@ type (
 	}
 )
 
+/*
+Builders used by the above code and artifact generation interfaces
+*/
 type (
 	ProcWorkspaceInfo struct {
 		Path string // fully-qualified path on the filesystem to the workspace

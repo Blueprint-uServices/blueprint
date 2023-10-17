@@ -1,20 +1,22 @@
 package docker
 
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-
-type (
-	Container interface {
-	}
-
-	Deployment interface {
-	}
-
-	ContainerNode interface {
-		blueprint.IRNode
-		ImplementsDockerNode()
-	}
+import (
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
 )
 
+/*
+The base IRNode interface for docker containers
+*/
+type Container interface {
+	core.ContainerNode
+	ImplementsDockerContainer()
+}
+
+/*
+Code and artifact generation interfaces that IRNodes
+can implement to provide docker images
+*/
 type (
 	ProvidesContainerImage interface {
 		AddContainerImage(ImageSet) error
@@ -25,6 +27,9 @@ type (
 	}
 )
 
+/*
+Builders used by the above code and artifact generation interfaces
+*/
 type (
 	// accumualtes images
 	ImageSet interface {

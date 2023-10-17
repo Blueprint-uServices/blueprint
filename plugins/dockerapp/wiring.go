@@ -1,4 +1,4 @@
-package dockercompose
+package dockerapp
 
 import (
 	"strings"
@@ -21,7 +21,7 @@ func NewDeployment(wiring blueprint.WiringSpec, deploymentName string, container
 		AddContainerToDeployment(wiring, deploymentName, containerName)
 	}
 
-	wiring.Define(deploymentName, &DockerCompose{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+	wiring.Define(deploymentName, &Deployment{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
 		deployment := newDockerComposeNamespace(namespace, wiring, deploymentName)
 
 		var containerNames []string
@@ -65,7 +65,7 @@ type DockerComposeNamespace struct {
 type dockerComposeNamespaceHandler struct {
 	blueprint.DefaultNamespaceHandler
 
-	IRNode *DockerCompose
+	IRNode *Deployment
 }
 
 // Creates a docker compose deployment `name` within the provided parent namespace
@@ -73,14 +73,14 @@ func newDockerComposeNamespace(parentNamespace blueprint.Namespace, wiring bluep
 	namespace := &DockerComposeNamespace{}
 	namespace.handler = &dockerComposeNamespaceHandler{}
 	namespace.handler.Init(&namespace.SimpleNamespace)
-	namespace.handler.IRNode = newDockerComposeDeployment(name)
-	namespace.Init(name, "DockerCompose", parentNamespace, wiring, namespace.handler)
+	namespace.handler.IRNode = newDeployment(name)
+	namespace.Init(name, "DockerApp", parentNamespace, wiring, namespace.handler)
 	return namespace
 }
 
 // Deployments can only contain container nodes
 func (namespace *dockerComposeNamespaceHandler) Accepts(nodeType any) bool {
-	_, ok := nodeType.(docker.ContainerNode)
+	_, ok := nodeType.(docker.Container)
 	return ok
 }
 

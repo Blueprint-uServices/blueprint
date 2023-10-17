@@ -16,7 +16,45 @@ commands to add to the Dockerfile, if implemented.
 */
 
 type DockerLinuxContainer interface {
-	docker.ContainerNode
+	docker.Container
 	docker.ProvidesContainerImage
 	docker.ProvidesContainerInstance
 }
+
+func (node *Container) AddContainerImage(set docker.ImageSet) error {
+	// The image only needs to be created in the output directory once
+	if node.Visited(node.ImageName) {
+		return nil
+	}
+
+	// Create a new subdirectory to construct the image
+	builder, err := set.NewImageBuilder(node.ImageName)
+	if err != nil {
+		return err
+	}
+
+	// Generate artifacts to the image directory
+	if err := node.GenerateArtifacts(builder.ImageDir); err != nil {
+		return err
+	}
+
+	// Generate the dockerfile into the image directory
+	if err := node.generateDockerfile(builder.ImageDir); err != nil {
+		return err
+	}
+}
+
+func (node *Container) AddContainerInstance(app docker.DockerApp) error {
+	// The instance only needs to be added to the output directory once
+	if node.Visited(node.InstanceName) {
+		return nil
+	}
+
+	return app.DeclareInstance(node.InstanceName, node.ImageName, node.ArgNodes)
+}
+
+func (node *Container) generateDockerfile(outputDir string) error {
+
+}
+
+func (node *Container) ImplementsDockerContainer() {}
