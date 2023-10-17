@@ -1,4 +1,4 @@
-package dockerapp
+package dockerdeployment
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerapp/workspace"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment/workspace"
 	"golang.org/x/exp/slog"
 )
 

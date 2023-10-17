@@ -6,7 +6,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerapp"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/healthchecker"
@@ -35,7 +35,7 @@ func main() {
 
 	// Initialize blueprint compiler
 	linuxcontainer.RegisterBuilders()
-	dockerapp.RegisterBuilders()
+	dockerdeployment.RegisterBuilders()
 
 	wiring := blueprint.NewWiringSpec("leaf_example")
 

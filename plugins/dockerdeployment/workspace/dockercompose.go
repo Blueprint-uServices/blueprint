@@ -6,7 +6,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerapp/dockergen"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment/dockergen"
 )
 
 /*

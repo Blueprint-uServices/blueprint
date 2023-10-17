@@ -1,4 +1,4 @@
-package dockerapp
+package dockerdeployment
 
 import (
 	"strings"
