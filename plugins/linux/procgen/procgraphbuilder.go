@@ -5,24 +5,24 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/process"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 )
 
 type ProcGraphBuilderImpl struct {
 	blueprint.VisitTrackerImpl
-	workspace process.ProcWorkspaceBuilder
-	info      process.ProcGraphInfo
+	workspace linux.ProcWorkspaceBuilder
+	info      linux.ProcGraphInfo
 	RunFuncs  map[string]string
 	AllNodes  map[string]blueprint.IRNode // All of the nodes used as dependencies
 	Args      map[string]blueprint.IRNode // Nodes that will be passed as arguments.
 }
 
-func NewProcGraphBuilderImpl(workspace process.ProcWorkspaceBuilder, name string, fileName string) (*ProcGraphBuilderImpl, error) {
+func NewProcGraphBuilderImpl(workspace linux.ProcWorkspaceBuilder, name string, fileName string) (*ProcGraphBuilderImpl, error) {
 	dir, file := filepath.Split(filepath.Clean(fileName))
 
 	builder := &ProcGraphBuilderImpl{
 		workspace: workspace,
-		info: process.ProcGraphInfo{
+		info: linux.ProcGraphInfo{
 			Workspace: workspace.Info(),
 			Name:      name,
 			FileName:  file,
@@ -37,7 +37,7 @@ func NewProcGraphBuilderImpl(workspace process.ProcWorkspaceBuilder, name string
 	return builder, nil
 }
 
-func (builder *ProcGraphBuilderImpl) Info() process.ProcGraphInfo {
+func (builder *ProcGraphBuilderImpl) Info() linux.ProcGraphInfo {
 	return builder.info
 }
 

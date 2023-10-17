@@ -3,15 +3,14 @@ package xtrace
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/process"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
 type XTraceServer struct {
-	process.Node
-	process.InstantiableProcess
-	process.ProvidesProcessArtifacts
+	docker.Container
 
 	ServerName string
 	Addr       *GolangXTraceAddress
@@ -73,12 +72,12 @@ func (node *XTraceServer) GetInterface(ctx blueprint.BuildContext) (service.Serv
 	return &XTraceInterface{Wrapped: iface}, nil
 }
 
-func (node *XTraceServer) AddProcessArtifacts(builder process.ProcWorkspaceBuilder) error {
+func (node *XTraceServer) AddProcessArtifacts(builder linux.ProcWorkspaceBuilder) error {
 	// TODO: generate artifacts
 	return nil
 }
 
-func (node *XTraceServer) AddProcessInstance(builder process.ProcGraphBuilder) error {
+func (node *XTraceServer) AddProcessInstance(builder linux.ProcGraphBuilder) error {
 	// TODO: instantiate the process
 	return nil
 }

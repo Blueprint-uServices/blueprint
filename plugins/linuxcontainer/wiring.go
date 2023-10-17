@@ -5,7 +5,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/process"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 )
 
 /*
@@ -84,7 +84,7 @@ func newLinuxNamespace(parentNamespace blueprint.Namespace, wiring blueprint.Wir
 
 // Golang processes can only contain golang nodes
 func (namespace *linuxNamespaceHandler) Accepts(nodeType any) bool {
-	_, ok := nodeType.(process.Node)
+	_, ok := nodeType.(linux.Node)
 	return ok
 }
 

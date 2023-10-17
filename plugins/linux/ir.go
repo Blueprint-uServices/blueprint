@@ -1,4 +1,4 @@
-package process
+package linux
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
@@ -20,15 +20,19 @@ artifacts
 type (
 
 	/*
-		The base IRNode interface for processes
+		The base IRNode interface for linux processes
 	*/
 	Node interface {
 		blueprint.IRNode
-		ImplementsProcessNode()
+		ImplementsLinuxProcess()
 	}
 )
 
 type (
+
+	/*
+		Any process node that wants to deploy to linux will need to implement this interface
+	*/
 
 	/*
 		For process nodes that want to provide code or other artifacts for their process.

@@ -1,13 +1,11 @@
 package procgen
 
 import (
-	"os"
 	"path/filepath"
-	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/process"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 )
 
 /*
@@ -44,8 +42,8 @@ func NewProcWorkspaceBuilder(workspaceDir string) (*ProcWorkspaceBuilderImpl, er
 	return workspace, nil
 }
 
-func (builder *ProcWorkspaceBuilderImpl) Info() process.ProcWorkspaceInfo {
-	return process.ProcWorkspaceInfo{Path: builder.WorkspaceDir}
+func (builder *ProcWorkspaceBuilderImpl) Info() linux.ProcWorkspaceInfo {
+	return linux.ProcWorkspaceInfo{Path: builder.WorkspaceDir}
 }
 
 // Creates a subdirectory and saves its metadata
@@ -99,7 +97,6 @@ chmod +x {{.FileName}}
 ./{{.FileName}}
 cd -
 {{end}}
-echo "
 `
 
 /*
@@ -112,17 +109,7 @@ The build.sh will typically be invoked by e.g. a Dockerfile
 */
 func (builder *ProcWorkspaceBuilderImpl) Finish() error {
 	filename := filepath.Join(builder.WorkspaceDir, builder.BuildFileName)
-	f, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR, 0755)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	tmpl, err := template.New(builder.BuildFileName).Parse(buildScriptTemplate)
-	if err != nil {
-		return err
-	}
-	return tmpl.Execute(f, builder)
+	return ExecuteTemplateToFile("build.sh", buildScriptTemplate, builder, filename)
 }
 
 func (builder *ProcWorkspaceBuilderImpl) ImplementsBuildContext() {}

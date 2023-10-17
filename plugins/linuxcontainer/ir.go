@@ -1,14 +1,11 @@
 package linuxcontainer
 
 import (
-	"fmt"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/process"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/process/procgen"
-	"golang.org/x/exp/slog"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 )
 
 /*
@@ -23,14 +20,15 @@ func init() {
 
 // to trigger module initialization and register builders
 func RegisterBuilders() {
-	blueprint.RegisterDefaultNamespace[process.Node]("linuxcontainer", buildDefaultProcessWorkspace)
+	blueprint.RegisterDefaultNamespace[linux.Node]("linuxcontainer", buildDefaultProcessWorkspace)
 }
 
 type Container struct {
 	blueprint.IRNode
-	docker.Node
-	docker.ProvidesContainerImage
-	docker.ProvidesContainerInstance
+
+	/* The implemented build targets for linuxcontainer.Container nodes */
+	BasicLinuxContainer  /* Can be deployed as a basic collection of processes; implemented in deploy.go */
+	DockerLinuxContainer /* Can be deployed as a docker container; implemented in deploydocker.go */
 
 	InstanceName   string
 	ImageName      string
@@ -85,61 +83,8 @@ func (node *Container) AddContainerInstance(app docker.DockerApp) error {
 	return nil
 }
 
-func (node *Container) generateArtifacts(procWorkspaceDir string, generateDockerfile bool) error {
-	// Create subdirectory for the processes in this ctr image
-	slog.Info(fmt.Sprintf("Building linux ctr %s to %s", node.Name(), procWorkspaceDir))
-	workspace, err := procgen.NewProcWorkspaceBuilder(procWorkspaceDir)
-	if err != nil {
-		return err
-	}
-
-	// Add all processes artifacts to the workspace
-	for _, child := range node.ContainedNodes {
-		if n, valid := child.(process.ProvidesProcessArtifacts); valid {
-			if err := n.AddProcessArtifacts(workspace); err != nil {
-				return err
-			}
-		}
-	}
-
-	// Collect the scripts to run the processes
-	graph, err := procgen.NewProcGraphBuilderImpl(workspace, node.Name(), "run.sh")
-	if err != nil {
-		return err
-	}
-
-	for _, child := range node.ContainedNodes {
-		if n, valid := child.(process.InstantiableProcess); valid {
-			if err := n.AddProcessInstance(graph); err != nil {
-				return err
-			}
-		}
-	}
-
-	for _, child := range node.ArgNodes {
-		if err := graph.AddArg(child); err != nil {
-			return err
-		}
-
-	}
-
-	// TODO: it's possible some metadata / address nodes are residing in this namespace.  They don't
-	// get passed in as args, but need to be added to the graph nonetheless
-
-	// Generate the run.sh file
-	graph.Build()
-
-	if generateDockerfile {
-		// TODO: generate dockerfile not implemented yet
-		// TODO: dockerfile will need to also invoke build script from workspace
-		return fmt.Errorf("generating dockerfile not yet implemented")
-	}
-
-	return workspace.Finish()
-}
-
 func buildDefaultProcessWorkspace(outputDir string, nodes []blueprint.IRNode) error {
 	ctr := newLinuxContainerNode("default")
 	ctr.ContainedNodes = nodes
-	return ctr.generateArtifacts(outputDir, false)
+	return ctr.GenerateArtifacts(outputDir)
 }

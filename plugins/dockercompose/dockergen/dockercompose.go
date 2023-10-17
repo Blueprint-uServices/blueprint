@@ -1,0 +1,3 @@
+package dockergen
+
+func NewDockerComposeBuilder() {}

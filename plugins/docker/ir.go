@@ -3,7 +3,13 @@ package docker
 import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 
 type (
-	Node interface {
+	Container interface {
+	}
+
+	Deployment interface {
+	}
+
+	ContainerNode interface {
 		blueprint.IRNode
 		ImplementsDockerNode()
 	}
