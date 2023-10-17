@@ -1,6 +1,9 @@
 package linuxcontainer
 
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
+import (
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/workspace"
+)
 
 /*
 The docker deployer for linux containers extends the default deployer,
@@ -21,40 +24,39 @@ type DockerLinuxContainer interface {
 	docker.ProvidesContainerInstance
 }
 
-func (node *Container) AddContainerImage(set docker.ImageSet) error {
+func (node *Container) AddContainerArtifacts(target docker.ContainerWorkspace) error {
 	// The image only needs to be created in the output directory once
-	if node.Visited(node.ImageName) {
+	if target.Visited(node.ImageName) {
 		return nil
 	}
 
 	// Create a new subdirectory to construct the image
-	builder, err := set.NewImageBuilder(node.ImageName)
+	dir, err := target.CreateImageDir(node.ImageName)
 	if err != nil {
 		return err
 	}
 
-	// Generate artifacts to the image directory
-	if err := node.GenerateArtifacts(builder.ImageDir); err != nil {
+	// Generate artifacts to the image directory in the normal way.
+	// By providing a docker workspace, processes will be able to
+	// add dockerfile commands
+	// The docker workspace extends the Finish() implementation
+	// to also generate the Dockerfile
+	workspace := workspace.NewDockerWorkspace(node.Name(), dir)
+	if err := node.generateArtifacts(workspace); err != nil {
 		return err
 	}
-
-	// Generate the dockerfile into the image directory
-	if err := node.generateDockerfile(builder.ImageDir); err != nil {
-		return err
-	}
+	return nil
 }
 
-func (node *Container) AddContainerInstance(app docker.DockerApp) error {
+func (node *Container) AddContainerInstance(target docker.ContainerWorkspace) error {
 	// The instance only needs to be added to the output directory once
-	if node.Visited(node.InstanceName) {
+	if target.Visited(node.InstanceName) {
 		return nil
 	}
 
-	return app.DeclareInstance(node.InstanceName, node.ImageName, node.ArgNodes)
-}
+	// TODO: all address and port related shenanigans will need to go here
 
-func (node *Container) generateDockerfile(outputDir string) error {
-
+	return target.DeclareLocalImage(node.InstanceName, node.ImageName)
 }
 
 func (node *Container) ImplementsDockerContainer() {}

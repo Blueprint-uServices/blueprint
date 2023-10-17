@@ -1,4 +1,4 @@
-package procgen
+package linuxgen
 
 import (
 	"bytes"

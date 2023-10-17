@@ -4,8 +4,6 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 )
 
 /*
@@ -13,15 +11,6 @@ linuxcontainer.Container is a node that represents a collection of runnable linu
 It can contain any number of other process.Node IRNodes.  When it's compiled, the goproc.Process
 will generate a run script that instantiates all contained processes.
 */
-
-func init() {
-	RegisterBuilders()
-}
-
-// to trigger module initialization and register builders
-func RegisterBuilders() {
-	blueprint.RegisterDefaultNamespace[linux.Process]("linuxcontainer", buildDefaultProcessWorkspace)
-}
 
 type Container struct {
 	blueprint.IRNode
@@ -73,18 +62,4 @@ func (node *Container) AddArg(argnode blueprint.IRNode) {
 func (node *Container) AddChild(child blueprint.IRNode) error {
 	node.ContainedNodes = append(node.ContainedNodes, child)
 	return nil
-}
-
-func (node *Container) AddContainerImage(set docker.ImageSet) error {
-	return nil
-}
-
-func (node *Container) AddContainerInstance(app docker.DockerApp) error {
-	return nil
-}
-
-func buildDefaultProcessWorkspace(outputDir string, nodes []blueprint.IRNode) error {
-	ctr := newLinuxContainerNode("default")
-	ctr.ContainedNodes = nodes
-	return ctr.GenerateArtifacts(outputDir)
 }

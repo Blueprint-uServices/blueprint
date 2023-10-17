@@ -5,7 +5,6 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
@@ -70,14 +69,4 @@ func (node *XTraceServer) String() string {
 func (node *XTraceServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
 	iface := node.Iface.ServiceInterface(ctx)
 	return &XTraceInterface{Wrapped: iface}, nil
-}
-
-func (node *XTraceServer) AddProcessArtifacts(builder linux.ProcWorkspaceBuilder) error {
-	// TODO: generate artifacts
-	return nil
-}
-
-func (node *XTraceServer) AddProcessInstance(builder linux.ProcGraphBuilder) error {
-	// TODO: instantiate the process
-	return nil
 }

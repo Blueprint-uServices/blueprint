@@ -6,7 +6,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux/procgen"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/linuxgen"
 	"golang.org/x/mod/modfile"
 )
 
@@ -45,8 +45,8 @@ run_{{RunFuncName .Name}} {
 /*
 From process.ProvidesProcessArtifacts
 */
-func (node *Process) AddProcessArtifacts(builder linux.ProcWorkspaceBuilder) error {
-	if builder.Visited(node.Name()) {
+func (node *Process) AddProcessArtifacts(builder linux.ProcessWorkspace) error {
+	if builder.Visited(node.Name() + ".artifacts") {
 		return nil
 	}
 
@@ -55,14 +55,18 @@ func (node *Process) AddProcessArtifacts(builder linux.ProcWorkspaceBuilder) err
 	if err != nil {
 		return err
 	}
+
+	// switch builder.(type) {
+	// case *linuxgen.ProcessWorkspaceImpl: p
+	// }
 	return node.GenerateArtifacts(outputDir)
 }
 
 /*
 From process.InstantiableProcess
 */
-func (node *Process) AddProcessInstance(builder linux.ProcGraphBuilder) error {
-	if builder.Visited(node.InstanceName) {
+func (node *Process) AddProcessInstance(builder linux.ProcessWorkspace) error {
+	if builder.Visited(node.InstanceName + ".instance") {
 		return nil
 	}
 
@@ -71,7 +75,7 @@ func (node *Process) AddProcessInstance(builder linux.ProcGraphBuilder) error {
 		return err
 	}
 
-	workspacePath := builder.Info().Workspace.Path
+	workspacePath := builder.Info().Path
 	procDir := filepath.Join(workspacePath, node.ProcName)
 	mainFilePath, err := filepath.Rel(procDir, mainFile)
 	if err != nil {
@@ -85,7 +89,7 @@ func (node *Process) AddProcessInstance(builder linux.ProcGraphBuilder) error {
 		Args:           node.ArgNodes,
 	}
 
-	runfunc, err := procgen.ExecuteTemplate("rungoproc", runFuncTemplate, templateArgs)
+	runfunc, err := linuxgen.ExecuteTemplate("rungoproc", runFuncTemplate, templateArgs)
 	if err != nil {
 		return err
 	}
@@ -93,8 +97,8 @@ func (node *Process) AddProcessInstance(builder linux.ProcGraphBuilder) error {
 	return builder.DeclareRunCommand(node.InstanceName, runfunc, node.ArgNodes...)
 }
 
-func (node *Process) findMainFile(builder linux.ProcGraphBuilder) (string, error) {
-	goWorkspaceDir := filepath.Join(builder.Info().Workspace.Path, node.ProcName)
+func (node *Process) findMainFile(builder linux.ProcessWorkspace) (string, error) {
+	goWorkspaceDir := filepath.Join(builder.Info().Path, node.ProcName)
 	entries, err := os.ReadDir(goWorkspaceDir)
 	if err != nil {
 		return "", err

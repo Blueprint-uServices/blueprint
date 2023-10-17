@@ -202,9 +202,9 @@ func (workspace *WorkspaceBuilderImpl) Finish() error {
 	}
 
 	// Resolve imported packages
-	for moduleSubDir := range workspace.Modules {
-		workspace.goModTidy(moduleSubDir)
-	}
+	// for moduleSubDir := range workspace.Modules {
+	// 	workspace.goModTidy(moduleSubDir)
+	// }
 
 	return nil
 }

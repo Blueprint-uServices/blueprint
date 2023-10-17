@@ -3,11 +3,21 @@ package linuxcontainer
 import (
 	"fmt"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux/procgen"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/workspace"
 	"golang.org/x/exp/slog"
 )
+
+func init() {
+	RegisterBuilders()
+}
+
+// to trigger module initialization and register builders
+func RegisterBuilders() {
+	blueprint.RegisterDefaultNamespace[linux.Process]("linuxcontainer", buildDefaultProcessWorkspace)
+}
 
 /*
 The default linux container deployer doesn't assume anything about the target environment,
@@ -29,11 +39,20 @@ The output processes will be runnable in the local environment.
 */
 func (node *Container) GenerateArtifacts(dir string) error {
 	slog.Info(fmt.Sprintf("Collecting process artifacts for %s in %s", node.Name(), dir))
-	workspace, err := procgen.NewProcWorkspaceBuilder(dir)
-	if err != nil {
-		return err
-	}
+	workspace := workspace.NewBasicWorkspace(node.Name(), dir)
+	return node.generateArtifacts(workspace)
+}
 
+/*
+The basic build process for any container of processes.
+
+Deployment targets like Docker will extend the linuxgen.BasicWorkspace
+to offer extra platform-specific commands.
+
+Process nodes that implement AddProcessArtifacts and AddProcessInstance
+can typecheck the workspace to utilize those platform-specific commands.
+*/
+func (node *Container) generateArtifacts(workspace linux.ProcessWorkspace) error {
 	// Add all processes artifacts to the workspace
 	for _, child := range node.ContainedNodes {
 		if n, valid := child.(linux.ProvidesProcessArtifacts); valid {
@@ -44,34 +63,26 @@ func (node *Container) GenerateArtifacts(dir string) error {
 	}
 
 	// Collect the scripts to run the processes
-	graph, err := procgen.NewProcGraphBuilderImpl(workspace, node.Name(), "run.sh")
-	if err != nil {
-		return err
-	}
-
 	for _, child := range node.ContainedNodes {
 		if n, valid := child.(linux.InstantiableProcess); valid {
-			if err := n.AddProcessInstance(graph); err != nil {
+			if err := n.AddProcessInstance(workspace); err != nil {
 				return err
 			}
 		}
 	}
 
-	for _, child := range node.ArgNodes {
-		if err := graph.AddArg(child); err != nil {
-			return err
-		}
-
-	}
+	// // Tell the workspace the nodes it should expect as args
+	// for _, child := range node.ArgNodes {
+	// 	workspace.AddArg(child)
+	// }
 
 	// TODO: it's possible some metadata / address nodes are residing in this namespace.  They don't
 	// get passed in as args, but need to be added to the graph nonetheless
-
-	// Generate the run.sh file
-	if err := graph.Build(); err != nil {
-		return err
-	}
-
 	return workspace.Finish()
+}
 
+func buildDefaultProcessWorkspace(outputDir string, nodes []blueprint.IRNode) error {
+	ctr := newLinuxContainerNode("default")
+	ctr.ContainedNodes = nodes
+	return ctr.GenerateArtifacts(outputDir)
 }
