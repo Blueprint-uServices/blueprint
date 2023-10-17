@@ -4,6 +4,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
 
@@ -21,25 +22,24 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 	clientNext := ptr.AddSrcModifier(wiring, thrift_client)
 
 	wiring.Define(thrift_client, &GolangThriftClient{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		server, err := namespace.Get(clientNext)
-		if err != nil {
-			return nil, err
+		var addr *GolangThriftServerAddress
+		if err := namespace.Get(clientNext, &addr); err != nil {
+			return nil, blueprint.Errorf("Thrift client %s expected %s to be an address, but encountered %s", thrift_client, clientNext, err)
 		}
-
-		return newGolangThriftClient(thrift_client, server)
+		return newGolangThriftClient(thrift_client, addr)
 	})
 
 	serverNext := ptr.AddDstModifier(wiring, thrift_server)
 
 	wiring.Define(thrift_server, &GolangThriftServer{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := namespace.Get(thrift_addr)
-		if err != nil {
-			return nil, err
+		var addr *GolangThriftServerAddress
+		if err := namespace.Get(thrift_addr, &addr); err != nil {
+			return nil, blueprint.Errorf("Thrift server %s expected %s to be an address, but encountered %s", thrift_server, thrift_addr, err)
 		}
 
-		wrapped, err := namespace.Get(serverNext)
-		if err != nil {
-			return nil, err
+		var wrapped golang.Service
+		if err := namespace.Get(serverNext, &wrapped); err != nil {
+			return nil, blueprint.Errorf("Thrift server %s expected %s to be a golang.Service, but encountered %s", thrift_server, serverNext, err)
 		}
 
 		return newGolangThriftServer(thrift_server, addr, wrapped)

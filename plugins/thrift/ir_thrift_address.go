@@ -37,8 +37,8 @@ func (addr *GolangThriftServerAddress) SetDestination(node blueprint.IRNode) err
 	return nil
 }
 
-func (addr *GolangThriftServerAddress) GetInterface() service.ServiceInterface {
-	return addr.Server.GetInterface()
+func (addr *GolangThriftServerAddress) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	return addr.Server.GetInterface(ctx)
 }
 
 func (addr *GolangThriftServerAddress) ImplementsAddressNode() {}

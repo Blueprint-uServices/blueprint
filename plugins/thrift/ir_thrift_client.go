@@ -2,7 +2,6 @@ package thrift
 
 import (
 	"fmt"
-	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
@@ -23,12 +22,7 @@ type GolangThriftClient struct {
 	outputPackage string
 }
 
-func newGolangThriftClient(name string, serverAddr blueprint.IRNode) (*GolangThriftClient, error) {
-	addr, is_addr := serverAddr.(*GolangThriftServerAddress)
-	if !is_addr {
-		return nil, blueprint.Errorf("Thrift client %s expected %s to be an address, but got %s", name, serverAddr.Name(), reflect.TypeOf(serverAddr).String())
-	}
-
+func newGolangThriftClient(name string, addr *GolangThriftServerAddress) (*GolangThriftClient, error) {
 	node := &GolangThriftClient{}
 	node.InstanceName = name
 	node.ServerAddr = addr
@@ -45,39 +39,43 @@ func (n *GolangThriftClient) Name() string {
 	return n.InstanceName
 }
 
-func (node *GolangThriftClient) GetInterface() service.ServiceInterface {
-	return node.GetGoInterface()
+func (node *GolangThriftClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	iface, err := node.ServerAddr.GetInterface(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tiface, isthrift := iface.(*ThriftInterface)
+	if !isthrift {
+		return nil, blueprint.Errorf("thrift client expected a Thrift interface from %v but found %v", node.ServerAddr.Name(), iface)
+	}
+	wrapped, isValid := tiface.Wrapped.(*gocode.ServiceInterface)
+	if !isValid {
+		return nil, blueprint.Errorf("thrift client expected the server's Thrift interface to wrap a gocode interface but found %v", tiface)
+	}
+	return wrapped, nil
 }
 
-func (node *GolangThriftClient) GetGoInterface() *gocode.ServiceInterface {
-	thrift, isThrift := node.ServerAddr.GetInterface().(*ThriftInterface)
-	if !isThrift {
-		return nil
-	}
-	wrapped, isValid := thrift.Wrapped.(*gocode.ServiceInterface)
-	if !isValid {
-		return nil
-	}
-	return wrapped
+func (node *GolangThriftClient) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.ServerAddr.Server.Wrapped.AddInterfaces(builder)
 }
 
 func (node *GolangThriftClient) GenerateFuncs(builder golang.ModuleBuilder) error {
-	service := node.GetGoInterface()
-	if service == nil {
-		return blueprint.Errorf("expected %v to have a gocode.ServiceInterface but got %v", node.Name(), node.ServerAddr.GetInterface())
+	iface, err := golang.GetGoInterface(builder, node)
+	if err != nil {
+		return nil
 	}
 
-	if builder.Visited(service.Name + ".grpc.client") {
+	if builder.Visited(iface.Name + ".grpc.client") {
 		return nil
 	}
 
 	// Generate the .thrift files
-	err := thriftcodegen.GenerateThrift(builder, service, node.outputPackage)
+	err = thriftcodegen.GenerateThrift(builder, iface, node.outputPackage)
 	if err != nil {
 		return err
 	}
 
-	err = thriftcodegen.GenerateClient(builder, service, node.outputPackage)
+	err = thriftcodegen.GenerateClient(builder, iface, node.outputPackage)
 	if err != nil {
 		return err
 	}
@@ -90,11 +88,17 @@ func (node *GolangThriftClient) AddInstantiation(builder golang.GraphBuilder) er
 		return nil
 	}
 
+	iface, err := golang.GetGoInterface(builder, node)
+	if err != nil {
+		return err
+	}
+
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
-			Name: fmt.Sprintf("New_%v_ThriftClient", node.GetGoInterface().Name),
+			Name: fmt.Sprintf("New_%v_ThriftClient", iface.BaseName),
 			Arguments: []gocode.Variable{
+				{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}},
 				{Name: "addr", Type: &gocode.BasicType{Name: "string"}},
 			},
 		},
