@@ -4,13 +4,13 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/process"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
 type RedisProcess struct {
-	process.Node
+	docker.Container
 	backend.Cache
 
 	InstanceName string

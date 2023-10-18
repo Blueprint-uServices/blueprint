@@ -1,4 +1,4 @@
-package procgen
+package linuxgen
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"strings"
 	"text/template"
 
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/process"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 )
 
 /*
@@ -70,11 +70,11 @@ func (e *templateExecutor) Get(name string) (string, error) {
 }
 
 func (e *templateExecutor) EnvVarName(name string) (string, error) {
-	return process.EnvVar(name), nil
+	return linux.EnvVar(name), nil
 }
 
 func (e *templateExecutor) RunFuncName(name string) (string, error) {
-	return process.FuncName(name), nil
+	return linux.FuncName(name), nil
 }
 
 func (e *templateExecutor) TitleCase(arg string) (string, error) {

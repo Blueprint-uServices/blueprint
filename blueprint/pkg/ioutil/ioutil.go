@@ -3,6 +3,7 @@ package ioutil
 import (
 	"errors"
 	"os"
+	"path/filepath"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 )
@@ -38,4 +39,21 @@ func CheckDir(path string, createIfAbsent bool) error {
 	} else {
 		return blueprint.Errorf("unexpected error for directory %s due to %s", path, err.Error())
 	}
+}
+
+/*
+Creates a subdirectory under the provided workspaceDir for the provided node.
+
+The node's name is used to name the subdirectory (the node name is first cleaned).
+
+# Returns the path to the subdirectory
+
+Will return an error if the subdirectory already exists
+*/
+func CreateNodeDir(workspaceDir string, name string) (string, error) {
+	nodeDir := filepath.Join(workspaceDir, blueprint.CleanName(name))
+	if err := CheckDir(nodeDir, true); err != nil {
+		return "", blueprint.Errorf("unable to create output dir for %v at %v due to %v", name, nodeDir, err.Error())
+	}
+	return nodeDir, nil
 }

@@ -24,9 +24,10 @@ The WorkspaceBuilder is used for accumulating local module directories into a go
 */
 type WorkspaceBuilderImpl struct {
 	blueprint.VisitTrackerImpl
-	WorkspaceDir string            // The directory containing this workspace
-	ModuleDirs   map[string]string // map from FQ module name to directory name within WorkspaceDir
-	Modules      map[string]string // map from directory name to FQ module name within WorkspaceDir
+	WorkspaceDir     string            // The directory containing this workspace
+	ModuleDirs       map[string]string // map from FQ module name to directory name within WorkspaceDir
+	Modules          map[string]string // map from directory name to FQ module name within WorkspaceDir
+	GeneratedModules map[string]string // map from directory name to FQ module name within WorkspaceDir
 }
 
 /*
@@ -39,6 +40,7 @@ func NewWorkspaceBuilder(workspaceDir string) (*WorkspaceBuilderImpl, error) {
 	workspace.WorkspaceDir = workspaceDir
 	workspace.ModuleDirs = make(map[string]string)
 	workspace.Modules = make(map[string]string)
+	workspace.GeneratedModules = make(map[string]string)
 	return workspace, nil
 }
 
@@ -75,6 +77,7 @@ func (workspace *WorkspaceBuilderImpl) CreateModule(moduleName string, moduleVer
 	// Save the module
 	workspace.Modules[moduleShortName] = moduleName
 	workspace.ModuleDirs[moduleName] = moduleShortName
+	workspace.GeneratedModules[moduleShortName] = moduleName
 
 	// Create the go.mod file
 	modfileContents := fmt.Sprintf("module %v\n\ngo 1.20", moduleName)
@@ -201,8 +204,8 @@ func (workspace *WorkspaceBuilderImpl) Finish() error {
 		workspace.updateModfile(moduleSubDir, moduleName)
 	}
 
-	// Resolve imported packages
-	for moduleSubDir := range workspace.Modules {
+	// Resolve imported packages for generated modules
+	for moduleSubDir := range workspace.GeneratedModules {
 		workspace.goModTidy(moduleSubDir)
 	}
 
