@@ -38,7 +38,7 @@ type runFuncTemplateArgs struct {
 var dockerRunFuncTemplate = `
 run_{{RunFuncName .Name}} {
 	cd {{.Name}}
-    {{.Name}}/{{.Name}}
+    ./{{.Name}}
 	{{- range $i, $arg := .Args}} --{{$arg.Name}}=${{EnvVarName $arg.Name}}{{end}} &
 	{{EnvVarName .Name}}=$!
 	return $?

@@ -22,16 +22,15 @@ var dockerfileBuildTemplate = `
 #  custom docker build commands provided by goproc.Process {{.ProcName}}
 #
 
-FROM golang:1.18-buster AS {{.ProcName}}
+FROM golang:1.20-bookworm AS {{.ProcName}}
 
 COPY ./{{.ProcName}} /src
 
 WORKDIR /src
 RUN go mod download
 
-WORKDIR /
 RUN mkdir /{{.ProcName}}
-RUN go build -o /{{.ProcName}} /src/{{.ProcName}}
+RUN go build -o /{{.ProcName}} ./{{.ProcName}}
 
 #
 # custom docker build commands provided by goproc.Process {{.ProcName}}

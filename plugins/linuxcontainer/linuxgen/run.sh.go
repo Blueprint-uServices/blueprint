@@ -79,7 +79,6 @@ func (run *RunScript) GenerateRunScript() error {
 }
 
 var runfileTemplate = `#!/bin/bash
-cd "$(dirname "$0")"
 
 WORKSPACE_NAME="{{.WorkspaceName}}"
 WORKSPACE_DIR=$(pwd)

@@ -28,6 +28,9 @@ func (d *Dockerfile) AddCustomCommands(procName string, commands string) {
 
 func (d *Dockerfile) Generate(procDirs map[string]string) error {
 	d.DefaultProcs = procDirs
+	for procName := range d.CustomProcs {
+		delete(d.DefaultProcs, procName)
+	}
 	return ExecuteTemplateToFile("linuxgen/dockerfilegen.go", dockerfileTemplate, d, d.FilePath)
 }
 
@@ -49,11 +52,10 @@ var dockerfileTemplate = `# syntax=docker/dockerfile:1
 
 
 ###
-# Step 2: create final image
+# Step 2: prepare the final image
 ###
 
-FROM gcr.io/distroless/base-debian10
-COPY . /
+FROM gcr.io/distroless/base-debian12
 
 # Copy artifacts for processes that didn't have custom build commands
 {{range $ProcName, $_ := .DefaultProcs -}}
@@ -65,13 +67,16 @@ COPY ./{{$ProcName}} /{{$ProcName}}
 COPY --from={{$ProcName}} /{{$ProcName}} /{{$ProcName}}
 {{end}}
 
+# Get a shell
+COPY --from=busybox:1.35.0-uclibc /bin/sh /bin/sh
+
 # Copy the build.sh file and run it
 WORKDIR /
 COPY ./build.sh /
-RUN ./build.sh
+RUN ["/bin/sh", "./build.sh"]
 
 # Copy the run.sh file and configure the entrypoint
 WORKDIR /
 COPY ./run.sh /
-ENTRYPOINT ["/run.sh"]
+ENTRYPOINT ["bin/sh", "./run.sh"]
 `
