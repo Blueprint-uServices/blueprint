@@ -12,7 +12,7 @@ type Deployment struct {
 	core.DeploymentNode
 
 	/* The implemented build targets for dockercompose.DockerCompose nodes */
-	DockerCompose /* Can be deployed as a docker-compose file; implemented in deploydockercompose.go */
+	dockerComposeDeployer /* Can be deployed as a docker-compose file; implemented in deploydockercompose.go */
 
 	DeploymentName string
 	ArgNodes       []blueprint.IRNode

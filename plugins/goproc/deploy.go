@@ -17,9 +17,11 @@ import (
 The default goproc deployer doesn't assume anything about the target environment, and simply
 packages the go code into a process with a main method.  It is assumed that the user
 or caller will install Go and any dependencies.
+
+The builder used to generate the workspace is located in gogen/workspacebuilder.go
 */
 
-type BasicGoProc interface {
+type filesystemDeployer interface {
 	core.ArtifactGenerator
 }
 

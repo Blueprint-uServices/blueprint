@@ -1,7 +1,9 @@
-package linuxgen
+package dockergen
 
 import (
 	"path/filepath"
+
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/linuxgen"
 )
 
 type Dockerfile struct {
@@ -31,7 +33,7 @@ func (d *Dockerfile) Generate(procDirs map[string]string) error {
 	for procName := range d.CustomProcs {
 		delete(d.DefaultProcs, procName)
 	}
-	return ExecuteTemplateToFile("linuxgen/dockerfilegen.go", dockerfileTemplate, d, d.FilePath)
+	return linuxgen.ExecuteTemplateToFile("dockergen/dockerfile_.go", dockerfileTemplate, d, d.FilePath)
 }
 
 var dockerfileTemplate = `# syntax=docker/dockerfile:1

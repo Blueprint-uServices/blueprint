@@ -17,17 +17,15 @@ func GenerateRunFunc(procName string, args ...blueprint.IRNode) (string, error) 
 }
 
 /*
-Generates command-line function to run a goproc in a Docker container
-
-When a goproc is in a Docker container, it is executed differently
-from when it's not.
+Generates command-line function to run a goproc that has been built to a binary
+using `go build`
 */
-func GenerateDockerRunFunc(procName string, args ...blueprint.IRNode) (string, error) {
+func GenerateBinaryRunFunc(procName string, args ...blueprint.IRNode) (string, error) {
 	templateArgs := runFuncTemplateArgs{
 		Name: procName,
 		Args: args,
 	}
-	return linuxgen.ExecuteTemplate("goproc_dockerrunfunc", dockerRunFuncTemplate, templateArgs)
+	return linuxgen.ExecuteTemplate("goproc_binaryrunfunc", binaryRunFuncTemplate, templateArgs)
 }
 
 type runFuncTemplateArgs struct {
@@ -35,7 +33,7 @@ type runFuncTemplateArgs struct {
 	Args []blueprint.IRNode
 }
 
-var dockerRunFuncTemplate = `
+var binaryRunFuncTemplate = `
 run_{{RunFuncName .Name}} {
 	cd {{.Name}}
     ./{{.Name}}

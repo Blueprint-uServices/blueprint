@@ -16,8 +16,8 @@ type Container struct {
 	blueprint.IRNode
 
 	/* The implemented build targets for linuxcontainer.Container nodes */
-	BasicLinuxContainer  /* Can be deployed as a basic collection of processes; implemented in deploy.go */
-	DockerLinuxContainer /* Can be deployed as a docker container; implemented in deploydocker.go */
+	filesystemDeployer /* Can be deployed as a basic collection of processes; implemented in deploy.go */
+	dockerDeployer     /* Can be deployed as a docker container; implemented in deploydocker.go */
 
 	InstanceName   string
 	ImageName      string

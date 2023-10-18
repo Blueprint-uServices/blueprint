@@ -16,7 +16,7 @@ The LinuxGoProc deployer doesn't set up the linux environment with necessary
 dependencies (e.g. installing Go); it is expected that the user will do this.
 */
 
-type LinuxGoProc interface {
+type linuxDeployer interface {
 	linux.Process
 	linux.ProvidesProcessArtifacts
 	linux.InstantiableProcess
@@ -65,7 +65,7 @@ func (node *Process) AddProcessInstance(builder linux.ProcessWorkspace) error {
 	var err error
 	switch builder.(type) {
 	case docker.ProcessWorkspace:
-		runfunc, err = goprocgen.GenerateDockerRunFunc(procName, node.ArgNodes...)
+		runfunc, err = goprocgen.GenerateBinaryRunFunc(procName, node.ArgNodes...)
 	default:
 		runfunc, err = goprocgen.GenerateRunFunc(procName, node.ArgNodes...)
 	}

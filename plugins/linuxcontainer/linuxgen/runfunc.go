@@ -8,6 +8,12 @@ import (
 
 /*
 Used to generate bash run funcs that get gathered together into a single run.sh
+
+Process nodes provide the bash command needed to execute the process; but that's
+not enough.  We need to make sure dependencies are correctly instantiated when needed.
+
+This code provides a wrapper function implementation around the commands provided
+by the process nodes
 */
 
 func GenerateRunFunc(name string, runfunc string, deps ...blueprint.IRNode) (string, error) {

@@ -5,8 +5,6 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
 /*
@@ -26,24 +24,14 @@ Most of the heavy lifting of code generation is done by the following:
 
 var generatedModulePrefix = "blueprint/goproc"
 
-func init() {
-	RegisterDefaultBuilders()
-}
-
-func RegisterDefaultBuilders() {
-	/* any unattached golang nodes will be instantiated in a "default" golang workspace */
-	blueprint.RegisterDefaultNamespace[golang.Node]("goproc", buildDefaultGolangWorkspace)
-	blueprint.RegisterDefaultBuilder[*Process]("goproc", buildDefaultGolangProcess)
-}
-
 // An IRNode representing a golang process.
 // This is Blueprint's main implementation of Golang processes
 type Process struct {
 	core.ProcessNode
 
 	/* The implemented build targets for golang.Process nodes */
-	BasicGoProc /* Can be deployed as a basic go process; implemented in deploy.go */
-	LinuxGoProc /* Can be deployed to linux; implemented in deploylinux.go */
+	filesystemDeployer /* Can be deployed as a basic go process; implemented in deploy.go */
+	linuxDeployer      /* Can be deployed to linux; implemented in deploylinux.go */
 
 	InstanceName   string
 	ProcName       string
@@ -90,32 +78,5 @@ func (node *Process) AddArg(argnode blueprint.IRNode) {
 
 func (node *Process) AddChild(child blueprint.IRNode) error {
 	node.ContainedNodes = append(node.ContainedNodes, child)
-	return nil
-}
-
-/*
-If the Blueprint application contains any floating golang nodes, they get
-built by this function.
-*/
-func buildDefaultGolangWorkspace(outputDir string, nodes []blueprint.IRNode) error {
-	proc := newGolangProcessNode("default")
-	proc.ContainedNodes = nodes
-	return proc.GenerateArtifacts(outputDir)
-}
-
-/*
-If the Blueprint application contains any floating goproc.Process nodes, they
-get built by this function.
-*/
-func buildDefaultGolangProcess(outputDir string, node blueprint.IRNode) error {
-	if proc, isProc := node.(*Process); isProc {
-		procDir, err := ioutil.CreateNodeDir(outputDir, node.Name())
-		if err != nil {
-			return err
-		}
-		if err := proc.GenerateArtifacts(procDir); err != nil {
-			return err
-		}
-	}
 	return nil
 }
