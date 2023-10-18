@@ -1,66 +1,58 @@
-package process
+package linux
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
 )
 
 /*
-process.Node is the base interface for any process
-
-To support process artifact generation, the following IR interfaces are provided.
-- process.ProvidesProcessArtifacts is for process nodes that collect files or
-  run commands to collect together runnable process artifacts
-- process.InstantiableProcess is for process nodes that can be run via a command
-
-Most processes will implement both IR interfaces, but some might not need any
-artifacts
+The base IRNode interface for linux processes
 */
+type Process interface {
+	core.ProcessNode
 
-// This Node represents a process
-type (
+	ImplementsLinuxProcess()
+}
 
-	/*
-		The base IRNode interface for processes
-	*/
-	Node interface {
-		blueprint.IRNode
-		ImplementsProcessNode()
-	}
-)
-
+/*
+Code and artifact generation interfaces that IRNodes can implement to provide linux
+processes.
+*/
 type (
 
 	/*
 		For process nodes that want to provide code or other artifacts for their process.
-		Methods on the ProcWorkspaceBuilder argument are used for collecting the artifacts
+		Methods on the `builder` argument are used for collecting the artifacts
 	*/
 	ProvidesProcessArtifacts interface {
-		AddProcessArtifacts(ProcWorkspaceBuilder) error
+		AddProcessArtifacts(target ProcessWorkspace) error
 	}
 
 	/*
 		For process nodes that can be instantiated.
-		Methods on the ProcGraphBuilder argument are used for declaring commands to start processes
+		Methods on the `builder` argument are used for declaring commands to start processes
 	*/
 	InstantiableProcess interface {
-		AddProcessInstance(ProcGraphBuilder) error
+		AddProcessInstance(target ProcessWorkspace) error
 	}
 )
 
+/*
+Builders used by the above code and artifact generation interfaces
+*/
 type (
-	ProcWorkspaceInfo struct {
-		Path string // fully-qualified path on the filesystem to the workspace
-	}
-
 	/*
-		A workspace just contains the artifacts for a number of different processes.
+		A process workspace has commands for adding artifacts to the workspace and
+		instantiating processes in a run.sh method.
 
-		Process nodes can provide their artifacts using the methods on this interface
+		Other plugins can extend this workspace with additional methods.  For example,
+		the Docker plugin extends the workspace to allow custom Dockerfile build
+		commands.
 	*/
-	ProcWorkspaceBuilder interface {
+	ProcessWorkspace interface {
 		blueprint.BuildContext
 
-		Info() ProcWorkspaceInfo
+		Info() ProcessWorkspaceInfo
 
 		/*
 			Creates a subdirectory in the workspace dir for a process node to collect
@@ -83,33 +75,6 @@ type (
 			which it resides.
 		*/
 		AddBuildScript(path string) error
-
-		/*
-			Indicates that we have completed building the workspace, and any finalization tasks
-			(e.g. generating build scripts) can run.
-
-			Only the plugin that created the workspace builder should call this method.
-		*/
-		Finish() error
-	}
-
-	ProcGraphInfo struct {
-		Workspace ProcWorkspaceInfo
-		Name      string // Name of the graph
-		FileName  string // Name of the file
-		FileDir   string // Dir within the workspace containing the file
-		FilePath  string // Path to the file within the workspace
-	}
-
-	/*
-		The ProcGraphBuilder accumulates the commands needed to start processes.
-		It then creates the script needed to start all processes, that is typically
-		used as the run command for a container image.
-	*/
-	ProcGraphBuilder interface {
-		blueprint.BuildContext
-
-		Info() ProcGraphInfo
 
 		/*
 			A plugin can provide the shell command(s) to run its process.
@@ -137,5 +102,20 @@ type (
 			 - the runfunc will be renamed to prevent name clashes between IRNodes
 		*/
 		DeclareRunCommand(name string, runfunc string, deps ...blueprint.IRNode) error
+
+		/*
+			Indicates that we have completed building the workspace, and any finalization tasks
+			(e.g. generating build scripts) can run.
+
+			Only the plugin that created the workspace builder should call this method.
+		*/
+		Finish() error
+
+		ImplementsProcessWorkspace()
+	}
+
+	ProcessWorkspaceInfo struct {
+		Path   string // fully-qualified path on the filesystem to the workspace
+		Target string // the type of workspace being built
 	}
 )
