@@ -1,14 +1,10 @@
 package goproc
 
 import (
-	"os"
-	"path/filepath"
-
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc/goprocgen"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/linuxgen"
-	"golang.org/x/mod/modfile"
 )
 
 /*
@@ -25,23 +21,6 @@ type LinuxGoProc interface {
 	linux.ProvidesProcessArtifacts
 	linux.InstantiableProcess
 }
-
-type runFuncTemplateArgs struct {
-	Name           string
-	GoWorkspaceDir string
-	GoMainFile     string
-	Args           []blueprint.IRNode
-}
-
-var runFuncTemplate = `
-run_{{RunFuncName .Name}} {
-	export CGO_ENABLED=1
-	cd {{.GoWorkspaceDir}}
-	go run {{.GoMainFile}}
-	{{- range $i, $arg := .Args}} --{{$arg.Name}}=${{EnvVarName $arg.Name}}{{end}} &
-	{{EnvVarName .Name}}=$!
-	return $?
-}`
 
 /*
 From process.ProvidesProcessArtifacts
@@ -64,7 +43,10 @@ func (node *Process) AddProcessArtifacts(builder linux.ProcessWorkspace) error {
 
 	// If it's a docker container, we can also add Dockerfile build commands
 	if dockerWorkspace, isDocker := builder.(docker.ProcessWorkspace); isDocker {
-		return dockerWorkspace.AddDockerfileCommands(node.Name(), "Hello world")
+		procName := blueprint.CleanName(node.Name())
+		buildCmds, err := goprocgen.GenerateDockerfileBuildCommands(procName)
+		dockerWorkspace.AddDockerfileCommands(procName, buildCmds)
+		return err
 	}
 	return nil
 }
@@ -77,57 +59,21 @@ func (node *Process) AddProcessInstance(builder linux.ProcessWorkspace) error {
 		return nil
 	}
 
-	mainFile, err := node.findMainFile(builder)
-	if err != nil {
-		return err
-	}
+	procName := blueprint.CleanName(node.Name())
 
-	workspacePath := builder.Info().Path
-	procDir := filepath.Join(workspacePath, node.ProcName)
-	mainFilePath, err := filepath.Rel(procDir, mainFile)
-	if err != nil {
-		return err
+	var runfunc string
+	var err error
+	switch builder.(type) {
+	case docker.ProcessWorkspace:
+		runfunc, err = goprocgen.GenerateDockerRunFunc(procName, node.ArgNodes...)
+	default:
+		runfunc, err = goprocgen.GenerateRunFunc(procName, node.ArgNodes...)
 	}
-
-	templateArgs := runFuncTemplateArgs{
-		Name:           node.InstanceName,
-		GoWorkspaceDir: filepath.ToSlash(node.ProcName),
-		GoMainFile:     filepath.ToSlash(mainFilePath),
-		Args:           node.ArgNodes,
-	}
-
-	runfunc, err := linuxgen.ExecuteTemplate("rungoproc", runFuncTemplate, templateArgs)
 	if err != nil {
 		return err
 	}
 
 	return builder.DeclareRunCommand(node.InstanceName, runfunc, node.ArgNodes...)
-}
-
-func (node *Process) findMainFile(builder linux.ProcessWorkspace) (string, error) {
-	goWorkspaceDir := filepath.Join(builder.Info().Path, node.ProcName)
-	entries, err := os.ReadDir(goWorkspaceDir)
-	if err != nil {
-		return "", err
-	}
-	for _, e := range entries {
-		if e.IsDir() {
-			modDir := filepath.Join(goWorkspaceDir, e.Name())
-			modFileName := filepath.Join(modDir, "go.mod")
-			modFileData, err := os.ReadFile(modFileName)
-			if err != nil {
-				continue
-			}
-			f, err := modfile.Parse(modFileName, modFileData, nil)
-			if err != nil {
-				continue
-			}
-			if f.Module.Mod.Path == node.ModuleName {
-				return filepath.Join(modDir, "main.go"), nil
-			}
-		}
-	}
-	return "", blueprint.Errorf("unable to find main.go file for golang process %v in %v", node.InstanceName, goWorkspaceDir)
 }
 
 func (node *Process) ImplementsLinuxProcess() {}

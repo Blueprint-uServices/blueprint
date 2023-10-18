@@ -42,8 +42,9 @@ func NewBasicWorkspace(name string, dir string) *BasicWorkspace {
 			Path:   filepath.Clean(dir),
 			Target: "basic",
 		},
-		Build: linuxgen.NewBuildScript(dir, "build.sh"),
-		Run:   linuxgen.NewRunScript(name, dir, "run.sh"),
+		Build:    linuxgen.NewBuildScript(dir, "build.sh"),
+		Run:      linuxgen.NewRunScript(name, dir, "run.sh"),
+		ProcDirs: make(map[string]string),
 	}
 }
 
@@ -54,17 +55,14 @@ func (workspace *BasicWorkspace) Info() linux.ProcessWorkspaceInfo {
 // Creates a subdirectory for a process to output its artifacts.
 // Saves the metadata about the process
 func (ws *BasicWorkspace) CreateProcessDir(name string) (string, error) {
-	return ioutil.CreateNodeDir(ws.info.Path, name)
+	path, err := ioutil.CreateNodeDir(ws.info.Path, name)
+	ws.ProcDirs[blueprint.CleanName(name)] = path
+	return path, err
 }
 
 // Adds a build script provided by a process
 func (ws *BasicWorkspace) AddBuildScript(path string) error {
 	return ws.Build.Add(path)
-}
-
-// TODO: this might be unnecessary
-func (ws *BasicWorkspace) AddArg(node blueprint.IRNode) {
-	ws.Run.Require(node)
 }
 
 // Adds a command to the run.sh file for running the specified process node

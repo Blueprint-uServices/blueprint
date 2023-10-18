@@ -25,15 +25,12 @@ func NewDockerWorkspace(name string, dir string) *DockerWorkspaceImpl {
 	ws := &DockerWorkspaceImpl{}
 	ws.info.Target = "docker"
 	ws.BasicWorkspace = *NewBasicWorkspace(name, dir)
-	ws.Dockerfile = linuxgen.NewDockerfile(dir)
+	ws.Dockerfile = linuxgen.NewDockerfile(name, dir)
 	return ws
 }
 
-func (ws *DockerWorkspaceImpl) AddDockerfileCommands(procName, commands string) error {
-	// TODO
-
-	ws.Dockerfile.Commands += commands
-	return nil
+func (ws *DockerWorkspaceImpl) AddDockerfileCommands(procName, commands string) {
+	ws.Dockerfile.AddCustomCommands(procName, commands)
 }
 
 /*
@@ -46,7 +43,7 @@ func (ws *DockerWorkspaceImpl) Finish() error {
 	}
 
 	// Additionally generate the dockerfile
-	return ws.Dockerfile.Generate()
+	return ws.Dockerfile.Generate(ws.ProcDirs)
 }
 
 func (ws *DockerWorkspaceImpl) ImplementsDockerProcessWorkspace() {}

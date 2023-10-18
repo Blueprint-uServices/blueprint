@@ -140,7 +140,7 @@ type (
 			into the final container as follows:
 				COPY --from={procname} /{procname} /{procname}
 		*/
-		AddDockerfileCommands(procName, commands string) error
+		AddDockerfileCommands(procName, commands string)
 
 		ImplementsDockerProcessWorkspace()
 	}
