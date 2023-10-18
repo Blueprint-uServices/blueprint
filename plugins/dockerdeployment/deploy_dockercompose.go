@@ -46,7 +46,7 @@ type (
 )
 
 func (node *Deployment) GenerateArtifacts(dir string) error {
-	slog.Info(fmt.Sprintf("Collecting container instances for %s in %s", node.Name(), dir))
+	slog.Info(fmt.Sprintf("Collecting container instances for deployment %s in %s", node.Name(), dir))
 	workspace := NewDockerComposeWorkspace(node.Name(), dir)
 	return node.generateArtifacts(workspace)
 }

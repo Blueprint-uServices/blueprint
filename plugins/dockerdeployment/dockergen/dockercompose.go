@@ -6,6 +6,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
+	"golang.org/x/exp/slog"
 )
 
 /*
@@ -26,10 +27,12 @@ func NewDockerComposeFile(workspaceName, workspaceDir, fileName string) *DockerC
 		WorkspaceDir:  workspaceDir,
 		FileName:      fileName,
 		FilePath:      filepath.Join(workspaceDir, fileName),
+		Instances:     make(map[string]string),
 	}
 }
 
 func (d *DockerComposeFile) Generate() error {
+	slog.Info(fmt.Sprintf("Generating %v/%v", d.WorkspaceName, d.FileName))
 	return ExecuteTemplateToFile("docker-compose", dockercomposeTemplate, d, d.FilePath)
 
 }
@@ -72,30 +75,33 @@ type instanceTemplateArgs struct {
 	Config            map[string]string // Map from environment variable name to value
 }
 
-var instanceTemplate = `
-  {{.InstanceName}}:
+var instanceTemplate = `{{.InstanceName}}:
     {{if .Image -}}
     image: {{.Image}}
-	{{- else if .ContainerTemplate -}}
+    {{- else if .ContainerTemplate -}}
     build:
-      context: ./{{.ContainerTemplate}}/
-      dockerfile: {{.ContainerTemplate}}/Dockerfile
-	{{- end}}
-	hostname: {{.InstanceName}}
-	ports:
-	  {{- range $external, $internal := .Ports -}}
+      context: {{.ContainerTemplate}}
+      dockerfile: ./Dockerfile
+    {{- end}}
+    hostname: {{.InstanceName}}
+    {{- if .Ports}}
+    ports:
+      {{- range $external, $internal := .Ports}}
       - "{{$external}}:{{$internal}}"
-	  {{end -}}
-	environment:
-	  {{- range $name, $value := .Config }}
-	  - {{$name}}={{$value}}
-	  {{end -}}
-	restart: always`
+      {{- end}}
+    {{- end}}
+    {{- if .Config}}
+    environment:
+      {{- range $name, $value := .Config}}
+      - {{$name}}={{$value}}
+      {{- end}}
+    restart: always
+    {{- end}}`
 
 var dockercomposeTemplate = `
 version: '3'
 services:
-{{range .Instances}}
-{{.}}
+{{range $_, $decl := .Instances}}
+  {{$decl}}
 {{end}}
 `
