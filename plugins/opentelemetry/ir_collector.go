@@ -1,11 +1,9 @@
 package opentelemetry
 
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/process"
+import "gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 
 type OpenTelemetryCollector struct {
-	process.Node
-	process.InstantiableProcess
-	process.ProvidesProcessArtifacts
+	docker.Container
 
 	CollectorName string
 	Addr          *OpenTelemetryCollectorAddr
@@ -24,14 +22,4 @@ func (node *OpenTelemetryCollector) Name() string {
 
 func (node *OpenTelemetryCollector) String() string {
 	return node.Name() + " = OTCollector(" + node.Addr.Name() + ")"
-}
-
-func (n *OpenTelemetryCollector) AddProcessArtifacts(builder process.ProcWorkspaceBuilder) error {
-	// TODO: generate artifacts
-	return nil
-}
-
-func (n *OpenTelemetryCollector) AddProcessInstance(builder process.ProcGraphBuilder) error {
-	// TODO: instantiate the process
-	return nil
 }
