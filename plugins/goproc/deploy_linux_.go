@@ -3,9 +3,11 @@ package goproc
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc/goprocgen"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc/linuxgen"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 )
+
+// This file name ends with an underscore because Go has magic filenames that won't compile
 
 /*
 Goprocs can be deployed to linux, which simply follows the same process as the
@@ -44,7 +46,7 @@ func (node *Process) AddProcessArtifacts(builder linux.ProcessWorkspace) error {
 	// If it's a docker container, we can also add Dockerfile build commands
 	if dockerWorkspace, isDocker := builder.(docker.ProcessWorkspace); isDocker {
 		procName := blueprint.CleanName(node.Name())
-		buildCmds, err := goprocgen.GenerateDockerfileBuildCommands(procName)
+		buildCmds, err := linuxgen.GenerateDockerfileBuildCommands(procName)
 		dockerWorkspace.AddDockerfileCommands(procName, buildCmds)
 		return err
 	}
@@ -65,9 +67,9 @@ func (node *Process) AddProcessInstance(builder linux.ProcessWorkspace) error {
 	var err error
 	switch builder.(type) {
 	case docker.ProcessWorkspace:
-		runfunc, err = goprocgen.GenerateBinaryRunFunc(procName, node.ArgNodes...)
+		runfunc, err = linuxgen.GenerateBinaryRunFunc(procName, node.ArgNodes...)
 	default:
-		runfunc, err = goprocgen.GenerateRunFunc(procName, node.ArgNodes...)
+		runfunc, err = linuxgen.GenerateRunFunc(procName, node.ArgNodes...)
 	}
 	if err != nil {
 		return err

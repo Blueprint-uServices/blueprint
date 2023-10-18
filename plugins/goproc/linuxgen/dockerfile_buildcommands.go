@@ -1,4 +1,4 @@
-package goprocgen
+package linuxgen
 
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
 
