@@ -41,7 +41,7 @@ type (
 
 		ImageDirs map[string]string // map from image name to directory
 
-		Compose *dockergen.DockerComposeFile
+		DockerComposeFile *dockergen.DockerComposeFile
 	}
 )
 
@@ -82,8 +82,8 @@ func NewDockerComposeWorkspace(name string, dir string) *dockerComposeWorkspace 
 			Path:   filepath.Clean(dir),
 			Target: "docker-compose",
 		},
-		ImageDirs: make(map[string]string),
-		Compose:   dockergen.NewDockerComposeFile(name, dir, "docker-compose.yml"),
+		ImageDirs:         make(map[string]string),
+		DockerComposeFile: dockergen.NewDockerComposeFile(name, dir, "docker-compose.yml"),
 	}
 }
 
@@ -99,17 +99,17 @@ func (d *dockerComposeWorkspace) CreateImageDir(imageName string) (string, error
 	return imageDir, err
 }
 
-func (d *dockerComposeWorkspace) DeclarePrebuiltInstance(instanceName string, image string) error {
-	return nil
+func (d *dockerComposeWorkspace) DeclarePrebuiltInstance(instanceName string, image string, args ...blueprint.IRNode) error {
+	return d.DockerComposeFile.AddImageInstance(instanceName, image, args...)
 }
 
-func (d *dockerComposeWorkspace) DeclareLocalImage(instanceName string, imageName string) error {
-	return nil
+func (d *dockerComposeWorkspace) DeclareLocalImage(instanceName string, imageDir string, args ...blueprint.IRNode) error {
+	return d.DockerComposeFile.AddBuildInstance(instanceName, imageDir, args...)
 }
 
 func (d *dockerComposeWorkspace) Finish() error {
 	// Now that all images and instances have been declared, we can generate the docker-compose file
-	return d.Compose.Generate()
+	return d.DockerComposeFile.Generate()
 }
 
 func (d *dockerComposeWorkspace) ImplementsBuildContext()       {}
