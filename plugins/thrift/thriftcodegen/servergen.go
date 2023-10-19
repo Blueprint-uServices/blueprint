@@ -84,13 +84,13 @@ func (handler *{{.Name}}) Run(ctx context.Context) error {
 {{$receiver := .Name -}}
 {{ range $_, $f := .Service.Methods }}
 func (handler *{{$receiver}}) {{$f.Name -}}(ctx context.Context, req *{{$service}}_{{$f.Name}}_Request) (*{{$service}}_{{$f.Name}}_Response, error) {
-	{{ArgVarsEquals $f}} req.unmarshall()
+	{{ArgVarsEquals $f}} unmarshall_{{$f.Name}}_req(req)
 	{{RetVars $f "err"}} := handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
 	if err != nil {
 		return nil, err
 	}
 	rsp := &{{$service}}_{{$f.Name}}_Response{}
-	rsp.marshall({{RetVars $f}})
+	marshall_{{$f.Name}}_rsp(rsp, {{RetVars $f}})
 	return rsp, nil
 }
 {{end}}

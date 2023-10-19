@@ -90,7 +90,7 @@ func New_{{.Name}}(ctx context.Context, serverAddress string) (*{{.Name}}, error
 func (client *{{$receiver}}) {{SignatureWithRetVars $f}} {
 	// Create and marshall the thrift Request object
 	req := &{{$service}}_{{$f.Name}}_Request{}
-	req.marshall({{ArgVars $f}})
+	marshall_{{$f.Name}}_req(req, {{ArgVars $f}})
 
 	ctx, cacnel := context.WithTimeout(ctx, client.Timeout)
 	defer cancel()
@@ -103,7 +103,7 @@ func (client *{{$receiver}}) {{SignatureWithRetVars $f}} {
 		return
 	}
 
-	{{RetVarsEquals $f}} rsp.unmarshall()
+	{{RetVarsEquals $f}} unmarshall_{{$f.Name}}_rsp(rsp)
 	return
 }
 {{end}}

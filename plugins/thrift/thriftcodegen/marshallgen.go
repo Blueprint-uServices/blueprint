@@ -37,9 +37,7 @@ package {{.Package}}
 {{ range $_1, $service := .Services -}}
 {{ range $_2, $method := $service.Methods -}}
 // Client-side function to pack {{$service.Name}}.{{$method.Name}} args into a GRPC {{$method.Request.ThriftType.Name}} struct
-func (msg *{{$method.Request.ThriftType.Name}}) marshall(
-	{{- range $j, $arg := $method.Request.FieldList}}{{if $j}}, {{end}}{{$arg.Name}} {{$imports.NameOf $arg.SrcType}}{{end -}}
-) *{{$method.Request.ThriftType.Name}} {
+func marshall_{{$method.Name}}_req({{$method.MarshallRequest $imports}}) *{{$method.Request.ThriftType.Name}} {
 	{{- range $j, $arg := $method.Request.FieldList}}
 	{{$arg.Marshall $imports ""}}
 	{{- end}}
@@ -47,7 +45,7 @@ func (msg *{{$method.Request.ThriftType.Name}}) marshall(
 }
 
 // Server-side function to unpack {{$service.Name}}.{{$method.Name}} args from a GRPC {{$method.Request.ThriftType.Name}} struct
-func (msg *{{$method.Request.ThriftType.Name}}) unmarshall() (
+func unmarshall_{{$method.Name}}_req(msg *{{$method.Request.ThriftType.Name}}) (
 	{{- range $j, $arg := $method.Request.FieldList}}{{if $j}}, {{end}}{{$arg.Name}} {{$imports.NameOf $arg.SrcType}}{{end -}}
 ) {
 	{{- range $j, $arg := $method.Request.FieldList}}
@@ -57,9 +55,7 @@ func (msg *{{$method.Request.ThriftType.Name}}) unmarshall() (
 }
 
 // Server-side function to pack {{$service.Name}}.{{$method.Name}} retvals into a GRPC {{$method.Response.ThriftType.Name}} struct
-func (msg *{{$method.Response.ThriftType.Name}}) marshall(
-	{{- range $j, $ret := $method.Response.FieldList}}{{if $j}}, {{end}}{{$ret.Name}} {{$imports.NameOf $ret.SrcType}}{{end -}}
-) *{{$method.Response.ThriftType.Name}} {
+func marshall_{{$method.Name}}_rsp({{$method.MarshallResponse $imports}}) *{{$method.Response.ThriftType.Name}} {
 	{{- range $j, $ret := $method.Response.FieldList}}
 	{{$ret.Marshall $imports ""}}
 	{{- end}}
@@ -67,7 +63,7 @@ func (msg *{{$method.Response.ThriftType.Name}}) marshall(
 }
 
 // Client-side function to unpack {{$service.Name}}.{{$method.Name}} retvals from a GRPC {{$method.Response.ThriftType.Name}} struct
-func (msg *{{$method.Response.ThriftType.Name}}) unmarshall() (
+func unmarshall_{{$method.Name}}_rsp(msg *{{$method.Response.ThriftType.Name}}) (
 	{{- range $j, $ret := $method.Response.FieldList}}{{if $j}}, {{end}}{{$ret.Name}} {{$imports.NameOf $ret.SrcType}}{{end -}}
 ) {
 	{{- range $j, $ret := $method.Response.FieldList}}
@@ -96,6 +92,30 @@ func (msg *{{$struct.ThriftType.Name}}) unmarshall(obj *{{$imports.Qualify $t.Pa
 }
 {{end}}
 `
+
+func (m *ThriftMethodDecl) MarshallRequest(imports *gogen.Imports) (string, error) {
+	var fields []string
+	fields = append(fields, "msg *"+m.Request.ThriftType.Name)
+	for _, field := range m.Request.FieldList {
+		fieldType := imports.NameOf(field.SrcType)
+		field_string := field.Name + " " + fieldType
+		fields = append(fields, field_string)
+	}
+	s := strings.Join(fields, ", ")
+	return s, nil
+}
+
+func (m *ThriftMethodDecl) MarshallResponse(imports *gogen.Imports) (string, error) {
+	var fields []string
+	fields = append(fields, "msg *"+m.Response.ThriftType.Name)
+	for _, field := range m.Response.FieldList {
+		fieldType := imports.NameOf(field.SrcType)
+		field_string := field.Name + " " + fieldType
+		fields = append(fields, field_string)
+	}
+	s := strings.Join(fields, ", ")
+	return s, nil
+}
 
 func (f *ThriftField) Marshall(imports *gogen.Imports, obj string) (string, error) {
 	switch t := f.ThriftGoType.(type) {
