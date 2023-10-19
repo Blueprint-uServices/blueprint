@@ -145,6 +145,10 @@ func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *goco
 		Constructor:  &gocode.UserType{Package: constructor.Package, Name: constructor.Name},
 	}
 	for i, Var := range constructor.Arguments[1:] {
+		if _, isMetadata := args[i].(blueprint.IRMetadata); isMetadata {
+			return blueprint.Errorf("invalid constructor argument %v; metadata nodes are not instantiable", args[i].Name())
+		}
+
 		arg := buildFuncConstructorArg{
 			Graph:    graph,
 			Var:      Var,

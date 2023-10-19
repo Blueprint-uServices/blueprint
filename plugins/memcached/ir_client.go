@@ -37,7 +37,7 @@ func newMemcachedGoClient(name string, addr *address.Address[*MemcachedProcess])
 }
 
 func (n *MemcachedGoClient) String() string {
-	return n.InstanceName + " = MemcachedClient(" + n.Addr.Name() + ")"
+	return n.InstanceName + " = MemcachedClient(" + n.Addr.Dial.Name() + ")"
 }
 
 func (n *MemcachedGoClient) Name() string {
@@ -85,7 +85,7 @@ func (node *MemcachedGoClient) AddInstantiation(builder golang.GraphBuilder) err
 
 	slog.Info(fmt.Sprintf("Instantiating MemcachedClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []blueprint.IRNode{node.Addr})
+	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []blueprint.IRNode{node.Addr.Dial})
 }
 
 func (node *MemcachedGoClient) ImplementsGolangNode()    {}

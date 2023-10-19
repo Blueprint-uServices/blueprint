@@ -29,7 +29,7 @@ func (node *OpenTelemetryCollectorClient) Name() string {
 }
 
 func (node *OpenTelemetryCollectorClient) String() string {
-	return node.Name() + " = OTClient(" + node.ServerAddr.Name() + ")"
+	return node.Name() + " = OTClient(" + node.ServerAddr.Dial.Name() + ")"
 }
 
 var collectorClientBuildFuncTemplate = `func(ctr golang.Container) (any, error) {

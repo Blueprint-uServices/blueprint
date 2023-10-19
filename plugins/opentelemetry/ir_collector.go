@@ -24,5 +24,5 @@ func (node *OpenTelemetryCollector) Name() string {
 }
 
 func (node *OpenTelemetryCollector) String() string {
-	return node.Name() + " = OTCollector(" + node.Addr.Name() + ")"
+	return node.Name() + " = OTCollector(" + node.Addr.Bind.Name() + ")"
 }

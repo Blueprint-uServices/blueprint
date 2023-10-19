@@ -36,7 +36,7 @@ func newRedisGoClient(name string, addr *address.Address[*RedisProcess]) (*Redis
 }
 
 func (n *RedisGoClient) String() string {
-	return n.InstanceName + " = RedisClient(" + n.Addr.Name() + ")"
+	return n.InstanceName + " = RedisClient(" + n.Addr.Dial.Name() + ")"
 }
 
 func (n *RedisGoClient) Name() string {
@@ -82,7 +82,7 @@ func (n *RedisGoClient) AddInstantiation(builder golang.GraphBuilder) error {
 
 	slog.Info(fmt.Sprintf("Instantiating RedisClient %v in %v/%v", n.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(n.InstanceName, n.Constructor, []blueprint.IRNode{n.Addr})
+	return builder.DeclareConstructor(n.InstanceName, n.Constructor, []blueprint.IRNode{n.Addr.Dial})
 }
 
 func (node *RedisGoClient) ImplementsGolangNode()    {}

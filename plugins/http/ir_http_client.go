@@ -33,7 +33,7 @@ func newGolangHttpClient(name string, addr *address.Address[*GolangHttpServer]) 
 }
 
 func (n *GolangHttpClient) String() string {
-	return n.InstanceName + " = HTTPClient(" + n.ServerAddr.Name() + ")"
+	return n.InstanceName + " = HTTPClient(" + n.ServerAddr.Dial.Name() + ")"
 }
 
 func (n *GolangHttpClient) Name() string {
@@ -96,7 +96,7 @@ func (node *GolangHttpClient) AddInstantiation(builder golang.GraphBuilder) erro
 		},
 	}
 
-	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.ServerAddr})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.ServerAddr.Dial})
 }
 
 func (node *GolangHttpClient) ImplementsGolangNode()    {}

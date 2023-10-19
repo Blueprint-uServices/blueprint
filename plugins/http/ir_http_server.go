@@ -58,7 +58,7 @@ func newGolangHttpServer(name string, serverAddr blueprint.IRNode, wrapped bluep
 }
 
 func (n *GolangHttpServer) String() string {
-	return n.InstanceName + " = HTTPServer(" + n.Wrapped.Name() + ", " + n.Addr.Name() + ")"
+	return n.InstanceName + " = HTTPServer(" + n.Wrapped.Name() + ", " + n.Addr.Bind.Name() + ")"
 }
 
 func (n *GolangHttpServer) Name() string {
@@ -101,7 +101,7 @@ func (node *GolangHttpServer) AddInstantiation(builder golang.GraphBuilder) erro
 			},
 		},
 	}
-	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped, node.Addr})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped, node.Addr.Bind})
 }
 
 func (node *GolangHttpServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {

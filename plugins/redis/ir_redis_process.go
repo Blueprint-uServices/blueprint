@@ -60,7 +60,7 @@ func (node *RedisProcess) init(name string) error {
 }
 
 func (r *RedisProcess) String() string {
-	return r.InstanceName + " = RedisProcess(" + r.Addr.Name() + ")"
+	return r.InstanceName + " = RedisProcess(" + r.Addr.Bind.Name() + ")"
 }
 
 func (r *RedisProcess) Name() string {

@@ -61,7 +61,7 @@ func (node *MemcachedProcess) init(name string) error {
 }
 
 func (n *MemcachedProcess) String() string {
-	return n.InstanceName + " = MemcachedProcess(" + n.Addr.Name() + ")"
+	return n.InstanceName + " = MemcachedProcess(" + n.Addr.Bind.Name() + ")"
 }
 
 func (n *MemcachedProcess) Name() string {
