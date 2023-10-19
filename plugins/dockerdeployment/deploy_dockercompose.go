@@ -58,20 +58,16 @@ The basic build process of a docker-compose deployment
 func (node *Deployment) generateArtifacts(workspace docker.ContainerWorkspace) error {
 
 	// Add any locally-built container images
-	for _, container := range node.ContainedNodes {
-		if n, valid := container.(docker.ProvidesContainerImage); valid {
-			if err := n.AddContainerArtifacts(workspace); err != nil {
-				return err
-			}
+	for _, node := range blueprint.Filter[docker.ProvidesContainerImage](node.ContainedNodes) {
+		if err := node.AddContainerArtifacts(workspace); err != nil {
+			return err
 		}
 	}
 
 	// Collect all container instances
-	for _, container := range node.ContainedNodes {
-		if n, valid := container.(docker.ProvidesContainerInstance); valid {
-			if err := n.AddContainerInstance(workspace); err != nil {
-				return err
-			}
+	for _, node := range blueprint.Filter[docker.ProvidesContainerInstance](node.ContainedNodes) {
+		if err := node.AddContainerInstance(workspace); err != nil {
+			return err
 		}
 	}
 

@@ -138,21 +138,9 @@ func (r *registry) BuildAll(outputDir string, nodes []IRNode) error {
 		return Errorf("unable to create output directory %v due to %v", outputDir, err.Error())
 	}
 
-	// Exclude metadata nodes
-	for i := 0; i < len(nodes); i++ {
-		if _, isMetadata := nodes[i].(IRMetadata); isMetadata {
-			nodes = append(nodes[:i], nodes[i+1:]...)
-			i--
-		}
-	}
-
-	// Exclude config nodes (for now)
-	for i := 0; i < len(nodes); i++ {
-		if _, isAddress := nodes[i].(IRConfig); isAddress {
-			nodes = append(nodes[:i], nodes[i+1:]...)
-			i--
-		}
-	}
+	// Exclude metadata nodes and config nodes (for now)
+	nodes = Remove[IRMetadata](nodes)
+	nodes = Remove[IRConfig](nodes)
 
 	// Build namespaces first
 	for _, builder := range r.namespace {

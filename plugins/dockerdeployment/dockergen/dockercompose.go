@@ -111,6 +111,10 @@ services:
     {{- end}}
     hostname: {{.InstanceName}}
     {{- if .Ports}}
+    expose:
+    {{- range $_, $internal := .Ports}}
+     - "{{$internal}}"
+    {{- end}}
     ports:
     {{- range $external, $internal := .Ports}}
      - "{{$external}}:{{$internal}}"
