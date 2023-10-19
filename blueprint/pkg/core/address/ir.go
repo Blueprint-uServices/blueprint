@@ -1,6 +1,7 @@
 package address
 
 import (
+	"fmt"
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
@@ -20,21 +21,22 @@ type (
 		ImplementsAddressNode()
 	}
 
+	addressConfig struct {
+		blueprint.IRConfig
+		Key      string
+		Hostname string
+		Port     uint16
+	}
+
 	/* A configuration parameter representing the address for a server to bind to */
 	BindConfig struct {
-		blueprint.IRConfig
-		Key           string
-		Interface     string
-		Port          uint16
+		addressConfig
 		PreferredPort uint16
 	}
 
 	/* A configuration parameter representing the address for a client to dial */
 	DialConfig struct {
-		blueprint.IRConfig
-		Key      string
-		Hostname string
-		Port     uint16
+		addressConfig
 	}
 )
 
@@ -75,22 +77,26 @@ func (addr *Address[ServerType]) SetDestination(node blueprint.IRNode) error {
 func (addr *Address[ServerType]) ImplementsAddressNode() {}
 func (addr *Address[ServerType]) ImplementsIRMetadata()  {}
 
-func (conf *BindConfig) Name() string {
+func (conf *addressConfig) Name() string {
 	return conf.Key
 }
 
-func (conf *BindConfig) String() string {
-	return conf.Key + " = DialConfig()"
+func (conf *addressConfig) String() string {
+	return conf.Key + " = AddressConfig()"
 }
 
-func (conf *BindConfig) ImplementsIRConfig() {}
-
-func (conf *DialConfig) Name() string {
-	return conf.Key
+func (conf *addressConfig) Optional() bool {
+	return false
 }
 
-func (conf *DialConfig) String() string {
-	return conf.Key + " = DialConfig()"
+func (conf *addressConfig) HasValue() bool {
+	return conf.Hostname != "" && conf.Port != 0
 }
 
-func (conf *DialConfig) ImplementsIRConfig() {}
+func (conf *addressConfig) Value() string {
+	return fmt.Sprintf("%v:%v", conf.Hostname, conf.Port)
+}
+
+func (conf *addressConfig) ImplementsIRConfig() {}
+func (conf *BindConfig) ImplementsBindConfig()  {}
+func (conf *DialConfig) ImplementsDialConfig()  {}

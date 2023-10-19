@@ -6,6 +6,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment/dockergen"
@@ -110,24 +111,19 @@ func (d *dockerComposeWorkspace) CreateImageDir(imageName string) (string, error
 }
 
 func (d *dockerComposeWorkspace) DeclarePrebuiltInstance(instanceName string, image string, args ...blueprint.IRNode) error {
+	// Docker containers should assign all internal server ports (typically using address.AssignPorts) before adding an instance
+	if err := address.CheckPorts(args); err != nil {
+		return blueprint.Errorf("unable to add docker instance %v due to %v", instanceName, err.Error())
+	}
+
 	return d.DockerComposeFile.AddImageInstance(instanceName, image, args...)
 }
 
 func (d *dockerComposeWorkspace) DeclareLocalImage(instanceName string, imageDir string, args ...blueprint.IRNode) error {
-	// track assigned ports here
-	// iterate over args, check for server addr
-	//   if an arg node is a server addr, (its value should be null), we can now assign it
-	//      generate an internal port for the addr
-	//      expose: add the internal port to the expose declaration
-	//      ports: add "${A_GRPC_ADDR}:generatedPort"
-	//      store instanceName:generatedPort on the IRnode
-	//      environment: set the value of A_GRPC_ADDR to instanceName:generatedPort
-	//
-	//
-	//      local addr will be instanceName:generatedPort
-	//      external addr is still the ${A_GRPC_ADDR} environment variable
-	//      set the addr environment variable inside the container to instanceName:generatedPort
-	//      external addr
+	// Docker containers should assign all internal server ports (typically using address.AssignPorts) before adding an instance
+	if err := address.CheckPorts(args); err != nil {
+		return blueprint.Errorf("unable to add docker instance %v due to %v", instanceName, err.Error())
+	}
 
 	return d.DockerComposeFile.AddBuildInstance(instanceName, imageDir, args...)
 }

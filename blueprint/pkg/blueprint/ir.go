@@ -19,6 +19,9 @@ type IRMetadata interface {
 
 type IRConfig interface {
 	IRNode
+	Optional() bool
+	HasValue() bool
+	Value() string
 	ImplementsIRConfig()
 }
 
