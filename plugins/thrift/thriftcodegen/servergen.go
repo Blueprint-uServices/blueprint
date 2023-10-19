@@ -66,7 +66,7 @@ func New_{{.Name}}(ctx context.Context, service {{.Imports.NameOf .Service.UserT
 // Blueprint: Run is automatically called in a separate goroutine by runtime/plugins/golang/di.go
 func (handler *{{.Name}}) Run(ctx context.Context) error {
 	var protocolFactory thrift.TProtocolFactory
-	protocolFactory = thrift.NewTBinaryProtocolFactor(true, true)
+	protocolFactory = thrift.NewTBinaryProtocolFactory(true, true)
 	var transportFactory thrift.TTransportFactory
 	transportFactory = thrift.NewTTransportFactory()
 	var transport thrift.TServerTransport
@@ -75,6 +75,7 @@ func (handler *{{.Name}}) Run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	processor := {{.ImportPrefix}}.New{{.Service.BaseName}}Processor(handler)
 	server := thrift.NewTSimpleServer4(processor, transport, transportFactory, protocolFactory)
 
 	go func() {

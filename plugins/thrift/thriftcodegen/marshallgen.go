@@ -25,6 +25,8 @@ func (b *ThriftBuilder) GenerateMarshallingCode(outputFilePath string) error {
 		}
 	}
 
+	args.Imports.AddPackages(b.InternalPkg)
+
 	return gogen.ExecuteTemplateToFile("marshallThrift", marshallTemplate, args, outputFilePath)
 }
 
@@ -34,40 +36,41 @@ package {{.Package}}
 {{.Imports}}
 
 {{$imports := .Imports -}}
+{{$pkg := .ImportName}}
 {{ range $_1, $service := .Services -}}
 {{ range $_2, $method := $service.Methods -}}
-// Client-side function to pack {{$service.Name}}.{{$method.Name}} args into a GRPC {{$method.Request.ThriftType.Name}} struct
-func marshall_{{$method.Name}}_req({{$method.MarshallRequest $imports}}) *{{$method.Request.ThriftType.Name}} {
+// Client-side function to pack {{$service.Name}}.{{$method.Name}} args into a Thrift {{$pkg}}.{{$method.Request.ThriftType.Name}} struct
+func marshall_{{$method.Name}}_req({{$method.MarshallRequest $imports $pkg}}) *{{$pkg}}.{{$method.Request.ThriftType.Name}} {
 	{{- range $j, $arg := $method.Request.FieldList}}
-	{{$arg.Marshall $imports ""}}
+	{{$arg.Marshall $imports "" $pkg}}
 	{{- end}}
 	return msg
 }
 
-// Server-side function to unpack {{$service.Name}}.{{$method.Name}} args from a GRPC {{$method.Request.ThriftType.Name}} struct
-func unmarshall_{{$method.Name}}_req(msg *{{$method.Request.ThriftType.Name}}) (
+// Server-side function to unpack {{$service.Name}}.{{$method.Name}} args from a Thrift {{$method.Request.ThriftType.Name}} struct
+func unmarshall_{{$method.Name}}_req(msg *{{$pkg}}.{{$method.Request.ThriftType.Name}}) (
 	{{- range $j, $arg := $method.Request.FieldList}}{{if $j}}, {{end}}{{$arg.Name}} {{$imports.NameOf $arg.SrcType}}{{end -}}
 ) {
 	{{- range $j, $arg := $method.Request.FieldList}}
-	{{$arg.Unmarshall $imports ""}}
+	{{$arg.Unmarshall $imports "" $pkg}}
 	{{- end}}
 	return
 }
 
-// Server-side function to pack {{$service.Name}}.{{$method.Name}} retvals into a GRPC {{$method.Response.ThriftType.Name}} struct
-func marshall_{{$method.Name}}_rsp({{$method.MarshallResponse $imports}}) *{{$method.Response.ThriftType.Name}} {
+// Server-side function to pack {{$service.Name}}.{{$method.Name}} retvals into a Thrift {{$pkg}}.{{$method.Response.ThriftType.Name}} struct
+func marshall_{{$method.Name}}_rsp({{$method.MarshallResponse $imports $pkg}}) *{{$pkg}}.{{$method.Response.ThriftType.Name}} {
 	{{- range $j, $ret := $method.Response.FieldList}}
-	{{$ret.Marshall $imports ""}}
+	{{$ret.Marshall $imports "" $pkg}}
 	{{- end}}
 	return msg
 }
 
-// Client-side function to unpack {{$service.Name}}.{{$method.Name}} retvals from a GRPC {{$method.Response.ThriftType.Name}} struct
-func unmarshall_{{$method.Name}}_rsp(msg *{{$method.Response.ThriftType.Name}}) (
+// Client-side function to unpack {{$service.Name}}.{{$method.Name}} retvals from a Thrift {{$method.Response.ThriftType.Name}} struct
+func unmarshall_{{$method.Name}}_rsp(msg *{{$pkg}}.{{$method.Response.ThriftType.Name}}) (
 	{{- range $j, $ret := $method.Response.FieldList}}{{if $j}}, {{end}}{{$ret.Name}} {{$imports.NameOf $ret.SrcType}}{{end -}}
 ) {
 	{{- range $j, $ret := $method.Response.FieldList}}
-	{{$ret.Unmarshall $imports ""}}
+	{{$ret.Unmarshall $imports "" $pkg}}
 	{{- end}}
 	return
 }
@@ -75,27 +78,28 @@ func unmarshall_{{$method.Name}}_rsp(msg *{{$method.Response.ThriftType.Name}}) 
 {{end -}}
 {{end -}}
 
+{{$pkg := .ImportName}}
 {{ range $t, $struct := .GoStructs}}
 // Utility function to pack {{$imports.Qualify $t.Package $t.Name}} into a Thrift {{$struct.ThriftType.Name}} struct
-func marshall_{{$struct.ThriftType.Name}}(msg *{{$struct.ThriftType.Name}}, obj *{{$imports.Qualify $t.Package $t.Name}}) *{{$struct.ThriftType.Name}} {
+func marshall_{{$struct.ThriftType.Name}}(msg *{{$pkg}}.{{$struct.ThriftType.Name}}, obj *{{$imports.Qualify $t.Package $t.Name}}) *{{$pkg}}.{{$struct.ThriftType.Name}} {
 	{{- range $j, $field := $struct.FieldList}}
-	{{$field.Marshall $imports "obj."}}
+	{{$field.Marshall $imports "obj." $pkg}}
 	{{- end}}
 	return msg
 }
 
 // Utility function to unpack {{$imports.Qualify $t.Package $t.Name}} from a Thrift {{$struct.ThriftType.Name}} struct
-func unmarshall_{{$struct.ThriftType.Name}}(msg *{{$struct.ThriftType.Name}}, obj *{{$imports.Qualify $t.Package $t.Name}}) {
+func unmarshall_{{$struct.ThriftType.Name}}(msg *{{$pkg}}.{{$struct.ThriftType.Name}}, obj *{{$imports.Qualify $t.Package $t.Name}}) {
 	{{- range $j, $field := $struct.FieldList}}
-	{{$field.Unmarshall $imports "obj."}}
+	{{$field.Unmarshall $imports "obj." $pkg}}
 	{{- end}}
 }
 {{end}}
 `
 
-func (m *ThriftMethodDecl) MarshallRequest(imports *gogen.Imports) (string, error) {
+func (m *ThriftMethodDecl) MarshallRequest(imports *gogen.Imports, pkg string) (string, error) {
 	var fields []string
-	fields = append(fields, "msg *"+m.Request.ThriftType.Name)
+	fields = append(fields, "msg *"+pkg+"."+m.Request.ThriftType.Name)
 	for _, field := range m.Request.FieldList {
 		fieldType := imports.NameOf(field.SrcType)
 		field_string := field.Name + " " + fieldType
@@ -105,9 +109,9 @@ func (m *ThriftMethodDecl) MarshallRequest(imports *gogen.Imports) (string, erro
 	return s, nil
 }
 
-func (m *ThriftMethodDecl) MarshallResponse(imports *gogen.Imports) (string, error) {
+func (m *ThriftMethodDecl) MarshallResponse(imports *gogen.Imports, pkg string) (string, error) {
 	var fields []string
-	fields = append(fields, "msg *"+m.Response.ThriftType.Name)
+	fields = append(fields, "msg *"+pkg+"."+m.Response.ThriftType.Name)
 	for _, field := range m.Response.FieldList {
 		fieldType := imports.NameOf(field.SrcType)
 		field_string := field.Name + " " + fieldType
@@ -117,11 +121,11 @@ func (m *ThriftMethodDecl) MarshallResponse(imports *gogen.Imports) (string, err
 	return s, nil
 }
 
-func (f *ThriftField) Marshall(imports *gogen.Imports, obj string) (string, error) {
+func (f *ThriftField) Marshall(imports *gogen.Imports, obj string, pkg string) (string, error) {
 	switch t := f.ThriftGoType.(type) {
 	case *gocode.UserType:
 		{
-			return fmt.Sprintf("msg.%s = marshall_%s(new(%s), &%s%s)", strings.Title(f.Name), t.Name, t.Name, obj, f.Name), nil
+			return fmt.Sprintf("msg.%s = marshall_%s(new(%s.%s), &%s%s)", strings.Title(f.Name), t.Name, pkg, t.Name, obj, f.Name), nil
 		}
 	case *gocode.BasicType:
 		{
@@ -131,7 +135,7 @@ func (f *ThriftField) Marshall(imports *gogen.Imports, obj string) (string, erro
 		{
 			switch pt := t.PointerTo.(type) {
 			case *gocode.UserType:
-				return fmt.Sprintf("msg.%s = marshall_%s(new(%s),%s%s)", strings.Title(f.Name), pt.Name, pt.Name, obj, f.Name), nil
+				return fmt.Sprintf("msg.%s = marshall_%s(new(%s.%s),%s%s)", strings.Title(f.Name), pt.Name, pkg, pt.Name, obj, f.Name), nil
 			case *gocode.BasicType:
 				return fmt.Sprintf("msg.%s = %s(*%s%s)", strings.Title(f.Name), pt.Name, obj, f.Name), nil
 			default:
@@ -144,10 +148,10 @@ func (f *ThriftField) Marshall(imports *gogen.Imports, obj string) (string, erro
 			case *gocode.UserType:
 				{
 					return fmt.Sprintf(`
-    msg.%s = make(map[%s]*%s)
+    msg.%s = make(map[%s]*%s.%s)
 	for k, v := range %s%s {
-		msg.%s[k] = marshall_%s(new(%s), &v)
-	}`, strings.Title(f.Name), t.KeyType, vt.Name, obj, f.Name, strings.Title(f.Name), vt.Name, vt.Name), nil
+		msg.%s[k] = marshall_%s(new(%s.%s), &v)
+	}`, strings.Title(f.Name), t.KeyType, pkg, vt.Name, obj, f.Name, strings.Title(f.Name), vt.Name, pkg, vt.Name), nil
 				}
 			case *gocode.BasicType:
 				return fmt.Sprintf("msg.%s = %s%s", strings.Title(f.Name), obj, f.Name), nil
@@ -160,8 +164,8 @@ func (f *ThriftField) Marshall(imports *gogen.Imports, obj string) (string, erro
 			switch st := t.SliceOf.(type) {
 			case *gocode.UserType:
 				return fmt.Sprintf(
-					"for _, v := range %s%s { msg.%s = append(msg.%s, marshall_%s(new(%s), &v)) }",
-					obj, f.Name, strings.Title(f.Name), strings.Title(f.Name), st.Name, st.Name), nil
+					"for _, v := range %s%s { msg.%s = append(msg.%s, marshall_%s(new(%s.%s), &v)) }",
+					obj, f.Name, strings.Title(f.Name), strings.Title(f.Name), st.Name, pkg, st.Name), nil
 			case *gocode.BasicType:
 				return fmt.Sprintf("msg.%s = %s%s", strings.Title(f.Name), obj, f.Name), nil
 			default:
@@ -172,7 +176,7 @@ func (f *ThriftField) Marshall(imports *gogen.Imports, obj string) (string, erro
 	return "", nil
 }
 
-func (f *ThriftField) Unmarshall(imports *gogen.Imports, obj string) (string, error) {
+func (f *ThriftField) Unmarshall(imports *gogen.Imports, obj string, pkg string) (string, error) {
 	switch t := f.ThriftGoType.(type) {
 	case *gocode.UserType:
 		{
@@ -219,7 +223,7 @@ func (f *ThriftField) Unmarshall(imports *gogen.Imports, obj string) (string, er
 	%s%s = make(%s, len(msg.%s))
 	for i, v := range msg.%s {
 		unmarshall_%s(v, &%s%s[i])
-	}`, obj, f.Name, imports.NameOf(f.SrcType), strings.Title(f.Name), strings.Title(f.Name), obj, f.Name, st.Name), nil
+	}`, obj, f.Name, imports.NameOf(f.SrcType), strings.Title(f.Name), strings.Title(f.Name), st.Name, obj, f.Name), nil
 			case *gocode.BasicType:
 				return fmt.Sprintf("%s%s = msg.%s", obj, f.Name, strings.Title(f.Name)), nil
 			default:

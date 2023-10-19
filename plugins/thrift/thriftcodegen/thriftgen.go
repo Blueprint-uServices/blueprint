@@ -33,6 +33,8 @@ func GenerateThrift(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 	tf.Module = builder.Info()
 	tf.Package = outputPackageName
 	tf.PackageName = tf.Module.Name + "/" + outputPackage
+	tf.ImportName = strings.ToLower(service.BaseName)
+	tf.InternalPkg = tf.PackageName + "/" + tf.ImportName
 
 	err = tf.AddService(service)
 	if err != nil {
@@ -123,6 +125,8 @@ type ThriftBuilder struct {
 	Package     string
 	Module      golang.ModuleInfo
 	PackageName string
+	ImportName  string
+	InternalPkg string
 	Services    map[string]*ThriftServiceDecl
 	Structs     map[string]*ThriftStructDecl
 	GoStructs   map[gocode.UserType]*ThriftStructDecl
