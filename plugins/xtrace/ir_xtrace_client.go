@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -17,14 +18,14 @@ type XTraceClient struct {
 	golang.Instantiable
 
 	ClientName string
-	ServerAddr *GolangXTraceAddress
+	ServerAddr *address.Address[*XTraceServer]
 
 	InstanceName string
 	Iface        *goparser.ParsedInterface
 	Constructor  *gocode.Constructor
 }
 
-func newXTraceClient(name string, addr *GolangXTraceAddress) (*XTraceClient, error) {
+func newXTraceClient(name string, addr *address.Address[*XTraceServer]) (*XTraceClient, error) {
 	node := &XTraceClient{}
 	err := node.init(name)
 	if err != nil {

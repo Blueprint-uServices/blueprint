@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -17,12 +18,12 @@ type GolangHttpClient struct {
 	golang.Instantiable
 
 	InstanceName string
-	ServerAddr   *GolangHttpServerAddress
+	ServerAddr   *address.Address[*GolangHttpServer]
 
 	outputPackage string
 }
 
-func newGolangHttpClient(name string, addr *GolangHttpServerAddress) (*GolangHttpClient, error) {
+func newGolangHttpClient(name string, addr *address.Address[*GolangHttpServer]) (*GolangHttpClient, error) {
 	node := &GolangHttpClient{}
 	node.InstanceName = name
 	node.ServerAddr = addr
@@ -32,7 +33,7 @@ func newGolangHttpClient(name string, addr *GolangHttpServerAddress) (*GolangHtt
 }
 
 func (n *GolangHttpClient) String() string {
-	return n.InstanceName + " = HTTPClient(" + n.ServerAddr.Name() + ")"
+	return n.InstanceName + " = HTTPClient(" + n.ServerAddr.Dial.Name() + ")"
 }
 
 func (n *GolangHttpClient) Name() string {
@@ -40,7 +41,7 @@ func (n *GolangHttpClient) Name() string {
 }
 
 func (node *GolangHttpClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
-	iface, err := node.ServerAddr.GetInterface(ctx)
+	iface, err := node.ServerAddr.Server.GetInterface(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +96,7 @@ func (node *GolangHttpClient) AddInstantiation(builder golang.GraphBuilder) erro
 		},
 	}
 
-	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.ServerAddr})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.ServerAddr.Dial})
 }
 
 func (node *GolangHttpClient) ImplementsGolangNode()    {}

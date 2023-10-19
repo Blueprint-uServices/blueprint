@@ -1,9 +1,11 @@
 package dockergen
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/linuxgen"
+	"golang.org/x/exp/slog"
 )
 
 type Dockerfile struct {
@@ -33,6 +35,7 @@ func (d *Dockerfile) Generate(procDirs map[string]string) error {
 	for procName := range d.CustomProcs {
 		delete(d.DefaultProcs, procName)
 	}
+	slog.Info(fmt.Sprintf("Generating %v/Dockerfile", d.WorkspaceName))
 	return linuxgen.ExecuteTemplateToFile("dockergen/dockerfile_.go", dockerfileTemplate, d, d.FilePath)
 }
 
