@@ -2,7 +2,6 @@ package zipkin
 
 import (
 	"context"
-	"log"
 
 	"go.opentelemetry.io/otel/exporters/zipkin"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
@@ -13,16 +12,16 @@ type ZipkinTracer struct {
 	tp *tracesdk.TracerProvider
 }
 
-func NewZipkinTracer(addr string, port string) *ZipkinTracer {
-	exp, err := zipkin.New("http://" + addr + ":" + port + "/api/v2/spans")
+func NewZipkinTracer(ctx context.Context, addr string) (*ZipkinTracer, error) {
+	exp, err := zipkin.New("http://" + addr + "/api/v2/spans")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	tp := tracesdk.NewTracerProvider(
 		tracesdk.WithBatcher(exp),
 	)
-	return &ZipkinTracer{tp}
+	return &ZipkinTracer{tp}, nil
 }
 
 func (t *ZipkinTracer) GetTracerProvider(ctx context.Context) (trace.TracerProvider, error) {
