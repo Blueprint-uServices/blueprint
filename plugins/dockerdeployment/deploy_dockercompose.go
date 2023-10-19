@@ -59,8 +59,8 @@ func (node *Deployment) generateArtifacts(workspace docker.ContainerWorkspace) e
 	// Iterate over contained nodes, check for addrseses and config.  Anything contained is in its topmost namespace.
 
 	// Add any locally-built container images
-	for _, child := range node.ContainedNodes {
-		if n, valid := child.(docker.ProvidesContainerImage); valid {
+	for _, container := range node.ContainedNodes {
+		if n, valid := container.(docker.ProvidesContainerImage); valid {
 			if err := n.AddContainerArtifacts(workspace); err != nil {
 				return err
 			}
@@ -68,8 +68,8 @@ func (node *Deployment) generateArtifacts(workspace docker.ContainerWorkspace) e
 	}
 
 	// Collect all container instances
-	for _, child := range node.ContainedNodes {
-		if n, valid := child.(docker.ProvidesContainerInstance); valid {
+	for _, container := range node.ContainedNodes {
+		if n, valid := container.(docker.ProvidesContainerInstance); valid {
 			if err := n.AddContainerInstance(workspace); err != nil {
 				return err
 			}
@@ -128,6 +128,7 @@ func (d *dockerComposeWorkspace) DeclareLocalImage(instanceName string, imageDir
 	//      external addr is still the ${A_GRPC_ADDR} environment variable
 	//      set the addr environment variable inside the container to instanceName:generatedPort
 	//      external addr
+
 	return d.DockerComposeFile.AddBuildInstance(instanceName, imageDir, args...)
 }
 

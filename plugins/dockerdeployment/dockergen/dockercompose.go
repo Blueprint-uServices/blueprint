@@ -18,7 +18,15 @@ type DockerComposeFile struct {
 	WorkspaceDir  string
 	FileName      string
 	FilePath      string
-	Instances     map[string]string // Container instance declarations
+	Instances     map[string]instance // Container instance declarations
+}
+
+type instance struct {
+	InstanceName      string
+	ContainerTemplate string            // only used if built; empty if not
+	Image             string            // only used by prebuilt; empty if not
+	Ports             map[int]int       // Map from external port to internal port
+	Config            map[string]string // Map from environment variable name to value
 }
 
 func NewDockerComposeFile(workspaceName, workspaceDir, fileName string) *DockerComposeFile {
@@ -27,7 +35,7 @@ func NewDockerComposeFile(workspaceName, workspaceDir, fileName string) *DockerC
 		WorkspaceDir:  workspaceDir,
 		FileName:      fileName,
 		FilePath:      filepath.Join(workspaceDir, fileName),
-		Instances:     make(map[string]string),
+		Instances:     make(map[string]instance),
 	}
 }
 
@@ -49,7 +57,7 @@ func (d *DockerComposeFile) addInstance(instanceName string, image string, conta
 	if _, exists := d.Instances[instanceName]; exists {
 		return blueprint.Errorf("re-declaration of container instance %v of image %v", instanceName, image)
 	}
-	templateArgs := instanceTemplateArgs{
+	instance := instance{
 		InstanceName:      instanceName,
 		ContainerTemplate: containerTemplateName,
 		Image:             image,
@@ -60,48 +68,37 @@ func (d *DockerComposeFile) addInstance(instanceName string, image string, conta
 	//   for now just pull from environment
 	for _, node := range args {
 		varname := linux.EnvVar(node.Name())
-		templateArgs.Config[varname] = fmt.Sprintf("${%v}", varname)
+		instance.Config[varname] = fmt.Sprintf("${%v}", varname)
 	}
-	decl, err := ExecuteTemplate("declareDockerComposeInstance", instanceTemplate, templateArgs)
-	d.Instances[instanceName] = decl
-	return err
+	d.Instances[instanceName] = instance
+	return nil
 }
-
-type instanceTemplateArgs struct {
-	InstanceName      string
-	ContainerTemplate string            // only used if built; empty if not
-	Image             string            // only used by prebuilt; empty if not
-	Ports             map[int]int       // Map from external port to internal port
-	Config            map[string]string // Map from environment variable name to value
-}
-
-var instanceTemplate = `{{.InstanceName}}:
-    {{if .Image -}}
-    image: {{.Image}}
-    {{- else if .ContainerTemplate -}}
-    build:
-      context: {{.ContainerTemplate}}
-      dockerfile: ./Dockerfile
-    {{- end}}
-    hostname: {{.InstanceName}}
-    {{- if .Ports}}
-    ports:
-      {{- range $external, $internal := .Ports}}
-      - "{{$external}}:{{$internal}}"
-      {{- end}}
-    {{- end}}
-    {{- if .Config}}
-    environment:
-      {{- range $name, $value := .Config}}
-      - {{$name}}={{$value}}
-      {{- end}}
-    restart: always
-    {{- end}}`
 
 var dockercomposeTemplate = `
 version: '3'
 services:
 {{range $_, $decl := .Instances}}
-  {{$decl}}
+  {{.InstanceName}}:
+    {{if .Image -}}
+    image: {{.Image}}
+    {{- else if .ContainerTemplate -}}
+    build:
+    context: {{.ContainerTemplate}}
+    dockerfile: ./Dockerfile
+    {{- end}}
+    hostname: {{.InstanceName}}
+    {{- if .Ports}}
+    ports:
+    {{- range $external, $internal := .Ports}}
+     - "{{$external}}:{{$internal}}"
+    {{- end}}
+    {{- end}}
+    {{- if .Config}}
+    environment:
+    {{- range $name, $value := .Config}}
+     - {{$name}}={{$value}}
+    {{- end}}
+    restart: always
+    {{- end}}
 {{end}}
 `

@@ -58,3 +58,16 @@ func setZero(dst any) error {
 	reflect.Indirect(receiver_ptr).SetZero()
 	return nil
 }
+
+/*
+A helper method to filter out nodes of a specific type from a slice of IRnodes
+*/
+func Filter[T IRNode](nodes []IRNode) []T {
+	var ts []T
+	for _, node := range nodes {
+		if t, isT := node.(T); isT {
+			ts = append(ts, t)
+		}
+	}
+	return ts
+}

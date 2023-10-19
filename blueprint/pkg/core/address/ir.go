@@ -20,12 +20,21 @@ type (
 		ImplementsAddressNode()
 	}
 
-	/* Config IRNode representing an address */
-	AddressConfig struct {
+	/* A configuration parameter representing the address for a server to bind to */
+	BindConfig struct {
+		blueprint.IRConfig
+		Key           string
+		Interface     string
+		Port          uint16
+		PreferredPort uint16
+	}
+
+	/* A configuration parameter representing the address for a client to dial */
+	DialConfig struct {
 		blueprint.IRConfig
 		Key      string
 		Hostname string
-		Port     string
+		Port     uint16
 	}
 )
 
@@ -34,8 +43,8 @@ type (
 	Address[ServerType blueprint.IRNode] struct {
 		AddrName string
 		Server   ServerType
-		Dial     *AddressConfig // Configuration value for the dial address
-		Bind     *AddressConfig // Configuration value for the bind address
+		Bind     *BindConfig // Configuration value for the bind address
+		Dial     *DialConfig // Configuration value for the dial address
 	}
 )
 
@@ -66,12 +75,22 @@ func (addr *Address[ServerType]) SetDestination(node blueprint.IRNode) error {
 func (addr *Address[ServerType]) ImplementsAddressNode() {}
 func (addr *Address[ServerType]) ImplementsIRMetadata()  {}
 
-func (conf *AddressConfig) Name() string {
+func (conf *BindConfig) Name() string {
 	return conf.Key
 }
 
-func (conf *AddressConfig) String() string {
-	return conf.Key + " = AddressConfig()"
+func (conf *BindConfig) String() string {
+	return conf.Key + " = DialConfig()"
 }
 
-func (conf *AddressConfig) ImplementsIRConfig() {}
+func (conf *BindConfig) ImplementsIRConfig() {}
+
+func (conf *DialConfig) Name() string {
+	return conf.Key
+}
+
+func (conf *DialConfig) String() string {
+	return conf.Key + " = DialConfig()"
+}
+
+func (conf *DialConfig) ImplementsIRConfig() {}

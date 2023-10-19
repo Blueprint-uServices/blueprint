@@ -24,13 +24,11 @@ func Define[ServerType blueprint.IRNode](wiring blueprint.WiringSpec, addressNam
 	wiring.SetProperty(addressName, "pointsTo", pointsTo)
 
 	// Add Config nodes for the server bind address and client address
-	defineConfig(wiring, bind(addressName), reachability)
-	defineConfig(wiring, dial(addressName), reachability)
-}
-
-func defineConfig(wiring blueprint.WiringSpec, confName string, reachability any) {
-	wiring.Define(confName, reachability, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		return &AddressConfig{Key: confName}, nil
+	wiring.Define(bind(addressName), reachability, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		return &BindConfig{Key: bind(addressName)}, nil
+	})
+	wiring.Define(dial(addressName), reachability, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		return &DialConfig{Key: dial(addressName)}, nil
 	})
 }
 
@@ -54,7 +52,7 @@ func Dial[ServerType blueprint.IRNode](namespace blueprint.Namespace, addressNam
 	}
 
 	// By getting the dial config value here, it gets implicitly added as an argument node to all namespaces
-	var dialConf *AddressConfig
+	var dialConf *DialConfig
 	if err := namespace.Get(dial(addr.AddrName), &dialConf); err != nil {
 		return nil, err
 	}
@@ -75,7 +73,7 @@ func Bind[ServerType blueprint.IRNode](namespace blueprint.Namespace, addressNam
 	}
 
 	// By getting the bind config value here, it gets implicitly added as an argument node to all namespaces
-	var bindConf *AddressConfig
+	var bindConf *BindConfig
 	if err := namespace.Get(bind(addr.AddrName), &bindConf); err != nil {
 		return nil, err
 	}

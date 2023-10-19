@@ -3,6 +3,7 @@ package linuxcontainer
 import (
 	"fmt"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/dockergen"
 	"golang.org/x/exp/slog"
@@ -83,7 +84,11 @@ func (node *Container) AddContainerInstance(target docker.ContainerWorkspace) er
 		return nil
 	}
 
-	// TODO: all address and port related shenanigans will need to go here
+	// Assign ports to addresses that are bound inside this container
+	if err := address.AssignPorts(append(node.ContainedNodes, node.ArgNodes...)); err != nil {
+		return err
+	}
+
 	slog.Info(fmt.Sprintf("Declaring container instance %v", node.InstanceName))
 	return target.DeclareLocalImage(node.InstanceName, node.ImageName, node.ArgNodes...)
 }
