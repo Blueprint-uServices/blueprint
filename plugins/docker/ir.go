@@ -69,9 +69,13 @@ type (
 
 			The instanceName will be used as the container hostname.
 
+			The IRnodes provided are considered arguments to the container.  If they
+			are Config IRNodes, environment variables will be set for the container instance.
+			If they are addresses, ports will be assigned and mapped.
+
 			Returns an error if an instance already exists with this name.
 		*/
-		DeclarePrebuiltInstance(instanceName string, image string) error
+		DeclarePrebuiltInstance(instanceName string, image string, args ...blueprint.IRNode) error
 
 		/*
 			Declares an instance of a container using container artifacts
@@ -80,9 +84,13 @@ type (
 
 			The instanceName will be used as the container hostname.
 
+			The IRnodes provided are considered arguments to the container.  If they
+			are Config IRNodes, environment variables will be set for the container instance.
+			If they are addresses, ports will be assigned and mapped.
+
 			Returns an error if an instance already exists with this name.
 		*/
-		DeclareLocalImage(instanceName string, imageName string) error
+		DeclareLocalImage(instanceName string, imageName string, args ...blueprint.IRNode) error
 
 		/*
 			Indicates that the caller has finished adding images and instances,

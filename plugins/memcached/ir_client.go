@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
@@ -18,13 +19,13 @@ type MemcachedGoClient struct {
 	backend.Cache
 
 	InstanceName string
-	Addr         *MemcachedAddr
+	Addr         *address.Address[*MemcachedProcess]
 
 	Iface       *goparser.ParsedInterface
 	Constructor *gocode.Constructor
 }
 
-func newMemcachedGoClient(name string, addr *MemcachedAddr) (*MemcachedGoClient, error) {
+func newMemcachedGoClient(name string, addr *address.Address[*MemcachedProcess]) (*MemcachedGoClient, error) {
 	client := &MemcachedGoClient{}
 	err := client.init(name)
 	if err != nil {
@@ -36,7 +37,7 @@ func newMemcachedGoClient(name string, addr *MemcachedAddr) (*MemcachedGoClient,
 }
 
 func (n *MemcachedGoClient) String() string {
-	return n.InstanceName + " = MemcachedClient(" + n.Addr.Name() + ")"
+	return n.InstanceName + " = MemcachedClient(" + n.Addr.Dial.Name() + ")"
 }
 
 func (n *MemcachedGoClient) Name() string {
@@ -84,7 +85,7 @@ func (node *MemcachedGoClient) AddInstantiation(builder golang.GraphBuilder) err
 
 	slog.Info(fmt.Sprintf("Instantiating MemcachedClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []blueprint.IRNode{node.Addr})
+	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []blueprint.IRNode{node.Addr.Dial})
 }
 
 func (node *MemcachedGoClient) ImplementsGolangNode()    {}

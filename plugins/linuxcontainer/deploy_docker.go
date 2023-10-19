@@ -1,8 +1,12 @@
 package linuxcontainer
 
 import (
+	"fmt"
+
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/dockergen"
+	"golang.org/x/exp/slog"
 )
 
 /*
@@ -51,11 +55,12 @@ type (
 
 func (node *Container) AddContainerArtifacts(target docker.ContainerWorkspace) error {
 	// The image only needs to be created in the output directory once
-	if target.Visited(node.ImageName) {
+	if target.Visited(node.ImageName + ".artifacts") {
 		return nil
 	}
 
 	// Create a new subdirectory to construct the image
+	slog.Info(fmt.Sprintf("Creating container image %v", node.InstanceName))
 	dir, err := target.CreateImageDir(node.ImageName)
 	if err != nil {
 		return err
@@ -75,13 +80,18 @@ func (node *Container) AddContainerArtifacts(target docker.ContainerWorkspace) e
 
 func (node *Container) AddContainerInstance(target docker.ContainerWorkspace) error {
 	// The instance only needs to be added to the output directory once
-	if target.Visited(node.InstanceName) {
+	if target.Visited(node.InstanceName + ".instance") {
 		return nil
 	}
 
-	// TODO: all address and port related shenanigans will need to go here
+	// Assign ports to addresses that are bound inside this container
+	if err := address.AssignPorts(append(node.ContainedNodes, node.ArgNodes...)); err != nil {
+		return err
+	}
+	defer address.ResetPorts(node.ArgNodes)
 
-	return target.DeclareLocalImage(node.InstanceName, node.ImageName)
+	slog.Info(fmt.Sprintf("Declaring container instance %v", node.InstanceName))
+	return target.DeclareLocalImage(node.InstanceName, node.ImageName, node.ArgNodes...)
 }
 
 func NewDockerWorkspace(name string, dir string) *dockerWorkspaceImpl {

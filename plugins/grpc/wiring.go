@@ -33,8 +33,8 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 
 	// Define the client wrapper
 	wiring.Define(grpcClient, &GolangClient{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		var addr *GolangServerAddress
-		if err := namespace.Get(clientNext, &addr); err != nil {
+		addr, err := address.Dial[*GolangServer](namespace, clientNext)
+		if err != nil {
 			return nil, blueprint.Errorf("GRPC client %s expected %s to be an address, but encountered %s", grpcClient, clientNext, err)
 		}
 
@@ -46,8 +46,8 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 
 	// Define the server
 	wiring.Define(grpcServer, &GolangServer{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		var addr *GolangServerAddress
-		if err := namespace.Get(grpcAddr, &addr); err != nil {
+		addr, err := address.Bind[*GolangServer](namespace, grpcAddr)
+		if err != nil {
 			return nil, blueprint.Errorf("GRPC server %s expected %s to be an address, but encountered %s", grpcServer, grpcAddr, err)
 		}
 
@@ -60,13 +60,7 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 	})
 
 	// Define the address and add it to the pointer dst
-	address.Define(wiring, grpcAddr, grpcServer, &blueprint.ApplicationNode{}, func(namespace blueprint.Namespace) (address.Address, error) {
-		addr := &GolangServerAddress{
-			AddrName: grpcAddr,
-			Server:   nil,
-		}
-		return addr, nil
-	})
+	address.Define[*GolangServer](wiring, grpcAddr, grpcServer, &blueprint.ApplicationNode{})
 	ptr.AddDstModifier(wiring, grpcAddr)
 
 }
