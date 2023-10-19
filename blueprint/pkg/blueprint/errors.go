@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	MAX_ERR_SIZE = 1024
+	MAX_ERR_SIZE = 2048
 )
 
 type BlueprintError struct {
