@@ -57,14 +57,17 @@ type {{.Name}} struct {
 	{{.Imports.NameOf .Service.UserType}}
 	Client *{{.ImportPrefix}}.{{.Service.BaseName}}Client // The actual thrift-generated client
 	Timeout time.Duration
+	Address string
 }
 
 func New_{{.Name}}(ctx context.Context, serverAddress string) (*{{.Name}}, error) {
+	handler := &{{.Name}}{}
+	handler.Address = serverAddress
 	var protocolFactory thrift.TProtocolFactory
-	protocolFactory = thrift.NewTBinaryProtocolFactor(true, true)
+	protocolFactory = thrift.NewTBinaryProtocolFactory(true, true)
 	var transportFactory thrift.TTransportFactory
 	transportFactory = thrift.NewTTransportFactory()
-	var transport thrift.TServerTransport
+	var transport thrift.TTransport
 	var err error
 	duration, err := time.ParseDuration("1s")
 	if err != nil {
@@ -74,7 +77,7 @@ func New_{{.Name}}(ctx context.Context, serverAddress string) (*{{.Name}}, error
 	if err != nil {
 		return nil, err
 	}
-	transport, err =  transportFactory.GetTransport(transport)
+	transport, err = transportFactory.GetTransport(transport)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +89,6 @@ func New_{{.Name}}(ctx context.Context, serverAddress string) (*{{.Name}}, error
 	oprot := protocolFactory.GetProtocol(transport)
 
 	client := {{.ImportPrefix}}.New{{.Service.BaseName}}Client(thrift.NewTStandardClient(iprot, oprot))
-	handler := &{{.Name}}{}
 	handler.Client = client
 	handler.Timeout = duration
 	return handler, nil

@@ -18,7 +18,7 @@ import (
 // Generates the .thrift file for the provided service interface, then compiles it using `thrift`.
 // See the plugin README for the required thrift package dependencies.
 func GenerateThrift(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error {
-	if builder.Visited(outputPackage + "/" + service.Name + ".thrift") {
+	if builder.Visited(outputPackage + "/" + service.BaseName + ".thrift") {
 		return nil
 	}
 
@@ -47,7 +47,7 @@ func GenerateThrift(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 		return blueprint.Errorf("unable to create thrift output dir %v due to %v", outputDir, err.Error())
 	}
 
-	outputFilename := filepath.Join(outputDir, service.Name+".thrift")
+	outputFilename := filepath.Join(outputDir, service.BaseName+".thrift")
 	err = tf.WriteThriftFile(outputFilename)
 	if err != nil {
 		return err
@@ -58,8 +58,8 @@ func GenerateThrift(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 		return err
 	}
 
-	slog.Info(fmt.Sprintf("Generating %v/%v_conversions.go", tf.PackageName, service.Name))
-	marshallFile := filepath.Join(outputDir, service.Name+"_conversions.go")
+	slog.Info(fmt.Sprintf("Generating %v/%v_conversions.go", tf.PackageName, service.BaseName))
+	marshallFile := filepath.Join(outputDir, service.BaseName+"_conversions.go")
 	return tf.GenerateMarshallingCode(marshallFile)
 }
 
