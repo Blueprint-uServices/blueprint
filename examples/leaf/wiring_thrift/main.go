@@ -58,7 +58,7 @@ func main() {
 	bp.Instantiate(pa, pb, client)
 	// bp.Instantiate(proc)
 
-	application, err := bp.Build()
+	application, err := bp.BuildIR()
 	if err != nil {
 		slog.Error("Unable to build blueprint, exiting", "error", err)
 		slog.Info("Application: \n" + application.String())
@@ -67,22 +67,7 @@ func main() {
 
 	slog.Info("Application: \n" + application.String())
 
-	// Below here is a WIP on generating code
-	nodes := make(map[string]blueprint.IRNode)
-	for _, node := range application.Children {
-		nodes[node.Name()] = node
-	}
-	err = nodes["pb"].(*goproc.Process).GenerateArtifacts("tmp")
-	if err != nil {
-		slog.Error(err.Error())
-		os.Exit(1)
-	}
-	err = nodes["pa"].(*goproc.Process).GenerateArtifacts("tmp")
-	if err != nil {
-		slog.Error(err.Error())
-		os.Exit(1)
-	}
-	err = nodes[client].(*goproc.Process).GenerateArtifacts("tmp")
+	err = application.Compile("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
