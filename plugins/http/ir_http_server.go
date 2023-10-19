@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -17,7 +18,7 @@ type GolangHttpServer struct {
 	golang.Instantiable
 
 	InstanceName string
-	Addr         *GolangHttpServerAddress
+	Addr         *address.Address[*GolangHttpServer]
 	Wrapped      golang.Service
 
 	outputPackage string
@@ -38,7 +39,7 @@ func (i *HttpInterface) GetMethods() []service.Method {
 }
 
 func newGolangHttpServer(name string, serverAddr blueprint.IRNode, wrapped blueprint.IRNode) (*GolangHttpServer, error) {
-	addr, is_addr := serverAddr.(*GolangHttpServerAddress)
+	addr, is_addr := serverAddr.(*address.Address[*GolangHttpServer])
 	if !is_addr {
 		return nil, blueprint.Errorf("HTTP server %s expected %s to be an address, but got %s", name, serverAddr.Name(), reflect.TypeOf(serverAddr).String())
 	}

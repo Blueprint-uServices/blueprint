@@ -2,6 +2,7 @@ package xtrace
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
@@ -12,7 +13,7 @@ type XTraceServer struct {
 	docker.Container
 
 	ServerName string
-	Addr       *GolangXTraceAddress
+	Addr       *address.Address[*XTraceServer]
 	Iface      *goparser.ParsedInterface
 }
 
@@ -29,7 +30,7 @@ func (xt *XTraceInterface) GetMethods() []service.Method {
 	return xt.Wrapped.GetMethods()
 }
 
-func newXTraceServer(name string, addr *GolangXTraceAddress) (*XTraceServer, error) {
+func newXTraceServer(name string, addr *address.Address[*XTraceServer]) (*XTraceServer, error) {
 	server := &XTraceServer{
 		ServerName: name,
 		Addr:       addr,

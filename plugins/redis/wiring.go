@@ -13,7 +13,7 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 	addrName := cacheName + ".addr"
 
 	wiring.Define(procName, &RedisProcess{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		var addr *RedisAddr
+		var addr *address.Address[*RedisProcess]
 		if err := ns.Get(addrName, &addr); err != nil {
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", procName, addrName, err)
 		}
@@ -27,8 +27,8 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 	pointer.CreatePointer(wiring, cacheName, &RedisGoClient{}, dstName)
 	ptr := pointer.GetPointer(wiring, cacheName)
 
-	address.Define(wiring, addrName, procName, &blueprint.ApplicationNode{}, func(ns blueprint.Namespace) (address.Address, error) {
-		addr := &RedisAddr{
+	address.Define(wiring, addrName, procName, &blueprint.ApplicationNode{}, func(ns blueprint.Namespace) (address.Node, error) {
+		addr := &address.Address[*RedisProcess]{
 			AddrName: addrName,
 			Server:   nil,
 		}
@@ -40,7 +40,7 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 	clientNext := ptr.AddSrcModifier(wiring, clientName)
 
 	wiring.Define(clientName, &RedisGoClient{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		var addr *RedisAddr
+		var addr *address.Address[*RedisProcess]
 		if err := ns.Get(clientNext, &addr); err != nil {
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", clientName, clientNext, err)
 		}

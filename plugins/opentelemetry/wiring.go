@@ -100,7 +100,7 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 
 	// Define the collector server
 	wiring.Define(collectorProc, &OpenTelemetryCollector{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		var addr *OpenTelemetryCollectorAddr
+		var addr *address.Address[*OpenTelemetryCollector]
 		err := namespace.Get(collectorAddr, &addr)
 		if err != nil {
 			return nil, err
@@ -125,7 +125,7 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 
 	// Define the collector client
 	wiring.Define(collectorClient, &OpenTelemetryCollectorClient{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		var addr *OpenTelemetryCollectorAddr
+		var addr *address.Address[*OpenTelemetryCollector]
 		err := namespace.Get(clientNext, &addr)
 		if err != nil {
 			return nil, err
@@ -135,10 +135,10 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 	})
 
 	// Define the address and add it to the pointer dst
-	address.Define(wiring, collectorAddr, collectorProc, &blueprint.ApplicationNode{}, func(namespace blueprint.Namespace) (address.Address, error) {
-		addr := &OpenTelemetryCollectorAddr{
-			AddrName:  collectorAddr,
-			Collector: nil,
+	address.Define(wiring, collectorAddr, collectorProc, &blueprint.ApplicationNode{}, func(namespace blueprint.Namespace) (address.Node, error) {
+		addr := &address.Address[*OpenTelemetryCollector]{
+			AddrName: collectorAddr,
+			Server:   nil,
 		}
 		return addr, nil
 	})

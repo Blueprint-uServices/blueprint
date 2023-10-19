@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -22,7 +23,7 @@ type GolangServer struct {
 	golang.Instantiable
 
 	InstanceName string
-	Addr         *GolangServerAddress
+	Addr         *address.Address[*GolangServer]
 	Wrapped      golang.Service
 
 	outputPackage string
@@ -42,7 +43,7 @@ func (grpc *GRPCInterface) GetMethods() []service.Method {
 	return grpc.Wrapped.GetMethods()
 }
 
-func newGolangServer(name string, addr *GolangServerAddress, service golang.Service) (*GolangServer, error) {
+func newGolangServer(name string, addr *address.Address[*GolangServer], service golang.Service) (*GolangServer, error) {
 	node := &GolangServer{}
 	node.InstanceName = name
 	node.Addr = addr

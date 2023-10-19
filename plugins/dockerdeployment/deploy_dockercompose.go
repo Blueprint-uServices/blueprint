@@ -55,6 +55,9 @@ func (node *Deployment) GenerateArtifacts(dir string) error {
 The basic build process of a docker-compose deployment
 */
 func (node *Deployment) generateArtifacts(workspace docker.ContainerWorkspace) error {
+
+	// Iterate over contained nodes, check for addrseses and config.  Anything contained is in its topmost namespace.
+
 	// Add any locally-built container images
 	for _, child := range node.ContainedNodes {
 		if n, valid := child.(docker.ProvidesContainerImage); valid {
@@ -72,6 +75,13 @@ func (node *Deployment) generateArtifacts(workspace docker.ContainerWorkspace) e
 			}
 		}
 	}
+
+	// iterate over contained nodes; maybe check for addr, maybe just check for config
+	//   if a contained node is a server addr, we expect the server to have set its addr by now to instanceName:port
+	//   In the .env file, declare the server addr to be the specific value set by the server, error if not set
+	//   Before returning to caller, update the addr config node, replacing the hostname to the machine's hostname?
+
+	// Also: for pass-through config just use VARIABLE_NAME to pass through from teh env
 
 	return workspace.Finish()
 }
@@ -104,6 +114,20 @@ func (d *dockerComposeWorkspace) DeclarePrebuiltInstance(instanceName string, im
 }
 
 func (d *dockerComposeWorkspace) DeclareLocalImage(instanceName string, imageDir string, args ...blueprint.IRNode) error {
+	// track assigned ports here
+	// iterate over args, check for server addr
+	//   if an arg node is a server addr, (its value should be null), we can now assign it
+	//      generate an internal port for the addr
+	//      expose: add the internal port to the expose declaration
+	//      ports: add "${A_GRPC_ADDR}:generatedPort"
+	//      store instanceName:generatedPort on the IRnode
+	//      environment: set the value of A_GRPC_ADDR to instanceName:generatedPort
+	//
+	//
+	//      local addr will be instanceName:generatedPort
+	//      external addr is still the ${A_GRPC_ADDR} environment variable
+	//      set the addr environment variable inside the container to instanceName:generatedPort
+	//      external addr
 	return d.DockerComposeFile.AddBuildInstance(instanceName, imageDir, args...)
 }
 

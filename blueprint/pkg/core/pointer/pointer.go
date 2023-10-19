@@ -89,7 +89,7 @@ func (ptr *PointerDef) AddDstModifier(wiring blueprint.WiringSpec, modifierName 
 func (ptr *PointerDef) InstantiateDst(namespace blueprint.Namespace) (blueprint.IRNode, error) {
 	namespace.Info("Instantiating pointer %s.dst from namespace %s", ptr.name, namespace.Name())
 	for _, modifier := range ptr.dstModifiers {
-		var addr address.Address
+		var addr address.Node
 		err := namespace.Get(modifier, &addr)
 
 		// Want to find the final dstModifier that points to an address, then instantiate the address
@@ -103,6 +103,7 @@ func (ptr *PointerDef) InstantiateDst(namespace blueprint.Namespace) (blueprint.
 				namespace.Info("Destination %s of %s has already been instantiated", dstName, addr.Name())
 				return nil, nil
 			} else {
+				namespace.Info("Instantiating %s of %s", dstName, addr.Name())
 				var dst blueprint.IRNode
 				if err := namespace.Instantiate(dstName, &dst); err != nil {
 					return nil, err
@@ -112,6 +113,8 @@ func (ptr *PointerDef) InstantiateDst(namespace blueprint.Namespace) (blueprint.
 					return nil, err
 				}
 			}
+		} else {
+			namespace.Info("Skipping %v, not an address", modifier)
 		}
 	}
 

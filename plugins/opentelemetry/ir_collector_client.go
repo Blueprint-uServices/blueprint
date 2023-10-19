@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"text/template"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
@@ -13,10 +14,10 @@ type OpenTelemetryCollectorClient struct {
 	golang.Instantiable
 
 	ClientName string
-	ServerAddr *OpenTelemetryCollectorAddr
+	ServerAddr *address.Address[*OpenTelemetryCollector]
 }
 
-func newOpenTelemetryCollectorClient(name string, addr *OpenTelemetryCollectorAddr) (*OpenTelemetryCollectorClient, error) {
+func newOpenTelemetryCollectorClient(name string, addr *address.Address[*OpenTelemetryCollector]) (*OpenTelemetryCollectorClient, error) {
 	node := &OpenTelemetryCollectorClient{}
 	node.ClientName = name
 	node.ServerAddr = addr

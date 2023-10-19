@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
@@ -17,13 +18,13 @@ type RedisGoClient struct {
 	golang.Service
 	backend.Cache
 	InstanceName string
-	Addr         *RedisAddr
+	Addr         *address.Address[*RedisProcess]
 
 	Iface       *goparser.ParsedInterface
 	Constructor *gocode.Constructor
 }
 
-func newRedisGoClient(name string, addr *RedisAddr) (*RedisGoClient, error) {
+func newRedisGoClient(name string, addr *address.Address[*RedisProcess]) (*RedisGoClient, error) {
 	client := &RedisGoClient{}
 	err := client.init(name)
 	if err != nil {

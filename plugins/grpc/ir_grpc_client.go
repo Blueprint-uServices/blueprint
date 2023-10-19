@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -21,12 +22,12 @@ type GolangClient struct {
 	golang.GeneratesFuncs
 
 	InstanceName string
-	ServerAddr   *GolangServerAddress
+	ServerAddr   *address.Address[*GolangServer]
 
 	outputPackage string
 }
 
-func newGolangClient(name string, addr *GolangServerAddress) (*GolangClient, error) {
+func newGolangClient(name string, addr *address.Address[*GolangServer]) (*GolangClient, error) {
 	node := &GolangClient{}
 	node.InstanceName = name
 	node.ServerAddr = addr
@@ -44,7 +45,7 @@ func (n *GolangClient) Name() string {
 }
 
 func (node *GolangClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
-	iface, err := node.ServerAddr.GetInterface(ctx)
+	iface, err := node.ServerAddr.Server.GetInterface(ctx)
 	if err != nil {
 		return nil, err
 	}

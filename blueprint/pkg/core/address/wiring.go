@@ -9,7 +9,7 @@ Defines an address called `addressName` that points to the definition `pointsto`
 
 The provided buildFunc should build an IRNode that implements the address.Address interface
 */
-func Define(wiring blueprint.WiringSpec, addressName string, pointsTo string, reachability any, build func(namespace blueprint.Namespace) (Address, error)) {
+func Define(wiring blueprint.WiringSpec, addressName string, pointsTo string, reachability any, build func(namespace blueprint.Namespace) (Node, error)) {
 	def := wiring.GetDef(pointsTo)
 	if def == nil {
 		wiring.AddError(blueprint.Errorf("trying to define address %s that points to %s but %s is not defined", addressName, pointsTo, pointsTo))

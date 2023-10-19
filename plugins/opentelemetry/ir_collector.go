@@ -1,15 +1,18 @@
 package opentelemetry
 
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
+import (
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
+)
 
 type OpenTelemetryCollector struct {
 	docker.Container
 
 	CollectorName string
-	Addr          *OpenTelemetryCollectorAddr
+	Addr          *address.Address[*OpenTelemetryCollector]
 }
 
-func newOpenTelemetryCollector(name string, addr *OpenTelemetryCollectorAddr) (*OpenTelemetryCollector, error) {
+func newOpenTelemetryCollector(name string, addr *address.Address[*OpenTelemetryCollector]) (*OpenTelemetryCollector, error) {
 	return &OpenTelemetryCollector{
 		CollectorName: name,
 		Addr:          addr,

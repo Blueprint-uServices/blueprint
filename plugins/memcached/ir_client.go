@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
@@ -18,13 +19,13 @@ type MemcachedGoClient struct {
 	backend.Cache
 
 	InstanceName string
-	Addr         *MemcachedAddr
+	Addr         *address.Address[*MemcachedProcess]
 
 	Iface       *goparser.ParsedInterface
 	Constructor *gocode.Constructor
 }
 
-func newMemcachedGoClient(name string, addr *MemcachedAddr) (*MemcachedGoClient, error) {
+func newMemcachedGoClient(name string, addr *address.Address[*MemcachedProcess]) (*MemcachedGoClient, error) {
 	client := &MemcachedGoClient{}
 	err := client.init(name)
 	if err != nil {
