@@ -22,7 +22,7 @@ See the plugin README for the required GRPC and protocol buffers package depende
 */
 func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error {
 	// No need to generate the proto more than once
-	if builder.Visited(outputPackage + "/" + service.Name + ".proto") {
+	if builder.Visited(outputPackage + "/" + service.BaseName + ".proto") {
 		return nil
 	}
 
@@ -53,7 +53,7 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 	}
 
 	// Write the proto file
-	outputFilename := filepath.Join(outputDir, service.Name+".proto")
+	outputFilename := filepath.Join(outputDir, service.BaseName+".proto")
 	err = pb.WriteProtoFile(outputFilename)
 	if err != nil {
 		return err
@@ -66,8 +66,8 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 	}
 
 	// Generate the marshalling code
-	slog.Info(fmt.Sprintf("Generating %v/%v_conversions.go", pb.PackageName, service.Name))
-	marshallFile := filepath.Join(outputDir, service.Name+"_conversions.go")
+	slog.Info(fmt.Sprintf("Generating %v/%v_conversions.go", pb.PackageName, service.BaseName))
+	marshallFile := filepath.Join(outputDir, service.BaseName+"_conversions.go")
 	return pb.GenerateMarshallingCode(marshallFile)
 }
 
