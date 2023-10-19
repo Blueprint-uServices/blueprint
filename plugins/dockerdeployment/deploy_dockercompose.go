@@ -57,8 +57,6 @@ The basic build process of a docker-compose deployment
 */
 func (node *Deployment) generateArtifacts(workspace docker.ContainerWorkspace) error {
 
-	// Iterate over contained nodes, check for addrseses and config.  Anything contained is in its topmost namespace.
-
 	// Add any locally-built container images
 	for _, container := range node.ContainedNodes {
 		if n, valid := container.(docker.ProvidesContainerImage); valid {
@@ -76,13 +74,6 @@ func (node *Deployment) generateArtifacts(workspace docker.ContainerWorkspace) e
 			}
 		}
 	}
-
-	// iterate over contained nodes; maybe check for addr, maybe just check for config
-	//   if a contained node is a server addr, we expect the server to have set its addr by now to instanceName:port
-	//   In the .env file, declare the server addr to be the specific value set by the server, error if not set
-	//   Before returning to caller, update the addr config node, replacing the hostname to the machine's hostname?
-
-	// Also: for pass-through config just use VARIABLE_NAME to pass through from teh env
 
 	return workspace.Finish()
 }
