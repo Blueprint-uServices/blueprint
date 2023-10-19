@@ -2,6 +2,7 @@ package redis
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
@@ -14,7 +15,7 @@ type RedisProcess struct {
 	backend.Cache
 
 	InstanceName string
-	Addr         *RedisAddr
+	Addr         *address.Address[*RedisProcess]
 	Iface        *goparser.ParsedInterface
 }
 
@@ -31,7 +32,7 @@ func (r *RedisInterface) GetMethods() []service.Method {
 	return r.Wrapped.GetMethods()
 }
 
-func newRedisProcess(name string, addr *RedisAddr) (*RedisProcess, error) {
+func newRedisProcess(name string, addr *address.Address[*RedisProcess]) (*RedisProcess, error) {
 	proc := &RedisProcess{}
 	proc.InstanceName = name
 	proc.Addr = addr
@@ -59,7 +60,7 @@ func (node *RedisProcess) init(name string) error {
 }
 
 func (r *RedisProcess) String() string {
-	return r.InstanceName + " = RedisProcess(" + r.Addr.Name() + ")"
+	return r.InstanceName + " = RedisProcess(" + r.Addr.Bind.Name() + ")"
 }
 
 func (r *RedisProcess) Name() string {

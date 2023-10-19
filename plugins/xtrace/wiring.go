@@ -64,8 +64,7 @@ func DefineXTraceServer(wiring blueprint.WiringSpec) {
 	xtraceDst := xtrace_server + ".dst"
 
 	wiring.Define(xtraceProc, &XTraceServer{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		var addr *GolangXTraceAddress
-		err := ns.Get(xtrace_addr, &addr)
+		addr, err := address.Bind[*XTraceServer](ns, xtrace_addr)
 		if err != nil {
 			return nil, err
 		}
@@ -83,8 +82,7 @@ func DefineXTraceServer(wiring blueprint.WiringSpec) {
 	clientNext := ptr.AddSrcModifier(wiring, xtraceClient)
 
 	wiring.Define(xtraceClient, &XTraceClient{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		var addr *GolangXTraceAddress
-		err := ns.Get(clientNext, &addr)
+		addr, err := address.Dial[*XTraceServer](ns, clientNext)
 		if err != nil {
 			return nil, err
 		}
@@ -92,12 +90,6 @@ func DefineXTraceServer(wiring blueprint.WiringSpec) {
 		return newXTraceClient(xtraceClient, addr)
 	})
 
-	address.Define(wiring, xtrace_addr, xtraceProc, &blueprint.ApplicationNode{}, func(ns blueprint.Namespace) (address.Address, error) {
-		addr := &GolangXTraceAddress{
-			AddrName: xtrace_addr,
-			Server:   nil,
-		}
-		return addr, nil
-	})
+	address.Define[*XTraceServer](wiring, xtrace_addr, xtraceProc, &blueprint.ApplicationNode{})
 	ptr.AddDstModifier(wiring, xtrace_addr)
 }

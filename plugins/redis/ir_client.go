@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
@@ -17,13 +18,13 @@ type RedisGoClient struct {
 	golang.Service
 	backend.Cache
 	InstanceName string
-	Addr         *RedisAddr
+	Addr         *address.Address[*RedisProcess]
 
 	Iface       *goparser.ParsedInterface
 	Constructor *gocode.Constructor
 }
 
-func newRedisGoClient(name string, addr *RedisAddr) (*RedisGoClient, error) {
+func newRedisGoClient(name string, addr *address.Address[*RedisProcess]) (*RedisGoClient, error) {
 	client := &RedisGoClient{}
 	err := client.init(name)
 	if err != nil {
@@ -35,7 +36,7 @@ func newRedisGoClient(name string, addr *RedisAddr) (*RedisGoClient, error) {
 }
 
 func (n *RedisGoClient) String() string {
-	return n.InstanceName + " = RedisClient(" + n.Addr.Name() + ")"
+	return n.InstanceName + " = RedisClient(" + n.Addr.Dial.Name() + ")"
 }
 
 func (n *RedisGoClient) Name() string {
@@ -81,7 +82,7 @@ func (n *RedisGoClient) AddInstantiation(builder golang.GraphBuilder) error {
 
 	slog.Info(fmt.Sprintf("Instantiating RedisClient %v in %v/%v", n.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(n.InstanceName, n.Constructor, []blueprint.IRNode{n.Addr})
+	return builder.DeclareConstructor(n.InstanceName, n.Constructor, []blueprint.IRNode{n.Addr.Dial})
 }
 
 func (node *RedisGoClient) ImplementsGolangNode()    {}

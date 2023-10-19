@@ -1,9 +1,6 @@
 package http
 
 import (
-	"errors"
-	"fmt"
-
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
@@ -33,9 +30,9 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 
 	// Define the client wrapper
 	wiring.Define(httpClient, &GolangHttpClient{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		var addr *GolangHttpServerAddress
+		var addr *address.Address[*GolangHttpServer]
 		if err := ns.Get(clientNext, &addr); err != nil {
-			return nil, errors.New(fmt.Sprintf("HTTP client %s expected %s to be an address, but encountered %s", httpClient, clientNext, err))
+			return nil, blueprint.Errorf("HTTP client %s expected %s to be an address, but encountered %s", httpClient, clientNext, err)
 		}
 		return newGolangHttpClient(httpClient, addr)
 	})
@@ -45,26 +42,20 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 
 	// Define the server
 	wiring.Define(httpServer, &GolangHttpServer{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		var addr *GolangHttpServerAddress
+		var addr *address.Address[*GolangHttpServer]
 		if err := ns.Get(httpAddr, &addr); err != nil {
-			return nil, errors.New(fmt.Sprintf("HTTP server %s expected %s to be an address, but encountered %s", httpServer, httpAddr, err))
+			return nil, blueprint.Errorf("HTTP server %s expected %s to be an address, but encountered %s", httpServer, httpAddr, err)
 		}
 
 		var wrapped golang.Service
 		if err := ns.Get(serverNext, &wrapped); err != nil {
-			return nil, errors.New(fmt.Sprintf("HTTP server %s expected %s to be a golang.Service, but encountered %s", httpServer, serverNext, err))
+			return nil, blueprint.Errorf("HTTP server %s expected %s to be a golang.Service, but encountered %s", httpServer, serverNext, err)
 		}
 
 		return newGolangHttpServer(httpServer, addr, wrapped)
 	})
 
 	// Define the address and add it to the pointer dst
-	address.Define(wiring, httpAddr, httpServer, &blueprint.ApplicationNode{}, func(ns blueprint.Namespace) (address.Address, error) {
-		addr := &GolangHttpServerAddress{
-			AddrName: httpAddr,
-			Server:   nil,
-		}
-		return addr, nil
-	})
+	address.Define[*GolangHttpServer](wiring, httpAddr, httpServer, &blueprint.ApplicationNode{})
 	ptr.AddDstModifier(wiring, httpAddr)
 }

@@ -28,6 +28,7 @@ func GenerateMain(
 		GraphPackage:     graphPackage,
 		GraphConstructor: graphConstructor,
 		Args:             nil,
+		Config:           make(map[string]string),
 		Instantiate:      nil,
 	}
 
@@ -41,11 +42,18 @@ func GenerateMain(
 	}
 
 	// Instantiate the nodes specified
-	for _, node := range nodesToInstantiate {
-		if _, isInstantiable := node.(golang.Instantiable); isInstantiable {
-			mainArgs.Instantiate = append(mainArgs.Instantiate, node.Name())
-		}
+	for _, node := range blueprint.FilterNodes[golang.Instantiable](nodesToInstantiate) {
+		mainArgs.Instantiate = append(mainArgs.Instantiate, node.Name())
 	}
+
+	// Materialize any configuration
+	for _, node := range blueprint.Filter[blueprint.IRConfig](nodesToInstantiate) {
+		if !node.HasValue() {
+			return blueprint.Errorf("golang main method expects to instantiate config variable %v but no value is set for it", node.Name())
+		}
+		mainArgs.Config[node.Name()] = node.Value()
+	}
+
 	slog.Info(fmt.Sprintf("Generating %v/main.go", module.Info().Name))
 	mainFileName := filepath.Join(module.Info().Path, "main.go")
 	return gogen.ExecuteTemplateToFile("goprocMain", mainTemplate, mainArgs, mainFileName)
@@ -62,6 +70,7 @@ type mainTemplateArgs struct {
 	GraphPackage     string
 	GraphConstructor string
 	Args             []mainArg
+	Config           map[string]string
 	Instantiate      []string
 }
 
@@ -108,6 +117,9 @@ func main() {
 	graphArgs := map[string]string{
 		{{- range $i, $arg := .Args}}
 		"{{$arg.Name}}": *{{$arg.Var}},
+		{{- end}}
+		{{- range $key, $value := .Config}}
+		"{{$key}}": "{{$value}}",
 		{{- end}}
 	}
 

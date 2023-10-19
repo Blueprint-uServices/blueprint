@@ -6,6 +6,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment/dockergen"
@@ -41,12 +42,12 @@ type (
 
 		ImageDirs map[string]string // map from image name to directory
 
-		Compose *dockergen.DockerComposeFile
+		DockerComposeFile *dockergen.DockerComposeFile
 	}
 )
 
 func (node *Deployment) GenerateArtifacts(dir string) error {
-	slog.Info(fmt.Sprintf("Collecting container instances for %s in %s", node.Name(), dir))
+	slog.Info(fmt.Sprintf("Collecting container instances for deployment %s in %s", node.Name(), dir))
 	workspace := NewDockerComposeWorkspace(node.Name(), dir)
 	return node.generateArtifacts(workspace)
 }
@@ -55,21 +56,18 @@ func (node *Deployment) GenerateArtifacts(dir string) error {
 The basic build process of a docker-compose deployment
 */
 func (node *Deployment) generateArtifacts(workspace docker.ContainerWorkspace) error {
+
 	// Add any locally-built container images
-	for _, child := range node.ContainedNodes {
-		if n, valid := child.(docker.ProvidesContainerImage); valid {
-			if err := n.AddContainerArtifacts(workspace); err != nil {
-				return err
-			}
+	for _, node := range blueprint.Filter[docker.ProvidesContainerImage](node.ContainedNodes) {
+		if err := node.AddContainerArtifacts(workspace); err != nil {
+			return err
 		}
 	}
 
 	// Collect all container instances
-	for _, child := range node.ContainedNodes {
-		if n, valid := child.(docker.ProvidesContainerInstance); valid {
-			if err := n.AddContainerInstance(workspace); err != nil {
-				return err
-			}
+	for _, node := range blueprint.Filter[docker.ProvidesContainerInstance](node.ContainedNodes) {
+		if err := node.AddContainerInstance(workspace); err != nil {
+			return err
 		}
 	}
 
@@ -82,8 +80,8 @@ func NewDockerComposeWorkspace(name string, dir string) *dockerComposeWorkspace 
 			Path:   filepath.Clean(dir),
 			Target: "docker-compose",
 		},
-		ImageDirs: make(map[string]string),
-		Compose:   dockergen.NewDockerComposeFile(name, dir, "docker-compose.yml"),
+		ImageDirs:         make(map[string]string),
+		DockerComposeFile: dockergen.NewDockerComposeFile(name, dir, "docker-compose.yml"),
 	}
 }
 
@@ -99,17 +97,27 @@ func (d *dockerComposeWorkspace) CreateImageDir(imageName string) (string, error
 	return imageDir, err
 }
 
-func (d *dockerComposeWorkspace) DeclarePrebuiltInstance(instanceName string, image string) error {
-	return nil
+func (d *dockerComposeWorkspace) DeclarePrebuiltInstance(instanceName string, image string, args ...blueprint.IRNode) error {
+	// Docker containers should assign all internal server ports (typically using address.AssignPorts) before adding an instance
+	if err := address.CheckPorts(args); err != nil {
+		return blueprint.Errorf("unable to add docker instance %v due to %v", instanceName, err.Error())
+	}
+
+	return d.DockerComposeFile.AddImageInstance(instanceName, image, args...)
 }
 
-func (d *dockerComposeWorkspace) DeclareLocalImage(instanceName string, imageName string) error {
-	return nil
+func (d *dockerComposeWorkspace) DeclareLocalImage(instanceName string, imageDir string, args ...blueprint.IRNode) error {
+	// Docker containers should assign all internal server ports (typically using address.AssignPorts) before adding an instance
+	if err := address.CheckPorts(args); err != nil {
+		return blueprint.Errorf("unable to add docker instance %v due to %v", instanceName, err.Error())
+	}
+
+	return d.DockerComposeFile.AddBuildInstance(instanceName, imageDir, args...)
 }
 
 func (d *dockerComposeWorkspace) Finish() error {
 	// Now that all images and instances have been declared, we can generate the docker-compose file
-	return d.Compose.Generate()
+	return d.DockerComposeFile.Generate()
 }
 
 func (d *dockerComposeWorkspace) ImplementsBuildContext()       {}

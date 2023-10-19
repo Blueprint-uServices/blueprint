@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -21,12 +22,12 @@ type GolangClient struct {
 	golang.GeneratesFuncs
 
 	InstanceName string
-	ServerAddr   *GolangServerAddress
+	ServerAddr   *address.Address[*GolangServer]
 
 	outputPackage string
 }
 
-func newGolangClient(name string, addr *GolangServerAddress) (*GolangClient, error) {
+func newGolangClient(name string, addr *address.Address[*GolangServer]) (*GolangClient, error) {
 	node := &GolangClient{}
 	node.InstanceName = name
 	node.ServerAddr = addr
@@ -36,7 +37,7 @@ func newGolangClient(name string, addr *GolangServerAddress) (*GolangClient, err
 }
 
 func (n *GolangClient) String() string {
-	return n.InstanceName + " = GRPCClient(" + n.ServerAddr.Name() + ")"
+	return n.InstanceName + " = GRPCClient(" + n.ServerAddr.Dial.Name() + ")"
 }
 
 func (n *GolangClient) Name() string {
@@ -44,7 +45,7 @@ func (n *GolangClient) Name() string {
 }
 
 func (node *GolangClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
-	iface, err := node.ServerAddr.GetInterface(ctx)
+	iface, err := node.ServerAddr.Server.GetInterface(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +117,7 @@ func (node *GolangClient) AddInstantiation(builder golang.GraphBuilder) error {
 	}
 
 	slog.Info(fmt.Sprintf("Instantiating GRPCClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
-	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.ServerAddr})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.ServerAddr.Dial})
 }
 
 func (node *GolangClient) ImplementsGolangNode()    {}

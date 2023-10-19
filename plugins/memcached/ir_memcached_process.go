@@ -2,6 +2,7 @@ package memcached
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
@@ -14,7 +15,7 @@ type MemcachedProcess struct {
 	docker.Container
 
 	InstanceName string
-	Addr         *MemcachedAddr
+	Addr         *address.Address[*MemcachedProcess]
 	Iface        *goparser.ParsedInterface
 }
 
@@ -31,7 +32,7 @@ func (m *MemcachedInterface) GetMethods() []service.Method {
 	return m.Wrapped.GetMethods()
 }
 
-func newMemcachedProcess(name string, addr *MemcachedAddr) (*MemcachedProcess, error) {
+func newMemcachedProcess(name string, addr *address.Address[*MemcachedProcess]) (*MemcachedProcess, error) {
 	proc := &MemcachedProcess{}
 	proc.InstanceName = name
 	proc.Addr = addr
@@ -60,7 +61,7 @@ func (node *MemcachedProcess) init(name string) error {
 }
 
 func (n *MemcachedProcess) String() string {
-	return n.InstanceName + " = MemcachedProcess(" + n.Addr.Name() + ")"
+	return n.InstanceName + " = MemcachedProcess(" + n.Addr.Bind.Name() + ")"
 }
 
 func (n *MemcachedProcess) Name() string {
