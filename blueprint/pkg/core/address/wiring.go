@@ -58,6 +58,8 @@ func Dial[ServerType blueprint.IRNode](namespace blueprint.Namespace, addressNam
 	if err := namespace.Get(dial(addr.AddrName), &dialConf); err != nil {
 		return nil, err
 	}
+	addr.Dial = dialConf
+
 	return addr, nil
 }
 
@@ -73,10 +75,12 @@ func Bind[ServerType blueprint.IRNode](namespace blueprint.Namespace, addressNam
 	}
 
 	// By getting the bind config value here, it gets implicitly added as an argument node to all namespaces
-	var dialConf *AddressConfig
-	if err := namespace.Get(bind(addr.AddrName), &dialConf); err != nil {
+	var bindConf *AddressConfig
+	if err := namespace.Get(bind(addr.AddrName), &bindConf); err != nil {
 		return nil, err
 	}
+	addr.Bind = bindConf
+
 	return addr, nil
 }
 

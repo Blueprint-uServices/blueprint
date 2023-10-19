@@ -37,7 +37,7 @@ func newGolangClient(name string, addr *address.Address[*GolangServer]) (*Golang
 }
 
 func (n *GolangClient) String() string {
-	return n.InstanceName + " = GRPCClient(" + n.ServerAddr.Name() + ")"
+	return n.InstanceName + " = GRPCClient(" + n.ServerAddr.Dial.Name() + ")"
 }
 
 func (n *GolangClient) Name() string {
@@ -117,7 +117,7 @@ func (node *GolangClient) AddInstantiation(builder golang.GraphBuilder) error {
 	}
 
 	slog.Info(fmt.Sprintf("Instantiating GRPCClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
-	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.ServerAddr})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.ServerAddr.Dial})
 }
 
 func (node *GolangClient) ImplementsGolangNode()    {}

@@ -53,7 +53,7 @@ func newGolangServer(name string, addr *address.Address[*GolangServer], service 
 }
 
 func (n *GolangServer) String() string {
-	return n.InstanceName + " = GRPCServer(" + n.Wrapped.Name() + ", " + n.Addr.Name() + ")"
+	return n.InstanceName + " = GRPCServer(" + n.Wrapped.Name() + ", " + n.Addr.Bind.Name() + ")"
 }
 
 func (n *GolangServer) Name() string {
@@ -112,7 +112,7 @@ func (node *GolangServer) AddInstantiation(builder golang.GraphBuilder) error {
 	}
 
 	slog.Info(fmt.Sprintf("Instantiating GRPCServer %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
-	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped, node.Addr})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped, node.Addr.Bind})
 }
 
 func (node *GolangServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {

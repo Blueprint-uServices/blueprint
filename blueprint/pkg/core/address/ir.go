@@ -34,6 +34,8 @@ type (
 	Address[ServerType blueprint.IRNode] struct {
 		AddrName string
 		Server   ServerType
+		Dial     *AddressConfig // Configuration value for the dial address
+		Bind     *AddressConfig // Configuration value for the bind address
 	}
 )
 

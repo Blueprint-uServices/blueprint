@@ -100,8 +100,7 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 
 	// Define the collector server
 	wiring.Define(collectorProc, &OpenTelemetryCollector{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		var addr *address.Address[*OpenTelemetryCollector]
-		err := namespace.Get(collectorAddr, &addr)
+		addr, err := address.Bind[*OpenTelemetryCollector](namespace, collectorAddr)
 		if err != nil {
 			return nil, err
 		}
@@ -125,8 +124,7 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 
 	// Define the collector client
 	wiring.Define(collectorClient, &OpenTelemetryCollectorClient{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		var addr *address.Address[*OpenTelemetryCollector]
-		err := namespace.Get(clientNext, &addr)
+		addr, err := address.Dial[*OpenTelemetryCollector](namespace, clientNext)
 		if err != nil {
 			return nil, err
 		}
