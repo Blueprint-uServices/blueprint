@@ -8,16 +8,24 @@ import (
 
 type (
 	/*
-		IRNode representing an address, used during the build process.
+		Metadata IRNode representing an address, used during the build process.
 		Contains metadata about the address and the node it points to
 	*/
 	Node interface {
 		blueprint.IRNode
-		blueprint.IRConfig
+		blueprint.IRMetadata
 		Name() string
 		GetDestination() blueprint.IRNode
 		SetDestination(blueprint.IRNode) error
 		ImplementsAddressNode()
+	}
+
+	/* Config IRNode representing an address */
+	AddressConfig struct {
+		blueprint.IRConfig
+		Key      string
+		Hostname string
+		Port     string
 	}
 )
 
@@ -29,26 +37,12 @@ type (
 	}
 )
 
-/* The address of a server, used by a client */
-type ServerAddress struct {
-	blueprint.IRConfig
-	Hostname string
-	Port     string
-}
-
-/* The address that a server binds to */
-type BindAddress struct {
-	blueprint.IRConfig
-	Hostname string
-	Port     string
-}
-
 func (addr *Address[ServerType]) Name() string {
 	return addr.AddrName
 }
 
 func (addr *Address[ServerType]) String() string {
-	return addr.AddrName + " = ServerAddress()"
+	return addr.AddrName
 }
 
 func (addr *Address[ServerType]) GetDestination() blueprint.IRNode {
@@ -68,4 +62,14 @@ func (addr *Address[ServerType]) SetDestination(node blueprint.IRNode) error {
 }
 
 func (addr *Address[ServerType]) ImplementsAddressNode() {}
-func (addr *Address[ServerType]) ImplementsIRConfig()    {}
+func (addr *Address[ServerType]) ImplementsIRMetadata()  {}
+
+func (conf *AddressConfig) Name() string {
+	return conf.Key
+}
+
+func (conf *AddressConfig) String() string {
+	return conf.Key + " = AddressConfig()"
+}
+
+func (conf *AddressConfig) ImplementsIRConfig() {}

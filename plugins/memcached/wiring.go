@@ -34,13 +34,7 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 	ptr := pointer.GetPointer(wiring, cacheName)
 
 	// Define the address and add the collectorAddr to the pointer dst
-	address.Define(wiring, addrName, procName, &blueprint.ApplicationNode{}, func(namespace blueprint.Namespace) (address.Node, error) {
-		addr := &address.Address[*MemcachedProcess]{
-			AddrName: addrName,
-			Server:   nil,
-		}
-		return addr, nil
-	})
+	address.Define[*MemcachedProcess](wiring, addrName, procName, &blueprint.ApplicationNode{})
 	ptr.AddDstModifier(wiring, addrName)
 
 	// Add the client to the pointer

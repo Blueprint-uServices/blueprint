@@ -92,12 +92,6 @@ func DefineXTraceServer(wiring blueprint.WiringSpec) {
 		return newXTraceClient(xtraceClient, addr)
 	})
 
-	address.Define(wiring, xtrace_addr, xtraceProc, &blueprint.ApplicationNode{}, func(ns blueprint.Namespace) (address.Node, error) {
-		addr := &address.Address[*XTraceServer]{
-			AddrName: xtrace_addr,
-			Server:   nil,
-		}
-		return addr, nil
-	})
+	address.Define[*XTraceServer](wiring, xtrace_addr, xtraceProc, &blueprint.ApplicationNode{})
 	ptr.AddDstModifier(wiring, xtrace_addr)
 }

@@ -13,6 +13,13 @@ import (
 	"golang.org/x/mod/modfile"
 )
 
+func ReplaceSuffix(s string, suffix string, replacement string) string {
+	if before, hasSuffix := strings.CutSuffix(s, suffix); hasSuffix {
+		return before + replacement
+	}
+	return s + "." + replacement
+}
+
 func Indent(str string, amount int) string {
 	lines := strings.Split(str, "\n")
 	for i, line := range lines {

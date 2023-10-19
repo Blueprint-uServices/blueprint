@@ -27,13 +27,7 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 	pointer.CreatePointer(wiring, cacheName, &RedisGoClient{}, dstName)
 	ptr := pointer.GetPointer(wiring, cacheName)
 
-	address.Define(wiring, addrName, procName, &blueprint.ApplicationNode{}, func(ns blueprint.Namespace) (address.Node, error) {
-		addr := &address.Address[*RedisProcess]{
-			AddrName: addrName,
-			Server:   nil,
-		}
-		return addr, nil
-	})
+	address.Define[*RedisProcess](wiring, addrName, procName, &blueprint.ApplicationNode{})
 
 	ptr.AddDstModifier(wiring, addrName)
 
