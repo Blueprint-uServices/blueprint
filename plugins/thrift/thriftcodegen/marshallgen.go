@@ -77,7 +77,7 @@ func unmarshall_{{$method.Name}}_rsp(msg *{{$method.Response.ThriftType.Name}}) 
 
 {{ range $t, $struct := .GoStructs}}
 // Utility function to pack {{$imports.Qualify $t.Package $t.Name}} into a Thrift {{$struct.ThriftType.Name}} struct
-func (msg *{{$struct.ThriftType.Name}}) marshall(obj *{{$imports.Qualify $t.Package $t.Name}}) *{{$struct.ThriftType.Name}} {
+func marshall_{{$struct.ThriftType.Name}}(msg *{{$struct.ThriftType.Name}}, obj *{{$imports.Qualify $t.Package $t.Name}}) *{{$struct.ThriftType.Name}} {
 	{{- range $j, $field := $struct.FieldList}}
 	{{$field.Marshall $imports "obj."}}
 	{{- end}}
@@ -85,7 +85,7 @@ func (msg *{{$struct.ThriftType.Name}}) marshall(obj *{{$imports.Qualify $t.Pack
 }
 
 // Utility function to unpack {{$imports.Qualify $t.Package $t.Name}} from a Thrift {{$struct.ThriftType.Name}} struct
-func (msg *{{$struct.ThriftType.Name}}) unmarshall(obj *{{$imports.Qualify $t.Package $t.Name}}) {
+func unmarshall_{{$struct.ThriftType.Name}}(msg *{{$struct.ThriftType.Name}}, obj *{{$imports.Qualify $t.Package $t.Name}}) {
 	{{- range $j, $field := $struct.FieldList}}
 	{{$field.Unmarshall $imports "obj."}}
 	{{- end}}
@@ -121,7 +121,7 @@ func (f *ThriftField) Marshall(imports *gogen.Imports, obj string) (string, erro
 	switch t := f.ThriftGoType.(type) {
 	case *gocode.UserType:
 		{
-			return fmt.Sprintf("msg.%s = new(%s).marshall(&%s%s)", strings.Title(f.Name), t.Name, obj, f.Name), nil
+			return fmt.Sprintf("msg.%s = marshall_%s(new(%s), &%s%s)", strings.Title(f.Name), t.Name, t.Name, obj, f.Name), nil
 		}
 	case *gocode.BasicType:
 		{
@@ -131,7 +131,7 @@ func (f *ThriftField) Marshall(imports *gogen.Imports, obj string) (string, erro
 		{
 			switch pt := t.PointerTo.(type) {
 			case *gocode.UserType:
-				return fmt.Sprintf("msg.%s = new(%s).marshall(%s%s)", strings.Title(f.Name), pt.Name, obj, f.Name), nil
+				return fmt.Sprintf("msg.%s = marshall_%s(new(%s),%s%s)", strings.Title(f.Name), pt.Name, pt.Name, obj, f.Name), nil
 			case *gocode.BasicType:
 				return fmt.Sprintf("msg.%s = %s(*%s%s)", strings.Title(f.Name), pt.Name, obj, f.Name), nil
 			default:
@@ -146,8 +146,8 @@ func (f *ThriftField) Marshall(imports *gogen.Imports, obj string) (string, erro
 					return fmt.Sprintf(`
     msg.%s = make(map[%s]*%s)
 	for k, v := range %s%s {
-		msg.%s[k] = new(%s).marshall(&v)
-	}`, strings.Title(f.Name), t.KeyType, vt.Name, obj, f.Name, strings.Title(f.Name), vt.Name), nil
+		msg.%s[k] = marshall_%s(new(%s), &v)
+	}`, strings.Title(f.Name), t.KeyType, vt.Name, obj, f.Name, strings.Title(f.Name), vt.Name, vt.Name), nil
 				}
 			case *gocode.BasicType:
 				return fmt.Sprintf("msg.%s = %s%s", strings.Title(f.Name), obj, f.Name), nil
@@ -160,8 +160,8 @@ func (f *ThriftField) Marshall(imports *gogen.Imports, obj string) (string, erro
 			switch st := t.SliceOf.(type) {
 			case *gocode.UserType:
 				return fmt.Sprintf(
-					"for _, v := range %s%s { msg.%s = append(msg.%s, new(%s).marshall(&v)) }",
-					obj, f.Name, strings.Title(f.Name), strings.Title(f.Name), st.Name), nil
+					"for _, v := range %s%s { msg.%s = append(msg.%s, marshall_%s(new(%s), &v)) }",
+					obj, f.Name, strings.Title(f.Name), strings.Title(f.Name), st.Name, st.Name), nil
 			case *gocode.BasicType:
 				return fmt.Sprintf("msg.%s = %s%s", strings.Title(f.Name), obj, f.Name), nil
 			default:
@@ -176,7 +176,7 @@ func (f *ThriftField) Unmarshall(imports *gogen.Imports, obj string) (string, er
 	switch t := f.ThriftGoType.(type) {
 	case *gocode.UserType:
 		{
-			return fmt.Sprintf("msg.%s.unmarshall(&%s%s)", strings.Title(f.Name), obj, f.Name), nil
+			return fmt.Sprintf("unmarshall_%s(msg.%s,&%s%s)", t.Name, strings.Title(f.Name), obj, f.Name), nil
 		}
 	case *gocode.BasicType:
 		{
@@ -186,7 +186,7 @@ func (f *ThriftField) Unmarshall(imports *gogen.Imports, obj string) (string, er
 		{
 			switch pt := t.PointerTo.(type) {
 			case *gocode.UserType:
-				return fmt.Sprintf("msg.%s.unmarshall(%s%s)", strings.Title(f.Name), obj, f.Name), nil
+				return fmt.Sprintf("unmarshall_%s(msg.%s, %s%s)", pt.Name, strings.Title(f.Name), obj, f.Name), nil
 			case *gocode.BasicType:
 				return fmt.Sprintf("%s%s = &%v(msg.%s)", obj, f.Name, f.SrcType, strings.Title(f.Name)), nil
 			default:
@@ -195,15 +195,15 @@ func (f *ThriftField) Unmarshall(imports *gogen.Imports, obj string) (string, er
 		}
 	case *gocode.Map:
 		{
-			switch t.ValueType.(type) {
+			switch vt := t.ValueType.(type) {
 			case *gocode.UserType:
 				{
 					return fmt.Sprintf(`
     %s%s = make(%s)
 	for k, v := range msg.%s {
 		objv := %s%s[k]
-		v.unmarshall(&objv)
-	}`, obj, f.Name, imports.NameOf(f.SrcType), strings.Title(f.Name), obj, f.Name), nil
+		unmarshall_%s(v, &objv)
+	}`, obj, f.Name, imports.NameOf(f.SrcType), strings.Title(f.Name), obj, f.Name, vt.Name), nil
 				}
 			case *gocode.BasicType:
 				return fmt.Sprintf("msg.%s = %s%s", strings.Title(f.Name), obj, f.Name), nil
@@ -218,8 +218,8 @@ func (f *ThriftField) Unmarshall(imports *gogen.Imports, obj string) (string, er
 				return fmt.Sprintf(`
 	%s%s = make(%s, len(msg.%s))
 	for i, v := range msg.%s {
-		v.unmarshall(&%s%s[i])
-	}`, obj, f.Name, imports.NameOf(f.SrcType), strings.Title(f.Name), strings.Title(f.Name), obj, f.Name), nil
+		unmarshall_%s(v, &%s%s[i])
+	}`, obj, f.Name, imports.NameOf(f.SrcType), strings.Title(f.Name), strings.Title(f.Name), obj, f.Name, st.Name), nil
 			case *gocode.BasicType:
 				return fmt.Sprintf("%s%s = msg.%s", obj, f.Name, strings.Title(f.Name)), nil
 			default:
