@@ -30,8 +30,8 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 
 	// Define the client wrapper
 	wiring.Define(httpClient, &GolangHttpClient{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		var addr *address.Address[*GolangHttpServer]
-		if err := ns.Get(clientNext, &addr); err != nil {
+		addr, err := address.Dial[*GolangHttpServer](ns, clientNext)
+		if err != nil {
 			return nil, blueprint.Errorf("HTTP client %s expected %s to be an address, but encountered %s", httpClient, clientNext, err)
 		}
 		return newGolangHttpClient(httpClient, addr)
@@ -42,8 +42,8 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 
 	// Define the server
 	wiring.Define(httpServer, &GolangHttpServer{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		var addr *address.Address[*GolangHttpServer]
-		if err := ns.Get(httpAddr, &addr); err != nil {
+		addr, err := address.Bind[*GolangHttpServer](ns, httpAddr)
+		if err != nil {
 			return nil, blueprint.Errorf("HTTP server %s expected %s to be an address, but encountered %s", httpServer, httpAddr, err)
 		}
 

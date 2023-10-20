@@ -11,11 +11,10 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/healthchecker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/redis"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplenosqldb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/xtrace"
 )
 
 func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) string {
@@ -23,7 +22,7 @@ func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) string {
 	retries.AddRetries(wiring, serviceName, 10)
 	healthchecker.AddHealthCheckAPI(wiring, serviceName)
 	circuitbreaker.AddCircuitBreaker(wiring, serviceName, 1000, 0.1, "1s")
-	xtrace.Instrument(wiring, serviceName)
+	//xtrace.Instrument(wiring, serviceName)
 	http.Deploy(wiring, serviceName)
 	return goproc.CreateProcess(wiring, procName, serviceName)
 }
@@ -36,9 +35,9 @@ func main() {
 	workflow.Init("../workflow")
 
 	b_database := simplenosqldb.Define(wiring, "b_database")
-	//b_cache := simplecache.Define(wiring, "b_cache")
+	b_cache := simplecache.Define(wiring, "b_cache")
 	//b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
-	b_cache := redis.PrebuiltProcess(wiring, "b_cache")
+	//b_cache := redis.PrebuiltProcess(wiring, "b_cache")
 	b := workflow.Define(wiring, "b", "LeafServiceImpl", b_cache, b_database)
 
 	a := workflow.Define(wiring, "a", "NonLeafService", b)
