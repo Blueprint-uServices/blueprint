@@ -71,3 +71,13 @@ func (node *OpenTelemetryCollector) GetInterface(ctx blueprint.BuildContext) (se
 	iface := node.Iface.ServiceInterface(ctx)
 	return &OTCollectorInterface{Wrapped: iface}, nil
 }
+
+func (node *OpenTelemetryCollector) AddContainerArtifacts(target docker.ContainerWorkspace) error {
+	// OpenTelemetryCollector doesn't have any artifacts to add
+	return nil
+}
+
+func (node *OpenTelemetryCollector) AddContainerInstance(target docker.ContainerWorkspace) error {
+	// OpenTelemetryCollector doesn't have any instances to add
+	return nil
+}

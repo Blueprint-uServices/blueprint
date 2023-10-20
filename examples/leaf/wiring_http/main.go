@@ -7,8 +7,10 @@ import (
 	"golang.org/x/exp/slog"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplenosqldb"
@@ -28,6 +30,10 @@ func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) string {
 
 func main() {
 	slog.Info("Constructing Wiring Spec")
+
+	// Initialize blueprint compiler
+	linuxcontainer.RegisterBuilders()
+	dockerdeployment.RegisterBuilders()
 
 	wiring := blueprint.NewWiringSpec("leaf_example")
 
