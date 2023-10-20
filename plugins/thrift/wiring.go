@@ -32,7 +32,7 @@ func Deploy(wiring blueprint.WiringSpec, serviceName string) {
 	serverNext := ptr.AddDstModifier(wiring, thrift_server)
 
 	wiring.Define(thrift_server, &GolangThriftServer{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := address.Dial[*GolangThriftServer](namespace, thrift_addr)
+		addr, err := address.Bind[*GolangThriftServer](namespace, thrift_addr)
 		if err != nil {
 			return nil, blueprint.Errorf("Thrift server %s expected %s to be an address, but encountered %s", thrift_server, thrift_addr, err)
 		}
