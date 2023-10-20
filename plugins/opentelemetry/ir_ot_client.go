@@ -27,6 +27,7 @@ func newOpenTelemetryClientWrapper(name string, server golang.Service, collector
 	node.WrapperName = name
 	node.Wrapped = server
 	node.Collector = collector
+	node.outputPackage = "ot"
 	return node, nil
 }
 
