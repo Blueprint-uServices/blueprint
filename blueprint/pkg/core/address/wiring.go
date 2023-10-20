@@ -6,8 +6,6 @@ import (
 
 /*
 Defines an address called `addressName` that points to the definition `pointsto`.
-
-The provided buildFunc should build an IRNode that implements the address.Address interface
 */
 func Define[ServerType blueprint.IRNode](wiring blueprint.WiringSpec, addressName string, pointsTo string, reachability any) {
 	def := wiring.GetDef(pointsTo)

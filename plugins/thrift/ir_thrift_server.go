@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -17,7 +18,7 @@ type GolangThriftServer struct {
 	golang.Instantiable
 
 	InstanceName string
-	Addr         *GolangThriftServerAddress
+	Addr         *address.Address[*GolangThriftServer]
 	Wrapped      golang.Service
 
 	outputPackage string
@@ -36,7 +37,7 @@ func (thrift *ThriftInterface) GetMethods() []service.Method {
 	return thrift.Wrapped.GetMethods()
 }
 
-func newGolangThriftServer(name string, addr *GolangThriftServerAddress, service golang.Service) (*GolangThriftServer, error) {
+func newGolangThriftServer(name string, addr *address.Address[*GolangThriftServer], service golang.Service) (*GolangThriftServer, error) {
 	node := &GolangThriftServer{}
 	node.InstanceName = name
 	node.Addr = addr
@@ -46,7 +47,7 @@ func newGolangThriftServer(name string, addr *GolangThriftServerAddress, service
 }
 
 func (n *GolangThriftServer) String() string {
-	return n.InstanceName + " = ThriftServer(" + n.Wrapped.Name() + ", " + n.Addr.Name() + ")"
+	return n.InstanceName + " = ThriftServer(" + n.Wrapped.Name() + ", " + n.Addr.Bind.Name() + ")"
 }
 
 func (n *GolangThriftServer) Name() string {
@@ -98,7 +99,7 @@ func (node *GolangThriftServer) AddInstantiation(builder golang.GraphBuilder) er
 	}
 
 	slog.Info(fmt.Sprintf("Instantiating ThriftServer %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
-	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped, node.Addr})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped, node.Addr.Bind})
 }
 
 func (node *GolangThriftServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {

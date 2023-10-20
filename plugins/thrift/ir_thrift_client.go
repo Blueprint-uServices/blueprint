@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
@@ -18,11 +19,11 @@ type GolangThriftClient struct {
 	golang.Instantiable
 
 	InstanceName  string
-	ServerAddr    *GolangThriftServerAddress
+	ServerAddr    *address.Address[*GolangThriftServer]
 	outputPackage string
 }
 
-func newGolangThriftClient(name string, addr *GolangThriftServerAddress) (*GolangThriftClient, error) {
+func newGolangThriftClient(name string, addr *address.Address[*GolangThriftServer]) (*GolangThriftClient, error) {
 	node := &GolangThriftClient{}
 	node.InstanceName = name
 	node.ServerAddr = addr
@@ -32,7 +33,7 @@ func newGolangThriftClient(name string, addr *GolangThriftServerAddress) (*Golan
 }
 
 func (n *GolangThriftClient) String() string {
-	return n.InstanceName + " = ThriftClient(" + n.ServerAddr.Name() + ")"
+	return n.InstanceName + " = ThriftClient(" + n.ServerAddr.Dial.Name() + ")"
 }
 
 func (n *GolangThriftClient) Name() string {
@@ -40,13 +41,13 @@ func (n *GolangThriftClient) Name() string {
 }
 
 func (node *GolangThriftClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
-	iface, err := node.ServerAddr.GetInterface(ctx)
+	iface, err := node.ServerAddr.Server.GetInterface(ctx)
 	if err != nil {
 		return nil, err
 	}
 	tiface, isthrift := iface.(*ThriftInterface)
 	if !isthrift {
-		return nil, blueprint.Errorf("thrift client expected a Thrift interface from %v but found %v", node.ServerAddr.Name(), iface)
+		return nil, blueprint.Errorf("thrift client expected a Thrift interface from %v but found %v", node.ServerAddr.Server.Name(), iface)
 	}
 	wrapped, isValid := tiface.Wrapped.(*gocode.ServiceInterface)
 	if !isValid {
@@ -105,7 +106,7 @@ func (node *GolangThriftClient) AddInstantiation(builder golang.GraphBuilder) er
 	}
 
 	slog.Info(fmt.Sprintf("Instantiating ThriftClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
-	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.ServerAddr})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.ServerAddr.Dial})
 }
 
 func (node *GolangThriftClient) ImplementsGolangNode()    {}

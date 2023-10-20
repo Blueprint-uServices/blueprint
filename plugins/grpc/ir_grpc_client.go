@@ -51,7 +51,7 @@ func (node *GolangClient) GetInterface(ctx blueprint.BuildContext) (service.Serv
 	}
 	grpc, isGrpc := iface.(*GRPCInterface)
 	if !isGrpc {
-		return nil, fmt.Errorf("grpc client expected a GRPC interface from %v but found %v", node.ServerAddr.Name(), iface)
+		return nil, fmt.Errorf("grpc client expected a GRPC interface from %v but found %v", node.ServerAddr.Server.Name(), iface)
 	}
 	wrapped, isValid := grpc.Wrapped.(*gocode.ServiceInterface)
 	if !isValid {
