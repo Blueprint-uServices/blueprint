@@ -35,7 +35,7 @@ and assigns ports to any addresses that haven't yet been assigned.
 
 Returns an error if multiple nodes have pre-assigned themselves conflicting ports
 */
-func AssignPorts(nodes []blueprint.IRNode) error {
+func AssignPorts(hostname string, nodes []blueprint.IRNode) error {
 	// Extract the BindConfig nodes
 	addrs := blueprint.Filter[*BindConfig](nodes)
 
@@ -56,7 +56,7 @@ func AssignPorts(nodes []blueprint.IRNode) error {
 		if addr.Port == 0 && addr.PreferredPort != 0 {
 			if _, conflict := ports[addr.PreferredPort]; !conflict {
 				addr.Port = addr.PreferredPort
-				addr.Hostname = "0.0.0.0"
+				addr.Hostname = hostname
 				ports[addr.Port] = addr
 			}
 		}
@@ -72,7 +72,7 @@ func AssignPorts(nodes []blueprint.IRNode) error {
 			for {
 				if _, alreadyAssigned := ports[candidatePort]; !alreadyAssigned {
 					addr.Port = candidatePort
-					addr.Hostname = "0.0.0.0"
+					addr.Hostname = hostname
 					ports[addr.Port] = addr
 					break
 				}
@@ -85,10 +85,6 @@ func AssignPorts(nodes []blueprint.IRNode) error {
 	// Update preferred ports
 	for _, addr := range addrs {
 		addr.PreferredPort = addr.Port
-	}
-
-	for _, conf := range ports {
-		fmt.Printf("assigned %v to port %v\n", conf.Name(), conf.Port)
 	}
 	return nil
 }

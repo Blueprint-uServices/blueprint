@@ -79,7 +79,7 @@ func toString(values ...any) string {
 {{ range $_, $f := .Service.Methods }}
 func (wlgen *{{$receiver}}) Call_{{$f.Name}}(ctx context.Context) error {
 	{{DeclareArgVars $f}}
-	fmt.Printf("{{$service.UserType.Name}}.{{$f.Name}}(%v)", toString({{ArgVars $f}}))
+	fmt.Printf("{{$service.UserType.Name}}.{{$f.Name}}(%v)\n", toString({{ArgVars $f}}))
 	{{RetVars $f "err"}} :=  wlgen.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
 	if err != nil {
 		fmt.Printf(" = error\n")

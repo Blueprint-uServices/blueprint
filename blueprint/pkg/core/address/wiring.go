@@ -24,11 +24,13 @@ func Define[ServerType blueprint.IRNode](wiring blueprint.WiringSpec, addressNam
 	// Add Config nodes for the server bind address and client address
 	wiring.Define(bind(addressName), reachability, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
 		conf := &BindConfig{}
+		conf.AddressName = addressName
 		conf.Key = bind(addressName)
 		return conf, nil
 	})
 	wiring.Define(dial(addressName), reachability, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
 		conf := &DialConfig{}
+		conf.AddressName = addressName
 		conf.Key = dial(addressName)
 		return conf, nil
 	})

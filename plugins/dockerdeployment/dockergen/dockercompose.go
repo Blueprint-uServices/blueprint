@@ -19,7 +19,9 @@ type DockerComposeFile struct {
 	WorkspaceDir  string
 	FileName      string
 	FilePath      string
-	Instances     map[string]instance // Container instance declarations
+	Instances     map[string]instance            // Container instance declarations
+	localServers  map[string]*address.BindConfig // Servers that have been defined within this docker-compose file
+	localDials    map[string]*address.DialConfig // All servers that will be dialed from within this docker-compose file
 }
 
 type instance struct {
@@ -38,10 +40,14 @@ func NewDockerComposeFile(workspaceName, workspaceDir, fileName string) *DockerC
 		FileName:      fileName,
 		FilePath:      filepath.Join(workspaceDir, fileName),
 		Instances:     make(map[string]instance),
+		localServers:  make(map[string]*address.BindConfig),
+		localDials:    make(map[string]*address.DialConfig),
 	}
 }
 
 func (d *DockerComposeFile) Generate() error {
+	// Point any local dials directly to the local server
+	d.ResolveLocalDials()
 	slog.Info(fmt.Sprintf("Generating %v/%v", d.WorkspaceName, d.FileName))
 	return ExecuteTemplateToFile("docker-compose", dockercomposeTemplate, d, d.FilePath)
 
@@ -70,6 +76,10 @@ func (d *DockerComposeFile) addInstance(instanceName string, image string, conta
 	for _, node := range args {
 		varname := linux.EnvVar(node.Name())
 
+		// TODO: only the server addrs that get passed in as node args to the docker deployment actually need to be included
+		//    in the docker-compose ports section; the remainder only need to be exposed to containers within the deployment
+		//    but not to the outsdie world
+
 		// Docker containers should assign all internal server ports (typically using address.AssignPorts) before adding an instance
 		if bind, isBindConfig := node.(*address.BindConfig); isBindConfig {
 			if bind.Port == 0 {
@@ -90,6 +100,40 @@ func (d *DockerComposeFile) addInstance(instanceName string, image string, conta
 		instance.Config[varname] = requiredEnvVar(node)
 	}
 	d.Instances[instanceName] = instance
+
+	// Save all the dial and binds that we see; before compiling the docker-compose, we'll link them up to each other
+	d.checkForAddrs(args)
+
+	return nil
+}
+
+func (d *DockerComposeFile) checkForAddrs(nodes []blueprint.IRNode) {
+	for _, node := range nodes {
+		switch c := node.(type) {
+		case *address.BindConfig:
+			d.localServers[c.AddressName] = c
+		case *address.DialConfig:
+			d.localDials[c.AddressName] = c
+		}
+	}
+}
+
+func (d *DockerComposeFile) ResolveLocalDials() error {
+	for name, bind := range d.localServers {
+		dial, hasLocalDial := d.localDials[name]
+		if !hasLocalDial {
+			continue
+		}
+
+		// Update the configured value for any instance that uses this dial addr
+		// to point it directly towards the local server
+		dialVarname := linux.EnvVar(dial.Name())
+		for _, instance := range d.Instances {
+			if _, hasConfig := instance.Config[dialVarname]; hasConfig {
+				instance.Config[dialVarname] = bind.Value()
+			}
+		}
+	}
 	return nil
 }
 

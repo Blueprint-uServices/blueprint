@@ -55,7 +55,7 @@ func (node *Deployment) GenerateArtifacts(dir string) error {
 /*
 The basic build process of a docker-compose deployment
 */
-func (node *Deployment) generateArtifacts(workspace docker.ContainerWorkspace) error {
+func (node *Deployment) generateArtifacts(workspace *dockerComposeWorkspace) error {
 
 	// Add any locally-built container images
 	for _, node := range blueprint.Filter[docker.ProvidesContainerImage](node.ContainedNodes) {
@@ -71,7 +71,15 @@ func (node *Deployment) generateArtifacts(workspace docker.ContainerWorkspace) e
 		}
 	}
 
-	return workspace.Finish()
+	// Build the docker-compose file
+	if err := workspace.Finish(); err != nil {
+		return err
+	}
+
+	// Reset any port assignments for externally-visible servers, since they will currently
+	// be assigned to docker-internal ports
+	address.ResetPorts(node.ArgNodes)
+	return nil
 }
 
 func NewDockerComposeWorkspace(name string, dir string) *dockerComposeWorkspace {

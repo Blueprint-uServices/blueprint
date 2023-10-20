@@ -23,9 +23,10 @@ type (
 
 	addressConfig struct {
 		blueprint.IRConfig
-		Key      string
-		Hostname string
-		Port     uint16
+		AddressName string // The name of the address metadata node
+		Key         string
+		Hostname    string
+		Port        uint16
 	}
 
 	/* A configuration parameter representing the address for a server to bind to */
