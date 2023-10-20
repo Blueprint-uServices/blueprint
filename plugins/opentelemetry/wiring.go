@@ -105,7 +105,7 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 			return nil, err
 		}
 
-		return newOpenTelemetryCollector(collectorProc, addr)
+		return newOpenTelemetryCollector(collectorProc, addr.Bind)
 	})
 
 	// By default, we should only have one collector globally
@@ -129,7 +129,7 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 			return nil, err
 		}
 
-		return newOpenTelemetryCollectorClient(collectorClient, addr)
+		return newOpenTelemetryCollectorClient(collectorClient, addr.Dial)
 	})
 
 	// Define the address and add it to the pointer dst

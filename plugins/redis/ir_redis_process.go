@@ -15,7 +15,7 @@ type RedisProcess struct {
 	backend.Cache
 
 	InstanceName string
-	Addr         *address.Address[*RedisProcess]
+	BindAddr     *address.BindConfig
 	Iface        *goparser.ParsedInterface
 }
 
@@ -32,10 +32,10 @@ func (r *RedisInterface) GetMethods() []service.Method {
 	return r.Wrapped.GetMethods()
 }
 
-func newRedisProcess(name string, addr *address.Address[*RedisProcess]) (*RedisProcess, error) {
+func newRedisProcess(name string, addr *address.BindConfig) (*RedisProcess, error) {
 	proc := &RedisProcess{}
 	proc.InstanceName = name
-	proc.Addr = addr
+	proc.BindAddr = addr
 	err := proc.init(name)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (node *RedisProcess) init(name string) error {
 }
 
 func (r *RedisProcess) String() string {
-	return r.InstanceName + " = RedisProcess(" + r.Addr.Bind.Name() + ")"
+	return r.InstanceName + " = RedisProcess(" + r.BindAddr.Name() + ")"
 }
 
 func (r *RedisProcess) Name() string {

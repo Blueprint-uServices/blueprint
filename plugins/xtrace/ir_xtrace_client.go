@@ -17,22 +17,22 @@ type XTraceClient struct {
 	golang.Node
 	golang.Instantiable
 
-	ClientName string
-	ServerAddr *address.Address[*XTraceServer]
+	ClientName     string
+	ServerDialAddr *address.DialConfig
 
 	InstanceName string
 	Iface        *goparser.ParsedInterface
 	Constructor  *gocode.Constructor
 }
 
-func newXTraceClient(name string, addr *address.Address[*XTraceServer]) (*XTraceClient, error) {
+func newXTraceClient(name string, addr *address.DialConfig) (*XTraceClient, error) {
 	node := &XTraceClient{}
 	err := node.init(name)
 	if err != nil {
 		return nil, err
 	}
 	node.ClientName = name
-	node.ServerAddr = addr
+	node.ServerDialAddr = addr
 	return node, nil
 }
 
@@ -41,7 +41,7 @@ func (node *XTraceClient) Name() string {
 }
 
 func (node *XTraceClient) String() string {
-	return node.Name() + " = XTraceClient(" + node.ServerAddr.Name() + ")"
+	return node.Name() + " = XTraceClient(" + node.ServerDialAddr.Name() + ")"
 }
 
 func (node *XTraceClient) init(name string) error {
@@ -70,7 +70,7 @@ func (node *XTraceClient) AddInstantiation(builder golang.GraphBuilder) error {
 
 	slog.Info(fmt.Sprintf("Instantiating XTraceClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []blueprint.IRNode{node.ServerAddr})
+	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []blueprint.IRNode{node.ServerDialAddr})
 }
 
 func (node *XTraceClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {

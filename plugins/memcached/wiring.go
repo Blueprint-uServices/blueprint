@@ -21,7 +21,7 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 		if err != nil {
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", procName, addrName, err)
 		}
-		return newMemcachedProcess(procName, addr)
+		return newMemcachedProcess(procName, addr.Bind)
 	})
 
 	// Mandate that this cache with this name must be unique within the application (although, this can be changed by namespaces)
@@ -46,7 +46,7 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 		if err != nil {
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", clientName, clientNext, err)
 		}
-		return newMemcachedGoClient(clientName, addr)
+		return newMemcachedGoClient(clientName, addr.Dial)
 	})
 
 	return cacheName

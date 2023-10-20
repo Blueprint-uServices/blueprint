@@ -14,13 +14,13 @@ type OpenTelemetryCollectorClient struct {
 	golang.Instantiable
 
 	ClientName string
-	ServerAddr *address.Address[*OpenTelemetryCollector]
+	ServerDial *address.DialConfig
 }
 
-func newOpenTelemetryCollectorClient(name string, addr *address.Address[*OpenTelemetryCollector]) (*OpenTelemetryCollectorClient, error) {
+func newOpenTelemetryCollectorClient(name string, addr *address.DialConfig) (*OpenTelemetryCollectorClient, error) {
 	node := &OpenTelemetryCollectorClient{}
 	node.ClientName = name
-	node.ServerAddr = addr
+	node.ServerDial = addr
 	return node, nil
 }
 
@@ -29,7 +29,7 @@ func (node *OpenTelemetryCollectorClient) Name() string {
 }
 
 func (node *OpenTelemetryCollectorClient) String() string {
-	return node.Name() + " = OTClient(" + node.ServerAddr.Dial.Name() + ")"
+	return node.Name() + " = OTClient(" + node.ServerDial.Name() + ")"
 }
 
 var collectorClientBuildFuncTemplate = `func(ctr golang.Container) (any, error) {

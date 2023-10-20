@@ -18,13 +18,13 @@ type RedisGoClient struct {
 	golang.Service
 	backend.Cache
 	InstanceName string
-	Addr         *address.Address[*RedisProcess]
+	Addr         *address.DialConfig
 
 	Iface       *goparser.ParsedInterface
 	Constructor *gocode.Constructor
 }
 
-func newRedisGoClient(name string, addr *address.Address[*RedisProcess]) (*RedisGoClient, error) {
+func newRedisGoClient(name string, addr *address.DialConfig) (*RedisGoClient, error) {
 	client := &RedisGoClient{}
 	err := client.init(name)
 	if err != nil {
@@ -36,7 +36,7 @@ func newRedisGoClient(name string, addr *address.Address[*RedisProcess]) (*Redis
 }
 
 func (n *RedisGoClient) String() string {
-	return n.InstanceName + " = RedisClient(" + n.Addr.Dial.Name() + ")"
+	return n.InstanceName + " = RedisClient(" + n.Addr.Name() + ")"
 }
 
 func (n *RedisGoClient) Name() string {
@@ -82,7 +82,7 @@ func (n *RedisGoClient) AddInstantiation(builder golang.GraphBuilder) error {
 
 	slog.Info(fmt.Sprintf("Instantiating RedisClient %v in %v/%v", n.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(n.InstanceName, n.Constructor, []blueprint.IRNode{n.Addr.Dial})
+	return builder.DeclareConstructor(n.InstanceName, n.Constructor, []blueprint.IRNode{n.Addr})
 }
 
 func (node *RedisGoClient) ImplementsGolangNode()    {}

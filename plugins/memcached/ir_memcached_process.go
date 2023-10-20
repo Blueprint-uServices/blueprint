@@ -15,7 +15,7 @@ type MemcachedProcess struct {
 	docker.Container
 
 	InstanceName string
-	Addr         *address.Address[*MemcachedProcess]
+	BindAddr     *address.BindConfig
 	Iface        *goparser.ParsedInterface
 }
 
@@ -32,10 +32,10 @@ func (m *MemcachedInterface) GetMethods() []service.Method {
 	return m.Wrapped.GetMethods()
 }
 
-func newMemcachedProcess(name string, addr *address.Address[*MemcachedProcess]) (*MemcachedProcess, error) {
+func newMemcachedProcess(name string, addr *address.BindConfig) (*MemcachedProcess, error) {
 	proc := &MemcachedProcess{}
 	proc.InstanceName = name
-	proc.Addr = addr
+	proc.BindAddr = addr
 	err := proc.init(name)
 	if err != nil {
 		return nil, err
@@ -61,7 +61,7 @@ func (node *MemcachedProcess) init(name string) error {
 }
 
 func (n *MemcachedProcess) String() string {
-	return n.InstanceName + " = MemcachedProcess(" + n.Addr.Bind.Name() + ")"
+	return n.InstanceName + " = MemcachedProcess(" + n.BindAddr.Name() + ")"
 }
 
 func (n *MemcachedProcess) Name() string {

@@ -69,7 +69,7 @@ func DefineXTraceServer(wiring blueprint.WiringSpec) {
 			return nil, err
 		}
 
-		return newXTraceServer(xtraceProc, addr)
+		return newXTraceServer(xtraceProc, addr.Bind)
 	})
 
 	wiring.Alias(xtraceDst, xtraceProc)
@@ -87,7 +87,7 @@ func DefineXTraceServer(wiring blueprint.WiringSpec) {
 			return nil, err
 		}
 
-		return newXTraceClient(xtraceClient, addr)
+		return newXTraceClient(xtraceClient, addr.Dial)
 	})
 
 	address.Define[*XTraceServer](wiring, xtrace_addr, xtraceProc, &blueprint.ApplicationNode{})

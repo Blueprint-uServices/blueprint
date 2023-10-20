@@ -19,25 +19,25 @@ type MemcachedGoClient struct {
 	backend.Cache
 
 	InstanceName string
-	Addr         *address.Address[*MemcachedProcess]
+	DialAddr     *address.DialConfig
 
 	Iface       *goparser.ParsedInterface
 	Constructor *gocode.Constructor
 }
 
-func newMemcachedGoClient(name string, addr *address.Address[*MemcachedProcess]) (*MemcachedGoClient, error) {
+func newMemcachedGoClient(name string, addr *address.DialConfig) (*MemcachedGoClient, error) {
 	client := &MemcachedGoClient{}
 	err := client.init(name)
 	if err != nil {
 		return nil, err
 	}
 	client.InstanceName = name
-	client.Addr = addr
+	client.DialAddr = addr
 	return client, nil
 }
 
 func (n *MemcachedGoClient) String() string {
-	return n.InstanceName + " = MemcachedClient(" + n.Addr.Dial.Name() + ")"
+	return n.InstanceName + " = MemcachedClient(" + n.DialAddr.Name() + ")"
 }
 
 func (n *MemcachedGoClient) Name() string {
@@ -85,7 +85,7 @@ func (node *MemcachedGoClient) AddInstantiation(builder golang.GraphBuilder) err
 
 	slog.Info(fmt.Sprintf("Instantiating MemcachedClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []blueprint.IRNode{node.Addr.Dial})
+	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []blueprint.IRNode{node.DialAddr})
 }
 
 func (node *MemcachedGoClient) ImplementsGolangNode()    {}

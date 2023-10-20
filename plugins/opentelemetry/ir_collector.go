@@ -9,13 +9,13 @@ type OpenTelemetryCollector struct {
 	docker.Container
 
 	CollectorName string
-	Addr          *address.Address[*OpenTelemetryCollector]
+	BindAddr      *address.BindConfig
 }
 
-func newOpenTelemetryCollector(name string, addr *address.Address[*OpenTelemetryCollector]) (*OpenTelemetryCollector, error) {
+func newOpenTelemetryCollector(name string, addr *address.BindConfig) (*OpenTelemetryCollector, error) {
 	return &OpenTelemetryCollector{
 		CollectorName: name,
-		Addr:          addr,
+		BindAddr:      addr,
 	}, nil
 }
 
@@ -24,5 +24,5 @@ func (node *OpenTelemetryCollector) Name() string {
 }
 
 func (node *OpenTelemetryCollector) String() string {
-	return node.Name() + " = OTCollector(" + node.Addr.Bind.Name() + ")"
+	return node.Name() + " = OTCollector(" + node.BindAddr.Name() + ")"
 }

@@ -17,7 +17,7 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 		if err != nil {
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", procName, addrName, err)
 		}
-		return newRedisProcess(procName, addr)
+		return newRedisProcess(procName, addr.Bind)
 	})
 
 	dstName := cacheName + ".dst"
@@ -38,7 +38,7 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 		if err != nil {
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", clientName, clientNext, err)
 		}
-		return newRedisGoClient(clientName, addr)
+		return newRedisGoClient(clientName, addr.Dial)
 	})
 
 	return cacheName

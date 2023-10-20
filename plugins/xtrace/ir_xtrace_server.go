@@ -13,7 +13,7 @@ type XTraceServer struct {
 	docker.Container
 
 	ServerName string
-	Addr       *address.Address[*XTraceServer]
+	BindAddr   *address.BindConfig
 	Iface      *goparser.ParsedInterface
 }
 
@@ -30,10 +30,10 @@ func (xt *XTraceInterface) GetMethods() []service.Method {
 	return xt.Wrapped.GetMethods()
 }
 
-func newXTraceServer(name string, addr *address.Address[*XTraceServer]) (*XTraceServer, error) {
+func newXTraceServer(name string, addr *address.BindConfig) (*XTraceServer, error) {
 	server := &XTraceServer{
 		ServerName: name,
-		Addr:       addr,
+		BindAddr:   addr,
 	}
 	err := server.init(name)
 	if err != nil {
@@ -64,7 +64,7 @@ func (node *XTraceServer) Name() string {
 }
 
 func (node *XTraceServer) String() string {
-	return node.Name() + " = XTraceServer(" + node.Addr.Name() + ")"
+	return node.Name() + " = XTraceServer(" + node.BindAddr.Name() + ")"
 }
 
 func (node *XTraceServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
