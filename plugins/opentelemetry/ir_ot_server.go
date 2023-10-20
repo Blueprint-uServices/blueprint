@@ -1,14 +1,15 @@
 package opentelemetry
 
 import (
-	"bytes"
 	"fmt"
+	"path/filepath"
 	"reflect"
-	"text/template"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
 	"golang.org/x/exp/slog"
 )
 
@@ -17,9 +18,10 @@ type OpenTelemetryServerWrapper struct {
 	golang.Instantiable
 	golang.GeneratesFuncs
 
-	WrapperName string
-	Wrapped     golang.Service
-	Collector   *OpenTelemetryCollectorClient
+	WrapperName   string
+	outputPackage string
+	Wrapped       golang.Service
+	Collector     *OpenTelemetryCollectorClient
 }
 
 func newOpenTelemetryServerWrapper(name string, server blueprint.IRNode, collector blueprint.IRNode) (*OpenTelemetryServerWrapper, error) {
@@ -37,6 +39,7 @@ func newOpenTelemetryServerWrapper(name string, server blueprint.IRNode, collect
 	node.WrapperName = name
 	node.Wrapped = serverNode
 	node.Collector = collectorClient
+	node.outputPackage = "ot"
 	return node, nil
 }
 
@@ -48,50 +51,65 @@ func (node *OpenTelemetryServerWrapper) String() string {
 	return node.Name() + " = OTServerWrapper(" + node.Wrapped.Name() + ", " + node.Collector.Name() + ")"
 }
 
-func (node *OpenTelemetryServerWrapper) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
-	// TODO: extend wrapped interface with tracing stuff
-	return node.Wrapped.GetInterface(ctx)
+func (node *OpenTelemetryServerWrapper) genInterface(ctx blueprint.BuildContext) (*gocode.ServiceInterface, error) {
+	iface, err := golang.GetGoInterface(ctx, node.Wrapped)
+	if err != nil {
+		return nil, err
+	}
+	module_ctx, valid := ctx.(golang.ModuleBuilder)
+	if !valid {
+		return nil, blueprint.Errorf("OTServerWrapper expected build context to be a ModuleBuilder, got %v", ctx)
+	}
+	i := gocode.CopyServiceInterface(fmt.Sprintf("%v_OTServerWrapperInterface", iface.BaseName), module_ctx.Info().Name+"/"+node.outputPackage, iface)
+	for name, method := range i.Methods {
+		method.AddArgument(gocode.Variable{Name: "trace_ctx", Type: &gocode.BasicType{Name: "string"}})
+		i.Methods[name] = method
+	}
+	return i, nil
 }
+
+func (node *OpenTelemetryServerWrapper) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+	return node.genInterface(ctx)
+}
+
+func (node *OpenTelemetryServerWrapper) ImplementsGolangNode()    {}
+func (node *OpenTelemetryServerWrapper) ImplementsGolangService() {}
 
 // Part of code generation compilation pass; creates the interface definition code for the wrapper,
 // and any new generated structs that are exposed and can be used by other IRNodes
 func (node *OpenTelemetryServerWrapper) AddInterfaces(builder golang.ModuleBuilder) error {
-	// Only generate instantiation code for this instance once
-	if builder.Visited(node.WrapperName + ".GenerateInterfaces") {
-		return nil
-	}
-	slog.Info(fmt.Sprintf("GenerateInterfaces %v\n", node))
-
-	err := node.Wrapped.AddInterfaces(builder)
+	iface, err := node.genInterface(builder)
 	if err != nil {
 		return err
 	}
 
-	// TODO: Generate the extended service interface that includes extra arguments and any structs that are used in that interface
+	err = generateClientSideInterfaces(builder, iface, node.outputPackage)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	return node.Wrapped.AddInterfaces(builder)
 }
 
 // Part of code generation compilation pass; provides implementation of interfaces from GenerateInterfaces
 func (node *OpenTelemetryServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
-	// Only generate instantiation code for this instance once
-	if builder.Visited(node.WrapperName + ".GenerateFuncs") {
-		return nil
+	wrapped_iface, err := golang.GetGoInterface(builder, node.Wrapped)
+	if err != nil {
+		return err
 	}
-	slog.Info(fmt.Sprintf("GenerateFuncs %v\n", node))
 
-	// TODO: Generate the wrapper implementation
+	coll_iface, err := golang.GetGoInterface(builder, node.Collector)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	impl_iface, err := node.genInterface(builder)
+	if err != nil {
+		return err
+	}
+
+	return generateServerHandler(builder, wrapped_iface, impl_iface, coll_iface, node.outputPackage)
 }
-
-var serverBuildFuncTemplate = `func(ctr golang.Container) (any, error) {
-
-		// TODO: generated OT server constructor
-
-		return nil, nil
-
-	}`
 
 // Part of code generation compilation pass; provides instantiation snippet
 func (node *OpenTelemetryServerWrapper) AddInstantiation(builder golang.GraphBuilder) error {
@@ -100,24 +118,137 @@ func (node *OpenTelemetryServerWrapper) AddInstantiation(builder golang.GraphBui
 		return nil
 	}
 
-	// TODO: generate the OT wrapper instantiation
-
-	// Instantiate the code template
-	t, err := template.New(node.WrapperName).Parse(serverBuildFuncTemplate)
+	iface, err := golang.GetGoInterface(builder, node.Wrapped)
 	if err != nil {
 		return err
 	}
 
-	// Generate the code
-	buf := &bytes.Buffer{}
-	err = t.Execute(buf, node)
+	collector_iface, err := golang.GetGoInterface(builder, node.Collector)
 	if err != nil {
 		return err
 	}
 
-	slog.Info("instantiating ot server client")
-	return builder.Declare(node.WrapperName, buf.String())
+	constructor := &gocode.Constructor{
+		Package: builder.Module().Info().Name + "/" + node.outputPackage,
+		Func: gocode.Func{
+			Name: fmt.Sprintf("New_%v_OTServerWrapper", iface.BaseName),
+			Arguments: []gocode.Variable{
+				{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}},
+				{Name: "service", Type: iface},
+				{Name: "otCollectorClient", Type: collector_iface},
+			},
+		},
+	}
+
+	return builder.DeclareConstructor(node.WrapperName, constructor, []blueprint.IRNode{node.Wrapped, node.Collector})
 }
 
-func (node *OpenTelemetryServerWrapper) ImplementsGolangNode()    {}
-func (node *OpenTelemetryServerWrapper) ImplementsGolangService() {}
+type serverArgs struct {
+	Package   golang.PackageInfo
+	Service   *gocode.ServiceInterface
+	Impl      *gocode.ServiceInterface
+	CollIface *gocode.ServiceInterface
+	Name      string
+	IfaceName string
+	Imports   *gogen.Imports
+}
+
+func generateServerHandler(builder golang.ModuleBuilder, wrapped *gocode.ServiceInterface, impl *gocode.ServiceInterface, coll_iface *gocode.ServiceInterface, outputPackage string) error {
+	pkg, err := builder.CreatePackage(outputPackage)
+	if err != nil {
+		return err
+	}
+
+	server := &serverArgs{
+		Package:   pkg,
+		Service:   wrapped,
+		Impl:      impl,
+		CollIface: coll_iface,
+		Name:      wrapped.BaseName + "_OTServerWrapper",
+		IfaceName: impl.Name,
+		Imports:   gogen.NewImports(pkg.Name),
+	}
+
+	server.Imports.AddPackages("context", "go.opentelemetry.io/otel/trace", "gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend")
+
+	slog.Info(fmt.Sprintf("Generating %v/%v", server.Package.PackageName, impl.Name))
+	outputFile := filepath.Join(server.Package.Path, impl.Name+".go")
+	return gogen.ExecuteTemplateToFile("OTServerWrapper", serverTemplate, server, outputFile)
+}
+
+func generateClientSideInterfaces(builder golang.ModuleBuilder, iface *gocode.ServiceInterface, outputPackage string) error {
+	pkg, err := builder.CreatePackage(outputPackage)
+	if err != nil {
+		return err
+	}
+
+	server := &serverArgs{
+		Package:   pkg,
+		Impl:      iface,
+		IfaceName: iface.Name,
+		Imports:   gogen.NewImports(pkg.Name),
+	}
+
+	server.Imports.AddPackages("context")
+	slog.Info(fmt.Sprintf("Generating %v/%v", server.Package.PackageName, iface.Name))
+	outputFile := filepath.Join(server.Package.Path, iface.Name+".go")
+	return gogen.ExecuteTemplateToFile("OTServerWrapper", clientTemplate, server, outputFile)
+}
+
+var serverTemplate = `// Blueprint: Auto-generated by XTrace Plugin
+package {{.Package.ShortName}}
+
+{{.Imports}}
+
+type {{.IfaceName}} interface {
+	{{range $_, $f := .Impl.Methods -}}
+	{{Signature $f}}
+	{{end}}
+}
+
+type {{.Name}} struct {
+	Service {{.Imports.NameOf .Service.UserType}}
+	CollClient {{.Imports.NameOf .CollIface.UserType}}
+}
+
+func New_{{.Name}}(ctx context.Context, service {{.Imports.NameOf .Service.UserType}}, coll_client {{.Imports.NameOf .CollIface.UserType}}) (*{{.Name}}, error) {
+	handler := &{{.Name}}{}
+	handler.Service = service
+	handler.CollClient = coll_client
+	return handler, nil
+}
+
+{{$service := .Service.Name -}}
+{{$receiver := .Name -}}
+{{range $_, $f := .Service.Methods}}
+func (handler *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}, trace_ctx string) ({{RetVarsAndTypes $f "err error"}}) {
+	if trace_ctx != "" {
+		span_ctx_config, _ := backend.GetSpanContext(trace_ctx)
+		span_ctx := trace.NewSpanContext(span_ctx_config)
+		ctx = trace.ContextWithRemoteSpanContext(ctx, span_ctx)
+	}
+
+	tp, _ := handler.CollClient.GetTracerProvider(ctx)
+	tr := tp.Tracer("{{$service}}")
+	ctx, span := tr.Start(ctx, "{{$f.Name}} start")
+	defer span.End()
+	{{RetVars $f "err"}} = handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
+	if err != nil {
+		span.RecordError(err)
+	}
+	return
+}
+{{end}}
+`
+
+var clientTemplate = `// Blueprint: Auto-generated by OT plugin
+package {{.Package.ShortName}}
+
+{{.Imports}}
+
+type {{.IfaceName}} interface {
+	{{range $_, $f := .Impl.Methods -}}
+	{{Signature $f}}
+	{{end}}
+}
+`
