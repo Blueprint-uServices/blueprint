@@ -187,7 +187,7 @@ func (handler *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.C
 	ctx, span := tr.Start(ctx, "{{$f.Name}} start")
 	defer span.End()
 	trace_ctx, _ := span.SpanContext().MarshalJSON()
-	{{RetVars $f "err"}} = handler.Client.{{$f.Name}}({{ArgVars $f "ctx}}, string(trace_ctx))
+	{{RetVars $f "err"}} = handler.Client.{{$f.Name}}({{ArgVars $f "ctx"}}, string(trace_ctx))
 	if err != nil {
 		span.RecordError(err)
 	}
