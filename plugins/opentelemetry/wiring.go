@@ -48,7 +48,7 @@ func InstrumentUsingCustomCollector(wiring blueprint.WiringSpec, serviceName str
 			return nil, err
 		}
 
-		var collectorClient *OpenTelemetryCollectorClient
+		var collectorClient OpenTelemetryCollectorInterface
 		err = namespace.Get(collectorName, &collectorClient)
 		if err != nil {
 			return nil, err
@@ -68,7 +68,7 @@ func InstrumentUsingCustomCollector(wiring blueprint.WiringSpec, serviceName str
 			return nil, err
 		}
 
-		var collectorClient *OpenTelemetryCollectorClient
+		var collectorClient OpenTelemetryCollectorInterface
 		err = namespace.Get(collectorName, &collectorClient)
 		if err != nil {
 			return nil, err

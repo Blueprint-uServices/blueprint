@@ -29,8 +29,8 @@ func GenerateServerHandler(builder golang.ModuleBuilder, service *gocode.Service
 
 	server.Imports.AddPackages("context", "encoding/json", "net/http", "github.com/gorilla/mux")
 
-	slog.Info(fmt.Sprintf("Generating %v/%v_HTTPServer.go", server.Package.PackageName, service.Name))
-	outputFile := filepath.Join(server.Package.Path, service.Name+"_HTTPServer.go")
+	slog.Info(fmt.Sprintf("Generating %v/%v_HTTPServer.go", server.Package.PackageName, service.BaseName))
+	outputFile := filepath.Join(server.Package.Path, service.BaseName+"_HTTPServer.go")
 	return gogen.ExecuteTemplateToFile("HTTPServer", serverTemplate, server, outputFile)
 }
 
