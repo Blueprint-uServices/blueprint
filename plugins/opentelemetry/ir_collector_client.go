@@ -13,6 +13,12 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+type OpenTelemetryCollectorInterface interface {
+	golang.Node
+	golang.Instantiable
+	ImplementsOTCollectorClient()
+}
+
 type OpenTelemetryCollectorClient struct {
 	golang.Node
 	golang.Instantiable
@@ -87,3 +93,5 @@ func (node *OpenTelemetryCollectorClient) AddToWorkspace(builder golang.Workspac
 }
 
 func (node *OpenTelemetryCollectorClient) ImplementsGolangNode() {}
+
+func (node *OpenTelemetryCollectorClient) ImplementsOTCollectorClient() {}

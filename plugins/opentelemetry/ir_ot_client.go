@@ -19,10 +19,10 @@ type OpenTelemetryClientWrapper struct {
 	WrapperName   string
 	outputPackage string
 	Wrapped       golang.Service
-	Collector     *OpenTelemetryCollectorClient
+	Collector     OpenTelemetryCollectorInterface
 }
 
-func newOpenTelemetryClientWrapper(name string, server golang.Service, collector *OpenTelemetryCollectorClient) (*OpenTelemetryClientWrapper, error) {
+func newOpenTelemetryClientWrapper(name string, server golang.Service, collector OpenTelemetryCollectorInterface) (*OpenTelemetryClientWrapper, error) {
 	node := &OpenTelemetryClientWrapper{}
 	node.WrapperName = name
 	node.Wrapped = server
