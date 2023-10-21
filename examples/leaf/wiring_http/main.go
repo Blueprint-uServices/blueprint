@@ -15,7 +15,6 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplenosqldb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/zipkin"
 )
 
 func serviceDefaults(wiring blueprint.WiringSpec, serviceName string, collectorName string) string {
@@ -24,8 +23,8 @@ func serviceDefaults(wiring blueprint.WiringSpec, serviceName string, collectorN
 	//healthchecker.AddHealthCheckAPI(wiring, serviceName)
 	//circuitbreaker.AddCircuitBreaker(wiring, serviceName, 1000, 0.1, "1s")
 	//xtrace.Instrument(wiring, serviceName)
-	//opentelemetry.Instrument(wiring, serviceName)
-	opentelemetry.InstrumentUsingCustomCollector(wiring, serviceName, collectorName)
+	opentelemetry.Instrument(wiring, serviceName)
+	//opentelemetry.InstrumentUsingCustomCollector(wiring, serviceName, collectorName)
 	http.Deploy(wiring, serviceName)
 	return goproc.CreateProcess(wiring, procName, serviceName)
 }
@@ -45,7 +44,8 @@ func main() {
 	b_cache := simplecache.Define(wiring, "b_cache")
 	//b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
 	//b_cache := redis.PrebuiltProcess(wiring, "b_cache")
-	trace_collector := zipkin.DefineZipkinCollector(wiring, "zipkin")
+	//trace_collector := zipkin.DefineZipkinCollector(wiring, "zipkin")
+	trace_collector := ""
 	b := workflow.Define(wiring, "b", "LeafServiceImpl", b_cache, b_database)
 
 	a := workflow.Define(wiring, "a", "NonLeafService", b)
