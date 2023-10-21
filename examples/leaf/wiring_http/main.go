@@ -10,12 +10,12 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/jaeger"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplenosqldb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/zipkin"
 )
 
 func serviceDefaults(wiring blueprint.WiringSpec, serviceName string, collectorName string) string {
@@ -45,7 +45,7 @@ func main() {
 	b_cache := simplecache.Define(wiring, "b_cache")
 	//b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
 	//b_cache := redis.PrebuiltProcess(wiring, "b_cache")
-	trace_collector := jaeger.DefineJaegerCollector(wiring, "jaeger")
+	trace_collector := zipkin.DefineZipkinCollector(wiring, "zipkin")
 	b := workflow.Define(wiring, "b", "LeafServiceImpl", b_cache, b_database)
 
 	a := workflow.Define(wiring, "a", "NonLeafService", b)
