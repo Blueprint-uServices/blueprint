@@ -75,3 +75,11 @@ func (node *RedisProcess) GetInterface(ctx blueprint.BuildContext) (service.Serv
 func (r *RedisProcess) GenerateArtifacts(outputDir string) error {
 	return nil
 }
+
+func (node *RedisProcess) AddContainerArtifacts(target docker.ContainerWorkspace) error {
+	return nil
+}
+
+func (node *RedisProcess) AddContainerInstance(target docker.ContainerWorkspace) error {
+	return target.DeclarePrebuiltInstance(node.InstanceName, "redis", node.BindAddr)
+}

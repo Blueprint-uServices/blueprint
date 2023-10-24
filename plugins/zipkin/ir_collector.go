@@ -73,11 +73,9 @@ func (node *ZipkinCollector) GetInterface(ctx blueprint.BuildContext) (service.S
 }
 
 func (node *ZipkinCollector) AddContainerArtifacts(targer docker.ContainerWorkspace) error {
-	// TODO: IMplement
 	return nil
 }
 
 func (node *ZipkinCollector) AddContainerInstance(target docker.ContainerWorkspace) error {
-	// TODO: Implement
-	return nil
+	return target.DeclarePrebuiltInstance(node.CollectorName, "openzipkin/zipkin", node.BindAddr)
 }

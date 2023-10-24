@@ -72,3 +72,11 @@ func (node *MemcachedProcess) GetInterface(ctx blueprint.BuildContext) (service.
 	iface := node.Iface.ServiceInterface(ctx)
 	return &MemcachedInterface{Wrapped: iface}, nil
 }
+
+func (node *MemcachedProcess) AddContainerArtifacts(target docker.ContainerWorkspace) error {
+	return nil
+}
+
+func (node *MemcachedProcess) AddContainerInstance(target docker.ContainerWorkspace) error {
+	return target.DeclarePrebuiltInstance(node.InstanceName, "memcached", node.BindAddr)
+}

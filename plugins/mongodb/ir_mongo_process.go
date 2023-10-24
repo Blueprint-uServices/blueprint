@@ -77,11 +77,9 @@ func (m *MongoDBProcess) GenerateArtifacts(outdir string) error {
 }
 
 func (node *MongoDBProcess) AddContainerArtifacts(targer docker.ContainerWorkspace) error {
-	// TODO: IMplement
 	return nil
 }
 
 func (node *MongoDBProcess) AddContainerInstance(target docker.ContainerWorkspace) error {
-	// TODO: Implement
-	return nil
+	return target.DeclarePrebuiltInstance(node.InstanceName, "mongo", node.BindAddr)
 }
