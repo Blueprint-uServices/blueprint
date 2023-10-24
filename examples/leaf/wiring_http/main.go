@@ -11,9 +11,9 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplenosqldb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
@@ -40,7 +40,8 @@ func main() {
 
 	workflow.Init("../workflow")
 
-	b_database := simplenosqldb.Define(wiring, "b_database")
+	//b_database := simplenosqldb.Define(wiring, "b_database")
+	b_database := mongodb.PrebuiltProcess(wiring, "b_database")
 	b_cache := simplecache.Define(wiring, "b_cache")
 	//b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
 	//b_cache := redis.PrebuiltProcess(wiring, "b_cache")
