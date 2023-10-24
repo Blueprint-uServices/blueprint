@@ -71,3 +71,11 @@ func (node *XTraceServer) GetInterface(ctx blueprint.BuildContext) (service.Serv
 	iface := node.Iface.ServiceInterface(ctx)
 	return &XTraceInterface{Wrapped: iface}, nil
 }
+
+func (node *XTraceServer) AddContainerArtifacts(target docker.ContainerWorkspace) error {
+	return nil
+}
+
+func (node *XTraceServer) AddContainerInstance(target docker.ContainerWorkspace) error {
+	return target.DeclarePrebuiltInstance(node.ServerName, "jonathanmace/xtrace-server:latest", node.BindAddr)
+}

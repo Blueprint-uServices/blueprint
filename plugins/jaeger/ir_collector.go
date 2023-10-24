@@ -73,11 +73,9 @@ func (node *JaegerCollector) GetInterface(ctx blueprint.BuildContext) (service.S
 }
 
 func (node *JaegerCollector) AddContainerArtifacts(targer docker.ContainerWorkspace) error {
-	// TODO: IMplement
 	return nil
 }
 
 func (node *JaegerCollector) AddContainerInstance(target docker.ContainerWorkspace) error {
-	// TODO: Implement
-	return nil
+	return target.DeclarePrebuiltInstance(node.CollectorName, "jaegertracing/all-in-one:latest", node.BindAddr)
 }
