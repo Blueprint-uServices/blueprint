@@ -81,5 +81,10 @@ func (node *MongoDBProcess) AddContainerArtifacts(targer docker.ContainerWorkspa
 }
 
 func (node *MongoDBProcess) AddContainerInstance(target docker.ContainerWorkspace) error {
+	instanceName := blueprint.CleanName(node.InstanceName)
+
+	node.BindAddr.Hostname = instanceName
+	node.BindAddr.Port = 27017
+
 	return target.DeclarePrebuiltInstance(node.InstanceName, "mongo", node.BindAddr)
 }

@@ -78,5 +78,10 @@ func (node *MemcachedProcess) AddContainerArtifacts(target docker.ContainerWorks
 }
 
 func (node *MemcachedProcess) AddContainerInstance(target docker.ContainerWorkspace) error {
+	instanceName := blueprint.CleanName(node.InstanceName)
+
+	node.BindAddr.Hostname = instanceName
+	node.BindAddr.Port = 11211
+
 	return target.DeclarePrebuiltInstance(node.InstanceName, "memcached", node.BindAddr)
 }

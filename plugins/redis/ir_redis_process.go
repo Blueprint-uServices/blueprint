@@ -81,5 +81,10 @@ func (node *RedisProcess) AddContainerArtifacts(target docker.ContainerWorkspace
 }
 
 func (node *RedisProcess) AddContainerInstance(target docker.ContainerWorkspace) error {
+	instanceName := blueprint.CleanName(node.InstanceName)
+
+	node.BindAddr.Hostname = instanceName
+	node.BindAddr.Port = 6379 // Just use default redis port
+
 	return target.DeclarePrebuiltInstance(node.InstanceName, "redis", node.BindAddr)
 }

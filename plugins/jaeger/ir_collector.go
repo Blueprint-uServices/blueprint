@@ -77,5 +77,10 @@ func (node *JaegerCollector) AddContainerArtifacts(targer docker.ContainerWorksp
 }
 
 func (node *JaegerCollector) AddContainerInstance(target docker.ContainerWorkspace) error {
+	instanceName := blueprint.CleanName(node.CollectorName)
+
+	node.BindAddr.Hostname = instanceName
+	node.BindAddr.Port = 14268
+
 	return target.DeclarePrebuiltInstance(node.CollectorName, "jaegertracing/all-in-one:latest", node.BindAddr)
 }
