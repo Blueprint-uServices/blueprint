@@ -28,20 +28,23 @@ func TestBasicClientPool(t *testing.T) {
 
 	assertIR(t, app,
 		`TestBasicClientPool = BlueprintApplication() {
-			leaf.grpc.addr = GolangServerAddress()
+			leaf.grpc.addr
+			leaf.grpc.bind_addr = AddressConfig()
 			leaf.handler.visibility
-			leafproc = GolangProcessNode(leaf.grpc.addr) {
+			leafproc = GolangProcessNode(leaf.grpc.bind_addr) {
 			  leaf = TestLeafService()
-			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.addr)
+			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
 			}
-			nonleaf.grpc.addr = GolangServerAddress()
+			nonleaf.grpc.addr
+			nonleaf.grpc.bind_addr = AddressConfig()
 			nonleaf.handler.visibility
-			nonleafproc = GolangProcessNode(nonleaf.grpc.addr, leaf.grpc.addr) {
+			leaf.grpc.dial_addr = AddressConfig()
+			nonleafproc = GolangProcessNode(nonleaf.grpc.bind_addr, leaf.grpc.dial_addr) {
 			  leaf.clientpool = ClientPool(leaf.grpc_client, 7) {
-				leaf.grpc_client = GRPCClient(leaf.grpc.addr)
+				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 			  }
 			  nonleaf = TestNonLeafService(leaf.clientpool)
-			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.addr)
+			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 		  }`)
 
@@ -66,21 +69,24 @@ func TestBasicClientPoolInnerModifier(t *testing.T) {
 
 	assertIR(t, app,
 		`TestBasicClientPoolInnerModifier = BlueprintApplication() {
-			leaf.grpc.addr = GolangServerAddress()
+			leaf.grpc.addr
+			leaf.grpc.bind_addr = AddressConfig()
 			leaf.handler.visibility
-			leafproc = GolangProcessNode(leaf.grpc.addr) {
+			leafproc = GolangProcessNode(leaf.grpc.bind_addr) {
 			  leaf = TestLeafService()
-			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.addr)
+			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
 			}
-			nonleaf.grpc.addr = GolangServerAddress()
+			nonleaf.grpc.addr
+			nonleaf.grpc.bind_addr = AddressConfig()
 			nonleaf.handler.visibility
-			nonleafproc = GolangProcessNode(nonleaf.grpc.addr, leaf.grpc.addr) {
+			leaf.grpc.dial_addr = AddressConfig()
+			nonleafproc = GolangProcessNode(nonleaf.grpc.bind_addr, leaf.grpc.dial_addr) {
 			  leaf.clientpool = ClientPool(leaf.client.retrier, 7) {
-				leaf.grpc_client = GRPCClient(leaf.grpc.addr)
+				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 				leaf.client.retrier = Retrier(leaf.grpc_client)
 			  }
 			  nonleaf = TestNonLeafService(leaf.clientpool)
-			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.addr)
+			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 		  }`)
 
@@ -104,21 +110,24 @@ func TestBasicClientPoolOuterModifier(t *testing.T) {
 
 	assertIR(t, app,
 		`TestBasicClientPoolOuterModifier = BlueprintApplication() {
-			leaf.grpc.addr = GolangServerAddress()
+			leaf.grpc.addr
+			leaf.grpc.bind_addr = AddressConfig()
 			leaf.handler.visibility
-			leafproc = GolangProcessNode(leaf.grpc.addr) {
+			leafproc = GolangProcessNode(leaf.grpc.bind_addr) {
 			  leaf = TestLeafService()
-			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.addr)
+			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
 			}
-			nonleaf.grpc.addr = GolangServerAddress()
+			nonleaf.grpc.addr
+			nonleaf.grpc.bind_addr = AddressConfig()
 			nonleaf.handler.visibility
-			nonleafproc = GolangProcessNode(nonleaf.grpc.addr, leaf.grpc.addr) {
+			leaf.grpc.dial_addr = AddressConfig()
+			nonleafproc = GolangProcessNode(nonleaf.grpc.bind_addr, leaf.grpc.dial_addr) {
 			  leaf.clientpool = ClientPool(leaf.grpc_client, 7) {
-				leaf.grpc_client = GRPCClient(leaf.grpc.addr)
+				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 			  }
 			  leaf.client.retrier = Retrier(leaf.clientpool)
 			  nonleaf = TestNonLeafService(leaf.client.retrier)
-			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.addr)
+			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 		  }`)
 
