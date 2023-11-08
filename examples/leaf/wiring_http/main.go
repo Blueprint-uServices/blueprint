@@ -42,9 +42,9 @@ func main() {
 	workflow.Init("../workflow")
 
 	//b_database := simplenosqldb.Define(wiring, "b_database")
-	b_database := mongodb.PrebuiltProcess(wiring, "b_database")
+	b_database := mongodb.PrebuiltContainer(wiring, "b_database")
 	//b_cache := simplecache.Define(wiring, "b_cache")
-	b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
+	b_cache := memcached.PrebuiltContainer(wiring, "b_cache")
 	//b_cache := redis.PrebuiltProcess(wiring, "b_cache")
 	trace_collector := zipkin.DefineZipkinCollector(wiring, "zipkin")
 	//trace_collector := ""
