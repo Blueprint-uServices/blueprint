@@ -80,7 +80,7 @@ func (node *XTraceServer) AddContainerInstance(target docker.ContainerWorkspace)
 	instanceName := blueprint.CleanName(node.ServerName)
 
 	node.BindAddr.Hostname = instanceName
-	node.BindAddr.Port = 8080
+	node.BindAddr.Port = 5563
 
 	return target.DeclarePrebuiltInstance(node.ServerName, "jonathanmace/xtrace-server:latest", node.BindAddr)
 }
