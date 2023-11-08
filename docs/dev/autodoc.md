@@ -14,4 +14,11 @@ cd blueprint
 gomarkdoc --output '{{.Dir}}/README.md' ./...
 ```
 
+Currently we use `gomarkdoc` to auto-generate READMEs for the following:
+```
+blueprint
+plugins
+runtime
+```
+
 For further information see the [gomarkdoc](https://github.com/princjef/gomarkdoc/tree/master) github repo.
