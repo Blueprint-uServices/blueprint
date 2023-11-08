@@ -1,0 +1,31 @@
+name: Generate Docs
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.20
+        
+    - name: GenDocs
+      id: GenDocs
+      continue-on-error: true
+      run: |
+        GO111MODULE=on go get -u github.com/princjef/gomarkdoc/cmd/gomarkdoc
+        ~/go/bin/gomarkdoc . > ./docs.md
+        exit $(git diff --exit-code docs.md)
+    - name: Commit Changes
+      if: steps.GenDocs.outcome == 'failure'
+      run: |
+        git config --global user.name 'AutoDocAction'
+        git config --global user.email 'AudoDocAction@no-reply.com'
+        git add docs.md
+        git commit -m "auto generated docs"
+        git push
