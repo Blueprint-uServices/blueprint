@@ -1,4 +1,4 @@
-# blueprintv2
+# blueprintv2 
 
 This repository is a work-in-progress refactor and reimplementation of several components of Blueprint.  v1 of Blueprint can be found on the [MPI-SWS GitLab cld/blueprint](https://gitlab.mpi-sws.org/cld/blueprint).
 
