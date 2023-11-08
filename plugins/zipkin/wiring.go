@@ -13,13 +13,13 @@ func DefineZipkinCollector(wiring blueprint.WiringSpec, collectorName string) st
 	collectorDst := collectorName + ".dst"
 	collectorClient := collectorName + ".client"
 
-	wiring.Define(collectorProc, &ZipkinCollector{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := address.Bind[*ZipkinCollector](ns, collectorAddr)
+	wiring.Define(collectorProc, &ZipkinCollectorContainer{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
+		addr, err := address.Bind[*ZipkinCollectorContainer](ns, collectorAddr)
 		if err != nil {
 			return nil, err
 		}
 
-		return newZipkinCollector(collectorProc, addr.Bind)
+		return newZipkinCollectorContainer(collectorProc, addr.Bind)
 	})
 
 	wiring.Alias(collectorDst, collectorProc)
@@ -34,7 +34,7 @@ func DefineZipkinCollector(wiring blueprint.WiringSpec, collectorName string) st
 	clientNext := ptr.AddSrcModifier(wiring, collectorClient)
 
 	wiring.Define(collectorClient, &ZipkinCollectorClient{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := address.Dial[*ZipkinCollector](ns, clientNext)
+		addr, err := address.Dial[*ZipkinCollectorContainer](ns, clientNext)
 		if err != nil {
 			return nil, err
 		}
@@ -42,7 +42,7 @@ func DefineZipkinCollector(wiring blueprint.WiringSpec, collectorName string) st
 		return newZipkinCollectorClient(collectorClient, addr.Dial)
 	})
 
-	address.Define[*ZipkinCollector](wiring, collectorAddr, collectorProc, &blueprint.ApplicationNode{})
+	address.Define[*ZipkinCollectorContainer](wiring, collectorAddr, collectorProc, &blueprint.ApplicationNode{})
 	ptr.AddDstModifier(wiring, collectorAddr)
 
 	return collectorName

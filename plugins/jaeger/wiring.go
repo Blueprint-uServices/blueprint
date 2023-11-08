@@ -13,13 +13,13 @@ func DefineJaegerCollector(wiring blueprint.WiringSpec, collectorName string) st
 	collectorDst := collectorName + ".dst"
 	collectorClient := collectorName + ".client"
 
-	wiring.Define(collectorProc, &JaegerCollector{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := address.Bind[*JaegerCollector](ns, collectorAddr)
+	wiring.Define(collectorProc, &JaegerCollectorContainer{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
+		addr, err := address.Bind[*JaegerCollectorContainer](ns, collectorAddr)
 		if err != nil {
 			return nil, err
 		}
 
-		return newJaegerCollector(collectorProc, addr.Bind)
+		return newJaegerCollectorContainer(collectorProc, addr.Bind)
 	})
 
 	wiring.Alias(collectorDst, collectorProc)
@@ -34,7 +34,7 @@ func DefineJaegerCollector(wiring blueprint.WiringSpec, collectorName string) st
 	clientNext := ptr.AddSrcModifier(wiring, collectorClient)
 
 	wiring.Define(collectorClient, &JaegerCollectorClient{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := address.Dial[*JaegerCollector](ns, clientNext)
+		addr, err := address.Dial[*JaegerCollectorContainer](ns, clientNext)
 		if err != nil {
 			return nil, err
 		}
@@ -42,7 +42,7 @@ func DefineJaegerCollector(wiring blueprint.WiringSpec, collectorName string) st
 		return newJaegerCollectorClient(collectorClient, addr.Dial)
 	})
 
-	address.Define[*JaegerCollector](wiring, collectorAddr, collectorProc, &blueprint.ApplicationNode{})
+	address.Define[*JaegerCollectorContainer](wiring, collectorAddr, collectorProc, &blueprint.ApplicationNode{})
 	ptr.AddDstModifier(wiring, collectorAddr)
 
 	return collectorName

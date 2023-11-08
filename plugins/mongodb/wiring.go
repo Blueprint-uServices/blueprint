@@ -6,17 +6,17 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
 )
 
-func PrebuiltProcess(wiring blueprint.WiringSpec, dbName string) string {
+func PrebuiltContainer(wiring blueprint.WiringSpec, dbName string) string {
 	procName := dbName + ".process"
 	clientName := dbName + ".client"
 	addrName := dbName + ".addr"
 
-	wiring.Define(procName, &MongoDBProcess{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := address.Bind[*MongoDBProcess](ns, addrName)
+	wiring.Define(procName, &MongoDBContainer{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
+		addr, err := address.Bind[*MongoDBContainer](ns, addrName)
 		if err != nil {
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", procName, addrName, err)
 		}
-		return newMongoDBProcess(procName, addr.Bind)
+		return newMongoDBContainer(procName, addr.Bind)
 	})
 
 	dstName := dbName + ".dst"
@@ -26,14 +26,14 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, dbName string) string {
 	pointer.CreatePointer(wiring, dbName, &MongoDBGoClient{}, dstName)
 	ptr := pointer.GetPointer(wiring, dbName)
 
-	address.Define[*MongoDBProcess](wiring, addrName, procName, &blueprint.ApplicationNode{})
+	address.Define[*MongoDBContainer](wiring, addrName, procName, &blueprint.ApplicationNode{})
 
 	ptr.AddDstModifier(wiring, addrName)
 
 	clientNext := ptr.AddSrcModifier(wiring, clientName)
 
 	wiring.Define(clientName, &MongoDBGoClient{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := address.Dial[*MongoDBProcess](ns, clientNext)
+		addr, err := address.Dial[*MongoDBContainer](ns, clientNext)
 		if err != nil {
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", clientName, clientNext, err)
 		}

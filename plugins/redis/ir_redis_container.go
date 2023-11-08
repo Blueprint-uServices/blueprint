@@ -10,7 +10,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
-type RedisProcess struct {
+type RedisContainer struct {
 	docker.Container
 	backend.Cache
 
@@ -32,8 +32,8 @@ func (r *RedisInterface) GetMethods() []service.Method {
 	return r.Wrapped.GetMethods()
 }
 
-func newRedisProcess(name string, addr *address.BindConfig) (*RedisProcess, error) {
-	proc := &RedisProcess{}
+func newRedisContainer(name string, addr *address.BindConfig) (*RedisContainer, error) {
+	proc := &RedisContainer{}
 	proc.InstanceName = name
 	proc.BindAddr = addr
 	err := proc.init(name)
@@ -43,7 +43,7 @@ func newRedisProcess(name string, addr *address.BindConfig) (*RedisProcess, erro
 	return proc, nil
 }
 
-func (node *RedisProcess) init(name string) error {
+func (node *RedisContainer) init(name string) error {
 	workflow.Init("../../runtime")
 
 	spec, err := workflow.GetSpec()
@@ -59,28 +59,28 @@ func (node *RedisProcess) init(name string) error {
 	return nil
 }
 
-func (r *RedisProcess) String() string {
+func (r *RedisContainer) String() string {
 	return r.InstanceName + " = RedisProcess(" + r.BindAddr.Name() + ")"
 }
 
-func (r *RedisProcess) Name() string {
+func (r *RedisContainer) Name() string {
 	return r.InstanceName
 }
 
-func (node *RedisProcess) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *RedisContainer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
 	iface := node.Iface.ServiceInterface(ctx)
 	return &RedisInterface{Wrapped: iface}, nil
 }
 
-func (r *RedisProcess) GenerateArtifacts(outputDir string) error {
+func (r *RedisContainer) GenerateArtifacts(outputDir string) error {
 	return nil
 }
 
-func (node *RedisProcess) AddContainerArtifacts(target docker.ContainerWorkspace) error {
+func (node *RedisContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error {
 	return nil
 }
 
-func (node *RedisProcess) AddContainerInstance(target docker.ContainerWorkspace) error {
+func (node *RedisContainer) AddContainerInstance(target docker.ContainerWorkspace) error {
 	node.BindAddr.Port = 6379 // Just use default redis port
 	return target.DeclarePrebuiltInstance(node.InstanceName, "redis", node.BindAddr)
 }
