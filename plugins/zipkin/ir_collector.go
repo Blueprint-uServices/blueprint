@@ -77,10 +77,6 @@ func (node *ZipkinCollector) AddContainerArtifacts(targer docker.ContainerWorksp
 }
 
 func (node *ZipkinCollector) AddContainerInstance(target docker.ContainerWorkspace) error {
-	instanceName := blueprint.CleanName(node.CollectorName)
-
-	node.BindAddr.Hostname = instanceName
 	node.BindAddr.Port = 9411
-
-	return target.DeclarePrebuiltInstance(instanceName, "openzipkin/zipkin", node.BindAddr)
+	return target.DeclarePrebuiltInstance(node.CollectorName, "openzipkin/zipkin", node.BindAddr)
 }
