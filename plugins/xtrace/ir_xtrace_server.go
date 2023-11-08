@@ -77,6 +77,6 @@ func (node *XTraceServer) AddContainerArtifacts(target docker.ContainerWorkspace
 }
 
 func (node *XTraceServer) AddContainerInstance(target docker.ContainerWorkspace) error {
-	node.BindAddr.Port = 8080
+	node.BindAddr.Port = 5563
 	return target.DeclarePrebuiltInstance(node.ServerName, "jonathanmace/xtrace-server:latest", node.BindAddr)
 }
