@@ -1,3 +1,5 @@
+// Package ioutil implements filesystem related utility methods primarily for use by
+// plugins that produce artifacts onto the local filesystem.
 package ioutil
 
 import (
@@ -6,6 +8,7 @@ import (
 	"path/filepath"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
 )
 
 // Returns true if the specified path exists and is a directory; false otherwise
@@ -16,10 +19,11 @@ func IsDir(path string) bool {
 	return false
 }
 
-/*
-Checks if the specified path exists and is a directory.
-If `createIfAbsent` is true, then this will attempt to create the directory
-*/
+// Returns nil if the specified path exists and is a directory; if not returns an error.
+// If the specified path does not exist, then createIfAbsent dictates whether the
+// path is either created, or an error is returned.
+// This method can also return an error if it was unable to create a directory at
+// the given path.
 func CheckDir(path string, createIfAbsent bool) error {
 	if info, err := os.Stat(path); err == nil {
 		if info.IsDir() {
@@ -41,17 +45,10 @@ func CheckDir(path string, createIfAbsent bool) error {
 	}
 }
 
-/*
-Creates a subdirectory under the provided workspaceDir for the provided node.
-
-The node's name is used to name the subdirectory (the node name is first cleaned).
-
-# Returns the path to the subdirectory
-
-Will return an error if the subdirectory already exists
-*/
+// Creates a subdirectory in the provided workspaceDir.
+// The provided name is first sanitized using [stringutil.CleanName]
 func CreateNodeDir(workspaceDir string, name string) (string, error) {
-	nodeDir := filepath.Join(workspaceDir, blueprint.CleanName(name))
+	nodeDir := filepath.Join(workspaceDir, stringutil.CleanName(name))
 	if err := CheckDir(nodeDir, true); err != nil {
 		return "", blueprint.Errorf("unable to create output dir for %v at %v due to %v", name, nodeDir, err.Error())
 	}

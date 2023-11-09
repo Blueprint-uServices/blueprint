@@ -6,6 +6,8 @@
 import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
 ```
 
+Package ioutil implements filesystem related utility methods primarily for use by plugins that produce artifacts onto the local filesystem.
+
 ## Index
 
 - [func CheckDir\(path string, createIfAbsent bool\) error](<#CheckDir>)
@@ -20,7 +22,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
 func CheckDir(path string, createIfAbsent bool) error
 ```
 
-Checks if the specified path exists and is a directory. If \`createIfAbsent\` is true, then this will attempt to create the directory
+Returns nil if the specified path exists and is a directory; if not returns an error. If the specified path does not exist, then createIfAbsent dictates whether the path is either created, or an error is returned. This method can also return an error if it was unable to create a directory at the given path.
 
 <a name="CreateNodeDir"></a>
 ## func CreateNodeDir
@@ -29,13 +31,7 @@ Checks if the specified path exists and is a directory. If \`createIfAbsent\` is
 func CreateNodeDir(workspaceDir string, name string) (string, error)
 ```
 
-Creates a subdirectory under the provided workspaceDir for the provided node.
-
-The node's name is used to name the subdirectory \(the node name is first cleaned\).
-
-### Returns the path to the subdirectory
-
-Will return an error if the subdirectory already exists
+Creates a subdirectory in the provided workspaceDir. The provided name is first sanitized using \[stringutil.CleanName\]
 
 <a name="IsDir"></a>
 ## func IsDir
