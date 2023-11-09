@@ -25,6 +25,12 @@ type IRConfig interface {
 	ImplementsIRConfig()
 }
 
+type ArtifactGenerator interface {
+
+	/* Generate artifacts to the provided fully-qualified directory on the local filesystem */
+	GenerateArtifacts(dir string) error
+}
+
 // The IR Node that represents the whole application
 type ApplicationNode struct {
 	IRNode

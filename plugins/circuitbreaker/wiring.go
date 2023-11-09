@@ -8,10 +8,12 @@ import (
 )
 
 // Adds circuit breaker functionality to all clients of the specified service.
+// Uses a [blueprint.WiringSpec].
 // Circuit breaker trips when `failure_rate` percentage of requests fail. Minimum number of requests for the circuit to break is specified using `min_reqs`.
 // The circuit breaker counters are reset after `interval` duration.
 // Usage:
-//    AddCircuitBreaker(wiring, "serviceA", 1000, 0.1, "1s")
+//
+//	AddCircuitBreaker(wiring, "serviceA", 1000, 0.1, "1s")
 func AddCircuitBreaker(wiring blueprint.WiringSpec, serviceName string, min_reqs int64, failure_rate float64, interval string) {
 	clientWrapper := serviceName + ".client.cb"
 

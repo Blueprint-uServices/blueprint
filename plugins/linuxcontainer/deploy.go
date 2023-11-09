@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/linuxgen"
@@ -27,7 +26,7 @@ type (
 		and manually call the run script.
 	*/
 	filesystemDeployer interface {
-		core.ArtifactGenerator
+		blueprint.ArtifactGenerator
 	}
 
 	/*

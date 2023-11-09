@@ -2,7 +2,6 @@ package docker
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 )
 
@@ -10,7 +9,7 @@ import (
 The base IRNode interface for docker containers
 */
 type Container interface {
-	core.ContainerNode
+	blueprint.IRNode
 	ImplementsDockerContainer()
 }
 

@@ -2,15 +2,13 @@ package linux
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
 )
 
 /*
 The base IRNode interface for linux processes
 */
 type Process interface {
-	core.ProcessNode
-
+	blueprint.IRNode
 	ImplementsLinuxProcess()
 }
 

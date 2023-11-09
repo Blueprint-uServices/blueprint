@@ -4,13 +4,10 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
 )
 
 /* A deployment is a collection of containers */
 type Deployment struct {
-	core.DeploymentNode
-
 	/* The implemented build targets for dockercompose.DockerCompose nodes */
 	dockerComposeDeployer /* Can be deployed as a docker-compose file; implemented in deploydockercompose.go */
 

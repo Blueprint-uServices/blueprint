@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
 )
 
 /*
@@ -27,8 +26,6 @@ var generatedModulePrefix = "blueprint/goproc"
 // An IRNode representing a golang process.
 // This is Blueprint's main implementation of Golang processes
 type Process struct {
-	core.ProcessNode
-
 	/* The implemented build targets for golang.Process nodes */
 	filesystemDeployer /* Can be deployed as a basic go process; implemented in deploy.go */
 	linuxDeployer      /* Can be deployed to linux; implemented in deploylinux.go */

@@ -26,7 +26,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/circuitbreaker"
 func AddCircuitBreaker(wiring blueprint.WiringSpec, serviceName string, min_reqs int64, failure_rate float64, interval string)
 ```
 
-Adds circuit breaker functionality to all clients of the specified service. Circuit breaker trips when \`failure\_rate\` percentage of requests fail. Minimum number of requests for the circuit to break is specified using \`min\_reqs\`. The circuit breaker counters are reset after \`interval\` duration. Usage:
+Adds circuit breaker functionality to all clients of the specified service. Uses a \[blueprint.WiringSpec\]. Circuit breaker trips when \`failure\_rate\` percentage of requests fail. Minimum number of requests for the circuit to break is specified using \`min\_reqs\`. The circuit breaker counters are reset after \`interval\` duration. Usage:
 
 ```
 AddCircuitBreaker(wiring, "serviceA", 1000, 0.1, "1s")

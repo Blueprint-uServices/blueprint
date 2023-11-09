@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
@@ -19,7 +18,7 @@ type (
 		generates a docker-compose.yml file on the local filesystem.
 	*/
 	dockerComposeDeployer interface {
-		core.ArtifactGenerator
+		blueprint.ArtifactGenerator
 	}
 
 	/*
