@@ -2,6 +2,8 @@ package blueprint
 
 import (
 	"strings"
+
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
 )
 
 // This file contains some of the core IR nodes for Blueprint
@@ -52,7 +54,7 @@ func (node *ApplicationNode) String() string {
 	for _, node := range node.Children {
 		children = append(children, node.String())
 	}
-	b.WriteString(Indent(strings.Join(children, "\n"), 2))
+	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
 	b.WriteString("\n}")
 	return b.String()
 }

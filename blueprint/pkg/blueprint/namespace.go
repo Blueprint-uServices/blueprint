@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
 	"golang.org/x/exp/slog"
 )
 
@@ -318,7 +319,7 @@ func (namespace *blueprintNamespace) Build() (IRNode, error) {
 func (namespace *SimpleNamespace) Info(message string, args ...any) {
 	if len(namespace.stack) > 0 {
 		src := namespace.stack[len(namespace.stack)-1]
-		callstack := src.Properties["callsite"][0].(*WiringCallstack)
+		callstack := src.Properties["callsite"][0].(*wiringCallstack)
 		slog.Info(fmt.Sprintf(fmt.Sprintf("%s %s: %s (%s)", namespace.NamespaceType, namespace.Name(), message, callstack.Stack[0].String()), args...))
 	} else {
 		slog.Info(fmt.Sprintf(fmt.Sprintf("%s %s: %s", namespace.NamespaceType, namespace.Name(), message), args...))
@@ -329,7 +330,7 @@ func (namespace *SimpleNamespace) Info(message string, args ...any) {
 func (namespace *SimpleNamespace) Debug(message string, args ...any) {
 	if len(namespace.stack) > 0 {
 		src := namespace.stack[len(namespace.stack)-1]
-		callstack := src.Properties["callsite"][0].(*WiringCallstack)
+		callstack := src.Properties["callsite"][0].(*wiringCallstack)
 		slog.Info(callstack.String())
 		slog.Debug(fmt.Sprintf(fmt.Sprintf("%s %s: %s (%s)", namespace.NamespaceType, namespace.Name(), message, callstack.Stack[0].String()), args...))
 	} else {
@@ -342,10 +343,14 @@ func (namespace *SimpleNamespace) Error(message string, args ...any) error {
 	formattedMessage := fmt.Sprintf(message, args...)
 	if len(namespace.stack) > 0 {
 		src := namespace.stack[len(namespace.stack)-1]
-		callstack := src.Properties["callsite"][0].(*WiringCallstack)
+		callstack := src.Properties["callsite"][0].(*wiringCallstack)
 		slog.Error(fmt.Sprintf("%s %s: %s (%s)", namespace.NamespaceType, namespace.Name(), formattedMessage, callstack.Stack[0].String()))
 	} else {
 		slog.Error(fmt.Sprintf("%s %s: %s", namespace.NamespaceType, namespace.Name(), formattedMessage))
 	}
 	return fmt.Errorf(formattedMessage)
+}
+
+func CleanName(name string) string {
+	return stringutil.CleanName(name)
 }

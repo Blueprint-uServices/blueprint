@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
 )
 
 /*
@@ -25,7 +26,7 @@ func GenerateRunFunc(name string, runfunc string, deps ...blueprint.IRNode) (str
 	templateArgs := runFuncTemplateArgs{
 		Name:         name,
 		Dependencies: deps,
-		RunFuncBody:  blueprint.Reindent(runfunc, 8),
+		RunFuncBody:  stringutil.Reindent(runfunc, 8),
 	}
 
 	return ExecuteTemplate("runfunc", runFuncTemplate, templateArgs)

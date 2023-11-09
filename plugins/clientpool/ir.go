@@ -7,6 +7,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
@@ -42,7 +43,7 @@ func (node *ClientPool) String() string {
 	for _, child := range node.ContainedNodes {
 		children = append(children, child.String())
 	}
-	b.WriteString(blueprint.Indent(strings.Join(children, "\n"), 2))
+	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
 	b.WriteString("\n}")
 	return b.String()
 }

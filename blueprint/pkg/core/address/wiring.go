@@ -2,6 +2,7 @@ package address
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
 )
 
 /*
@@ -87,9 +88,9 @@ func Bind[ServerType blueprint.IRNode](namespace blueprint.Namespace, addressNam
 }
 
 func bind(addressName string) string {
-	return blueprint.ReplaceSuffix(addressName, "addr", "bind_addr")
+	return stringutil.ReplaceSuffix(addressName, "addr", "bind_addr")
 }
 
 func dial(addressName string) string {
-	return blueprint.ReplaceSuffix(addressName, "addr", "dial_addr")
+	return stringutil.ReplaceSuffix(addressName, "addr", "dial_addr")
 }

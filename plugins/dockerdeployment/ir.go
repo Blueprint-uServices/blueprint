@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
 )
 
 /* A deployment is a collection of containers */
@@ -38,7 +39,7 @@ func (node *Deployment) String() string {
 	for _, child := range node.ContainedNodes {
 		children = append(children, child.String())
 	}
-	b.WriteString(blueprint.Indent(strings.Join(children, "\n"), 2))
+	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
 	b.WriteString("\n}")
 	return b.String()
 }

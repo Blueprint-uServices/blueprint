@@ -9,31 +9,25 @@ import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 ## Index
 
 - [Constants](<#constants>)
-- [func Capitalize\(s string\) string](<#Capitalize>)
 - [func CleanName\(name string\) string](<#CleanName>)
 - [func DisableCompilerLogging\(\)](<#DisableCompilerLogging>)
 - [func EnableCompilerLogging\(\)](<#EnableCompilerLogging>)
 - [func Errorf\(format string, a ...any\) error](<#Errorf>)
 - [func Filter\[T any\]\(nodes \[\]IRNode\) \[\]T](<#Filter>)
-- [func Indent\(str string, amount int\) string](<#Indent>)
 - [func NewBlueprintError\(msg string\) error](<#NewBlueprintError>)
 - [func RegisterDefaultBuilder\[T IRNode\]\(name string, buildFunc func\(outputDir string, node IRNode\) error\)](<#RegisterDefaultBuilder>)
 - [func RegisterDefaultNamespace\[T IRNode\]\(name string, buildFunc func\(outputDir string, nodes \[\]IRNode\) error\)](<#RegisterDefaultNamespace>)
-- [func Reindent\(str string, amount int\) string](<#Reindent>)
-- [func ReplaceSuffix\(s string, suffix string, replacement string\) string](<#ReplaceSuffix>)
 - [type ApplicationNode](<#ApplicationNode>)
   - [func \(app \*ApplicationNode\) Compile\(outputDir string\) error](<#ApplicationNode.Compile>)
   - [func \(node \*ApplicationNode\) Name\(\) string](<#ApplicationNode.Name>)
   - [func \(node \*ApplicationNode\) String\(\) string](<#ApplicationNode.String>)
+- [type ArtifactGenerator](<#ArtifactGenerator>)
 - [type Blueprint](<#Blueprint>)
   - [func \(blueprint \*Blueprint\) BuildIR\(\) \(\*ApplicationNode, error\)](<#Blueprint.BuildIR>)
   - [func \(blueprint \*Blueprint\) Instantiate\(names ...string\)](<#Blueprint.Instantiate>)
   - [func \(blueprint \*Blueprint\) InstantiateAll\(\)](<#Blueprint.InstantiateAll>)
 - [type BlueprintError](<#BlueprintError>)
   - [func \(e \*BlueprintError\) Error\(\) string](<#BlueprintError.Error>)
-- [type BlueprintLoggerHandler](<#BlueprintLoggerHandler>)
-  - [func \(h \*BlueprintLoggerHandler\) Handle\(ctx context.Context, r slog.Record\) error](<#BlueprintLoggerHandler.Handle>)
-- [type BlueprintLoggerHandlerOptions](<#BlueprintLoggerHandlerOptions>)
 - [type BuildContext](<#BuildContext>)
 - [type BuildFunc](<#BuildFunc>)
 - [type DefaultNamespaceHandler](<#DefaultNamespaceHandler>)
@@ -61,16 +55,9 @@ import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
   - [func \(namespace \*SimpleNamespace\) Name\(\) string](<#SimpleNamespace.Name>)
   - [func \(namespace \*SimpleNamespace\) Put\(name string, node IRNode\) error](<#SimpleNamespace.Put>)
 - [type SimpleNamespaceHandler](<#SimpleNamespaceHandler>)
-- [type SourceFileInfo](<#SourceFileInfo>)
-  - [func GetSourceFileInfo\(fileName string\) \*SourceFileInfo](<#GetSourceFileInfo>)
-  - [func \(info \*SourceFileInfo\) String\(\) string](<#SourceFileInfo.String>)
 - [type VisitTracker](<#VisitTracker>)
 - [type VisitTrackerImpl](<#VisitTrackerImpl>)
   - [func \(tracker \*VisitTrackerImpl\) Visited\(name string\) bool](<#VisitTrackerImpl.Visited>)
-- [type WiringCallsite](<#WiringCallsite>)
-  - [func \(cs WiringCallsite\) String\(\) string](<#WiringCallsite.String>)
-- [type WiringCallstack](<#WiringCallstack>)
-  - [func \(stack \*WiringCallstack\) String\(\) string](<#WiringCallstack.String>)
 - [type WiringDef](<#WiringDef>)
   - [func \(def \*WiringDef\) AddProperty\(key string, value any\)](<#WiringDef.AddProperty>)
   - [func \(def \*WiringDef\) GetProperties\(key string, dst any\) error](<#WiringDef.GetProperties>)
@@ -91,15 +78,6 @@ const (
     MAX_ERR_SIZE = 2048
 )
 ```
-
-<a name="Capitalize"></a>
-## func Capitalize
-
-```go
-func Capitalize(s string) string
-```
-
-
 
 <a name="CleanName"></a>
 ## func CleanName
@@ -146,15 +124,6 @@ func Filter[T any](nodes []IRNode) []T
 
 A helper method to filter out nodes of a specific type from a slice of IRnodes
 
-<a name="Indent"></a>
-## func Indent
-
-```go
-func Indent(str string, amount int) string
-```
-
-
-
 <a name="NewBlueprintError"></a>
 ## func NewBlueprintError
 
@@ -181,24 +150,6 @@ func RegisterDefaultNamespace[T IRNode](name string, buildFunc func(outputDir st
 ```
 
 If the root Blueprint application contains nodes of type T, this function enables plugins to register a default namespace to combine and build those nodes.
-
-<a name="Reindent"></a>
-## func Reindent
-
-```go
-func Reindent(str string, amount int) string
-```
-
-
-
-<a name="ReplaceSuffix"></a>
-## func ReplaceSuffix
-
-```go
-func ReplaceSuffix(s string, suffix string, replacement string) string
-```
-
-
 
 <a name="ApplicationNode"></a>
 ## type ApplicationNode
@@ -240,6 +191,19 @@ func (node *ApplicationNode) String() string
 ```
 
 Print the IR graph
+
+<a name="ArtifactGenerator"></a>
+## type ArtifactGenerator
+
+
+
+```go
+type ArtifactGenerator interface {
+
+    /* Generate artifacts to the provided fully-qualified directory on the local filesystem */
+    GenerateArtifacts(dir string) error
+}
+```
 
 <a name="Blueprint"></a>
 ## type Blueprint
@@ -299,38 +263,6 @@ func (e *BlueprintError) Error() string
 ```
 
 
-
-<a name="BlueprintLoggerHandler"></a>
-## type BlueprintLoggerHandler
-
-Implementation of Blueprint's custom Handler of slog.Logger
-
-```go
-type BlueprintLoggerHandler struct {
-    slog.Handler
-    // contains filtered or unexported fields
-}
-```
-
-<a name="BlueprintLoggerHandler.Handle"></a>
-### func \(\*BlueprintLoggerHandler\) Handle
-
-```go
-func (h *BlueprintLoggerHandler) Handle(ctx context.Context, r slog.Record) error
-```
-
-
-
-<a name="BlueprintLoggerHandlerOptions"></a>
-## type BlueprintLoggerHandlerOptions
-
-
-
-```go
-type BlueprintLoggerHandlerOptions struct {
-    SlogOpts slog.HandlerOptions
-}
-```
 
 <a name="BuildContext"></a>
 ## type BuildContext
@@ -651,39 +583,6 @@ type SimpleNamespaceHandler interface {
 }
 ```
 
-<a name="SourceFileInfo"></a>
-## type SourceFileInfo
-
-
-
-```go
-type SourceFileInfo struct {
-    Filename          string // Local filename
-    Module            string // Fully qualified module name
-    ModulePath        string // path to module on disk
-    ModuleFilename    string // Filename within module
-    WorkspaceFilename string // Filename within workspace, if the module is in a workspace; otherwise ModuleFilename
-}
-```
-
-<a name="GetSourceFileInfo"></a>
-### func GetSourceFileInfo
-
-```go
-func GetSourceFileInfo(fileName string) *SourceFileInfo
-```
-
-
-
-<a name="SourceFileInfo.String"></a>
-### func \(\*SourceFileInfo\) String
-
-```go
-func (info *SourceFileInfo) String() string
-```
-
-
-
 <a name="VisitTracker"></a>
 ## type VisitTracker
 
@@ -716,49 +615,6 @@ func (tracker *VisitTrackerImpl) Visited(name string) bool
 ```
 
 Multiple instances of a node can exist across a Blueprint application that generates and uses the same code. This method is used by nodes to determine whether code has already been generated in this workspace by a different instance of the same node type. The first call to this method for a given name will return false; subsequent calls will return true
-
-<a name="WiringCallsite"></a>
-## type WiringCallsite
-
-
-
-```go
-type WiringCallsite struct {
-    Source     *SourceFileInfo
-    LineNumber int
-    Func       string
-    FuncName   string
-}
-```
-
-<a name="WiringCallsite.String"></a>
-### func \(WiringCallsite\) String
-
-```go
-func (cs WiringCallsite) String() string
-```
-
-
-
-<a name="WiringCallstack"></a>
-## type WiringCallstack
-
-
-
-```go
-type WiringCallstack struct {
-    Stack []WiringCallsite
-}
-```
-
-<a name="WiringCallstack.String"></a>
-### func \(\*WiringCallstack\) String
-
-```go
-func (stack *WiringCallstack) String() string
-```
-
-
 
 <a name="WiringDef"></a>
 ## type WiringDef

@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"strings"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
 	"golang.org/x/exp/slog"
 )
 
@@ -196,7 +197,7 @@ func (wiring *wiringSpecImpl) String() string {
 	for alias, pointsto := range wiring.aliases {
 		defStrings = append(defStrings, alias+" -> "+pointsto)
 	}
-	return fmt.Sprintf("%s = WiringSpec {\n%s\n}", wiring.name, Indent(strings.Join(defStrings, "\n"), 2))
+	return fmt.Sprintf("%s = WiringSpec {\n%s\n}", wiring.name, stringutil.Indent(strings.Join(defStrings, "\n"), 2))
 }
 
 func (wiring *wiringSpecImpl) AddError(err error) {
