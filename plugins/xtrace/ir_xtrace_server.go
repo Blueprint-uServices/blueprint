@@ -9,7 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
-type XTraceServer struct {
+type XTraceServerContainer struct {
 	docker.Container
 
 	ServerName string
@@ -30,8 +30,8 @@ func (xt *XTraceInterface) GetMethods() []service.Method {
 	return xt.Wrapped.GetMethods()
 }
 
-func newXTraceServer(name string, addr *address.BindConfig) (*XTraceServer, error) {
-	server := &XTraceServer{
+func newXTraceServerContainer(name string, addr *address.BindConfig) (*XTraceServerContainer, error) {
+	server := &XTraceServerContainer{
 		ServerName: name,
 		BindAddr:   addr,
 	}
@@ -42,7 +42,7 @@ func newXTraceServer(name string, addr *address.BindConfig) (*XTraceServer, erro
 	return server, nil
 }
 
-func (node *XTraceServer) init(name string) error {
+func (node *XTraceServerContainer) init(name string) error {
 	workflow.Init("../../runtime")
 
 	spec, err := workflow.GetSpec()
@@ -59,15 +59,24 @@ func (node *XTraceServer) init(name string) error {
 	return nil
 }
 
-func (node *XTraceServer) Name() string {
+func (node *XTraceServerContainer) Name() string {
 	return node.ServerName
 }
 
-func (node *XTraceServer) String() string {
+func (node *XTraceServerContainer) String() string {
 	return node.Name() + " = XTraceServer(" + node.BindAddr.Name() + ")"
 }
 
-func (node *XTraceServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *XTraceServerContainer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
 	iface := node.Iface.ServiceInterface(ctx)
 	return &XTraceInterface{Wrapped: iface}, nil
+}
+
+func (node *XTraceServerContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error {
+	return nil
+}
+
+func (node *XTraceServerContainer) AddContainerInstance(target docker.ContainerWorkspace) error {
+	node.BindAddr.Port = 5563
+	return target.DeclarePrebuiltInstance(node.ServerName, "jonathanmace/xtrace-server:latest", node.BindAddr)
 }

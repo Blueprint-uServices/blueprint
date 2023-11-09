@@ -9,7 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
-type JaegerCollector struct {
+type JaegerCollectorContainer struct {
 	docker.Container
 
 	CollectorName string
@@ -30,8 +30,8 @@ func (j *JaegerInterface) GetMethods() []service.Method {
 	return j.Wrapped.GetMethods()
 }
 
-func newJaegerCollector(name string, addr *address.BindConfig) (*JaegerCollector, error) {
-	collector := &JaegerCollector{
+func newJaegerCollectorContainer(name string, addr *address.BindConfig) (*JaegerCollectorContainer, error) {
+	collector := &JaegerCollectorContainer{
 		CollectorName: name,
 		BindAddr:      addr,
 	}
@@ -42,7 +42,7 @@ func newJaegerCollector(name string, addr *address.BindConfig) (*JaegerCollector
 	return collector, nil
 }
 
-func (node *JaegerCollector) init(name string) error {
+func (node *JaegerCollectorContainer) init(name string) error {
 	workflow.Init("../../runtime")
 
 	spec, err := workflow.GetSpec()
@@ -59,25 +59,24 @@ func (node *JaegerCollector) init(name string) error {
 	return nil
 }
 
-func (node *JaegerCollector) Name() string {
+func (node *JaegerCollectorContainer) Name() string {
 	return node.CollectorName
 }
 
-func (node *JaegerCollector) String() string {
+func (node *JaegerCollectorContainer) String() string {
 	return node.Name() + " = JaegerCollector(" + node.BindAddr.Name() + ")"
 }
 
-func (node *JaegerCollector) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *JaegerCollectorContainer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
 	iface := node.Iface.ServiceInterface(ctx)
 	return &JaegerInterface{Wrapped: iface}, nil
 }
 
-func (node *JaegerCollector) AddContainerArtifacts(targer docker.ContainerWorkspace) error {
-	// TODO: IMplement
+func (node *JaegerCollectorContainer) AddContainerArtifacts(targer docker.ContainerWorkspace) error {
 	return nil
 }
 
-func (node *JaegerCollector) AddContainerInstance(target docker.ContainerWorkspace) error {
-	// TODO: Implement
-	return nil
+func (node *JaegerCollectorContainer) AddContainerInstance(target docker.ContainerWorkspace) error {
+	node.BindAddr.Port = 14268
+	return target.DeclarePrebuiltInstance(node.CollectorName, "jaegertracing/all-in-one:latest", node.BindAddr)
 }

@@ -10,7 +10,7 @@ import (
 
 // Instruments the service with an entry + exit point xtrace wrapper to generate xtrace compatible logs
 func Instrument(wiring blueprint.WiringSpec, serviceName string) {
-	DefineXTraceServer(wiring)
+	DefineXTraceServerContainer(wiring)
 	clientWrapper := serviceName + ".client.xtrace"
 	serverWrapper := serviceName + ".server.xtrace"
 	xtrace_server := "xtrace_server"
@@ -56,20 +56,20 @@ func Instrument(wiring blueprint.WiringSpec, serviceName string) {
 	})
 }
 
-func DefineXTraceServer(wiring blueprint.WiringSpec) {
+func DefineXTraceServerContainer(wiring blueprint.WiringSpec) {
 	xtrace_server := "xtrace_server"
 	xtrace_addr := xtrace_server + ".addr"
 	xtraceClient := xtrace_server + ".client"
 	xtraceProc := xtrace_server + ".proc"
 	xtraceDst := xtrace_server + ".dst"
 
-	wiring.Define(xtraceProc, &XTraceServer{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := address.Bind[*XTraceServer](ns, xtrace_addr)
+	wiring.Define(xtraceProc, &XTraceServerContainer{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
+		addr, err := address.Bind[*XTraceServerContainer](ns, xtrace_addr)
 		if err != nil {
 			return nil, err
 		}
 
-		return newXTraceServer(xtraceProc, addr.Bind)
+		return newXTraceServerContainer(xtraceProc, addr.Bind)
 	})
 
 	wiring.Alias(xtraceDst, xtraceProc)
@@ -82,7 +82,7 @@ func DefineXTraceServer(wiring blueprint.WiringSpec) {
 	clientNext := ptr.AddSrcModifier(wiring, xtraceClient)
 
 	wiring.Define(xtraceClient, &XTraceClient{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := address.Dial[*XTraceServer](ns, clientNext)
+		addr, err := address.Dial[*XTraceServerContainer](ns, clientNext)
 		if err != nil {
 			return nil, err
 		}
@@ -90,6 +90,6 @@ func DefineXTraceServer(wiring blueprint.WiringSpec) {
 		return newXTraceClient(xtraceClient, addr.Dial)
 	})
 
-	address.Define[*XTraceServer](wiring, xtrace_addr, xtraceProc, &blueprint.ApplicationNode{})
+	address.Define[*XTraceServerContainer](wiring, xtrace_addr, xtraceProc, &blueprint.ApplicationNode{})
 	ptr.AddDstModifier(wiring, xtrace_addr)
 }

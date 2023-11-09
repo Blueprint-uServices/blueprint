@@ -62,6 +62,7 @@ func (d *DockerComposeFile) AddBuildInstance(instanceName string, containerTempl
 }
 
 func (d *DockerComposeFile) addInstance(instanceName string, image string, containerTemplateName string, args ...blueprint.IRNode) error {
+	instanceName = blueprint.CleanName(instanceName)
 	if _, exists := d.Instances[instanceName]; exists {
 		return blueprint.Errorf("re-declaration of container instance %v of image %v", instanceName, image)
 	}
@@ -86,6 +87,7 @@ func (d *DockerComposeFile) addInstance(instanceName string, image string, conta
 				return fmt.Errorf("cannot add docker instance %v due to unbound server port %v", instanceName, bind.Name())
 			}
 			instance.Ports[requiredEnvVar(node)] = bind.Port
+			bind.Hostname = instanceName
 		}
 
 		if conf, isConfig := node.(blueprint.IRConfig); isConfig {

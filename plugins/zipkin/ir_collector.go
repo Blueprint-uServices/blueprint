@@ -9,7 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
-type ZipkinCollector struct {
+type ZipkinCollectorContainer struct {
 	docker.Container
 
 	CollectorName string
@@ -30,8 +30,8 @@ func (j *ZipkinInterface) GetMethods() []service.Method {
 	return j.Wrapped.GetMethods()
 }
 
-func newZipkinCollector(name string, addr *address.BindConfig) (*ZipkinCollector, error) {
-	collector := &ZipkinCollector{
+func newZipkinCollectorContainer(name string, addr *address.BindConfig) (*ZipkinCollectorContainer, error) {
+	collector := &ZipkinCollectorContainer{
 		CollectorName: name,
 		BindAddr:      addr,
 	}
@@ -42,7 +42,7 @@ func newZipkinCollector(name string, addr *address.BindConfig) (*ZipkinCollector
 	return collector, nil
 }
 
-func (node *ZipkinCollector) init(name string) error {
+func (node *ZipkinCollectorContainer) init(name string) error {
 	workflow.Init("../../runtime")
 
 	spec, err := workflow.GetSpec()
@@ -59,25 +59,24 @@ func (node *ZipkinCollector) init(name string) error {
 	return nil
 }
 
-func (node *ZipkinCollector) Name() string {
+func (node *ZipkinCollectorContainer) Name() string {
 	return node.CollectorName
 }
 
-func (node *ZipkinCollector) String() string {
+func (node *ZipkinCollectorContainer) String() string {
 	return node.Name() + " = ZipkinCollector(" + node.BindAddr.Name() + ")"
 }
 
-func (node *ZipkinCollector) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *ZipkinCollectorContainer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
 	iface := node.Iface.ServiceInterface(ctx)
 	return &ZipkinInterface{Wrapped: iface}, nil
 }
 
-func (node *ZipkinCollector) AddContainerArtifacts(targer docker.ContainerWorkspace) error {
-	// TODO: IMplement
+func (node *ZipkinCollectorContainer) AddContainerArtifacts(targer docker.ContainerWorkspace) error {
 	return nil
 }
 
-func (node *ZipkinCollector) AddContainerInstance(target docker.ContainerWorkspace) error {
-	// TODO: Implement
-	return nil
+func (node *ZipkinCollectorContainer) AddContainerInstance(target docker.ContainerWorkspace) error {
+	node.BindAddr.Port = 9411
+	return target.DeclarePrebuiltInstance(node.CollectorName, "openzipkin/zipkin", node.BindAddr)
 }

@@ -9,19 +9,19 @@ import (
 /*
 Defines a cache called `cacheName` that uses the pre-built memcached process image
 */
-func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
+func PrebuiltContainer(wiring blueprint.WiringSpec, cacheName string) string {
 	// The nodes that we are defining
 	procName := cacheName + ".process"
 	clientName := cacheName + ".client"
 	addrName := cacheName + ".addr"
 
 	// First define the process
-	wiring.Define(procName, &MemcachedProcess{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := address.Bind[*MemcachedProcess](namespace, addrName)
+	wiring.Define(procName, &MemcachedContainer{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+		addr, err := address.Bind[*MemcachedContainer](namespace, addrName)
 		if err != nil {
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", procName, addrName, err)
 		}
-		return newMemcachedProcess(procName, addr.Bind)
+		return newMemcachedContainer(procName, addr.Bind)
 	})
 
 	// Mandate that this cache with this name must be unique within the application (although, this can be changed by namespaces)
@@ -34,7 +34,7 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 	ptr := pointer.GetPointer(wiring, cacheName)
 
 	// Define the address and add the collectorAddr to the pointer dst
-	address.Define[*MemcachedProcess](wiring, addrName, procName, &blueprint.ApplicationNode{})
+	address.Define[*MemcachedContainer](wiring, addrName, procName, &blueprint.ApplicationNode{})
 	ptr.AddDstModifier(wiring, addrName)
 
 	// Add the client to the pointer
@@ -42,7 +42,7 @@ func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string {
 
 	// Define the memcached go client
 	wiring.Define(clientName, &MemcachedGoClient{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		addr, err := address.Dial[*MemcachedProcess](namespace, clientNext)
+		addr, err := address.Dial[*MemcachedContainer](namespace, clientNext)
 		if err != nil {
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", clientName, clientNext, err)
 		}
