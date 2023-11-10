@@ -1,7 +1,6 @@
 package blueprint
 
 import (
-	"errors"
 	"fmt"
 	"runtime"
 )
@@ -10,29 +9,25 @@ const (
 	MAX_ERR_SIZE = 2048
 )
 
-type BlueprintError struct {
+// An error used by Blueprint's compiler that captures the calling
+// stack so that we can tie errors back to the plugins that caused
+// the error
+type blueprintError struct {
 	Stack []byte
 	Err   error
 }
 
-func (e *BlueprintError) Error() string {
+func (e *blueprintError) Error() string {
 	return fmt.Sprintf("%v\n%v", e.Err, string(e.Stack))
 }
 
-func NewBlueprintError(msg string) error {
-	bytes := make([]byte, MAX_ERR_SIZE)
-	runtime.Stack(bytes, false)
-	return &BlueprintError{
-		Stack: bytes,
-		Err:   errors.New(msg),
-	}
-}
-
+// Generates an error in the same way as fmt.Errorf but also includes
+// the call stack
 func Errorf(format string, a ...any) error {
 	bytes := make([]byte, MAX_ERR_SIZE)
 	runtime.Stack(bytes, false)
 	err := fmt.Errorf(format, a...)
-	return &BlueprintError{
+	return &blueprintError{
 		Stack: bytes,
 		Err:   err,
 	}

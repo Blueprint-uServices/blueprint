@@ -1,4 +1,4 @@
-package blueprint
+package logging
 
 import (
 	"context"
@@ -16,10 +16,6 @@ import (
 	"golang.org/x/mod/modfile"
 )
 
-type blueprintLoggerHandlerOptions struct {
-	SlogOpts slog.HandlerOptions
-}
-
 // Implementation of Blueprint's custom Handler of slog.Logger
 type blueprintLoggerHandler struct {
 	slog.Handler
@@ -27,6 +23,11 @@ type blueprintLoggerHandler struct {
 	enabled bool
 }
 
+type blueprintLoggerHandlerOptions struct {
+	SlogOpts slog.HandlerOptions
+}
+
+// Implementation of a slog logger
 func (h *blueprintLoggerHandler) Handle(ctx context.Context, r slog.Record) error {
 	if !h.enabled {
 		return nil
@@ -86,12 +87,15 @@ func init() {
 	slog.SetDefault(logger)
 }
 
+// Compiler logging is enabled by default; this method is useful for tests to disable and enable logging
+// in order to suppress output.
 func EnableCompilerLogging() {
 	if loggerhandler != nil {
 		loggerhandler.enabled = true
 	}
 }
 
+// Disables logging by the compiler; useful when running tests to suppress verbose output.
 func DisableCompilerLogging() {
 	if loggerhandler != nil {
 		loggerhandler.enabled = false
@@ -190,6 +194,7 @@ func getSourceFileInfo(fileName string) *sourceFileInfo {
 	return info
 }
 
+// Used to tie logging statements and errors back to the wiring file line that caused the error
 type Callsite struct {
 	Source     *sourceFileInfo
 	LineNumber int
@@ -197,6 +202,7 @@ type Callsite struct {
 	FuncName   string
 }
 
+// Used to tie logging statements and errors back to the wiring file line that caused the error
 type Callstack struct {
 	Stack []Callsite
 }
@@ -213,6 +219,9 @@ func (stack *Callstack) String() string {
 	return strings.Join(s, "\n")
 }
 
+// Gets the current callstack including file information.
+// Blueprint's wiring spec uses this so that logging statements and error messages
+// can be attributed back to the appropriate wiring spec line.
 func GetCallstack() *Callstack {
 	pc := make([]uintptr, 10)
 	n := runtime.Callers(3, pc)

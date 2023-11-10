@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/logging"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"golang.org/x/exp/slog"
 )
@@ -280,7 +281,7 @@ func (namespace *SimpleNamespace) GetProperties(name string, key string, dst any
 func (namespace *SimpleNamespace) Info(message string, args ...any) {
 	if len(namespace.stack) > 0 {
 		src := namespace.stack[len(namespace.stack)-1]
-		callstack := src.Properties["callsite"][0].(*blueprint.Callstack)
+		callstack := src.Properties["callsite"][0].(*logging.Callstack)
 		slog.Info(fmt.Sprintf(fmt.Sprintf("%s %s: %s (%s)", namespace.NamespaceType, namespace.Name(), message, callstack.Stack[0].String()), args...))
 	} else {
 		slog.Info(fmt.Sprintf(fmt.Sprintf("%s %s: %s", namespace.NamespaceType, namespace.Name(), message), args...))
@@ -291,7 +292,7 @@ func (namespace *SimpleNamespace) Info(message string, args ...any) {
 func (namespace *SimpleNamespace) Debug(message string, args ...any) {
 	if len(namespace.stack) > 0 {
 		src := namespace.stack[len(namespace.stack)-1]
-		callstack := src.Properties["callsite"][0].(*blueprint.Callstack)
+		callstack := src.Properties["callsite"][0].(*logging.Callstack)
 		slog.Info(callstack.String())
 		slog.Debug(fmt.Sprintf(fmt.Sprintf("%s %s: %s (%s)", namespace.NamespaceType, namespace.Name(), message, callstack.Stack[0].String()), args...))
 	} else {
@@ -304,7 +305,7 @@ func (namespace *SimpleNamespace) Error(message string, args ...any) error {
 	formattedMessage := fmt.Sprintf(message, args...)
 	if len(namespace.stack) > 0 {
 		src := namespace.stack[len(namespace.stack)-1]
-		callstack := src.Properties["callsite"][0].(*blueprint.Callstack)
+		callstack := src.Properties["callsite"][0].(*logging.Callstack)
 		slog.Error(fmt.Sprintf("%s %s: %s (%s)", namespace.NamespaceType, namespace.Name(), formattedMessage, callstack.Stack[0].String()))
 	} else {
 		slog.Error(fmt.Sprintf("%s %s: %s", namespace.NamespaceType, namespace.Name(), formattedMessage))

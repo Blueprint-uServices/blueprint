@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/logging"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 )
@@ -128,7 +128,7 @@ func (spec *wiringSpecImpl) Define(name string, nodeType any, build BuildFunc) {
 	def := spec.getDef(name, true)
 	def.NodeType = nodeType
 	def.Build = build
-	def.Properties["callsite"] = []any{blueprint.GetCallstack()}
+	def.Properties["callsite"] = []any{logging.GetCallstack()}
 }
 
 // Primarily for use by plugins to build nodes; this will recursively resolve any aliases until a def is reached
