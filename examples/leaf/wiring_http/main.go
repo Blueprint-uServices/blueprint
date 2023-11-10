@@ -56,15 +56,9 @@ func main() {
 
 	slog.Info("Wiring Spec: \n" + wiring.String())
 
-	bp, err := wiring.GetBlueprint()
-	if err != nil {
-		slog.Error(err.Error())
-		os.Exit(1)
-	}
-
-	bp.Instantiate(pa, pb)
-
-	application, err := bp.BuildIR()
+	// Build the IR for our specific nodes
+	nodesToInstantiate := []string{pa, pb}
+	application, err := wiring.BuildIR(nodesToInstantiate...)
 	if err != nil {
 		slog.Error("Unable to build blueprint, exiting", "error", err)
 		slog.Info("Application: \n" + application.String())

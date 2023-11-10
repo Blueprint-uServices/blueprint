@@ -2,24 +2,18 @@ package blueprint
 
 import (
 	"fmt"
-	"os"
 	"reflect"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
-	"golang.org/x/exp/slog"
 )
-
-type Blueprint struct {
-	applicationNamespace *blueprintNamespace
-	wiring               *wiringSpecImpl
-}
 
 type BuildFunc func(Namespace) (IRNode, error)
 
 type WiringSpec interface {
 	Define(name string, nodeType any, build BuildFunc) // Adds a named node definition to the spec that can be built with the provided build function
 	GetDef(name string) *WiringDef                     // For use by plugins to access the defined build functions and metadata
+	Defs() []string                                    // Returns names of all defined nodes
 
 	Alias(name string, pointsto string)   // Defines an alias to another defined node; these can be recursive
 	GetAlias(alias string) (string, bool) // Gets the value of the specified alias, if it exists
@@ -35,7 +29,7 @@ type WiringSpec interface {
 	AddError(err error) // Used by plugins to signify an error; the error will be returned by a call to Err or GetBlueprint
 	Err() error         // Gets an error if there is currently one
 
-	GetBlueprint() (*Blueprint, error) // After defining everything, this method provides the means to then build everything.
+	BuildIR(nodesToInstantiate ...string) (*ApplicationNode, error) // After defining everything, this builds the IR for the specified named nodes (implicitly including dependencies of those nodes)
 }
 
 type WiringDef struct {
@@ -141,6 +135,14 @@ func (wiring *wiringSpecImpl) GetDef(name string) *WiringDef {
 	return wiring.getDef(name, false)
 }
 
+func (wiring *wiringSpecImpl) Defs() []string {
+	defs := make([]string, 0, len(wiring.defs))
+	for name := range wiring.defs {
+		defs = append(defs, name)
+	}
+	return defs
+}
+
 // Defines an alias to another node.  Deletes any existing def for the alias
 func (wiring *wiringSpecImpl) Alias(alias string, pointsto string) {
 	_, exists := wiring.defs[alias]
@@ -224,48 +226,6 @@ func (wiring *wiringSpecImpl) Err() error {
 	}
 }
 
-func (wiring *wiringSpecImpl) GetBlueprint() (*Blueprint, error) {
-	blueprint := Blueprint{}
-
-	namespace, err := newBlueprintNamespace(wiring, wiring.name)
-	if err != nil {
-		slog.Error("Unable to build workflow spec, exiting", "error", err)
-		os.Exit(1)
-	}
-	blueprint.applicationNamespace = namespace
-	blueprint.wiring = wiring
-	return &blueprint, wiring.Err()
-}
-
-// Instantiates one or more specific named nodes
-func (blueprint *Blueprint) Instantiate(names ...string) {
-	for _, name := range names {
-		nameToGet := name
-		blueprint.applicationNamespace.Defer(func() error {
-			blueprint.applicationNamespace.Info("Instantiating %v", nameToGet)
-			var node IRNode
-			return blueprint.applicationNamespace.Get(nameToGet, &node)
-		})
-	}
-}
-
-// Instantiates any nodes that haven't yet been instantiated.  Although this is commonly used,
-// it is preferred to explicitly instantiate nodes by name.
-func (blueprint *Blueprint) InstantiateAll() {
-	for name := range blueprint.wiring.defs {
-		nameToGet := name
-		blueprint.applicationNamespace.Defer(func() error {
-			blueprint.applicationNamespace.Info("Instantiating %v", nameToGet)
-			var node IRNode
-			return blueprint.applicationNamespace.Get(nameToGet, &node)
-		})
-	}
-}
-
-func (blueprint *Blueprint) BuildIR() (*ApplicationNode, error) {
-	node, err := blueprint.applicationNamespace.Build()
-	if err != nil {
-		return node.(*ApplicationNode), err
-	}
-	return node.(*ApplicationNode), err
+func (wiring *wiringSpecImpl) BuildIR(nodesToInstantiate ...string) (*ApplicationNode, error) {
+	return BuildApplicationIR(wiring, wiring.name, nodesToInstantiate...)
 }

@@ -275,46 +275,6 @@ func (namespace *SimpleNamespace) GetProperties(name string, key string, dst any
 	return def.GetProperties(key, dst)
 }
 
-type blueprintNamespace struct {
-	SimpleNamespace
-
-	handler *blueprintNamespaceHandler
-}
-
-type blueprintNamespaceHandler struct {
-	DefaultNamespaceHandler
-
-	application *ApplicationNode
-}
-
-func newBlueprintNamespace(wiring WiringSpec, name string) (*blueprintNamespace, error) {
-	namespace := &blueprintNamespace{}
-	handler := blueprintNamespaceHandler{}
-	handler.Init(&namespace.SimpleNamespace)
-	handler.application = &ApplicationNode{}
-	namespace.handler = &handler
-	namespace.Init(name, "BlueprintApplication", nil, wiring, &handler)
-	return namespace, nil
-}
-
-func (namespace *blueprintNamespace) Build() (IRNode, error) {
-	node := &ApplicationNode{}
-	node.name = namespace.Name()
-
-	// Execute deferred functions until empty
-	for len(namespace.Deferred) > 0 {
-		next := namespace.Deferred[0]
-		namespace.Deferred = namespace.Deferred[1:]
-		err := next()
-		if err != nil {
-			node.Children = namespace.handler.Nodes
-			return node, err
-		}
-	}
-	node.Children = namespace.handler.Nodes
-	return node, nil
-}
-
 // Augments debug messages with information about the namespace
 func (namespace *SimpleNamespace) Info(message string, args ...any) {
 	if len(namespace.stack) > 0 {
