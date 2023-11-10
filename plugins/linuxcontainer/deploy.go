@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/ioutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/linuxgen"

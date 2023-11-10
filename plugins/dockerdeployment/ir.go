@@ -3,8 +3,8 @@ package dockerdeployment
 import (
 	"strings"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
 )
 
 /* A deployment is a collection of containers */

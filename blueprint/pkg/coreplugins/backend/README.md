@@ -3,7 +3,7 @@
 # backend
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
+import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/backend"
 ```
 
 ## Index

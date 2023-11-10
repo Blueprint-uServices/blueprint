@@ -1,6 +1,6 @@
 package ir
 
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
+import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
 
 func CleanName(name string) string {
 	return stringutil.CleanName(name)

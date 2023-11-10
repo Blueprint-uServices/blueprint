@@ -3,7 +3,7 @@
 # address
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
+import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
 ```
 
 ## Index

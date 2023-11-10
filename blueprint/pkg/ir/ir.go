@@ -3,7 +3,7 @@ package ir
 import (
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
 )
 
 // This file contains some of the core IR nodes for Blueprint

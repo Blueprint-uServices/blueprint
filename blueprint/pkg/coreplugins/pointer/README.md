@@ -3,7 +3,7 @@
 # pointer
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
 ```
 
 ## Index

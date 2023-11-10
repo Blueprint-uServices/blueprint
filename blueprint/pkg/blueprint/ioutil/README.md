@@ -3,7 +3,7 @@
 # ioutil
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
+import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/ioutil"
 ```
 
 Package ioutil implements filesystem related utility methods primarily for use by plugins that produce artifacts onto the local filesystem.

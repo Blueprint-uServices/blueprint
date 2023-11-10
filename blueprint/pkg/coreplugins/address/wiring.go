@@ -2,8 +2,8 @@ package address
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
