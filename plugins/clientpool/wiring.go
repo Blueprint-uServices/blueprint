@@ -1,8 +1,9 @@
 package clientpool
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
@@ -10,22 +11,22 @@ import (
 /*
 Wraps the client side of a service with a client pool with N client instances
 */
-func Create(wiring blueprint.WiringSpec, serviceName string, n int) {
+func Create(spec wiring.WiringSpec, serviceName string, n int) {
 	clientpool := serviceName + ".clientpool"
 
 	// Get the pointer metadata
-	ptr := pointer.GetPointer(wiring, serviceName)
+	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {
 		slog.Error("Unable to create clientpool for " + serviceName + " as it is not a pointer")
 		return
 	}
 
 	// Add the client wrapper to the pointer src
-	clientNext := ptr.AddSrcModifier(wiring, clientpool)
+	clientNext := ptr.AddSrcModifier(spec, clientpool)
 
 	// Define the client pool
-	wiring.Define(clientpool, &ClientPool{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		pool := NewClientPoolNamespace(namespace, wiring, clientpool, n)
+	spec.Define(clientpool, &ClientPool{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
+		pool := NewClientPoolNamespace(namespace, spec, clientpool, n)
 
 		err := pool.Get(clientNext, &pool.handler.IRNode.Client)
 		return pool.handler.IRNode, err
@@ -34,23 +35,23 @@ func Create(wiring blueprint.WiringSpec, serviceName string, n int) {
 
 type (
 	ClientpoolNamespace struct {
-		blueprint.SimpleNamespace
+		wiring.SimpleNamespace
 		handler *clientpoolNamespaceHandler
 	}
 
 	clientpoolNamespaceHandler struct {
-		blueprint.DefaultNamespaceHandler
+		wiring.DefaultNamespaceHandler
 
 		IRNode *ClientPool
 	}
 )
 
-func NewClientPoolNamespace(parent blueprint.Namespace, wiring blueprint.WiringSpec, name string, n int) *ClientpoolNamespace {
+func NewClientPoolNamespace(parent wiring.Namespace, spec wiring.WiringSpec, name string, n int) *ClientpoolNamespace {
 	namespace := &ClientpoolNamespace{}
 	namespace.handler = &clientpoolNamespaceHandler{}
 	namespace.handler.Init(&namespace.SimpleNamespace)
 	namespace.handler.IRNode = newClientPool(name, n)
-	namespace.Init(name, "ClientPool", parent, wiring, namespace.handler)
+	namespace.Init(name, "ClientPool", parent, spec, namespace.handler)
 	return namespace
 }
 
@@ -61,12 +62,12 @@ func (namespace *clientpoolNamespaceHandler) Accepts(nodeType any) bool {
 }
 
 // When a node is added to this namespace, we just attach it to the IRNode representing the clientpool
-func (handler *clientpoolNamespaceHandler) AddNode(name string, node blueprint.IRNode) error {
+func (handler *clientpoolNamespaceHandler) AddNode(name string, node ir.IRNode) error {
 	return handler.IRNode.AddChild(node)
 }
 
 // When an edge is added to this namespace, we just attach it as an argument to the IRNode representing the clientpool
-func (handler *clientpoolNamespaceHandler) AddEdge(name string, node blueprint.IRNode) error {
+func (handler *clientpoolNamespaceHandler) AddEdge(name string, node ir.IRNode) error {
 	handler.IRNode.AddArg(node)
 	return nil
 }

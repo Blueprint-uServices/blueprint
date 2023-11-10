@@ -1,14 +1,14 @@
 package linuxgen
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/linuxgen"
 )
 
 /*
 Generates command-line function to run a goproc
 */
-func GenerateRunFunc(procName string, args ...blueprint.IRNode) (string, error) {
+func GenerateRunFunc(procName string, args ...ir.IRNode) (string, error) {
 	templateArgs := runFuncTemplateArgs{
 		Name: procName,
 		Args: args,
@@ -20,7 +20,7 @@ func GenerateRunFunc(procName string, args ...blueprint.IRNode) (string, error) 
 Generates command-line function to run a goproc that has been built to a binary
 using `go build`
 */
-func GenerateBinaryRunFunc(procName string, args ...blueprint.IRNode) (string, error) {
+func GenerateBinaryRunFunc(procName string, args ...ir.IRNode) (string, error) {
 	templateArgs := runFuncTemplateArgs{
 		Name: procName,
 		Args: args,
@@ -30,7 +30,7 @@ func GenerateBinaryRunFunc(procName string, args ...blueprint.IRNode) (string, e
 
 type runFuncTemplateArgs struct {
 	Name string
-	Args []blueprint.IRNode
+	Args []ir.IRNode
 }
 
 var binaryRunFuncTemplate = `

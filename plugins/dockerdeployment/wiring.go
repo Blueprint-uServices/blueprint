@@ -5,24 +5,26 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 )
 
 // Adds a child node to an existing container deployment
-func AddContainerToDeployment(wiring blueprint.WiringSpec, deploymentName, containerName string) {
-	wiring.AddProperty(deploymentName, "Children", containerName)
+func AddContainerToDeployment(spec wiring.WiringSpec, deploymentName, containerName string) {
+	spec.AddProperty(deploymentName, "Children", containerName)
 }
 
 // Adds a deployment that explicitly instantiates all of the containers provided.
 // The deployment will also implicitly instantiate any of the dependencies of the containers
-func NewDeployment(wiring blueprint.WiringSpec, deploymentName string, containers ...string) string {
+func NewDeployment(spec wiring.WiringSpec, deploymentName string, containers ...string) string {
 	// If any children were provided in this call, add them to the process via a property
 	for _, containerName := range containers {
-		AddContainerToDeployment(wiring, deploymentName, containerName)
+		AddContainerToDeployment(spec, deploymentName, containerName)
 	}
 
-	wiring.Define(deploymentName, &Deployment{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		deployment := newDockerComposeNamespace(namespace, wiring, deploymentName)
+	spec.Define(deploymentName, &Deployment{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
+		deployment := newDockerComposeNamespace(namespace, spec, deploymentName)
 
 		var containerNames []string
 		if err := namespace.GetProperties(deploymentName, "Children", &containerNames); err != nil {
@@ -32,10 +34,10 @@ func NewDeployment(wiring blueprint.WiringSpec, deploymentName string, container
 
 		// Instantiate all of the containers.  If the container node hasn't actually been defined, then this will error out
 		for _, containerName := range containerNames {
-			ptr := pointer.GetPointer(wiring, containerName)
+			ptr := pointer.GetPointer(spec, containerName)
 			if ptr == nil {
 				// for non-pointer types, just get the child node
-				var child blueprint.IRNode
+				var child ir.IRNode
 				if err := deployment.Get(containerName, &child); err != nil {
 					return nil, err
 				}
@@ -58,23 +60,23 @@ func NewDeployment(wiring blueprint.WiringSpec, deploymentName string, container
 // Used during building to accumulate docker container nodes
 // Non-container nodes will just be recursively fetched from the parent namespace
 type DockerComposeNamespace struct {
-	blueprint.SimpleNamespace
+	wiring.SimpleNamespace
 	handler *dockerComposeNamespaceHandler
 }
 
 type dockerComposeNamespaceHandler struct {
-	blueprint.DefaultNamespaceHandler
+	wiring.DefaultNamespaceHandler
 
 	IRNode *Deployment
 }
 
-// Creates a docker compose deployment `name` within the provided parent namespace
-func newDockerComposeNamespace(parentNamespace blueprint.Namespace, wiring blueprint.WiringSpec, name string) *DockerComposeNamespace {
+// Creates a docker compose deployment `name` wwiring.Namespaceovided parent namespace
+func newDockerComposeNamespace(parentNamespace wiring.Namespace, spec wiring.WiringSpec, name string) *DockerComposeNamespace {
 	namespace := &DockerComposeNamespace{}
 	namespace.handler = &dockerComposeNamespaceHandler{}
 	namespace.handler.Init(&namespace.SimpleNamespace)
 	namespace.handler.IRNode = newContainerDeployment(name)
-	namespace.Init(name, "DockerApp", parentNamespace, wiring, namespace.handler)
+	namespace.Init(name, "DockerApp", parentNamespace, spec, namespace.handler)
 	return namespace
 }
 
@@ -85,12 +87,12 @@ func (namespace *dockerComposeNamespaceHandler) Accepts(nodeType any) bool {
 }
 
 // When a node is added to this namespace, we just attach it to the IRNode representing the deployment
-func (handler *dockerComposeNamespaceHandler) AddNode(name string, node blueprint.IRNode) error {
+func (handler *dockerComposeNamespaceHandler) AddNode(name string, node ir.IRNode) error {
 	return handler.IRNode.AddChild(node)
 }
 
 // When an edge is added to this namespace, we just attach it as an argument to the IRNode representing the deployment
-func (handler *dockerComposeNamespaceHandler) AddEdge(name string, node blueprint.IRNode) error {
+func (handler *dockerComposeNamespaceHandler) AddEdge(name string, node ir.IRNode) error {
 	handler.IRNode.AddArg(node)
 	return nil
 }

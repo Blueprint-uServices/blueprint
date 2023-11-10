@@ -3,6 +3,8 @@ package circuitbreaker
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
@@ -13,19 +15,19 @@ import (
 // The circuit breaker counters are reset after `interval` duration.
 // Usage:
 //
-//	AddCircuitBreaker(wiring, "serviceA", 1000, 0.1, "1s")
-func AddCircuitBreaker(wiring blueprint.WiringSpec, serviceName string, min_reqs int64, failure_rate float64, interval string) {
+//	AddCircuitBreaker(spec, "serviceA", 1000, 0.1, "1s")
+func AddCircuitBreaker(spec wiring.WiringSpec, serviceName string, min_reqs int64, failure_rate float64, interval string) {
 	clientWrapper := serviceName + ".client.cb"
 
-	ptr := pointer.GetPointer(wiring, serviceName)
+	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {
 		slog.Error("Unable to add a circuit breaker to " + serviceName + " as it is not a pointer")
 		return
 	}
 
-	clientNext := ptr.AddSrcModifier(wiring, clientWrapper)
+	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
 
-	wiring.Define(clientWrapper, &CircuitBreakerClient{Min_Reqs: min_reqs, FailureRate: failure_rate}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(clientWrapper, &CircuitBreakerClient{Min_Reqs: min_reqs, FailureRate: failure_rate}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
 
 		if err := ns.Get(clientNext, &wrapped); err != nil {

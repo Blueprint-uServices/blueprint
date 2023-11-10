@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/linuxgen"
 	"golang.org/x/exp/slog"
@@ -26,7 +26,7 @@ type (
 		and manually call the run script.
 	*/
 	filesystemDeployer interface {
-		blueprint.ArtifactGenerator
+		ir.ArtifactGenerator
 	}
 
 	/*
@@ -45,7 +45,7 @@ type (
 	   a build.sh script
 	*/
 	filesystemWorkspace struct {
-		blueprint.VisitTrackerImpl
+		ir.VisitTrackerImpl
 
 		info linux.ProcessWorkspaceInfo
 
@@ -129,7 +129,7 @@ func (workspace *filesystemWorkspace) Info() linux.ProcessWorkspaceInfo {
 // Saves the metadata about the process
 func (ws *filesystemWorkspace) CreateProcessDir(name string) (string, error) {
 	path, err := ioutil.CreateNodeDir(ws.info.Path, name)
-	ws.ProcDirs[blueprint.CleanName(name)] = path
+	ws.ProcDirs[ir.CleanName(name)] = path
 	return path, err
 }
 
@@ -139,7 +139,7 @@ func (ws *filesystemWorkspace) AddBuildScript(path string) error {
 }
 
 // Adds a command to the run.sh file for running the specified process node
-func (ws *filesystemWorkspace) DeclareRunCommand(name string, runfunc string, deps ...blueprint.IRNode) error {
+func (ws *filesystemWorkspace) DeclareRunCommand(name string, runfunc string, deps ...ir.IRNode) error {
 	// Generate the runfunc
 	runfunc_impl, err := linuxgen.GenerateRunFunc(name, runfunc, deps...)
 	ws.Run.Add(name, runfunc_impl, deps...)

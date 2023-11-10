@@ -3,10 +3,10 @@ package memcached
 import (
 	"fmt"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
@@ -64,7 +64,7 @@ func (node *MemcachedGoClient) init(name string) error {
 	return nil
 }
 
-func (n *MemcachedGoClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (n *MemcachedGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return n.Iface.ServiceInterface(ctx), nil
 }
 
@@ -85,7 +85,7 @@ func (node *MemcachedGoClient) AddInstantiation(builder golang.GraphBuilder) err
 
 	slog.Info(fmt.Sprintf("Instantiating MemcachedClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []blueprint.IRNode{node.DialAddr})
+	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []ir.IRNode{node.DialAddr})
 }
 
 func (node *MemcachedGoClient) ImplementsGolangNode()    {}

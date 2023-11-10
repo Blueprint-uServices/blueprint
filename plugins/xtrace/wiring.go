@@ -4,26 +4,28 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
 
 // Instruments the service with an entry + exit point xtrace wrapper to generate xtrace compatible logs
-func Instrument(wiring blueprint.WiringSpec, serviceName string) {
-	DefineXTraceServerContainer(wiring)
+func Instrument(spec wiring.WiringSpec, serviceName string) {
+	DefineXTraceServerContainer(spec)
 	clientWrapper := serviceName + ".client.xtrace"
 	serverWrapper := serviceName + ".server.xtrace"
 	xtrace_server := "xtrace_server"
 
-	ptr := pointer.GetPointer(wiring, serviceName)
+	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {
 		slog.Error("Unable to deploy " + serviceName + " using XTrace as it is not a pointer")
 	}
 
-	clientNext := ptr.AddSrcModifier(wiring, clientWrapper)
+	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
 	slog.Info("Next client is ", clientNext)
 
-	wiring.Define(clientWrapper, &XtraceClientWrapper{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(clientWrapper, &XtraceClientWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
 		if err := ns.Get(clientNext, &wrapped); err != nil {
 			return nil, blueprint.Errorf("XTrace client %s expected %s to be a golang.Service, but encountered %s", clientWrapper, clientNext, err)
@@ -38,9 +40,9 @@ func Instrument(wiring blueprint.WiringSpec, serviceName string) {
 		return newXtraceClientWrapper(clientWrapper, wrapped, xtraceClient)
 	})
 
-	serverNext := ptr.AddDstModifier(wiring, serverWrapper)
+	serverNext := ptr.AddDstModifier(spec, serverWrapper)
 
-	wiring.Define(serverWrapper, &XtraceServerWrapper{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(serverWrapper, &XtraceServerWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
 		if err := ns.Get(serverNext, &wrapped); err != nil {
 			return nil, blueprint.Errorf("XTrace server %s expected %s to be a golang.Service, but encountered %s", serverWrapper, serverNext, wrapped)
@@ -56,14 +58,14 @@ func Instrument(wiring blueprint.WiringSpec, serviceName string) {
 	})
 }
 
-func DefineXTraceServerContainer(wiring blueprint.WiringSpec) {
+func DefineXTraceServerContainer(spec wiring.WiringSpec) {
 	xtrace_server := "xtrace_server"
 	xtrace_addr := xtrace_server + ".addr"
 	xtraceClient := xtrace_server + ".client"
 	xtraceProc := xtrace_server + ".proc"
 	xtraceDst := xtrace_server + ".dst"
 
-	wiring.Define(xtraceProc, &XTraceServerContainer{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(xtraceProc, &XTraceServerContainer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Bind[*XTraceServerContainer](ns, xtrace_addr)
 		if err != nil {
 			return nil, err
@@ -72,16 +74,16 @@ func DefineXTraceServerContainer(wiring blueprint.WiringSpec) {
 		return newXTraceServerContainer(xtraceProc, addr.Bind)
 	})
 
-	wiring.Alias(xtraceDst, xtraceProc)
-	pointer.RequireUniqueness(wiring, xtraceDst, &blueprint.ApplicationNode{})
+	spec.Alias(xtraceDst, xtraceProc)
+	pointer.RequireUniqueness(spec, xtraceDst, &ir.ApplicationNode{})
 
-	pointer.CreatePointer(wiring, xtrace_server, &XTraceClient{}, xtraceDst)
-	ptr := pointer.GetPointer(wiring, xtrace_server)
-	ptr.AddDstModifier(wiring, xtrace_addr)
+	pointer.CreatePointer(spec, xtrace_server, &XTraceClient{}, xtraceDst)
+	ptr := pointer.GetPointer(spec, xtrace_server)
+	ptr.AddDstModifier(spec, xtrace_addr)
 
-	clientNext := ptr.AddSrcModifier(wiring, xtraceClient)
+	clientNext := ptr.AddSrcModifier(spec, xtraceClient)
 
-	wiring.Define(xtraceClient, &XTraceClient{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(xtraceClient, &XTraceClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*XTraceServerContainer](ns, clientNext)
 		if err != nil {
 			return nil, err
@@ -90,6 +92,6 @@ func DefineXTraceServerContainer(wiring blueprint.WiringSpec) {
 		return newXTraceClient(xtraceClient, addr.Dial)
 	})
 
-	address.Define[*XTraceServerContainer](wiring, xtrace_addr, xtraceProc, &blueprint.ApplicationNode{})
-	ptr.AddDstModifier(wiring, xtrace_addr)
+	address.Define[*XTraceServerContainer](spec, xtrace_addr, xtraceProc, &ir.ApplicationNode{})
+	ptr.AddDstModifier(spec, xtrace_addr)
 }

@@ -3,7 +3,7 @@ package goproc
 import (
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
 )
 
@@ -34,15 +34,15 @@ type Process struct {
 	InstanceName   string
 	ProcName       string
 	ModuleName     string
-	ArgNodes       []blueprint.IRNode
-	ContainedNodes []blueprint.IRNode
+	ArgNodes       []ir.IRNode
+	ContainedNodes []ir.IRNode
 }
 
 // A Golang Process Node can either be given the child nodes ahead of time, or they can be added using AddArtifactNode / AddCodeNode
 func newGolangProcessNode(name string) *Process {
 	node := Process{}
 	node.InstanceName = name
-	node.ProcName = blueprint.CleanName(name)
+	node.ProcName = ir.CleanName(name)
 	node.ModuleName = generatedModulePrefix + "/" + node.ProcName
 	return &node
 }
@@ -70,11 +70,11 @@ func (node *Process) String() string {
 	return b.String()
 }
 
-func (node *Process) AddArg(argnode blueprint.IRNode) {
+func (node *Process) AddArg(argnode ir.IRNode) {
 	node.ArgNodes = append(node.ArgNodes, argnode)
 }
 
-func (node *Process) AddChild(child blueprint.IRNode) error {
+func (node *Process) AddChild(child ir.IRNode) error {
 	node.ContainedNodes = append(node.ContainedNodes, child)
 	return nil
 }

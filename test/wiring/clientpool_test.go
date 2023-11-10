@@ -11,20 +11,20 @@ import (
 )
 
 func TestBasicClientPool(t *testing.T) {
-	wiring := newWiringSpec("TestBasicClientPool")
+	spec := newWiringSpec("TestBasicClientPool")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	clientpool.Create(wiring, leaf, 7)
+	clientpool.Create(spec, leaf, 7)
 
-	grpc.Deploy(wiring, leaf)
-	grpc.Deploy(wiring, nonleaf)
+	grpc.Deploy(spec, leaf)
+	grpc.Deploy(spec, nonleaf)
 
-	leafproc := goproc.CreateProcess(wiring, "leafproc", leaf)
-	nonleafproc := goproc.CreateProcess(wiring, "nonleafproc", nonleaf)
+	leafproc := goproc.CreateProcess(spec, "leafproc", leaf)
+	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
 
-	app := assertBuildSuccess(t, wiring, leafproc, nonleafproc)
+	app := assertBuildSuccess(t, spec, leafproc, nonleafproc)
 
 	assertIR(t, app,
 		`TestBasicClientPool = BlueprintApplication() {
@@ -51,21 +51,21 @@ func TestBasicClientPool(t *testing.T) {
 }
 
 func TestBasicClientPoolInnerModifier(t *testing.T) {
-	wiring := newWiringSpec("TestBasicClientPoolInnerModifier")
+	spec := newWiringSpec("TestBasicClientPoolInnerModifier")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	clientpool.Create(wiring, leaf, 7)
-	retries.AddRetries(wiring, leaf, 10)
+	clientpool.Create(spec, leaf, 7)
+	retries.AddRetries(spec, leaf, 10)
 
-	grpc.Deploy(wiring, leaf)
-	grpc.Deploy(wiring, nonleaf)
+	grpc.Deploy(spec, leaf)
+	grpc.Deploy(spec, nonleaf)
 
-	leafproc := goproc.CreateProcess(wiring, "leafproc", leaf)
-	nonleafproc := goproc.CreateProcess(wiring, "nonleafproc", nonleaf)
+	leafproc := goproc.CreateProcess(spec, "leafproc", leaf)
+	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
 
-	app := assertBuildSuccess(t, wiring, leafproc, nonleafproc)
+	app := assertBuildSuccess(t, spec, leafproc, nonleafproc)
 
 	assertIR(t, app,
 		`TestBasicClientPoolInnerModifier = BlueprintApplication() {
@@ -92,21 +92,21 @@ func TestBasicClientPoolInnerModifier(t *testing.T) {
 
 }
 func TestBasicClientPoolOuterModifier(t *testing.T) {
-	wiring := newWiringSpec("TestBasicClientPoolOuterModifier")
+	spec := newWiringSpec("TestBasicClientPoolOuterModifier")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	retries.AddRetries(wiring, leaf, 10)
-	clientpool.Create(wiring, leaf, 7)
+	retries.AddRetries(spec, leaf, 10)
+	clientpool.Create(spec, leaf, 7)
 
-	grpc.Deploy(wiring, leaf)
-	grpc.Deploy(wiring, nonleaf)
+	grpc.Deploy(spec, leaf)
+	grpc.Deploy(spec, nonleaf)
 
-	leafproc := goproc.CreateProcess(wiring, "leafproc", leaf)
-	nonleafproc := goproc.CreateProcess(wiring, "nonleafproc", nonleaf)
+	leafproc := goproc.CreateProcess(spec, "leafproc", leaf)
+	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
 
-	app := assertBuildSuccess(t, wiring, leafproc, nonleafproc)
+	app := assertBuildSuccess(t, spec, leafproc, nonleafproc)
 
 	assertIR(t, app,
 		`TestBasicClientPoolOuterModifier = BlueprintApplication() {
@@ -134,17 +134,17 @@ func TestBasicClientPoolOuterModifier(t *testing.T) {
 }
 
 func TestInvalidModifierOrder(t *testing.T) {
-	wiring := newWiringSpec("TestBasicClientPool")
+	spec := newWiringSpec("TestBasicClientPool")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	grpc.Deploy(wiring, leaf)
-	clientpool.Create(wiring, leaf, 7)
+	grpc.Deploy(spec, leaf)
+	clientpool.Create(spec, leaf, 7)
 
-	leafproc := goproc.CreateProcess(wiring, "leafproc", leaf)
-	nonleafproc := goproc.CreateProcess(wiring, "nonleafproc", nonleaf)
+	leafproc := goproc.CreateProcess(spec, "leafproc", leaf)
+	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
 
-	assertBuildFailure(t, wiring, leafproc, nonleafproc)
+	assertBuildFailure(t, spec, leafproc, nonleafproc)
 
 }

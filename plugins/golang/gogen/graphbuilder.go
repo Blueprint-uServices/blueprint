@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"golang.org/x/exp/slog"
@@ -30,7 +31,7 @@ The typical usage of a `GraphBuilder` is to:
  3. Generate the final output by calling `GraphBuilder.Finish`
 */
 type GraphBuilderImpl struct {
-	blueprint.VisitTrackerImpl
+	ir.VisitTrackerImpl
 	module       golang.ModuleBuilder // The module containing this file
 	Package      golang.PackageInfo
 	FileName     string            // The short name of the file
@@ -105,7 +106,7 @@ func (graph *GraphBuilderImpl) Declare(name, buildFuncSrc string) error {
 type buildFuncConstructorArg struct {
 	Graph    *GraphBuilderImpl
 	Var      gocode.Variable
-	Node     blueprint.IRNode
+	Node     ir.IRNode
 	NodeName string
 	NodeType gocode.TypeName
 }
@@ -129,7 +130,7 @@ var buildFuncTemplate = `func(ctr golang.Container) (any, error) {
 		return {{.Graph.Imports.NameOf .Constructor}}(ctr.Context(), {{range $i, $arg := .Args}}{{if $i}}, {{end}}{{.Var.Name}}{{end}})
 	}`
 
-func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *gocode.Constructor, args []blueprint.IRNode) error {
+func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *gocode.Constructor, args []ir.IRNode) error {
 	if len(constructor.Arguments) != len(args)+1 {
 		argNames := []string{}
 		for _, arg := range args {
@@ -141,11 +142,11 @@ func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *goco
 	templateArgs := buildFuncArgs{
 		Graph:        graph,
 		Name:         name,
-		InstanceName: blueprint.CleanName(name),
+		InstanceName: ir.CleanName(name),
 		Constructor:  &gocode.UserType{Package: constructor.Package, Name: constructor.Name},
 	}
 	for i, Var := range constructor.Arguments[1:] {
-		if _, isMetadata := args[i].(blueprint.IRMetadata); isMetadata {
+		if _, isMetadata := args[i].(ir.IRMetadata); isMetadata {
 			return blueprint.Errorf("invalid constructor argument %v; metadata nodes are not instantiable", args[i].Name())
 		}
 
@@ -153,7 +154,7 @@ func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *goco
 			Graph:    graph,
 			Var:      Var,
 			Node:     args[i],
-			NodeName: blueprint.CleanName(args[i].Name()),
+			NodeName: ir.CleanName(args[i].Name()),
 			NodeType: &gocode.BasicType{Name: "string"},
 		}
 

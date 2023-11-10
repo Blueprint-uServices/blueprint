@@ -1,18 +1,18 @@
 package backend
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 )
 
 type (
 	Cache interface {
-		blueprint.IRNode
+		ir.IRNode
 		service.ServiceNode
 	}
 
 	NoSQLDB interface {
-		blueprint.IRNode
+		ir.IRNode
 		service.ServiceNode
 	}
 )

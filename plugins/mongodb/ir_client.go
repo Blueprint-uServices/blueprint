@@ -3,10 +3,10 @@ package mongodb
 import (
 	"fmt"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
@@ -62,7 +62,7 @@ func (node *MongoDBGoClient) init(name string) error {
 	return nil
 }
 
-func (n *MongoDBGoClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (n *MongoDBGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return n.Iface.ServiceInterface(ctx), nil
 }
 
@@ -81,7 +81,7 @@ func (n *MongoDBGoClient) AddInstantiation(builder golang.GraphBuilder) error {
 
 	slog.Info(fmt.Sprintf("Instantiating MongoClient %v in %v/%v", n.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(n.InstanceName, n.Constructor, []blueprint.IRNode{n.Addr})
+	return builder.DeclareConstructor(n.InstanceName, n.Constructor, []ir.IRNode{n.Addr})
 }
 
 func (node *MongoDBGoClient) ImplementsGolangNode()    {}

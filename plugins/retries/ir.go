@@ -6,6 +6,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 )
@@ -32,7 +33,7 @@ func (node *RetrierClient) String() string {
 	return node.Name() + " = Retrier(" + node.Wrapped.Name() + ")"
 }
 
-func newRetrierClient(name string, server blueprint.IRNode, max_clients int64) (*RetrierClient, error) {
+func newRetrierClient(name string, server ir.IRNode, max_clients int64) (*RetrierClient, error) {
 	serverNode, is_callable := server.(golang.Service)
 	if !is_callable {
 		return nil, blueprint.Errorf("retrier server wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
@@ -51,7 +52,7 @@ func (node *RetrierClient) AddInterfaces(builder golang.ModuleBuilder) error {
 	return node.Wrapped.AddInterfaces(builder)
 }
 
-func (node *RetrierClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *RetrierClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.Wrapped.GetInterface(ctx)
 }
 
@@ -89,5 +90,5 @@ func (node *RetrierClient) AddInstantiation(builder golang.GraphBuilder) error {
 		},
 	}
 
-	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped})
 }

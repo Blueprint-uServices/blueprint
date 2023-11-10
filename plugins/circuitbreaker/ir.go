@@ -6,6 +6,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 )
@@ -34,7 +35,7 @@ func (node *CircuitBreakerClient) String() string {
 	return node.Name() + " = CircuitBreaker(" + node.Wrapped.Name() + ")"
 }
 
-func newCircuitBreakerClient(name string, server blueprint.IRNode, min_reqs int64, failure_rate float64, interval string) (*CircuitBreakerClient, error) {
+func newCircuitBreakerClient(name string, server ir.IRNode, min_reqs int64, failure_rate float64, interval string) (*CircuitBreakerClient, error) {
 	serverNode, is_callable := server.(golang.Service)
 	if !is_callable {
 		return nil, blueprint.Errorf("circuitbreaker client wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
@@ -55,7 +56,7 @@ func (node *CircuitBreakerClient) AddInterfaces(builder golang.ModuleBuilder) er
 	return node.Wrapped.AddInterfaces(builder)
 }
 
-func (node *CircuitBreakerClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *CircuitBreakerClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.Wrapped.GetInterface(ctx)
 }
 
@@ -93,5 +94,5 @@ func (node *CircuitBreakerClient) AddInstantiation(builder golang.GraphBuilder) 
 		},
 	}
 
-	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped})
 }

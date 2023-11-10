@@ -8,12 +8,12 @@ import (
 )
 
 func TestSimpleCache(t *testing.T) {
-	wiring := newWiringSpec("TestSimpleCache")
+	spec := newWiringSpec("TestSimpleCache")
 
-	leaf_cache := simplecache.Define(wiring, "leaf_cache")
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
+	leaf_cache := simplecache.Define(spec, "leaf_cache")
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
 
-	app := assertBuildSuccess(t, wiring, leaf, leaf_cache)
+	app := assertBuildSuccess(t, spec, leaf, leaf_cache)
 
 	assertIR(t, app,
 		`TestSimpleCache = BlueprintApplication() {
@@ -24,13 +24,13 @@ func TestSimpleCache(t *testing.T) {
           }`)
 }
 func TestSimpleCacheAndServices(t *testing.T) {
-	wiring := newWiringSpec("TestSimpleCache")
+	spec := newWiringSpec("TestSimpleCache")
 
-	leaf_cache := simplecache.Define(wiring, "leaf_cache")
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf_cache := simplecache.Define(spec, "leaf_cache")
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	app := assertBuildSuccess(t, wiring, leaf, leaf_cache, nonleaf)
+	app := assertBuildSuccess(t, spec, leaf, leaf_cache, nonleaf)
 
 	assertIR(t, app,
 		`TestSimpleCache = BlueprintApplication() {

@@ -2,34 +2,36 @@ package address
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
 /*
 Defines an address called `addressName` that points to the definition `pointsto`.
 */
-func Define[ServerType blueprint.IRNode](wiring blueprint.WiringSpec, addressName string, pointsTo string, reachability any) {
-	def := wiring.GetDef(pointsTo)
+func Define[ServerType ir.IRNode](spec wiring.WiringSpec, addressName string, pointsTo string, reachability any) {
+	def := spec.GetDef(pointsTo)
 	if def == nil {
-		wiring.AddError(blueprint.Errorf("trying to define address %s that points to %s but %s is not defined", addressName, pointsTo, pointsTo))
+		spec.AddError(blueprint.Errorf("trying to define address %s that points to %s but %s is not defined", addressName, pointsTo, pointsTo))
 	}
 
 	// Define the metadata for the address, used during the build process
-	wiring.Define(addressName, reachability, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(addressName, reachability, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		addr := &Address[ServerType]{}
 		addr.AddrName = addressName
 		return addr, nil
 	})
-	wiring.SetProperty(addressName, "pointsTo", pointsTo)
+	spec.SetProperty(addressName, "pointsTo", pointsTo)
 
 	// Add Config nodes for the server bind address and client address
-	wiring.Define(bind(addressName), reachability, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(bind(addressName), reachability, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		conf := &BindConfig{}
 		conf.AddressName = addressName
 		conf.Key = bind(addressName)
 		return conf, nil
 	})
-	wiring.Define(dial(addressName), reachability, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(dial(addressName), reachability, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		conf := &DialConfig{}
 		conf.AddressName = addressName
 		conf.Key = dial(addressName)
@@ -37,7 +39,7 @@ func Define[ServerType blueprint.IRNode](wiring blueprint.WiringSpec, addressNam
 	})
 }
 
-func DestinationOf(namespace blueprint.Namespace, addressName string) (string, error) {
+func DestinationOf(namespace wiring.Namespace, addressName string) (string, error) {
 	var pointsTo string
 	if err := namespace.GetProperty(addressName, "pointsTo", &pointsTo); err != nil {
 		return "", blueprint.Errorf("expected pointsTo property of %v to be a string; %v", addressName, err.Error())
@@ -50,7 +52,7 @@ The client side of an address should call this method to get the address to dial
 
 Under the hood this will ensure the configuration values for the dialling address get added to the namespace
 */
-func Dial[ServerType blueprint.IRNode](namespace blueprint.Namespace, addressName string) (*Address[ServerType], error) {
+func Dial[ServerType ir.IRNode](namespace wiring.Namespace, addressName string) (*Address[ServerType], error) {
 	var addr *Address[ServerType]
 	if err := namespace.Get(addressName, &addr); err != nil {
 		return nil, err
@@ -71,7 +73,7 @@ The server side of an address should call this method to get the address to bind
 
 Under the hood this will ensure the configuration values for the binding address get added to the namespace
 */
-func Bind[ServerType blueprint.IRNode](namespace blueprint.Namespace, addressName string) (*Address[ServerType], error) {
+func Bind[ServerType ir.IRNode](namespace wiring.Namespace, addressName string) (*Address[ServerType], error) {
 	var addr *Address[ServerType]
 	if err := namespace.Get(addressName, &addr); err != nil {
 		return nil, err

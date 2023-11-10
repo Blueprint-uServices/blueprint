@@ -1,10 +1,10 @@
 package redis
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
@@ -67,7 +67,7 @@ func (r *RedisContainer) Name() string {
 	return r.InstanceName
 }
 
-func (node *RedisContainer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *RedisContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface := node.Iface.ServiceInterface(ctx)
 	return &RedisInterface{Wrapped: iface}, nil
 }

@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 )
 
 type (
@@ -13,16 +14,16 @@ type (
 		Contains metadata about the address and the node it points to
 	*/
 	Node interface {
-		blueprint.IRNode
-		blueprint.IRMetadata
+		ir.IRNode
+		ir.IRMetadata
 		Name() string
-		GetDestination() blueprint.IRNode
-		SetDestination(blueprint.IRNode) error
+		GetDestination() ir.IRNode
+		SetDestination(ir.IRNode) error
 		ImplementsAddressNode()
 	}
 
 	addressConfig struct {
-		blueprint.IRConfig
+		ir.IRConfig
 		AddressName string // The name of the address metadata node
 		Key         string
 		Hostname    string
@@ -43,7 +44,7 @@ type (
 
 type (
 	/* Basic generic implementation of address.Node */
-	Address[ServerType blueprint.IRNode] struct {
+	Address[ServerType ir.IRNode] struct {
 		AddrName string
 		Server   ServerType
 		Bind     *BindConfig // Configuration value for the bind address
@@ -59,14 +60,14 @@ func (addr *Address[ServerType]) String() string {
 	return addr.AddrName
 }
 
-func (addr *Address[ServerType]) GetDestination() blueprint.IRNode {
+func (addr *Address[ServerType]) GetDestination() ir.IRNode {
 	if reflect.ValueOf(addr.Server).IsNil() {
 		return nil
 	}
 	return addr.Server
 }
 
-func (addr *Address[ServerType]) SetDestination(node blueprint.IRNode) error {
+func (addr *Address[ServerType]) SetDestination(node ir.IRNode) error {
 	server, isServer := node.(ServerType)
 	if !isServer {
 		return blueprint.Errorf("address %v points to invalid server type %v", addr.AddrName, node)

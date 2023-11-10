@@ -3,8 +3,8 @@ package simplecache
 import (
 	"fmt"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
@@ -61,7 +61,7 @@ func (node *SimpleCache) Name() string {
 	return node.InstanceName
 }
 
-func (node *SimpleCache) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *SimpleCache) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.Iface.ServiceInterface(ctx), nil
 }
 

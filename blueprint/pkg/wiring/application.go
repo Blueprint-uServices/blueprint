@@ -1,12 +1,14 @@
-package blueprint
+package wiring
 
-func BuildApplicationIR(wiring WiringSpec, name string, nodesToInstantiate ...string) (*ApplicationNode, error) {
+import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+
+func BuildApplicationIR(spec WiringSpec, name string, nodesToInstantiate ...string) (*ir.ApplicationNode, error) {
 	// Create a root namespace for the application
-	namespace := newRootNamespace(wiring, name)
+	namespace := newRootNamespace(spec, name)
 
 	// If no nodes were specified, then instead we will instantiate all defined nodes
 	if len(nodesToInstantiate) == 0 {
-		nodesToInstantiate = wiring.Defs()
+		nodesToInstantiate = spec.Defs()
 	}
 
 	// Queue up the nodes to be built
@@ -28,16 +30,16 @@ type rootNamespace struct {
 type rootNamespaceHandler struct {
 	DefaultNamespaceHandler
 
-	application *ApplicationNode
+	application *ir.ApplicationNode
 }
 
-func newRootNamespace(wiring WiringSpec, name string) *rootNamespace {
+func newRootNamespace(spec WiringSpec, name string) *rootNamespace {
 	namespace := &rootNamespace{}
 	handler := rootNamespaceHandler{}
 	handler.Init(&namespace.SimpleNamespace)
-	handler.application = &ApplicationNode{}
+	handler.application = &ir.ApplicationNode{}
 	namespace.handler = &handler
-	namespace.Init(name, "BlueprintApplication", nil, wiring, &handler)
+	namespace.Init(name, "BlueprintApplication", nil, spec, &handler)
 	return namespace
 }
 
@@ -45,16 +47,15 @@ func newRootNamespace(wiring WiringSpec, name string) *rootNamespace {
 func (namespace *rootNamespace) instantiate(nodeName string) {
 	namespace.Defer(func() error {
 		namespace.Info("Instantiating %v", nodeName)
-		var node IRNode
+		var node ir.IRNode
 		return namespace.Get(nodeName, &node)
 	})
 }
 
 // Builds all nodes that were added using instantiate as well as any
 // recursively dependent nodes
-func (namespace *rootNamespace) buildApplication() (*ApplicationNode, error) {
-	node := &ApplicationNode{}
-	node.name = namespace.Name()
+func (namespace *rootNamespace) buildApplication() (*ir.ApplicationNode, error) {
+	node := ir.NewApplicationNode(namespace.Name())
 
 	// Execute deferred functions until empty
 	for len(namespace.Deferred) > 0 {

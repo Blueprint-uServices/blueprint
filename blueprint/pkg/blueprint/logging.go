@@ -190,22 +190,22 @@ func getSourceFileInfo(fileName string) *sourceFileInfo {
 	return info
 }
 
-type wiringCallsite struct {
+type Callsite struct {
 	Source     *sourceFileInfo
 	LineNumber int
 	Func       string
 	FuncName   string
 }
 
-type wiringCallstack struct {
-	Stack []wiringCallsite
+type Callstack struct {
+	Stack []Callsite
 }
 
-func (cs wiringCallsite) String() string {
+func (cs Callsite) String() string {
 	return fmt.Sprintf("%s:%v %s", cs.Source.ModuleFilename, cs.LineNumber, cs.Func)
 }
 
-func (stack *wiringCallstack) String() string {
+func (stack *Callstack) String() string {
 	var s []string
 	for _, callsite := range stack.Stack {
 		s = append(s, callsite.String())
@@ -213,7 +213,7 @@ func (stack *wiringCallstack) String() string {
 	return strings.Join(s, "\n")
 }
 
-func getWiringCallsite() *wiringCallstack {
+func GetCallstack() *Callstack {
 	pc := make([]uintptr, 10)
 	n := runtime.Callers(3, pc)
 	if n == 0 {
@@ -221,12 +221,12 @@ func getWiringCallsite() *wiringCallstack {
 	}
 
 	frames := runtime.CallersFrames(pc[:n-2])
-	callstack := &wiringCallstack{}
+	callstack := &Callstack{}
 	for {
 		frame, more := frames.Next()
 
 		splits := strings.Split(frame.Function, "/")
-		callsite := wiringCallsite{
+		callsite := Callsite{
 			Source:     getSourceFileInfo(frame.File),
 			LineNumber: frame.Line,
 			Func:       splits[len(splits)-1],

@@ -4,15 +4,17 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
 // Defines a cache called `cacheName` that uses the pre-built redis image
-func PrebuiltContainer(wiring blueprint.WiringSpec, cacheName string) string {
+func PrebuiltContainer(spec wiring.WiringSpec, cacheName string) string {
 	procName := cacheName + ".process"
 	clientName := cacheName + ".client"
 	addrName := cacheName + ".addr"
 
-	wiring.Define(procName, &RedisContainer{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(procName, &RedisContainer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Bind[*RedisContainer](ns, addrName)
 		if err != nil {
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", procName, addrName, err)
@@ -21,19 +23,19 @@ func PrebuiltContainer(wiring blueprint.WiringSpec, cacheName string) string {
 	})
 
 	dstName := cacheName + ".dst"
-	wiring.Alias(dstName, procName)
-	pointer.RequireUniqueness(wiring, dstName, &blueprint.ApplicationNode{})
+	spec.Alias(dstName, procName)
+	pointer.RequireUniqueness(spec, dstName, &ir.ApplicationNode{})
 
-	pointer.CreatePointer(wiring, cacheName, &RedisGoClient{}, dstName)
-	ptr := pointer.GetPointer(wiring, cacheName)
+	pointer.CreatePointer(spec, cacheName, &RedisGoClient{}, dstName)
+	ptr := pointer.GetPointer(spec, cacheName)
 
-	address.Define[*RedisContainer](wiring, addrName, procName, &blueprint.ApplicationNode{})
+	address.Define[*RedisContainer](spec, addrName, procName, &ir.ApplicationNode{})
 
-	ptr.AddDstModifier(wiring, addrName)
+	ptr.AddDstModifier(spec, addrName)
 
-	clientNext := ptr.AddSrcModifier(wiring, clientName)
+	clientNext := ptr.AddSrcModifier(spec, clientName)
 
-	wiring.Define(clientName, &RedisGoClient{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(clientName, &RedisGoClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*RedisContainer](ns, clientNext)
 		if err != nil {
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", clientName, clientNext, err)

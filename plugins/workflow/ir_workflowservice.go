@@ -7,6 +7,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 	"golang.org/x/exp/slog"
@@ -27,13 +28,13 @@ type WorkflowService struct {
 	Spec *WorkflowSpec
 
 	// IR Nodes of arguments that will be passed in to the generated code
-	Args []blueprint.IRNode
+	Args []ir.IRNode
 }
 
 /*
 A node representing the server-side of a workflow service.
 */
-func newWorkflowService(name string, serviceType string, args []blueprint.IRNode) (*WorkflowService, error) {
+func newWorkflowService(name string, serviceType string, args []ir.IRNode) (*WorkflowService, error) {
 	// Look up the service details; errors out if the service doesn't exist
 	spec, err := GetSpec()
 	if err != nil {
@@ -69,7 +70,7 @@ func (node *WorkflowService) Name() string {
 	return node.InstanceName
 }
 
-func (node *WorkflowService) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *WorkflowService) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.ServiceInfo.Iface.ServiceInterface(ctx), nil
 }
 

@@ -24,12 +24,12 @@ The workflow services used in this test exercise the following:
 */
 
 func TestBasicServices(t *testing.T) {
-	wiring := newWiringSpec("TestBasicServices")
+	spec := newWiringSpec("TestBasicServices")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	app := assertBuildSuccess(t, wiring, leaf, nonleaf)
+	app := assertBuildSuccess(t, spec, leaf, nonleaf)
 
 	assertIR(t, app,
 		`TestBasicServices = BlueprintApplication() {
@@ -41,12 +41,12 @@ func TestBasicServices(t *testing.T) {
 }
 
 func TestImplicitInstantiation(t *testing.T) {
-	wiring := newWiringSpec("TestImplicitInstantiation")
+	spec := newWiringSpec("TestImplicitInstantiation")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	app := assertBuildSuccess(t, wiring, nonleaf)
+	app := assertBuildSuccess(t, spec, nonleaf)
 
 	assertIR(t, app,
 		`TestImplicitInstantiation = BlueprintApplication() {
@@ -58,27 +58,27 @@ func TestImplicitInstantiation(t *testing.T) {
 }
 
 func TestBadServiceConstructor(t *testing.T) {
-	wiring := newWiringSpec("TestBadServiceConstructor")
+	spec := newWiringSpec("TestBadServiceConstructor")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafServiceImpl", leaf) // non-leaf service constructor returns the interface type; matching the impl not currently supported
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafServiceImpl", leaf) // non-leaf service constructor returns the interface type; matching the impl not currently supported
 
-	app, err := build(t, wiring, leaf, nonleaf)
+	app, err := build(t, spec, leaf, nonleaf)
 	if !assert.Error(t, err) {
-		slog.Info("Wiring Spec: \n" + wiring.String())
+		slog.Info("Wiring Spec: \n" + spec.String())
 		slog.Info("Application: \n" + app.String())
 	}
 }
 
 func TestBadServiceConstructor2(t *testing.T) {
-	wiring := newWiringSpec("TestBadServiceConstructor2")
+	spec := newWiringSpec("TestBadServiceConstructor2")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafService") // leaf service constructor returns an *impl; matching the interface not currently supported
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafService") // leaf service constructor returns an *impl; matching the interface not currently supported
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	app, err := build(t, wiring, leaf, nonleaf)
+	app, err := build(t, spec, leaf, nonleaf)
 	if !assert.Error(t, err) {
-		slog.Info("Wiring Spec: \n" + wiring.String())
+		slog.Info("Wiring Spec: \n" + spec.String())
 		slog.Info("Application: \n" + app.String())
 	}
 }

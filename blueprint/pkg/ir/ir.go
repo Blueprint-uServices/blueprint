@@ -1,4 +1,4 @@
-package blueprint
+package ir
 
 import (
 	"strings"
@@ -39,6 +39,10 @@ type ApplicationNode struct {
 
 	name     string
 	Children []IRNode
+}
+
+func NewApplicationNode(name string) *ApplicationNode {
+	return &ApplicationNode{name: name}
 }
 
 func (node *ApplicationNode) Name() string {

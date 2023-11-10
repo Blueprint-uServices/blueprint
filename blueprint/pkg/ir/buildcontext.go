@@ -1,4 +1,4 @@
-package blueprint
+package ir
 
 /*
 Base interface used during build time; plugins that generate artifacts use this

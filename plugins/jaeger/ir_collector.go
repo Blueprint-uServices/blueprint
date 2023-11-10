@@ -1,9 +1,9 @@
 package jaeger
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
@@ -67,7 +67,7 @@ func (node *JaegerCollectorContainer) String() string {
 	return node.Name() + " = JaegerCollector(" + node.BindAddr.Name() + ")"
 }
 
-func (node *JaegerCollectorContainer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *JaegerCollectorContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface := node.Iface.ServiceInterface(ctx)
 	return &JaegerInterface{Wrapped: iface}, nil
 }

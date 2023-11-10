@@ -1,10 +1,10 @@
 package memcached
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
@@ -68,7 +68,7 @@ func (n *MemcachedContainer) Name() string {
 	return n.InstanceName
 }
 
-func (node *MemcachedContainer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *MemcachedContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface := node.Iface.ServiceInterface(ctx)
 	return &MemcachedInterface{Wrapped: iface}, nil
 }
@@ -78,7 +78,7 @@ func (node *MemcachedContainer) AddContainerArtifacts(target docker.ContainerWor
 }
 
 func (node *MemcachedContainer) AddContainerInstance(target docker.ContainerWorkspace) error {
-	instanceName := blueprint.CleanName(node.InstanceName)
+	instanceName := ir.CleanName(node.InstanceName)
 
 	node.BindAddr.Hostname = instanceName
 	node.BindAddr.Port = 11211

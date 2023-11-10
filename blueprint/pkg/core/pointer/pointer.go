@@ -3,8 +3,9 @@ package pointer
 import (
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
 type PointerDef struct {
@@ -27,7 +28,7 @@ func (ptr PointerDef) String() string {
 	return b.String()
 }
 
-func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst string) *PointerDef {
+func CreatePointer(spec wiring.WiringSpec, name string, ptrType any, dst string) *PointerDef {
 	ptr := &PointerDef{}
 	ptr.name = name
 	ptr.srcModifiers = nil
@@ -37,10 +38,10 @@ func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst st
 	ptr.dstModifiers = nil
 	ptr.dst = dst
 
-	wiring.Alias(ptr.srcTail, ptr.dstHead)
+	spec.Alias(ptr.srcTail, ptr.dstHead)
 
-	wiring.Define(name, ptrType, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		var node blueprint.IRNode
+	spec.Define(name, ptrType, func(namespace wiring.Namespace) (ir.IRNode, error) {
+		var node ir.IRNode
 		if err := namespace.Get(ptr.srcHead, &node); err != nil {
 			return nil, err
 		}
@@ -53,40 +54,40 @@ func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst st
 		return node, nil
 	})
 
-	wiring.SetProperty(name, "ptr", ptr)
+	spec.SetProperty(name, "ptr", ptr)
 
 	return ptr
 }
 
-func IsPointer(wiring blueprint.WiringSpec, name string) bool {
+func IsPointer(spec wiring.WiringSpec, name string) bool {
 	var ptr *PointerDef
-	return wiring.GetProperty(name, "ptr", &ptr) == nil
+	return spec.GetProperty(name, "ptr", &ptr) == nil
 }
 
-func GetPointer(wiring blueprint.WiringSpec, name string) *PointerDef {
+func GetPointer(spec wiring.WiringSpec, name string) *PointerDef {
 	var ptr *PointerDef
-	wiring.GetProperty(name, "ptr", &ptr)
+	spec.GetProperty(name, "ptr", &ptr)
 	return ptr
 }
 
-func (ptr *PointerDef) AddSrcModifier(wiring blueprint.WiringSpec, modifierName string) string {
-	wiring.Alias(ptr.srcTail, modifierName)
+func (ptr *PointerDef) AddSrcModifier(spec wiring.WiringSpec, modifierName string) string {
+	spec.Alias(ptr.srcTail, modifierName)
 	ptr.srcTail = modifierName + ".ptr.src.next"
-	wiring.Alias(ptr.srcTail, ptr.dstHead)
+	spec.Alias(ptr.srcTail, ptr.dstHead)
 	ptr.srcModifiers = append(ptr.srcModifiers, modifierName)
 
 	return ptr.srcTail
 }
 
-func (ptr *PointerDef) AddDstModifier(wiring blueprint.WiringSpec, modifierName string) string {
+func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName string) string {
 	nextDst := ptr.dstHead
 	ptr.dstHead = modifierName
-	wiring.Alias(ptr.srcTail, ptr.dstHead)
+	spec.Alias(ptr.srcTail, ptr.dstHead)
 	ptr.dstModifiers = append([]string{ptr.dstHead}, ptr.dstModifiers...)
 	return nextDst
 }
 
-func (ptr *PointerDef) InstantiateDst(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) (ir.IRNode, error) {
 	namespace.Info("Instantiating pointer %s.dst from namespace %s", ptr.name, namespace.Name())
 	for _, modifier := range ptr.dstModifiers {
 		var addr address.Node
@@ -104,7 +105,7 @@ func (ptr *PointerDef) InstantiateDst(namespace blueprint.Namespace) (blueprint.
 				return nil, nil
 			} else {
 				namespace.Info("Instantiating %s of %s", dstName, addr.Name())
-				var dst blueprint.IRNode
+				var dst ir.IRNode
 				if err := namespace.Instantiate(dstName, &dst); err != nil {
 					return nil, err
 				}
@@ -118,7 +119,7 @@ func (ptr *PointerDef) InstantiateDst(namespace blueprint.Namespace) (blueprint.
 		}
 	}
 
-	var node blueprint.IRNode
+	var node ir.IRNode
 	err := namespace.Get(ptr.dst, &node)
 	return node, err
 }

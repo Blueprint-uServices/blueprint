@@ -1,4 +1,4 @@
-package blueprint
+package ir
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"strings"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"golang.org/x/exp/slog"
 )
 
@@ -132,10 +133,10 @@ func (b *nodeBuilder) BuildCompatibleNodes(outputDir string, nodes []IRNode) ([]
 func (r *registry) BuildAll(outputDir string, nodes []IRNode) error {
 	// Create output directory
 	if info, err := os.Stat(outputDir); err == nil && info.IsDir() {
-		return Errorf("output directory %v already exists", outputDir)
+		return blueprint.Errorf("output directory %v already exists", outputDir)
 	}
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return Errorf("unable to create output directory %v due to %v", outputDir, err.Error())
+		return blueprint.Errorf("unable to create output directory %v due to %v", outputDir, err.Error())
 	}
 
 	// Exclude metadata nodes and config nodes (for now)
@@ -169,7 +170,7 @@ func (r *registry) BuildAll(outputDir string, nodes []IRNode) error {
 		for t := range unbuiltTypes {
 			typeNames = append(typeNames, t.String())
 		}
-		return Errorf("No registered builders for node types %s", strings.Join(typeNames, ", "))
+		return blueprint.Errorf("No registered builders for node types %s", strings.Join(typeNames, ", "))
 	}
 	return nil
 }

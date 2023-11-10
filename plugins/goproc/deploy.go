@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc/goprocgen"
@@ -22,7 +22,7 @@ The builder used to generate the workspace is located in gogen/workspacebuilder.
 */
 
 type filesystemDeployer interface {
-	blueprint.ArtifactGenerator
+	ir.ArtifactGenerator
 }
 
 /*

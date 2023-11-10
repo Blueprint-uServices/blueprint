@@ -3,7 +3,7 @@ package dockerdeployment
 import (
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
 )
 
@@ -13,8 +13,8 @@ type Deployment struct {
 	dockerComposeDeployer /* Can be deployed as a docker-compose file; implemented in deploydockercompose.go */
 
 	DeploymentName string
-	ArgNodes       []blueprint.IRNode
-	ContainedNodes []blueprint.IRNode
+	ArgNodes       []ir.IRNode
+	ContainedNodes []ir.IRNode
 }
 
 func newContainerDeployment(name string) *Deployment {
@@ -44,11 +44,11 @@ func (node *Deployment) String() string {
 	return b.String()
 }
 
-func (node *Deployment) AddArg(argnode blueprint.IRNode) {
+func (node *Deployment) AddArg(argnode ir.IRNode) {
 	node.ArgNodes = append(node.ArgNodes, argnode)
 }
 
-func (node *Deployment) AddChild(child blueprint.IRNode) error {
+func (node *Deployment) AddChild(child ir.IRNode) error {
 	node.ContainedNodes = append(node.ContainedNodes, child)
 	return nil
 }

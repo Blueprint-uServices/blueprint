@@ -1,14 +1,16 @@
-package blueprint
+package wiring
 
 import (
 	"fmt"
 	"reflect"
 	"strings"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/stringutil"
 )
 
-type BuildFunc func(Namespace) (IRNode, error)
+type BuildFunc func(Namespace) (ir.IRNode, error)
 
 type WiringSpec interface {
 	Define(name string, nodeType any, build BuildFunc) // Adds a named node definition to the spec that can be built with the provided build function
@@ -29,7 +31,7 @@ type WiringSpec interface {
 	AddError(err error) // Used by plugins to signify an error; the error will be returned by a call to Err or GetBlueprint
 	Err() error         // Gets an error if there is currently one
 
-	BuildIR(nodesToInstantiate ...string) (*ApplicationNode, error) // After defining everything, this builds the IR for the specified named nodes (implicitly including dependencies of those nodes)
+	BuildIR(nodesToInstantiate ...string) (*ir.ApplicationNode, error) // After defining everything, this builds the IR for the specified named nodes (implicitly including dependencies of those nodes)
 }
 
 type WiringDef struct {
@@ -94,9 +96,9 @@ func (def *WiringDef) String() string {
 	return b.String()
 }
 
-func (wiring *wiringSpecImpl) resolveAlias(alias string) string {
+func (spec *wiringSpecImpl) resolveAlias(alias string) string {
 	for {
-		name, is_alias := wiring.aliases[alias]
+		name, is_alias := spec.aliases[alias]
 		if is_alias {
 			alias = name
 		} else {
@@ -105,15 +107,15 @@ func (wiring *wiringSpecImpl) resolveAlias(alias string) string {
 	}
 }
 
-func (wiring *wiringSpecImpl) getDef(name string, createIfAbsent bool) *WiringDef {
-	if def, ok := wiring.defs[name]; ok {
+func (spec *wiringSpecImpl) getDef(name string, createIfAbsent bool) *WiringDef {
+	if def, ok := spec.defs[name]; ok {
 		return def
 	} else if createIfAbsent {
 		def := WiringDef{}
 		def.Name = name
 		def.Properties = make(map[string][]any)
-		wiring.defs[name] = &def
-		delete(wiring.aliases, name)
+		spec.defs[name] = &def
+		delete(spec.aliases, name)
 		return &def
 	} else {
 		return nil
@@ -122,60 +124,60 @@ func (wiring *wiringSpecImpl) getDef(name string, createIfAbsent bool) *WiringDe
 
 // Adds a named node to the spec that can be built with the provided build function.
 // The nodeType is used as an indicator of where to build the node; the buildfunc is not required to actually return a node of that type
-func (wiring *wiringSpecImpl) Define(name string, nodeType any, build BuildFunc) {
-	def := wiring.getDef(name, true)
+func (spec *wiringSpecImpl) Define(name string, nodeType any, build BuildFunc) {
+	def := spec.getDef(name, true)
 	def.NodeType = nodeType
 	def.Build = build
-	def.Properties["callsite"] = []any{getWiringCallsite()}
+	def.Properties["callsite"] = []any{blueprint.GetCallstack()}
 }
 
 // Primarily for use by plugins to build nodes; this will recursively resolve any aliases until a def is reached
-func (wiring *wiringSpecImpl) GetDef(name string) *WiringDef {
-	name = wiring.resolveAlias(name)
-	return wiring.getDef(name, false)
+func (spec *wiringSpecImpl) GetDef(name string) *WiringDef {
+	name = spec.resolveAlias(name)
+	return spec.getDef(name, false)
 }
 
-func (wiring *wiringSpecImpl) Defs() []string {
-	defs := make([]string, 0, len(wiring.defs))
-	for name := range wiring.defs {
+func (spec *wiringSpecImpl) Defs() []string {
+	defs := make([]string, 0, len(spec.defs))
+	for name := range spec.defs {
 		defs = append(defs, name)
 	}
 	return defs
 }
 
 // Defines an alias to another node.  Deletes any existing def for the alias
-func (wiring *wiringSpecImpl) Alias(alias string, pointsto string) {
-	_, exists := wiring.defs[alias]
+func (spec *wiringSpecImpl) Alias(alias string, pointsto string) {
+	_, exists := spec.defs[alias]
 	if exists {
-		delete(wiring.defs, alias)
+		delete(spec.defs, alias)
 	}
-	wiring.aliases[alias] = pointsto
+	spec.aliases[alias] = pointsto
 }
 
 // If the provided name is an alias, returns what it points to.
 //
 //	Otherwise returns the empty string and false
-func (wiring *wiringSpecImpl) GetAlias(alias string) (string, bool) {
-	name, exists := wiring.aliases[alias]
+func (spec *wiringSpecImpl) GetAlias(alias string) (string, bool) {
+	name, exists := spec.aliases[alias]
 	return name, exists
 }
 
 // Sets a static value in the wiring spec, replacing any existing values for the specified key
-func (wiring *wiringSpecImpl) SetProperty(name string, propKey string, propValue any) {
-	def := wiring.getDef(name, true)
+func (spec *wiringSpecImpl) SetProperty(name string, propKey string, propValue any) {
+	def := spec.getDef(name, true)
 	def.Properties[propKey] = []any{propValue}
 
 }
 
 // Adds a static value to the wiring spec, appending it to any existing values for the specified key
-func (wiring *wiringSpecImpl) AddProperty(name string, propKey string, propValue any) {
-	def := wiring.getDef(name, true)
+func (spec *wiringSpecImpl) AddProperty(name string, propKey string, propValue any) {
+	def := spec.getDef(name, true)
 	def.Properties[propKey] = append(def.Properties[propKey], propValue)
 }
 
 // Primarily for use by plugins to get configuration values
-func (wiring *wiringSpecImpl) GetProperty(name string, key string, dst any) error {
-	def := wiring.getDef(name, false)
+func (spec *wiringSpecImpl) GetProperty(name string, key string, dst any) error {
+	def := spec.getDef(name, false)
 	if def != nil {
 		return def.GetProperty(key, dst)
 	}
@@ -183,27 +185,27 @@ func (wiring *wiringSpecImpl) GetProperty(name string, key string, dst any) erro
 }
 
 // Primarily for use by plugins to get configuration values
-func (wiring *wiringSpecImpl) GetProperties(name string, key string, dst any) error {
-	def := wiring.getDef(name, false)
+func (spec *wiringSpecImpl) GetProperties(name string, key string, dst any) error {
+	def := spec.getDef(name, false)
 	if def != nil {
 		return def.GetProperties(key, dst)
 	}
 	return nil
 }
 
-func (wiring *wiringSpecImpl) String() string {
+func (spec *wiringSpecImpl) String() string {
 	var defStrings []string
-	for _, def := range wiring.defs {
+	for _, def := range spec.defs {
 		defStrings = append(defStrings, def.String())
 	}
-	for alias, pointsto := range wiring.aliases {
+	for alias, pointsto := range spec.aliases {
 		defStrings = append(defStrings, alias+" -> "+pointsto)
 	}
-	return fmt.Sprintf("%s = WiringSpec {\n%s\n}", wiring.name, stringutil.Indent(strings.Join(defStrings, "\n"), 2))
+	return fmt.Sprintf("%s = WiringSpec {\n%s\n}", spec.name, stringutil.Indent(strings.Join(defStrings, "\n"), 2))
 }
 
-func (wiring *wiringSpecImpl) AddError(err error) {
-	wiring.errors = append(wiring.errors, err)
+func (spec *wiringSpecImpl) AddError(err error) {
+	spec.errors = append(spec.errors, err)
 }
 
 type WiringError struct {
@@ -218,14 +220,14 @@ func (e WiringError) Error() string {
 	return strings.Join(errStrings, "\n")
 }
 
-func (wiring *wiringSpecImpl) Err() error {
-	if wiring.errors == nil {
+func (spec *wiringSpecImpl) Err() error {
+	if spec.errors == nil {
 		return nil
 	} else {
-		return &WiringError{wiring.errors}
+		return &WiringError{spec.errors}
 	}
 }
 
-func (wiring *wiringSpecImpl) BuildIR(nodesToInstantiate ...string) (*ApplicationNode, error) {
-	return BuildApplicationIR(wiring, wiring.name, nodesToInstantiate...)
+func (spec *wiringSpecImpl) BuildIR(nodesToInstantiate ...string) (*ir.ApplicationNode, error) {
+	return BuildApplicationIR(spec, spec.name, nodesToInstantiate...)
 }

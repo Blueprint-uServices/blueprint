@@ -12,6 +12,7 @@ import (
 	cp "github.com/otiai10/copy"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 	"golang.org/x/mod/modfile"
@@ -23,7 +24,7 @@ Implements the WorkspaceBuilder interface defined in golang/ir.go
 The WorkspaceBuilder is used for accumulating local module directories into a golang workspace.
 */
 type WorkspaceBuilderImpl struct {
-	blueprint.VisitTrackerImpl
+	ir.VisitTrackerImpl
 	WorkspaceDir     string            // The directory containing this workspace
 	ModuleDirs       map[string]string // map from FQ module name to directory name within WorkspaceDir
 	Modules          map[string]string // map from directory name to FQ module name within WorkspaceDir

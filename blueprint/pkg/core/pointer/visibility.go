@@ -2,15 +2,17 @@ package pointer
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
 // Metadata used to enforce reachability constraints for nodes (primarily services)
 type VisibilityMetadata struct {
-	blueprint.IRMetadata
+	ir.IRMetadata
 
 	name      string
-	node      blueprint.IRNode
-	namespace blueprint.Namespace
+	node      ir.IRNode
+	namespace wiring.Namespace
 }
 
 func (md *VisibilityMetadata) Name() string {
@@ -30,21 +32,21 @@ This is independent of whether it can be addressed by any node within that granu
 
 The name argument should be an alias that this call will redefine.
 */
-func RequireUniqueness(wiring blueprint.WiringSpec, alias string, visibility any) {
-	name, is_alias := wiring.GetAlias(alias)
+func RequireUniqueness(spec wiring.WiringSpec, alias string, visibility any) {
+	name, is_alias := spec.GetAlias(alias)
 	if !is_alias {
-		wiring.AddError(blueprint.Errorf("cannot configure the uniqueness of %s because it points directly to a node; uniqueness can only be set for aliases", alias))
+		spec.AddError(blueprint.Errorf("cannot configure the uniqueness of %s because it points directly to a node; uniqueness can only be set for aliases", alias))
 		return
 	}
 
-	def := wiring.GetDef(name)
+	def := spec.GetDef(name)
 	if def == nil {
-		wiring.AddError(blueprint.Errorf("cannot configure the uniqueness of %s because it does not exist", name))
+		spec.AddError(blueprint.Errorf("cannot configure the uniqueness of %s because it does not exist", name))
 		return
 	}
 
 	mdName := name + ".visibility"
-	wiring.Define(mdName, visibility, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(mdName, visibility, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		md := &VisibilityMetadata{}
 		md.name = mdName
 		md.node = nil
@@ -53,7 +55,7 @@ func RequireUniqueness(wiring blueprint.WiringSpec, alias string, visibility any
 	})
 
 	checkName := name + ".uniqueness_check"
-	wiring.Define(checkName, def.NodeType, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(checkName, def.NodeType, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		var md *VisibilityMetadata
 		if err := namespace.Get(mdName, &md); err != nil {
 			return nil, blueprint.Errorf("expected %v to be uniqueness metadata but got %v", mdName, err)
@@ -68,5 +70,5 @@ func RequireUniqueness(wiring blueprint.WiringSpec, alias string, visibility any
 		return md.node, err
 	})
 
-	wiring.Alias(alias, checkName)
+	spec.Alias(alias, checkName)
 }

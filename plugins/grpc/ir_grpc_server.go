@@ -3,9 +3,9 @@ package grpc
 import (
 	"fmt"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc/grpccodegen"
@@ -113,10 +113,10 @@ func (node *GolangServer) AddInstantiation(builder golang.GraphBuilder) error {
 	}
 
 	slog.Info(fmt.Sprintf("Instantiating GRPCServer %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
-	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped, node.Addr.Bind})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, node.Addr.Bind})
 }
 
-func (node *GolangServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *GolangServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface, err := node.Wrapped.GetInterface(ctx)
 	return &GRPCInterface{Wrapped: iface}, err
 }

@@ -1,8 +1,8 @@
 package linuxcontainer
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 )
 
@@ -16,17 +16,17 @@ func init() {
 
 // to trigger module initialization and register builders
 func RegisterBuilders() {
-	blueprint.RegisterDefaultNamespace[linux.Process]("linuxcontainer", buildDefaultLinuxWorkspace)
-	blueprint.RegisterDefaultBuilder[*Container]("linuxcontainer", buildDefaultLinuxContainer)
+	ir.RegisterDefaultNamespace[linux.Process]("linuxcontainer", buildDefaultLinuxWorkspace)
+	ir.RegisterDefaultBuilder[*Container]("linuxcontainer", buildDefaultLinuxContainer)
 }
 
-func buildDefaultLinuxWorkspace(outputDir string, nodes []blueprint.IRNode) error {
+func buildDefaultLinuxWorkspace(outputDir string, nodes []ir.IRNode) error {
 	ctr := newLinuxContainerNode("default")
 	ctr.ContainedNodes = nodes
 	return ctr.GenerateArtifacts(outputDir)
 }
 
-func buildDefaultLinuxContainer(outputDir string, node blueprint.IRNode) error {
+func buildDefaultLinuxContainer(outputDir string, node ir.IRNode) error {
 	if ctr, isContainer := node.(*Container); isContainer {
 		ctrDir, err := ioutil.CreateNodeDir(outputDir, node.Name())
 		if err != nil {

@@ -7,6 +7,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
@@ -35,7 +36,7 @@ func (node *XtraceClientWrapper) String() string {
 func (node *XtraceClientWrapper) ImplementsGolangNode()    {}
 func (node *XtraceClientWrapper) ImplementsGolangService() {}
 
-func newXtraceClientWrapper(name string, wrapped blueprint.IRNode, xtraceClient blueprint.IRNode) (*XtraceClientWrapper, error) {
+func newXtraceClientWrapper(name string, wrapped ir.IRNode, xtraceClient ir.IRNode) (*XtraceClientWrapper, error) {
 	serverNode, is_callable := wrapped.(golang.Service)
 	if !is_callable {
 		return nil, blueprint.Errorf("xtrace client wrapper requires %s to be a golang service but got %s", wrapped.Name(), reflect.TypeOf(wrapped).String())
@@ -54,7 +55,7 @@ func newXtraceClientWrapper(name string, wrapped blueprint.IRNode, xtraceClient 
 	return node, nil
 }
 
-func (node *XtraceClientWrapper) genInterface(ctx blueprint.BuildContext) (*gocode.ServiceInterface, error) {
+func (node *XtraceClientWrapper) genInterface(ctx ir.BuildContext) (*gocode.ServiceInterface, error) {
 	iface, err := golang.GetGoInterface(ctx, node.Wrapped)
 	if err != nil {
 		return nil, err
@@ -99,7 +100,7 @@ func (node *XtraceClientWrapper) AddInstantiation(builder golang.GraphBuilder) e
 		},
 	}
 
-	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped, node.XTClient})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, node.XTClient})
 }
 
 func (node *XtraceClientWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
@@ -121,7 +122,7 @@ func (node *XtraceClientWrapper) GenerateFuncs(builder golang.ModuleBuilder) err
 	return generateClientHandler(builder, wrapped_iface, impl_iface, xtrace_iface, node.outputPackage)
 }
 
-func (node *XtraceClientWrapper) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *XtraceClientWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.genInterface(ctx)
 }
 

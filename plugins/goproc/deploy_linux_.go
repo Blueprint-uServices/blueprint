@@ -1,7 +1,7 @@
 package goproc
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc/linuxgen"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
@@ -45,7 +45,7 @@ func (node *Process) AddProcessArtifacts(builder linux.ProcessWorkspace) error {
 
 	// If it's a docker container, we can also add Dockerfile build commands
 	if dockerWorkspace, isDocker := builder.(docker.ProcessWorkspace); isDocker {
-		procName := blueprint.CleanName(node.Name())
+		procName := ir.CleanName(node.Name())
 		buildCmds, err := linuxgen.GenerateDockerfileBuildCommands(procName)
 		dockerWorkspace.AddDockerfileCommands(procName, buildCmds)
 		return err
@@ -61,7 +61,7 @@ func (node *Process) AddProcessInstance(builder linux.ProcessWorkspace) error {
 		return nil
 	}
 
-	procName := blueprint.CleanName(node.Name())
+	procName := ir.CleanName(node.Name())
 
 	var runfunc string
 	var err error

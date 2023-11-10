@@ -7,6 +7,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ioutil"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment/dockergen"
 	"golang.org/x/exp/slog"
@@ -18,7 +19,7 @@ type (
 		generates a docker-compose.yml file on the local filesystem.
 	*/
 	dockerComposeDeployer interface {
-		blueprint.ArtifactGenerator
+		ir.ArtifactGenerator
 	}
 
 	/*
@@ -35,7 +36,7 @@ type (
 
 	*/
 	dockerComposeWorkspace struct {
-		blueprint.VisitTrackerImpl
+		ir.VisitTrackerImpl
 
 		info docker.ContainerWorkspaceInfo
 
@@ -57,14 +58,14 @@ The basic build process of a docker-compose deployment
 func (node *Deployment) generateArtifacts(workspace *dockerComposeWorkspace) error {
 
 	// Add any locally-built container images
-	for _, node := range blueprint.Filter[docker.ProvidesContainerImage](node.ContainedNodes) {
+	for _, node := range ir.Filter[docker.ProvidesContainerImage](node.ContainedNodes) {
 		if err := node.AddContainerArtifacts(workspace); err != nil {
 			return err
 		}
 	}
 
 	// Collect all container instances
-	for _, node := range blueprint.Filter[docker.ProvidesContainerInstance](node.ContainedNodes) {
+	for _, node := range ir.Filter[docker.ProvidesContainerInstance](node.ContainedNodes) {
 		if err := node.AddContainerInstance(workspace); err != nil {
 			return err
 		}
@@ -98,13 +99,13 @@ func (d *dockerComposeWorkspace) Info() docker.ContainerWorkspaceInfo {
 
 func (d *dockerComposeWorkspace) CreateImageDir(imageName string) (string, error) {
 	// Only alphanumeric and underscores are allowed in an proc name
-	imageName = blueprint.CleanName(imageName)
+	imageName = ir.CleanName(imageName)
 	imageDir, err := ioutil.CreateNodeDir(d.info.Path, imageName)
 	d.ImageDirs[imageName] = imageDir
 	return imageDir, err
 }
 
-func (d *dockerComposeWorkspace) DeclarePrebuiltInstance(instanceName string, image string, args ...blueprint.IRNode) error {
+func (d *dockerComposeWorkspace) DeclarePrebuiltInstance(instanceName string, image string, args ...ir.IRNode) error {
 	// Docker containers should assign all internal server ports (typically using address.AssignPorts) before adding an instance
 	if err := address.CheckPorts(args); err != nil {
 		return blueprint.Errorf("unable to add docker instance %v due to %v", instanceName, err.Error())
@@ -113,7 +114,7 @@ func (d *dockerComposeWorkspace) DeclarePrebuiltInstance(instanceName string, im
 	return d.DockerComposeFile.AddImageInstance(instanceName, image, args...)
 }
 
-func (d *dockerComposeWorkspace) DeclareLocalImage(instanceName string, imageDir string, args ...blueprint.IRNode) error {
+func (d *dockerComposeWorkspace) DeclareLocalImage(instanceName string, imageDir string, args ...ir.IRNode) error {
 	// Docker containers should assign all internal server ports (typically using address.AssignPorts) before adding an instance
 	if err := address.CheckPorts(args); err != nil {
 		return blueprint.Errorf("unable to add docker instance %v due to %v", instanceName, err.Error())

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 )
 
 /*
@@ -35,9 +36,9 @@ and assigns ports to any addresses that haven't yet been assigned.
 
 Returns an error if multiple nodes have pre-assigned themselves conflicting ports
 */
-func AssignPorts(hostname string, nodes []blueprint.IRNode) error {
+func AssignPorts(hostname string, nodes []ir.IRNode) error {
 	// Extract the BindConfig nodes
-	addrs := blueprint.Filter[*BindConfig](nodes)
+	addrs := ir.Filter[*BindConfig](nodes)
 
 	ports := make(map[uint16]*BindConfig)
 
@@ -92,9 +93,9 @@ func AssignPorts(hostname string, nodes []blueprint.IRNode) error {
 /*
 Returns an error if any ports haven't been allocated
 */
-func CheckPorts(nodes []blueprint.IRNode) error {
+func CheckPorts(nodes []ir.IRNode) error {
 	var missing []string
-	for _, addr := range blueprint.Filter[*BindConfig](nodes) {
+	for _, addr := range ir.Filter[*BindConfig](nodes) {
 		if addr.Port == 0 {
 			missing = append(missing, addr.Name())
 		}
@@ -109,8 +110,8 @@ func CheckPorts(nodes []blueprint.IRNode) error {
 If a namespace translates addresses, then it will need to reset the assigned
 ports before returning to the parent namespace
 */
-func ResetPorts(nodes []blueprint.IRNode) {
-	for _, addr := range blueprint.Filter[*BindConfig](nodes) {
+func ResetPorts(nodes []ir.IRNode) {
+	for _, addr := range ir.Filter[*BindConfig](nodes) {
 		addr.Port = 0
 		addr.Hostname = ""
 	}
