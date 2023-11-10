@@ -48,7 +48,7 @@ At build time, services need to be able to provide information about the interfa
 
 ```go
 type ServiceNode interface {
-    GetInterface(ctx blueprint.BuildContext) (ServiceInterface, error)
+    GetInterface(ctx ir.BuildContext) (ServiceInterface, error)
 }
 ```
 

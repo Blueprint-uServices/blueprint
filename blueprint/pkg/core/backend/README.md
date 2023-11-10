@@ -19,7 +19,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/backend"
 
 ```go
 type Cache interface {
-    blueprint.IRNode
+    ir.IRNode
     service.ServiceNode
 }
 ```
@@ -31,7 +31,7 @@ type Cache interface {
 
 ```go
 type NoSQLDB interface {
-    blueprint.IRNode
+    ir.IRNode
     service.ServiceNode
 }
 ```

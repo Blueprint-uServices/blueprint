@@ -8,19 +8,19 @@ import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 
 ## Index
 
-- [func AssignPorts\(hostname string, nodes \[\]blueprint.IRNode\) error](<#AssignPorts>)
-- [func CheckPorts\(nodes \[\]blueprint.IRNode\) error](<#CheckPorts>)
-- [func Define\[ServerType blueprint.IRNode\]\(wiring blueprint.WiringSpec, addressName string, pointsTo string, reachability any\)](<#Define>)
-- [func DestinationOf\(namespace blueprint.Namespace, addressName string\) \(string, error\)](<#DestinationOf>)
-- [func ResetPorts\(nodes \[\]blueprint.IRNode\)](<#ResetPorts>)
+- [func AssignPorts\(hostname string, nodes \[\]ir.IRNode\) error](<#AssignPorts>)
+- [func CheckPorts\(nodes \[\]ir.IRNode\) error](<#CheckPorts>)
+- [func Define\[ServerType ir.IRNode\]\(spec wiring.WiringSpec, addressName string, pointsTo string, reachability any\)](<#Define>)
+- [func DestinationOf\(namespace wiring.Namespace, addressName string\) \(string, error\)](<#DestinationOf>)
+- [func ResetPorts\(nodes \[\]ir.IRNode\)](<#ResetPorts>)
 - [type Address](<#Address>)
-  - [func Bind\[ServerType blueprint.IRNode\]\(namespace blueprint.Namespace, addressName string\) \(\*Address\[ServerType\], error\)](<#Bind>)
-  - [func Dial\[ServerType blueprint.IRNode\]\(namespace blueprint.Namespace, addressName string\) \(\*Address\[ServerType\], error\)](<#Dial>)
-  - [func \(addr \*Address\[ServerType\]\) GetDestination\(\) blueprint.IRNode](<#Address[ServerType].GetDestination>)
+  - [func Bind\[ServerType ir.IRNode\]\(namespace wiring.Namespace, addressName string\) \(\*Address\[ServerType\], error\)](<#Bind>)
+  - [func Dial\[ServerType ir.IRNode\]\(namespace wiring.Namespace, addressName string\) \(\*Address\[ServerType\], error\)](<#Dial>)
+  - [func \(addr \*Address\[ServerType\]\) GetDestination\(\) ir.IRNode](<#Address[ServerType].GetDestination>)
   - [func \(addr \*Address\[ServerType\]\) ImplementsAddressNode\(\)](<#Address[ServerType].ImplementsAddressNode>)
   - [func \(addr \*Address\[ServerType\]\) ImplementsIRMetadata\(\)](<#Address[ServerType].ImplementsIRMetadata>)
   - [func \(addr \*Address\[ServerType\]\) Name\(\) string](<#Address[ServerType].Name>)
-  - [func \(addr \*Address\[ServerType\]\) SetDestination\(node blueprint.IRNode\) error](<#Address[ServerType].SetDestination>)
+  - [func \(addr \*Address\[ServerType\]\) SetDestination\(node ir.IRNode\) error](<#Address[ServerType].SetDestination>)
   - [func \(addr \*Address\[ServerType\]\) String\(\) string](<#Address[ServerType].String>)
 - [type BindConfig](<#BindConfig>)
   - [func \(conf \*BindConfig\) ImplementsBindConfig\(\)](<#BindConfig.ImplementsBindConfig>)
@@ -33,7 +33,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
 ## func AssignPorts
 
 ```go
-func AssignPorts(hostname string, nodes []blueprint.IRNode) error
+func AssignPorts(hostname string, nodes []ir.IRNode) error
 ```
 
 A helper method for use by namespace nodes.
@@ -48,7 +48,7 @@ Returns an error if multiple nodes have pre\-assigned themselves conflicting por
 ## func CheckPorts
 
 ```go
-func CheckPorts(nodes []blueprint.IRNode) error
+func CheckPorts(nodes []ir.IRNode) error
 ```
 
 Returns an error if any ports haven't been allocated
@@ -57,7 +57,7 @@ Returns an error if any ports haven't been allocated
 ## func Define
 
 ```go
-func Define[ServerType blueprint.IRNode](wiring blueprint.WiringSpec, addressName string, pointsTo string, reachability any)
+func Define[ServerType ir.IRNode](spec wiring.WiringSpec, addressName string, pointsTo string, reachability any)
 ```
 
 Defines an address called \`addressName\` that points to the definition \`pointsto\`.
@@ -66,7 +66,7 @@ Defines an address called \`addressName\` that points to the definition \`points
 ## func DestinationOf
 
 ```go
-func DestinationOf(namespace blueprint.Namespace, addressName string) (string, error)
+func DestinationOf(namespace wiring.Namespace, addressName string) (string, error)
 ```
 
 
@@ -75,7 +75,7 @@ func DestinationOf(namespace blueprint.Namespace, addressName string) (string, e
 ## func ResetPorts
 
 ```go
-func ResetPorts(nodes []blueprint.IRNode)
+func ResetPorts(nodes []ir.IRNode)
 ```
 
 If a namespace translates addresses, then it will need to reset the assigned ports before returning to the parent namespace
@@ -86,7 +86,7 @@ If a namespace translates addresses, then it will need to reset the assigned por
 Basic generic implementation of address.Node
 
 ```go
-type Address[ServerType blueprint.IRNode] struct {
+type Address[ServerType ir.IRNode] struct {
     AddrName string
     Server   ServerType
     Bind     *BindConfig // Configuration value for the bind address
@@ -98,7 +98,7 @@ type Address[ServerType blueprint.IRNode] struct {
 ### func Bind
 
 ```go
-func Bind[ServerType blueprint.IRNode](namespace blueprint.Namespace, addressName string) (*Address[ServerType], error)
+func Bind[ServerType ir.IRNode](namespace wiring.Namespace, addressName string) (*Address[ServerType], error)
 ```
 
 The server side of an address should call this method to get the address to bind for a server
@@ -109,7 +109,7 @@ Under the hood this will ensure the configuration values for the binding address
 ### func Dial
 
 ```go
-func Dial[ServerType blueprint.IRNode](namespace blueprint.Namespace, addressName string) (*Address[ServerType], error)
+func Dial[ServerType ir.IRNode](namespace wiring.Namespace, addressName string) (*Address[ServerType], error)
 ```
 
 The client side of an address should call this method to get the address to dial for a server
@@ -120,7 +120,7 @@ Under the hood this will ensure the configuration values for the dialling addres
 ### func \(\*Address\[ServerType\]\) GetDestination
 
 ```go
-func (addr *Address[ServerType]) GetDestination() blueprint.IRNode
+func (addr *Address[ServerType]) GetDestination() ir.IRNode
 ```
 
 
@@ -156,7 +156,7 @@ func (addr *Address[ServerType]) Name() string
 ### func \(\*Address\[ServerType\]\) SetDestination
 
 ```go
-func (addr *Address[ServerType]) SetDestination(node blueprint.IRNode) error
+func (addr *Address[ServerType]) SetDestination(node ir.IRNode) error
 ```
 
 
@@ -222,11 +222,11 @@ Contains metadata about the address and the node it points to
 
 ```go
 type Node interface {
-    blueprint.IRNode
-    blueprint.IRMetadata
+    ir.IRNode
+    ir.IRMetadata
     Name() string
-    GetDestination() blueprint.IRNode
-    SetDestination(blueprint.IRNode) error
+    GetDestination() ir.IRNode
+    SetDestination(ir.IRNode) error
     ImplementsAddressNode()
 }
 ```

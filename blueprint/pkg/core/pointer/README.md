@@ -8,14 +8,14 @@ import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
 
 ## Index
 
-- [func IsPointer\(wiring blueprint.WiringSpec, name string\) bool](<#IsPointer>)
-- [func RequireUniqueness\(wiring blueprint.WiringSpec, alias string, visibility any\)](<#RequireUniqueness>)
+- [func IsPointer\(spec wiring.WiringSpec, name string\) bool](<#IsPointer>)
+- [func RequireUniqueness\(spec wiring.WiringSpec, alias string, visibility any\)](<#RequireUniqueness>)
 - [type PointerDef](<#PointerDef>)
-  - [func CreatePointer\(wiring blueprint.WiringSpec, name string, ptrType any, dst string\) \*PointerDef](<#CreatePointer>)
-  - [func GetPointer\(wiring blueprint.WiringSpec, name string\) \*PointerDef](<#GetPointer>)
-  - [func \(ptr \*PointerDef\) AddDstModifier\(wiring blueprint.WiringSpec, modifierName string\) string](<#PointerDef.AddDstModifier>)
-  - [func \(ptr \*PointerDef\) AddSrcModifier\(wiring blueprint.WiringSpec, modifierName string\) string](<#PointerDef.AddSrcModifier>)
-  - [func \(ptr \*PointerDef\) InstantiateDst\(namespace blueprint.Namespace\) \(blueprint.IRNode, error\)](<#PointerDef.InstantiateDst>)
+  - [func CreatePointer\(spec wiring.WiringSpec, name string, ptrType any, dst string\) \*PointerDef](<#CreatePointer>)
+  - [func GetPointer\(spec wiring.WiringSpec, name string\) \*PointerDef](<#GetPointer>)
+  - [func \(ptr \*PointerDef\) AddDstModifier\(spec wiring.WiringSpec, modifierName string\) string](<#PointerDef.AddDstModifier>)
+  - [func \(ptr \*PointerDef\) AddSrcModifier\(spec wiring.WiringSpec, modifierName string\) string](<#PointerDef.AddSrcModifier>)
+  - [func \(ptr \*PointerDef\) InstantiateDst\(namespace wiring.Namespace\) \(ir.IRNode, error\)](<#PointerDef.InstantiateDst>)
   - [func \(ptr PointerDef\) String\(\) string](<#PointerDef.String>)
 - [type VisibilityMetadata](<#VisibilityMetadata>)
   - [func \(md \*VisibilityMetadata\) Name\(\) string](<#VisibilityMetadata.Name>)
@@ -26,7 +26,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
 ## func IsPointer
 
 ```go
-func IsPointer(wiring blueprint.WiringSpec, name string) bool
+func IsPointer(spec wiring.WiringSpec, name string) bool
 ```
 
 
@@ -35,7 +35,7 @@ func IsPointer(wiring blueprint.WiringSpec, name string) bool
 ## func RequireUniqueness
 
 ```go
-func RequireUniqueness(wiring blueprint.WiringSpec, alias string, visibility any)
+func RequireUniqueness(spec wiring.WiringSpec, alias string, visibility any)
 ```
 
 A uniqueness check can be applied to any aliased node.
@@ -61,7 +61,7 @@ type PointerDef struct {
 ### func CreatePointer
 
 ```go
-func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst string) *PointerDef
+func CreatePointer(spec wiring.WiringSpec, name string, ptrType any, dst string) *PointerDef
 ```
 
 
@@ -70,7 +70,7 @@ func CreatePointer(wiring blueprint.WiringSpec, name string, ptrType any, dst st
 ### func GetPointer
 
 ```go
-func GetPointer(wiring blueprint.WiringSpec, name string) *PointerDef
+func GetPointer(spec wiring.WiringSpec, name string) *PointerDef
 ```
 
 
@@ -79,7 +79,7 @@ func GetPointer(wiring blueprint.WiringSpec, name string) *PointerDef
 ### func \(\*PointerDef\) AddDstModifier
 
 ```go
-func (ptr *PointerDef) AddDstModifier(wiring blueprint.WiringSpec, modifierName string) string
+func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName string) string
 ```
 
 
@@ -88,7 +88,7 @@ func (ptr *PointerDef) AddDstModifier(wiring blueprint.WiringSpec, modifierName 
 ### func \(\*PointerDef\) AddSrcModifier
 
 ```go
-func (ptr *PointerDef) AddSrcModifier(wiring blueprint.WiringSpec, modifierName string) string
+func (ptr *PointerDef) AddSrcModifier(spec wiring.WiringSpec, modifierName string) string
 ```
 
 
@@ -97,7 +97,7 @@ func (ptr *PointerDef) AddSrcModifier(wiring blueprint.WiringSpec, modifierName 
 ### func \(\*PointerDef\) InstantiateDst
 
 ```go
-func (ptr *PointerDef) InstantiateDst(namespace blueprint.Namespace) (blueprint.IRNode, error)
+func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) (ir.IRNode, error)
 ```
 
 
@@ -118,7 +118,7 @@ Metadata used to enforce reachability constraints for nodes \(primarily services
 
 ```go
 type VisibilityMetadata struct {
-    blueprint.IRMetadata
+    ir.IRMetadata
     // contains filtered or unexported fields
 }
 ```
