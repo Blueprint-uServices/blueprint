@@ -72,7 +72,7 @@ func main() {
 
 	// Below here is a WIP on generating code
 
-	err = application.Compile("tmp")
+	err = application.GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)

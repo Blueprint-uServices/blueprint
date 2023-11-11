@@ -37,7 +37,7 @@ func main() {
 	linuxcontainer.RegisterBuilders()
 	dockerdeployment.RegisterBuilders()
 
-	spec := spec.NewWiringSpec("leaf_example")
+	spec := wiring.NewWiringSpec("leaf_example")
 
 	workflow.Init("../workflow")
 
@@ -69,7 +69,7 @@ func main() {
 
 	// Below here is a WIP on generating code
 
-	err = application.Compile("tmp")
+	err = application.GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)

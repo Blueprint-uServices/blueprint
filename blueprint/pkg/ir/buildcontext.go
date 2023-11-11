@@ -1,39 +1,30 @@
 package ir
 
-/*
-Base interface used during build time; plugins that generate artifacts use this
-*/
 type (
+	// A Blueprint application can potentially have multiple IR node instances spread across the application
+	// that generate the same code.
+	//
+	// Visit tracker is a utility method used during artifact generation to prevent nodes from unnecessarily
+	// generating the same artifact repeatedly, when once will suffice.
 	VisitTracker interface {
+		// Returns false on the first invocation of name; true on subsequent invocations
 		Visited(name string) bool
 	}
 
+	// All artifact generation occurs in the context of some BuildContext.
+	//
+	// Plugins that control the artifact generation process should implement this interface.
 	BuildContext interface {
 		VisitTracker
 		ImplementsBuildContext()
 	}
 )
 
-/*
-In Blueprint, it is possible for there to be multiple different IRNode instances, across that application,
-that generate and use the same code.  It is possible that the corresponding plugin does not want to generate
-that code multiple times.  The VisitTracker provides a simple way for plugins to prevent generating output
-code multiple times.
-
-In methods where code gets generated (e.g. in golang Instantiable), before generating any code, plugins
-invoke `VisitTracker.Visited` with a unique identifier (e.g. representing the node, instance, or plugin).
-The first invocation for the identifier returns true; subsequent invocations return false.
-*/
+// Basic implementation of the [VisitTracker] interface
 type VisitTrackerImpl struct {
 	visited map[string]any
 }
 
-/*
-Multiple instances of a node can exist across a Blueprint application that generates and uses the same code.
-This method is used by nodes to determine whether code has already been generated in this workspace by a
-different instance of the same node type.
-The first call to this method for a given name will return false; subsequent calls will return true
-*/
 func (tracker *VisitTrackerImpl) Visited(name string) bool {
 	if tracker.visited == nil {
 		tracker.visited = make(map[string]any)

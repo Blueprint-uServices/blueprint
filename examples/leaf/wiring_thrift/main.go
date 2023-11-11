@@ -25,7 +25,7 @@ func serviceDefaults(spec wiring.WiringSpec, serviceName string) string {
 func main() {
 	fmt.Println("Constructing Wiring Spec")
 
-	spec := spec.NewWiringSpec("leaf_example")
+	spec := wiring.NewWiringSpec("leaf_example")
 
 	// Create the wiring spec
 	workflow.Init("../workflow")
@@ -60,7 +60,7 @@ func main() {
 
 	slog.Info("Application: \n" + application.String())
 
-	err = application.Compile("tmp")
+	err = application.GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)

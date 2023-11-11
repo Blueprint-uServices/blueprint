@@ -10,39 +10,65 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-/*
-A Namespace is used during the IR-building process to accumulate built nodes.
-
-Blueprint has several basic out-of-the-box namespaces that are used when building applications.  A plugin can implement
-its own custom namespace.  Implementing a custom Namespace is useful to achieve any of the following:
-  - Namespaces are the mechanism for limiting the visibility and addressibility of nodes
-  - Namespaces are the mechanism for templating nodes (e.g. to implement replication of nodes)
-
-For example, to build a GoProcess that contains Golang object instances, there will be a Namespace that accumulates
-Golang object instance nodes during the building process, and then creates a GoProcess namespace node.
-
-Most namespace implementations should extend the BasicNamespace struct
-*/
+// Namespace is a dependency injection container used by Blueprint plugins during Blueprint's IR construction process.
+// Namespaces instantiate and store IRNodes.  A root Blueprint application is itself a Namespace.
+//
+// A Namespace argument is passed to the [BuildFunc] when an IRNode is being built.  An IRNode can potentially
+// be built multiple times, in different namespaces.
+//
+// If an IRNode depends on other IRNodes, those others can be fetched by calling [Namespace.Get].  If those IRNodes
+// haven't yet been built, then their BuildFuncs will also be invoked, recursively.  Conversely, if those IRNodes
+// are already built, then the built instance is re-used.
+//
+// Namespaces are hierarchical and a namespace implementation can choose to only support a subset of IRNodes.
+// In this case, [Namespace.Get] on an unsupported IRNode will recursively get the node on the parent namespace.
+// Namespaces inspect the nodeType argument of [WiringSpec.Define] to make this decision.
 type Namespace interface {
-	Name() string                                         // The name of this namespace
-	Get(name string, dst any) error                       // Get an ir.IRNode from this namespace or a parent namespace, possibly building it.  Places the ir.IRNode in the pointer dst.  dst can be an ir.IRNode or any implementation of an ir.IRNode
-	Instantiate(name string, dst any) error               // The same as Get, but without creating a dependency (an edge) into the current namespace.  Places the ir.IRNode in the pointer dst.  dst can be an ir.IRNode or any implementation of an ir.IRNode
-	GetProperty(name string, key string, dst any) error   // Get a property from this namespace; dst should be a pointer to value
-	GetProperties(name string, key string, dst any) error // Get a slice property from this namespace; dst should be a pointer to a slice
-	Put(name string, node ir.IRNode) error                // Put a node into this namespace
-	Defer(f func() error)                                 // Enqueue a function to be executed once finished building the current nodes
+	// Returns the name of this namespace
+	Name() string
 
-	Info(message string, args ...any)        // Logging
-	Warn(message string, args ...any)        // Logging
-	Error(message string, args ...any) error // Logging
+	// Gets an IRNode with the specified name from this namespace, placing the result in the pointer dst.
+	// dst should typically be a pointer to an IRNode type.
+	// If the node has already been built, it returns the existing built node.
+	// If the node hasn't yet been built, the node's [BuildFunc] will be called and the result will be
+	// cached and returned.
+	// This call might recursively call [Get] on a parent namespace depending on the [nodeType] registered
+	// for name.
+	Get(name string, dst any) error
+
+	// The same as [Get] but without creating a depending (an edge) into the current namespace.  Most
+	// plugins should use [Get] instead.
+	Instantiate(name string, dst any) error
+
+	// Gets a property from the wiring spec; dst should be a pointer to a value
+	GetProperty(name string, key string, dst any) error
+
+	// Gets a slice of properties from the wiring spec; dst should be a pointer to a slice
+	GetProperties(name string, key string, dst any) error
+
+	// Puts a node into this namespace
+	Put(name string, node ir.IRNode) error
+
+	// Enqueue a function to be executed after all currently-queued functions have finished executing.
+	// Most plugins should not need to use this.
+	Defer(f func() error)
+
+	// Log an info-level message
+	Info(message string, args ...any)
+
+	// Log a warn-level message
+	Warn(message string, args ...any)
+
+	// Log an error-level message
+	Error(message string, args ...any) error
 }
 
-/*
-A SimpleNamespace implements all of the Namespace methods and only requires users to implement a SimpleNamespaceHandler interface.
-Most plugins will want to use SimpleNamespace rather than directly implementing Namespace.
-
-See the documentation of SimpleNamespaceHandler for methods to override.
-*/
+// SimpleNamespace is a base implementation of a [Namespace] that provides implementations of most methods.
+//
+// Most plugins that want to implement a [Namespace] will want to use [SimpleNamespace] and only provide
+// a [SimpleNamespaceHandler] implementation for a few of the custom namespace logics.
+//
+// See the documentation of [SimpleNamespaceHandler] for methods to implement.
 type SimpleNamespace struct {
 	Namespace
 
@@ -58,30 +84,35 @@ type SimpleNamespace struct {
 	stack []*WiringDef // Used when building; the stack of wiring defs currently being built
 }
 
-/*
-Has four methods with default implementations that callers can override with custom logic:
-  - LookupDef(name) - look up a WiringDef; default implementation directly consults the WiringSpec.
-    callers can override this if they want to restrict, modify, or wrap definitions
-    that get instantiated within this namespace.
-  - Accepts(nodeType) - should return true if the specified node type should be built within this namespace,
-    or false if we should ask the parent to build it instead.  Most namespace implementations will only
-    accept certain node types, and will thus want to override this method.  For example, a golang process
-    will only accept golang nodes
-  - AddNode(name, ir.IRNode) - this is called when a node is created within this namespace.  The SimpleNamespace
-    internally saves the node for future lookups; callers might want to save the node e.g. as a child within
-    a node that is being created.
-  - AddEdge(name, ir.IRNode) - this is called when a node was created by a parent namespace but referenced within
-    this namespace.  The SimpleNamespace internally saves the node for future lookups; callers might want to save the
-    node e.g. as an argument to the node that is being created
-*/
+// SimpleNamespaceHandler is an interface intended for use by any Blueprint plugin that wants to
+// provide a custom namespace.
+//
+// The plugin should implement the methods of this handler and then create a [SimpleNamespace] and call
+// [SimpleNamespace.Init]
 type SimpleNamespaceHandler interface {
+	// Initialize the handler with a namespace
 	Init(*SimpleNamespace)
+
+	// Look up a [WiringDef] from the wiring spec.
 	LookupDef(string) (*WiringDef, error)
+
+	// Reports true if this namespace can build nodes of the specified node type.
+	//
+	// For some node type T, if Accepts(T) returns false, then nodes of type T will
+	// not be built in this namespace and instead the parent namespace will be called.
 	Accepts(any) bool
+
+	// After a node has been gotten from the parent namespace, AddEdge will be
+	// called to inform the handler that the node should be passed to this namespace
+	// as an argument.
 	AddEdge(string, ir.IRNode) error
+
+	// After a node has been built in this namespace, AddNode will be called
+	// to enable the handler to save the built node.
 	AddNode(string, ir.IRNode) error
 }
 
+// A basic [SimpleNamespaceHandler] implementation that accepts nodes of all types.
 type DefaultNamespaceHandler struct {
 	SimpleNamespaceHandler
 	Namespace *SimpleNamespace
@@ -94,12 +125,6 @@ func (handler *DefaultNamespaceHandler) Init(namespace *SimpleNamespace) {
 	handler.Namespace = namespace
 }
 
-/*
-Look up a WiringDef; default implementation directly consults the WiringSpec.
-
-	callers can override this if they want to restrict, modify, or wrap definitions
-	that get instantiated within this namespace.
-*/
 func (handler *DefaultNamespaceHandler) LookupDef(name string) (*WiringDef, error) {
 	def := handler.Namespace.Wiring.GetDef(name)
 	if def == nil {
@@ -108,30 +133,22 @@ func (handler *DefaultNamespaceHandler) LookupDef(name string) (*WiringDef, erro
 	return def, nil
 }
 
-/*
-should return true if the specified node type should be built within this namespace, or false if we should ask the parent to build it instead.  Most namespace implementations will only
-
-	accept certain node types, and will thus want to override this method.  For example, a golang process
-	will only accept golang nodes
-*/
 func (handler *DefaultNamespaceHandler) Accepts(nodeType any) bool {
 	return true
 }
 
-// This is called after getting a node from the parent namespace.  By default it just saves the node
-// as an edge.  Namespace implementations can override this method to do other things.
 func (handler *DefaultNamespaceHandler) AddEdge(name string, node ir.IRNode) error {
 	handler.Edges = append(handler.Edges, node)
 	return nil
 }
 
-// This is called after building a node in the current namespace.  By default it just saves the node
-// on the namespace.  Namespace implementations can override this method to do other things.
 func (handler *DefaultNamespaceHandler) AddNode(name string, node ir.IRNode) error {
 	handler.Nodes = append(handler.Nodes, node)
 	return nil
 }
 
+// Initializes a SimpleNamespace.  To do so, a parent namespace, wiring spec,
+// and [SimpleNamespaceHandler] implementation must be provided.
 func (namespace *SimpleNamespace) Init(name, namespacetype string, parent Namespace, wiring WiringSpec, handler SimpleNamespaceHandler) {
 	namespace.NamespaceName = name
 	namespace.NamespaceType = namespacetype
@@ -141,6 +158,7 @@ func (namespace *SimpleNamespace) Init(name, namespacetype string, parent Namesp
 	namespace.Seen = make(map[string]ir.IRNode)
 	namespace.Added = make(map[string]any)
 }
+
 func (namespace *SimpleNamespace) Name() string {
 	return namespace.NamespaceName
 }
@@ -277,7 +295,6 @@ func (namespace *SimpleNamespace) GetProperties(name string, key string, dst any
 	return def.GetProperties(key, dst)
 }
 
-// Augments debug messages with information about the namespace
 func (namespace *SimpleNamespace) Info(message string, args ...any) {
 	if len(namespace.stack) > 0 {
 		src := namespace.stack[len(namespace.stack)-1]
@@ -288,7 +305,6 @@ func (namespace *SimpleNamespace) Info(message string, args ...any) {
 	}
 }
 
-// Augments debug messages with information about the namespace
 func (namespace *SimpleNamespace) Debug(message string, args ...any) {
 	if len(namespace.stack) > 0 {
 		src := namespace.stack[len(namespace.stack)-1]
@@ -300,7 +316,6 @@ func (namespace *SimpleNamespace) Debug(message string, args ...any) {
 	}
 }
 
-// Augments debug messages with information about the namespace
 func (namespace *SimpleNamespace) Error(message string, args ...any) error {
 	formattedMessage := fmt.Sprintf(message, args...)
 	if len(namespace.stack) > 0 {

@@ -2,6 +2,16 @@ package wiring
 
 import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 
+// Builds the IR of an application using the definitions of the provided spec.  Returns
+// an [ir.ApplicationNode] of the application.
+//
+// Callers should typically provide nodesToInstantiate to specify which nodes should
+// be instantiated in the application.  This method will recursively instantiate any
+// dependencies.
+//
+// If nodesToInstantiate is empty, all nodes will be instantiated,
+// but this might not result in an application with the desired topology.  Hence
+// the recommended approach is to explicitly specify which nodes to instantiate.
 func BuildApplicationIR(spec WiringSpec, name string, nodesToInstantiate ...string) (*ir.ApplicationNode, error) {
 	// Create a root namespace for the application
 	namespace := newRootNamespace(spec, name)
@@ -55,7 +65,7 @@ func (namespace *rootNamespace) instantiate(nodeName string) {
 // Builds all nodes that were added using instantiate as well as any
 // recursively dependent nodes
 func (namespace *rootNamespace) buildApplication() (*ir.ApplicationNode, error) {
-	node := ir.NewApplicationNode(namespace.Name())
+	node := &ir.ApplicationNode{ApplicationName: namespace.Name()}
 
 	// Execute deferred functions until empty
 	for len(namespace.Deferred) > 0 {

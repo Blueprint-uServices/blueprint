@@ -1,3 +1,11 @@
+// Package wiring provides the entry point for a Blueprint application to create and configure
+// a wiring spec; that wiring spec can enriched and extended by plugins; ultimately it
+// is used by applications to generate concrete application instances.
+//
+// The starting point for a Blueprint application is the [NewWiringSpec] function.
+// Subsequently, Blueprint applications should typically not need to directly invoke
+// methods on the [WiringSpec] instance; instead the applications should invoke
+// plugins, passing the [WiringSpec] instance to those plugins.
 package wiring
 
 import (
@@ -10,6 +18,9 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 )
 
+// Creates an IR node within the provided namespace or within a new child namespace.
+// Other named IR nodes can be fetched from the provided Namespace by invoking [Namespace.Get]
+// or other [Namespace] methods.
 type BuildFunc func(Namespace) (ir.IRNode, error)
 
 type WiringSpec interface {
