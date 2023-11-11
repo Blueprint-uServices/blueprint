@@ -1,8 +1,7 @@
 package docker
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 )
 
@@ -10,7 +9,7 @@ import (
 The base IRNode interface for docker containers
 */
 type Container interface {
-	core.ContainerNode
+	ir.IRNode
 	ImplementsDockerContainer()
 }
 
@@ -50,7 +49,7 @@ type (
 	*/
 
 	ContainerWorkspace interface {
-		blueprint.BuildContext
+		ir.BuildContext
 
 		Info() ContainerWorkspaceInfo
 
@@ -75,7 +74,7 @@ type (
 
 			Returns an error if an instance already exists with this name.
 		*/
-		DeclarePrebuiltInstance(instanceName string, image string, args ...blueprint.IRNode) error
+		DeclarePrebuiltInstance(instanceName string, image string, args ...ir.IRNode) error
 
 		/*
 			Declares an instance of a container using container artifacts
@@ -90,7 +89,7 @@ type (
 
 			Returns an error if an instance already exists with this name.
 		*/
-		DeclareLocalImage(instanceName string, imageName string, args ...blueprint.IRNode) error
+		DeclareLocalImage(instanceName string, imageName string, args ...ir.IRNode) error
 
 		/*
 			Indicates that the caller has finished adding images and instances,

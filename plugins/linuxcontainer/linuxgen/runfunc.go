@@ -4,6 +4,8 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 )
 
 /*
@@ -16,7 +18,7 @@ This code provides a wrapper function implementation around the commands provide
 by the process nodes
 */
 
-func GenerateRunFunc(name string, runfunc string, deps ...blueprint.IRNode) (string, error) {
+func GenerateRunFunc(name string, runfunc string, deps ...ir.IRNode) (string, error) {
 	runfunc = getFuncBody(runfunc)
 	if runfunc == "" {
 		return "", blueprint.Errorf("invalid runfunc for process %v %v", name, runfunc)
@@ -25,7 +27,7 @@ func GenerateRunFunc(name string, runfunc string, deps ...blueprint.IRNode) (str
 	templateArgs := runFuncTemplateArgs{
 		Name:         name,
 		Dependencies: deps,
-		RunFuncBody:  blueprint.Reindent(runfunc, 8),
+		RunFuncBody:  stringutil.Reindent(runfunc, 8),
 	}
 
 	return ExecuteTemplate("runfunc", runFuncTemplate, templateArgs)
@@ -43,7 +45,7 @@ func getFuncBody(runcmd string) string {
 
 type runFuncTemplateArgs struct {
 	Name         string
-	Dependencies []blueprint.IRNode
+	Dependencies []ir.IRNode
 	RunFuncBody  string
 }
 

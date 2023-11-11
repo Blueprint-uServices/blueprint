@@ -5,8 +5,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
@@ -20,8 +21,8 @@ type ClientPool struct {
 	PoolName       string
 	N              int
 	Client         golang.Service
-	ArgNodes       []blueprint.IRNode
-	ContainedNodes []blueprint.IRNode
+	ArgNodes       []ir.IRNode
+	ContainedNodes []ir.IRNode
 }
 
 func newClientPool(name string, n int) *ClientPool {
@@ -42,21 +43,21 @@ func (node *ClientPool) String() string {
 	for _, child := range node.ContainedNodes {
 		children = append(children, child.String())
 	}
-	b.WriteString(blueprint.Indent(strings.Join(children, "\n"), 2))
+	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
 	b.WriteString("\n}")
 	return b.String()
 }
 
-func (pool *ClientPool) AddArg(argnode blueprint.IRNode) {
+func (pool *ClientPool) AddArg(argnode ir.IRNode) {
 	pool.ArgNodes = append(pool.ArgNodes, argnode)
 }
 
-func (pool *ClientPool) AddChild(child blueprint.IRNode) error {
+func (pool *ClientPool) AddChild(child ir.IRNode) error {
 	pool.ContainedNodes = append(pool.ContainedNodes, child)
 	return nil
 }
 
-func (pool *ClientPool) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (pool *ClientPool) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	/* ClientPool doesn't modify the client's interface and doesn't introduce new interfaces */
 	return pool.Client.GetInterface(ctx)
 }

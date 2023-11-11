@@ -15,15 +15,15 @@ Tests for correct IR layout from wiring spec helper functions for GRPC
 */
 
 func TestServicesOverGRPCNoProcess(t *testing.T) {
-	wiring := newWiringSpec("TestServicesOverGRPCNoProcess")
+	spec := newWiringSpec("TestServicesOverGRPCNoProcess")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	grpc.Deploy(wiring, leaf)
-	grpc.Deploy(wiring, nonleaf)
+	grpc.Deploy(spec, leaf)
+	grpc.Deploy(spec, nonleaf)
 
-	app := assertBuildSuccess(t, wiring, leaf, nonleaf)
+	app := assertBuildSuccess(t, spec, leaf, nonleaf)
 
 	assertIR(t, app,
 		`TestServicesOverGRPCNoProcess = BlueprintApplication() {
@@ -45,17 +45,17 @@ func TestServicesOverGRPCNoProcess(t *testing.T) {
 }
 
 func TestServicesOverGRPCSameProcess(t *testing.T) {
-	wiring := newWiringSpec("TestServicesOverGRPCSameProcess")
+	spec := newWiringSpec("TestServicesOverGRPCSameProcess")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	grpc.Deploy(wiring, leaf)
-	grpc.Deploy(wiring, nonleaf)
+	grpc.Deploy(spec, leaf)
+	grpc.Deploy(spec, nonleaf)
 
-	myproc := goproc.CreateProcess(wiring, "myproc", leaf, nonleaf)
+	myproc := goproc.CreateProcess(spec, "myproc", leaf, nonleaf)
 
-	app := assertBuildSuccess(t, wiring, myproc)
+	app := assertBuildSuccess(t, spec, myproc)
 
 	assertIR(t, app,
 		`TestServicesOverGRPCSameProcess = BlueprintApplication() {
@@ -77,18 +77,18 @@ func TestServicesOverGRPCSameProcess(t *testing.T) {
 }
 
 func TestBasicServicesOverGRPCDifferentProcesses(t *testing.T) {
-	wiring := newWiringSpec("TestBasicServicesOverGRPCDifferentProcesses")
+	spec := newWiringSpec("TestBasicServicesOverGRPCDifferentProcesses")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	grpc.Deploy(wiring, leaf)
-	grpc.Deploy(wiring, nonleaf)
+	grpc.Deploy(spec, leaf)
+	grpc.Deploy(spec, nonleaf)
 
-	leafproc := goproc.CreateProcess(wiring, "leafproc", leaf)
-	nonleafproc := goproc.CreateProcess(wiring, "nonleafproc", nonleaf)
+	leafproc := goproc.CreateProcess(spec, "leafproc", leaf)
+	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
 
-	app := assertBuildSuccess(t, wiring, leafproc, nonleafproc)
+	app := assertBuildSuccess(t, spec, leafproc, nonleafproc)
 
 	assertIR(t, app,
 		`TestBasicServicesOverGRPCDifferentProcesses = BlueprintApplication() {
@@ -112,32 +112,32 @@ func TestBasicServicesOverGRPCDifferentProcesses(t *testing.T) {
 }
 
 func TestReachabilityErrorForServiceNotDeployedWithGRPC(t *testing.T) {
-	wiring := newWiringSpec("TestReachabilityErrorForServiceNotDeployedWithGRPC")
+	spec := newWiringSpec("TestReachabilityErrorForServiceNotDeployedWithGRPC")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	grpc.Deploy(wiring, nonleaf)
+	grpc.Deploy(spec, nonleaf)
 
-	leafproc := goproc.CreateProcess(wiring, "leafproc", leaf)
-	nonleafproc := goproc.CreateProcess(wiring, "nonleafproc", nonleaf)
+	leafproc := goproc.CreateProcess(spec, "leafproc", leaf)
+	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
 
-	err := assertBuildFailure(t, wiring, leafproc, nonleafproc)
+	err := assertBuildFailure(t, spec, leafproc, nonleafproc)
 	assert.Contains(t, err.Error(), "reachability error")
 }
 
 func TestNoReachabilityErrorForServiceNotDeployedWithGRPC(t *testing.T) {
-	wiring := newWiringSpec("TestNoReachabilityErrorForServiceNotDeployedWithGRPC")
+	spec := newWiringSpec("TestNoReachabilityErrorForServiceNotDeployedWithGRPC")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	grpc.Deploy(wiring, leaf)
+	grpc.Deploy(spec, leaf)
 
-	leafproc := goproc.CreateProcess(wiring, "leafproc", leaf)
-	nonleafproc := goproc.CreateProcess(wiring, "nonleafproc", nonleaf)
+	leafproc := goproc.CreateProcess(spec, "leafproc", leaf)
+	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
 
-	app := assertBuildSuccess(t, wiring, leafproc, nonleafproc)
+	app := assertBuildSuccess(t, spec, leafproc, nonleafproc)
 
 	assertIR(t, app,
 		`TestNoReachabilityErrorForServiceNotDeployedWithGRPC = BlueprintApplication() {
@@ -158,20 +158,20 @@ func TestNoReachabilityErrorForServiceNotDeployedWithGRPC(t *testing.T) {
 }
 
 func TestClientProc(t *testing.T) {
-	wiring := newWiringSpec("TestNoReachabilityErrorForServiceNotDeployedWithGRPC")
+	spec := newWiringSpec("TestNoReachabilityErrorForServiceNotDeployedWithGRPC")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	grpc.Deploy(wiring, leaf)
-	grpc.Deploy(wiring, nonleaf)
+	grpc.Deploy(spec, leaf)
+	grpc.Deploy(spec, nonleaf)
 
-	leafproc := goproc.CreateProcess(wiring, "leafproc", leaf)
-	nonleafproc := goproc.CreateProcess(wiring, "nonleafproc", nonleaf)
+	leafproc := goproc.CreateProcess(spec, "leafproc", leaf)
+	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
 
-	leafclient := goproc.CreateClientProcess(wiring, "leafclient", nonleaf)
+	leafclient := goproc.CreateClientProcess(spec, "leafclient", nonleaf)
 
-	app := assertBuildSuccess(t, wiring, leafproc, nonleafproc, leafclient)
+	app := assertBuildSuccess(t, spec, leafproc, nonleafproc, leafclient)
 
 	assertIR(t, app,
 		`TestNoReachabilityErrorForServiceNotDeployedWithGRPC = BlueprintApplication() {
@@ -199,17 +199,17 @@ func TestClientProc(t *testing.T) {
 }
 
 func TestImplicitServicesInSameProcWithGRPC(t *testing.T) {
-	wiring := newWiringSpec("TestImplicitServicesInSameProcWithGRPC")
+	spec := newWiringSpec("TestImplicitServicesInSameProcWithGRPC")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	grpc.Deploy(wiring, leaf)
-	grpc.Deploy(wiring, nonleaf)
+	grpc.Deploy(spec, leaf)
+	grpc.Deploy(spec, nonleaf)
 
-	leafclient := goproc.CreateClientProcess(wiring, "leafclient", nonleaf)
+	leafclient := goproc.CreateClientProcess(spec, "leafclient", nonleaf)
 
-	app := assertBuildSuccess(t, wiring, leafclient)
+	app := assertBuildSuccess(t, spec, leafclient)
 
 	assertIR(t, app,
 		`TestImplicitServicesInSameProcWithGRPC = BlueprintApplication() {
@@ -233,16 +233,16 @@ func TestImplicitServicesInSameProcWithGRPC(t *testing.T) {
 }
 
 func TestImplicitServicesInSameProcPartialGRPC(t *testing.T) {
-	wiring := newWiringSpec("TestImplicitServicesInSameProcPartialGRPC")
+	spec := newWiringSpec("TestImplicitServicesInSameProcPartialGRPC")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	grpc.Deploy(wiring, nonleaf)
+	grpc.Deploy(spec, nonleaf)
 
-	leafclient := goproc.CreateClientProcess(wiring, "leafclient", nonleaf)
+	leafclient := goproc.CreateClientProcess(spec, "leafclient", nonleaf)
 
-	app := assertBuildSuccess(t, wiring, leafclient)
+	app := assertBuildSuccess(t, spec, leafclient)
 
 	assertIR(t, app,
 		`TestImplicitServicesInSameProcPartialGRPC = BlueprintApplication() {
@@ -261,21 +261,21 @@ func TestImplicitServicesInSameProcPartialGRPC(t *testing.T) {
 }
 
 func TestImplicitCacheInSameProc(t *testing.T) {
-	wiring := newWiringSpec("TestImplicitCacheInSameProc")
+	spec := newWiringSpec("TestImplicitCacheInSameProc")
 
-	leaf_cache := simplecache.Define(wiring, "leaf_cache")
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf_cache := simplecache.Define(spec, "leaf_cache")
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	grpc.Deploy(wiring, leaf)
-	grpc.Deploy(wiring, nonleaf)
+	grpc.Deploy(spec, leaf)
+	grpc.Deploy(spec, nonleaf)
 
-	leafproc := goproc.CreateProcess(wiring, "leafproc", leaf)
-	nonleafproc := goproc.CreateProcess(wiring, "nonleafproc", nonleaf)
+	leafproc := goproc.CreateProcess(spec, "leafproc", leaf)
+	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
 
-	leafclient := goproc.CreateClientProcess(wiring, "leafclient", nonleaf)
+	leafclient := goproc.CreateClientProcess(spec, "leafclient", nonleaf)
 
-	app := assertBuildSuccess(t, wiring, leafproc, nonleafproc, leafclient)
+	app := assertBuildSuccess(t, spec, leafproc, nonleafproc, leafclient)
 
 	assertIR(t, app,
 		`TestImplicitCacheInSameProc = BlueprintApplication() {

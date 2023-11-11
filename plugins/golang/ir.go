@@ -1,8 +1,8 @@
 package golang
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 )
 
@@ -30,7 +30,7 @@ type (
 		wishes to exist within a Golang namespace.
 	*/
 	Node interface {
-		blueprint.IRNode
+		ir.IRNode
 		ImplementsGolangNode() // Idiomatically necessary in Go for typecasting correctly
 	}
 
@@ -164,7 +164,7 @@ type (
 	   using the methods on `WorkspaceBuilder`.
 	*/
 	WorkspaceBuilder interface {
-		blueprint.BuildContext
+		ir.BuildContext
 
 		/*
 			Metadata into about the workspace being built
@@ -231,7 +231,7 @@ type (
 	   file
 	*/
 	ModuleBuilder interface {
-		blueprint.BuildContext
+		ir.BuildContext
 
 		/*
 			Metadata into about the module being built
@@ -301,7 +301,7 @@ type (
 	   dependencies of this node.
 	*/
 	GraphBuilder interface {
-		blueprint.BuildContext
+		ir.BuildContext
 
 		/*
 			Metadata info about the graph being built
@@ -338,7 +338,7 @@ type (
 			code, the GraphBuilder will automatically create the build func src code,
 			invoking the specified constructor and passing the provided nodes as args
 		*/
-		DeclareConstructor(name string, constructor *gocode.Constructor, args []blueprint.IRNode) error
+		DeclareConstructor(name string, constructor *gocode.Constructor, args []ir.IRNode) error
 
 		/*
 			Gets the ModuleBuilder that contains this GraphBuilder

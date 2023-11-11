@@ -3,7 +3,7 @@ package workload
 import (
 	"fmt"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"golang.org/x/exp/slog"
@@ -22,7 +22,7 @@ type WorkloadgenClient struct {
 	outputPackage string
 }
 
-func NewWorkloadGenerator(name string, node blueprint.IRNode) (*WorkloadgenClient, error) {
+func NewWorkloadGenerator(name string, node ir.IRNode) (*WorkloadgenClient, error) {
 	service, isService := node.(golang.Service)
 	if !isService {
 		return nil, fmt.Errorf("cannot create workload generator for non-service %v", node)
@@ -78,7 +78,7 @@ func (node *WorkloadgenClient) AddInstantiation(builder golang.GraphBuilder) err
 	}
 
 	slog.Info(fmt.Sprintf("Instantiating WorkloadGen %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
-	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped})
 }
 
 func (workloadgen *WorkloadgenClient) Name() string {

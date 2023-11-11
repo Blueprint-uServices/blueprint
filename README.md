@@ -6,7 +6,7 @@ This repository is a work-in-progress refactor and reimplementation of several c
 
 Shortcuts:
 * [IR documentation](docs/ir.md)
-* [Wiring documentation](docs/wiring.md)
+* [Wiring documentation](docs/spec.md)
 
 ## Rationale
 
@@ -38,31 +38,31 @@ A simple example wiring spec can be found in [examples/leaf/wiring/main.go](exam
 
 Creates a new Blueprint wiring spec
 ```
-wiring := blueprint.NewWiringSpec("example")
+spec := blueprint.NewWiringSpec("example")
 ```
 
 Defines a cache and some services that call each other
 ```
-b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
-b := workflow.Define(wiring, "b", "LeafService", b_cache)
-a := workflow.Define(wiring, "a", "nonLeafService", b)
+b_cache := memcached.PrebuiltProcess(spec, "b_cache")
+b := workflow.Define(spec, "b", "LeafService", b_cache)
+a := workflow.Define(spec, "a", "nonLeafService", b)
 ```
 
 Applies some default modifiers to the services
 ```
 func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) string {
 	procName := fmt.Sprintf("p%s", serviceName)
-	opentelemetry.Instrument(wiring, serviceName)
-	grpc.Deploy(wiring, serviceName)
-	return golang.CreateProcess(wiring, procName, serviceName)
+	opentelemetry.Instrument(spec, serviceName)
+	grpc.Deploy(spec, serviceName)
+	return golang.CreateProcess(spec, procName, serviceName)
 }
-pa := serviceDefaults(wiring, a)
-pb := serviceDefaults(wiring, b)
+pa := serviceDefaults(spec, a)
+pb := serviceDefaults(spec, b)
 ```
 
 Instructs Blueprint to instantiate `a` and `b`
 ```
-bp := wiring.GetBlueprint()
+bp := spec.GetBlueprint()
 bp.Instantiate(pa, pb)
 ```
 
@@ -117,4 +117,4 @@ The code in this repository is currently laid out as follows:
 A plugin typically, at a minimum, defines two types of functionality.  What is described below is convention rather than strict requirement:
 
 * `ir.go` defines Blueprint IR nodes for the plugin.  For example, in the [GRPC ir.go](plugins/grpc/ir.go), two IR nodes are defined: one representing the GRPC server and one representing the GRPC client.  IR nodes implement interfaces such as `golang.Node` and `golang.CodeGenerator` which are used by other IR nodes.  For example, the `GolangServer` node contains a reference to some other node, `Wrapped`, that must be a `golang.Service` node.  See [docs/ir.md](docs/ir.md) for more information about the IR.
-* `wiring.go` integrates the plugin into Blueprint's wiring spec.  Blueprint's wiring API can be called directly by wiring spec implementations, but in practice plugins can provide utility methods that simplify things.  For example, in the [GRPC wiring.go](plugins/grpc/wiring.go), a method `Deploy` exists; this can be called from a user's wiring spec to wrap a service in GRPC.  See [docs/wiring.md](docs/wiring.md) for more information about Wiring.
+* `spec.go` integrates the plugin into Blueprint's wiring spec.  Blueprint's wiring API can be called directly by wiring spec implementations, but in practice plugins can provide utility methods that simplify things.  For example, in the [GRPC spec.go](plugins/grpc/spec.go), a method `Deploy` exists; this can be called from a user's wiring spec to wrap a service in GRPC.  See [docs/spec.md](docs/spec.md) for more information about spec.

@@ -3,13 +3,13 @@ package linux
 import (
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 )
 
 func EnvVar(name string) string {
-	return strings.ToUpper(blueprint.CleanName(name))
+	return strings.ToUpper(ir.CleanName(name))
 }
 
 func FuncName(name string) string {
-	return strings.ToLower(blueprint.CleanName(name))
+	return strings.ToLower(ir.CleanName(name))
 }

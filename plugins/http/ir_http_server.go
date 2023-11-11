@@ -5,8 +5,9 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/http/httpcodegen"
@@ -38,7 +39,7 @@ func (i *HttpInterface) GetMethods() []service.Method {
 	return i.Wrapped.GetMethods()
 }
 
-func newGolangHttpServer(name string, serverAddr blueprint.IRNode, wrapped blueprint.IRNode) (*GolangHttpServer, error) {
+func newGolangHttpServer(name string, serverAddr ir.IRNode, wrapped ir.IRNode) (*GolangHttpServer, error) {
 	addr, is_addr := serverAddr.(*address.Address[*GolangHttpServer])
 	if !is_addr {
 		return nil, blueprint.Errorf("HTTP server %s expected %s to be an address, but got %s", name, serverAddr.Name(), reflect.TypeOf(serverAddr).String())
@@ -101,10 +102,10 @@ func (node *GolangHttpServer) AddInstantiation(builder golang.GraphBuilder) erro
 			},
 		},
 	}
-	return builder.DeclareConstructor(node.InstanceName, constructor, []blueprint.IRNode{node.Wrapped, node.Addr.Bind})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, node.Addr.Bind})
 }
 
-func (node *GolangHttpServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *GolangHttpServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface, err := node.Wrapped.GetInterface(ctx)
 	return &HttpInterface{Wrapped: iface}, err
 }

@@ -3,7 +3,7 @@ package linuxcontainer
 import (
 	"fmt"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/dockergen"
 	"golang.org/x/exp/slog"

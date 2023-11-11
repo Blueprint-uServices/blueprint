@@ -3,20 +3,18 @@ package dockerdeployment
 import (
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 )
 
 /* A deployment is a collection of containers */
 type Deployment struct {
-	core.DeploymentNode
-
 	/* The implemented build targets for dockercompose.DockerCompose nodes */
 	dockerComposeDeployer /* Can be deployed as a docker-compose file; implemented in deploydockercompose.go */
 
 	DeploymentName string
-	ArgNodes       []blueprint.IRNode
-	ContainedNodes []blueprint.IRNode
+	ArgNodes       []ir.IRNode
+	ContainedNodes []ir.IRNode
 }
 
 func newContainerDeployment(name string) *Deployment {
@@ -41,16 +39,16 @@ func (node *Deployment) String() string {
 	for _, child := range node.ContainedNodes {
 		children = append(children, child.String())
 	}
-	b.WriteString(blueprint.Indent(strings.Join(children, "\n"), 2))
+	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
 	b.WriteString("\n}")
 	return b.String()
 }
 
-func (node *Deployment) AddArg(argnode blueprint.IRNode) {
+func (node *Deployment) AddArg(argnode ir.IRNode) {
 	node.ArgNodes = append(node.ArgNodes, argnode)
 }
 
-func (node *Deployment) AddChild(child blueprint.IRNode) error {
+func (node *Deployment) AddChild(child ir.IRNode) error {
 	node.ContainedNodes = append(node.ContainedNodes, child)
 	return nil
 }

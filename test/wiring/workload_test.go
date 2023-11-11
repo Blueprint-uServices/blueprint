@@ -10,20 +10,20 @@ import (
 )
 
 func TestBasicWorkloadGenerator(t *testing.T) {
-	wiring := newWiringSpec("TestBasicWorkloadGenerator")
+	spec := newWiringSpec("TestBasicWorkloadGenerator")
 
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	grpc.Deploy(wiring, leaf)
-	grpc.Deploy(wiring, nonleaf)
+	grpc.Deploy(spec, leaf)
+	grpc.Deploy(spec, nonleaf)
 
-	leafproc := goproc.CreateProcess(wiring, "leafproc", leaf)
-	nonleafproc := goproc.CreateProcess(wiring, "nonleafproc", nonleaf)
+	leafproc := goproc.CreateProcess(spec, "leafproc", leaf)
+	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
 
-	wlgen := workload.Generator(wiring, nonleaf)
+	wlgen := workload.Generator(spec, nonleaf)
 
-	app := assertBuildSuccess(t, wiring, wlgen, leafproc, nonleafproc)
+	app := assertBuildSuccess(t, spec, wlgen, leafproc, nonleafproc)
 
 	assertIR(t, app,
 		`TestBasicWorkloadGenerator = BlueprintApplication() {

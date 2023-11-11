@@ -6,7 +6,8 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
@@ -24,7 +25,7 @@ type OpenTelemetryServerWrapper struct {
 	Collector     OpenTelemetryCollectorInterface
 }
 
-func newOpenTelemetryServerWrapper(name string, server blueprint.IRNode, collector blueprint.IRNode) (*OpenTelemetryServerWrapper, error) {
+func newOpenTelemetryServerWrapper(name string, server ir.IRNode, collector ir.IRNode) (*OpenTelemetryServerWrapper, error) {
 	serverNode, is_callable := server.(golang.Service)
 	if !is_callable {
 		return nil, blueprint.Errorf("opentelemetry server wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
@@ -51,7 +52,7 @@ func (node *OpenTelemetryServerWrapper) String() string {
 	return node.Name() + " = OTServerWrapper(" + node.Wrapped.Name() + ", " + node.Collector.Name() + ")"
 }
 
-func (node *OpenTelemetryServerWrapper) genInterface(ctx blueprint.BuildContext) (*gocode.ServiceInterface, error) {
+func (node *OpenTelemetryServerWrapper) genInterface(ctx ir.BuildContext) (*gocode.ServiceInterface, error) {
 	iface, err := golang.GetGoInterface(ctx, node.Wrapped)
 	if err != nil {
 		return nil, err
@@ -68,7 +69,7 @@ func (node *OpenTelemetryServerWrapper) genInterface(ctx blueprint.BuildContext)
 	return i, nil
 }
 
-func (node *OpenTelemetryServerWrapper) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *OpenTelemetryServerWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.genInterface(ctx)
 }
 
@@ -140,7 +141,7 @@ func (node *OpenTelemetryServerWrapper) AddInstantiation(builder golang.GraphBui
 		},
 	}
 
-	return builder.DeclareConstructor(node.WrapperName, constructor, []blueprint.IRNode{node.Wrapped, node.Collector})
+	return builder.DeclareConstructor(node.WrapperName, constructor, []ir.IRNode{node.Wrapped, node.Collector})
 }
 
 type serverArgs struct {

@@ -3,7 +3,7 @@ package linuxgen
 import (
 	"path/filepath"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 )
 
 /*
@@ -18,9 +18,9 @@ type RunScript struct {
 	WorkspaceDir  string
 	FileName      string
 	FilePath      string
-	RunFuncs      map[string]string           // Function bodies provided by processes
-	AllNodes      map[string]blueprint.IRNode // All nodes seen by this run script
-	Args          map[string]blueprint.IRNode // Arguments that will be set in calling the environment
+	RunFuncs      map[string]string    // Function bodies provided by processes
+	AllNodes      map[string]ir.IRNode // All nodes seen by this run script
+	Args          map[string]ir.IRNode // Arguments that will be set in calling the environment
 }
 
 /*
@@ -34,8 +34,8 @@ func NewRunScript(workspaceName, workspaceDir, fileName string) *RunScript {
 		FileName:      fileName,
 		FilePath:      filepath.Join(workspaceDir, fileName),
 		RunFuncs:      make(map[string]string),
-		AllNodes:      make(map[string]blueprint.IRNode),
-		Args:          make(map[string]blueprint.IRNode),
+		AllNodes:      make(map[string]ir.IRNode),
+		Args:          make(map[string]ir.IRNode),
 	}
 }
 
@@ -47,11 +47,11 @@ argument.
 We use this so that the generated run.sh knows which environment variables
 will be needed or used by the processes it runs.
 */
-func (run *RunScript) Require(node blueprint.IRNode) {
+func (run *RunScript) Require(node ir.IRNode) {
 	run.AllNodes[node.Name()] = node
 }
 
-func (run *RunScript) Add(procName, runfunc string, deps ...blueprint.IRNode) {
+func (run *RunScript) Add(procName, runfunc string, deps ...ir.IRNode) {
 	// Save the runfunc
 	run.RunFuncs[procName] = runfunc
 

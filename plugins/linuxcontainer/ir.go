@@ -3,7 +3,8 @@ package linuxcontainer
 import (
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 )
 
 /*
@@ -13,7 +14,7 @@ will generate a run script that instantiates all contained processes.
 */
 
 type Container struct {
-	blueprint.IRNode
+	ir.IRNode
 
 	/* The implemented build targets for linuxcontainer.Container nodes */
 	filesystemDeployer /* Can be deployed as a basic collection of processes; implemented in deploy.go */
@@ -21,14 +22,14 @@ type Container struct {
 
 	InstanceName   string
 	ImageName      string
-	ArgNodes       []blueprint.IRNode
-	ContainedNodes []blueprint.IRNode
+	ArgNodes       []ir.IRNode
+	ContainedNodes []ir.IRNode
 }
 
 func newLinuxContainerNode(name string) *Container {
 	node := Container{}
 	node.InstanceName = name
-	node.ImageName = blueprint.CleanName(name)
+	node.ImageName = ir.CleanName(name)
 	return &node
 }
 
@@ -50,16 +51,16 @@ func (node *Container) String() string {
 	for _, child := range node.ContainedNodes {
 		children = append(children, child.String())
 	}
-	b.WriteString(blueprint.Indent(strings.Join(children, "\n"), 2))
+	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
 	b.WriteString("\n}")
 	return b.String()
 }
 
-func (node *Container) AddArg(argnode blueprint.IRNode) {
+func (node *Container) AddArg(argnode ir.IRNode) {
 	node.ArgNodes = append(node.ArgNodes, argnode)
 }
 
-func (node *Container) AddChild(child blueprint.IRNode) error {
+func (node *Container) AddChild(child ir.IRNode) error {
 	node.ContainedNodes = append(node.ContainedNodes, child)
 	return nil
 }

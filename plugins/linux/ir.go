@@ -1,16 +1,14 @@
 package linux
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 )
 
 /*
 The base IRNode interface for linux processes
 */
 type Process interface {
-	core.ProcessNode
-
+	ir.IRNode
 	ImplementsLinuxProcess()
 }
 
@@ -50,7 +48,7 @@ type (
 		commands.
 	*/
 	ProcessWorkspace interface {
-		blueprint.BuildContext
+		ir.BuildContext
 
 		Info() ProcessWorkspaceInfo
 
@@ -101,7 +99,7 @@ type (
 			   proc workspace
 			 - the runfunc will be renamed to prevent name clashes between IRNodes
 		*/
-		DeclareRunCommand(name string, runfunc string, deps ...blueprint.IRNode) error
+		DeclareRunCommand(name string, runfunc string, deps ...ir.IRNode) error
 
 		/*
 			Indicates that we have completed building the workspace, and any finalization tasks

@@ -3,8 +3,8 @@ package goproc
 import (
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 )
 
 /*
@@ -27,8 +27,6 @@ var generatedModulePrefix = "blueprint/goproc"
 // An IRNode representing a golang process.
 // This is Blueprint's main implementation of Golang processes
 type Process struct {
-	core.ProcessNode
-
 	/* The implemented build targets for golang.Process nodes */
 	filesystemDeployer /* Can be deployed as a basic go process; implemented in deploy.go */
 	linuxDeployer      /* Can be deployed to linux; implemented in deploylinux.go */
@@ -36,15 +34,15 @@ type Process struct {
 	InstanceName   string
 	ProcName       string
 	ModuleName     string
-	ArgNodes       []blueprint.IRNode
-	ContainedNodes []blueprint.IRNode
+	ArgNodes       []ir.IRNode
+	ContainedNodes []ir.IRNode
 }
 
 // A Golang Process Node can either be given the child nodes ahead of time, or they can be added using AddArtifactNode / AddCodeNode
 func newGolangProcessNode(name string) *Process {
 	node := Process{}
 	node.InstanceName = name
-	node.ProcName = blueprint.CleanName(name)
+	node.ProcName = ir.CleanName(name)
 	node.ModuleName = generatedModulePrefix + "/" + node.ProcName
 	return &node
 }
@@ -67,16 +65,16 @@ func (node *Process) String() string {
 	for _, child := range node.ContainedNodes {
 		children = append(children, child.String())
 	}
-	b.WriteString(blueprint.Indent(strings.Join(children, "\n"), 2))
+	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
 	b.WriteString("\n}")
 	return b.String()
 }
 
-func (node *Process) AddArg(argnode blueprint.IRNode) {
+func (node *Process) AddArg(argnode ir.IRNode) {
 	node.ArgNodes = append(node.ArgNodes, argnode)
 }
 
-func (node *Process) AddChild(child blueprint.IRNode) error {
+func (node *Process) AddChild(child ir.IRNode) error {
 	node.ContainedNodes = append(node.ContainedNodes, child)
 	return nil
 }

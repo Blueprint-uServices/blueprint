@@ -6,7 +6,7 @@ import (
 
 	"golang.org/x/exp/slog"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
@@ -18,16 +18,16 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/zipkin"
 )
 
-func serviceDefaults(wiring blueprint.WiringSpec, serviceName string, collectorName string) string {
+func serviceDefaults(spec wiring.WiringSpec, serviceName string, collectorName string) string {
 	procName := fmt.Sprintf("p%s", serviceName)
-	//retries.AddRetries(wiring, serviceName, 10)
-	//healthchecker.AddHealthCheckAPI(wiring, serviceName)
-	//circuitbreaker.AddCircuitBreaker(wiring, serviceName, 1000, 0.1, "1s")
-	//xtrace.Instrument(wiring, serviceName)
-	//opentelemetry.Instrument(wiring, serviceName)
-	opentelemetry.InstrumentUsingCustomCollector(wiring, serviceName, collectorName)
-	http.Deploy(wiring, serviceName)
-	return goproc.CreateProcess(wiring, procName, serviceName)
+	//retries.AddRetries(spec, serviceName, 10)
+	//healthchecker.AddHealthCheckAPI(spec, serviceName)
+	//circuitbreaker.AddCircuitBreaker(spec, serviceName, 1000, 0.1, "1s")
+	//xtrace.Instrument(spec, serviceName)
+	//opentelemetry.Instrument(spec, serviceName)
+	opentelemetry.InstrumentUsingCustomCollector(spec, serviceName, collectorName)
+	http.Deploy(spec, serviceName)
+	return goproc.CreateProcess(spec, procName, serviceName)
 }
 
 func main() {
@@ -37,34 +37,28 @@ func main() {
 	linuxcontainer.RegisterBuilders()
 	dockerdeployment.RegisterBuilders()
 
-	wiring := blueprint.NewWiringSpec("leaf_example")
+	spec := wiring.NewWiringSpec("leaf_example")
 
 	workflow.Init("../workflow")
 
-	//b_database := simplenosqldb.Define(wiring, "b_database")
-	b_database := mongodb.PrebuiltContainer(wiring, "b_database")
-	//b_cache := simplecache.Define(wiring, "b_cache")
-	b_cache := memcached.PrebuiltContainer(wiring, "b_cache")
-	//b_cache := redis.PrebuiltProcess(wiring, "b_cache")
-	trace_collector := zipkin.DefineZipkinCollector(wiring, "zipkin")
+	//b_database := simplenosqldb.Define(spec, "b_database")
+	b_database := mongodb.PrebuiltContainer(spec, "b_database")
+	//b_cache := simplecache.Define(spec, "b_cache")
+	b_cache := memcached.PrebuiltContainer(spec, "b_cache")
+	//b_cache := redis.PrebuiltProcess(spec, "b_cache")
+	trace_collector := zipkin.DefineZipkinCollector(spec, "zipkin")
 	//trace_collector := ""
-	b := workflow.Define(wiring, "b", "LeafServiceImpl", b_cache, b_database)
+	b := workflow.Define(spec, "b", "LeafServiceImpl", b_cache, b_database)
 
-	a := workflow.Define(wiring, "a", "NonLeafService", b)
-	pa := serviceDefaults(wiring, a, trace_collector)
-	pb := serviceDefaults(wiring, b, trace_collector)
+	a := workflow.Define(spec, "a", "NonLeafService", b)
+	pa := serviceDefaults(spec, a, trace_collector)
+	pb := serviceDefaults(spec, b, trace_collector)
 
-	slog.Info("Wiring Spec: \n" + wiring.String())
+	slog.Info("Wiring Spec: \n" + spec.String())
 
-	bp, err := wiring.GetBlueprint()
-	if err != nil {
-		slog.Error(err.Error())
-		os.Exit(1)
-	}
-
-	bp.Instantiate(pa, pb)
-
-	application, err := bp.BuildIR()
+	// Build the IR for our specific nodes
+	nodesToInstantiate := []string{pa, pb}
+	application, err := spec.BuildIR(nodesToInstantiate...)
 	if err != nil {
 		slog.Error("Unable to build blueprint, exiting", "error", err)
 		slog.Info("Application: \n" + application.String())
@@ -75,7 +69,7 @@ func main() {
 
 	// Below here is a WIP on generating code
 
-	err = application.Compile("tmp")
+	err = application.GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)

@@ -2,16 +2,18 @@ package mongodb
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
-func PrebuiltContainer(wiring blueprint.WiringSpec, dbName string) string {
+func PrebuiltContainer(spec wiring.WiringSpec, dbName string) string {
 	procName := dbName + ".process"
 	clientName := dbName + ".client"
 	addrName := dbName + ".addr"
 
-	wiring.Define(procName, &MongoDBContainer{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(procName, &MongoDBContainer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Bind[*MongoDBContainer](ns, addrName)
 		if err != nil {
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", procName, addrName, err)
@@ -20,19 +22,19 @@ func PrebuiltContainer(wiring blueprint.WiringSpec, dbName string) string {
 	})
 
 	dstName := dbName + ".dst"
-	wiring.Alias(dstName, procName)
-	pointer.RequireUniqueness(wiring, dstName, &blueprint.ApplicationNode{})
+	spec.Alias(dstName, procName)
+	pointer.RequireUniqueness(spec, dstName, &ir.ApplicationNode{})
 
-	pointer.CreatePointer(wiring, dbName, &MongoDBGoClient{}, dstName)
-	ptr := pointer.GetPointer(wiring, dbName)
+	pointer.CreatePointer(spec, dbName, &MongoDBGoClient{}, dstName)
+	ptr := pointer.GetPointer(spec, dbName)
 
-	address.Define[*MongoDBContainer](wiring, addrName, procName, &blueprint.ApplicationNode{})
+	address.Define[*MongoDBContainer](spec, addrName, procName, &ir.ApplicationNode{})
 
-	ptr.AddDstModifier(wiring, addrName)
+	ptr.AddDstModifier(spec, addrName)
 
-	clientNext := ptr.AddSrcModifier(wiring, clientName)
+	clientNext := ptr.AddSrcModifier(spec, clientName)
 
-	wiring.Define(clientName, &MongoDBGoClient{}, func(ns blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(clientName, &MongoDBGoClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*MongoDBContainer](ns, clientNext)
 		if err != nil {
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", clientName, clientNext, err)

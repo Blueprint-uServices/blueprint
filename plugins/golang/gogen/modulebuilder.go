@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
@@ -18,7 +18,7 @@ The ModuleBuilder is used by plugins that generate golang source files, and need
 code into.
 */
 type ModuleBuilderImpl struct {
-	blueprint.VisitTrackerImpl
+	ir.VisitTrackerImpl
 	Name      string                // The FQ name of this module
 	workspace *WorkspaceBuilderImpl // The workspace that this module exists within
 	ModuleDir string                // The directory containing this module
@@ -67,7 +67,7 @@ func (module *ModuleBuilderImpl) Workspace() golang.WorkspaceBuilder {
 	return module.workspace
 }
 
-func (module *ModuleBuilderImpl) Build(nodes []blueprint.IRNode) error {
+func (module *ModuleBuilderImpl) Build(nodes []ir.IRNode) error {
 	for _, node := range nodes {
 		if n, valid := node.(golang.ProvidesInterface); valid {
 			err := n.AddInterfaces(module)

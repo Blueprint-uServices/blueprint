@@ -1,9 +1,9 @@
 package xtrace
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
@@ -67,7 +67,7 @@ func (node *XTraceServerContainer) String() string {
 	return node.Name() + " = XTraceServer(" + node.BindAddr.Name() + ")"
 }
 
-func (node *XTraceServerContainer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *XTraceServerContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface := node.Iface.ServiceInterface(ctx)
 	return &XTraceInterface{Wrapped: iface}, nil
 }

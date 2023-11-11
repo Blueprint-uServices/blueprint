@@ -4,7 +4,8 @@ import (
 	"reflect"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"golang.org/x/exp/slog"
 )
@@ -15,7 +16,7 @@ Helper method that does typecasting on builder and service.
 Assumes builder is a golang module builder, and service is a golang module; if so, gets the golang
 service interface for the service.  If not, returns an error.
 */
-func GetGoInterface(ctx blueprint.BuildContext, node blueprint.IRNode) (*gocode.ServiceInterface, error) {
+func GetGoInterface(ctx ir.BuildContext, node ir.IRNode) (*gocode.ServiceInterface, error) {
 	service, isService := node.(service.ServiceNode)
 	if !isService {
 		return nil, blueprint.Errorf("cannot get a service interface from non-service node %v", node)

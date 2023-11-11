@@ -5,7 +5,9 @@ import (
 	"runtime"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"golang.org/x/exp/slog"
 )
 
@@ -73,15 +75,15 @@ doesn't exist, then this will result in a build error.
 This call creates several definitions within the wiring spec.  In particular, `serviceName` is
 defined as a pointer to the actual service, and can thus be modified and
 */
-func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string {
+func Define(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string {
 	// Define the service
 	handlerName := serviceName + ".handler"
-	wiring.Define(handlerName, &WorkflowService{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(handlerName, &WorkflowService{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		// Get all of the argument nodes; can error out if the arguments weren't actually defined
 		// For arguments that are pointer types, this will only get the caller-side of the pointer
-		var arg_nodes []blueprint.IRNode
+		var arg_nodes []ir.IRNode
 		for _, arg_name := range serviceArgs {
-			var arg blueprint.IRNode
+			var arg ir.IRNode
 			if err := namespace.Get(arg_name, &arg); err != nil {
 				return nil, err
 			}
@@ -94,11 +96,11 @@ func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, servic
 
 	// Mandate that this service with this name must be unique within the application (although, this can be changed by namespaces)
 	dstName := serviceName + ".dst"
-	wiring.Alias(dstName, handlerName)
-	pointer.RequireUniqueness(wiring, dstName, &blueprint.ApplicationNode{})
+	spec.Alias(dstName, handlerName)
+	pointer.RequireUniqueness(spec, dstName, &ir.ApplicationNode{})
 
 	// Define the pointer
-	pointer.CreatePointer(wiring, serviceName, &WorkflowService{}, dstName)
+	pointer.CreatePointer(spec, serviceName, &WorkflowService{}, dstName)
 
 	return serviceName
 }

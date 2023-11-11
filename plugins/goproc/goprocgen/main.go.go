@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
 	"golang.org/x/exp/slog"
@@ -16,8 +17,8 @@ call the graphConstructor provided to create and instantiate nodes.
 */
 func GenerateMain(
 	name string,
-	argNodes []blueprint.IRNode,
-	nodesToInstantiate []blueprint.IRNode,
+	argNodes []ir.IRNode,
+	nodesToInstantiate []ir.IRNode,
 	module golang.ModuleBuilder,
 	graphPackage string,
 	graphConstructor string) error {
@@ -37,17 +38,17 @@ func GenerateMain(
 		mainArgs.Args = append(mainArgs.Args, mainArg{
 			Name: arg.Name(),
 			Doc:  arg.String(),
-			Var:  blueprint.CleanName(arg.Name()),
+			Var:  ir.CleanName(arg.Name()),
 		})
 	}
 
 	// Instantiate the nodes specified
-	for _, node := range blueprint.FilterNodes[golang.Instantiable](nodesToInstantiate) {
+	for _, node := range ir.FilterNodes[golang.Instantiable](nodesToInstantiate) {
 		mainArgs.Instantiate = append(mainArgs.Instantiate, node.Name())
 	}
 
 	// Materialize any configuration
-	for _, node := range blueprint.Filter[blueprint.IRConfig](nodesToInstantiate) {
+	for _, node := range ir.Filter[ir.IRConfig](nodesToInstantiate) {
 		if !node.HasValue() {
 			return blueprint.Errorf("golang main method expects to instantiate config variable %v but no value is set for it", node.Name())
 		}

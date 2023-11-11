@@ -1,9 +1,10 @@
 package opentelemetry
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
@@ -16,32 +17,32 @@ This call will also define the OpenTelemetry collector.
 
 Instrumenting `serviceName` will add both src and dst-side modifiers to the pointer.
 */
-func Instrument(wiring blueprint.WiringSpec, serviceName string) {
-	DefineOpenTelemetryCollector(wiring, DefaultOpenTelemetryCollectorName)
-	InstrumentUsingCustomCollector(wiring, serviceName, DefaultOpenTelemetryCollectorName)
+func Instrument(spec wiring.WiringSpec, serviceName string) {
+	DefineOpenTelemetryCollector(spec, DefaultOpenTelemetryCollectorName)
+	InstrumentUsingCustomCollector(spec, serviceName, DefaultOpenTelemetryCollectorName)
 }
 
 /*
 This is the same as the Instrument function, but uses `collectorName` as the OpenTelemetry
 collector and does not attempt to define or redefine the collector.
 */
-func InstrumentUsingCustomCollector(wiring blueprint.WiringSpec, serviceName string, collectorName string) {
+func InstrumentUsingCustomCollector(spec wiring.WiringSpec, serviceName string, collectorName string) {
 	// The nodes that we are defining
 	clientWrapper := serviceName + ".client.ot"
 	serverWrapper := serviceName + ".server.ot"
 
 	// Get the pointer metadata
-	ptr := pointer.GetPointer(wiring, serviceName)
+	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {
 		slog.Error("Unable to instrument " + serviceName + " with OpenTelemetry as it is not a pointer")
 		return
 	}
 
 	// Add the client wrapper to the pointer src
-	clientNext := ptr.AddSrcModifier(wiring, clientWrapper)
+	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
 
 	// Define the client wrapper
-	wiring.Define(clientWrapper, &OpenTelemetryClientWrapper{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(clientWrapper, &OpenTelemetryClientWrapper{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		var server golang.Service
 		err := namespace.Get(clientNext, &server)
 		if err != nil {
@@ -58,10 +59,10 @@ func InstrumentUsingCustomCollector(wiring blueprint.WiringSpec, serviceName str
 	})
 
 	// Add the server wrapper to the pointer dst
-	serverNext := ptr.AddDstModifier(wiring, serverWrapper)
+	serverNext := ptr.AddDstModifier(spec, serverWrapper)
 
 	// Define the server wrapper
-	wiring.Define(serverWrapper, &OpenTelemetryServerWrapper{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(serverWrapper, &OpenTelemetryServerWrapper{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
 		err := namespace.Get(serverNext, &wrapped)
 		if err != nil {
@@ -89,7 +90,7 @@ Defines the OpenTelemetry collector as a process node
 This doesn't need to be explicitly called, although it can if users want to control
 the placement of the opentelemetry collector
 */
-func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName string) string {
+func DefineOpenTelemetryCollector(spec wiring.WiringSpec, collectorName string) string {
 	// The nodes that we are defining
 	collectorAddr := collectorName + ".addr"
 	collectorProc := collectorName + ".proc"
@@ -99,7 +100,7 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 	// Define the collector address
 
 	// Define the collector server
-	wiring.Define(collectorProc, &OpenTelemetryCollector{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(collectorProc, &OpenTelemetryCollector{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Bind[*OpenTelemetryCollector](namespace, collectorAddr)
 		if err != nil {
 			return nil, err
@@ -109,21 +110,21 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 	})
 
 	// By default, we should only have one collector globally
-	wiring.Alias(collectorDst, collectorProc)
-	pointer.RequireUniqueness(wiring, collectorDst, &blueprint.ApplicationNode{})
+	spec.Alias(collectorDst, collectorProc)
+	pointer.RequireUniqueness(spec, collectorDst, &ir.ApplicationNode{})
 
 	// Define the pointer to the collector for golang clients
-	pointer.CreatePointer(wiring, collectorName, &OpenTelemetryCollectorClient{}, collectorDst)
-	ptr := pointer.GetPointer(wiring, collectorName)
+	pointer.CreatePointer(spec, collectorName, &OpenTelemetryCollectorClient{}, collectorDst)
+	ptr := pointer.GetPointer(spec, collectorName)
 
 	// Add the collectorAddr to the pointer dst
-	ptr.AddDstModifier(wiring, collectorAddr)
+	ptr.AddDstModifier(spec, collectorAddr)
 
 	// Add the client to the pointer
-	clientNext := ptr.AddSrcModifier(wiring, collectorClient)
+	clientNext := ptr.AddSrcModifier(spec, collectorClient)
 
 	// Define the collector client
-	wiring.Define(collectorClient, &OpenTelemetryCollectorClient{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
+	spec.Define(collectorClient, &OpenTelemetryCollectorClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*OpenTelemetryCollector](namespace, clientNext)
 		if err != nil {
 			return nil, err
@@ -133,8 +134,8 @@ func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName str
 	})
 
 	// Define the address and add it to the pointer dst
-	address.Define[*OpenTelemetryCollector](wiring, collectorAddr, collectorProc, &blueprint.ApplicationNode{})
-	ptr.AddDstModifier(wiring, collectorAddr)
+	address.Define[*OpenTelemetryCollector](spec, collectorAddr, collectorProc, &ir.ApplicationNode{})
+	ptr.AddDstModifier(spec, collectorAddr)
 
 	// Return the name of the pointer
 	return collectorName

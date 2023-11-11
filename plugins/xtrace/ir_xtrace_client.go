@@ -3,9 +3,9 @@ package xtrace
 import (
 	"fmt"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
@@ -70,7 +70,7 @@ func (node *XTraceClient) AddInstantiation(builder golang.GraphBuilder) error {
 
 	slog.Info(fmt.Sprintf("Instantiating XTraceClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []blueprint.IRNode{node.ServerDialAddr})
+	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []ir.IRNode{node.ServerDialAddr})
 }
 
 func (node *XTraceClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
@@ -81,7 +81,7 @@ func (node *XTraceClient) AddInterfaces(builder golang.ModuleBuilder) error {
 	return node.AddToWorkspace(builder.Workspace())
 }
 
-func (node *XTraceClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *XTraceClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.Iface.ServiceInterface(ctx), nil
 }
 

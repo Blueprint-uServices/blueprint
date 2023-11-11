@@ -1,6 +1,6 @@
 # Blueprint Wiring
 
-Blueprint's wiring is how an application is assembled out of its constituent pieces.  The underlying type `WiringSpec` is used to assemble a wiring spec, defined in [pkg/blueprint/wiring.go](blueprint/pkg/blueprint/wiring.go).
+Blueprint's wiring is how an application is assembled out of its constituent pieces.  The underlying type `WiringSpec` is used to assemble a wiring spec, defined in [pkg/blueprint/spec.go](blueprint/pkg/blueprint/spec.go).
 
 ## Getting Started
 
@@ -8,18 +8,18 @@ To begin constructing a wiring spec, create a new wiring spec, giving the applic
 
 ```
 import "gitlab.mpi-sws.org/cld/blueprint/pkg/blueprint"
-wiring := blueprint.NewWiringSpec("example")
+spec := blueprint.NewWiringSpec("example")
 ```
 
 ## Typical Usage by Applications
 
-The WiringSpec provides an API for building up an application, but the typical usage is not to use these methods directly, but to use plugin-specific utility methods that simplify things further.  Here are some example methods provided by different plugins.  For each plugin, these methods are by convention defined in the plugin's `wiring.go` file:
+The WiringSpec provides an API for building up an application, but the typical usage is not to use these methods directly, but to use plugin-specific utility methods that simplify things further.  Here are some example methods provided by different plugins.  For each plugin, these methods are by convention defined in the plugin's `spec.go` file:
 
-* `workflow.Define(serviceName, serviceType, serviceArgs...)` from the [workflow](plugins/workflow/wiring.go) plugin creates a service called `serviceName` that is an instance of `serviceType` which was defined in the application's workflow spec.  If the service takes arguments (e.g. to make calls to other services or to backends), the names of those other services can be provided as `serviceArgs`
-* `opentelemetry.Instrument(serviceName)` from the [opentelemetry](plugins/opentelemetry/wiring.go) plugin will wrap existing service `serviceName` with an opentelemetry wrapper class that will create spans and propagate contexts
-* `grpc.Deploy(serviceName)` from the [grpc](plugins/grpc/wiring.go) will deploy an existing service `serviceName` with GRPC such that callers to the service will now make RPC calls using a grpc client library
-* `golang.CreateProcess(procName, children...)` from the [golang](plugins/golang/wiring.go) plugin creates a Golang process called `procName` that contains zero or more named child nodes `children`.  Children are typically services like `serviceName` defined with `workflow.Define`.
-* `memcached.PrebuiltProcess(cacheName)` from the [memcached](plugins/memcached/wiring.go) plugin instantiates a standalone memcached process called `cacheName` that can be used by workflow services.
+* `workflow.Define(serviceName, serviceType, serviceArgs...)` from the [workflow](plugins/workflow/spec.go) plugin creates a service called `serviceName` that is an instance of `serviceType` which was defined in the application's workflow spec.  If the service takes arguments (e.g. to make calls to other services or to backends), the names of those other services can be provided as `serviceArgs`
+* `opentelemetry.Instrument(serviceName)` from the [opentelemetry](plugins/opentelemetry/spec.go) plugin will wrap existing service `serviceName` with an opentelemetry wrapper class that will create spans and propagate contexts
+* `grpc.Deploy(serviceName)` from the [grpc](plugins/grpc/spec.go) will deploy an existing service `serviceName` with GRPC such that callers to the service will now make RPC calls using a grpc client library
+* `golang.CreateProcess(procName, children...)` from the [golang](plugins/golang/spec.go) plugin creates a Golang process called `procName` that contains zero or more named child nodes `children`.  Children are typically services like `serviceName` defined with `workflow.Define`.
+* `memcached.PrebuiltProcess(cacheName)` from the [memcached](plugins/memcached/spec.go) plugin instantiates a standalone memcached process called `cacheName` that can be used by workflow services.
 
 ## Dependency Injection
 
@@ -76,16 +76,16 @@ Namespace nodes like this are implemented by extending blueprint.Namespace.  Thi
 Recall that a golang process is defined with a name, and it contains a number of golang objects.  For example, if we want to deploy `foo` in a process and expose it with GRPC, we might write the following wiring:
 
 ```
-workflow.Define(wiring, "foo", "MyFooService")
-grpc.Deploy(wiring, "foo")
-golang.CreateProcess(wiring, "fooProc", "foo")
+workflow.Define(spec, "foo", "MyFooService")
+grpc.Deploy(spec, "foo")
+golang.CreateProcess(spec, "fooProc", "foo")
 ```
 
-In this example we want to particularly focusing on the implementation of `golang.CreateProcess`.  This implementation makes use of a custom `golang.ProcessNamespace` which is defined in [namespace.go](plugins/golang/namespace.go) and used in [wiring.go](plugins/golang/wiring.go) in the definition of `CreateProcess`.
+In this example we want to particularly focusing on the implementation of `golang.CreateProcess`.  This implementation makes use of a custom `golang.ProcessNamespace` which is defined in [namespace.go](plugins/golang/namespace.go) and used in [spec.go](plugins/golang/spec.go) in the definition of `CreateProcess`.
 
 Its usage is rather straightforward.  In the build function for `fooProc`, the first thing that happens is to create a new namespace as a child of the received namespace:
 ```
-process := NewGolangProcessNamespace(namespace, wiring, procName)
+process := NewGolangProcessNamespace(namespace, spec, procName)
 ```
 
 Here, we say that `process` is a *child* namespace of the received `namespace`, and that `namespace` is the *parent* namespace of `process`.
@@ -94,7 +94,7 @@ Subsequently, in the build function of `fooProc`, there is a call to `Get("foo")
 
 Internally, `process` will make note of nodes such as `foo` that get built, as well as any other nodes that `foo` builds recursively.  Eventually, once `foo` has been built, `fooProc`'s build function finishes.  It returns an IR node representing the process, that contains `foo` as well as any golang nodes that were built as a result of building `foo`.
 
-**Types.** Namespaces make use of IR nodeTypes to decide whether to, either, (a) build a node here, in this namespace; or (b) just get the node from the parent namespace instead.  Consider the example of a memcached container image.  It is nonsensical for a golang process to contain a memcached container image.  So the `golang.ProcessNamespace` does not support building nodes of type Container.  The Namespace interface, which is defined in [pkg/blueprint/namespace.go](blueprint/pkg/blueprint/namespace.go) and implemented by the [Golang plugin](plugins/golang/namespace.go) allows namespaces to specify which node types they actually support and can be built in this namespace; for all other node types, a call to Get will just recursively call Get in the parent namespace.  Recall, that in `wiring.Define`, one of the arguments is `nodeType` -- the type of node that this definition will build.
+**Types.** Namespaces make use of IR nodeTypes to decide whether to, either, (a) build a node here, in this namespace; or (b) just get the node from the parent namespace instead.  Consider the example of a memcached container image.  It is nonsensical for a golang process to contain a memcached container image.  So the `golang.ProcessNamespace` does not support building nodes of type Container.  The Namespace interface, which is defined in [pkg/blueprint/namespace.go](blueprint/pkg/blueprint/namespace.go) and implemented by the [Golang plugin](plugins/golang/namespace.go) allows namespaces to specify which node types they actually support and can be built in this namespace; for all other node types, a call to Get will just recursively call Get in the parent namespace.  Recall, that in `spec.Define`, one of the arguments is `nodeType` -- the type of node that this definition will build.
  that `golang.ProcessNamespace` *doesn't* support (e.g. to a memcached container image), then the node is instead gotten from the parent namespace, recursively.  
 
 **Singletons.** Although nodes are singletons within a namespace, there can be multiple different namespace instances, each with its own node instance.  For example, suppose we have services A, B, and C, all making RPC calls to service D over GRPC.  Then there will be an instance of D's GRPC client in each of A, B, and C's processes.
@@ -109,4 +109,4 @@ When an address is defined, it is up to the plugin to decide the nodeType of the
 
 ### Pointers
 
-Pointers are a concept that are not directly part of Blueprint's wiring spec, but are built on top of it and widely used.  A pointer represents a chain of nodes, often with an address in the middle.  A pointer can be created for any defined node.  Modifers can be applied to pointers, which entails inserting extra nodes in the chain of nodes.  This is best illustrated by the [workflow plugin](plugins/workflow/wiring.go) which, for any service, defines both a handler and a pointer to the handler; and the [GRPC plugin](plugins/grpc/wiring.go), which adds client, server, and address nodes to a pointer.
+Pointers are a concept that are not directly part of Blueprint's wiring spec, but are built on top of it and widely used.  A pointer represents a chain of nodes, often with an address in the middle.  A pointer can be created for any defined node.  Modifers can be applied to pointers, which entails inserting extra nodes in the chain of nodes.  This is best illustrated by the [workflow plugin](plugins/workflow/spec.go) which, for any service, defines both a handler and a pointer to the handler; and the [GRPC plugin](plugins/grpc/spec.go), which adds client, server, and address nodes to a pointer.

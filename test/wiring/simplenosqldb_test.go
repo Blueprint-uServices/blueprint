@@ -9,14 +9,14 @@ import (
 )
 
 func TestSimpleNoSQLDB(t *testing.T) {
-	wiring := newWiringSpec("TestSimpleNoSQLDB")
+	spec := newWiringSpec("TestSimpleNoSQLDB")
 
-	leaf_cache := simplecache.Define(wiring, "leaf_cache")
-	leaf_db := simplenosqldb.Define(wiring, "leaf_db")
-	leaf := workflow.Define(wiring, "leaf", "TestLeafServiceImplWithDB", leaf_cache, leaf_db)
-	nonleaf := workflow.Define(wiring, "nonleaf", "TestNonLeafService", leaf)
+	leaf_cache := simplecache.Define(spec, "leaf_cache")
+	leaf_db := simplenosqldb.Define(spec, "leaf_db")
+	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImplWithDB", leaf_cache, leaf_db)
+	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	app := assertBuildSuccess(t, wiring, leaf, leaf_db, nonleaf)
+	app := assertBuildSuccess(t, spec, leaf, leaf_db, nonleaf)
 
 	assertIR(t, app,
 		`TestSimpleNoSQLDB = BlueprintApplication() {

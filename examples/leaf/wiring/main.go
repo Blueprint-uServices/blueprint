@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
@@ -18,59 +18,50 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func serviceDefaults(wiring blueprint.WiringSpec, serviceName string) string {
+func serviceDefaults(spec wiring.WiringSpec, serviceName string) string {
 	procName := fmt.Sprintf("proc%s", serviceName)
 	ctrName := fmt.Sprintf("ctr%s", serviceName)
-	// opentelemetry.Instrument(wiring, serviceName)
-	clientpool.Create(wiring, serviceName, 5)
-	healthchecker.AddHealthCheckAPI(wiring, serviceName)
-	grpc.Deploy(wiring, serviceName)
-	goproc.CreateProcess(wiring, procName, serviceName)
-	return linuxcontainer.CreateContainer(wiring, ctrName, procName)
+	// opentelemetry.Instrument(spec, serviceName)
+	clientpool.Create(spec, serviceName, 5)
+	healthchecker.AddHealthCheckAPI(spec, serviceName)
+	grpc.Deploy(spec, serviceName)
+	goproc.CreateProcess(spec, procName, serviceName)
+	return linuxcontainer.CreateContainer(spec, ctrName, procName)
 }
 
 func main() {
 
-	fmt.Println("Constructing Wiring Spec")
+	fmt.Println("Constructing spec Spec")
 
 	// Initialize blueprint compiler
 	linuxcontainer.RegisterBuilders()
 	dockerdeployment.RegisterBuilders()
 
-	wiring := blueprint.NewWiringSpec("leaf_example")
+	// --------------
+
+	spec := wiring.NewWiringSpec("leaf_example")
 
 	// Create the wiring spec
 	workflow.Init("../workflow")
 
-	// b_cache := memcached.PrebuiltProcess(wiring, "b_cache")
-	b_database := simplenosqldb.Define(wiring, "b_database")
-	b_cache := simplecache.Define(wiring, "b_cache")
-	b := workflow.Define(wiring, "b", "LeafServiceImpl", b_cache, b_database)
+	b_database := simplenosqldb.Define(spec, "b_database")
+	b_cache := simplecache.Define(spec, "b_cache")
+	b := workflow.Define(spec, "b", "LeafServiceImpl", b_cache, b_database)
 
-	// b := workflow.Define(wiring, "b", "LeafServiceImpl")
-	// a := workflow.Define(wiring, "a", "NonLeafServiceImpl", b) // Will fail, because no constructors returning the impl directly
-	a := workflow.Define(wiring, "a", "NonLeafService", b)
+	a := workflow.Define(spec, "a", "NonLeafService", b)
 
-	pa := serviceDefaults(wiring, a)
-	pb := serviceDefaults(wiring, b)
-	// proc := goproc.CreateProcess(wiring, "proc", a, b)
+	pa := serviceDefaults(spec, a)
+	pb := serviceDefaults(spec, b)
 
-	// client := goproc.CreateClientProcess(wiring, "client", a)
-	client := workload.Generator(wiring, a)
+	client := workload.Generator(spec, a)
 
-	// Let's print out all of the nodes currently defined in the wiring spec
-	slog.Info("Wiring Spec: \n" + wiring.String())
+	// -----------------
 
-	bp, err := wiring.GetBlueprint()
-	if err != nil {
-		slog.Error(err.Error())
-		os.Exit(1)
-	}
+	slog.Info("spec Spec: \n" + spec.String())
 
-	bp.Instantiate(pa, pb, client)
-	// bp.Instantiate(proc)
-
-	application, err := bp.BuildIR()
+	// Build the IR for our specific nodes
+	nodesToInstantiate := []string{pa, pb, client}
+	application, err := spec.BuildIR(nodesToInstantiate...)
 	if err != nil {
 		slog.Error("Unable to build blueprint, exiting", "error", err)
 		slog.Info("Application: \n" + application.String())
@@ -81,7 +72,7 @@ func main() {
 
 	// Below here is a WIP on generating code
 
-	err = application.Compile("tmp")
+	err = application.GenerateArtifacts("tmp")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)

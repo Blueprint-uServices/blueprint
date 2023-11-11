@@ -5,7 +5,8 @@ import (
 	"path/filepath"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
@@ -39,7 +40,7 @@ func (node *OpenTelemetryClientWrapper) String() string {
 	return node.Name() + " = OTClientWrapper(" + node.Wrapped.Name() + ", " + node.Collector.Name() + ")"
 }
 
-func (node *OpenTelemetryClientWrapper) genInterface(ctx blueprint.BuildContext) (*gocode.ServiceInterface, error) {
+func (node *OpenTelemetryClientWrapper) genInterface(ctx ir.BuildContext) (*gocode.ServiceInterface, error) {
 	iface, err := golang.GetGoInterface(ctx, node.Wrapped)
 	if err != nil {
 		return nil, err
@@ -56,7 +57,7 @@ func (node *OpenTelemetryClientWrapper) genInterface(ctx blueprint.BuildContext)
 	return i, nil
 }
 
-func (node *OpenTelemetryClientWrapper) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error) {
+func (node *OpenTelemetryClientWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.genInterface(ctx)
 }
 
@@ -115,7 +116,7 @@ func (node *OpenTelemetryClientWrapper) AddInstantiation(builder golang.GraphBui
 		},
 	}
 
-	return builder.DeclareConstructor(node.WrapperName, constructor, []blueprint.IRNode{node.Wrapped, node.Collector})
+	return builder.DeclareConstructor(node.WrapperName, constructor, []ir.IRNode{node.Wrapped, node.Collector})
 }
 
 func (node *OpenTelemetryClientWrapper) ImplementsGolangNode()    {}

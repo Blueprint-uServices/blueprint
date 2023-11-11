@@ -5,7 +5,8 @@ import (
 	"path/filepath"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/address"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 	"golang.org/x/exp/slog"
 )
@@ -53,16 +54,16 @@ func (d *DockerComposeFile) Generate() error {
 
 }
 
-func (d *DockerComposeFile) AddImageInstance(instanceName string, image string, args ...blueprint.IRNode) error {
+func (d *DockerComposeFile) AddImageInstance(instanceName string, image string, args ...ir.IRNode) error {
 	return d.addInstance(instanceName, image, "", args...)
 }
 
-func (d *DockerComposeFile) AddBuildInstance(instanceName string, containerTemplateName string, args ...blueprint.IRNode) error {
+func (d *DockerComposeFile) AddBuildInstance(instanceName string, containerTemplateName string, args ...ir.IRNode) error {
 	return d.addInstance(instanceName, "", containerTemplateName, args...)
 }
 
-func (d *DockerComposeFile) addInstance(instanceName string, image string, containerTemplateName string, args ...blueprint.IRNode) error {
-	instanceName = blueprint.CleanName(instanceName)
+func (d *DockerComposeFile) addInstance(instanceName string, image string, containerTemplateName string, args ...ir.IRNode) error {
+	instanceName = ir.CleanName(instanceName)
 	if _, exists := d.Instances[instanceName]; exists {
 		return blueprint.Errorf("re-declaration of container instance %v of image %v", instanceName, image)
 	}
@@ -90,7 +91,7 @@ func (d *DockerComposeFile) addInstance(instanceName string, image string, conta
 			bind.Hostname = instanceName
 		}
 
-		if conf, isConfig := node.(blueprint.IRConfig); isConfig {
+		if conf, isConfig := node.(ir.IRConfig); isConfig {
 			if conf.HasValue() {
 				instance.Config[varname] = conf.Value()
 				continue
@@ -109,7 +110,7 @@ func (d *DockerComposeFile) addInstance(instanceName string, image string, conta
 	return nil
 }
 
-func (d *DockerComposeFile) checkForAddrs(nodes []blueprint.IRNode) {
+func (d *DockerComposeFile) checkForAddrs(nodes []ir.IRNode) {
 	for _, node := range nodes {
 		switch c := node.(type) {
 		case *address.BindConfig:
@@ -139,7 +140,7 @@ func (d *DockerComposeFile) ResolveLocalDials() error {
 	return nil
 }
 
-func requiredEnvVar(node blueprint.IRNode) string {
+func requiredEnvVar(node ir.IRNode) string {
 	return fmt.Sprintf("${%v?%v must be set by the calling environment}", linux.EnvVar(node.Name()), node.Name())
 }
 
