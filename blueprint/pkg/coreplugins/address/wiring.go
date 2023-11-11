@@ -7,9 +7,16 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
-/*
-Defines an address called `addressName` that points to the definition `pointsto`.
-*/
+// Defines an address called addressName whose server-side node has name pointsTo.
+//
+// This method is primarily intended for use by other Blueprint plugins.
+//
+// The type parameter ServerType should correspond to the node type of pointsTo.
+//
+// Reachability of an address defines how far up the parent namespaces the address should
+// exist and be reachable.  By default most addresses will want to use ir.ApplicationNode as
+// the reachability to indicate that the address can be reached by any node anywhere in
+// the application.
 func Define[ServerType ir.IRNode](spec wiring.WiringSpec, addressName string, pointsTo string, reachability any) {
 	def := spec.GetDef(pointsTo)
 	if def == nil {
@@ -39,7 +46,10 @@ func Define[ServerType ir.IRNode](spec wiring.WiringSpec, addressName string, po
 	})
 }
 
-func DestinationOf(namespace wiring.Namespace, addressName string) (string, error) {
+// Returns the value of pointsTo that was provided when addressName was defined.
+//
+// Used by the pointer plugin.
+func PointsTo(namespace wiring.Namespace, addressName string) (string, error) {
 	var pointsTo string
 	if err := namespace.GetProperty(addressName, "pointsTo", &pointsTo); err != nil {
 		return "", blueprint.Errorf("expected pointsTo property of %v to be a string; %v", addressName, err.Error())
@@ -47,11 +57,12 @@ func DestinationOf(namespace wiring.Namespace, addressName string) (string, erro
 	return pointsTo, nil
 }
 
-/*
-The client side of an address should call this method to get the address to dial for a server
-
-Under the hood this will ensure the configuration values for the dialling address get added to the namespace
-*/
+// Gets the [DialConfig] configuration node of addressName from the namespace.
+//
+// This method is intended for use by other Blueprint plugins within their own BuildFuncs.
+//
+// This is a convenience method for use when only the dial address is needed.  It is equivalent to getting
+// addressName directly from namespace and then reading then [Address.Dial] field.
 func Dial[ServerType ir.IRNode](namespace wiring.Namespace, addressName string) (*Address[ServerType], error) {
 	var addr *Address[ServerType]
 	if err := namespace.Get(addressName, &addr); err != nil {
@@ -68,11 +79,12 @@ func Dial[ServerType ir.IRNode](namespace wiring.Namespace, addressName string) 
 	return addr, nil
 }
 
-/*
-The server side of an address should call this method to get the address to bind for a server
-
-Under the hood this will ensure the configuration values for the binding address get added to the namespace
-*/
+// Gets the [BindConfig] configuration node of addressName from the namespace.
+//
+// This method is intended for use by other Blueprint plugins within their own BuildFuncs.
+//
+// This is a convenience method for use when only the dial address is needed.  It is equivalent to getting
+// addressName directly from namespace and then reading then [Address.Bind] field.
 func Bind[ServerType ir.IRNode](namespace wiring.Namespace, addressName string) (*Address[ServerType], error) {
 	var addr *Address[ServerType]
 	if err := namespace.Get(addressName, &addr); err != nil {

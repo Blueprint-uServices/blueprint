@@ -1,3 +1,4 @@
+// Package backend provides IR node interfaces for common backend components.
 package backend
 
 import (

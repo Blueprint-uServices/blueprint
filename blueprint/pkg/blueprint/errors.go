@@ -22,7 +22,11 @@ func (e *blueprintError) Error() string {
 }
 
 // Generates an error in the same way as fmt.Errorf but also includes
-// the call stack
+// the call stack.
+//
+// Plugins should generally use this method, because it enables us
+// to more easily tie errors back to the plugins and wiring specs
+// that caused the error.
 func Errorf(format string, a ...any) error {
 	bytes := make([]byte, MAX_ERR_SIZE)
 	runtime.Stack(bytes, false)

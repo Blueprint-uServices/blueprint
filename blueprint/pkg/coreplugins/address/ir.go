@@ -1,3 +1,17 @@
+// Package address provides IR nodes to represent addressing, particularly between clients and servers.
+//
+// This plugin is primarily for use by other Blueprint plugins.  It is not expected that a wiring spec
+// needs to directly call methods from this package.
+//
+// The main usage by other Blueprint plugins is the Define method, which will define an address that points
+// to an IR node of a specified type.  Within a buildfunc, plugins can directly get the address by name,
+// or use the helper methods Bind and Dial to get only the relevant configuration nodes.
+//
+// To implement addressing, several concerns are addressed:
+//   - when a client node is instantiated it usually wants to access the server node in order to discover
+//     the server's address and its interface.  But the client doesn't want to accidentally instantiate
+//     the server in the wrong place.  An Address node adds one layer of indirection to prevent this.
+//   - an address node takes care of configuration variables for binding and dialling the address.
 package address
 
 import (
@@ -9,16 +23,27 @@ import (
 )
 
 type (
-	/*
-		Metadata IRNode representing an address, used during the build process.
-		Contains metadata about the address and the node it points to
-	*/
+	// IR metadata node representing an address.
+	//
+	// The main purpose of this node is to enable client nodes to link to server
+	// nodes lazily without inadvertently instantiating the server nodes in the
+	// wrong namespace.
+	//
+	// During the build process, the destination node of an address will be stored
+	// on this node.  That enables clients, later, to call methods on the server
+	// node, e.g. to get the interface that the server node exposes.
+	//
+	// The main implementation of this interface is [Address]
 	Node interface {
 		ir.IRNode
 		ir.IRMetadata
-		Name() string
+
+		// Returns the server-side of an address if it has been instantiated; nil otherwise
 		GetDestination() ir.IRNode
+
+		// Sets the server-side of the address to be the provided node.
 		SetDestination(ir.IRNode) error
+
 		ImplementsAddressNode()
 	}
 
@@ -30,20 +55,25 @@ type (
 		Port        uint16
 	}
 
-	/* A configuration parameter representing the address for a server to bind to */
+	// IR config node representing an address that a server should bind to.
 	BindConfig struct {
 		addressConfig
 		PreferredPort uint16
 	}
 
-	/* A configuration parameter representing the address for a client to dial */
+	// IR config node representing an address that a client should dial.
 	DialConfig struct {
 		addressConfig
 	}
 )
 
 type (
-	/* Basic generic implementation of address.Node */
+	// The main implementation of the [Node] interface.
+	//
+	// In addition to storing the destination IR node, the address
+	// also comes with two configuration IR nodes: a [BindConfig] that
+	// is the bind address of the destination node, and a [DialConfig] that is the
+	// address callers should dial.
 	Address[ServerType ir.IRNode] struct {
 		AddrName string
 		Server   ServerType

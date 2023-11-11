@@ -9,32 +9,21 @@ import (
 )
 
 /*
-This file contains some helper methods for working with address configs.
+AssignPorts is a helper method intended for use by namespace nodes when they
+are compiling code and concrete ports must be assigned to [BindConfig] IR nodes.
 
-In general, server IRnodes will need to bind to a port, but for most
-IRNodes this port is not pre-defined and can be assigned at deployment
-time or even at runtime.
+The provided nodes can be any IR nodes; this method will filter out only the [BindConfig]
+nodes.
 
-Addresses and ports are thus usually passed into nodes at runtime as
-arguments.
+Some of the provided nodes might already be assigned to a particular port.  This method
+will not change those port assignments, though it will return an error if two nodes
+are already pre-assigned to the same port.
 
-For a few nodes -- primarily namespace nodes -- the nodes might need to
-explicitly expose ports of servers running within the namespace.
+Ports will be assigned either ascending from port 2000, or ascending from a node's
+preferred port if a preference was specified.
 
-Likewise, some namespace nodes might want to assign ports to the servers
-running within the namespace.  In this case, each server needs its own
-unique port.
-*/
-
-/*
-A helper method for use by namespace nodes.
-
-nodes -- IRnodes that exist within the namespace and/or the namespace receives as arguments
-
-This method searches containedNodes and argNodes for server bind addresses
-and assigns ports to any addresses that haven't yet been assigned.
-
-Returns an error if multiple nodes have pre-assigned themselves conflicting ports
+After calling this method, any provided [BindConfig] IR nodes will have their hostname
+and port set.
 */
 func AssignPorts(hostname string, nodes []ir.IRNode) error {
 	// Extract the BindConfig nodes
@@ -90,9 +79,7 @@ func AssignPorts(hostname string, nodes []ir.IRNode) error {
 	return nil
 }
 
-/*
-Returns an error if any ports haven't been allocated
-*/
+// Returns an error if there are [BindConfig] nodes in the provided list that haven't been allocated a port.
 func CheckPorts(nodes []ir.IRNode) error {
 	var missing []string
 	for _, addr := range ir.Filter[*BindConfig](nodes) {
@@ -106,10 +93,10 @@ func CheckPorts(nodes []ir.IRNode) error {
 	return nil
 }
 
-/*
-If a namespace translates addresses, then it will need to reset the assigned
-ports before returning to the parent namespace
-*/
+// Clears the hostname and port from any [BindConfig] node.
+//
+// This is used by namespace nodes when performing address translation, e.g. between
+// ports within a container vs. external to a container.
 func ResetPorts(nodes []ir.IRNode) {
 	for _, addr := range ir.Filter[*BindConfig](nodes) {
 		addr.Port = 0

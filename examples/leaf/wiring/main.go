@@ -37,28 +37,26 @@ func main() {
 	linuxcontainer.RegisterBuilders()
 	dockerdeployment.RegisterBuilders()
 
+	// --------------
+
 	spec := wiring.NewWiringSpec("leaf_example")
 
 	// Create the wiring spec
 	workflow.Init("../workflow")
 
-	// b_cache := memcached.PrebuiltProcess(spec, "b_cache")
 	b_database := simplenosqldb.Define(spec, "b_database")
 	b_cache := simplecache.Define(spec, "b_cache")
 	b := workflow.Define(spec, "b", "LeafServiceImpl", b_cache, b_database)
 
-	// b := workflow.Define(spec, "b", "LeafServiceImpl")
-	// a := workflow.Define(spec, "a", "NonLeafServiceImpl", b) // Will fail, because no constructors returning the impl directly
 	a := workflow.Define(spec, "a", "NonLeafService", b)
 
 	pa := serviceDefaults(spec, a)
 	pb := serviceDefaults(spec, b)
-	// proc := goproc.CreateProcess(spec, "proc", a, b)
 
-	// client := goproc.CreateClientProcess(spec, "client", a)
 	client := workload.Generator(spec, a)
 
-	// Let's print out all of the nodes currently defined in the spec spec
+	// -----------------
+
 	slog.Info("spec Spec: \n" + spec.String())
 
 	// Build the IR for our specific nodes

@@ -7,7 +7,7 @@ import (
 )
 
 // Metadata used to enforce reachability constraints for nodes (primarily services)
-type VisibilityMetadata struct {
+type visibilityMetadata struct {
 	ir.IRMetadata
 
 	name      string
@@ -15,11 +15,11 @@ type VisibilityMetadata struct {
 	namespace wiring.Namespace
 }
 
-func (md *VisibilityMetadata) Name() string {
+func (md *visibilityMetadata) Name() string {
 	return md.name
 }
 
-func (md *VisibilityMetadata) String() string {
+func (md *visibilityMetadata) String() string {
 	return md.name
 }
 
@@ -47,7 +47,7 @@ func RequireUniqueness(spec wiring.WiringSpec, alias string, visibility any) {
 
 	mdName := name + ".visibility"
 	spec.Define(mdName, visibility, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		md := &VisibilityMetadata{}
+		md := &visibilityMetadata{}
 		md.name = mdName
 		md.node = nil
 		md.namespace = nil
@@ -56,7 +56,7 @@ func RequireUniqueness(spec wiring.WiringSpec, alias string, visibility any) {
 
 	checkName := name + ".uniqueness_check"
 	spec.Define(checkName, def.NodeType, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		var md *VisibilityMetadata
+		var md *visibilityMetadata
 		if err := namespace.Get(mdName, &md); err != nil {
 			return nil, blueprint.Errorf("expected %v to be uniqueness metadata but got %v", mdName, err)
 		}

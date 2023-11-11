@@ -1,3 +1,9 @@
+// Package logging implements a custom slog logger for Blueprint.
+//
+// The custom logger adds additional callsite information to logging statements,
+// to provide more information during the compilation process about which
+// plugins are producing logs or errors, and to tie that information back
+// to the corresponding wiring line.
 package logging
 
 import (

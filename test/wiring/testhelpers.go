@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/logging"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
@@ -13,8 +13,8 @@ import (
 )
 
 func newWiringSpec(name string) wiring.WiringSpec {
-	blueprint.DisableCompilerLogging()
-	defer blueprint.EnableCompilerLogging()
+	logging.DisableCompilerLogging()
+	defer logging.EnableCompilerLogging()
 	workflow.Reset()
 	spec := wiring.NewWiringSpec(name)
 	workflow.Init("../workflow")
@@ -22,8 +22,8 @@ func newWiringSpec(name string) wiring.WiringSpec {
 }
 
 func build(t *testing.T, spec wiring.WiringSpec, toInstantiate ...string) (*ir.ApplicationNode, error) {
-	blueprint.DisableCompilerLogging()
-	defer blueprint.EnableCompilerLogging()
+	logging.DisableCompilerLogging()
+	defer logging.EnableCompilerLogging()
 	return spec.BuildIR(toInstantiate...)
 }
 
