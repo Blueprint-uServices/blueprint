@@ -197,32 +197,32 @@ func (db *SimpleCollection) DeleteMany(ctx context.Context, filter bson.D) error
 
 }
 
-func (db *SimpleCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) error {
+func (db *SimpleCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) (int, error) {
 	filterOp, err := query.ParseFilter(filter)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	updateOp, err := query.ParseUpdate(update)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	for i := range db.items {
 		if filterOp.Apply(db.items[i]) {
-			return updateOp.Apply(&db.items[i])
+			return 1, updateOp.Apply(&db.items[i])
 		}
 	}
-	return nil
+	return 0, nil
 }
 
-func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) error {
+func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error) {
 	filterOp, err := query.ParseFilter(filter)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	updateOp, err := query.ParseUpdate(update)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if verbose {
 		fmt.Printf("---- UpdateMany\n")
@@ -230,6 +230,7 @@ func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, updat
 		fmt.Printf(" UPDATE: %v\n", updateOp)
 	}
 
+	updated := 0
 	for i := range db.items {
 		if filterOp.Apply(db.items[i]) {
 			if verbose {
@@ -237,18 +238,19 @@ func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, updat
 			}
 			err := updateOp.Apply(&db.items[i])
 			if err != nil {
-				return err
+				return updated, err
 			}
 			if verbose {
 				fmt.Printf("      --> %v\n", db.items[i])
 			}
+			updated += 1
 		} else {
 			if verbose {
 				fmt.Printf("          %v\n", db.items[i])
 			}
 		}
 	}
-	return nil
+	return updated, nil
 }
 
 func (db *SimpleCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) error {

@@ -26,8 +26,8 @@ type NoSQLCollection interface {
 	InsertMany(ctx context.Context, documents []interface{}) error
 	FindOne(ctx context.Context, filter bson.D, projection ...bson.D) (NoSQLCursor, error)  //projections should be optional,just like they are in go-mongo and py-mongo. In go-mongo they use an explicit SetProjection method.
 	FindMany(ctx context.Context, filter bson.D, projection ...bson.D) (NoSQLCursor, error) // Result is not a slice -> it is an object we can use to retrieve documents using res.All().
-	UpdateOne(ctx context.Context, filter bson.D, update bson.D) error
-	UpdateMany(ctx context.Context, filter bson.D, update bson.D) error
+	UpdateOne(ctx context.Context, filter bson.D, update bson.D) (int, error)
+	UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error)
 	ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) error
 	ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) error
 }

@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-//* constructor
+// * constructor
 func NewMongoDB(ctx context.Context, addr string) (*MongoDB, error) {
 	clientOptions := options.Client().ApplyURI("mongodb://" + addr)
 	client, err := mongo.Connect(ctx, clientOptions)
@@ -112,16 +112,15 @@ func (mc *MongoCollection) FindMany(ctx context.Context, filter bson.D, projecti
 	}, nil
 }
 
-//* not sure about the `update` parameter and its conversion
-func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) error {
-	_, err := mc.collection.UpdateOne(ctx, filter, update)
-	return err
+// * not sure about the `update` parameter and its conversion
+func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) (int, error) {
+	result, err := mc.collection.UpdateOne(ctx, filter, update)
+	return int(result.ModifiedCount), err
 }
 
-func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) error {
-	_, err := mc.collection.UpdateMany(ctx, filter, update)
-	return err
-
+func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error) {
+	result, err := mc.collection.UpdateMany(ctx, filter, update)
+	return int(result.ModifiedCount), err
 }
 
 func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) error {
