@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Depends on godoc2markdown being installed.
+# Installation instructions: https://git.sr.ht/~humaid/godoc2markdown
+
 HOME_DIR=$PWD
 dirs=(
 # Core packages
