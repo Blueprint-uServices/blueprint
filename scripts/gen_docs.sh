@@ -3,7 +3,7 @@
 # Depends on godoc2markdown being installed.
 # Installation instructions: https://git.sr.ht/~humaid/godoc2markdown
 
-HOME_DIR=$PWD
+HOME_DIR=$PWD/../
 dirs=(
 # Core packages
     "blueprint/pkg/blueprint/ioutil"
@@ -54,11 +54,17 @@ dirs=(
     "runtime/plugins/zipkin"
 )
 
+# Remove all the old docs
+mkdir -p $HOME_DIR/docs/api
+cd $HOME_DIR/docs/api/
+rm *.md
+cd $HOME_DIR
+
 for dir in "${dirs[@]}"
 do
     cd $dir
     title=$(echo "$dir" | tr '/' '_')
-    outfile=$HOME_DIR/docs/$title.md
+    outfile=$HOME_DIR/docs/api/$title.md
     echo "Generating documentation for $dir"
     echo "---" > $outfile
     echo "title: $dir" >> $outfile
