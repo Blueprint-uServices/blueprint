@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type NoSQLDatabase interface {
@@ -20,14 +21,85 @@ type NoSQLCursor interface {
 }
 
 type NoSQLCollection interface {
+	// Deletes the first document that matches filter
+	//
+	// We use the same filter semantics as mongodb
+	// https://www.mongodb.com/docs/manual/tutorial/query-documents/
 	DeleteOne(ctx context.Context, filter bson.D) error
+
+	// Deletes all documents that match filter
+	//
+	// We use the same filter semantics as mongodb
+	// https://www.mongodb.com/docs/manual/tutorial/query-documents/
 	DeleteMany(ctx context.Context, filter bson.D) error
+
+	// Inserts the document into the collection.
 	InsertOne(ctx context.Context, document interface{}) error
+
+	// Inserts all provided documents into the collection
 	InsertMany(ctx context.Context, documents []interface{}) error
-	FindOne(ctx context.Context, filter bson.D, projection ...bson.D) (NoSQLCursor, error)  //projections should be optional,just like they are in go-mongo and py-mongo. In go-mongo they use an explicit SetProjection method.
+
+	// Finds a document that matches filter.
+	//
+	// We use the same filter semantics as mongodb
+	// https://www.mongodb.com/docs/manual/tutorial/query-documents/
+	//
+	// Projections are optional and behave with mongodb semantics.
+	FindOne(ctx context.Context, filter bson.D, projection ...bson.D) (NoSQLCursor, error)
+
+	// Finds all documents that match the filter.
+	//
+	// We use the same filter semantics as mongodb
+	// https://www.mongodb.com/docs/manual/tutorial/query-documents/
+	//
+	// Projections are optional and behave with mongodb semantics.
 	FindMany(ctx context.Context, filter bson.D, projection ...bson.D) (NoSQLCursor, error) // Result is not a slice -> it is an object we can use to retrieve documents using res.All().
+
+	// Applies the provided update to the first document that matches filter
+	//
+	// We use the same filter semantics as mongodb
+	// https://www.mongodb.com/docs/manual/tutorial/query-documents/
+	//
+	// We use the same update operators as mongodb
+	// https://www.mongodb.com/docs/manual/reference/method/db.collection.update/
+	//
+	// Returns the number of updated documents (0 or 1)
 	UpdateOne(ctx context.Context, filter bson.D, update bson.D) (int, error)
+
+	// Applies the provided update to all documents that match the filter
+	//
+	// We use the same filter semantics as mongodb
+	// https://www.mongodb.com/docs/manual/tutorial/query-documents/
+	//
+	// We use the same update operators as mongodb
+	// https://www.mongodb.com/docs/manual/reference/method/db.collection.update/
+	//
+	// Returns the number of updated documents (>= 0)
 	UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error)
-	ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) error
-	ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) error
+
+	// Attempts to match a document in the collection with "_id" = id.
+	// If a match is found, replaces the existing document with the provided document.
+	// If a match is not found, document is inserted into the collection.
+	// Returns true if an existing document was updated; false otherwise
+	//
+	// This method requires that document has an "_id" field in its BSON representation.
+	// If document is a golang struct, the standard way to do this is to tag a field as follows:
+	//     ID   primitive.ObjectID `bson:"_id"`
+	UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error)
+
+	// Replaces the first document that matches filter with the replacement document.
+	//
+	// We use the same filter semantics as mongodb
+	// https://www.mongodb.com/docs/manual/tutorial/query-documents/
+	//
+	// Returns the number of replaced documents (0 or 1)
+	ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error)
+
+	// Replaces all documents that match filter with the replacement documents.
+	//
+	// We use the same filter semantics as mongodb
+	// https://www.mongodb.com/docs/manual/tutorial/query-documents/
+	//
+	// Returns the number of replaced documents.
+	ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) (int, error)
 }

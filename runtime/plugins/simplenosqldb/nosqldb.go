@@ -253,35 +253,46 @@ func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, updat
 	return updated, nil
 }
 
-func (db *SimpleCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) error {
+func (db *SimpleCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error) {
+	filter := bson.D{{"_id", id}}
+	update := bson.D{{"$set", document}}
+	updatedCount, err := db.UpdateOne(ctx, filter, update)
+	if updatedCount == 1 || err != nil {
+		return true, nil
+	}
+	return false, db.InsertOne(ctx, document)
+}
+
+func (db *SimpleCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error) {
 	query, err := query.ParseFilter(filter)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	for i, item := range db.items {
 		if query.Apply(item) {
 			db.items[i], err = toBson(replacement)
-			return err
+			return 1, err
 		}
 	}
-	return nil
+	return 0, nil
 }
 
-func (db *SimpleCollection) ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) error {
+func (db *SimpleCollection) ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) (int, error) {
 	query, err := query.ParseFilter(filter)
 	if err != nil {
-		return nil
+		return 0, nil
 	}
-	for i, j := 0, 0; i < len(replacements) && j < len(db.items); j++ {
+	updateCount := 0
+	for j := 0; updateCount < len(replacements) && j < len(db.items); j++ {
 		if query.Apply(db.items[j]) {
-			db.items[j], err = toBson(replacements[i])
+			db.items[j], err = toBson(replacements[updateCount])
 			if err != nil {
-				return err
+				return updateCount, err
 			}
-			i++
+			updateCount++
 		}
 	}
-	return nil
+	return updateCount, nil
 }
 
 func toBson(document any) (bson.D, error) {
