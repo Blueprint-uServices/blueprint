@@ -96,7 +96,7 @@ type userServiceImpl struct {
 // information in a NoSQLDatabase.
 //
 // Returns an error if unable to get the users, addresses, or cards collection from the DB
-func NewUserServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*userServiceImpl, error) {
+func NewUserServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (UserService, error) {
 	users, err := newUserStore(ctx, db)
 	return &userServiceImpl{users: users}, err
 }
@@ -127,6 +127,8 @@ func (s *userServiceImpl) Register(ctx context.Context, username, password, emai
 	u.Email = email
 	u.FirstName = first
 	u.LastName = last
+	u.Addresses = []Address{}
+	u.Cards = []Card{}
 
 	// Save the user in the DB
 	err := s.users.createUser(ctx, &u)

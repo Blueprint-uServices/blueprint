@@ -38,7 +38,7 @@ func (s *cardStore) getCard(ctx context.Context, cardid string) (Card, error) {
 		return Card{}, err
 	}
 	card := dbCard{}
-	err = cursor.All(ctx, &card)
+	err = cursor.One(ctx, &card)
 
 	// Convert from DB card data to Card object
 	card.Card.ID = card.ID.Hex()
@@ -47,6 +47,10 @@ func (s *cardStore) getCard(ctx context.Context, cardid string) (Card, error) {
 
 // Gets cards from the card store
 func (s *cardStore) getCards(ctx context.Context, cardIds []string) ([]Card, error) {
+	if len(cardIds) == 0 {
+		return nil, nil
+	}
+
 	// Convert the card IDs from hex strings to objects
 	ids, err := hexToObjectIds(cardIds)
 	if err != nil {
@@ -73,7 +77,7 @@ func (s *cardStore) getCards(ctx context.Context, cardIds []string) ([]Card, err
 
 func (s *cardStore) getAllCards(ctx context.Context) ([]Card, error) {
 	// Run the query
-	cursor, err := s.c.FindMany(ctx, bson.D{{}})
+	cursor, err := s.c.FindMany(ctx, bson.D{})
 	if err != nil {
 		return nil, err
 	}
@@ -106,6 +110,9 @@ func (s *cardStore) createCard(ctx context.Context, card *Card) error {
 
 // Creates or updates the provided cards in the cardStore.
 func (s *cardStore) createCards(ctx context.Context, cards []Card) ([]primitive.ObjectID, error) {
+	if len(cards) == 0 {
+		return nil, nil
+	}
 	createdIds := make([]primitive.ObjectID, 0)
 	for _, card := range cards {
 		toInsert := dbCard{

@@ -52,8 +52,10 @@ func newUserStore(ctx context.Context, db backend.NoSQLDatabase) (*userStore, er
 // Generates database IDs for the user then adds to the database
 func (s *userStore) createUser(ctx context.Context, user *User) error {
 	u := dbUser{
-		User: *user,
-		ID:   primitive.NewObjectID(),
+		User:       *user,
+		ID:         primitive.NewObjectID(),
+		AddressIDs: []primitive.ObjectID{},
+		CardIDs:    []primitive.ObjectID{},
 	}
 	var err error
 	if u.CardIDs, err = s.cards.createCards(ctx, user.Cards); err != nil {
@@ -122,7 +124,7 @@ func (s *userStore) getUser(ctx context.Context, userid string) (User, error) {
 // Get all users
 func (s *userStore) getUsers(ctx context.Context) ([]User, error) {
 	// Execute query
-	cursor, err := s.customers.FindMany(ctx, bson.D{{}})
+	cursor, err := s.customers.FindMany(ctx, bson.D{})
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +197,7 @@ func (s *userStore) delete(ctx context.Context, entity string, id string) error 
 	case "cards":
 		return s.deleteCard(ctx, id)
 	default:
-		return errors.New("Invalid entity" + entity)
+		return errors.New("Invalid entity " + entity)
 	}
 }
 
@@ -262,7 +264,7 @@ func (s *userStore) deleteAttr(ctx context.Context, attr, idhex string) error {
 	}
 
 	// Remove customer attr
-	filter := bson.D{{}}
+	filter := bson.D{}
 	update := bson.D{{"$pull", bson.D{{attr, id}}}}
 	_, err = s.customers.UpdateMany(ctx, filter, update)
 	return err

@@ -38,7 +38,7 @@ func (s *addressStore) getAddress(ctx context.Context, addressid string) (Addres
 		return Address{}, err
 	}
 	address := dbAddress{}
-	err = cursor.All(ctx, &address)
+	err = cursor.One(ctx, &address)
 
 	// Convert from DB address data to Address object
 	address.Address.ID = address.ID.Hex()
@@ -47,6 +47,10 @@ func (s *addressStore) getAddress(ctx context.Context, addressid string) (Addres
 
 // Gets addresses from the address store
 func (s *addressStore) getAddresses(ctx context.Context, addressIds []string) ([]Address, error) {
+	if len(addressIds) == 0 {
+		return nil, nil
+	}
+
 	// Convert the address IDs from hex strings to objects
 	ids, err := hexToObjectIds(addressIds)
 	if err != nil {
@@ -73,7 +77,7 @@ func (s *addressStore) getAddresses(ctx context.Context, addressIds []string) ([
 
 func (s *addressStore) getAllAddresses(ctx context.Context) ([]Address, error) {
 	// Run the query
-	cursor, err := s.c.FindMany(ctx, bson.D{{}})
+	cursor, err := s.c.FindMany(ctx, bson.D{})
 	if err != nil {
 		return nil, err
 	}
@@ -106,6 +110,9 @@ func (s *addressStore) createAddress(ctx context.Context, address *Address) erro
 
 // Creates or updates the provided addresses in the addressStore.
 func (s *addressStore) createAddresses(ctx context.Context, addresses []Address) ([]primitive.ObjectID, error) {
+	if len(addresses) == 0 {
+		return nil, nil
+	}
 	createdIds := make([]primitive.ObjectID, 0)
 	for _, address := range addresses {
 		toInsert := dbAddress{
