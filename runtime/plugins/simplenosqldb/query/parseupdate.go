@@ -44,6 +44,14 @@ func ParseUpdate(update bson.D) (Update, error) {
 				}
 				updates = append(updates, pushes...)
 			}
+		case "$pull":
+			{
+				pulls, err := parsePull(op.Value)
+				if err != nil {
+					return nil, err
+				}
+				updates = append(updates, pulls...)
+			}
 		default:
 			return nil, fmt.Errorf("unsupported update op %v", op.Key)
 		}
@@ -111,7 +119,7 @@ func parseInc(args any) ([]Update, error) {
 func parsePush(args any) ([]Update, error) {
 	d, isD := args.(bson.D)
 	if !isD {
-		return nil, fmt.Errorf("invalid $set operator; expected a bson.D, got %v", args)
+		return nil, fmt.Errorf("invalid $push operator; expected a bson.D, got %v", args)
 	}
 	var updates []Update
 	for _, e := range d {
@@ -125,6 +133,36 @@ func parsePush(args any) ([]Update, error) {
 		}
 
 		update, err := PushValue(e.Value)
+		if err != nil {
+			return nil, err
+		}
+		updates = append(updates, UpdatePath(e.Key, update))
+	}
+	return updates, nil
+}
+
+func parsePull(args any) ([]Update, error) {
+	d, isD := args.(bson.D)
+	if !isD {
+		return nil, fmt.Errorf("invalid $pull operator; expected a bson.D, got %v", args)
+	}
+	var updates []Update
+	for _, e := range d {
+		// Check that the value isn't a bunch of modifiers; not currently implemented
+		if ed, eIsD := e.Value.(bson.D); eIsD {
+			for _, e2 := range ed {
+				if strings.HasPrefix(e2.Key, "$") {
+					return nil, fmt.Errorf("modifiers not currently supported for $pull operation; got %v", e2)
+				}
+			}
+		}
+
+		filter, err := parseValue(e.Value)
+		if err != nil {
+			return nil, err
+		}
+
+		update, err := PullMatches(filter)
 		if err != nil {
 			return nil, err
 		}

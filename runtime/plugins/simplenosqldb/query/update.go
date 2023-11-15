@@ -27,6 +27,10 @@ type (
 		value []byte
 	}
 
+	pull struct {
+		filter Filter
+	}
+
 	unsetfield struct {
 		fieldName string
 	}
@@ -68,6 +72,10 @@ func SetValue(value any) (Update, error) {
 func PushValue(value any) (Update, error) {
 	t, v, err := bson.MarshalValue(value)
 	return &push{t: t, value: v}, err
+}
+
+func PullMatches(filter Filter) (Update, error) {
+	return &pull{filter: filter}, nil
 }
 
 func UnsetField(fieldName string) Update {
@@ -190,6 +198,39 @@ func (p *push) Apply(itemRef any) error {
 
 	a = append(a, v)
 	return backend.CopyResult(a, itemRef)
+}
+
+func (p *pull) Apply(itemRef any) error {
+	itemVal, err := backend.GetPointerValue(itemRef)
+	if err != nil {
+		return err
+	}
+
+	if itemVal == nil {
+		itemVal = bson.A{}
+	}
+
+	a, isA := itemVal.(bson.A)
+	if !isA {
+		return fmt.Errorf("expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+	}
+
+	var updated bson.A
+	updated = nil
+	for i := range a {
+		if p.filter.Apply(a[i]) {
+			if updated == nil {
+				updated = append(updated, a[:i]...)
+			}
+		} else if updated != nil {
+			updated = append(updated, a[i])
+		}
+	}
+
+	if updated != nil {
+		return backend.CopyResult(updated, itemRef)
+	}
+	return nil
 }
 
 func (u *unsetfield) Apply(itemRef any) error {
@@ -372,6 +413,10 @@ func (p *push) String() string {
 	var v interface{}
 	bson.UnmarshalValue(p.t, p.value, &v)
 	return fmt.Sprintf("push %v", v)
+}
+
+func (p *pull) String() string {
+	return fmt.Sprintf("pull: %v", p.filter)
 }
 
 func (s *unsetfield) String() string {

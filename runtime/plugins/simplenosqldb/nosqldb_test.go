@@ -1163,6 +1163,27 @@ func TestPush(t *testing.T) {
 	}
 }
 
+func TestPull(t *testing.T) {
+	ctx, db := MakeTestDB(t)
+
+	{
+		update := bson.D{{"$pull", bson.D{{"sizes", 8}}}}
+		_, err := db.UpdateMany(ctx, bson.D{}, update)
+		assert.NoError(t, err)
+
+		filter := bson.D{{"type", "English Breakfast"}}
+		cursor, err := db.FindOne(ctx, filter)
+		assert.NoError(t, err)
+
+		var tea Tea
+		err = cursor.One(ctx, &tea)
+		assert.NoError(t, err)
+		assert.Equal(t, "English Breakfast", tea.Type)
+		assert.Len(t, tea.Sizes, 2)
+		assert.ElementsMatch(t, tea.Sizes, []int32{4, 16})
+	}
+}
+
 type ObjectIDTest struct {
 	ID   primitive.ObjectID `bson:"_id,omitempty"`
 	Type string

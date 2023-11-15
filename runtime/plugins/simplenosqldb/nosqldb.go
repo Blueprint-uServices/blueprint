@@ -255,10 +255,10 @@ func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, updat
 
 func (db *SimpleCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error) {
 	filter := bson.D{{"_id", id}}
-	update := bson.D{{"$set", document}}
-	updatedCount, err := db.UpdateOne(ctx, filter, update)
+	updatedCount, err := db.ReplaceOne(ctx, filter, document)
 	if updatedCount == 1 || err != nil {
-		return true, nil
+		fmt.Printf("Upsert replaced existing %v\n", id)
+		return true, err
 	}
 	return false, db.InsertOne(ctx, document)
 }
@@ -283,9 +283,9 @@ func (db *SimpleCollection) ReplaceMany(ctx context.Context, filter bson.D, repl
 		return 0, nil
 	}
 	updateCount := 0
-	for j := 0; updateCount < len(replacements) && j < len(db.items); j++ {
-		if query.Apply(db.items[j]) {
-			db.items[j], err = toBson(replacements[updateCount])
+	for i := 0; updateCount < len(replacements) && i < len(db.items); i++ {
+		if query.Apply(db.items[i]) {
+			db.items[i], err = toBson(replacements[updateCount])
 			if err != nil {
 				return updateCount, err
 			}
