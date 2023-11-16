@@ -5,12 +5,8 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 )
 
-func init() {
-	RegisterBuilders()
-}
-
 // to trigger module initialization and register builders
-func RegisterBuilders() {
+func RegisterAsDefaultBuilder() {
 	ir.RegisterDefaultNamespace[docker.Container]("containerdeployment", buildDefaultContainerWorkspace)
 }
 

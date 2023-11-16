@@ -34,8 +34,8 @@ func main() {
 	fmt.Println("Constructing spec Spec")
 
 	// Initialize blueprint compiler
-	linuxcontainer.RegisterBuilders()
-	dockerdeployment.RegisterBuilders()
+	linuxcontainer.RegisterAsDefaultBuilder()
+	dockerdeployment.RegisterAsDefaultBuilder()
 
 	// --------------
 

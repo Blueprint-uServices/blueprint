@@ -10,12 +10,8 @@ import (
 Registers a linux process workspace as the default way of combining and building processes
 */
 
-func init() {
-	RegisterBuilders()
-}
-
 // to trigger module initialization and register builders
-func RegisterBuilders() {
+func RegisterAsDefaultBuilder() {
 	ir.RegisterDefaultNamespace[linux.Process]("linuxcontainer", buildDefaultLinuxWorkspace)
 	ir.RegisterDefaultBuilder[*Container]("linuxcontainer", buildDefaultLinuxContainer)
 }
