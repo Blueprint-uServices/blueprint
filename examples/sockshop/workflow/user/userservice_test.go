@@ -1,4 +1,4 @@
-package user
+package user_test
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/user"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/mongodb"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 )
@@ -15,7 +16,7 @@ var dbType = "simple"
 var mongoAddr = "localhost:27017"
 
 // For convenience so we can run tests against different backends
-func makeUserService(t *testing.T) (context.Context, UserService) {
+func makeUserService(t *testing.T) (context.Context, user.UserService) {
 	switch dbType {
 	case "simple":
 		return makeSimpleUserService(t)
@@ -28,32 +29,32 @@ func makeUserService(t *testing.T) (context.Context, UserService) {
 }
 
 // Make a user service that uses the simplenosqldb
-func makeSimpleUserService(t *testing.T) (context.Context, UserService) {
+func makeSimpleUserService(t *testing.T) (context.Context, user.UserService) {
 	ctx := context.Background()
 
 	db, err := simplenosqldb.NewSimpleNoSQLDB(ctx)
 	assert.NoError(t, err)
 
-	user, err := NewUserServiceImpl(ctx, db)
+	user, err := user.NewUserServiceImpl(ctx, db)
 	assert.NoError(t, err)
 
 	return ctx, user
 }
 
 // Make a user service that uses mongodb
-func makeMongoUserService(t *testing.T) (context.Context, UserService) {
+func makeMongoUserService(t *testing.T) (context.Context, user.UserService) {
 	ctx := context.Background()
 
 	db, err := mongodb.NewMongoDB(ctx, mongoAddr)
 	assert.NoError(t, err)
 
-	user, err := NewUserServiceImpl(ctx, db)
+	user, err := user.NewUserServiceImpl(ctx, db)
 	assert.NoError(t, err)
 
 	return ctx, user
 }
 
-var jon = User{
+var jon = user.User{
 	FirstName: "Jonathan",
 	LastName:  "Mace",
 	Email:     "jon@mpi",
@@ -61,7 +62,7 @@ var jon = User{
 	Password:  "secret",
 }
 
-var vaastav = User{
+var vaastav = user.User{
 	FirstName: "Vaastav",
 	LastName:  "Anand",
 	Email:     "vaastav@mpi",
@@ -69,7 +70,7 @@ var vaastav = User{
 	Password:  "supersecret",
 }
 
-var mpisb = Address{
+var mpisb = user.Address{
 	Street:   "Campus",
 	Number:   "E1 5",
 	Country:  "Germany",
@@ -77,19 +78,19 @@ var mpisb = Address{
 	PostCode: "66123",
 }
 
-var amex = Card{
+var amex = user.Card{
 	LongNum: "378282246310005",
 	Expires: "0530",
 	CCV:     "123",
 }
 
-var visa = Card{
+var visa = user.Card{
 	LongNum: "4012888888881881",
 	Expires: "0731",
 	CCV:     "456",
 }
 
-var mpikl = Address{
+var mpikl = user.Address{
 	Street:   "Paul-Ehrlich-Strasse",
 	Number:   "G 26",
 	Country:  "Germany",
@@ -97,14 +98,14 @@ var mpikl = Address{
 	PostCode: "67663",
 }
 
-var deepak = User{
+var deepak = user.User{
 	FirstName: "Deepak",
 	LastName:  "Garg",
 	Email:     "deepak@mpi",
 	Username:  "deepak",
 	Password:  "supersupersecret",
-	Addresses: []Address{mpisb, mpikl},
-	Cards:     []Card{visa},
+	Addresses: []user.Address{mpisb, mpikl},
+	Cards:     []user.Card{visa},
 }
 
 // We write the service test as a single test because we don't want to tear down and
@@ -288,7 +289,7 @@ func TestAll(t *testing.T) {
 
 }
 
-func expectUsers(t *testing.T, service UserService, expectedCount int) []User {
+func expectUsers(t *testing.T, service user.UserService, expectedCount int) []user.User {
 	// Get all users
 	users, err := service.GetUsers(context.Background(), "")
 	assert.NoError(t, err)
@@ -296,7 +297,7 @@ func expectUsers(t *testing.T, service UserService, expectedCount int) []User {
 	return users
 }
 
-func expectCards(t *testing.T, service UserService, expectedCount int) []Card {
+func expectCards(t *testing.T, service user.UserService, expectedCount int) []user.Card {
 	// Get all cards
 	cards, err := service.GetCards(context.Background(), "")
 	assert.NoError(t, err)
@@ -304,7 +305,7 @@ func expectCards(t *testing.T, service UserService, expectedCount int) []Card {
 	return cards
 }
 
-func expectAddresses(t *testing.T, service UserService, expectedCount int) []Address {
+func expectAddresses(t *testing.T, service user.UserService, expectedCount int) []user.Address {
 	// Get all addresses
 	addresses, err := service.GetAddresses(context.Background(), "")
 	assert.NoError(t, err)
@@ -312,7 +313,7 @@ func expectAddresses(t *testing.T, service UserService, expectedCount int) []Add
 	return addresses
 }
 
-func expectUser(t *testing.T, service UserService, uid string, expected User) User {
+func expectUser(t *testing.T, service user.UserService, uid string, expected user.User) user.User {
 	// Make sure the uid isn't the empty string
 	assert.NotEmpty(t, uid)
 
@@ -343,7 +344,7 @@ func expectUser(t *testing.T, service UserService, uid string, expected User) Us
 	return actual
 }
 
-func expectLogin(t *testing.T, service UserService, expected User) User {
+func expectLogin(t *testing.T, service user.UserService, expected user.User) user.User {
 	// Log in the user
 	actual, err := service.Login(context.Background(), expected.Username, expected.Password)
 	assert.NoError(t, err)
@@ -364,7 +365,7 @@ func expectLogin(t *testing.T, service UserService, expected User) User {
 	return actual
 }
 
-func expectAddress(t *testing.T, service UserService, addressId string, expected Address) Address {
+func expectAddress(t *testing.T, service user.UserService, addressId string, expected user.Address) user.Address {
 	// Make sure the addressid isn't the empty string
 	assert.NotEmpty(t, addressId)
 
@@ -380,7 +381,7 @@ func expectAddress(t *testing.T, service UserService, addressId string, expected
 	return actual
 }
 
-func expectCard(t *testing.T, service UserService, cardid string, expected Card) Card {
+func expectCard(t *testing.T, service user.UserService, cardid string, expected user.Card) user.Card {
 	// Make sure the cardid isn't the empty string
 	assert.NotEmpty(t, cardid)
 
@@ -396,7 +397,7 @@ func expectCard(t *testing.T, service UserService, cardid string, expected Card)
 	return actual
 }
 
-func matchUsers(t *testing.T, expected User, actual User) {
+func matchUsers(t *testing.T, expected user.User, actual user.User) {
 	assert.Equal(t, expected.Username, actual.Username)
 	assert.Equal(t, expected.FirstName, actual.FirstName)
 	assert.Equal(t, expected.LastName, actual.LastName)
@@ -405,7 +406,7 @@ func matchUsers(t *testing.T, expected User, actual User) {
 	assert.Len(t, actual.Cards, len(expected.Cards))
 }
 
-func matchAddresses(t *testing.T, expected Address, actual Address) {
+func matchAddresses(t *testing.T, expected user.Address, actual user.Address) {
 	assert.Equal(t, expected.Street, actual.Street)
 	assert.Equal(t, expected.Number, actual.Number)
 	assert.Equal(t, expected.Country, actual.Country)
@@ -413,7 +414,7 @@ func matchAddresses(t *testing.T, expected Address, actual Address) {
 	assert.Equal(t, expected.PostCode, actual.PostCode)
 }
 
-func matchCards(t *testing.T, expected Card, actual Card, isMasked ...bool) {
+func matchCards(t *testing.T, expected user.Card, actual user.Card, isMasked ...bool) {
 	if len(isMasked) > 0 && isMasked[0] == true {
 		l := len(actual.LongNum) - 4
 		expectMasked := fmt.Sprintf("%v%v", strings.Repeat("*", l), actual.LongNum[l:])
