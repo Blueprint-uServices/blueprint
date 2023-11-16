@@ -138,6 +138,7 @@ func (s *userStore) getUsers(ctx context.Context) ([]User, error) {
 	// Convert from database users to user objects
 	users := []User{}
 	for _, dbUser := range dbUsers {
+		dbUser.AddUserIDs()
 		users = append(users, dbUser.User)
 	}
 	return users, nil
@@ -264,7 +265,7 @@ func (s *userStore) deleteAttr(ctx context.Context, attr, idhex string) error {
 	}
 
 	// Remove customer attr
-	filter := bson.D{}
+	filter := bson.D{{attr, id}}
 	update := bson.D{{"$pull", bson.D{{attr, id}}}}
 	_, err = s.customers.UpdateMany(ctx, filter, update)
 	return err

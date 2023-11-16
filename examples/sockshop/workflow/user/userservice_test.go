@@ -12,7 +12,7 @@ import (
 )
 
 var dbType = "simple"
-var mongoAddr = ""
+var mongoAddr = "localhost:27017"
 
 // For convenience so we can run tests against different backends
 func makeUserService(t *testing.T) (context.Context, UserService) {
