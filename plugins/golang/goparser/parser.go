@@ -220,6 +220,11 @@ func (mod *ParsedModule) Load() error {
 		}
 
 		for name, pkg := range pkgs {
+			// Ignore _test packages
+			if strings.HasSuffix(name, "_test") {
+				continue
+			}
+
 			p := &ParsedPackage{}
 			p.Ast = pkg
 			p.ShortName = name
