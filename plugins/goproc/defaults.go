@@ -6,11 +6,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
-func init() {
-	RegisterDefaultBuilders()
-}
-
-func RegisterDefaultBuilders() {
+func RegisterAsDefaultBuilder() {
 	/* any unattached golang nodes will be instantiated in a "default" golang workspace */
 	ir.RegisterDefaultNamespace[golang.Node]("goproc", buildDefaultGolangWorkspace)
 	ir.RegisterDefaultBuilder[*Process]("goproc", buildDefaultGolangProcess)

@@ -197,32 +197,32 @@ func (db *SimpleCollection) DeleteMany(ctx context.Context, filter bson.D) error
 
 }
 
-func (db *SimpleCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) error {
+func (db *SimpleCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) (int, error) {
 	filterOp, err := query.ParseFilter(filter)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	updateOp, err := query.ParseUpdate(update)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	for i := range db.items {
 		if filterOp.Apply(db.items[i]) {
-			return updateOp.Apply(&db.items[i])
+			return 1, updateOp.Apply(&db.items[i])
 		}
 	}
-	return nil
+	return 0, nil
 }
 
-func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) error {
+func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error) {
 	filterOp, err := query.ParseFilter(filter)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	updateOp, err := query.ParseUpdate(update)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if verbose {
 		fmt.Printf("---- UpdateMany\n")
@@ -230,6 +230,7 @@ func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, updat
 		fmt.Printf(" UPDATE: %v\n", updateOp)
 	}
 
+	updated := 0
 	for i := range db.items {
 		if filterOp.Apply(db.items[i]) {
 			if verbose {
@@ -237,49 +238,61 @@ func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, updat
 			}
 			err := updateOp.Apply(&db.items[i])
 			if err != nil {
-				return err
+				return updated, err
 			}
 			if verbose {
 				fmt.Printf("      --> %v\n", db.items[i])
 			}
+			updated += 1
 		} else {
 			if verbose {
 				fmt.Printf("          %v\n", db.items[i])
 			}
 		}
 	}
-	return nil
+	return updated, nil
 }
 
-func (db *SimpleCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) error {
+func (db *SimpleCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error) {
+	filter := bson.D{{"_id", id}}
+	updatedCount, err := db.ReplaceOne(ctx, filter, document)
+	if updatedCount == 1 || err != nil {
+		fmt.Printf("Upsert replaced existing %v\n", id)
+		return true, err
+	}
+	return false, db.InsertOne(ctx, document)
+}
+
+func (db *SimpleCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error) {
 	query, err := query.ParseFilter(filter)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	for i, item := range db.items {
 		if query.Apply(item) {
 			db.items[i], err = toBson(replacement)
-			return err
+			return 1, err
 		}
 	}
-	return nil
+	return 0, nil
 }
 
-func (db *SimpleCollection) ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) error {
+func (db *SimpleCollection) ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) (int, error) {
 	query, err := query.ParseFilter(filter)
 	if err != nil {
-		return nil
+		return 0, nil
 	}
-	for i, j := 0, 0; i < len(replacements) && j < len(db.items); j++ {
-		if query.Apply(db.items[j]) {
-			db.items[j], err = toBson(replacements[i])
+	updateCount := 0
+	for i := 0; updateCount < len(replacements) && i < len(db.items); i++ {
+		if query.Apply(db.items[i]) {
+			db.items[i], err = toBson(replacements[updateCount])
 			if err != nil {
-				return err
+				return updateCount, err
 			}
-			i++
+			updateCount++
 		}
 	}
-	return nil
+	return updateCount, nil
 }
 
 func toBson(document any) (bson.D, error) {

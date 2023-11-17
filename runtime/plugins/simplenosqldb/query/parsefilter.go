@@ -358,6 +358,9 @@ func parseValueOperator(e bson.E) (Filter, error) {
 				}
 				filters = append(filters, filter)
 			}
+			if len(filters) == 0 {
+				return Not(Exists()), nil
+			}
 			return Or(filters...), nil
 		}
 	case "$nin":

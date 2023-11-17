@@ -797,7 +797,8 @@ func TestSimpleUpdate(t *testing.T) {
 		filter := bson.D{{"type", "English Breakfast"}}
 		update := bson.D{{"$set", bson.D{{"rating", 9}}}}
 
-		err := db.UpdateMany(ctx, filter, update)
+		updated, err := db.UpdateMany(ctx, filter, update)
+		assert.Equal(t, 1, updated)
 		assert.NoError(t, err)
 
 		cursor, err := db.FindMany(ctx, filter)
@@ -847,7 +848,8 @@ func TestUpdateAddNewField(t *testing.T) {
 		filter := bson.D{{"type", "English Breakfast"}}
 		update := bson.D{{"$set", bson.D{{"message", "The best tea."}}}}
 
-		err := db.UpdateMany(ctx, filter, update)
+		updated, err := db.UpdateMany(ctx, filter, update)
+		assert.Equal(t, 1, updated)
 		assert.NoError(t, err)
 
 		cursor, err := db.FindMany(ctx, filter)
@@ -866,7 +868,8 @@ func TestUpdateAddNewField(t *testing.T) {
 		filter := bson.D{{"type", "English Breakfast"}}
 		update := bson.D{{"$set", bson.D{{"fact.info", "Further information."}, {"fact.source", "jon"}}}}
 
-		err := db.UpdateMany(ctx, filter, update)
+		updated, err := db.UpdateMany(ctx, filter, update)
+		assert.Equal(t, 1, updated)
 		assert.NoError(t, err)
 
 		cursor, err := db.FindMany(ctx, filter)
@@ -904,7 +907,8 @@ func TestUpdateArray(t *testing.T) {
 		filter := bson.D{{"type", "English Breakfast"}}
 		update := bson.D{{"$set", bson.D{{"facts.3.info", "The best tea."}}}}
 
-		err := db.UpdateMany(ctx, filter, update)
+		updated, err := db.UpdateMany(ctx, filter, update)
+		assert.Equal(t, 1, updated)
 		assert.NoError(t, err)
 
 		cursor, err := db.FindMany(ctx, filter)
@@ -924,7 +928,8 @@ func TestUpdateArray(t *testing.T) {
 		filter := bson.D{{"type", "English Breakfast"}}
 		update := bson.D{{"$set", bson.D{{"facts.3.info", "no fact."}}}}
 
-		err := db.UpdateMany(ctx, filter, update)
+		updated, err := db.UpdateMany(ctx, filter, update)
+		assert.Equal(t, 1, updated)
 		assert.NoError(t, err)
 
 		cursor, err := db.FindMany(ctx, filter)
@@ -944,7 +949,8 @@ func TestUpdateArray(t *testing.T) {
 		filter := bson.D{{"type", "English Breakfast"}}
 		update := bson.D{{"$set", bson.D{{"facts", bson.A{}}}}}
 
-		err := db.UpdateMany(ctx, filter, update)
+		updated, err := db.UpdateMany(ctx, filter, update)
+		assert.Equal(t, 1, updated)
 		assert.NoError(t, err)
 
 		cursor, err := db.FindMany(ctx, filter)
@@ -981,7 +987,8 @@ func TestUnset(t *testing.T) {
 		filter := bson.D{{"rating", 6}, {"sizes", 8}}
 		update := bson.D{{"$unset", bson.D{{"type", ""}}}}
 
-		err := db.UpdateMany(ctx, filter, update)
+		updated, err := db.UpdateMany(ctx, filter, update)
+		assert.Equal(t, 1, updated)
 		assert.NoError(t, err)
 
 		cursor, err := db.FindMany(ctx, filter)
@@ -999,7 +1006,8 @@ func TestUnset(t *testing.T) {
 		filter := bson.D{{"rating", 6}, {"sizes", 8}}
 		update := bson.D{{"$unset", bson.D{{"sizes.1", ""}}}}
 
-		err := db.UpdateMany(ctx, filter, update)
+		updated, err := db.UpdateMany(ctx, filter, update)
+		assert.Equal(t, 1, updated)
 		assert.NoError(t, err)
 
 		cursor, err := db.FindMany(ctx, filter)
@@ -1036,7 +1044,8 @@ func TestInc(t *testing.T) {
 		for i := 1; i < 5; i++ {
 			update := bson.D{{"$inc", bson.D{{"rating", 1}}}}
 
-			err := db.UpdateMany(ctx, filter, update)
+			updated, err := db.UpdateMany(ctx, filter, update)
+			assert.Equal(t, 1, updated)
 			assert.NoError(t, err)
 
 			cursor, err := db.FindMany(ctx, filter)
@@ -1076,7 +1085,8 @@ func TestIncArray(t *testing.T) {
 		for i := 1; i < 5; i++ {
 			update := bson.D{{"$inc", bson.D{{"sizes.5", 2}}}}
 
-			err := db.UpdateMany(ctx, filter, update)
+			updated, err := db.UpdateMany(ctx, filter, update)
+			assert.Equal(t, 1, updated)
 			assert.NoError(t, err)
 
 			cursor, err := db.FindMany(ctx, filter)
@@ -1115,7 +1125,8 @@ func TestPush(t *testing.T) {
 		filter := bson.D{{"type", "Masala"}}
 		update := bson.D{{"$push", bson.D{{"sizes", 6}}}}
 
-		err := db.UpdateMany(ctx, filter, update)
+		updated, err := db.UpdateMany(ctx, filter, update)
+		assert.Equal(t, 1, updated)
 		assert.NoError(t, err)
 
 		cursor, err := db.FindMany(ctx, filter)
@@ -1134,7 +1145,8 @@ func TestPush(t *testing.T) {
 		filter := bson.D{{"type", "English Breakfast"}}
 		update := bson.D{{"$push", bson.D{{"sizes", 12}, {"Vendor", "newvendor"}}}}
 
-		err := db.UpdateMany(ctx, filter, update)
+		updated, err := db.UpdateMany(ctx, filter, update)
+		assert.Equal(t, 1, updated)
 		assert.NoError(t, err)
 
 		cursor, err := db.FindMany(ctx, filter)
@@ -1148,6 +1160,27 @@ func TestPush(t *testing.T) {
 		assert.Equal(t, "English Breakfast", getteas[0].Type)
 		assert.ElementsMatch(t, getteas[0].Sizes, []int32{4, 8, 16, 12})
 		assert.ElementsMatch(t, getteas[0].Vendor, []string{"newvendor"})
+	}
+}
+
+func TestPull(t *testing.T) {
+	ctx, db := MakeTestDB(t)
+
+	{
+		update := bson.D{{"$pull", bson.D{{"sizes", 8}}}}
+		_, err := db.UpdateMany(ctx, bson.D{}, update)
+		assert.NoError(t, err)
+
+		filter := bson.D{{"type", "English Breakfast"}}
+		cursor, err := db.FindOne(ctx, filter)
+		assert.NoError(t, err)
+
+		var tea Tea
+		err = cursor.One(ctx, &tea)
+		assert.NoError(t, err)
+		assert.Equal(t, "English Breakfast", tea.Type)
+		assert.Len(t, tea.Sizes, 2)
+		assert.ElementsMatch(t, tea.Sizes, []int32{4, 16})
 	}
 }
 
@@ -1196,7 +1229,8 @@ func TestUpdateByObjectID(t *testing.T) {
 		assert.Equal(t, id.Type, "English Breakfast")
 
 		updateTo := bson.D{{"$set", bson.D{{"type", "Scottish Breakfast"}}}}
-		err = db.UpdateOne(ctx, idFilter, updateTo)
+		updated, err := db.UpdateOne(ctx, idFilter, updateTo)
+		assert.Equal(t, 1, updated)
 		assert.NoError(t, err)
 
 		cursor, err = db.FindOne(ctx, idFilter)

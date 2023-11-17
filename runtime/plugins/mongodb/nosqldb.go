@@ -6,11 +6,12 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-//* constructor
+// * constructor
 func NewMongoDB(ctx context.Context, addr string) (*MongoDB, error) {
 	clientOptions := options.Client().ApplyURI("mongodb://" + addr)
 	client, err := mongo.Connect(ctx, clientOptions)
@@ -112,27 +113,33 @@ func (mc *MongoCollection) FindMany(ctx context.Context, filter bson.D, projecti
 	}, nil
 }
 
-//* not sure about the `update` parameter and its conversion
-func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) error {
-	_, err := mc.collection.UpdateOne(ctx, filter, update)
-	return err
+// * not sure about the `update` parameter and its conversion
+func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) (int, error) {
+	result, err := mc.collection.UpdateOne(ctx, filter, update)
+	return int(result.ModifiedCount), err
 }
 
-func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) error {
-	_, err := mc.collection.UpdateMany(ctx, filter, update)
-	return err
-
+func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error) {
+	result, err := mc.collection.UpdateMany(ctx, filter, update)
+	return int(result.ModifiedCount), err
 }
 
-func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) error {
-
-	_, err := mc.collection.ReplaceOne(ctx, filter, replacement)
-
-	return err
+func (mc *MongoCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error) {
+	filter := bson.D{{"_id", id}}
+	update := bson.D{{"$set", document}}
+	opts := options.Update().SetUpsert(true)
+	result, err := mc.collection.UpdateOne(ctx, filter, update, opts)
+	return result.MatchedCount == 1, err
 }
 
-func (mc *MongoCollection) ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) error {
-	return errors.New("ReplaceMany not implemented")
+func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error) {
+
+	result, err := mc.collection.ReplaceOne(ctx, filter, replacement)
+	return int(result.MatchedCount), err
+}
+
+func (mc *MongoCollection) ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) (int, error) {
+	return 0, errors.New("ReplaceMany not implemented")
 }
 
 type MongoCursor struct {
