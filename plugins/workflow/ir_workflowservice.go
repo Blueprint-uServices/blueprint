@@ -108,7 +108,7 @@ func (node *WorkflowService) AddToWorkspace(builder golang.WorkspaceBuilder) err
 	return nil
 }
 
-func (node *WorkflowService) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *WorkflowService) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil

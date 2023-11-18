@@ -95,7 +95,7 @@ func (node *HealthCheckerServerWrapper) GenerateFuncs(builder golang.ModuleBuild
 	return nil
 }
 
-func (node *HealthCheckerServerWrapper) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *HealthCheckerServerWrapper) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil

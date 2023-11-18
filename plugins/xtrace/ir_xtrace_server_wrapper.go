@@ -73,7 +73,7 @@ func (node *XtraceServerWrapper) genInterface(ctx ir.BuildContext) (*gocode.Serv
 	return i, nil
 }
 
-func (node *XtraceServerWrapper) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *XtraceServerWrapper) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.InstanceName) {
 		return nil
 	}

@@ -55,7 +55,7 @@ func (node *WorkloadgenClient) GenerateFuncs(builder golang.ModuleBuilder) error
 }
 
 // Provides the golang code to instantiate the workloadgen client
-func (node *WorkloadgenClient) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *WorkloadgenClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only add instantiation code for this specific client once
 	if builder.Visited(node.InstanceName) {
 		return nil

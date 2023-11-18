@@ -75,7 +75,7 @@ func (node *SimpleNoSQLDB) AddInterfaces(builder golang.ModuleBuilder) error {
 	return node.AddToWorkspace(builder.Workspace())
 }
 
-func (node *SimpleNoSQLDB) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *SimpleNoSQLDB) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil

@@ -93,7 +93,7 @@ func (node *GolangClient) GenerateFuncs(builder golang.ModuleBuilder) error {
 	return nil
 }
 
-func (node *GolangClient) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *GolangClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil

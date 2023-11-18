@@ -91,14 +91,14 @@ style.  The runtime dependency injection interface is defined in runtime/plugins
 The basic requirement of an instantiable node is that it can provide a buildFunc definition that
 will be invoked at runtime to create the instance.  A buildFunc has method signature:
 
-	func(ctr golang.Container) (any, error)
+	func(ctr golang.Namespace) (any, error)
 
 The buildFunc will instantiate and return an instance or an error.  If the node needs to be
-able to call other instances, it can acquire the instances through the golang.Container's Get
+able to call other instances, it can acquire the instances through the golang.Namespace's Get
 method.  For example, the following pseudocode for a tracing wrapper class would get the
 underlying handler then return the wrapper class:
 
-	func(ctr golang.Container) (any, error) {
+	func(ctr golang.Namespace) (any, error) {
 		handler, err := ctr.Get("serviceA.handler")
 		if err != nil {
 			return nil, err

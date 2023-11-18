@@ -74,7 +74,7 @@ func (node *GolangHttpClient) GenerateFuncs(builder golang.ModuleBuilder) error 
 	return httpcodegen.GenerateClient(builder, iface, node.outputPackage)
 }
 
-func (node *GolangHttpClient) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *GolangHttpClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil

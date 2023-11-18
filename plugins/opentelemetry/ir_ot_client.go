@@ -88,7 +88,7 @@ func (node *OpenTelemetryClientWrapper) GenerateFuncs(builder golang.ModuleBuild
 }
 
 // Part of code generation compilation pass; provides instantiation snippet
-func (node *OpenTelemetryClientWrapper) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *OpenTelemetryClientWrapper) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.WrapperName) {
 		return nil

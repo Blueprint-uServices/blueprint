@@ -75,7 +75,7 @@ func (n *RedisGoClient) AddInterfaces(builder golang.ModuleBuilder) error {
 	return n.AddToWorkspace(builder.Workspace())
 }
 
-func (n *RedisGoClient) AddInstantiation(builder golang.GraphBuilder) error {
+func (n *RedisGoClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(n.InstanceName) {
 		return nil
 	}

@@ -21,7 +21,7 @@ func GetGoInterface(ctx ir.BuildContext, node ir.IRNode) (*gocode.ServiceInterfa
 	if !isService {
 		return nil, blueprint.Errorf("cannot get a service interface from non-service node %v", node)
 	}
-	if graph, isGraphBuilder := ctx.(GraphBuilder); isGraphBuilder {
+	if graph, isGraphBuilder := ctx.(NamespaceBuilder); isGraphBuilder {
 		ctx = graph.Module()
 	}
 	module, isModuleBuilder := ctx.(ModuleBuilder)
