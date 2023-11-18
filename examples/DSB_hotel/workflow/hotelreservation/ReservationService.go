@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type ReservationService interface {
@@ -146,8 +147,8 @@ func (r *ReservationServiceImpl) MakeReservation(ctx context.Context, customerNa
 		var capacity int64
 		err = r.reserveCache.Get(ctx, cap_key, &capacity)
 		if err != nil {
-			query := `{"HotelId":"` + hotelId + `"}`
-			res, err := hnumber_collection.FindOne(query)
+			query := bson.D{{"hotelid", hotelId}}
+			res, err := hnumber_collection.FindOne(ctx, query)
 			if err != nil {
 				return []string{}, nil
 			}

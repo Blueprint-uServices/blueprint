@@ -134,7 +134,7 @@ func (r *RateServiceImpl) GetRates(ctx context.Context, hotelIDs []string, inDat
 			if err2 != nil {
 				return []RatePlan{}, err2
 			}
-			query := bson.D{{"HotelID", hotel_id}}
+			query := bson.D{{"hotelid", hotel_id}}
 			rs, err := collection.FindMany(ctx, query)
 			if err != nil {
 				return rate_plans, err
