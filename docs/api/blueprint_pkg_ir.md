@@ -1,7 +1,7 @@
 ---
-title: blueprint/pkg/ir/
+title: blueprint/pkg/ir
 ---
-# blueprint/pkg/ir/
+# blueprint/pkg/ir
 ```go
 package ir // import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 ```

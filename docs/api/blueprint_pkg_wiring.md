@@ -1,7 +1,7 @@
 ---
-title: blueprint/pkg/wiring/
+title: blueprint/pkg/wiring
 ---
-# blueprint/pkg/wiring/
+# blueprint/pkg/wiring
 ```go
 package wiring // import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 ```
