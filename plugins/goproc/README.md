@@ -8,13 +8,13 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 
 ## Index
 
-- [func AddChildToProcess\(wiring blueprint.WiringSpec, procName, childName string\)](<#AddChildToProcess>)
-- [func CreateClientProcess\(wiring blueprint.WiringSpec, procName string, children ...string\) string](<#CreateClientProcess>)
-- [func CreateProcess\(wiring blueprint.WiringSpec, procName string, children ...string\) string](<#CreateProcess>)
-- [func RegisterDefaultBuilders\(\)](<#RegisterDefaultBuilders>)
+- [func AddChildToProcess\(spec wiring.WiringSpec, procName, childName string\)](<#AddChildToProcess>)
+- [func CreateClientProcess\(spec wiring.WiringSpec, procName string, children ...string\) string](<#CreateClientProcess>)
+- [func CreateProcess\(spec wiring.WiringSpec, procName string, children ...string\) string](<#CreateProcess>)
+- [func RegisterAsDefaultBuilder\(\)](<#RegisterAsDefaultBuilder>)
 - [type Process](<#Process>)
-  - [func \(node \*Process\) AddArg\(argnode blueprint.IRNode\)](<#Process.AddArg>)
-  - [func \(node \*Process\) AddChild\(child blueprint.IRNode\) error](<#Process.AddChild>)
+  - [func \(node \*Process\) AddArg\(argnode ir.IRNode\)](<#Process.AddArg>)
+  - [func \(node \*Process\) AddChild\(child ir.IRNode\) error](<#Process.AddChild>)
   - [func \(node \*Process\) AddProcessArtifacts\(builder linux.ProcessWorkspace\) error](<#Process.AddProcessArtifacts>)
   - [func \(node \*Process\) AddProcessInstance\(builder linux.ProcessWorkspace\) error](<#Process.AddProcessInstance>)
   - [func \(node \*Process\) GenerateArtifacts\(workspaceDir string\) error](<#Process.GenerateArtifacts>)
@@ -28,7 +28,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 ## func AddChildToProcess
 
 ```go
-func AddChildToProcess(wiring blueprint.WiringSpec, procName, childName string)
+func AddChildToProcess(spec wiring.WiringSpec, procName, childName string)
 ```
 
 Adds a child node to an existing process
@@ -37,7 +37,7 @@ Adds a child node to an existing process
 ## func CreateClientProcess
 
 ```go
-func CreateClientProcess(wiring blueprint.WiringSpec, procName string, children ...string) string
+func CreateClientProcess(spec wiring.WiringSpec, procName string, children ...string) string
 ```
 
 Creates a process that contains clients to the specified children. This is for convenience in serving as a starting point to write a custom client
@@ -46,16 +46,16 @@ Creates a process that contains clients to the specified children. This is for c
 ## func CreateProcess
 
 ```go
-func CreateProcess(wiring blueprint.WiringSpec, procName string, children ...string) string
+func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) string
 ```
 
 Adds a process that explicitly instantiates all of the children provided. The process will also implicitly instantiate any of the dependencies of the children
 
-<a name="RegisterDefaultBuilders"></a>
-## func RegisterDefaultBuilders
+<a name="RegisterAsDefaultBuilder"></a>
+## func RegisterAsDefaultBuilder
 
 ```go
-func RegisterDefaultBuilders()
+func RegisterAsDefaultBuilder()
 ```
 
 
@@ -67,13 +67,11 @@ An IRNode representing a golang process. This is Blueprint's main implementation
 
 ```go
 type Process struct {
-    core.ProcessNode
-
     InstanceName   string
     ProcName       string
     ModuleName     string
-    ArgNodes       []blueprint.IRNode
-    ContainedNodes []blueprint.IRNode
+    ArgNodes       []ir.IRNode
+    ContainedNodes []ir.IRNode
     // contains filtered or unexported fields
 }
 ```
@@ -82,7 +80,7 @@ type Process struct {
 ### func \(\*Process\) AddArg
 
 ```go
-func (node *Process) AddArg(argnode blueprint.IRNode)
+func (node *Process) AddArg(argnode ir.IRNode)
 ```
 
 
@@ -91,7 +89,7 @@ func (node *Process) AddArg(argnode blueprint.IRNode)
 ### func \(\*Process\) AddChild
 
 ```go
-func (node *Process) AddChild(child blueprint.IRNode) error
+func (node *Process) AddChild(child ir.IRNode) error
 ```
 
 
@@ -161,7 +159,7 @@ Used during building to accumulate golang application\-level nodes Non\-golang n
 
 ```go
 type ProcessNamespace struct {
-    blueprint.SimpleNamespace
+    wiring.SimpleNamespace
     // contains filtered or unexported fields
 }
 ```

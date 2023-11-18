@@ -16,10 +16,11 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
   - [func \(db \*SimpleCollection\) FindOne\(ctx context.Context, filter bson.D, projection ...bson.D\) \(backend.NoSQLCursor, error\)](<#SimpleCollection.FindOne>)
   - [func \(db \*SimpleCollection\) InsertMany\(ctx context.Context, documents \[\]interface\{\}\) error](<#SimpleCollection.InsertMany>)
   - [func \(db \*SimpleCollection\) InsertOne\(ctx context.Context, document interface\{\}\) error](<#SimpleCollection.InsertOne>)
-  - [func \(db \*SimpleCollection\) ReplaceMany\(ctx context.Context, filter bson.D, replacements ...interface\{\}\) error](<#SimpleCollection.ReplaceMany>)
-  - [func \(db \*SimpleCollection\) ReplaceOne\(ctx context.Context, filter bson.D, replacement interface\{\}\) error](<#SimpleCollection.ReplaceOne>)
-  - [func \(db \*SimpleCollection\) UpdateMany\(ctx context.Context, filter bson.D, update bson.D\) error](<#SimpleCollection.UpdateMany>)
-  - [func \(db \*SimpleCollection\) UpdateOne\(ctx context.Context, filter bson.D, update bson.D\) error](<#SimpleCollection.UpdateOne>)
+  - [func \(db \*SimpleCollection\) ReplaceMany\(ctx context.Context, filter bson.D, replacements ...interface\{\}\) \(int, error\)](<#SimpleCollection.ReplaceMany>)
+  - [func \(db \*SimpleCollection\) ReplaceOne\(ctx context.Context, filter bson.D, replacement interface\{\}\) \(int, error\)](<#SimpleCollection.ReplaceOne>)
+  - [func \(db \*SimpleCollection\) UpdateMany\(ctx context.Context, filter bson.D, update bson.D\) \(int, error\)](<#SimpleCollection.UpdateMany>)
+  - [func \(db \*SimpleCollection\) UpdateOne\(ctx context.Context, filter bson.D, update bson.D\) \(int, error\)](<#SimpleCollection.UpdateOne>)
+  - [func \(db \*SimpleCollection\) UpsertID\(ctx context.Context, id primitive.ObjectID, document interface\{\}\) \(bool, error\)](<#SimpleCollection.UpsertID>)
 - [type SimpleCursor](<#SimpleCursor>)
   - [func \(c \*SimpleCursor\) All\(ctx context.Context, obj interface\{\}\) error](<#SimpleCursor.All>)
   - [func \(c \*SimpleCursor\) One\(ctx context.Context, obj interface\{\}\) error](<#SimpleCursor.One>)
@@ -106,7 +107,7 @@ func (db *SimpleCollection) InsertOne(ctx context.Context, document interface{})
 ### func \(\*SimpleCollection\) ReplaceMany
 
 ```go
-func (db *SimpleCollection) ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) error
+func (db *SimpleCollection) ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) (int, error)
 ```
 
 
@@ -115,7 +116,7 @@ func (db *SimpleCollection) ReplaceMany(ctx context.Context, filter bson.D, repl
 ### func \(\*SimpleCollection\) ReplaceOne
 
 ```go
-func (db *SimpleCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) error
+func (db *SimpleCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error)
 ```
 
 
@@ -124,7 +125,7 @@ func (db *SimpleCollection) ReplaceOne(ctx context.Context, filter bson.D, repla
 ### func \(\*SimpleCollection\) UpdateMany
 
 ```go
-func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) error
+func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error)
 ```
 
 
@@ -133,7 +134,16 @@ func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, updat
 ### func \(\*SimpleCollection\) UpdateOne
 
 ```go
-func (db *SimpleCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) error
+func (db *SimpleCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) (int, error)
+```
+
+
+
+<a name="SimpleCollection.UpsertID"></a>
+### func \(\*SimpleCollection\) UpsertID
+
+```go
+func (db *SimpleCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error)
 ```
 
 

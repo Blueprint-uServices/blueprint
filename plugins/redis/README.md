@@ -8,12 +8,19 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/redis"
 
 ## Index
 
-- [func PrebuiltProcess\(wiring blueprint.WiringSpec, cacheName string\) string](<#PrebuiltProcess>)
+- [func PrebuiltContainer\(spec wiring.WiringSpec, cacheName string\) string](<#PrebuiltContainer>)
+- [type RedisContainer](<#RedisContainer>)
+  - [func \(node \*RedisContainer\) AddContainerArtifacts\(target docker.ContainerWorkspace\) error](<#RedisContainer.AddContainerArtifacts>)
+  - [func \(node \*RedisContainer\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#RedisContainer.AddContainerInstance>)
+  - [func \(r \*RedisContainer\) GenerateArtifacts\(outputDir string\) error](<#RedisContainer.GenerateArtifacts>)
+  - [func \(node \*RedisContainer\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#RedisContainer.GetInterface>)
+  - [func \(r \*RedisContainer\) Name\(\) string](<#RedisContainer.Name>)
+  - [func \(r \*RedisContainer\) String\(\) string](<#RedisContainer.String>)
 - [type RedisGoClient](<#RedisGoClient>)
-  - [func \(n \*RedisGoClient\) AddInstantiation\(builder golang.GraphBuilder\) error](<#RedisGoClient.AddInstantiation>)
+  - [func \(n \*RedisGoClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#RedisGoClient.AddInstantiation>)
   - [func \(n \*RedisGoClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#RedisGoClient.AddInterfaces>)
   - [func \(n \*RedisGoClient\) AddToWorkspace\(builder golang.WorkspaceBuilder\) error](<#RedisGoClient.AddToWorkspace>)
-  - [func \(n \*RedisGoClient\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#RedisGoClient.GetInterface>)
+  - [func \(n \*RedisGoClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#RedisGoClient.GetInterface>)
   - [func \(node \*RedisGoClient\) ImplementsGolangNode\(\)](<#RedisGoClient.ImplementsGolangNode>)
   - [func \(node \*RedisGoClient\) ImplementsGolangService\(\)](<#RedisGoClient.ImplementsGolangService>)
   - [func \(n \*RedisGoClient\) Name\(\) string](<#RedisGoClient.Name>)
@@ -21,21 +28,86 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/redis"
 - [type RedisInterface](<#RedisInterface>)
   - [func \(r \*RedisInterface\) GetMethods\(\) \[\]service.Method](<#RedisInterface.GetMethods>)
   - [func \(r \*RedisInterface\) GetName\(\) string](<#RedisInterface.GetName>)
-- [type RedisProcess](<#RedisProcess>)
-  - [func \(r \*RedisProcess\) GenerateArtifacts\(outputDir string\) error](<#RedisProcess.GenerateArtifacts>)
-  - [func \(node \*RedisProcess\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#RedisProcess.GetInterface>)
-  - [func \(r \*RedisProcess\) Name\(\) string](<#RedisProcess.Name>)
-  - [func \(r \*RedisProcess\) String\(\) string](<#RedisProcess.String>)
 
 
-<a name="PrebuiltProcess"></a>
-## func PrebuiltProcess
+<a name="PrebuiltContainer"></a>
+## func PrebuiltContainer
 
 ```go
-func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string
+func PrebuiltContainer(spec wiring.WiringSpec, cacheName string) string
 ```
 
 Defines a cache called \`cacheName\` that uses the pre\-built redis image
+
+<a name="RedisContainer"></a>
+## type RedisContainer
+
+
+
+```go
+type RedisContainer struct {
+    docker.Container
+    backend.Cache
+
+    InstanceName string
+    BindAddr     *address.BindConfig
+    Iface        *goparser.ParsedInterface
+}
+```
+
+<a name="RedisContainer.AddContainerArtifacts"></a>
+### func \(\*RedisContainer\) AddContainerArtifacts
+
+```go
+func (node *RedisContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error
+```
+
+
+
+<a name="RedisContainer.AddContainerInstance"></a>
+### func \(\*RedisContainer\) AddContainerInstance
+
+```go
+func (node *RedisContainer) AddContainerInstance(target docker.ContainerWorkspace) error
+```
+
+
+
+<a name="RedisContainer.GenerateArtifacts"></a>
+### func \(\*RedisContainer\) GenerateArtifacts
+
+```go
+func (r *RedisContainer) GenerateArtifacts(outputDir string) error
+```
+
+
+
+<a name="RedisContainer.GetInterface"></a>
+### func \(\*RedisContainer\) GetInterface
+
+```go
+func (node *RedisContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
+```
+
+
+
+<a name="RedisContainer.Name"></a>
+### func \(\*RedisContainer\) Name
+
+```go
+func (r *RedisContainer) Name() string
+```
+
+
+
+<a name="RedisContainer.String"></a>
+### func \(\*RedisContainer\) String
+
+```go
+func (r *RedisContainer) String() string
+```
+
+
 
 <a name="RedisGoClient"></a>
 ## type RedisGoClient
@@ -58,7 +130,7 @@ type RedisGoClient struct {
 ### func \(\*RedisGoClient\) AddInstantiation
 
 ```go
-func (n *RedisGoClient) AddInstantiation(builder golang.GraphBuilder) error
+func (n *RedisGoClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -85,7 +157,7 @@ func (n *RedisGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
 ### func \(\*RedisGoClient\) GetInterface
 
 ```go
-func (n *RedisGoClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (n *RedisGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 
@@ -152,58 +224,6 @@ func (r *RedisInterface) GetMethods() []service.Method
 
 ```go
 func (r *RedisInterface) GetName() string
-```
-
-
-
-<a name="RedisProcess"></a>
-## type RedisProcess
-
-
-
-```go
-type RedisProcess struct {
-    docker.Container
-    backend.Cache
-
-    InstanceName string
-    BindAddr     *address.BindConfig
-    Iface        *goparser.ParsedInterface
-}
-```
-
-<a name="RedisProcess.GenerateArtifacts"></a>
-### func \(\*RedisProcess\) GenerateArtifacts
-
-```go
-func (r *RedisProcess) GenerateArtifacts(outputDir string) error
-```
-
-
-
-<a name="RedisProcess.GetInterface"></a>
-### func \(\*RedisProcess\) GetInterface
-
-```go
-func (node *RedisProcess) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
-```
-
-
-
-<a name="RedisProcess.Name"></a>
-### func \(\*RedisProcess\) Name
-
-```go
-func (r *RedisProcess) Name() string
-```
-
-
-
-<a name="RedisProcess.String"></a>
-### func \(\*RedisProcess\) String
-
-```go
-func (r *RedisProcess) String() string
 ```
 
 

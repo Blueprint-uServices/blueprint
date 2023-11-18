@@ -30,6 +30,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb/query"
   - [func BroadcastUpdate\(update Update\) Update](<#BroadcastUpdate>)
   - [func IncInt\(amount int64\) Update](<#IncInt>)
   - [func ParseUpdate\(update bson.D\) \(Update, error\)](<#ParseUpdate>)
+  - [func PullMatches\(filter Filter\) \(Update, error\)](<#PullMatches>)
   - [func PushValue\(value any\) \(Update, error\)](<#PushValue>)
   - [func SetValue\(value any\) \(Update, error\)](<#SetValue>)
   - [func UnsetElement\(index int\) Update](<#UnsetElement>)
@@ -253,6 +254,15 @@ func IncInt(amount int64) Update
 
 ```go
 func ParseUpdate(update bson.D) (Update, error)
+```
+
+
+
+<a name="PullMatches"></a>
+### func PullMatches
+
+```go
+func PullMatches(filter Filter) (Update, error)
 ```
 
 

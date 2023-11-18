@@ -8,12 +8,12 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/simplenosqldb"
 
 ## Index
 
-- [func Define\(wiring blueprint.WiringSpec, dbName string\) string](<#Define>)
+- [func Define\(spec wiring.WiringSpec, dbName string\) string](<#Define>)
 - [type SimpleNoSQLDB](<#SimpleNoSQLDB>)
-  - [func \(node \*SimpleNoSQLDB\) AddInstantiation\(builder golang.GraphBuilder\) error](<#SimpleNoSQLDB.AddInstantiation>)
+  - [func \(node \*SimpleNoSQLDB\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#SimpleNoSQLDB.AddInstantiation>)
   - [func \(node \*SimpleNoSQLDB\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#SimpleNoSQLDB.AddInterfaces>)
   - [func \(node \*SimpleNoSQLDB\) AddToWorkspace\(builder golang.WorkspaceBuilder\) error](<#SimpleNoSQLDB.AddToWorkspace>)
-  - [func \(node \*SimpleNoSQLDB\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#SimpleNoSQLDB.GetInterface>)
+  - [func \(node \*SimpleNoSQLDB\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#SimpleNoSQLDB.GetInterface>)
   - [func \(node \*SimpleNoSQLDB\) ImplementsGolangNode\(\)](<#SimpleNoSQLDB.ImplementsGolangNode>)
   - [func \(node \*SimpleNoSQLDB\) ImplementsGolangService\(\)](<#SimpleNoSQLDB.ImplementsGolangService>)
   - [func \(node \*SimpleNoSQLDB\) Name\(\) string](<#SimpleNoSQLDB.Name>)
@@ -24,7 +24,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/simplenosqldb"
 ## func Define
 
 ```go
-func Define(wiring blueprint.WiringSpec, dbName string) string
+func Define(spec wiring.WiringSpec, dbName string) string
 ```
 
 Creates a simple nosqldb instance with the specified name
@@ -54,7 +54,7 @@ type SimpleNoSQLDB struct {
 ### func \(\*SimpleNoSQLDB\) AddInstantiation
 
 ```go
-func (node *SimpleNoSQLDB) AddInstantiation(builder golang.GraphBuilder) error
+func (node *SimpleNoSQLDB) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -81,7 +81,7 @@ The nosqldb interface and SimpleNoSQLDB implementation exist in the runtime pack
 ### func \(\*SimpleNoSQLDB\) GetInterface
 
 ```go
-func (node *SimpleNoSQLDB) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *SimpleNoSQLDB) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 

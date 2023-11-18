@@ -9,17 +9,17 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
 ## Index
 
 - [Variables](<#variables>)
-- [func DefineOpenTelemetryCollector\(wiring blueprint.WiringSpec, collectorName string\) string](<#DefineOpenTelemetryCollector>)
-- [func Instrument\(wiring blueprint.WiringSpec, serviceName string\)](<#Instrument>)
-- [func InstrumentUsingCustomCollector\(wiring blueprint.WiringSpec, serviceName string, collectorName string\)](<#InstrumentUsingCustomCollector>)
+- [func DefineOpenTelemetryCollector\(spec wiring.WiringSpec, collectorName string\) string](<#DefineOpenTelemetryCollector>)
+- [func Instrument\(spec wiring.WiringSpec, serviceName string\)](<#Instrument>)
+- [func InstrumentUsingCustomCollector\(spec wiring.WiringSpec, serviceName string, collectorName string\)](<#InstrumentUsingCustomCollector>)
 - [type OTCollectorInterface](<#OTCollectorInterface>)
   - [func \(xt \*OTCollectorInterface\) GetMethods\(\) \[\]service.Method](<#OTCollectorInterface.GetMethods>)
   - [func \(xt \*OTCollectorInterface\) GetName\(\) string](<#OTCollectorInterface.GetName>)
 - [type OpenTelemetryClientWrapper](<#OpenTelemetryClientWrapper>)
-  - [func \(node \*OpenTelemetryClientWrapper\) AddInstantiation\(builder golang.GraphBuilder\) error](<#OpenTelemetryClientWrapper.AddInstantiation>)
+  - [func \(node \*OpenTelemetryClientWrapper\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#OpenTelemetryClientWrapper.AddInstantiation>)
   - [func \(node \*OpenTelemetryClientWrapper\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#OpenTelemetryClientWrapper.AddInterfaces>)
   - [func \(node \*OpenTelemetryClientWrapper\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#OpenTelemetryClientWrapper.GenerateFuncs>)
-  - [func \(node \*OpenTelemetryClientWrapper\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#OpenTelemetryClientWrapper.GetInterface>)
+  - [func \(node \*OpenTelemetryClientWrapper\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#OpenTelemetryClientWrapper.GetInterface>)
   - [func \(node \*OpenTelemetryClientWrapper\) ImplementsGolangNode\(\)](<#OpenTelemetryClientWrapper.ImplementsGolangNode>)
   - [func \(node \*OpenTelemetryClientWrapper\) ImplementsGolangService\(\)](<#OpenTelemetryClientWrapper.ImplementsGolangService>)
   - [func \(node \*OpenTelemetryClientWrapper\) Name\(\) string](<#OpenTelemetryClientWrapper.Name>)
@@ -27,24 +27,24 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
 - [type OpenTelemetryCollector](<#OpenTelemetryCollector>)
   - [func \(node \*OpenTelemetryCollector\) AddContainerArtifacts\(target docker.ContainerWorkspace\) error](<#OpenTelemetryCollector.AddContainerArtifacts>)
   - [func \(node \*OpenTelemetryCollector\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#OpenTelemetryCollector.AddContainerInstance>)
-  - [func \(node \*OpenTelemetryCollector\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#OpenTelemetryCollector.GetInterface>)
+  - [func \(node \*OpenTelemetryCollector\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#OpenTelemetryCollector.GetInterface>)
   - [func \(node \*OpenTelemetryCollector\) Name\(\) string](<#OpenTelemetryCollector.Name>)
   - [func \(node \*OpenTelemetryCollector\) String\(\) string](<#OpenTelemetryCollector.String>)
 - [type OpenTelemetryCollectorClient](<#OpenTelemetryCollectorClient>)
-  - [func \(node \*OpenTelemetryCollectorClient\) AddInstantiation\(builder golang.GraphBuilder\) error](<#OpenTelemetryCollectorClient.AddInstantiation>)
+  - [func \(node \*OpenTelemetryCollectorClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#OpenTelemetryCollectorClient.AddInstantiation>)
   - [func \(node \*OpenTelemetryCollectorClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#OpenTelemetryCollectorClient.AddInterfaces>)
   - [func \(node \*OpenTelemetryCollectorClient\) AddToWorkspace\(builder golang.WorkspaceBuilder\) error](<#OpenTelemetryCollectorClient.AddToWorkspace>)
-  - [func \(node \*OpenTelemetryCollectorClient\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#OpenTelemetryCollectorClient.GetInterface>)
+  - [func \(node \*OpenTelemetryCollectorClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#OpenTelemetryCollectorClient.GetInterface>)
   - [func \(node \*OpenTelemetryCollectorClient\) ImplementsGolangNode\(\)](<#OpenTelemetryCollectorClient.ImplementsGolangNode>)
   - [func \(node \*OpenTelemetryCollectorClient\) ImplementsOTCollectorClient\(\)](<#OpenTelemetryCollectorClient.ImplementsOTCollectorClient>)
   - [func \(node \*OpenTelemetryCollectorClient\) Name\(\) string](<#OpenTelemetryCollectorClient.Name>)
   - [func \(node \*OpenTelemetryCollectorClient\) String\(\) string](<#OpenTelemetryCollectorClient.String>)
 - [type OpenTelemetryCollectorInterface](<#OpenTelemetryCollectorInterface>)
 - [type OpenTelemetryServerWrapper](<#OpenTelemetryServerWrapper>)
-  - [func \(node \*OpenTelemetryServerWrapper\) AddInstantiation\(builder golang.GraphBuilder\) error](<#OpenTelemetryServerWrapper.AddInstantiation>)
+  - [func \(node \*OpenTelemetryServerWrapper\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#OpenTelemetryServerWrapper.AddInstantiation>)
   - [func \(node \*OpenTelemetryServerWrapper\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#OpenTelemetryServerWrapper.AddInterfaces>)
   - [func \(node \*OpenTelemetryServerWrapper\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#OpenTelemetryServerWrapper.GenerateFuncs>)
-  - [func \(node \*OpenTelemetryServerWrapper\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#OpenTelemetryServerWrapper.GetInterface>)
+  - [func \(node \*OpenTelemetryServerWrapper\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#OpenTelemetryServerWrapper.GetInterface>)
   - [func \(node \*OpenTelemetryServerWrapper\) ImplementsGolangNode\(\)](<#OpenTelemetryServerWrapper.ImplementsGolangNode>)
   - [func \(node \*OpenTelemetryServerWrapper\) ImplementsGolangService\(\)](<#OpenTelemetryServerWrapper.ImplementsGolangService>)
   - [func \(node \*OpenTelemetryServerWrapper\) Name\(\) string](<#OpenTelemetryServerWrapper.Name>)
@@ -63,7 +63,7 @@ var DefaultOpenTelemetryCollectorName = "ot_collector"
 ## func DefineOpenTelemetryCollector
 
 ```go
-func DefineOpenTelemetryCollector(wiring blueprint.WiringSpec, collectorName string) string
+func DefineOpenTelemetryCollector(spec wiring.WiringSpec, collectorName string) string
 ```
 
 Defines the OpenTelemetry collector as a process node
@@ -76,7 +76,7 @@ This doesn't need to be explicitly called, although it can if users want to cont
 ## func Instrument
 
 ```go
-func Instrument(wiring blueprint.WiringSpec, serviceName string)
+func Instrument(spec wiring.WiringSpec, serviceName string)
 ```
 
 Instruments \`serviceName\` with OpenTelemetry. This can only be done if \`serviceName\` is a pointer from Golang nodes to Golang nodes.
@@ -89,7 +89,7 @@ Instrumenting \`serviceName\` will add both src and dst\-side modifiers to the p
 ## func InstrumentUsingCustomCollector
 
 ```go
-func InstrumentUsingCustomCollector(wiring blueprint.WiringSpec, serviceName string, collectorName string)
+func InstrumentUsingCustomCollector(spec wiring.WiringSpec, serviceName string, collectorName string)
 ```
 
 This is the same as the Instrument function, but uses \`collectorName\` as the OpenTelemetry collector and does not attempt to define or redefine the collector.
@@ -146,7 +146,7 @@ type OpenTelemetryClientWrapper struct {
 ### func \(\*OpenTelemetryClientWrapper\) AddInstantiation
 
 ```go
-func (node *OpenTelemetryClientWrapper) AddInstantiation(builder golang.GraphBuilder) error
+func (node *OpenTelemetryClientWrapper) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 Part of code generation compilation pass; provides instantiation snippet
@@ -173,7 +173,7 @@ Part of code generation compilation pass; provides implementation of interfaces 
 ### func \(\*OpenTelemetryClientWrapper\) GetInterface
 
 ```go
-func (node *OpenTelemetryClientWrapper) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *OpenTelemetryClientWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 
@@ -251,7 +251,7 @@ func (node *OpenTelemetryCollector) AddContainerInstance(target docker.Container
 ### func \(\*OpenTelemetryCollector\) GetInterface
 
 ```go
-func (node *OpenTelemetryCollector) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *OpenTelemetryCollector) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 
@@ -297,7 +297,7 @@ type OpenTelemetryCollectorClient struct {
 ### func \(\*OpenTelemetryCollectorClient\) AddInstantiation
 
 ```go
-func (node *OpenTelemetryCollectorClient) AddInstantiation(builder golang.GraphBuilder) error
+func (node *OpenTelemetryCollectorClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -324,7 +324,7 @@ func (node *OpenTelemetryCollectorClient) AddToWorkspace(builder golang.Workspac
 ### func \(\*OpenTelemetryCollectorClient\) GetInterface
 
 ```go
-func (node *OpenTelemetryCollectorClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *OpenTelemetryCollectorClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 
@@ -401,7 +401,7 @@ type OpenTelemetryServerWrapper struct {
 ### func \(\*OpenTelemetryServerWrapper\) AddInstantiation
 
 ```go
-func (node *OpenTelemetryServerWrapper) AddInstantiation(builder golang.GraphBuilder) error
+func (node *OpenTelemetryServerWrapper) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 Part of code generation compilation pass; provides instantiation snippet
@@ -428,7 +428,7 @@ Part of code generation compilation pass; provides implementation of interfaces 
 ### func \(\*OpenTelemetryServerWrapper\) GetInterface
 
 ```go
-func (node *OpenTelemetryServerWrapper) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *OpenTelemetryServerWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 

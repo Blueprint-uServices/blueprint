@@ -8,12 +8,12 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
 
 ## Index
 
-- [func AddRetries\(wiring blueprint.WiringSpec, serviceName string, max\_retries int64\)](<#AddRetries>)
+- [func AddRetries\(spec wiring.WiringSpec, serviceName string, max\_retries int64\)](<#AddRetries>)
 - [type RetrierClient](<#RetrierClient>)
-  - [func \(node \*RetrierClient\) AddInstantiation\(builder golang.GraphBuilder\) error](<#RetrierClient.AddInstantiation>)
+  - [func \(node \*RetrierClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#RetrierClient.AddInstantiation>)
   - [func \(node \*RetrierClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#RetrierClient.AddInterfaces>)
   - [func \(node \*RetrierClient\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#RetrierClient.GenerateFuncs>)
-  - [func \(node \*RetrierClient\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#RetrierClient.GetInterface>)
+  - [func \(node \*RetrierClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#RetrierClient.GetInterface>)
   - [func \(node \*RetrierClient\) ImplementsGolangNode\(\)](<#RetrierClient.ImplementsGolangNode>)
   - [func \(node \*RetrierClient\) Name\(\) string](<#RetrierClient.Name>)
   - [func \(node \*RetrierClient\) String\(\) string](<#RetrierClient.String>)
@@ -23,7 +23,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
 ## func AddRetries
 
 ```go
-func AddRetries(wiring blueprint.WiringSpec, serviceName string, max_retries int64)
+func AddRetries(spec wiring.WiringSpec, serviceName string, max_retries int64)
 ```
 
 Modifies the given service such that all clients to that service retry \`max\_retries\` number of times on error.
@@ -51,7 +51,7 @@ type RetrierClient struct {
 ### func \(\*RetrierClient\) AddInstantiation
 
 ```go
-func (node *RetrierClient) AddInstantiation(builder golang.GraphBuilder) error
+func (node *RetrierClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -78,7 +78,7 @@ func (node *RetrierClient) GenerateFuncs(builder golang.ModuleBuilder) error
 ### func \(\*RetrierClient\) GetInterface
 
 ```go
-func (node *RetrierClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *RetrierClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 

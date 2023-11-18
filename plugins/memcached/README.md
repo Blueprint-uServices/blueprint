@@ -8,12 +8,18 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/memcached"
 
 ## Index
 
-- [func PrebuiltProcess\(wiring blueprint.WiringSpec, cacheName string\) string](<#PrebuiltProcess>)
+- [func PrebuiltContainer\(spec wiring.WiringSpec, cacheName string\) string](<#PrebuiltContainer>)
+- [type MemcachedContainer](<#MemcachedContainer>)
+  - [func \(node \*MemcachedContainer\) AddContainerArtifacts\(target docker.ContainerWorkspace\) error](<#MemcachedContainer.AddContainerArtifacts>)
+  - [func \(node \*MemcachedContainer\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#MemcachedContainer.AddContainerInstance>)
+  - [func \(node \*MemcachedContainer\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#MemcachedContainer.GetInterface>)
+  - [func \(n \*MemcachedContainer\) Name\(\) string](<#MemcachedContainer.Name>)
+  - [func \(n \*MemcachedContainer\) String\(\) string](<#MemcachedContainer.String>)
 - [type MemcachedGoClient](<#MemcachedGoClient>)
-  - [func \(node \*MemcachedGoClient\) AddInstantiation\(builder golang.GraphBuilder\) error](<#MemcachedGoClient.AddInstantiation>)
+  - [func \(node \*MemcachedGoClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#MemcachedGoClient.AddInstantiation>)
   - [func \(node \*MemcachedGoClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#MemcachedGoClient.AddInterfaces>)
   - [func \(node \*MemcachedGoClient\) AddToWorkspace\(builder golang.WorkspaceBuilder\) error](<#MemcachedGoClient.AddToWorkspace>)
-  - [func \(n \*MemcachedGoClient\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#MemcachedGoClient.GetInterface>)
+  - [func \(n \*MemcachedGoClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#MemcachedGoClient.GetInterface>)
   - [func \(node \*MemcachedGoClient\) ImplementsGolangNode\(\)](<#MemcachedGoClient.ImplementsGolangNode>)
   - [func \(node \*MemcachedGoClient\) ImplementsGolangService\(\)](<#MemcachedGoClient.ImplementsGolangService>)
   - [func \(n \*MemcachedGoClient\) Name\(\) string](<#MemcachedGoClient.Name>)
@@ -21,20 +27,77 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/memcached"
 - [type MemcachedInterface](<#MemcachedInterface>)
   - [func \(m \*MemcachedInterface\) GetMethods\(\) \[\]service.Method](<#MemcachedInterface.GetMethods>)
   - [func \(m \*MemcachedInterface\) GetName\(\) string](<#MemcachedInterface.GetName>)
-- [type MemcachedProcess](<#MemcachedProcess>)
-  - [func \(node \*MemcachedProcess\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#MemcachedProcess.GetInterface>)
-  - [func \(n \*MemcachedProcess\) Name\(\) string](<#MemcachedProcess.Name>)
-  - [func \(n \*MemcachedProcess\) String\(\) string](<#MemcachedProcess.String>)
 
 
-<a name="PrebuiltProcess"></a>
-## func PrebuiltProcess
+<a name="PrebuiltContainer"></a>
+## func PrebuiltContainer
 
 ```go
-func PrebuiltProcess(wiring blueprint.WiringSpec, cacheName string) string
+func PrebuiltContainer(spec wiring.WiringSpec, cacheName string) string
 ```
 
 Defines a cache called \`cacheName\` that uses the pre\-built memcached process image
+
+<a name="MemcachedContainer"></a>
+## type MemcachedContainer
+
+
+
+```go
+type MemcachedContainer struct {
+    backend.Cache
+    docker.Container
+
+    InstanceName string
+    BindAddr     *address.BindConfig
+    Iface        *goparser.ParsedInterface
+}
+```
+
+<a name="MemcachedContainer.AddContainerArtifacts"></a>
+### func \(\*MemcachedContainer\) AddContainerArtifacts
+
+```go
+func (node *MemcachedContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error
+```
+
+
+
+<a name="MemcachedContainer.AddContainerInstance"></a>
+### func \(\*MemcachedContainer\) AddContainerInstance
+
+```go
+func (node *MemcachedContainer) AddContainerInstance(target docker.ContainerWorkspace) error
+```
+
+
+
+<a name="MemcachedContainer.GetInterface"></a>
+### func \(\*MemcachedContainer\) GetInterface
+
+```go
+func (node *MemcachedContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
+```
+
+
+
+<a name="MemcachedContainer.Name"></a>
+### func \(\*MemcachedContainer\) Name
+
+```go
+func (n *MemcachedContainer) Name() string
+```
+
+
+
+<a name="MemcachedContainer.String"></a>
+### func \(\*MemcachedContainer\) String
+
+```go
+func (n *MemcachedContainer) String() string
+```
+
+
 
 <a name="MemcachedGoClient"></a>
 ## type MemcachedGoClient
@@ -58,7 +121,7 @@ type MemcachedGoClient struct {
 ### func \(\*MemcachedGoClient\) AddInstantiation
 
 ```go
-func (node *MemcachedGoClient) AddInstantiation(builder golang.GraphBuilder) error
+func (node *MemcachedGoClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 Part of code generation compilation pass; provides instantiation snippet
@@ -85,7 +148,7 @@ func (node *MemcachedGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) e
 ### func \(\*MemcachedGoClient\) GetInterface
 
 ```go
-func (n *MemcachedGoClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (n *MemcachedGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 
@@ -152,49 +215,6 @@ func (m *MemcachedInterface) GetMethods() []service.Method
 
 ```go
 func (m *MemcachedInterface) GetName() string
-```
-
-
-
-<a name="MemcachedProcess"></a>
-## type MemcachedProcess
-
-
-
-```go
-type MemcachedProcess struct {
-    backend.Cache
-    docker.Container
-
-    InstanceName string
-    BindAddr     *address.BindConfig
-    Iface        *goparser.ParsedInterface
-}
-```
-
-<a name="MemcachedProcess.GetInterface"></a>
-### func \(\*MemcachedProcess\) GetInterface
-
-```go
-func (node *MemcachedProcess) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
-```
-
-
-
-<a name="MemcachedProcess.Name"></a>
-### func \(\*MemcachedProcess\) Name
-
-```go
-func (n *MemcachedProcess) Name() string
-```
-
-
-
-<a name="MemcachedProcess.String"></a>
-### func \(\*MemcachedProcess\) String
-
-```go
-func (n *MemcachedProcess) String() string
 ```
 
 

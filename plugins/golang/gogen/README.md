@@ -10,16 +10,6 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
 
 - [func ExecuteTemplate\(name string, body string, args any\) \(string, error\)](<#ExecuteTemplate>)
 - [func ExecuteTemplateToFile\(name string, body string, args any, filename string\) error](<#ExecuteTemplateToFile>)
-- [type GraphBuilderImpl](<#GraphBuilderImpl>)
-  - [func NewGraphBuilder\(module golang.ModuleBuilder, fileName, packagePath, funcName string\) \(\*GraphBuilderImpl, error\)](<#NewGraphBuilder>)
-  - [func \(code \*GraphBuilderImpl\) Build\(\) error](<#GraphBuilderImpl.Build>)
-  - [func \(graph \*GraphBuilderImpl\) Declare\(name, buildFuncSrc string\) error](<#GraphBuilderImpl.Declare>)
-  - [func \(graph \*GraphBuilderImpl\) DeclareConstructor\(name string, constructor \*gocode.Constructor, args \[\]blueprint.IRNode\) error](<#GraphBuilderImpl.DeclareConstructor>)
-  - [func \(code \*GraphBuilderImpl\) ImplementsBuildContext\(\)](<#GraphBuilderImpl.ImplementsBuildContext>)
-  - [func \(graph \*GraphBuilderImpl\) Import\(packageName string\) string](<#GraphBuilderImpl.Import>)
-  - [func \(graph \*GraphBuilderImpl\) ImportType\(typeName gocode.TypeName\) string](<#GraphBuilderImpl.ImportType>)
-  - [func \(graph \*GraphBuilderImpl\) Info\(\) golang.GraphInfo](<#GraphBuilderImpl.Info>)
-  - [func \(code \*GraphBuilderImpl\) Module\(\) golang.ModuleBuilder](<#GraphBuilderImpl.Module>)
 - [type Imports](<#Imports>)
   - [func NewImports\(packageName string\) \*Imports](<#NewImports>)
   - [func \(imports \*Imports\) AddPackage\(pkg string\) string](<#Imports.AddPackage>)
@@ -30,11 +20,23 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
   - [func \(imports \*Imports\) String\(\) string](<#Imports.String>)
 - [type ModuleBuilderImpl](<#ModuleBuilderImpl>)
   - [func NewModuleBuilder\(workspace \*WorkspaceBuilderImpl, moduleName string\) \(\*ModuleBuilderImpl, error\)](<#NewModuleBuilder>)
-  - [func \(module \*ModuleBuilderImpl\) Build\(nodes \[\]blueprint.IRNode\) error](<#ModuleBuilderImpl.Build>)
+  - [func \(module \*ModuleBuilderImpl\) Build\(nodes \[\]ir.IRNode\) error](<#ModuleBuilderImpl.Build>)
   - [func \(module \*ModuleBuilderImpl\) CreatePackage\(packageName string\) \(golang.PackageInfo, error\)](<#ModuleBuilderImpl.CreatePackage>)
   - [func \(module \*ModuleBuilderImpl\) ImplementsBuildContext\(\)](<#ModuleBuilderImpl.ImplementsBuildContext>)
   - [func \(module \*ModuleBuilderImpl\) Info\(\) golang.ModuleInfo](<#ModuleBuilderImpl.Info>)
   - [func \(module \*ModuleBuilderImpl\) Workspace\(\) golang.WorkspaceBuilder](<#ModuleBuilderImpl.Workspace>)
+- [type NamespaceBuilderImpl](<#NamespaceBuilderImpl>)
+  - [func NewNamespaceBuilder\(module golang.ModuleBuilder, name, fileName, packagePath, funcName string\) \(\*NamespaceBuilderImpl, error\)](<#NewNamespaceBuilder>)
+  - [func \(code \*NamespaceBuilderImpl\) Build\(\) error](<#NamespaceBuilderImpl.Build>)
+  - [func \(n \*NamespaceBuilderImpl\) Declare\(name, buildFuncSrc string\) error](<#NamespaceBuilderImpl.Declare>)
+  - [func \(namespace \*NamespaceBuilderImpl\) DeclareConstructor\(name string, constructor \*gocode.Constructor, args \[\]ir.IRNode\) error](<#NamespaceBuilderImpl.DeclareConstructor>)
+  - [func \(code \*NamespaceBuilderImpl\) ImplementsBuildContext\(\)](<#NamespaceBuilderImpl.ImplementsBuildContext>)
+  - [func \(n \*NamespaceBuilderImpl\) Import\(packageName string\) string](<#NamespaceBuilderImpl.Import>)
+  - [func \(n \*NamespaceBuilderImpl\) ImportType\(typeName gocode.TypeName\) string](<#NamespaceBuilderImpl.ImportType>)
+  - [func \(n \*NamespaceBuilderImpl\) Info\(\) golang.NamespaceInfo](<#NamespaceBuilderImpl.Info>)
+  - [func \(n \*NamespaceBuilderImpl\) Instantiate\(name string\)](<#NamespaceBuilderImpl.Instantiate>)
+  - [func \(n \*NamespaceBuilderImpl\) Module\(\) golang.ModuleBuilder](<#NamespaceBuilderImpl.Module>)
+  - [func \(n \*NamespaceBuilderImpl\) Require\(name, description string\)](<#NamespaceBuilderImpl.Require>)
 - [type WorkspaceBuilderImpl](<#WorkspaceBuilderImpl>)
   - [func NewWorkspaceBuilder\(workspaceDir string\) \(\*WorkspaceBuilderImpl, error\)](<#NewWorkspaceBuilder>)
   - [func \(workspace \*WorkspaceBuilderImpl\) AddLocalModule\(shortName string, moduleSrcPath string\) error](<#WorkspaceBuilderImpl.AddLocalModule>)
@@ -60,120 +62,6 @@ func ExecuteTemplate(name string, body string, args any) (string, error)
 
 ```go
 func ExecuteTemplateToFile(name string, body string, args any, filename string) error
-```
-
-
-
-<a name="GraphBuilderImpl"></a>
-## type GraphBuilderImpl
-
-Implements the GraphBuilder interface defined in gogen/ir.go
-
-GraphBuilder is useful for any golang namespace node, such as the goproc plugin, that wants to be able to instantiate Golang IR nodes.
-
-The GraphBuilder accumulates code from child nodes and stubs for instantiating the code.
-
-The GraphBuilder can then be used to generate a source file that constructs the graph.
-
-The typical usage of a \`GraphBuilder\` is to:
-
-1. Create a new \`GraphBuilder\` with the \`NewGraphBuilder\` method
-
-2. Collect code definitions from child nodes by calling \`Instantiable.AddInstantiation\` on those nodes
-
-3. Generate the final output by calling \`GraphBuilder.Finish\`
-
-```go
-type GraphBuilderImpl struct {
-    blueprint.VisitTrackerImpl
-
-    Package      golang.PackageInfo
-    FileName     string            // The short name of the file
-    FilePath     string            // The fully qualified path to the file
-    FuncName     string            // The name of the function to generate
-    Imports      *Imports          // Import declarations in the file; map of shortname to full package import name
-    Declarations map[string]string // The DI declarations
-    // contains filtered or unexported fields
-}
-```
-
-<a name="NewGraphBuilder"></a>
-### func NewGraphBuilder
-
-```go
-func NewGraphBuilder(module golang.ModuleBuilder, fileName, packagePath, funcName string) (*GraphBuilderImpl, error)
-```
-
-Create a new GraphBuilder
-
-<a name="GraphBuilderImpl.Build"></a>
-### func \(\*GraphBuilderImpl\) Build
-
-```go
-func (code *GraphBuilderImpl) Build() error
-```
-
-Generates the file within its module
-
-<a name="GraphBuilderImpl.Declare"></a>
-### func \(\*GraphBuilderImpl\) Declare
-
-```go
-func (graph *GraphBuilderImpl) Declare(name, buildFuncSrc string) error
-```
-
-
-
-<a name="GraphBuilderImpl.DeclareConstructor"></a>
-### func \(\*GraphBuilderImpl\) DeclareConstructor
-
-```go
-func (graph *GraphBuilderImpl) DeclareConstructor(name string, constructor *gocode.Constructor, args []blueprint.IRNode) error
-```
-
-
-
-<a name="GraphBuilderImpl.ImplementsBuildContext"></a>
-### func \(\*GraphBuilderImpl\) ImplementsBuildContext
-
-```go
-func (code *GraphBuilderImpl) ImplementsBuildContext()
-```
-
-
-
-<a name="GraphBuilderImpl.Import"></a>
-### func \(\*GraphBuilderImpl\) Import
-
-```go
-func (graph *GraphBuilderImpl) Import(packageName string) string
-```
-
-
-
-<a name="GraphBuilderImpl.ImportType"></a>
-### func \(\*GraphBuilderImpl\) ImportType
-
-```go
-func (graph *GraphBuilderImpl) ImportType(typeName gocode.TypeName) string
-```
-
-
-
-<a name="GraphBuilderImpl.Info"></a>
-### func \(\*GraphBuilderImpl\) Info
-
-```go
-func (graph *GraphBuilderImpl) Info() golang.GraphInfo
-```
-
-
-
-<a name="GraphBuilderImpl.Module"></a>
-### func \(\*GraphBuilderImpl\) Module
-
-```go
-func (code *GraphBuilderImpl) Module() golang.ModuleBuilder
 ```
 
 
@@ -267,7 +155,7 @@ The ModuleBuilder is used by plugins that generate golang source files, and need
 
 ```go
 type ModuleBuilderImpl struct {
-    blueprint.VisitTrackerImpl
+    ir.VisitTrackerImpl
     Name string // The FQ name of this module
 
     ModuleDir string // The directory containing this module
@@ -290,7 +178,7 @@ After dependencies and code have been added to the module, plugins must call Gen
 ### func \(\*ModuleBuilderImpl\) Build
 
 ```go
-func (module *ModuleBuilderImpl) Build(nodes []blueprint.IRNode) error
+func (module *ModuleBuilderImpl) Build(nodes []ir.IRNode) error
 ```
 
 
@@ -331,6 +219,141 @@ func (module *ModuleBuilderImpl) Workspace() golang.WorkspaceBuilder
 
 
 
+<a name="NamespaceBuilderImpl"></a>
+## type NamespaceBuilderImpl
+
+Implements the \[ir.NamespaceBuilder\] interface defined in gogen/ir.go
+
+\[ir.NamespaceBuilder\] is useful for any golang namespace node, such as the goproc plugin, that wants to be able to instantiate Golang IR nodes.
+
+The \[ir.NamespaceBuilder\] accumulates code from child nodes and stubs for instantiating the code.
+
+The \[ir.NamespaceBuilder\] can then be used to generate a source file that constructs the namespace.
+
+The typical usage of a \[ir.NamespaceBuilder\] is to:
+
+1. Create a new \[ir.NamespaceBuilder\] with the [NewNamespaceBuilder](<#NewNamespaceBuilder>) method
+
+2. Collect code definitions from child nodes by calling \`Instantiable.AddInstantiation\` on those nodes
+
+3. Generate the final output by calling \`NamespaceBuilder.Finish\`
+
+```go
+type NamespaceBuilderImpl struct {
+    ir.VisitTrackerImpl
+
+    Package        golang.PackageInfo
+    Name           string            // IR node name
+    FileName       string            // The short name of the file
+    FilePath       string            // The fully qualified path to the file
+    FuncName       string            // The name of the function to generate
+    Imports        *Imports          // Import declarations in the file; map of shortname to full package import name
+    Declarations   map[string]string // The DI declarations
+    Requires       map[string]string
+    Instantiations map[string]struct{}
+    // contains filtered or unexported fields
+}
+```
+
+<a name="NewNamespaceBuilder"></a>
+### func NewNamespaceBuilder
+
+```go
+func NewNamespaceBuilder(module golang.ModuleBuilder, name, fileName, packagePath, funcName string) (*NamespaceBuilderImpl, error)
+```
+
+Create a new NamespaceBuilder
+
+<a name="NamespaceBuilderImpl.Build"></a>
+### func \(\*NamespaceBuilderImpl\) Build
+
+```go
+func (code *NamespaceBuilderImpl) Build() error
+```
+
+Generates the file within its module
+
+<a name="NamespaceBuilderImpl.Declare"></a>
+### func \(\*NamespaceBuilderImpl\) Declare
+
+```go
+func (n *NamespaceBuilderImpl) Declare(name, buildFuncSrc string) error
+```
+
+
+
+<a name="NamespaceBuilderImpl.DeclareConstructor"></a>
+### func \(\*NamespaceBuilderImpl\) DeclareConstructor
+
+```go
+func (namespace *NamespaceBuilderImpl) DeclareConstructor(name string, constructor *gocode.Constructor, args []ir.IRNode) error
+```
+
+
+
+<a name="NamespaceBuilderImpl.ImplementsBuildContext"></a>
+### func \(\*NamespaceBuilderImpl\) ImplementsBuildContext
+
+```go
+func (code *NamespaceBuilderImpl) ImplementsBuildContext()
+```
+
+
+
+<a name="NamespaceBuilderImpl.Import"></a>
+### func \(\*NamespaceBuilderImpl\) Import
+
+```go
+func (n *NamespaceBuilderImpl) Import(packageName string) string
+```
+
+
+
+<a name="NamespaceBuilderImpl.ImportType"></a>
+### func \(\*NamespaceBuilderImpl\) ImportType
+
+```go
+func (n *NamespaceBuilderImpl) ImportType(typeName gocode.TypeName) string
+```
+
+
+
+<a name="NamespaceBuilderImpl.Info"></a>
+### func \(\*NamespaceBuilderImpl\) Info
+
+```go
+func (n *NamespaceBuilderImpl) Info() golang.NamespaceInfo
+```
+
+
+
+<a name="NamespaceBuilderImpl.Instantiate"></a>
+### func \(\*NamespaceBuilderImpl\) Instantiate
+
+```go
+func (n *NamespaceBuilderImpl) Instantiate(name string)
+```
+
+
+
+<a name="NamespaceBuilderImpl.Module"></a>
+### func \(\*NamespaceBuilderImpl\) Module
+
+```go
+func (n *NamespaceBuilderImpl) Module() golang.ModuleBuilder
+```
+
+
+
+<a name="NamespaceBuilderImpl.Require"></a>
+### func \(\*NamespaceBuilderImpl\) Require
+
+```go
+func (n *NamespaceBuilderImpl) Require(name, description string)
+```
+
+
+
 <a name="WorkspaceBuilderImpl"></a>
 ## type WorkspaceBuilderImpl
 
@@ -340,7 +363,7 @@ The WorkspaceBuilder is used for accumulating local module directories into a go
 
 ```go
 type WorkspaceBuilderImpl struct {
-    blueprint.VisitTrackerImpl
+    ir.VisitTrackerImpl
     WorkspaceDir     string            // The directory containing this workspace
     ModuleDirs       map[string]string // map from FQ module name to directory name within WorkspaceDir
     Modules          map[string]string // map from directory name to FQ module name within WorkspaceDir

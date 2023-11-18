@@ -8,20 +8,20 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/http"
 
 ## Index
 
-- [func Deploy\(wiring blueprint.WiringSpec, serviceName string\)](<#Deploy>)
+- [func Deploy\(spec wiring.WiringSpec, serviceName string\)](<#Deploy>)
 - [type GolangHttpClient](<#GolangHttpClient>)
-  - [func \(node \*GolangHttpClient\) AddInstantiation\(builder golang.GraphBuilder\) error](<#GolangHttpClient.AddInstantiation>)
+  - [func \(node \*GolangHttpClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#GolangHttpClient.AddInstantiation>)
   - [func \(node \*GolangHttpClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#GolangHttpClient.AddInterfaces>)
   - [func \(node \*GolangHttpClient\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#GolangHttpClient.GenerateFuncs>)
-  - [func \(node \*GolangHttpClient\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#GolangHttpClient.GetInterface>)
+  - [func \(node \*GolangHttpClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#GolangHttpClient.GetInterface>)
   - [func \(node \*GolangHttpClient\) ImplementsGolangNode\(\)](<#GolangHttpClient.ImplementsGolangNode>)
   - [func \(node \*GolangHttpClient\) ImplementsGolangService\(\)](<#GolangHttpClient.ImplementsGolangService>)
   - [func \(n \*GolangHttpClient\) Name\(\) string](<#GolangHttpClient.Name>)
   - [func \(n \*GolangHttpClient\) String\(\) string](<#GolangHttpClient.String>)
 - [type GolangHttpServer](<#GolangHttpServer>)
-  - [func \(node \*GolangHttpServer\) AddInstantiation\(builder golang.GraphBuilder\) error](<#GolangHttpServer.AddInstantiation>)
+  - [func \(node \*GolangHttpServer\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#GolangHttpServer.AddInstantiation>)
   - [func \(node \*GolangHttpServer\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#GolangHttpServer.GenerateFuncs>)
-  - [func \(node \*GolangHttpServer\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#GolangHttpServer.GetInterface>)
+  - [func \(node \*GolangHttpServer\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#GolangHttpServer.GetInterface>)
   - [func \(node \*GolangHttpServer\) ImplementsGolangNode\(\)](<#GolangHttpServer.ImplementsGolangNode>)
   - [func \(n \*GolangHttpServer\) Name\(\) string](<#GolangHttpServer.Name>)
   - [func \(n \*GolangHttpServer\) String\(\) string](<#GolangHttpServer.String>)
@@ -34,7 +34,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/http"
 ## func Deploy
 
 ```go
-func Deploy(wiring blueprint.WiringSpec, serviceName string)
+func Deploy(spec wiring.WiringSpec, serviceName string)
 ```
 
 Deploys \`serviceName\` as a HTTP server. This can only be done if \`serviceName\` is a pointer from Golang nodes to Golang nodes.
@@ -63,7 +63,7 @@ type GolangHttpClient struct {
 ### func \(\*GolangHttpClient\) AddInstantiation
 
 ```go
-func (node *GolangHttpClient) AddInstantiation(builder golang.GraphBuilder) error
+func (node *GolangHttpClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -90,7 +90,7 @@ func (node *GolangHttpClient) GenerateFuncs(builder golang.ModuleBuilder) error
 ### func \(\*GolangHttpClient\) GetInterface
 
 ```go
-func (node *GolangHttpClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *GolangHttpClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 
@@ -153,7 +153,7 @@ type GolangHttpServer struct {
 ### func \(\*GolangHttpServer\) AddInstantiation
 
 ```go
-func (node *GolangHttpServer) AddInstantiation(builder golang.GraphBuilder) error
+func (node *GolangHttpServer) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -171,7 +171,7 @@ Generates the HTTP Server handler
 ### func \(\*GolangHttpServer\) GetInterface
 
 ```go
-func (node *GolangHttpServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *GolangHttpServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 

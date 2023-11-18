@@ -8,14 +8,14 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 
 ## Index
 
-- [func Define\(wiring blueprint.WiringSpec, serviceName, serviceType string, serviceArgs ...string\) string](<#Define>)
+- [func Define\(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string\) string](<#Define>)
 - [func Init\(srcModulePaths ...string\)](<#Init>)
 - [func Reset\(\)](<#Reset>)
 - [type WorkflowService](<#WorkflowService>)
-  - [func \(node \*WorkflowService\) AddInstantiation\(builder golang.GraphBuilder\) error](<#WorkflowService.AddInstantiation>)
+  - [func \(node \*WorkflowService\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#WorkflowService.AddInstantiation>)
   - [func \(node \*WorkflowService\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#WorkflowService.AddInterfaces>)
   - [func \(node \*WorkflowService\) AddToWorkspace\(builder golang.WorkspaceBuilder\) error](<#WorkflowService.AddToWorkspace>)
-  - [func \(node \*WorkflowService\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#WorkflowService.GetInterface>)
+  - [func \(node \*WorkflowService\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#WorkflowService.GetInterface>)
   - [func \(node \*WorkflowService\) ImplementsGolangNode\(\)](<#WorkflowService.ImplementsGolangNode>)
   - [func \(node \*WorkflowService\) ImplementsGolangService\(\)](<#WorkflowService.ImplementsGolangService>)
   - [func \(node \*WorkflowService\) Name\(\) string](<#WorkflowService.Name>)
@@ -31,7 +31,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 ## func Define
 
 ```go
-func Define(wiring blueprint.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string
+func Define(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string
 ```
 
 This adds a service to the application, using a definition that was provided in the workflow spec.
@@ -86,7 +86,7 @@ type WorkflowService struct {
     Spec *WorkflowSpec
 
     // IR Nodes of arguments that will be passed in to the generated code
-    Args []blueprint.IRNode
+    Args []ir.IRNode
 }
 ```
 
@@ -94,7 +94,7 @@ type WorkflowService struct {
 ### func \(\*WorkflowService\) AddInstantiation
 
 ```go
-func (node *WorkflowService) AddInstantiation(builder golang.GraphBuilder) error
+func (node *WorkflowService) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -121,7 +121,7 @@ Part of artifact generation. In addition to the interfaces, adds the constructor
 ### func \(\*WorkflowService\) GetInterface
 
 ```go
-func (node *WorkflowService) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *WorkflowService) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 

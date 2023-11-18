@@ -15,10 +15,11 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/mongodb"
   - [func \(mc \*MongoCollection\) FindOne\(ctx context.Context, filter bson.D, projection ...bson.D\) \(backend.NoSQLCursor, error\)](<#MongoCollection.FindOne>)
   - [func \(mc \*MongoCollection\) InsertMany\(ctx context.Context, documents \[\]interface\{\}\) error](<#MongoCollection.InsertMany>)
   - [func \(mc \*MongoCollection\) InsertOne\(ctx context.Context, document interface\{\}\) error](<#MongoCollection.InsertOne>)
-  - [func \(mc \*MongoCollection\) ReplaceMany\(ctx context.Context, filter bson.D, replacements ...interface\{\}\) error](<#MongoCollection.ReplaceMany>)
-  - [func \(mc \*MongoCollection\) ReplaceOne\(ctx context.Context, filter bson.D, replacement interface\{\}\) error](<#MongoCollection.ReplaceOne>)
-  - [func \(mc \*MongoCollection\) UpdateMany\(ctx context.Context, filter bson.D, update bson.D\) error](<#MongoCollection.UpdateMany>)
-  - [func \(mc \*MongoCollection\) UpdateOne\(ctx context.Context, filter bson.D, update bson.D\) error](<#MongoCollection.UpdateOne>)
+  - [func \(mc \*MongoCollection\) ReplaceMany\(ctx context.Context, filter bson.D, replacements ...interface\{\}\) \(int, error\)](<#MongoCollection.ReplaceMany>)
+  - [func \(mc \*MongoCollection\) ReplaceOne\(ctx context.Context, filter bson.D, replacement interface\{\}\) \(int, error\)](<#MongoCollection.ReplaceOne>)
+  - [func \(mc \*MongoCollection\) UpdateMany\(ctx context.Context, filter bson.D, update bson.D\) \(int, error\)](<#MongoCollection.UpdateMany>)
+  - [func \(mc \*MongoCollection\) UpdateOne\(ctx context.Context, filter bson.D, update bson.D\) \(int, error\)](<#MongoCollection.UpdateOne>)
+  - [func \(mc \*MongoCollection\) UpsertID\(ctx context.Context, id primitive.ObjectID, document interface\{\}\) \(bool, error\)](<#MongoCollection.UpsertID>)
 - [type MongoCursor](<#MongoCursor>)
   - [func \(mr \*MongoCursor\) All\(ctx context.Context, objs interface\{\}\) error](<#MongoCursor.All>)
   - [func \(mr \*MongoCursor\) One\(ctx context.Context, obj interface\{\}\) error](<#MongoCursor.One>)
@@ -96,7 +97,7 @@ func (mc *MongoCollection) InsertOne(ctx context.Context, document interface{}) 
 ### func \(\*MongoCollection\) ReplaceMany
 
 ```go
-func (mc *MongoCollection) ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) error
+func (mc *MongoCollection) ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) (int, error)
 ```
 
 
@@ -105,7 +106,7 @@ func (mc *MongoCollection) ReplaceMany(ctx context.Context, filter bson.D, repla
 ### func \(\*MongoCollection\) ReplaceOne
 
 ```go
-func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) error
+func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error)
 ```
 
 
@@ -114,7 +115,7 @@ func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replac
 ### func \(\*MongoCollection\) UpdateMany
 
 ```go
-func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) error
+func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error)
 ```
 
 
@@ -123,10 +124,19 @@ func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update
 ### func \(\*MongoCollection\) UpdateOne
 
 ```go
-func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) error
+func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) (int, error)
 ```
 
 \* not sure about the \`update\` parameter and its conversion
+
+<a name="MongoCollection.UpsertID"></a>
+### func \(\*MongoCollection\) UpsertID
+
+```go
+func (mc *MongoCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error)
+```
+
+
 
 <a name="MongoCursor"></a>
 ## type MongoCursor

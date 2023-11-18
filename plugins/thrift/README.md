@@ -8,20 +8,20 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/thrift"
 
 ## Index
 
-- [func Deploy\(wiring blueprint.WiringSpec, serviceName string\)](<#Deploy>)
+- [func Deploy\(spec wiring.WiringSpec, serviceName string\)](<#Deploy>)
 - [type GolangThriftClient](<#GolangThriftClient>)
-  - [func \(node \*GolangThriftClient\) AddInstantiation\(builder golang.GraphBuilder\) error](<#GolangThriftClient.AddInstantiation>)
+  - [func \(node \*GolangThriftClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#GolangThriftClient.AddInstantiation>)
   - [func \(node \*GolangThriftClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#GolangThriftClient.AddInterfaces>)
   - [func \(node \*GolangThriftClient\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#GolangThriftClient.GenerateFuncs>)
-  - [func \(node \*GolangThriftClient\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#GolangThriftClient.GetInterface>)
+  - [func \(node \*GolangThriftClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#GolangThriftClient.GetInterface>)
   - [func \(node \*GolangThriftClient\) ImplementsGolangNode\(\)](<#GolangThriftClient.ImplementsGolangNode>)
   - [func \(node \*GolangThriftClient\) ImplementsGolangService\(\)](<#GolangThriftClient.ImplementsGolangService>)
   - [func \(n \*GolangThriftClient\) Name\(\) string](<#GolangThriftClient.Name>)
   - [func \(n \*GolangThriftClient\) String\(\) string](<#GolangThriftClient.String>)
 - [type GolangThriftServer](<#GolangThriftServer>)
-  - [func \(node \*GolangThriftServer\) AddInstantiation\(builder golang.GraphBuilder\) error](<#GolangThriftServer.AddInstantiation>)
+  - [func \(node \*GolangThriftServer\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#GolangThriftServer.AddInstantiation>)
   - [func \(node \*GolangThriftServer\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#GolangThriftServer.GenerateFuncs>)
-  - [func \(node \*GolangThriftServer\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#GolangThriftServer.GetInterface>)
+  - [func \(node \*GolangThriftServer\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#GolangThriftServer.GetInterface>)
   - [func \(node \*GolangThriftServer\) ImplementsGolangNode\(\)](<#GolangThriftServer.ImplementsGolangNode>)
   - [func \(n \*GolangThriftServer\) Name\(\) string](<#GolangThriftServer.Name>)
   - [func \(n \*GolangThriftServer\) String\(\) string](<#GolangThriftServer.String>)
@@ -34,7 +34,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/thrift"
 ## func Deploy
 
 ```go
-func Deploy(wiring blueprint.WiringSpec, serviceName string)
+func Deploy(spec wiring.WiringSpec, serviceName string)
 ```
 
 
@@ -61,7 +61,7 @@ type GolangThriftClient struct {
 ### func \(\*GolangThriftClient\) AddInstantiation
 
 ```go
-func (node *GolangThriftClient) AddInstantiation(builder golang.GraphBuilder) error
+func (node *GolangThriftClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -88,7 +88,7 @@ func (node *GolangThriftClient) GenerateFuncs(builder golang.ModuleBuilder) erro
 ### func \(\*GolangThriftClient\) GetInterface
 
 ```go
-func (node *GolangThriftClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *GolangThriftClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 
@@ -151,7 +151,7 @@ type GolangThriftServer struct {
 ### func \(\*GolangThriftServer\) AddInstantiation
 
 ```go
-func (node *GolangThriftServer) AddInstantiation(builder golang.GraphBuilder) error
+func (node *GolangThriftServer) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -169,7 +169,7 @@ func (node *GolangThriftServer) GenerateFuncs(builder golang.ModuleBuilder) erro
 ### func \(\*GolangThriftServer\) GetInterface
 
 ```go
-func (node *GolangThriftServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *GolangThriftServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 

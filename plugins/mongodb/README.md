@@ -8,33 +8,103 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
 
 ## Index
 
-- [func PrebuiltProcess\(wiring blueprint.WiringSpec, dbName string\) string](<#PrebuiltProcess>)
+- [func PrebuiltContainer\(spec wiring.WiringSpec, dbName string\) string](<#PrebuiltContainer>)
+- [type MongoDBContainer](<#MongoDBContainer>)
+  - [func \(node \*MongoDBContainer\) AddContainerArtifacts\(targer docker.ContainerWorkspace\) error](<#MongoDBContainer.AddContainerArtifacts>)
+  - [func \(node \*MongoDBContainer\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#MongoDBContainer.AddContainerInstance>)
+  - [func \(m \*MongoDBContainer\) GenerateArtifacts\(outdir string\) error](<#MongoDBContainer.GenerateArtifacts>)
+  - [func \(m \*MongoDBContainer\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#MongoDBContainer.GetInterface>)
+  - [func \(m \*MongoDBContainer\) Name\(\) string](<#MongoDBContainer.Name>)
+  - [func \(m \*MongoDBContainer\) String\(\) string](<#MongoDBContainer.String>)
 - [type MongoDBGoClient](<#MongoDBGoClient>)
-  - [func \(n \*MongoDBGoClient\) AddInstantiation\(builder golang.GraphBuilder\) error](<#MongoDBGoClient.AddInstantiation>)
+  - [func \(n \*MongoDBGoClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#MongoDBGoClient.AddInstantiation>)
   - [func \(n \*MongoDBGoClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#MongoDBGoClient.AddInterfaces>)
   - [func \(n \*MongoDBGoClient\) AddToWorkspace\(builder golang.WorkspaceBuilder\) error](<#MongoDBGoClient.AddToWorkspace>)
-  - [func \(n \*MongoDBGoClient\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#MongoDBGoClient.GetInterface>)
+  - [func \(n \*MongoDBGoClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#MongoDBGoClient.GetInterface>)
   - [func \(node \*MongoDBGoClient\) ImplementsGolangNode\(\)](<#MongoDBGoClient.ImplementsGolangNode>)
   - [func \(node \*MongoDBGoClient\) ImplementsGolangService\(\)](<#MongoDBGoClient.ImplementsGolangService>)
   - [func \(m \*MongoDBGoClient\) Name\(\) string](<#MongoDBGoClient.Name>)
   - [func \(m \*MongoDBGoClient\) String\(\) string](<#MongoDBGoClient.String>)
-- [type MongoDBProcess](<#MongoDBProcess>)
-  - [func \(node \*MongoDBProcess\) AddContainerArtifacts\(targer docker.ContainerWorkspace\) error](<#MongoDBProcess.AddContainerArtifacts>)
-  - [func \(node \*MongoDBProcess\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#MongoDBProcess.AddContainerInstance>)
-  - [func \(m \*MongoDBProcess\) GenerateArtifacts\(outdir string\) error](<#MongoDBProcess.GenerateArtifacts>)
-  - [func \(m \*MongoDBProcess\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#MongoDBProcess.GetInterface>)
-  - [func \(m \*MongoDBProcess\) Name\(\) string](<#MongoDBProcess.Name>)
-  - [func \(m \*MongoDBProcess\) String\(\) string](<#MongoDBProcess.String>)
 - [type MongoInterface](<#MongoInterface>)
   - [func \(m \*MongoInterface\) GetMethods\(\) \[\]service.Method](<#MongoInterface.GetMethods>)
   - [func \(m \*MongoInterface\) GetName\(\) string](<#MongoInterface.GetName>)
 
 
-<a name="PrebuiltProcess"></a>
-## func PrebuiltProcess
+<a name="PrebuiltContainer"></a>
+## func PrebuiltContainer
 
 ```go
-func PrebuiltProcess(wiring blueprint.WiringSpec, dbName string) string
+func PrebuiltContainer(spec wiring.WiringSpec, dbName string) string
+```
+
+
+
+<a name="MongoDBContainer"></a>
+## type MongoDBContainer
+
+
+
+```go
+type MongoDBContainer struct {
+    docker.Container
+    backend.NoSQLDB
+
+    InstanceName string
+    BindAddr     *address.BindConfig
+    Iface        *goparser.ParsedInterface
+}
+```
+
+<a name="MongoDBContainer.AddContainerArtifacts"></a>
+### func \(\*MongoDBContainer\) AddContainerArtifacts
+
+```go
+func (node *MongoDBContainer) AddContainerArtifacts(targer docker.ContainerWorkspace) error
+```
+
+
+
+<a name="MongoDBContainer.AddContainerInstance"></a>
+### func \(\*MongoDBContainer\) AddContainerInstance
+
+```go
+func (node *MongoDBContainer) AddContainerInstance(target docker.ContainerWorkspace) error
+```
+
+
+
+<a name="MongoDBContainer.GenerateArtifacts"></a>
+### func \(\*MongoDBContainer\) GenerateArtifacts
+
+```go
+func (m *MongoDBContainer) GenerateArtifacts(outdir string) error
+```
+
+
+
+<a name="MongoDBContainer.GetInterface"></a>
+### func \(\*MongoDBContainer\) GetInterface
+
+```go
+func (m *MongoDBContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
+```
+
+
+
+<a name="MongoDBContainer.Name"></a>
+### func \(\*MongoDBContainer\) Name
+
+```go
+func (m *MongoDBContainer) Name() string
+```
+
+
+
+<a name="MongoDBContainer.String"></a>
+### func \(\*MongoDBContainer\) String
+
+```go
+func (m *MongoDBContainer) String() string
 ```
 
 
@@ -59,7 +129,7 @@ type MongoDBGoClient struct {
 ### func \(\*MongoDBGoClient\) AddInstantiation
 
 ```go
-func (n *MongoDBGoClient) AddInstantiation(builder golang.GraphBuilder) error
+func (n *MongoDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -86,7 +156,7 @@ func (n *MongoDBGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
 ### func \(\*MongoDBGoClient\) GetInterface
 
 ```go
-func (n *MongoDBGoClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (n *MongoDBGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 
@@ -123,76 +193,6 @@ func (m *MongoDBGoClient) Name() string
 
 ```go
 func (m *MongoDBGoClient) String() string
-```
-
-
-
-<a name="MongoDBProcess"></a>
-## type MongoDBProcess
-
-
-
-```go
-type MongoDBProcess struct {
-    docker.Container
-    backend.NoSQLDB
-
-    InstanceName string
-    BindAddr     *address.BindConfig
-    Iface        *goparser.ParsedInterface
-}
-```
-
-<a name="MongoDBProcess.AddContainerArtifacts"></a>
-### func \(\*MongoDBProcess\) AddContainerArtifacts
-
-```go
-func (node *MongoDBProcess) AddContainerArtifacts(targer docker.ContainerWorkspace) error
-```
-
-
-
-<a name="MongoDBProcess.AddContainerInstance"></a>
-### func \(\*MongoDBProcess\) AddContainerInstance
-
-```go
-func (node *MongoDBProcess) AddContainerInstance(target docker.ContainerWorkspace) error
-```
-
-
-
-<a name="MongoDBProcess.GenerateArtifacts"></a>
-### func \(\*MongoDBProcess\) GenerateArtifacts
-
-```go
-func (m *MongoDBProcess) GenerateArtifacts(outdir string) error
-```
-
-
-
-<a name="MongoDBProcess.GetInterface"></a>
-### func \(\*MongoDBProcess\) GetInterface
-
-```go
-func (m *MongoDBProcess) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
-```
-
-
-
-<a name="MongoDBProcess.Name"></a>
-### func \(\*MongoDBProcess\) Name
-
-```go
-func (m *MongoDBProcess) Name() string
-```
-
-
-
-<a name="MongoDBProcess.String"></a>
-### func \(\*MongoDBProcess\) String
-
-```go
-func (m *MongoDBProcess) String() string
 ```
 
 

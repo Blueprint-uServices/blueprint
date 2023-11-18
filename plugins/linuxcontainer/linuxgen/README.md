@@ -10,16 +10,16 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/linuxgen"
 
 - [func ExecuteTemplate\(name string, body string, args any\) \(string, error\)](<#ExecuteTemplate>)
 - [func ExecuteTemplateToFile\(name string, body string, args any, filename string\) error](<#ExecuteTemplateToFile>)
-- [func GenerateRunFunc\(name string, runfunc string, deps ...blueprint.IRNode\) \(string, error\)](<#GenerateRunFunc>)
+- [func GenerateRunFunc\(name string, runfunc string, deps ...ir.IRNode\) \(string, error\)](<#GenerateRunFunc>)
 - [type BuildScript](<#BuildScript>)
   - [func NewBuildScript\(workspaceDir, fileName string\) \*BuildScript](<#NewBuildScript>)
   - [func \(d \*BuildScript\) Add\(filePath string\) error](<#BuildScript.Add>)
   - [func \(d \*BuildScript\) GenerateBuildScript\(\) error](<#BuildScript.GenerateBuildScript>)
 - [type RunScript](<#RunScript>)
   - [func NewRunScript\(workspaceName, workspaceDir, fileName string\) \*RunScript](<#NewRunScript>)
-  - [func \(run \*RunScript\) Add\(procName, runfunc string, deps ...blueprint.IRNode\)](<#RunScript.Add>)
+  - [func \(run \*RunScript\) Add\(procName, runfunc string, deps ...ir.IRNode\)](<#RunScript.Add>)
   - [func \(run \*RunScript\) GenerateRunScript\(\) error](<#RunScript.GenerateRunScript>)
-  - [func \(run \*RunScript\) Require\(node blueprint.IRNode\)](<#RunScript.Require>)
+  - [func \(run \*RunScript\) Require\(node ir.IRNode\)](<#RunScript.Require>)
 
 
 <a name="ExecuteTemplate"></a>
@@ -44,7 +44,7 @@ func ExecuteTemplateToFile(name string, body string, args any, filename string) 
 ## func GenerateRunFunc
 
 ```go
-func GenerateRunFunc(name string, runfunc string, deps ...blueprint.IRNode) (string, error)
+func GenerateRunFunc(name string, runfunc string, deps ...ir.IRNode) (string, error)
 ```
 
 
@@ -105,9 +105,9 @@ type RunScript struct {
     WorkspaceDir  string
     FileName      string
     FilePath      string
-    RunFuncs      map[string]string           // Function bodies provided by processes
-    AllNodes      map[string]blueprint.IRNode // All nodes seen by this run script
-    Args          map[string]blueprint.IRNode // Arguments that will be set in calling the environment
+    RunFuncs      map[string]string    // Function bodies provided by processes
+    AllNodes      map[string]ir.IRNode // All nodes seen by this run script
+    Args          map[string]ir.IRNode // Arguments that will be set in calling the environment
 }
 ```
 
@@ -124,7 +124,7 @@ Creates a new run.sh that will check environment variables are set and invokes t
 ### func \(\*RunScript\) Add
 
 ```go
-func (run *RunScript) Add(procName, runfunc string, deps ...blueprint.IRNode)
+func (run *RunScript) Add(procName, runfunc string, deps ...ir.IRNode)
 ```
 
 
@@ -142,7 +142,7 @@ func (run *RunScript) GenerateRunScript() error
 ### func \(\*RunScript\) Require
 
 ```go
-func (run *RunScript) Require(node blueprint.IRNode)
+func (run *RunScript) Require(node ir.IRNode)
 ```
 
 Indicate that the specified node is required within this namespace; either it is built by its own runfunc, or it must be provided as argument.

@@ -8,12 +8,12 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/circuitbreaker"
 
 ## Index
 
-- [func AddCircuitBreaker\(wiring blueprint.WiringSpec, serviceName string, min\_reqs int64, failure\_rate float64, interval string\)](<#AddCircuitBreaker>)
+- [func AddCircuitBreaker\(spec wiring.WiringSpec, serviceName string, min\_reqs int64, failure\_rate float64, interval string\)](<#AddCircuitBreaker>)
 - [type CircuitBreakerClient](<#CircuitBreakerClient>)
-  - [func \(node \*CircuitBreakerClient\) AddInstantiation\(builder golang.GraphBuilder\) error](<#CircuitBreakerClient.AddInstantiation>)
+  - [func \(node \*CircuitBreakerClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#CircuitBreakerClient.AddInstantiation>)
   - [func \(node \*CircuitBreakerClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#CircuitBreakerClient.AddInterfaces>)
   - [func \(node \*CircuitBreakerClient\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#CircuitBreakerClient.GenerateFuncs>)
-  - [func \(node \*CircuitBreakerClient\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#CircuitBreakerClient.GetInterface>)
+  - [func \(node \*CircuitBreakerClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#CircuitBreakerClient.GetInterface>)
   - [func \(node \*CircuitBreakerClient\) ImplementsGolangNode\(\)](<#CircuitBreakerClient.ImplementsGolangNode>)
   - [func \(node \*CircuitBreakerClient\) Name\(\) string](<#CircuitBreakerClient.Name>)
   - [func \(node \*CircuitBreakerClient\) String\(\) string](<#CircuitBreakerClient.String>)
@@ -23,7 +23,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/circuitbreaker"
 ## func AddCircuitBreaker
 
 ```go
-func AddCircuitBreaker(wiring blueprint.WiringSpec, serviceName string, min_reqs int64, failure_rate float64, interval string)
+func AddCircuitBreaker(spec wiring.WiringSpec, serviceName string, min_reqs int64, failure_rate float64, interval string)
 ```
 
 Adds circuit breaker functionality to all clients of the specified service. Uses a \[blueprint.WiringSpec\]. Circuit breaker trips when \`failure\_rate\` percentage of requests fail. Minimum number of requests for the circuit to break is specified using \`min\_reqs\`. The circuit breaker counters are reset after \`interval\` duration. Usage:
@@ -57,7 +57,7 @@ type CircuitBreakerClient struct {
 ### func \(\*CircuitBreakerClient\) AddInstantiation
 
 ```go
-func (node *CircuitBreakerClient) AddInstantiation(builder golang.GraphBuilder) error
+func (node *CircuitBreakerClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -84,7 +84,7 @@ func (node *CircuitBreakerClient) GenerateFuncs(builder golang.ModuleBuilder) er
 ### func \(\*CircuitBreakerClient\) GetInterface
 
 ```go
-func (node *CircuitBreakerClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *CircuitBreakerClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 

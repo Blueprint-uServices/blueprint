@@ -57,8 +57,7 @@ The base IRNode interface for linux processes
 
 ```go
 type Process interface {
-    core.ProcessNode
-
+    ir.IRNode
     ImplementsLinuxProcess()
 }
 ```
@@ -78,7 +77,7 @@ commands.
 
 ```go
 type ProcessWorkspace interface {
-    blueprint.BuildContext
+    ir.BuildContext
 
     Info() ProcessWorkspaceInfo
 
@@ -129,7 +128,7 @@ type ProcessWorkspace interface {
     	   proc workspace
     	 - the runfunc will be renamed to prevent name clashes between IRNodes
     */
-    DeclareRunCommand(name string, runfunc string, deps ...blueprint.IRNode) error
+    DeclareRunCommand(name string, runfunc string, deps ...ir.IRNode) error
 
     /*
     	Indicates that we have completed building the workspace, and any finalization tasks

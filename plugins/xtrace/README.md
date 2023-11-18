@@ -8,48 +8,50 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/xtrace"
 
 ## Index
 
-- [func DefineXTraceServer\(wiring blueprint.WiringSpec\)](<#DefineXTraceServer>)
-- [func Instrument\(wiring blueprint.WiringSpec, serviceName string\)](<#Instrument>)
+- [func DefineXTraceServerContainer\(spec wiring.WiringSpec\)](<#DefineXTraceServerContainer>)
+- [func Instrument\(spec wiring.WiringSpec, serviceName string\)](<#Instrument>)
 - [type XTraceClient](<#XTraceClient>)
-  - [func \(node \*XTraceClient\) AddInstantiation\(builder golang.GraphBuilder\) error](<#XTraceClient.AddInstantiation>)
+  - [func \(node \*XTraceClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#XTraceClient.AddInstantiation>)
   - [func \(node \*XTraceClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#XTraceClient.AddInterfaces>)
   - [func \(node \*XTraceClient\) AddToWorkspace\(builder golang.WorkspaceBuilder\) error](<#XTraceClient.AddToWorkspace>)
-  - [func \(node \*XTraceClient\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#XTraceClient.GetInterface>)
+  - [func \(node \*XTraceClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#XTraceClient.GetInterface>)
   - [func \(node \*XTraceClient\) ImplementsGolangNode\(\)](<#XTraceClient.ImplementsGolangNode>)
   - [func \(node \*XTraceClient\) Name\(\) string](<#XTraceClient.Name>)
   - [func \(node \*XTraceClient\) String\(\) string](<#XTraceClient.String>)
 - [type XTraceInterface](<#XTraceInterface>)
   - [func \(xt \*XTraceInterface\) GetMethods\(\) \[\]service.Method](<#XTraceInterface.GetMethods>)
   - [func \(xt \*XTraceInterface\) GetName\(\) string](<#XTraceInterface.GetName>)
-- [type XTraceServer](<#XTraceServer>)
-  - [func \(node \*XTraceServer\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#XTraceServer.GetInterface>)
-  - [func \(node \*XTraceServer\) Name\(\) string](<#XTraceServer.Name>)
-  - [func \(node \*XTraceServer\) String\(\) string](<#XTraceServer.String>)
+- [type XTraceServerContainer](<#XTraceServerContainer>)
+  - [func \(node \*XTraceServerContainer\) AddContainerArtifacts\(target docker.ContainerWorkspace\) error](<#XTraceServerContainer.AddContainerArtifacts>)
+  - [func \(node \*XTraceServerContainer\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#XTraceServerContainer.AddContainerInstance>)
+  - [func \(node \*XTraceServerContainer\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#XTraceServerContainer.GetInterface>)
+  - [func \(node \*XTraceServerContainer\) Name\(\) string](<#XTraceServerContainer.Name>)
+  - [func \(node \*XTraceServerContainer\) String\(\) string](<#XTraceServerContainer.String>)
 - [type XtraceClientWrapper](<#XtraceClientWrapper>)
-  - [func \(node \*XtraceClientWrapper\) AddInstantiation\(builder golang.GraphBuilder\) error](<#XtraceClientWrapper.AddInstantiation>)
+  - [func \(node \*XtraceClientWrapper\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#XtraceClientWrapper.AddInstantiation>)
   - [func \(node \*XtraceClientWrapper\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#XtraceClientWrapper.AddInterfaces>)
   - [func \(node \*XtraceClientWrapper\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#XtraceClientWrapper.GenerateFuncs>)
-  - [func \(node \*XtraceClientWrapper\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#XtraceClientWrapper.GetInterface>)
+  - [func \(node \*XtraceClientWrapper\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#XtraceClientWrapper.GetInterface>)
   - [func \(node \*XtraceClientWrapper\) ImplementsGolangNode\(\)](<#XtraceClientWrapper.ImplementsGolangNode>)
   - [func \(node \*XtraceClientWrapper\) ImplementsGolangService\(\)](<#XtraceClientWrapper.ImplementsGolangService>)
   - [func \(node \*XtraceClientWrapper\) Name\(\) string](<#XtraceClientWrapper.Name>)
   - [func \(node \*XtraceClientWrapper\) String\(\) string](<#XtraceClientWrapper.String>)
 - [type XtraceServerWrapper](<#XtraceServerWrapper>)
-  - [func \(node \*XtraceServerWrapper\) AddInstantiation\(builder golang.GraphBuilder\) error](<#XtraceServerWrapper.AddInstantiation>)
+  - [func \(node \*XtraceServerWrapper\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#XtraceServerWrapper.AddInstantiation>)
   - [func \(node \*XtraceServerWrapper\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#XtraceServerWrapper.AddInterfaces>)
   - [func \(node \*XtraceServerWrapper\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#XtraceServerWrapper.GenerateFuncs>)
-  - [func \(node \*XtraceServerWrapper\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#XtraceServerWrapper.GetInterface>)
+  - [func \(node \*XtraceServerWrapper\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#XtraceServerWrapper.GetInterface>)
   - [func \(node \*XtraceServerWrapper\) ImplementsGolangNode\(\)](<#XtraceServerWrapper.ImplementsGolangNode>)
   - [func \(node \*XtraceServerWrapper\) ImplementsGolangService\(\)](<#XtraceServerWrapper.ImplementsGolangService>)
   - [func \(node \*XtraceServerWrapper\) Name\(\) string](<#XtraceServerWrapper.Name>)
   - [func \(node \*XtraceServerWrapper\) String\(\) string](<#XtraceServerWrapper.String>)
 
 
-<a name="DefineXTraceServer"></a>
-## func DefineXTraceServer
+<a name="DefineXTraceServerContainer"></a>
+## func DefineXTraceServerContainer
 
 ```go
-func DefineXTraceServer(wiring blueprint.WiringSpec)
+func DefineXTraceServerContainer(spec wiring.WiringSpec)
 ```
 
 
@@ -58,7 +60,7 @@ func DefineXTraceServer(wiring blueprint.WiringSpec)
 ## func Instrument
 
 ```go
-func Instrument(wiring blueprint.WiringSpec, serviceName string)
+func Instrument(spec wiring.WiringSpec, serviceName string)
 ```
 
 Instruments the service with an entry \+ exit point xtrace wrapper to generate xtrace compatible logs
@@ -86,7 +88,7 @@ type XTraceClient struct {
 ### func \(\*XTraceClient\) AddInstantiation
 
 ```go
-func (node *XTraceClient) AddInstantiation(builder golang.GraphBuilder) error
+func (node *XTraceClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -113,7 +115,7 @@ func (node *XTraceClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
 ### func \(\*XTraceClient\) GetInterface
 
 ```go
-func (node *XTraceClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *XTraceClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 
@@ -175,13 +177,13 @@ func (xt *XTraceInterface) GetName() string
 
 
 
-<a name="XTraceServer"></a>
-## type XTraceServer
+<a name="XTraceServerContainer"></a>
+## type XTraceServerContainer
 
 
 
 ```go
-type XTraceServer struct {
+type XTraceServerContainer struct {
     docker.Container
 
     ServerName string
@@ -190,29 +192,47 @@ type XTraceServer struct {
 }
 ```
 
-<a name="XTraceServer.GetInterface"></a>
-### func \(\*XTraceServer\) GetInterface
+<a name="XTraceServerContainer.AddContainerArtifacts"></a>
+### func \(\*XTraceServerContainer\) AddContainerArtifacts
 
 ```go
-func (node *XTraceServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *XTraceServerContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error
 ```
 
 
 
-<a name="XTraceServer.Name"></a>
-### func \(\*XTraceServer\) Name
+<a name="XTraceServerContainer.AddContainerInstance"></a>
+### func \(\*XTraceServerContainer\) AddContainerInstance
 
 ```go
-func (node *XTraceServer) Name() string
+func (node *XTraceServerContainer) AddContainerInstance(target docker.ContainerWorkspace) error
 ```
 
 
 
-<a name="XTraceServer.String"></a>
-### func \(\*XTraceServer\) String
+<a name="XTraceServerContainer.GetInterface"></a>
+### func \(\*XTraceServerContainer\) GetInterface
 
 ```go
-func (node *XTraceServer) String() string
+func (node *XTraceServerContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
+```
+
+
+
+<a name="XTraceServerContainer.Name"></a>
+### func \(\*XTraceServerContainer\) Name
+
+```go
+func (node *XTraceServerContainer) Name() string
+```
+
+
+
+<a name="XTraceServerContainer.String"></a>
+### func \(\*XTraceServerContainer\) String
+
+```go
+func (node *XTraceServerContainer) String() string
 ```
 
 
@@ -240,7 +260,7 @@ type XtraceClientWrapper struct {
 ### func \(\*XtraceClientWrapper\) AddInstantiation
 
 ```go
-func (node *XtraceClientWrapper) AddInstantiation(builder golang.GraphBuilder) error
+func (node *XtraceClientWrapper) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -267,7 +287,7 @@ func (node *XtraceClientWrapper) GenerateFuncs(builder golang.ModuleBuilder) err
 ### func \(\*XtraceClientWrapper\) GetInterface
 
 ```go
-func (node *XtraceClientWrapper) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *XtraceClientWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 
@@ -331,7 +351,7 @@ type XtraceServerWrapper struct {
 ### func \(\*XtraceServerWrapper\) AddInstantiation
 
 ```go
-func (node *XtraceServerWrapper) AddInstantiation(builder golang.GraphBuilder) error
+func (node *XtraceServerWrapper) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -358,7 +378,7 @@ func (node *XtraceServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) err
 ### func \(\*XtraceServerWrapper\) GetInterface
 
 ```go
-func (node *XtraceServerWrapper) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *XtraceServerWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 

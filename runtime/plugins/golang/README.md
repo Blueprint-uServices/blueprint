@@ -6,66 +6,215 @@
 import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/golang"
 ```
 
+Package golang implements the golang namespace used by Blueprint applications at runtime to instantiate golang nodes.
+
+A golang namespace takes care of the following:
+
+- receives string arguments from the calling environment
+- instantiates nodes that live in this namespace
+
 ## Index
 
 - [type BuildFunc](<#BuildFunc>)
-- [type Container](<#Container>)
-- [type Graph](<#Graph>)
-  - [func NewGraph\(ctx context.Context, cancel context.CancelFunc, parent Container, name string\) Graph](<#NewGraph>)
+- [type Namespace](<#Namespace>)
+  - [func \(n \*Namespace\) Await\(\)](<#Namespace.Await>)
+  - [func \(n \*Namespace\) Context\(\) \(ctx context.Context\)](<#Namespace.Context>)
+  - [func \(n \*Namespace\) Get\(name string, receiver any\) error](<#Namespace.Get>)
+  - [func \(n \*Namespace\) Shutdown\(awaitCompletion bool\)](<#Namespace.Shutdown>)
+- [type NamespaceBuilder](<#NamespaceBuilder>)
+  - [func NewNamespaceBuilder\(name string\) \*NamespaceBuilder](<#NewNamespaceBuilder>)
+  - [func \(b \*NamespaceBuilder\) Build\(ctx context.Context\) \(\*Namespace, error\)](<#NamespaceBuilder.Build>)
+  - [func \(b \*NamespaceBuilder\) BuildWithParent\(parent \*Namespace\) \(\*Namespace, error\)](<#NamespaceBuilder.BuildWithParent>)
+  - [func \(b \*NamespaceBuilder\) Define\(name string, build BuildFunc\)](<#NamespaceBuilder.Define>)
+  - [func \(b \*NamespaceBuilder\) Instantiate\(name string\)](<#NamespaceBuilder.Instantiate>)
+  - [func \(b \*NamespaceBuilder\) Require\(name string, description string\)](<#NamespaceBuilder.Require>)
+  - [func \(b \*NamespaceBuilder\) Set\(name string, value string\)](<#NamespaceBuilder.Set>)
 - [type Runnable](<#Runnable>)
 
 
 <a name="BuildFunc"></a>
 ## type BuildFunc
 
+Constructs a node. Within a namespace, a BuildFunc will only be called once, when somebody calls [Namespace.Get](<#Namespace.Get>) for the named node.
 
+Namespaces reuse built nodes; subsequent calls to [Namespace.Get](<#Namespace.Get>) will return the same built instance as the first invocation.
+
+node is a runtime instance such as a service, a wrapper class, etc.
+
+If node implements the [Runnable](<#Runnable>) interface then in addition to building the node. a namespace will also invoke \[node.Run\] in a separate goroutine.
 
 ```go
-type BuildFunc func(ctr Container) (any, error)
+type BuildFunc func(n *Namespace) (node any, err error)
 ```
 
-<a name="Container"></a>
-## type Container
+<a name="Namespace"></a>
+## type Namespace
 
+A namespace from which nodes can be fetched by name.
 
+Nodes in the namespace can either be:
+
+- argument nodes passed in to the namespace
+- nodes built within this namespace.
+
+A namespace is constructed using the [NamespaceBuilder](<#NamespaceBuilder>) struct, which can be created with the [NewNamespaceBuilder](<#NewNamespaceBuilder>) method.
+
+The standard usage of a namespace is by a golang process. Any golang services, wrappers, etc. are created using a NamespaceImpl.
+
+Some plugins, such as the ClientPool plugin, also use child Namespaces within the golang process NamespaceImpl.
 
 ```go
-type Container interface {
-    Get(name string, receiver any) error
-    Context() context.Context // In case the buildfunc wants to start background goroutines
-    CancelFunc() context.CancelFunc
-    WaitGroup() *sync.WaitGroup // Waitgroup used by this container; plugins can call Add if they create goroutines
+type Namespace struct {
+    // contains filtered or unexported fields
 }
 ```
 
-<a name="Graph"></a>
-## type Graph
-
-
+<a name="Namespace.Await"></a>
+### func \(\*Namespace\) Await
 
 ```go
-type Graph interface {
-    Define(name string, build BuildFunc) error
-    Build() Container
+func (n *Namespace) Await()
+```
+
+If any nodes in this namespace are running goroutines, waits for them to finish
+
+<a name="Namespace.Context"></a>
+### func \(\*Namespace\) Context
+
+```go
+func (n *Namespace) Context() (ctx context.Context)
+```
+
+ctx can be used by any [BuildFunc](<#BuildFunc>) that wants to start background goroutines, perform a blocking select, etc.
+
+ctx will be notified on the Done channel if the namespace is shutdown during blocking.
+
+<a name="Namespace.Get"></a>
+### func \(\*Namespace\) Get
+
+```go
+func (n *Namespace) Get(name string, receiver any) error
+```
+
+Gets a node from this namespace. If the node hasn't been built yet, it will be built.
+
+<a name="Namespace.Shutdown"></a>
+### func \(\*Namespace\) Shutdown
+
+```go
+func (n *Namespace) Shutdown(awaitCompletion bool)
+```
+
+Stops any nodes \(e.g. servers\) that are running in this namespace.
+
+<a name="NamespaceBuilder"></a>
+## type NamespaceBuilder
+
+The NamespaceBuilder is used at runtime by golang nodes to accumulate node definitions and configuration values for a namespace.
+
+Use the [NewNamespaceBuilder](<#NewNamespaceBuilder>) function to create a namespace builder.
+
+Ultimately one of the Build methods should be called to create and start the namespace.
+
+```go
+type NamespaceBuilder struct {
+    // contains filtered or unexported fields
 }
 ```
 
-<a name="NewGraph"></a>
-### func NewGraph
+<a name="NewNamespaceBuilder"></a>
+### func NewNamespaceBuilder
 
 ```go
-func NewGraph(ctx context.Context, cancel context.CancelFunc, parent Container, name string) Graph
+func NewNamespaceBuilder(name string) *NamespaceBuilder
 ```
 
+Instantiates a new NamespaceBuilder.
 
+The NamespaceBuilder accumulates node and config variable definitions. Once all definitions are added, the Build\* methods are used to build the namespace.
+
+<a name="NamespaceBuilder.Build"></a>
+### func \(\*NamespaceBuilder\) Build
+
+```go
+func (b *NamespaceBuilder) Build(ctx context.Context) (*Namespace, error)
+```
+
+Builds and returns the namespace. This will:
+
+- check that all required nodes have been defined
+- parse command line arguments looking for missing required nodes
+- build any nodes that were specified with \[Instantiate\]
+
+Returns a [Namespace](<#Namespace>) where nodes can now be gotten.
+
+<a name="NamespaceBuilder.BuildWithParent"></a>
+### func \(\*NamespaceBuilder\) BuildWithParent
+
+```go
+func (b *NamespaceBuilder) BuildWithParent(parent *Namespace) (*Namespace, error)
+```
+
+Builds and returns the namespace. This will:
+
+- check that all required nodes have been defined either in this namespace or in the parent namespace\(s\)
+- NOT parse command line arguments
+- build any nodes that were specified with \[Instantiate\], fetching missing nodes from the parent namespace
+
+<a name="NamespaceBuilder.Define"></a>
+### func \(\*NamespaceBuilder\) Define
+
+```go
+func (b *NamespaceBuilder) Define(name string, build BuildFunc)
+```
+
+Defines a build function for a node that can be built within this namespace.
+
+name gives a name to the node that will be built.
+
+build is a [BuildFunc](<#BuildFunc>) for building the node. build is lazily invoked when Get\(name\) is called on the [Namespace](<#Namespace>)
+
+<a name="NamespaceBuilder.Instantiate"></a>
+### func \(\*NamespaceBuilder\) Instantiate
+
+```go
+func (b *NamespaceBuilder) Instantiate(name string)
+```
+
+Indicates that name should be eagerly built when the namespace is built.
+
+The typical usage of this is to ensure that servers get started for namespaces that run servers.
+
+<a name="NamespaceBuilder.Require"></a>
+### func \(\*NamespaceBuilder\) Require
+
+```go
+func (b *NamespaceBuilder) Require(name string, description string)
+```
+
+Indicates that name is a required node. When the namespace is built, an error will be returned if any required nodes are missing.
+
+The typical usage of this is to eagerly validate that all command line arguments have been provided.
+
+<a name="NamespaceBuilder.Set"></a>
+### func \(\*NamespaceBuilder\) Set
+
+```go
+func (b *NamespaceBuilder) Set(name string, value string)
+```
+
+Sets a node to the specified value.
+
+Typically this is used for setting configuration or argument variables.
 
 <a name="Runnable"></a>
 ## type Runnable
 
-For nodes that want to run background goroutines
+If the return value of a [BuildFunc](<#BuildFunc>) implements the [Runnable](<#Runnable>) interface then the Namespace will automatically call \[Runnable.Run\] in a separate goroutine
 
 ```go
 type Runnable interface {
+    // [Namespace] will call Run in a separate goroutine.
     Run(ctx context.Context) error
 }
 ```

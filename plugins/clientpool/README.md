@@ -8,25 +8,25 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
 
 ## Index
 
-- [func Create\(wiring blueprint.WiringSpec, serviceName string, n int\)](<#Create>)
+- [func Create\(spec wiring.WiringSpec, serviceName string, n int\)](<#Create>)
 - [type ClientPool](<#ClientPool>)
-  - [func \(pool \*ClientPool\) AddArg\(argnode blueprint.IRNode\)](<#ClientPool.AddArg>)
-  - [func \(pool \*ClientPool\) AddChild\(child blueprint.IRNode\) error](<#ClientPool.AddChild>)
-  - [func \(pool \*ClientPool\) AddInstantiation\(builder golang.GraphBuilder\) error](<#ClientPool.AddInstantiation>)
+  - [func \(pool \*ClientPool\) AddArg\(argnode ir.IRNode\)](<#ClientPool.AddArg>)
+  - [func \(pool \*ClientPool\) AddChild\(child ir.IRNode\) error](<#ClientPool.AddChild>)
+  - [func \(pool \*ClientPool\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#ClientPool.AddInstantiation>)
   - [func \(pool \*ClientPool\) AddInterfaces\(module golang.ModuleBuilder\) error](<#ClientPool.AddInterfaces>)
   - [func \(pool \*ClientPool\) GenerateFuncs\(module golang.ModuleBuilder\) error](<#ClientPool.GenerateFuncs>)
-  - [func \(pool \*ClientPool\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#ClientPool.GetInterface>)
+  - [func \(pool \*ClientPool\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#ClientPool.GetInterface>)
   - [func \(node \*ClientPool\) Name\(\) string](<#ClientPool.Name>)
   - [func \(node \*ClientPool\) String\(\) string](<#ClientPool.String>)
 - [type ClientpoolNamespace](<#ClientpoolNamespace>)
-  - [func NewClientPoolNamespace\(parent blueprint.Namespace, wiring blueprint.WiringSpec, name string, n int\) \*ClientpoolNamespace](<#NewClientPoolNamespace>)
+  - [func NewClientPoolNamespace\(parent wiring.Namespace, spec wiring.WiringSpec, name string, n int\) \*ClientpoolNamespace](<#NewClientPoolNamespace>)
 
 
 <a name="Create"></a>
 ## func Create
 
 ```go
-func Create(wiring blueprint.WiringSpec, serviceName string, n int)
+func Create(spec wiring.WiringSpec, serviceName string, n int)
 ```
 
 Wraps the client side of a service with a client pool with N client instances
@@ -44,8 +44,8 @@ type ClientPool struct {
     PoolName       string
     N              int
     Client         golang.Service
-    ArgNodes       []blueprint.IRNode
-    ContainedNodes []blueprint.IRNode
+    ArgNodes       []ir.IRNode
+    ContainedNodes []ir.IRNode
 }
 ```
 
@@ -53,7 +53,7 @@ type ClientPool struct {
 ### func \(\*ClientPool\) AddArg
 
 ```go
-func (pool *ClientPool) AddArg(argnode blueprint.IRNode)
+func (pool *ClientPool) AddArg(argnode ir.IRNode)
 ```
 
 
@@ -62,7 +62,7 @@ func (pool *ClientPool) AddArg(argnode blueprint.IRNode)
 ### func \(\*ClientPool\) AddChild
 
 ```go
-func (pool *ClientPool) AddChild(child blueprint.IRNode) error
+func (pool *ClientPool) AddChild(child ir.IRNode) error
 ```
 
 
@@ -71,7 +71,7 @@ func (pool *ClientPool) AddChild(child blueprint.IRNode) error
 ### func \(\*ClientPool\) AddInstantiation
 
 ```go
-func (pool *ClientPool) AddInstantiation(builder golang.GraphBuilder) error
+func (pool *ClientPool) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -98,7 +98,7 @@ func (pool *ClientPool) GenerateFuncs(module golang.ModuleBuilder) error
 ### func \(\*ClientPool\) GetInterface
 
 ```go
-func (pool *ClientPool) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (pool *ClientPool) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 
@@ -128,7 +128,7 @@ func (node *ClientPool) String() string
 
 ```go
 type ClientpoolNamespace struct {
-    blueprint.SimpleNamespace
+    wiring.SimpleNamespace
     // contains filtered or unexported fields
 }
 ```
@@ -137,7 +137,7 @@ type ClientpoolNamespace struct {
 ### func NewClientPoolNamespace
 
 ```go
-func NewClientPoolNamespace(parent blueprint.Namespace, wiring blueprint.WiringSpec, name string, n int) *ClientpoolNamespace
+func NewClientPoolNamespace(parent wiring.Namespace, spec wiring.WiringSpec, name string, n int) *ClientpoolNamespace
 ```
 
 

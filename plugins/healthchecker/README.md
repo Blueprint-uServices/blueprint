@@ -8,12 +8,12 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/healthchecker"
 
 ## Index
 
-- [func AddHealthCheckAPI\(wiring blueprint.WiringSpec, serviceName string\)](<#AddHealthCheckAPI>)
+- [func AddHealthCheckAPI\(spec wiring.WiringSpec, serviceName string\)](<#AddHealthCheckAPI>)
 - [type HealthCheckerServerWrapper](<#HealthCheckerServerWrapper>)
-  - [func \(node \*HealthCheckerServerWrapper\) AddInstantiation\(builder golang.GraphBuilder\) error](<#HealthCheckerServerWrapper.AddInstantiation>)
+  - [func \(node \*HealthCheckerServerWrapper\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#HealthCheckerServerWrapper.AddInstantiation>)
   - [func \(node \*HealthCheckerServerWrapper\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#HealthCheckerServerWrapper.AddInterfaces>)
   - [func \(node \*HealthCheckerServerWrapper\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#HealthCheckerServerWrapper.GenerateFuncs>)
-  - [func \(node \*HealthCheckerServerWrapper\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#HealthCheckerServerWrapper.GetInterface>)
+  - [func \(node \*HealthCheckerServerWrapper\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#HealthCheckerServerWrapper.GetInterface>)
   - [func \(node \*HealthCheckerServerWrapper\) ImplementsGolangNode\(\)](<#HealthCheckerServerWrapper.ImplementsGolangNode>)
   - [func \(node \*HealthCheckerServerWrapper\) Name\(\) string](<#HealthCheckerServerWrapper.Name>)
   - [func \(node \*HealthCheckerServerWrapper\) String\(\) string](<#HealthCheckerServerWrapper.String>)
@@ -23,7 +23,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/healthchecker"
 ## func AddHealthCheckAPI
 
 ```go
-func AddHealthCheckAPI(wiring blueprint.WiringSpec, serviceName string)
+func AddHealthCheckAPI(spec wiring.WiringSpec, serviceName string)
 ```
 
 
@@ -49,7 +49,7 @@ type HealthCheckerServerWrapper struct {
 ### func \(\*HealthCheckerServerWrapper\) AddInstantiation
 
 ```go
-func (node *HealthCheckerServerWrapper) AddInstantiation(builder golang.GraphBuilder) error
+func (node *HealthCheckerServerWrapper) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -76,7 +76,7 @@ func (node *HealthCheckerServerWrapper) GenerateFuncs(builder golang.ModuleBuild
 ### func \(\*HealthCheckerServerWrapper\) GetInterface
 
 ```go
-func (node *HealthCheckerServerWrapper) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *HealthCheckerServerWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 

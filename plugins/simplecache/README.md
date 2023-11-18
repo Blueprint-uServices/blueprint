@@ -8,12 +8,12 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
 
 ## Index
 
-- [func Define\(wiring blueprint.WiringSpec, cacheName string\) string](<#Define>)
+- [func Define\(spec wiring.WiringSpec, cacheName string\) string](<#Define>)
 - [type SimpleCache](<#SimpleCache>)
-  - [func \(node \*SimpleCache\) AddInstantiation\(builder golang.GraphBuilder\) error](<#SimpleCache.AddInstantiation>)
+  - [func \(node \*SimpleCache\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#SimpleCache.AddInstantiation>)
   - [func \(node \*SimpleCache\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#SimpleCache.AddInterfaces>)
   - [func \(node \*SimpleCache\) AddToWorkspace\(builder golang.WorkspaceBuilder\) error](<#SimpleCache.AddToWorkspace>)
-  - [func \(node \*SimpleCache\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#SimpleCache.GetInterface>)
+  - [func \(node \*SimpleCache\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#SimpleCache.GetInterface>)
   - [func \(node \*SimpleCache\) ImplementsGolangNode\(\)](<#SimpleCache.ImplementsGolangNode>)
   - [func \(node \*SimpleCache\) ImplementsGolangService\(\)](<#SimpleCache.ImplementsGolangService>)
   - [func \(node \*SimpleCache\) Name\(\) string](<#SimpleCache.Name>)
@@ -24,7 +24,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
 ## func Define
 
 ```go
-func Define(wiring blueprint.WiringSpec, cacheName string) string
+func Define(spec wiring.WiringSpec, cacheName string) string
 ```
 
 Creates a simple cache instance with the specified name
@@ -54,7 +54,7 @@ type SimpleCache struct {
 ### func \(\*SimpleCache\) AddInstantiation
 
 ```go
-func (node *SimpleCache) AddInstantiation(builder golang.GraphBuilder) error
+func (node *SimpleCache) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -81,7 +81,7 @@ The cache interface and simplecache implementation exist in the runtime package
 ### func \(\*SimpleCache\) GetInterface
 
 ```go
-func (node *SimpleCache) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *SimpleCache) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 

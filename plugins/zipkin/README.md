@@ -8,22 +8,22 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/zipkin"
 
 ## Index
 
-- [func DefineZipkinCollector\(wiring blueprint.WiringSpec, collectorName string\) string](<#DefineZipkinCollector>)
-- [type ZipkinCollector](<#ZipkinCollector>)
-  - [func \(node \*ZipkinCollector\) AddContainerArtifacts\(targer docker.ContainerWorkspace\) error](<#ZipkinCollector.AddContainerArtifacts>)
-  - [func \(node \*ZipkinCollector\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#ZipkinCollector.AddContainerInstance>)
-  - [func \(node \*ZipkinCollector\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#ZipkinCollector.GetInterface>)
-  - [func \(node \*ZipkinCollector\) Name\(\) string](<#ZipkinCollector.Name>)
-  - [func \(node \*ZipkinCollector\) String\(\) string](<#ZipkinCollector.String>)
+- [func DefineZipkinCollector\(spec wiring.WiringSpec, collectorName string\) string](<#DefineZipkinCollector>)
 - [type ZipkinCollectorClient](<#ZipkinCollectorClient>)
-  - [func \(node \*ZipkinCollectorClient\) AddInstantiation\(builder golang.GraphBuilder\) error](<#ZipkinCollectorClient.AddInstantiation>)
+  - [func \(node \*ZipkinCollectorClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#ZipkinCollectorClient.AddInstantiation>)
   - [func \(node \*ZipkinCollectorClient\) AddInterfaces\(builder golang.WorkspaceBuilder\) error](<#ZipkinCollectorClient.AddInterfaces>)
   - [func \(node \*ZipkinCollectorClient\) AddToWorkspace\(builder golang.WorkspaceBuilder\) error](<#ZipkinCollectorClient.AddToWorkspace>)
-  - [func \(node \*ZipkinCollectorClient\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#ZipkinCollectorClient.GetInterface>)
+  - [func \(node \*ZipkinCollectorClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#ZipkinCollectorClient.GetInterface>)
   - [func \(node \*ZipkinCollectorClient\) ImplementsGolangNode\(\)](<#ZipkinCollectorClient.ImplementsGolangNode>)
   - [func \(node \*ZipkinCollectorClient\) ImplementsOTCollectorClient\(\)](<#ZipkinCollectorClient.ImplementsOTCollectorClient>)
   - [func \(node \*ZipkinCollectorClient\) Name\(\) string](<#ZipkinCollectorClient.Name>)
   - [func \(node \*ZipkinCollectorClient\) String\(\) string](<#ZipkinCollectorClient.String>)
+- [type ZipkinCollectorContainer](<#ZipkinCollectorContainer>)
+  - [func \(node \*ZipkinCollectorContainer\) AddContainerArtifacts\(targer docker.ContainerWorkspace\) error](<#ZipkinCollectorContainer.AddContainerArtifacts>)
+  - [func \(node \*ZipkinCollectorContainer\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#ZipkinCollectorContainer.AddContainerInstance>)
+  - [func \(node \*ZipkinCollectorContainer\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#ZipkinCollectorContainer.GetInterface>)
+  - [func \(node \*ZipkinCollectorContainer\) Name\(\) string](<#ZipkinCollectorContainer.Name>)
+  - [func \(node \*ZipkinCollectorContainer\) String\(\) string](<#ZipkinCollectorContainer.String>)
 - [type ZipkinInterface](<#ZipkinInterface>)
   - [func \(j \*ZipkinInterface\) GetMethods\(\) \[\]service.Method](<#ZipkinInterface.GetMethods>)
   - [func \(j \*ZipkinInterface\) GetName\(\) string](<#ZipkinInterface.GetName>)
@@ -33,70 +33,10 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/zipkin"
 ## func DefineZipkinCollector
 
 ```go
-func DefineZipkinCollector(wiring blueprint.WiringSpec, collectorName string) string
+func DefineZipkinCollector(spec wiring.WiringSpec, collectorName string) string
 ```
 
 Defines the Zipkin collector as a process node. Also creates a pointer to the collector and a client node that are used by clients.
-
-<a name="ZipkinCollector"></a>
-## type ZipkinCollector
-
-
-
-```go
-type ZipkinCollector struct {
-    docker.Container
-
-    CollectorName string
-    BindAddr      *address.BindConfig
-    Iface         *goparser.ParsedInterface
-}
-```
-
-<a name="ZipkinCollector.AddContainerArtifacts"></a>
-### func \(\*ZipkinCollector\) AddContainerArtifacts
-
-```go
-func (node *ZipkinCollector) AddContainerArtifacts(targer docker.ContainerWorkspace) error
-```
-
-
-
-<a name="ZipkinCollector.AddContainerInstance"></a>
-### func \(\*ZipkinCollector\) AddContainerInstance
-
-```go
-func (node *ZipkinCollector) AddContainerInstance(target docker.ContainerWorkspace) error
-```
-
-
-
-<a name="ZipkinCollector.GetInterface"></a>
-### func \(\*ZipkinCollector\) GetInterface
-
-```go
-func (node *ZipkinCollector) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
-```
-
-
-
-<a name="ZipkinCollector.Name"></a>
-### func \(\*ZipkinCollector\) Name
-
-```go
-func (node *ZipkinCollector) Name() string
-```
-
-
-
-<a name="ZipkinCollector.String"></a>
-### func \(\*ZipkinCollector\) String
-
-```go
-func (node *ZipkinCollector) String() string
-```
-
-
 
 <a name="ZipkinCollectorClient"></a>
 ## type ZipkinCollectorClient
@@ -120,7 +60,7 @@ type ZipkinCollectorClient struct {
 ### func \(\*ZipkinCollectorClient\) AddInstantiation
 
 ```go
-func (node *ZipkinCollectorClient) AddInstantiation(builder golang.GraphBuilder) error
+func (node *ZipkinCollectorClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -147,7 +87,7 @@ func (node *ZipkinCollectorClient) AddToWorkspace(builder golang.WorkspaceBuilde
 ### func \(\*ZipkinCollectorClient\) GetInterface
 
 ```go
-func (node *ZipkinCollectorClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *ZipkinCollectorClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 
@@ -184,6 +124,66 @@ func (node *ZipkinCollectorClient) Name() string
 
 ```go
 func (node *ZipkinCollectorClient) String() string
+```
+
+
+
+<a name="ZipkinCollectorContainer"></a>
+## type ZipkinCollectorContainer
+
+
+
+```go
+type ZipkinCollectorContainer struct {
+    docker.Container
+
+    CollectorName string
+    BindAddr      *address.BindConfig
+    Iface         *goparser.ParsedInterface
+}
+```
+
+<a name="ZipkinCollectorContainer.AddContainerArtifacts"></a>
+### func \(\*ZipkinCollectorContainer\) AddContainerArtifacts
+
+```go
+func (node *ZipkinCollectorContainer) AddContainerArtifacts(targer docker.ContainerWorkspace) error
+```
+
+
+
+<a name="ZipkinCollectorContainer.AddContainerInstance"></a>
+### func \(\*ZipkinCollectorContainer\) AddContainerInstance
+
+```go
+func (node *ZipkinCollectorContainer) AddContainerInstance(target docker.ContainerWorkspace) error
+```
+
+
+
+<a name="ZipkinCollectorContainer.GetInterface"></a>
+### func \(\*ZipkinCollectorContainer\) GetInterface
+
+```go
+func (node *ZipkinCollectorContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
+```
+
+
+
+<a name="ZipkinCollectorContainer.Name"></a>
+### func \(\*ZipkinCollectorContainer\) Name
+
+```go
+func (node *ZipkinCollectorContainer) Name() string
+```
+
+
+
+<a name="ZipkinCollectorContainer.String"></a>
+### func \(\*ZipkinCollectorContainer\) String
+
+```go
+func (node *ZipkinCollectorContainer) String() string
 ```
 
 

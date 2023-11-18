@@ -8,23 +8,23 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 
 ## Index
 
-- [func Deploy\(wiring blueprint.WiringSpec, serviceName string\)](<#Deploy>)
+- [func Deploy\(spec wiring.WiringSpec, serviceName string\)](<#Deploy>)
 - [type GRPCInterface](<#GRPCInterface>)
   - [func \(grpc \*GRPCInterface\) GetMethods\(\) \[\]service.Method](<#GRPCInterface.GetMethods>)
   - [func \(grpc \*GRPCInterface\) GetName\(\) string](<#GRPCInterface.GetName>)
 - [type GolangClient](<#GolangClient>)
-  - [func \(node \*GolangClient\) AddInstantiation\(builder golang.GraphBuilder\) error](<#GolangClient.AddInstantiation>)
+  - [func \(node \*GolangClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#GolangClient.AddInstantiation>)
   - [func \(node \*GolangClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#GolangClient.AddInterfaces>)
   - [func \(node \*GolangClient\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#GolangClient.GenerateFuncs>)
-  - [func \(node \*GolangClient\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#GolangClient.GetInterface>)
+  - [func \(node \*GolangClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#GolangClient.GetInterface>)
   - [func \(node \*GolangClient\) ImplementsGolangNode\(\)](<#GolangClient.ImplementsGolangNode>)
   - [func \(node \*GolangClient\) ImplementsGolangService\(\)](<#GolangClient.ImplementsGolangService>)
   - [func \(n \*GolangClient\) Name\(\) string](<#GolangClient.Name>)
   - [func \(n \*GolangClient\) String\(\) string](<#GolangClient.String>)
 - [type GolangServer](<#GolangServer>)
-  - [func \(node \*GolangServer\) AddInstantiation\(builder golang.GraphBuilder\) error](<#GolangServer.AddInstantiation>)
+  - [func \(node \*GolangServer\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#GolangServer.AddInstantiation>)
   - [func \(node \*GolangServer\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#GolangServer.GenerateFuncs>)
-  - [func \(node \*GolangServer\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#GolangServer.GetInterface>)
+  - [func \(node \*GolangServer\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#GolangServer.GetInterface>)
   - [func \(node \*GolangServer\) ImplementsGolangNode\(\)](<#GolangServer.ImplementsGolangNode>)
   - [func \(n \*GolangServer\) Name\(\) string](<#GolangServer.Name>)
   - [func \(n \*GolangServer\) String\(\) string](<#GolangServer.String>)
@@ -34,7 +34,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 ## func Deploy
 
 ```go
-func Deploy(wiring blueprint.WiringSpec, serviceName string)
+func Deploy(spec wiring.WiringSpec, serviceName string)
 ```
 
 Deploys \`serviceName\` as a GRPC server. This can only be done if \`serviceName\` is a pointer from Golang nodes to Golang nodes.
@@ -91,7 +91,7 @@ type GolangClient struct {
 ### func \(\*GolangClient\) AddInstantiation
 
 ```go
-func (node *GolangClient) AddInstantiation(builder golang.GraphBuilder) error
+func (node *GolangClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -118,7 +118,7 @@ Generates proto files and the RPC client
 ### func \(\*GolangClient\) GetInterface
 
 ```go
-func (node *GolangClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *GolangClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 
@@ -181,7 +181,7 @@ type GolangServer struct {
 ### func \(\*GolangServer\) AddInstantiation
 
 ```go
-func (node *GolangServer) AddInstantiation(builder golang.GraphBuilder) error
+func (node *GolangServer) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -199,7 +199,7 @@ Generates proto files and the RPC server handler
 ### func \(\*GolangServer\) GetInterface
 
 ```go
-func (node *GolangServer) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *GolangServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 

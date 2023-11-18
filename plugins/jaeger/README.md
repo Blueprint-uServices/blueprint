@@ -8,22 +8,22 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/jaeger"
 
 ## Index
 
-- [func DefineJaegerCollector\(wiring blueprint.WiringSpec, collectorName string\) string](<#DefineJaegerCollector>)
-- [type JaegerCollector](<#JaegerCollector>)
-  - [func \(node \*JaegerCollector\) AddContainerArtifacts\(targer docker.ContainerWorkspace\) error](<#JaegerCollector.AddContainerArtifacts>)
-  - [func \(node \*JaegerCollector\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#JaegerCollector.AddContainerInstance>)
-  - [func \(node \*JaegerCollector\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#JaegerCollector.GetInterface>)
-  - [func \(node \*JaegerCollector\) Name\(\) string](<#JaegerCollector.Name>)
-  - [func \(node \*JaegerCollector\) String\(\) string](<#JaegerCollector.String>)
+- [func DefineJaegerCollector\(spec wiring.WiringSpec, collectorName string\) string](<#DefineJaegerCollector>)
 - [type JaegerCollectorClient](<#JaegerCollectorClient>)
-  - [func \(node \*JaegerCollectorClient\) AddInstantiation\(builder golang.GraphBuilder\) error](<#JaegerCollectorClient.AddInstantiation>)
+  - [func \(node \*JaegerCollectorClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#JaegerCollectorClient.AddInstantiation>)
   - [func \(node \*JaegerCollectorClient\) AddInterfaces\(builder golang.WorkspaceBuilder\) error](<#JaegerCollectorClient.AddInterfaces>)
   - [func \(node \*JaegerCollectorClient\) AddToWorkspace\(builder golang.WorkspaceBuilder\) error](<#JaegerCollectorClient.AddToWorkspace>)
-  - [func \(node \*JaegerCollectorClient\) GetInterface\(ctx blueprint.BuildContext\) \(service.ServiceInterface, error\)](<#JaegerCollectorClient.GetInterface>)
+  - [func \(node \*JaegerCollectorClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#JaegerCollectorClient.GetInterface>)
   - [func \(node \*JaegerCollectorClient\) ImplementsGolangNode\(\)](<#JaegerCollectorClient.ImplementsGolangNode>)
   - [func \(node \*JaegerCollectorClient\) ImplementsOTCollectorClient\(\)](<#JaegerCollectorClient.ImplementsOTCollectorClient>)
   - [func \(node \*JaegerCollectorClient\) Name\(\) string](<#JaegerCollectorClient.Name>)
   - [func \(node \*JaegerCollectorClient\) String\(\) string](<#JaegerCollectorClient.String>)
+- [type JaegerCollectorContainer](<#JaegerCollectorContainer>)
+  - [func \(node \*JaegerCollectorContainer\) AddContainerArtifacts\(targer docker.ContainerWorkspace\) error](<#JaegerCollectorContainer.AddContainerArtifacts>)
+  - [func \(node \*JaegerCollectorContainer\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#JaegerCollectorContainer.AddContainerInstance>)
+  - [func \(node \*JaegerCollectorContainer\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#JaegerCollectorContainer.GetInterface>)
+  - [func \(node \*JaegerCollectorContainer\) Name\(\) string](<#JaegerCollectorContainer.Name>)
+  - [func \(node \*JaegerCollectorContainer\) String\(\) string](<#JaegerCollectorContainer.String>)
 - [type JaegerInterface](<#JaegerInterface>)
   - [func \(j \*JaegerInterface\) GetMethods\(\) \[\]service.Method](<#JaegerInterface.GetMethods>)
   - [func \(j \*JaegerInterface\) GetName\(\) string](<#JaegerInterface.GetName>)
@@ -33,70 +33,10 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/jaeger"
 ## func DefineJaegerCollector
 
 ```go
-func DefineJaegerCollector(wiring blueprint.WiringSpec, collectorName string) string
+func DefineJaegerCollector(spec wiring.WiringSpec, collectorName string) string
 ```
 
 Defines the Jaeger collector as a process node. Also creates a pointer to the collector and a client node that are used by clients.
-
-<a name="JaegerCollector"></a>
-## type JaegerCollector
-
-
-
-```go
-type JaegerCollector struct {
-    docker.Container
-
-    CollectorName string
-    BindAddr      *address.BindConfig
-    Iface         *goparser.ParsedInterface
-}
-```
-
-<a name="JaegerCollector.AddContainerArtifacts"></a>
-### func \(\*JaegerCollector\) AddContainerArtifacts
-
-```go
-func (node *JaegerCollector) AddContainerArtifacts(targer docker.ContainerWorkspace) error
-```
-
-
-
-<a name="JaegerCollector.AddContainerInstance"></a>
-### func \(\*JaegerCollector\) AddContainerInstance
-
-```go
-func (node *JaegerCollector) AddContainerInstance(target docker.ContainerWorkspace) error
-```
-
-
-
-<a name="JaegerCollector.GetInterface"></a>
-### func \(\*JaegerCollector\) GetInterface
-
-```go
-func (node *JaegerCollector) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
-```
-
-
-
-<a name="JaegerCollector.Name"></a>
-### func \(\*JaegerCollector\) Name
-
-```go
-func (node *JaegerCollector) Name() string
-```
-
-
-
-<a name="JaegerCollector.String"></a>
-### func \(\*JaegerCollector\) String
-
-```go
-func (node *JaegerCollector) String() string
-```
-
-
 
 <a name="JaegerCollectorClient"></a>
 ## type JaegerCollectorClient
@@ -120,7 +60,7 @@ type JaegerCollectorClient struct {
 ### func \(\*JaegerCollectorClient\) AddInstantiation
 
 ```go
-func (node *JaegerCollectorClient) AddInstantiation(builder golang.GraphBuilder) error
+func (node *JaegerCollectorClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 
@@ -147,7 +87,7 @@ func (node *JaegerCollectorClient) AddToWorkspace(builder golang.WorkspaceBuilde
 ### func \(\*JaegerCollectorClient\) GetInterface
 
 ```go
-func (node *JaegerCollectorClient) GetInterface(ctx blueprint.BuildContext) (service.ServiceInterface, error)
+func (node *JaegerCollectorClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
 
@@ -184,6 +124,66 @@ func (node *JaegerCollectorClient) Name() string
 
 ```go
 func (node *JaegerCollectorClient) String() string
+```
+
+
+
+<a name="JaegerCollectorContainer"></a>
+## type JaegerCollectorContainer
+
+
+
+```go
+type JaegerCollectorContainer struct {
+    docker.Container
+
+    CollectorName string
+    BindAddr      *address.BindConfig
+    Iface         *goparser.ParsedInterface
+}
+```
+
+<a name="JaegerCollectorContainer.AddContainerArtifacts"></a>
+### func \(\*JaegerCollectorContainer\) AddContainerArtifacts
+
+```go
+func (node *JaegerCollectorContainer) AddContainerArtifacts(targer docker.ContainerWorkspace) error
+```
+
+
+
+<a name="JaegerCollectorContainer.AddContainerInstance"></a>
+### func \(\*JaegerCollectorContainer\) AddContainerInstance
+
+```go
+func (node *JaegerCollectorContainer) AddContainerInstance(target docker.ContainerWorkspace) error
+```
+
+
+
+<a name="JaegerCollectorContainer.GetInterface"></a>
+### func \(\*JaegerCollectorContainer\) GetInterface
+
+```go
+func (node *JaegerCollectorContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
+```
+
+
+
+<a name="JaegerCollectorContainer.Name"></a>
+### func \(\*JaegerCollectorContainer\) Name
+
+```go
+func (node *JaegerCollectorContainer) Name() string
+```
+
+
+
+<a name="JaegerCollectorContainer.String"></a>
+### func \(\*JaegerCollectorContainer\) String
+
+```go
+func (node *JaegerCollectorContainer) String() string
 ```
 
 

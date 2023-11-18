@@ -8,12 +8,12 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 
 ## Index
 
-- [func AddProcessToContainer\(wiring blueprint.WiringSpec, containerName, childName string\)](<#AddProcessToContainer>)
-- [func CreateContainer\(wiring blueprint.WiringSpec, containerName string, children ...string\) string](<#CreateContainer>)
-- [func RegisterBuilders\(\)](<#RegisterBuilders>)
+- [func AddProcessToContainer\(spec wiring.WiringSpec, containerName, childName string\)](<#AddProcessToContainer>)
+- [func CreateContainer\(spec wiring.WiringSpec, containerName string, children ...string\) string](<#CreateContainer>)
+- [func RegisterAsDefaultBuilder\(\)](<#RegisterAsDefaultBuilder>)
 - [type Container](<#Container>)
-  - [func \(node \*Container\) AddArg\(argnode blueprint.IRNode\)](<#Container.AddArg>)
-  - [func \(node \*Container\) AddChild\(child blueprint.IRNode\) error](<#Container.AddChild>)
+  - [func \(node \*Container\) AddArg\(argnode ir.IRNode\)](<#Container.AddArg>)
+  - [func \(node \*Container\) AddChild\(child ir.IRNode\) error](<#Container.AddChild>)
   - [func \(node \*Container\) AddContainerArtifacts\(target docker.ContainerWorkspace\) error](<#Container.AddContainerArtifacts>)
   - [func \(node \*Container\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#Container.AddContainerInstance>)
   - [func \(node \*Container\) GenerateArtifacts\(dir string\) error](<#Container.GenerateArtifacts>)
@@ -27,7 +27,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 ## func AddProcessToContainer
 
 ```go
-func AddProcessToContainer(wiring blueprint.WiringSpec, containerName, childName string)
+func AddProcessToContainer(spec wiring.WiringSpec, containerName, childName string)
 ```
 
 Adds a process to an existing container
@@ -36,16 +36,16 @@ Adds a process to an existing container
 ## func CreateContainer
 
 ```go
-func CreateContainer(wiring blueprint.WiringSpec, containerName string, children ...string) string
+func CreateContainer(spec wiring.WiringSpec, containerName string, children ...string) string
 ```
 
 Adds a container that will explicitly instantiate all of the named child processes The container will also implicitly instantiate any of the dependencies of the children
 
-<a name="RegisterBuilders"></a>
-## func RegisterBuilders
+<a name="RegisterAsDefaultBuilder"></a>
+## func RegisterAsDefaultBuilder
 
 ```go
-func RegisterBuilders()
+func RegisterAsDefaultBuilder()
 ```
 
 to trigger module initialization and register builders
@@ -57,12 +57,12 @@ to trigger module initialization and register builders
 
 ```go
 type Container struct {
-    blueprint.IRNode
+    ir.IRNode
 
     InstanceName   string
     ImageName      string
-    ArgNodes       []blueprint.IRNode
-    ContainedNodes []blueprint.IRNode
+    ArgNodes       []ir.IRNode
+    ContainedNodes []ir.IRNode
     // contains filtered or unexported fields
 }
 ```
@@ -71,7 +71,7 @@ type Container struct {
 ### func \(\*Container\) AddArg
 
 ```go
-func (node *Container) AddArg(argnode blueprint.IRNode)
+func (node *Container) AddArg(argnode ir.IRNode)
 ```
 
 
@@ -80,7 +80,7 @@ func (node *Container) AddArg(argnode blueprint.IRNode)
 ### func \(\*Container\) AddChild
 
 ```go
-func (node *Container) AddChild(child blueprint.IRNode) error
+func (node *Container) AddChild(child ir.IRNode) error
 ```
 
 
@@ -152,7 +152,7 @@ Used during building to accumulate linux process nodes Non\-linux process nodes 
 
 ```go
 type LinuxNamespace struct {
-    blueprint.SimpleNamespace
+    wiring.SimpleNamespace
     // contains filtered or unexported fields
 }
 ```

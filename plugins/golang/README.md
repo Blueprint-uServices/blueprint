@@ -9,13 +9,13 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 ## Index
 
 - [func AddRuntimeModule\(workspace WorkspaceBuilder\) error](<#AddRuntimeModule>)
-- [func GetGoInterface\(ctx blueprint.BuildContext, node blueprint.IRNode\) \(\*gocode.ServiceInterface, error\)](<#GetGoInterface>)
+- [func GetGoInterface\(ctx ir.BuildContext, node ir.IRNode\) \(\*gocode.ServiceInterface, error\)](<#GetGoInterface>)
 - [type GeneratesFuncs](<#GeneratesFuncs>)
-- [type GraphBuilder](<#GraphBuilder>)
-- [type GraphInfo](<#GraphInfo>)
 - [type Instantiable](<#Instantiable>)
 - [type ModuleBuilder](<#ModuleBuilder>)
 - [type ModuleInfo](<#ModuleInfo>)
+- [type NamespaceBuilder](<#NamespaceBuilder>)
+- [type NamespaceInfo](<#NamespaceInfo>)
 - [type Node](<#Node>)
 - [type PackageInfo](<#PackageInfo>)
 - [type ProvidesInterface](<#ProvidesInterface>)
@@ -38,7 +38,7 @@ func AddRuntimeModule(workspace WorkspaceBuilder) error
 ## func GetGoInterface
 
 ```go
-func GetGoInterface(ctx blueprint.BuildContext, node blueprint.IRNode) (*gocode.ServiceInterface, error)
+func GetGoInterface(ctx ir.BuildContext, node ir.IRNode) (*gocode.ServiceInterface, error)
 ```
 
 Helper method that does typecasting on builder and service.
@@ -71,116 +71,6 @@ type GeneratesFuncs interface {
 }
 ```
 
-<a name="GraphBuilder"></a>
-## type GraphBuilder
-
-GraphBuilder is used by IRNodes that implement the Instantiable interface. The GraphBuilder provides
-
-```
-the following methods that can be used by plugins to provide instantiation code:
-
-  - `Import` declares that a particular package should be imported, as it will be used by the
-    instantiation code
-
-  - `Declare` provides a buildFunc as a string that will be inserted into the output file; buildFunc
-    is used at runtime to create the instance
-
-In the generated golang code, instances are declared and created using a simple dependency injection
-style.  The runtime dependency injection interface is defined in runtime/plugins/golang/di.go
-
-The basic requirement of an instantiable node is that it can provide a buildFunc definition that
-will be invoked at runtime to create the instance.  A buildFunc has method signature:
-
-	func(ctr golang.Namespace) (any, error)
-
-The buildFunc will instantiate and return an instance or an error.  If the node needs to be
-able to call other instances, it can acquire the instances through the golang.Namespace's Get
-method.  For example, the following pseudocode for a tracing wrapper class would get the
-underlying handler then return the wrapper class:
-
-	func(ctr golang.Namespace) (any, error) {
-		handler, err := ctr.Get("serviceA.handler")
-		if err != nil {
-			return nil, err
-		}
-
-		serviceA, isValid := handler.(ServiceA)
-		if !isValid {
-			return nil, blueprint.Errorf("serviceA.handler does not implement ServiceA interface")
-		}
-
-		return newServiceATracingWrapper(serviceA), nil
-	}
-
-The above code makes reference to names like `serviceA.handler`; rarely should these names
-be hard-coded, instead they would typically be provided by calling or inspecting the IR
-dependencies of this node.
-```
-
-```go
-type GraphBuilder interface {
-    blueprint.BuildContext
-
-    /*
-    	Metadata info about the graph being built
-    */
-    Info() GraphInfo
-
-    /*
-    	Adds an import statement to the generated file; this is necessary for any types
-    	declared in other packages that are going to be used in a DI declaration.
-
-    	This method returns the type alias that should be used in the generated code.
-    	By default the type alias is just the package name, but if there are multiple
-    	different imports with the same package name, then aliases will be created
-    */
-    Import(packageName string) string
-
-    /*
-    	If the provided type is a user type or a builtin type, adds an import statement
-    	similar to the `Import` method.
-
-    	Returns the name that should be used in code for the type.  For example, if it's
-    	a type from an imported package, then would return mypackage.Foo.
-    */
-    ImportType(typeName gocode.TypeName) string
-
-    /*
-    	Provides the source code of a buildFunc that will be invoked at runtime by the
-    	generated code, to build the named instance
-    */
-    Declare(instanceName string, buildFuncSrc string) error
-
-    /*
-    	This is like Declare, but instead of having to manually construct the source
-    	code, the GraphBuilder will automatically create the build func src code,
-    	invoking the specified constructor and passing the provided nodes as args
-    */
-    DeclareConstructor(name string, constructor *gocode.Constructor, args []blueprint.IRNode) error
-
-    /*
-    	Gets the ModuleBuilder that contains this GraphBuilder
-    */
-    Module() ModuleBuilder
-}
-```
-
-<a name="GraphInfo"></a>
-## type GraphInfo
-
-APIs used by the above IR nodes when they are generating code.
-
-The main implementation of these interfaces is in the \[goprocess\]\(../goprocess\) plugin
-
-```go
-type GraphInfo struct {
-    Package  PackageInfo
-    FileName string // Name of the file within the pacakge
-    FilePath string // Fully-qualified path to the file on the filesystem
-    FuncName string // Name of the function that builds the graph
-}
-```
-
 <a name="Instantiable"></a>
 ## type Instantiable
 
@@ -194,7 +84,7 @@ server is instantiable but it does not expose methods that can be directly invok
 level.  In constract a Golang GRPC client is a service and is instantiable because it does expose methods
 that can be directly invoked.
 
-The GraphBuilder struct provides functionality for plugins to declare:
+The NamespaceBuilder struct provides functionality for plugins to declare:
 
 	(a) how to instantiate instances of things
 	(b) relevant types and method signatures for use by other plugins
@@ -206,7 +96,7 @@ type Instantiable interface {
        AddInstantion will be invoked during compilation to enable an IRNode to add its instantiation code
        to a generated golang file.
     */
-    AddInstantiation(GraphBuilder) error
+    AddInstantiation(NamespaceBuilder) error
 }
 ```
 
@@ -229,7 +119,7 @@ file
 
 ```go
 type ModuleBuilder interface {
-    blueprint.BuildContext
+    ir.BuildContext
 
     /*
     	Metadata into about the module being built
@@ -266,6 +156,127 @@ type ModuleInfo struct {
 }
 ```
 
+<a name="NamespaceBuilder"></a>
+## type NamespaceBuilder
+
+NamespaceBuilder is used by IRNodes that implement the Instantiable interface. The NamespaceBuilder provides
+
+```
+the following methods that can be used by plugins to provide instantiation code:
+
+  - `Import` declares that a particular package should be imported, as it will be used by the
+    instantiation code
+
+  - `Declare` provides a buildFunc as a string that will be inserted into the output file; buildFunc
+    is used at runtime to create the instance
+
+In the generated golang code, instances are declared and created using a simple dependency injection
+style.  The runtime dependency injection interface is defined in runtime/plugins/golang/di.go
+
+The basic requirement of an instantiable node is that it can provide a buildFunc definition that
+will be invoked at runtime to create the instance.  A buildFunc has method signature:
+
+	func(n *golang.Namespace) (any, error)
+
+The buildFunc will instantiate and return an instance or an error.  If the node needs to be
+able to call other instances, it can acquire the instances through the golang.Namespace's Get
+method.  For example, the following pseudocode for a tracing wrapper class would get the
+underlying handler then return the wrapper class:
+
+	func(n *golang.Namespace) (any, error) {
+		handler, err := n.Get("serviceA.handler")
+		if err != nil {
+			return nil, err
+		}
+
+		serviceA, isValid := handler.(ServiceA)
+		if !isValid {
+			return nil, blueprint.Errorf("serviceA.handler does not implement ServiceA interface")
+		}
+
+		return newServiceATracingWrapper(serviceA), nil
+	}
+
+The above code makes reference to names like `serviceA.handler`; rarely should these names
+be hard-coded, instead they would typically be provided by calling or inspecting the IR
+dependencies of this node.
+```
+
+```go
+type NamespaceBuilder interface {
+    ir.BuildContext
+
+    /*
+    	Metadata info about the namespace being built
+    */
+    Info() NamespaceInfo
+
+    /*
+    	Adds an import statement to the generated file; this is necessary for any types
+    	declared in other packages that are going to be used in a DI declaration.
+
+    	This method returns the type alias that should be used in the generated code.
+    	By default the type alias is just the package name, but if there are multiple
+    	different imports with the same package name, then aliases will be created
+    */
+    Import(packageName string) string
+
+    /*
+    	If the provided type is a user type or a builtin type, adds an import statement
+    	similar to the `Import` method.
+
+    	Returns the name that should be used in code for the type.  For example, if it's
+    	a type from an imported package, then would return mypackage.Foo.
+    */
+    ImportType(typeName gocode.TypeName) string
+
+    /*
+    	Provides the source code of a buildFunc that will be invoked at runtime by the
+    	generated code, to build the named instance
+    */
+    Declare(instanceName string, buildFuncSrc string) error
+
+    /*
+    	This is like Declare, but instead of having to manually construct the source
+    	code, the NamespaceBuilder will automatically create the build func src code,
+    	invoking the specified constructor and passing the provided nodes as args
+    */
+    DeclareConstructor(name string, constructor *gocode.Constructor, args []ir.IRNode) error
+
+    /*
+    	Specify nodes needed by this namespace that exist in a parent namespace
+    	and will be passed as runtime arguments
+    */
+    Require(name, description string)
+
+    /*
+    	Specify nodes that should be immediately built when the namespace is instantiated
+    */
+    Instantiate(name string)
+
+    /*
+    	Gets the ModuleBuilder that contains this NamespaceBuilder
+    */
+    Module() ModuleBuilder
+}
+```
+
+<a name="NamespaceInfo"></a>
+## type NamespaceInfo
+
+APIs used by the above IR nodes when they are generating code.
+
+The main implementation of these interfaces is in the \[goprocess\]\(../goprocess\) plugin
+
+```go
+type NamespaceInfo struct {
+    Package  PackageInfo
+    FileName string // Name of the file within the pacakge
+    FilePath string // Fully-qualified path to the file on the filesystem
+    FuncName string // Name of the function that builds the namespace
+}
+```
+
 <a name="Node"></a>
 ## type Node
 
@@ -277,7 +288,7 @@ wishes to exist within a Golang namespace.
 
 ```go
 type Node interface {
-    blueprint.IRNode
+    ir.IRNode
     ImplementsGolangNode() // Idiomatically necessary in Go for typecasting correctly
 }
 ```
@@ -397,7 +408,7 @@ using the methods on `WorkspaceBuilder`.
 
 ```go
 type WorkspaceBuilder interface {
-    blueprint.BuildContext
+    ir.BuildContext
 
     /*
     	Metadata into about the workspace being built

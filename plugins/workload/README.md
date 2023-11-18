@@ -9,10 +9,10 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/workload"
 ## Index
 
 - [func GenerateWorkloadgenCode\(builder golang.ModuleBuilder, service \*gocode.ServiceInterface, outputPackage string\) error](<#GenerateWorkloadgenCode>)
-- [func Generator\(wiring blueprint.WiringSpec, service string\) string](<#Generator>)
+- [func Generator\(spec wiring.WiringSpec, service string\) string](<#Generator>)
 - [type WorkloadgenClient](<#WorkloadgenClient>)
-  - [func NewWorkloadGenerator\(name string, node blueprint.IRNode\) \(\*WorkloadgenClient, error\)](<#NewWorkloadGenerator>)
-  - [func \(node \*WorkloadgenClient\) AddInstantiation\(builder golang.GraphBuilder\) error](<#WorkloadgenClient.AddInstantiation>)
+  - [func NewWorkloadGenerator\(name string, node ir.IRNode\) \(\*WorkloadgenClient, error\)](<#NewWorkloadGenerator>)
+  - [func \(node \*WorkloadgenClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#WorkloadgenClient.AddInstantiation>)
   - [func \(node \*WorkloadgenClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#WorkloadgenClient.AddInterfaces>)
   - [func \(node \*WorkloadgenClient\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#WorkloadgenClient.GenerateFuncs>)
   - [func \(node \*WorkloadgenClient\) ImplementsGolangNode\(\)](<#WorkloadgenClient.ImplementsGolangNode>)
@@ -33,7 +33,7 @@ Generates the workload generator client
 ## func Generator
 
 ```go
-func Generator(wiring blueprint.WiringSpec, service string) string
+func Generator(spec wiring.WiringSpec, service string) string
 ```
 
 Creates a workload generator process that will invoke the specified service
@@ -58,7 +58,7 @@ type WorkloadgenClient struct {
 ### func NewWorkloadGenerator
 
 ```go
-func NewWorkloadGenerator(name string, node blueprint.IRNode) (*WorkloadgenClient, error)
+func NewWorkloadGenerator(name string, node ir.IRNode) (*WorkloadgenClient, error)
 ```
 
 
@@ -67,7 +67,7 @@ func NewWorkloadGenerator(name string, node blueprint.IRNode) (*WorkloadgenClien
 ### func \(\*WorkloadgenClient\) AddInstantiation
 
 ```go
-func (node *WorkloadgenClient) AddInstantiation(builder golang.GraphBuilder) error
+func (node *WorkloadgenClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
 Provides the golang code to instantiate the workloadgen client

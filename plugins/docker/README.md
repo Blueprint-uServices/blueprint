@@ -23,7 +23,7 @@ The base IRNode interface for docker containers
 
 ```go
 type Container interface {
-    core.ContainerNode
+    ir.IRNode
     ImplementsDockerContainer()
 }
 ```
@@ -35,7 +35,7 @@ Builders used by the above code and artifact generation interfaces
 
 ```go
 type ContainerWorkspace interface {
-    blueprint.BuildContext
+    ir.BuildContext
 
     Info() ContainerWorkspaceInfo
 
@@ -60,7 +60,7 @@ type ContainerWorkspace interface {
 
     	Returns an error if an instance already exists with this name.
     */
-    DeclarePrebuiltInstance(instanceName string, image string, args ...blueprint.IRNode) error
+    DeclarePrebuiltInstance(instanceName string, image string, args ...ir.IRNode) error
 
     /*
     	Declares an instance of a container using container artifacts
@@ -75,7 +75,7 @@ type ContainerWorkspace interface {
 
     	Returns an error if an instance already exists with this name.
     */
-    DeclareLocalImage(instanceName string, imageName string, args ...blueprint.IRNode) error
+    DeclareLocalImage(instanceName string, imageName string, args ...ir.IRNode) error
 
     /*
     	Indicates that the caller has finished adding images and instances,

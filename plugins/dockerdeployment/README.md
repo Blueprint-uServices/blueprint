@@ -8,12 +8,12 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment"
 
 ## Index
 
-- [func AddContainerToDeployment\(wiring blueprint.WiringSpec, deploymentName, containerName string\)](<#AddContainerToDeployment>)
-- [func NewDeployment\(wiring blueprint.WiringSpec, deploymentName string, containers ...string\) string](<#NewDeployment>)
-- [func RegisterBuilders\(\)](<#RegisterBuilders>)
+- [func AddContainerToDeployment\(spec wiring.WiringSpec, deploymentName, containerName string\)](<#AddContainerToDeployment>)
+- [func NewDeployment\(spec wiring.WiringSpec, deploymentName string, containers ...string\) string](<#NewDeployment>)
+- [func RegisterAsDefaultBuilder\(\)](<#RegisterAsDefaultBuilder>)
 - [type Deployment](<#Deployment>)
-  - [func \(node \*Deployment\) AddArg\(argnode blueprint.IRNode\)](<#Deployment.AddArg>)
-  - [func \(node \*Deployment\) AddChild\(child blueprint.IRNode\) error](<#Deployment.AddChild>)
+  - [func \(node \*Deployment\) AddArg\(argnode ir.IRNode\)](<#Deployment.AddArg>)
+  - [func \(node \*Deployment\) AddChild\(child ir.IRNode\) error](<#Deployment.AddChild>)
   - [func \(node \*Deployment\) GenerateArtifacts\(dir string\) error](<#Deployment.GenerateArtifacts>)
   - [func \(node \*Deployment\) Name\(\) string](<#Deployment.Name>)
   - [func \(node \*Deployment\) String\(\) string](<#Deployment.String>)
@@ -24,7 +24,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment"
 ## func AddContainerToDeployment
 
 ```go
-func AddContainerToDeployment(wiring blueprint.WiringSpec, deploymentName, containerName string)
+func AddContainerToDeployment(spec wiring.WiringSpec, deploymentName, containerName string)
 ```
 
 Adds a child node to an existing container deployment
@@ -33,16 +33,16 @@ Adds a child node to an existing container deployment
 ## func NewDeployment
 
 ```go
-func NewDeployment(wiring blueprint.WiringSpec, deploymentName string, containers ...string) string
+func NewDeployment(spec wiring.WiringSpec, deploymentName string, containers ...string) string
 ```
 
 Adds a deployment that explicitly instantiates all of the containers provided. The deployment will also implicitly instantiate any of the dependencies of the containers
 
-<a name="RegisterBuilders"></a>
-## func RegisterBuilders
+<a name="RegisterAsDefaultBuilder"></a>
+## func RegisterAsDefaultBuilder
 
 ```go
-func RegisterBuilders()
+func RegisterAsDefaultBuilder()
 ```
 
 to trigger module initialization and register builders
@@ -54,11 +54,9 @@ A deployment is a collection of containers
 
 ```go
 type Deployment struct {
-    core.DeploymentNode
-
     DeploymentName string
-    ArgNodes       []blueprint.IRNode
-    ContainedNodes []blueprint.IRNode
+    ArgNodes       []ir.IRNode
+    ContainedNodes []ir.IRNode
     // contains filtered or unexported fields
 }
 ```
@@ -67,7 +65,7 @@ type Deployment struct {
 ### func \(\*Deployment\) AddArg
 
 ```go
-func (node *Deployment) AddArg(argnode blueprint.IRNode)
+func (node *Deployment) AddArg(argnode ir.IRNode)
 ```
 
 
@@ -76,7 +74,7 @@ func (node *Deployment) AddArg(argnode blueprint.IRNode)
 ### func \(\*Deployment\) AddChild
 
 ```go
-func (node *Deployment) AddChild(child blueprint.IRNode) error
+func (node *Deployment) AddChild(child ir.IRNode) error
 ```
 
 
@@ -115,7 +113,7 @@ Used during building to accumulate docker container nodes Non\-container nodes w
 
 ```go
 type DockerComposeNamespace struct {
-    blueprint.SimpleNamespace
+    wiring.SimpleNamespace
     // contains filtered or unexported fields
 }
 ```

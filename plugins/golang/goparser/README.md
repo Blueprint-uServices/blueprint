@@ -25,7 +25,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
   - [func \(f \*ParsedFunc\) String\(\) string](<#ParsedFunc.String>)
 - [type ParsedImport](<#ParsedImport>)
 - [type ParsedInterface](<#ParsedInterface>)
-  - [func \(iface \*ParsedInterface\) ServiceInterface\(ctx blueprint.BuildContext\) \*gocode.ServiceInterface](<#ParsedInterface.ServiceInterface>)
+  - [func \(iface \*ParsedInterface\) ServiceInterface\(ctx ir.BuildContext\) \*gocode.ServiceInterface](<#ParsedInterface.ServiceInterface>)
   - [func \(iface \*ParsedInterface\) Type\(\) \*gocode.UserType](<#ParsedInterface.Type>)
 - [type ParsedModule](<#ParsedModule>)
   - [func \(mod \*ParsedModule\) Load\(\) error](<#ParsedModule.Load>)
@@ -243,7 +243,7 @@ type ParsedInterface struct {
 ### func \(\*ParsedInterface\) ServiceInterface
 
 ```go
-func (iface *ParsedInterface) ServiceInterface(ctx blueprint.BuildContext) *gocode.ServiceInterface
+func (iface *ParsedInterface) ServiceInterface(ctx ir.BuildContext) *gocode.ServiceInterface
 ```
 
 

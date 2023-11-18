@@ -8,16 +8,16 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/goproc/linuxgen"
 
 ## Index
 
-- [func GenerateBinaryRunFunc\(procName string, args ...blueprint.IRNode\) \(string, error\)](<#GenerateBinaryRunFunc>)
+- [func GenerateBinaryRunFunc\(procName string, args ...ir.IRNode\) \(string, error\)](<#GenerateBinaryRunFunc>)
 - [func GenerateDockerfileBuildCommands\(goProcName string\) \(string, error\)](<#GenerateDockerfileBuildCommands>)
-- [func GenerateRunFunc\(procName string, args ...blueprint.IRNode\) \(string, error\)](<#GenerateRunFunc>)
+- [func GenerateRunFunc\(procName string, args ...ir.IRNode\) \(string, error\)](<#GenerateRunFunc>)
 
 
 <a name="GenerateBinaryRunFunc"></a>
 ## func GenerateBinaryRunFunc
 
 ```go
-func GenerateBinaryRunFunc(procName string, args ...blueprint.IRNode) (string, error)
+func GenerateBinaryRunFunc(procName string, args ...ir.IRNode) (string, error)
 ```
 
 Generates command\-line function to run a goproc that has been built to a binary using \`go build\`
@@ -35,7 +35,7 @@ If the goproc is being deployed to Docker, we can provide some custom build comm
 ## func GenerateRunFunc
 
 ```go
-func GenerateRunFunc(procName string, args ...blueprint.IRNode) (string, error)
+func GenerateRunFunc(procName string, args ...ir.IRNode) (string, error)
 ```
 
 Generates command\-line function to run a goproc

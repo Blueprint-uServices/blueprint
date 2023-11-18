@@ -12,8 +12,8 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment/dockergen"
 - [func ExecuteTemplateToFile\(name string, body string, args any, filename string\) error](<#ExecuteTemplateToFile>)
 - [type DockerComposeFile](<#DockerComposeFile>)
   - [func NewDockerComposeFile\(workspaceName, workspaceDir, fileName string\) \*DockerComposeFile](<#NewDockerComposeFile>)
-  - [func \(d \*DockerComposeFile\) AddBuildInstance\(instanceName string, containerTemplateName string, args ...blueprint.IRNode\) error](<#DockerComposeFile.AddBuildInstance>)
-  - [func \(d \*DockerComposeFile\) AddImageInstance\(instanceName string, image string, args ...blueprint.IRNode\) error](<#DockerComposeFile.AddImageInstance>)
+  - [func \(d \*DockerComposeFile\) AddBuildInstance\(instanceName string, containerTemplateName string, args ...ir.IRNode\) error](<#DockerComposeFile.AddBuildInstance>)
+  - [func \(d \*DockerComposeFile\) AddImageInstance\(instanceName string, image string, args ...ir.IRNode\) error](<#DockerComposeFile.AddImageInstance>)
   - [func \(d \*DockerComposeFile\) Generate\(\) error](<#DockerComposeFile.Generate>)
   - [func \(d \*DockerComposeFile\) ResolveLocalDials\(\) error](<#DockerComposeFile.ResolveLocalDials>)
 
@@ -65,7 +65,7 @@ func NewDockerComposeFile(workspaceName, workspaceDir, fileName string) *DockerC
 ### func \(\*DockerComposeFile\) AddBuildInstance
 
 ```go
-func (d *DockerComposeFile) AddBuildInstance(instanceName string, containerTemplateName string, args ...blueprint.IRNode) error
+func (d *DockerComposeFile) AddBuildInstance(instanceName string, containerTemplateName string, args ...ir.IRNode) error
 ```
 
 
@@ -74,7 +74,7 @@ func (d *DockerComposeFile) AddBuildInstance(instanceName string, containerTempl
 ### func \(\*DockerComposeFile\) AddImageInstance
 
 ```go
-func (d *DockerComposeFile) AddImageInstance(instanceName string, image string, args ...blueprint.IRNode) error
+func (d *DockerComposeFile) AddImageInstance(instanceName string, image string, args ...ir.IRNode) error
 ```
 
 
