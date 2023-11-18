@@ -10,10 +10,10 @@ require (
 	gitlab.mpi-sws.org/cld/tracing/tracing-framework-go v0.0.0-20211206181151-6edc754a9f2a
 	go.mongodb.org/mongo-driver v1.12.1
 	go.opentelemetry.io/otel/exporters/jaeger v1.17.0
-	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.19.0
-	go.opentelemetry.io/otel/exporters/zipkin v1.19.0
-	go.opentelemetry.io/otel/sdk v1.19.0
-	go.opentelemetry.io/otel/trace v1.19.0
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.20.0
+	go.opentelemetry.io/otel/exporters/zipkin v1.20.0
+	go.opentelemetry.io/otel/sdk v1.20.0
+	go.opentelemetry.io/otel/trace v1.20.0
 	golang.org/x/exp v0.0.0-20230728194245-b0cb94b80691
 )
 
