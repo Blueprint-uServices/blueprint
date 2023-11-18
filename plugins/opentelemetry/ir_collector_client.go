@@ -69,7 +69,7 @@ func (node *OpenTelemetryCollectorClient) init(name string) error {
 	return nil
 }
 
-func (node *OpenTelemetryCollectorClient) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *OpenTelemetryCollectorClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.ClientName) {
 		return nil

@@ -73,7 +73,7 @@ func (node *CircuitBreakerClient) GenerateFuncs(builder golang.ModuleBuilder) er
 	return generateClient(builder, iface, node.outputPackage, node.Min_Reqs, node.FailureRate, node.Interval)
 }
 
-func (node *CircuitBreakerClient) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *CircuitBreakerClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.InstanceName) {
 		return nil
 	}

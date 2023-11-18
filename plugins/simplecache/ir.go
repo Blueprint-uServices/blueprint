@@ -74,7 +74,7 @@ func (node *SimpleCache) AddInterfaces(builder golang.ModuleBuilder) error {
 	return node.AddToWorkspace(builder.Workspace())
 }
 
-func (node *SimpleCache) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *SimpleCache) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil

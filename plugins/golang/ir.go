@@ -68,7 +68,7 @@ type (
 	   level.  In constract a Golang GRPC client is a service and is instantiable because it does expose methods
 	   that can be directly invoked.
 
-	   The GraphBuilder struct provides functionality for plugins to declare:
+	   The NamespaceBuilder struct provides functionality for plugins to declare:
 
 	   	(a) how to instantiate instances of things
 	   	(b) relevant types and method signatures for use by other plugins
@@ -78,7 +78,7 @@ type (
 		   AddInstantion will be invoked during compilation to enable an IRNode to add its instantiation code
 		   to a generated golang file.
 		*/
-		AddInstantiation(GraphBuilder) error
+		AddInstantiation(NamespaceBuilder) error
 	}
 
 	/*
@@ -252,15 +252,15 @@ type (
 		Workspace() WorkspaceBuilder
 	}
 
-	GraphInfo struct {
+	NamespaceInfo struct {
 		Package  PackageInfo
 		FileName string // Name of the file within the pacakge
 		FilePath string // Fully-qualified path to the file on the filesystem
-		FuncName string // Name of the function that builds the graph
+		FuncName string // Name of the function that builds the namespace
 	}
 
 	/*
-	   GraphBuilder is used by IRNodes that implement the Instantiable interface.  The GraphBuilder provides
+	   NamespaceBuilder is used by IRNodes that implement the Instantiable interface.  The NamespaceBuilder provides
 	   the following methods that can be used by plugins to provide instantiation code:
 
 	     - `Import` declares that a particular package should be imported, as it will be used by the
@@ -275,15 +275,15 @@ type (
 	   The basic requirement of an instantiable node is that it can provide a buildFunc definition that
 	   will be invoked at runtime to create the instance.  A buildFunc has method signature:
 
-	   	func(ctr golang.Container) (any, error)
+	   	func(n *golang.Namespace) (any, error)
 
 	   The buildFunc will instantiate and return an instance or an error.  If the node needs to be
-	   able to call other instances, it can acquire the instances through the golang.Container's Get
+	   able to call other instances, it can acquire the instances through the golang.Namespace's Get
 	   method.  For example, the following pseudocode for a tracing wrapper class would get the
 	   underlying handler then return the wrapper class:
 
-	   	func(ctr golang.Container) (any, error) {
-	   		handler, err := ctr.Get("serviceA.handler")
+	   	func(n *golang.Namespace) (any, error) {
+	   		handler, err := n.Get("serviceA.handler")
 	   		if err != nil {
 	   			return nil, err
 	   		}
@@ -300,13 +300,13 @@ type (
 	   be hard-coded, instead they would typically be provided by calling or inspecting the IR
 	   dependencies of this node.
 	*/
-	GraphBuilder interface {
+	NamespaceBuilder interface {
 		ir.BuildContext
 
 		/*
-			Metadata info about the graph being built
+			Metadata info about the namespace being built
 		*/
-		Info() GraphInfo
+		Info() NamespaceInfo
 
 		/*
 			Adds an import statement to the generated file; this is necessary for any types
@@ -335,13 +335,24 @@ type (
 
 		/*
 			This is like Declare, but instead of having to manually construct the source
-			code, the GraphBuilder will automatically create the build func src code,
+			code, the NamespaceBuilder will automatically create the build func src code,
 			invoking the specified constructor and passing the provided nodes as args
 		*/
 		DeclareConstructor(name string, constructor *gocode.Constructor, args []ir.IRNode) error
 
 		/*
-			Gets the ModuleBuilder that contains this GraphBuilder
+			Specify nodes needed by this namespace that exist in a parent namespace
+			and will be passed as runtime arguments
+		*/
+		Require(name, description string)
+
+		/*
+			Specify nodes that should be immediately built when the namespace is instantiated
+		*/
+		Instantiate(name string)
+
+		/*
+			Gets the ModuleBuilder that contains this NamespaceBuilder
 		*/
 		Module() ModuleBuilder
 	}

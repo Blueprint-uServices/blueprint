@@ -74,7 +74,7 @@ func (n *MongoDBGoClient) AddInterfaces(builder golang.ModuleBuilder) error {
 	return n.AddToWorkspace(builder.Workspace())
 }
 
-func (n *MongoDBGoClient) AddInstantiation(builder golang.GraphBuilder) error {
+func (n *MongoDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(n.InstanceName) {
 		return nil
 	}

@@ -1,7 +1,7 @@
-// Package wiringbuilder doesn't provide any blueprint IR or wiring spec extensions.
+// Package wiringcmd doesn't provide any blueprint IR or wiring spec extensions.
 //
 // It is a helper package for building wiring spec command line programs.
-// The Blueprint example applications use the cmdbuilder
+// The Blueprint example applications use the cmdbuilder in their wiring specs
 package wiringcmd
 
 import (

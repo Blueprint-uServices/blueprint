@@ -62,7 +62,7 @@ func (node *ZipkinCollectorClient) init(name string) error {
 	return nil
 }
 
-func (node *ZipkinCollectorClient) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *ZipkinCollectorClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.ClientName) {
 		return nil

@@ -85,7 +85,7 @@ func (node *GolangThriftClient) GenerateFuncs(builder golang.ModuleBuilder) erro
 	return nil
 }
 
-func (node *GolangThriftClient) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *GolangThriftClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.InstanceName) {
 		return nil
 	}

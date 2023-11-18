@@ -63,7 +63,7 @@ func (node *XTraceClient) init(name string) error {
 	return nil
 }
 
-func (node *XTraceClient) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *XTraceClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.ClientName) {
 		return nil
 	}

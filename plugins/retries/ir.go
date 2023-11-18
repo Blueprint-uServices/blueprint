@@ -69,7 +69,7 @@ func (node *RetrierClient) GenerateFuncs(builder golang.ModuleBuilder) error {
 	return generateClient(builder, iface, node.outputPackage, node.Max)
 }
 
-func (node *RetrierClient) AddInstantiation(builder golang.GraphBuilder) error {
+func (node *RetrierClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.InstanceName) {
 		return nil
 	}
