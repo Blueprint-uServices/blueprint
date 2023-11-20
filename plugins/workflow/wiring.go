@@ -105,6 +105,23 @@ func Define(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs
 	return serviceName
 }
 
+// Auto-generates tests for serviceName by converting the service's unit
+// tests into tests that run using a client of serviceName.
+//
+// This will include a separate 'tests' package in Blueprint's output.
+// The tests will be runnable in the usual `go test` way, though any
+// required arguments such as IP addresses of services must be passed.
+//
+// The plugin will only work for tests that meet the following criteria:
+//   - tests are written using go's standard testing library
+//   - tests are defined in a separate module from the workflow spec
+//     (required to prevent circular module dependencies)
+//   - tests do not instantiate serviceName instances directly, but
+//     instead make use of the runtime ServiceRegistry struct
+func Test(spec wiring.WiringSpec, serviceName string) {
+
+}
+
 /*
 TODOs:
 
