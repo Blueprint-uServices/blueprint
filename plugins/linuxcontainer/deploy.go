@@ -101,7 +101,7 @@ func (node *Container) generateArtifacts(workspace linux.ProcessWorkspace) error
 	}
 
 	// TODO: it's possible some metadata / address nodes are residing in this namespace.  They don't
-	// get passed in as args, but need to be added to the graph nonetheless
+	// get passed in as args, but need to be added to the namespace nonetheless
 	return workspace.Finish()
 }
 

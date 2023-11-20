@@ -18,7 +18,7 @@ The `GenerateArtifacts` method generates the main method based on the process's 
 Most of the heavy lifting of code generation is done by the following:
 * gogen/workspacebuilder
 * gogen/modulebuilder
-* gogen/graphbuilder
+* gogen/namespacebuilder
 
 */
 

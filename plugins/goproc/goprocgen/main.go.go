@@ -13,24 +13,24 @@ import (
 
 /*
 Generates a main.go file in the provided module.  The main method will
-call the graphConstructor provided to create and instantiate nodes.
+call the namespaceConstructor provided to create and instantiate nodes.
 */
 func GenerateMain(
 	name string,
 	argNodes []ir.IRNode,
 	nodesToInstantiate []ir.IRNode,
 	module golang.ModuleBuilder,
-	graphPackage string,
-	graphConstructor string) error {
+	namespacePackage string,
+	namespaceConstructor string) error {
 
 	// Generate the main.go
 	mainArgs := mainTemplateArgs{
-		Name:             name,
-		GraphPackage:     graphPackage,
-		GraphConstructor: graphConstructor,
-		Args:             nil,
-		Config:           make(map[string]string),
-		Instantiate:      nil,
+		Name:                 name,
+		NamespacePackage:     namespacePackage,
+		NamespaceConstructor: namespaceConstructor,
+		Args:                 nil,
+		Config:               make(map[string]string),
+		Instantiate:          nil,
 	}
 
 	// Expect command-line arguments for all argNodes specified
@@ -67,12 +67,12 @@ type mainArg struct {
 }
 
 type mainTemplateArgs struct {
-	Name             string
-	GraphPackage     string
-	GraphConstructor string
-	Args             []mainArg
-	Config           map[string]string
-	Instantiate      []string
+	Name                 string
+	NamespacePackage     string
+	NamespaceConstructor string
+	Args                 []mainArg
+	Config               map[string]string
+	Instantiate          []string
 }
 
 var mainTemplate = `// {{.Name}} runs the {{.Name}} Golang process.
@@ -101,14 +101,14 @@ import (
 	"context"
 	"os"
 
-	"{{.GraphPackage}}"
+	"{{.NamespacePackage}}"
 
 	"golang.org/x/exp/slog"
 )
 
 func main() {
 	slog.Info("Running {{.Name}}")
-	n, err := {{.GraphConstructor}}("{{.Name}}").Build(context.Background())
+	n, err := {{.NamespaceConstructor}}("{{.Name}}").Build(context.Background())
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
