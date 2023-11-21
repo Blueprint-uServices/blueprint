@@ -344,7 +344,14 @@ type (
 			Specify nodes needed by this namespace that exist in a parent namespace
 			and will be passed as runtime arguments
 		*/
-		Require(name, description string)
+		RequiredArg(name, description string)
+
+		/*
+			Specify optional arguments to this namespace.  If an optional argument is not
+			present then a runtime error can occur if a node needs to access the missing
+			argument
+		*/
+		OptionalArg(name, description string)
 
 		/*
 			Specify nodes that should be immediately built when the namespace is instantiated

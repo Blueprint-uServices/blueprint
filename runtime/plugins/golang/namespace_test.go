@@ -22,7 +22,7 @@ func TestEmptyNamespace(t *testing.T) {
 
 func TestMissingNode(t *testing.T) {
 	b := golang.NewNamespaceBuilder("TestMissingNode")
-	b.Require("something", "something required")
+	b.Required("something", "something required")
 	_, err := b.Build(context.Background())
 	assert.Error(t, err)
 }
@@ -45,7 +45,7 @@ func TestMissingNodeWithParent(t *testing.T) {
 	assert.NoError(t, err)
 
 	b2 := golang.NewNamespaceBuilder("TestMissingNodeWithParent-Child")
-	b2.Require("something", "something required")
+	b2.Required("something", "something required")
 	_, err = b2.BuildWithParent(n1)
 	assert.Error(t, err)
 }
@@ -57,7 +57,7 @@ func TestParentNode(t *testing.T) {
 	assert.NoError(t, err)
 
 	b2 := golang.NewNamespaceBuilder("TestParentNode-Child")
-	b2.Require("something", "something required")
+	b2.Required("something", "something required")
 	n2, err := b2.BuildWithParent(n1)
 	assert.NoError(t, err)
 
@@ -100,7 +100,7 @@ func TestBuildInParentNamespace(t *testing.T) {
 	assert.NoError(t, err)
 
 	cb := golang.NewNamespaceBuilder("TestBuildInParentNamespace-Child")
-	cb.Require("something", "something required")
+	cb.Required("something", "something required")
 	c, err := cb.BuildWithParent(p)
 	assert.NoError(t, err)
 

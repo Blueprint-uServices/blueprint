@@ -30,7 +30,7 @@ import (
 // node is a runtime instance such as a service, a wrapper class, etc.
 //
 // If node implements the [Runnable] interface then in addition to building the node.
-// a namespace will also invoke [node.Run] in a separate goroutine.
+// a namespace will also invoke [Runnable.Run] in a separate goroutine.
 type BuildFunc func(n *Namespace) (node any, err error)
 
 // If the return value of a [BuildFunc] implements the [Runnable] interface then
@@ -50,7 +50,8 @@ type Runnable interface {
 type NamespaceBuilder struct {
 	name        string
 	buildFuncs  map[string]BuildFunc
-	required    map[string]*requiredNode
+	required    map[string]*argNode
+	optional    map[string]*argNode
 	instantiate map[string]struct{}
 
 	// The first error encountered while defining nodes on the builder.
@@ -69,10 +70,10 @@ type NamespaceBuilder struct {
 // can be created with the [NewNamespaceBuilder] method.
 //
 // The standard usage of a namespace is by a golang process.  Any
-// golang services, wrappers, etc. are created using a NamespaceImpl.
+// golang services, wrappers, etc. are created using a Namespace.
 //
 // Some plugins, such as the ClientPool plugin, also use child Namespaces
-// within the golang process NamespaceImpl.
+// within the golang process Namespace.
 type Namespace struct {
 	name       string
 	buildFuncs map[string]BuildFunc
@@ -85,7 +86,7 @@ type Namespace struct {
 	parent *Namespace
 }
 
-type requiredNode struct {
+type argNode struct {
 	name        string
 	description string
 	flag        *string
@@ -100,7 +101,8 @@ func NewNamespaceBuilder(name string) *NamespaceBuilder {
 	b := &NamespaceBuilder{}
 	b.name = name
 	b.buildFuncs = make(map[string]BuildFunc)
-	b.required = make(map[string]*requiredNode)
+	b.required = make(map[string]*argNode)
+	b.optional = make(map[string]*argNode)
 	b.instantiate = make(map[string]struct{})
 
 	return b
@@ -132,8 +134,20 @@ func (b *NamespaceBuilder) Define(name string, build BuildFunc) {
 //
 // The typical usage of this is to eagerly validate that all command line
 // arguments have been provided.
-func (b *NamespaceBuilder) Require(name string, description string) {
-	b.required[name] = &requiredNode{
+func (b *NamespaceBuilder) Required(name string, description string) {
+	b.required[name] = &argNode{
+		name:        name,
+		description: description,
+	}
+}
+
+// Indicates that name is an optional node.  An error will only be returned
+// if the caller attempts to build the node.
+//
+// The typical usage of this is when using only a single client from a client
+// library
+func (b *NamespaceBuilder) Optional(name string, description string) {
+	b.optional[name] = &argNode{
 		name:        name,
 		description: description,
 	}
@@ -246,6 +260,9 @@ func (b *NamespaceBuilder) parseFlags() {
 	for _, node := range b.required {
 		node.flag = flag.String(node.name, "", node.description)
 	}
+	for _, node := range b.optional {
+		node.flag = flag.String(node.name, "", node.description)
+	}
 	flag.Parse()
 
 	for _, node := range b.required {
@@ -253,6 +270,17 @@ func (b *NamespaceBuilder) parseFlags() {
 			slog.Warn(fmt.Sprintf("Ignoring command line arg for %v\n", node.name))
 		} else if *node.flag != "" {
 			b.Set(node.name, *node.flag)
+		}
+	}
+	for _, node := range b.optional {
+		if _, exists := b.buildFuncs[node.name]; exists {
+			slog.Warn(fmt.Sprintf("Ignoring command line arg for %v\n", node.name))
+		} else if *node.flag != "" {
+			b.Set(node.name, *node.flag)
+		} else {
+			b.Define(node.name, func(n *Namespace) (any, error) {
+				return nil, fmt.Errorf("optional arg %v was not set", node.name)
+			})
 		}
 	}
 }

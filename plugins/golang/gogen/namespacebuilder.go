@@ -40,7 +40,8 @@ type NamespaceBuilderImpl struct {
 	FuncName       string            // The name of the function to generate
 	Imports        *Imports          // Import declarations in the file; map of shortname to full package import name
 	Declarations   map[string]string // The DI declarations
-	Requires       map[string]string
+	Required       map[string]string
+	Optional       map[string]string
 	Instantiations map[string]struct{}
 }
 
@@ -62,7 +63,8 @@ func NewNamespaceBuilder(module golang.ModuleBuilder, name, fileName, packagePat
 		FuncName:       funcName,
 		Imports:        NewImports(pkg.Path),
 		Declarations:   make(map[string]string),
-		Requires:       make(map[string]string),
+		Required:       make(map[string]string),
+		Optional:       make(map[string]string),
 		Instantiations: make(map[string]struct{}),
 	}
 
@@ -100,8 +102,12 @@ func (n *NamespaceBuilderImpl) Module() golang.ModuleBuilder {
 	return n.module
 }
 
-func (n *NamespaceBuilderImpl) Require(name, description string) {
-	n.Requires[name] = description
+func (n *NamespaceBuilderImpl) RequiredArg(name, description string) {
+	n.Required[name] = description
+}
+
+func (n *NamespaceBuilderImpl) OptionalArg(name, description string) {
+	n.Optional[name] = description
 }
 
 func (n *NamespaceBuilderImpl) Instantiate(name string) {
@@ -216,13 +222,23 @@ func {{ .FuncName }}(name string) *golang.NamespaceBuilder {
 //  - passed on the command line (if built using [golang.NamespaceBuilder.Build])
 //  - are defined in parent (if built using [golang.NamespaceBuilder.BuildWithParent])
 //
-// Required arguments:
-{{- range $defName, $description := .Requires }}
+// The following arguments will be eagerly checked and building the namespace
+// will fail if they haven't been provided:
+{{- range $defName, $description := .Required }}
+//   {{$defName}}
+{{- end }}
+//
+// The following arguments are optional and a failure will only occur if the client
+// tries to build a node that needs the argument to be set
+{{- range $defName, $description := .Optional }}
 //   {{$defName}}
 {{- end }}
 func set_{{.Name}}_Args(b *golang.NamespaceBuilder) {
-	{{- range $defName, $description := .Requires }}
-	b.Require("{{$defName}}", "{{$description}}")
+	{{- range $defName, $description := .Required }}
+	b.Required("{{$defName}}", "{{$description}}")
+	{{- end }}
+	{{- range $defName, $description := .Required }}
+	b.Optional("{{$defName}}", "{{$description}}")
 	{{- end }}
 }
 

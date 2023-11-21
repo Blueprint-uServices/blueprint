@@ -1,9 +1,6 @@
 package goproc
 
 import (
-	"strings"
-
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 )
 
@@ -52,22 +49,7 @@ func (node *Process) Name() string {
 }
 
 func (node *Process) String() string {
-	var b strings.Builder
-	b.WriteString(node.InstanceName)
-	b.WriteString(" = GolangProcessNode(")
-	var args []string
-	for _, arg := range node.ArgNodes {
-		args = append(args, arg.Name())
-	}
-	b.WriteString(strings.Join(args, ", "))
-	b.WriteString(") {\n")
-	var children []string
-	for _, child := range node.ContainedNodes {
-		children = append(children, child.String())
-	}
-	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
-	b.WriteString("\n}")
-	return b.String()
+	return ir.PrettyPrintNamespace(node.InstanceName, "GolangProcessNode", node.ArgNodes, node.ContainedNodes)
 }
 
 func (node *Process) AddArg(argnode ir.IRNode) {

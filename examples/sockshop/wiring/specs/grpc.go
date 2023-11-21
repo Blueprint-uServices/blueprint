@@ -5,6 +5,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/gotests"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplenosqldb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
@@ -25,7 +26,9 @@ func makeGrpcSpec(spec wiring.WiringSpec) ([]string, error) {
 	user_service := workflow.Define(spec, "user_service", "UserService", user_db)
 	user_service_proc := applyGrpcDefaults(spec, user_service)
 
-	return []string{user_service_proc}, nil
+	tests := gotests.Test(spec, "user_service")
+
+	return []string{user_service_proc, tests}, nil
 }
 
 func applyGrpcDefaults(spec wiring.WiringSpec, serviceName string) string {

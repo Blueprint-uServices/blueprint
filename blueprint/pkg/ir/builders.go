@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/ioutil"
 	"golang.org/x/exp/slog"
 )
 
@@ -115,7 +116,26 @@ func (b *nodeBuilder) buildCompatibleNodes(outputDir string, nodes []IRNode) ([]
 	return remaining, nil
 }
 
-func (r *registry) buildAll(outputDir string, nodes []IRNode) error {
+func buildArtifactGeneratorNodes(outputdir string, nodes []IRNode) ([]IRNode, error) {
+	remaining := make([]IRNode, 0, len(nodes))
+	for _, node := range nodes {
+		if gen, isGen := node.(ArtifactGenerator); isGen {
+			subdir, err := ioutil.CreateNodeDir(outputdir, node.Name())
+			if err != nil {
+				return nil, err
+			}
+
+			if err := gen.GenerateArtifacts(subdir); err != nil {
+				return nil, err
+			}
+		} else {
+			remaining = append(remaining, node)
+		}
+	}
+	return remaining, nil
+}
+
+func (r *registry) buildAll(outputDir string, nodes []IRNode) (err error) {
 	// Create output directory
 	if info, err := os.Stat(outputDir); err == nil && info.IsDir() {
 		return blueprint.Errorf("output directory %v already exists", outputDir)
@@ -130,7 +150,6 @@ func (r *registry) buildAll(outputDir string, nodes []IRNode) error {
 
 	// Build namespaces first
 	for _, builder := range r.namespace {
-		var err error
 		nodes, err = builder.buildCompatibleNodes(outputDir, nodes)
 		if err != nil {
 			return err
@@ -139,11 +158,16 @@ func (r *registry) buildAll(outputDir string, nodes []IRNode) error {
 
 	// Build individual nodes
 	for _, builder := range r.node {
-		var err error
 		nodes, err = builder.buildCompatibleNodes(outputDir, nodes)
 		if err != nil {
 			return err
 		}
+	}
+
+	// For anything left, if it's an artifact generator node, just generate artifacts to a subdir
+	nodes, err = buildArtifactGeneratorNodes(outputDir, nodes)
+	if err != nil {
+		return err
 	}
 
 	if len(nodes) > 0 {
