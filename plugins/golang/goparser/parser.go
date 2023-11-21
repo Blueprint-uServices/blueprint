@@ -66,6 +66,7 @@ type (
 		Structs       map[string]*ParsedStruct    // Structs parsed from this package
 		Interfaces    map[string]*ParsedInterface // Interfaces parsed from this package
 		Funcs         map[string]*ParsedFunc      // Functions parsed from this package (does not include funcs with receiver types)
+		Vars          map[string]*ParsedVar       // Vars declared in this package; we save their AST but don't process them
 	}
 
 	ParsedFile struct {
@@ -100,6 +101,12 @@ type (
 		gocode.Func
 		File *ParsedFile
 		Ast  *ast.FuncType
+	}
+
+	// Currently we save var statements but don't do anything with them
+	ParsedVar struct {
+		File *ParsedFile
+		Ast  *ast.ValueSpec
 	}
 
 	ParsedImport struct {
@@ -242,6 +249,7 @@ func (mod *ParsedModule) Load() error {
 			p.Interfaces = make(map[string]*ParsedInterface)
 			p.Structs = make(map[string]*ParsedStruct)
 			p.Funcs = make(map[string]*ParsedFunc)
+			p.Vars = make(map[string]*ParsedVar)
 
 			if existing, exists := mod.Packages[p.Name]; exists {
 				return blueprint.Errorf("duplicate definition of package %v at %v and %v", p.Name, path, existing.SrcDir)
@@ -294,6 +302,10 @@ func (pkg *ParsedPackage) Load() error {
 	// definitions can be in different files to receiver types
 	for _, f := range pkg.Files {
 		err := f.LoadFuncs()
+		if err != nil {
+			return err
+		}
+		err = f.LoadVars()
 		if err != nil {
 			return err
 		}
@@ -592,6 +604,34 @@ func (f *ParsedFile) LoadStructsAndInterfaces() error {
 						}
 					}
 				}
+			}
+		}
+	}
+	return nil
+}
+
+/*
+Looks for:
+  - vars declared
+*/
+func (f *ParsedFile) LoadVars() error {
+	for _, decl := range f.Ast.Decls {
+		// We are only looking for VAR declarations.
+		d, is_gendecl := decl.(*ast.GenDecl)
+		if !is_gendecl || d.Tok != token.VAR {
+			continue
+		}
+
+		for _, spec := range d.Specs {
+			valspec, ok := spec.(*ast.ValueSpec)
+			if !ok {
+				return blueprint.Errorf("parsing error, expected valuespec in decls of %v", f.Name)
+			}
+
+			// Save the AST of the var for later use
+			f.Package.Vars[valspec.Names[0].Name] = &ParsedVar{
+				File: f,
+				Ast:  valspec,
 			}
 		}
 	}
