@@ -43,15 +43,13 @@ func Test(spec wiring.WiringSpec, serviceName string) string {
 		testLib.Info("converting unit tests for %v services (%s)", len(serviceNames), strings.Join(serviceNames, ", "))
 
 		// Instantiate service clients.  If the child node hasn't actually been defined, then this will error out
-		var servicesToTest []ir.IRNode
 		for _, serviceName := range serviceNames {
 			var client ir.IRNode
 			if err := testLib.Get(serviceName, &client); err != nil {
 				return nil, err
 			}
-			servicesToTest = append(servicesToTest, client)
+			testLib.handler.IRNode.ServicesToTest[serviceName] = client
 		}
-		testLib.handler.IRNode.ServicesToTest = servicesToTest
 
 		// Instantiate and return the service
 		return testLib.handler.IRNode, nil

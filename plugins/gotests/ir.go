@@ -2,10 +2,13 @@ package gotests
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/gotests/codegen"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 	"golang.org/x/exp/slog"
 )
 
@@ -16,13 +19,14 @@ type TestLibrary struct {
 	ModuleName     string
 	ArgNodes       []ir.IRNode
 	ContainedNodes []ir.IRNode
-	ServicesToTest []ir.IRNode
+	ServicesToTest map[string]ir.IRNode
 }
 
 func newTestLibrary(name string) *TestLibrary {
 	node := TestLibrary{}
 	node.LibraryName = name
 	node.ModuleName = "blueprint/testclients"
+	node.ServicesToTest = make(map[string]ir.IRNode)
 	return &node
 }
 
@@ -84,9 +88,9 @@ func (lib *TestLibrary) GenerateArtifacts(workspaceDir string) error {
 
 	// Create the method to instantiate the namespace
 	namespaceFileName := "clients.go"
-	procPackage := "goproc"
-	constructorName := "NewClientLibraryForTests"
-	namespaceBuilder, err := gogen.NewNamespaceBuilder(module, "gotests", namespaceFileName, procPackage, constructorName)
+	procPackage := "clients"
+	constructorName := "NewClientLibrary"
+	namespaceBuilder, err := gogen.NewNamespaceBuilder(module, "clients", namespaceFileName, procPackage, constructorName)
 	if err != nil {
 		return err
 	}
@@ -113,19 +117,52 @@ func (lib *TestLibrary) GenerateArtifacts(workspaceDir string) error {
 		return err
 	}
 
-	for _, node := range lib.ServicesToTest {
+	// Modify the tests
+
+	// Find all registry.ServiceRegistry variables declared in the workflow spec code
+	r, err := FindWorkflowServiceRegistries()
+	if err != nil {
+		return err
+	}
+
+	// Find the ones that match the services we want to test and generate additional test initialization code
+	for name, node := range lib.ServicesToTest {
+		// Find the interface type
 		iface, err := golang.GetGoInterface(module, node)
 		if err != nil {
 			return err
 		}
-		fmt.Printf("got iface for %v: \n%v\n", node.Name(), iface)
-	}
 
-	// TODO: update the tests
-	//  * copy the test lib to the output
-	//  * for the services under test, get their interface
-	//  * parse code to find registry for these service types
-	//  * add file to package containing the specific test
+		// Find registries of that type
+		registries := r.Get(&iface.UserType)
+		if len(registries) == 0 {
+			slog.Warn(fmt.Sprintf("Cannot test %v due to no instances found of registry.ServiceRegistry[%v]", name, iface.UserType))
+		} else {
+			for _, reg := range registries {
+				slog.Info(fmt.Sprintf("Test registry %v for %v (%v) found in %v", reg.VarName, name, reg.RegistryOf, reg.Var.File.Name))
+
+				// Include the registry's source module in the output
+				moduleDir, err := workflow.CopyModuleToOutputWorkspace(workspace, reg.Var.File.Package.Module)
+				if err != nil {
+					return err
+				}
+
+				// Generate the init function, which will create and add the service client to the tests
+				packageDir := filepath.Join(moduleDir, reg.Var.File.PathInModule)
+				packageName := reg.Var.File.Package.Name
+				packageShortName := reg.Var.File.Package.ShortName
+				registryVar := reg.VarName
+				clientName := name
+				nodeToInstantiate := node.Name()
+				clientType := reg.RegistryOf
+
+				err = codegen.AddClientToTests(packageDir, packageName, packageShortName, registryVar, clientName, nodeToInstantiate, clientType)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
 
 	// Complete workspace generation
 	return workspace.Finish()

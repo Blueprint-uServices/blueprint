@@ -73,6 +73,7 @@ type (
 		Package          *ParsedPackage
 		Name             string                   // Filename
 		Path             string                   // Fully qualified path to the file
+		PathInModule     string                   // Path within the module to the file
 		AnonymousImports []*ParsedImport          // Import declarations that were imported with .
 		NamedImports     map[string]*ParsedImport // Import declarations - map from shortname to fully qualified package import name
 		Ast              *ast.File                // The AST of the file
@@ -106,6 +107,7 @@ type (
 	// Currently we save var statements but don't do anything with them
 	ParsedVar struct {
 		File *ParsedFile
+		Name string
 		Ast  *ast.ValueSpec
 	}
 
@@ -244,7 +246,11 @@ func (mod *ParsedModule) Load() error {
 				return blueprint.Errorf("%s should exist within %s but got %s", path, mod.SrcDir, err.Error())
 			}
 			p.Files = make(map[string]*ParsedFile)
-			p.Name = mod.Name + "/" + filepath.ToSlash(p.PackageDir)
+			if p.PackageDir == "." {
+				p.Name = mod.Name
+			} else {
+				p.Name = mod.Name + "/" + filepath.ToSlash(p.PackageDir)
+			}
 			p.DeclaredTypes = make(map[string]gocode.UserType)
 			p.Interfaces = make(map[string]*ParsedInterface)
 			p.Structs = make(map[string]*ParsedStruct)
@@ -268,6 +274,8 @@ func (mod *ParsedModule) Load() error {
 }
 
 func (pkg *ParsedPackage) Load() error {
+	moduleDir := pkg.Module.SrcDir
+
 	// Create files
 	for filename, ast := range pkg.Ast.Files {
 		f := &ParsedFile{}
@@ -277,6 +285,11 @@ func (pkg *ParsedPackage) Load() error {
 		f.NamedImports = make(map[string]*ParsedImport)
 		f.Package = pkg
 		f.Path = filepath.Join(pkg.SrcDir)
+		var err error
+		f.PathInModule, err = filepath.Rel(moduleDir, f.Path)
+		if err != nil {
+			return err
+		}
 
 		pkg.Files[filename] = f
 	}
@@ -472,6 +485,8 @@ func (f *ParsedFile) ResolveType(expr ast.Expr, typeParams ...string) gocode.Typ
 		return &gocode.StructType{}
 	case *ast.IndexExpr:
 		return &gocode.GenericType{BaseType: f.ResolveType(e.X, typeParams...)}
+	case *ast.IndexListExpr:
+		return &gocode.GenericType{BaseType: f.ResolveType(e.X, typeParams...)}
 	default:
 		fmt.Printf("unknown or invalid expr type %v %v\n", reflect.TypeOf(expr), expr)
 	}
@@ -631,6 +646,7 @@ func (f *ParsedFile) LoadVars() error {
 			// Save the AST of the var for later use
 			f.Package.Vars[valspec.Names[0].Name] = &ParsedVar{
 				File: f,
+				Name: valspec.Names[0].Name,
 				Ast:  valspec,
 			}
 		}

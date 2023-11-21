@@ -237,7 +237,7 @@ func set_{{.Name}}_Args(b *golang.NamespaceBuilder) {
 	{{- range $defName, $description := .Required }}
 	b.Required("{{$defName}}", "{{$description}}")
 	{{- end }}
-	{{- range $defName, $description := .Required }}
+	{{- range $defName, $description := .Optional }}
 	b.Optional("{{$defName}}", "{{$description}}")
 	{{- end }}
 }

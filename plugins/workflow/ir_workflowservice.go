@@ -85,27 +85,30 @@ the interfaces, but in case it doesn't, it will add the correct module
 */
 func (node *WorkflowService) AddToWorkspace(builder golang.WorkspaceBuilder) error {
 	// Add blueprint runtime to the workspace
-	err := golang.AddRuntimeModule(builder)
-	if err != nil {
+	if err := golang.AddRuntimeModule(builder); err != nil {
 		return err
 	}
 
-	modulesToAdd := []*goparser.ParsedModule{
-		node.ServiceInfo.Iface.File.Package.Module,
-		node.ServiceInfo.Constructor.File.Package.Module,
+	// Add interface module to workspace
+	if _, err := CopyModuleToOutputWorkspace(builder, node.ServiceInfo.Iface.File.Package.Module); err != nil {
+		return err
 	}
 
-	for _, mod := range modulesToAdd {
-		if !builder.Visited(mod.Name) {
-			_, subdir := filepath.Split(mod.SrcDir)
-			slog.Info(fmt.Sprintf("Copying local module %v to workspace", subdir))
-			err := builder.AddLocalModule(subdir, mod.SrcDir)
-			if err != nil {
-				return err
-			}
-		}
+	// Add constructor module to workspace
+	if _, err := CopyModuleToOutputWorkspace(builder, node.ServiceInfo.Constructor.File.Package.Module); err != nil {
+		return err
 	}
+
 	return nil
+}
+
+func CopyModuleToOutputWorkspace(b golang.WorkspaceBuilder, mod *goparser.ParsedModule) (string, error) {
+	if b.Visited(mod.Name) {
+		return "", nil
+	}
+	_, subdir := filepath.Split(mod.SrcDir)
+	slog.Info(fmt.Sprintf("Copying local module %v to workspace", subdir))
+	return b.AddLocalModule(subdir, mod.SrcDir)
 }
 
 func (node *WorkflowService) AddInstantiation(builder golang.NamespaceBuilder) error {
