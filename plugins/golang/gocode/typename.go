@@ -184,7 +184,14 @@ type (
 	*/
 	GenericType struct {
 		TypeName
-		BaseType TypeName
+		BaseType  TypeName
+		TypeParam TypeName
+	}
+
+	// The type parameter of a generic struct or func
+	GenericTypeParam struct {
+		TypeName
+		ParamName string
 	}
 )
 
@@ -245,16 +252,26 @@ func (t *StructType) String() string {
 	return "struct{...}"
 }
 
-func (t *BasicType) IsTypeName()     {}
-func (t *UserType) IsTypeName()      {}
-func (t *Slice) IsTypeName()         {}
-func (t *Ellipsis) IsTypeName()      {}
-func (t *Pointer) IsTypeName()       {}
-func (t *Map) IsTypeName()           {}
-func (t *Chan) IsTypeName()          {}
-func (t *ReceiveChan) IsTypeName()   {}
-func (t *SendChan) IsTypeName()      {}
-func (t *AnyType) IsTypeName()       {}
-func (t *InterfaceType) IsTypeName() {}
-func (t *FuncType) IsTypeName()      {}
-func (t *StructType) IsTypeName()    {}
+func (t *GenericType) String() string {
+	return fmt.Sprintf("%v[%v]", t.BaseType, t.TypeParam)
+}
+
+func (t *GenericTypeParam) String() string {
+	return t.ParamName
+}
+
+func (t *BasicType) IsTypeName()        {}
+func (t *UserType) IsTypeName()         {}
+func (t *Slice) IsTypeName()            {}
+func (t *Ellipsis) IsTypeName()         {}
+func (t *Pointer) IsTypeName()          {}
+func (t *Map) IsTypeName()              {}
+func (t *Chan) IsTypeName()             {}
+func (t *ReceiveChan) IsTypeName()      {}
+func (t *SendChan) IsTypeName()         {}
+func (t *AnyType) IsTypeName()          {}
+func (t *InterfaceType) IsTypeName()    {}
+func (t *FuncType) IsTypeName()         {}
+func (t *StructType) IsTypeName()       {}
+func (t *GenericType) IsTypeName()      {}
+func (t *GenericTypeParam) IsTypeName() {}

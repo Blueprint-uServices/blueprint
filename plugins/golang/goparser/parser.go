@@ -13,6 +13,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"golang.org/x/exp/slices"
 	"golang.org/x/mod/modfile"
 )
 
@@ -85,6 +86,7 @@ type (
 		Fields          map[string]*ParsedField // Named fields declared in this struct only, does not include promoted fields (not implemented yet)
 		PromotedField   *ParsedField            // If there is a promoted field, stored here
 		AnonymousFields []*ParsedField          // Subsequent anonymous fields
+		TypeParams      []string                // Names of generic type parameters
 	}
 
 	ParsedInterface struct {
@@ -335,7 +337,7 @@ func (pkg *ParsedPackage) Parse() error {
 }
 
 func (f *ParsedField) Parse() error {
-	f.Type = f.Struct.File.ResolveType(f.Ast.Type)
+	f.Type = f.Struct.File.ResolveType(f.Ast.Type, f.Struct.TypeParams...)
 	if f.Type == nil {
 		return blueprint.Errorf("unable to resolve the type of %v field %v", f.Struct.Name, f)
 	}
@@ -378,8 +380,9 @@ An ident can be:
   - any
   - a type declared locally within the file or package
   - a type imported with an `import . "package"` decl
+  - a generic type from a struct or func's type params
 */
-func (f *ParsedFile) ResolveIdent(name string) gocode.TypeName {
+func (f *ParsedFile) ResolveIdent(name string, typeParams ...string) gocode.TypeName {
 	if gocode.IsBasicType(name) {
 		return &gocode.BasicType{Name: name}
 	}
@@ -391,6 +394,10 @@ func (f *ParsedFile) ResolveIdent(name string) gocode.TypeName {
 	local, isLocalType := f.Package.DeclaredTypes[name]
 	if isLocalType {
 		return &local
+	}
+
+	if slices.Contains(typeParams, name) {
+		return &gocode.GenericTypeParam{ParamName: name}
 	}
 
 	if len(f.AnonymousImports) == 1 {
@@ -413,14 +420,16 @@ func (f *ParsedFile) ResolveSelector(packageShortName string, name string) gocod
 	return &gocode.UserType{Package: pkg.Package, Name: name}
 }
 
-func (f *ParsedFile) ResolveType(expr ast.Expr) gocode.TypeName {
+// If the expr is in the context of a generic struct or func,
+// typeParams provides the additional named type params
+func (f *ParsedFile) ResolveType(expr ast.Expr, typeParams ...string) gocode.TypeName {
 	switch e := expr.(type) {
 	case *ast.Ident:
-		return f.ResolveIdent(e.Name)
+		return f.ResolveIdent(e.Name, typeParams...)
 	case *ast.ArrayType:
-		return &gocode.Slice{SliceOf: f.ResolveType(e.Elt)}
+		return &gocode.Slice{SliceOf: f.ResolveType(e.Elt, typeParams...)}
 	case *ast.MapType:
-		return &gocode.Map{KeyType: f.ResolveType(e.Key), ValueType: f.ResolveType(e.Value)}
+		return &gocode.Map{KeyType: f.ResolveType(e.Key, typeParams...), ValueType: f.ResolveType(e.Value, typeParams...)}
 	case *ast.InterfaceType:
 		return &gocode.InterfaceType{}
 	case *ast.SelectorExpr:
@@ -433,25 +442,24 @@ func (f *ParsedFile) ResolveType(expr ast.Expr) gocode.TypeName {
 			return f.ResolveSelector(x.Name, e.Sel.Name)
 		}
 	case *ast.StarExpr:
-		// TODO: here indexexpr should be supported to handle templated types
-		return &gocode.Pointer{PointerTo: f.ResolveType(e.X)}
+		return &gocode.Pointer{PointerTo: f.ResolveType(e.X, typeParams...)}
 	case *ast.Ellipsis:
-		return &gocode.Ellipsis{EllipsisOf: f.ResolveType(e.Elt)}
+		return &gocode.Ellipsis{EllipsisOf: f.ResolveType(e.Elt, typeParams...)}
 	case *ast.ChanType:
 		switch e.Dir {
 		case ast.SEND:
-			return &gocode.SendChan{SendType: f.ResolveType(e.Value)}
+			return &gocode.SendChan{SendType: f.ResolveType(e.Value, typeParams...)}
 		case ast.RECV:
-			return &gocode.ReceiveChan{ReceiveType: f.ResolveType(e.Value)}
+			return &gocode.ReceiveChan{ReceiveType: f.ResolveType(e.Value, typeParams...)}
 		default:
-			return &gocode.Chan{ChanOf: f.ResolveType(e.Value)}
+			return &gocode.Chan{ChanOf: f.ResolveType(e.Value, typeParams...)}
 		}
 	case *ast.FuncType:
 		return &gocode.FuncType{}
 	case *ast.StructType:
 		return &gocode.StructType{}
 	case *ast.IndexExpr:
-		return &gocode.GenericType{BaseType: f.ResolveType(e.X)}
+		return &gocode.GenericType{BaseType: f.ResolveType(e.X, typeParams...)}
 	default:
 		fmt.Printf("unknown or invalid expr type %v %v\n", reflect.TypeOf(expr), expr)
 	}
@@ -510,6 +518,17 @@ func (f *ParsedFile) LoadStructsAndInterfaces() error {
 				return blueprint.Errorf("parsing error, expected typespec in decls of %v", f.Name)
 			}
 
+			var typeParams []string
+			if typespec.TypeParams != nil {
+				for _, field := range typespec.TypeParams.List {
+					if field.Names != nil {
+						for _, name := range field.Names {
+							typeParams = append(typeParams, name.Name)
+						}
+					}
+				}
+			}
+
 			// Save all types that are declared in the file
 			u := gocode.UserType{Package: f.Package.Name, Name: typespec.Name.Name}
 			f.Package.DeclaredTypes[u.Name] = u
@@ -551,6 +570,8 @@ func (f *ParsedFile) LoadStructsAndInterfaces() error {
 					struc.Fields = make(map[string]*ParsedField)
 					struc.PromotedField = nil
 					struc.AnonymousFields = nil
+					struc.TypeParams = typeParams
+
 					f.Package.Structs[struc.Name] = struc
 
 					if t.Fields != nil {
@@ -604,6 +625,8 @@ func (f *ParsedFile) LoadFuncs() error {
 			f.Package.Funcs[fun.Name] = fun
 			continue
 		}
+
+		// This doesn't work with generic types
 
 		// Pull out the name of the receiver struct
 		var receiverName string
