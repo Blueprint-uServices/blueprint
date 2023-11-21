@@ -13,24 +13,14 @@ Registers a linux process workspace as the default way of combining and building
 // to trigger module initialization and register builders
 func RegisterAsDefaultBuilder() {
 	ir.RegisterDefaultNamespace[linux.Process]("linuxcontainer", buildDefaultLinuxWorkspace)
-	ir.RegisterDefaultBuilder[*Container]("linuxcontainer", buildDefaultLinuxContainer)
 }
 
 func buildDefaultLinuxWorkspace(outputDir string, nodes []ir.IRNode) error {
-	ctr := newLinuxContainerNode("default")
+	ctr := newLinuxContainerNode("linuxprocesses")
 	ctr.ContainedNodes = nodes
-	return ctr.GenerateArtifacts(outputDir)
-}
-
-func buildDefaultLinuxContainer(outputDir string, node ir.IRNode) error {
-	if ctr, isContainer := node.(*Container); isContainer {
-		ctrDir, err := ioutil.CreateNodeDir(outputDir, node.Name())
-		if err != nil {
-			return err
-		}
-		if err := ctr.GenerateArtifacts(ctrDir); err != nil {
-			return err
-		}
+	ctrDir, err := ioutil.CreateNodeDir(outputDir, "linuxprocesses")
+	if err != nil {
+		return err
 	}
-	return nil
+	return ctr.GenerateArtifacts(ctrDir)
 }
