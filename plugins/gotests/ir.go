@@ -126,6 +126,12 @@ func (lib *TestLibrary) GenerateArtifacts(workspaceDir string) error {
 	}
 
 	// Find the ones that match the services we want to test and generate additional test initialization code
+	builders := make(map[string]*codegen.ClientBuilder)
+
+	namespacePackage := namespaceBuilder.Package.PackageName
+	namespaceConstructor := namespaceBuilder.Package.ShortName + "." + constructorName
+	namespaceName := "tests"
+
 	for name, node := range lib.ServicesToTest {
 		// Find the interface type
 		iface, err := golang.GetGoInterface(module, node)
@@ -137,33 +143,37 @@ func (lib *TestLibrary) GenerateArtifacts(workspaceDir string) error {
 		registries := r.Get(&iface.UserType)
 		if len(registries) == 0 {
 			slog.Warn(fmt.Sprintf("Cannot test %v due to no instances found of registry.ServiceRegistry[%v]", name, iface.UserType.String()))
-		} else {
-			for _, reg := range registries {
-				slog.Info(fmt.Sprintf("Test registry %v for %v (%v) found in %v", reg.VarName, name, reg.RegistryOf, reg.Var.File.Name))
+			continue
+		}
 
-				// Include the registry's source module in the output
-				moduleDir, err := workflow.CopyModuleToOutputWorkspace(workspace, reg.Var.File.Package.Module)
+		// Group registries by package, because we will generate one file per package that has tests
+		for _, reg := range registries {
+			slog.Info(fmt.Sprintf("Test registry %v for %v (%v) found in %v", reg.VarName, name, reg.RegistryOf, reg.Var.File.Name))
+
+			pkg := reg.Var.File.Package
+
+			if _, exists := builders[pkg.Name]; !exists {
+				// The first time we see a package, create a builder
+				moduleDir, err := workflow.CopyModuleToOutputWorkspace(workspace, pkg.Module)
 				if err != nil {
 					return err
 				}
 
-				// Generate the init function, which will create and add the service client to the tests
+				// One client builder gets created per package with tests
 				packageDir := filepath.Join(moduleDir, reg.Var.File.PathInModule)
-				packageName := reg.Var.File.Package.Name
-				packageShortName := reg.Var.File.Package.ShortName
-				registryVar := reg.VarName
-				clientName := name
-				nodeToInstantiate := node.Name()
-				clientType := reg.RegistryOf
-
-				namespacePackage := namespaceBuilder.Package.PackageName
-				namespaceConstructor := namespaceBuilder.Package.ShortName + "." + constructorName
-
-				err = codegen.AddClientToTests(packageDir, packageName, packageShortName, namespacePackage, namespaceConstructor, registryVar, clientName, nodeToInstantiate, clientType)
-				if err != nil {
-					return err
-				}
+				builders[pkg.Name] = codegen.NewClientBuilder(pkg.Name, pkg.ShortName, namespaceConstructor, namespacePackage, namespaceName, packageDir)
 			}
+
+			// Add the client to the builder
+			builders[pkg.Name].AddClient(reg.VarName, name, node.Name(), reg.RegistryOf)
+		}
+	}
+
+	// Do the codegen
+	for _, b := range builders {
+		err = b.Build()
+		if err != nil {
+			return err
 		}
 	}
 

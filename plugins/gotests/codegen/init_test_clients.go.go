@@ -9,41 +9,52 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-// packageDir is a fully qualified output directory containing the test code and registry variable.
-// packageName is the fully qualified name of the output package
-// registryVar is the variable name within the package that is a ServiceRegistry
-// clientName is the name of the client to register in the registry
-// nodeToInstantiate is the node to instantiate when the client gets created
-// clientType is the type of the client and the type parameter of the ServiceRegistry
-func AddClientToTests(packageDir, packageName, packageShortName, namespacePackage, namespaceConstructor, registryVar, clientName, nodeToInstantiate string, clientType gocode.TypeName) error {
-	filename := fmt.Sprintf("init_%v_%v_client.go", clientName, registryVar)
+type ClientBuilder struct {
+	PackageShortName     string // The package name to use in the package declaration
+	NamespaceConstructor string // The func that creates the namespace
+	NamespaceName        string // The name to use for the namespace
+	OutputDir            string // The output directory; should be the same as the package directory
+	Clients              []*clientRegistration
+	Imports              *gogen.Imports // Manages imports for us
+}
 
-	templateArgs := TestClientArgs{
+type clientRegistration struct {
+	ClientName        string          // The name of the client we're registering
+	RegistryVarName   string          // The name of the ServiceRegistry variable within this package
+	ClientType        gocode.TypeName // The client type managed by the ServiceRegistry
+	NodeToInstantiate string          // The node in the namespace to instantiate when creating the client
+}
+
+func NewClientBuilder(packageName, packageShortName, namespaceConstructor, namespacePackage, namespaceName, outputDir string) *ClientBuilder {
+	b := &ClientBuilder{
 		PackageShortName:     packageShortName,
 		NamespaceConstructor: namespaceConstructor,
-		RegistryVarName:      registryVar,
-		ClientName:           clientName,
-		NodeToInstantiate:    nodeToInstantiate,
-		ClientType:           clientType,
+		NamespaceName:        namespaceName,
+		OutputDir:            outputDir,
 		Imports:              gogen.NewImports(packageName),
 	}
 
-	templateArgs.Imports.AddPackages("context", namespacePackage)
+	b.Imports.AddPackages("context", namespacePackage)
 
-	slog.Info(fmt.Sprintf("Generating %v/%v.go", packageDir, filename))
-	outputFile := filepath.Join(packageDir, filename)
-	return gogen.ExecuteTemplateToFile("ServiceRegistryTestClientInit", initTestClientsTemplate, templateArgs, outputFile)
+	return b
 }
 
-type TestClientArgs struct {
-	PackageShortName     string          // The package name used in the package declaration
-	NamespaceConstructor string          // The func that creates the namespace
-	RegistryVarName      string          // The name of the variable in the test code containing the registry.ServiceRegistry
-	ClientName           string          // The name to give that client that will be added to the registry
-	NodeToInstantiate    string          // The node in the namespace to instantiate when creating the client
-	ClientType           gocode.TypeName // The type of the registry and client
+func (b *ClientBuilder) AddClient(registryVar, clientName, nodeToInstantiate string, clientType gocode.TypeName) {
+	r := &clientRegistration{
+		ClientName:        clientName,
+		RegistryVarName:   registryVar,
+		ClientType:        clientType,
+		NodeToInstantiate: nodeToInstantiate,
+	}
+	b.Clients = append(b.Clients, r)
+}
 
-	Imports *gogen.Imports // Manages imports for us
+func (b *ClientBuilder) Build() error {
+	filename := "blueprint_clients.go"
+
+	slog.Info(fmt.Sprintf("Generating %v/%v.go", b.OutputDir, filename))
+	outputFile := filepath.Join(b.OutputDir, filename)
+	return gogen.ExecuteTemplateToFile("ServiceRegistryTestClientInit", initTestClientsTemplate, b, outputFile)
 }
 
 var initTestClientsTemplate = `
@@ -52,13 +63,11 @@ package {{ .PackageShortName }}
 {{ .Imports }}
 
 // Auto-generated code by the Blueprint gotests plugin.
-//
-// Hooks in to the {{ .RegistryVarName }} to add a {{ .ClientName }} client that uses
-// generated client code.
 func init() {
 	// Initialize the clientlib early so that it can pick up command-line flags
-	clientlib := {{ .NamespaceConstructor }}("{{ .ClientName }}")
+	clientlib := {{ .NamespaceConstructor }}("{{ .NamespaceName }}")
 
+	{{ range $_, $client := .Clients }}
 	{{ .RegistryVarName }}.Register("{{ .ClientName }}", func(ctx context.Context) ({{ NameOf .ClientType }}, error) {
 		// Build the client library
 		namespace, err := clientlib.Build(ctx)
@@ -71,5 +80,6 @@ func init() {
 		err = namespace.Get("{{ .NodeToInstantiate }}", &client)
 		return client, err
 	})
+	{{end}}
 }
 `
