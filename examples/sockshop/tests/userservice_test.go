@@ -18,8 +18,6 @@ import (
 // for different deployments when compiling an application.
 var userServiceRegistry = registry.NewServiceRegistry[user.UserService]("user_service")
 
-var userserviceregistry2 *registry.ServiceRegistry[user.UserService]
-
 func init() {
 	// If the tests are run locally, we fall back to this user service implementation
 	userServiceRegistry.Register("local", func(ctx context.Context) (user.UserService, error) {
