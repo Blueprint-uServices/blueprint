@@ -136,7 +136,7 @@ func (lib *TestLibrary) GenerateArtifacts(workspaceDir string) error {
 		// Find registries of that type
 		registries := r.Get(&iface.UserType)
 		if len(registries) == 0 {
-			slog.Warn(fmt.Sprintf("Cannot test %v due to no instances found of registry.ServiceRegistry[%v]", name, iface.UserType))
+			slog.Warn(fmt.Sprintf("Cannot test %v due to no instances found of registry.ServiceRegistry[%v]", name, iface.UserType.String()))
 		} else {
 			for _, reg := range registries {
 				slog.Info(fmt.Sprintf("Test registry %v for %v (%v) found in %v", reg.VarName, name, reg.RegistryOf, reg.Var.File.Name))

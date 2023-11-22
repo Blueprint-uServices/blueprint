@@ -25,12 +25,14 @@ import (
 //     dependencies
 //   - tests make use of the core runtime registry.ServiceRegistry to acquire
 //     client instances (as opposed to manually constructing them).
-func Test(spec wiring.WiringSpec, serviceName string) string {
+func Test(spec wiring.WiringSpec, servicesToTest ...string) string {
 
 	name := "gotests"
 
 	// The output gotests package can include tests for multiple services
-	spec.AddProperty(name, "Services", serviceName)
+	for _, serviceName := range servicesToTest {
+		spec.AddProperty(name, "Services", serviceName)
+	}
 
 	// Might redefine gotests multiple times; no big deal
 	spec.Define("gotests", &TestLibrary{}, func(namespace wiring.Namespace) (ir.IRNode, error) {

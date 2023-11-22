@@ -103,11 +103,10 @@ func (node *WorkflowService) AddToWorkspace(builder golang.WorkspaceBuilder) err
 }
 
 func CopyModuleToOutputWorkspace(b golang.WorkspaceBuilder, mod *goparser.ParsedModule) (string, error) {
-	if b.Visited(mod.Name) {
-		return "", nil
-	}
 	_, subdir := filepath.Split(mod.SrcDir)
-	slog.Info(fmt.Sprintf("Copying local module %v to workspace", subdir))
+	if !b.Visited(mod.Name) {
+		slog.Info(fmt.Sprintf("Copying local module %v to workspace", subdir))
+	}
 	return b.AddLocalModule(subdir, mod.SrcDir)
 }
 
