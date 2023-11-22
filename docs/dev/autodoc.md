@@ -11,7 +11,7 @@ go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
 Run `gomarkdoc` for a particular package; in this case we use the `blueprint` package as an example
 ```
 cd blueprint
-gomarkdoc --output '{{.Dir}}/README.md' ./...
+gomarkdoc -e --output '{{.Dir}}/README.md' ./...
 ```
 
 Currently we use `gomarkdoc` to auto-generate READMEs for the following:
