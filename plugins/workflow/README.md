@@ -8,6 +8,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 
 ## Index
 
+- [func CopyModuleToOutputWorkspace\(b golang.WorkspaceBuilder, mod \*goparser.ParsedModule\) \(string, error\)](<#CopyModuleToOutputWorkspace>)
 - [func Define\(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string\) string](<#Define>)
 - [func Init\(srcModulePaths ...string\)](<#Init>)
 - [func Reset\(\)](<#Reset>)
@@ -25,6 +26,15 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
   - [func NewWorkflowSpec\(srcModuleDirs ...string\) \(\*WorkflowSpec, error\)](<#NewWorkflowSpec>)
   - [func \(spec \*WorkflowSpec\) Get\(name string\) \(\*WorkflowSpecService, error\)](<#WorkflowSpec.Get>)
 - [type WorkflowSpecService](<#WorkflowSpecService>)
+
+
+<a name="CopyModuleToOutputWorkspace"></a>
+## func CopyModuleToOutputWorkspace
+
+```go
+func CopyModuleToOutputWorkspace(b golang.WorkspaceBuilder, mod *goparser.ParsedModule) (string, error)
+```
+
 
 
 <a name="Define"></a>

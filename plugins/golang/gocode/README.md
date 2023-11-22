@@ -35,6 +35,11 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
   - [func \(t \*FuncType\) IsTypeName\(\)](<#FuncType.IsTypeName>)
   - [func \(t \*FuncType\) String\(\) string](<#FuncType.String>)
 - [type GenericType](<#GenericType>)
+  - [func \(t \*GenericType\) IsTypeName\(\)](<#GenericType.IsTypeName>)
+  - [func \(t \*GenericType\) String\(\) string](<#GenericType.String>)
+- [type GenericTypeParam](<#GenericTypeParam>)
+  - [func \(t \*GenericTypeParam\) IsTypeName\(\)](<#GenericTypeParam.IsTypeName>)
+  - [func \(t \*GenericTypeParam\) String\(\) string](<#GenericTypeParam.String>)
 - [type InterfaceType](<#InterfaceType>)
   - [func \(t \*InterfaceType\) IsTypeName\(\)](<#InterfaceType.IsTypeName>)
   - [func \(t \*InterfaceType\) String\(\) string](<#InterfaceType.String>)
@@ -340,9 +345,58 @@ A struct with generics. For now blueprint doesn't support generics in service de
 ```go
 type GenericType struct {
     TypeName
-    BaseType TypeName
+    BaseType  TypeName
+    TypeParam TypeName
 }
 ```
+
+<a name="GenericType.IsTypeName"></a>
+### func \(\*GenericType\) IsTypeName
+
+```go
+func (t *GenericType) IsTypeName()
+```
+
+
+
+<a name="GenericType.String"></a>
+### func \(\*GenericType\) String
+
+```go
+func (t *GenericType) String() string
+```
+
+
+
+<a name="GenericTypeParam"></a>
+## type GenericTypeParam
+
+The type parameter of a generic struct or func
+
+```go
+type GenericTypeParam struct {
+    TypeName
+    ParamName string
+}
+```
+
+<a name="GenericTypeParam.IsTypeName"></a>
+### func \(\*GenericTypeParam\) IsTypeName
+
+```go
+func (t *GenericTypeParam) IsTypeName()
+```
+
+
+
+<a name="GenericTypeParam.String"></a>
+### func \(\*GenericTypeParam\) String
+
+```go
+func (t *GenericTypeParam) String() string
+```
+
+
 
 <a name="InterfaceType"></a>
 ## type InterfaceType

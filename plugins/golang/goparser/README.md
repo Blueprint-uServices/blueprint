@@ -8,6 +8,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 
 ## Index
 
+- [func ExprStr\(e ast.Expr\) string](<#ExprStr>)
 - [type ParsedField](<#ParsedField>)
   - [func \(f \*ParsedField\) Parse\(\) error](<#ParsedField.Parse>)
   - [func \(f \*ParsedField\) String\(\) string](<#ParsedField.String>)
@@ -15,9 +16,10 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
   - [func \(f \*ParsedFile\) LoadFuncs\(\) error](<#ParsedFile.LoadFuncs>)
   - [func \(f \*ParsedFile\) LoadImports\(\) error](<#ParsedFile.LoadImports>)
   - [func \(f \*ParsedFile\) LoadStructsAndInterfaces\(\) error](<#ParsedFile.LoadStructsAndInterfaces>)
-  - [func \(f \*ParsedFile\) ResolveIdent\(name string\) gocode.TypeName](<#ParsedFile.ResolveIdent>)
+  - [func \(f \*ParsedFile\) LoadVars\(\) error](<#ParsedFile.LoadVars>)
+  - [func \(f \*ParsedFile\) ResolveIdent\(name string, typeParams ...string\) gocode.TypeName](<#ParsedFile.ResolveIdent>)
   - [func \(f \*ParsedFile\) ResolveSelector\(packageShortName string, name string\) gocode.TypeName](<#ParsedFile.ResolveSelector>)
-  - [func \(f \*ParsedFile\) ResolveType\(expr ast.Expr\) gocode.TypeName](<#ParsedFile.ResolveType>)
+  - [func \(f \*ParsedFile\) ResolveType\(expr ast.Expr, typeParams ...string\) gocode.TypeName](<#ParsedFile.ResolveType>)
   - [func \(f \*ParsedFile\) String\(\) string](<#ParsedFile.String>)
 - [type ParsedFunc](<#ParsedFunc>)
   - [func \(f \*ParsedFunc\) AsConstructor\(\) \*gocode.Constructor](<#ParsedFunc.AsConstructor>)
@@ -43,7 +45,17 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 - [type ParsedStruct](<#ParsedStruct>)
   - [func \(f \*ParsedStruct\) String\(\) string](<#ParsedStruct.String>)
   - [func \(struc \*ParsedStruct\) Type\(\) \*gocode.UserType](<#ParsedStruct.Type>)
+- [type ParsedVar](<#ParsedVar>)
 
+
+<a name="ExprStr"></a>
+## func ExprStr
+
+```go
+func ExprStr(e ast.Expr) string
+```
+
+Returns a string representation of an expr and its internals Useful for debugging golang code parsers.
 
 <a name="ParsedField"></a>
 ## type ParsedField
@@ -87,6 +99,7 @@ type ParsedFile struct {
     Package          *ParsedPackage
     Name             string                   // Filename
     Path             string                   // Fully qualified path to the file
+    PathInModule     string                   // Path within the module to the file
     AnonymousImports []*ParsedImport          // Import declarations that were imported with .
     NamedImports     map[string]*ParsedImport // Import declarations - map from shortname to fully qualified package import name
     Ast              *ast.File                // The AST of the file
@@ -132,11 +145,22 @@ Does not:
 
 - look for function declarations
 
+<a name="ParsedFile.LoadVars"></a>
+### func \(\*ParsedFile\) LoadVars
+
+```go
+func (f *ParsedFile) LoadVars() error
+```
+
+Looks for:
+
+- vars declared
+
 <a name="ParsedFile.ResolveIdent"></a>
 ### func \(\*ParsedFile\) ResolveIdent
 
 ```go
-func (f *ParsedFile) ResolveIdent(name string) gocode.TypeName
+func (f *ParsedFile) ResolveIdent(name string, typeParams ...string) gocode.TypeName
 ```
 
 An ident can be:
@@ -145,6 +169,7 @@ An ident can be:
 - any
 - a type declared locally within the file or package
 - a type imported with an \`import . "package"\` decl
+- a generic type from a struct or func's type params
 
 <a name="ParsedFile.ResolveSelector"></a>
 ### func \(\*ParsedFile\) ResolveSelector
@@ -159,10 +184,10 @@ func (f *ParsedFile) ResolveSelector(packageShortName string, name string) gocod
 ### func \(\*ParsedFile\) ResolveType
 
 ```go
-func (f *ParsedFile) ResolveType(expr ast.Expr) gocode.TypeName
+func (f *ParsedFile) ResolveType(expr ast.Expr, typeParams ...string) gocode.TypeName
 ```
 
-
+If the expr is in the context of a generic struct or func, typeParams provides the additional named type params
 
 <a name="ParsedFile.String"></a>
 ### func \(\*ParsedFile\) String
@@ -365,6 +390,7 @@ type ParsedPackage struct {
     Structs       map[string]*ParsedStruct    // Structs parsed from this package
     Interfaces    map[string]*ParsedInterface // Interfaces parsed from this package
     Funcs         map[string]*ParsedFunc      // Functions parsed from this package (does not include funcs with receiver types)
+    Vars          map[string]*ParsedVar       // Vars declared in this package; we save their AST but don't process them
 }
 ```
 
@@ -410,6 +436,7 @@ type ParsedStruct struct {
     Fields          map[string]*ParsedField // Named fields declared in this struct only, does not include promoted fields (not implemented yet)
     PromotedField   *ParsedField            // If there is a promoted field, stored here
     AnonymousFields []*ParsedField          // Subsequent anonymous fields
+    TypeParams      []string                // Names of generic type parameters
 }
 ```
 
@@ -430,5 +457,18 @@ func (struc *ParsedStruct) Type() *gocode.UserType
 ```
 
 
+
+<a name="ParsedVar"></a>
+## type ParsedVar
+
+Currently we save var statements but don't do anything with them
+
+```go
+type ParsedVar struct {
+    File *ParsedFile
+    Name string
+    Ast  *ast.ValueSpec
+}
+```
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
