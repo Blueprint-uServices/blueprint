@@ -264,7 +264,6 @@ func TestAll(t *testing.T) {
 		_, err = service.Login(ctx, deepak.Username, deepak.Password)
 		assert.Error(t, err)
 	}
-
 }
 
 func expectUsers(t *testing.T, service user.UserService, expectedCount int) []user.User {

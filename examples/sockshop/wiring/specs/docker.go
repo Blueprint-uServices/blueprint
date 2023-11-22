@@ -1,10 +1,9 @@
 package specs
 
 import (
-	"fmt"
-
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/gotests"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
@@ -24,14 +23,17 @@ var Docker = wiringcmd.SpecOption{
 func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	user_db := mongodb.PrebuiltContainer(spec, "user_db")
 	user_service := workflow.Define(spec, "user_service", "UserService", user_db)
-	user_service_ctr := applyDockerDefaults(spec, user_service)
+	user_ctr := applyDockerDefaults(spec, user_service, "user_proc", "user_container")
 
-	return []string{user_service_ctr}, nil
+	payment_service := workflow.Define(spec, "payment_service", "PaymentService")
+	payment_ctr := applyDockerDefaults(spec, payment_service, "payment_proc", "payment_container")
+
+	tests := gotests.Test(spec, user_service, payment_service)
+
+	return []string{user_ctr, payment_ctr, tests}, nil
 }
 
-func applyDockerDefaults(spec wiring.WiringSpec, serviceName string) string {
-	procName := fmt.Sprintf("%s_process", serviceName)
-	ctrName := fmt.Sprintf("%s_container", serviceName)
+func applyDockerDefaults(spec wiring.WiringSpec, serviceName, procName, ctrName string) string {
 	grpc.Deploy(spec, serviceName)
 	goproc.CreateProcess(spec, procName, serviceName)
 	return linuxcontainer.CreateContainer(spec, ctrName, procName)
