@@ -14,7 +14,7 @@ An application's IR representation is produced by constructing and then building
 
 - [func CleanName\(name string\) string](<#CleanName>)
 - [func Filter\[T any\]\(nodes \[\]IRNode\) \[\]T](<#Filter>)
-- [func RegisterDefaultBuilder\[T IRNode\]\(name string, buildFunc func\(outputDir string, node IRNode\) error\)](<#RegisterDefaultBuilder>)
+- [func PrettyPrintNamespace\(instanceName string, namespaceType string, argNodes \[\]IRNode, childNodes \[\]IRNode\) string](<#PrettyPrintNamespace>)
 - [func RegisterDefaultNamespace\[T IRNode\]\(name string, buildFunc func\(outputDir string, nodes \[\]IRNode\) error\)](<#RegisterDefaultNamespace>)
 - [type ApplicationNode](<#ApplicationNode>)
   - [func \(app \*ApplicationNode\) GenerateArtifacts\(dir string\) error](<#ApplicationNode.GenerateArtifacts>)
@@ -52,14 +52,14 @@ func Filter[T any](nodes []IRNode) []T
 
 Returns a slice containing only nodes of type T
 
-<a name="RegisterDefaultBuilder"></a>
-## func RegisterDefaultBuilder
+<a name="PrettyPrintNamespace"></a>
+## func PrettyPrintNamespace
 
 ```go
-func RegisterDefaultBuilder[T IRNode](name string, buildFunc func(outputDir string, node IRNode) error)
+func PrettyPrintNamespace(instanceName string, namespaceType string, argNodes []IRNode, childNodes []IRNode) string
 ```
 
-When building an application, any IR nodes of type T that reside within the top\-level application will be built using the specified buildFunc. The buildFunc will only be invoked if there isn't a default namespace registered for nodes of type T.
+
 
 <a name="RegisterDefaultNamespace"></a>
 ## func RegisterDefaultNamespace

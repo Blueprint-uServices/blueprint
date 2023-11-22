@@ -12,7 +12,11 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-type TestLibrary struct {
+// An IR node that:
+//   - creates a golang workspace with all client library code
+//   - copies tests from the source application to the output
+//   - modifies tests to register the generated clients
+type testLibrary struct {
 	ir.ArtifactGenerator
 
 	LibraryName    string
@@ -22,19 +26,19 @@ type TestLibrary struct {
 	ServicesToTest map[string]ir.IRNode
 }
 
-func newTestLibrary(name string) *TestLibrary {
-	node := TestLibrary{}
+func newTestLibrary(name string) *testLibrary {
+	node := testLibrary{}
 	node.LibraryName = name
 	node.ModuleName = "blueprint/testclients"
 	node.ServicesToTest = make(map[string]ir.IRNode)
 	return &node
 }
 
-func (lib *TestLibrary) Name() string {
+func (lib *testLibrary) Name() string {
 	return lib.LibraryName
 }
 
-func (lib *TestLibrary) String() string {
+func (lib *testLibrary) String() string {
 	return ir.PrettyPrintNamespace(lib.LibraryName, "GolangTests", lib.ArgNodes, lib.ContainedNodes)
 }
 
@@ -45,7 +49,7 @@ Within the workspace will have converted all compatible unit tests into
 tests that can be run against the generated Blueprint system.  The
 generated Blueprint system must be running for the tests to work.
 */
-func (lib *TestLibrary) GenerateArtifacts(workspaceDir string) error {
+func (lib *testLibrary) GenerateArtifacts(workspaceDir string) error {
 	slog.Info(fmt.Sprintf("Generating unit tests to %s", workspaceDir))
 	workspace, err := gogen.NewWorkspaceBuilder(workspaceDir)
 	if err != nil {
@@ -120,7 +124,7 @@ func (lib *TestLibrary) GenerateArtifacts(workspaceDir string) error {
 	// Modify the tests
 
 	// Find all registry.ServiceRegistry variables declared in the workflow spec code
-	r, err := FindWorkflowServiceRegistries()
+	r, err := findWorkflowServiceRegistries()
 	if err != nil {
 		return err
 	}

@@ -1,9 +1,12 @@
 # Blueprint
 
-This package contains the core of Blueprint's compiler abstractions.
+This go module implements Blueprint's compiler as well as the [WiringSpec API](pkg/wiring) used by Blueprint applications.
 
-`pkg/blueprint` has definitions of the WiringSpec API, the base types of Blueprint's IR, and the core of Blueprint's building and compilation process.
+### Related documentation
+- [../docs/manual/workflow.md](docs/manual/workflow.md) describes how to write a Blueprint application
+- [../docs/manual/wiring.md](docs/manual/wiring.md) describes creating a wiring spec for an application
 
-`pkg/core` has plugin implementations that are sufficiently important that we consider them core plugins.  This includes stdlib interfaces for common backends like caches and databases; addresses and pointers; containers, processes, services, and artifact-generating nodes.
-
-For an example of Blueprint's compiler usage, see the [wiring spec of the Leaf example](examples/leaf/wiring/main.go)
+### Other modules in this repository
+- [../plugins](../plugins) contains a range of plugins that implement most of Blueprint's features and functionality
+- [../runtime](../runtime) contains runtime code that is used by Blueprint applications and by plugins
+- [../examples](../examples) contains some example applications

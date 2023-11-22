@@ -1,5 +1,28 @@
-// Package gotests provides a plugin for automatically converting workflow spec unit tests into
+// Package gotests provides a Blueprint plugin for automatically converting black-box workflow spec unit tests into
 // tests that can run against a compiled Blueprint system.
+//
+// To use the gotests plugin in a wiring spec, call gotests.[Test] and specify the services to test.  During
+// compilation the plugin will search for compatible black-box tests, modify them, and include the modified tests
+// in the compiled output.
+//
+// Tests are only compatible if they meet the following requirements:
+//   - tests are contained in a separate module from the workflow spec
+//   - the test module is on the workflow spec search path (e.g. using [workflow.Init])
+//   - tests use the [registry.ServiceRegistry] to acquire service clients
+//
+// To run the generated tests:
+//  1. start the compiled application
+//  2. navigate to the 'tests' directory in the compiled output
+//  3. run `go test` passing any required command-line arguments such as addresses
+//
+// A test can potentially leave state within the application; running the test twice in succession
+// may result in a failure the second time since the application is not in a clean state.
+//
+// See [Workflow Tests] for more information on writing workflow tests.
+//
+// [Workflow Tests]: https://github.com/Blueprint-uServices/blueprint/tree/main/docs/manual/workflow_tests.md
+// [registry.ServiceRegistry]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/core/registry
+// [workflow.Init]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/workflow
 package gotests
 
 import (
@@ -11,20 +34,23 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
-// Specifies that any compatible unit dests defined for serviceName should be automatically
-// converted into tests for the compiled Blueprint system.
+// Auto-generates tests for servicesToTest by converting existing black-box workflow unit tests.
+// After compilation, the output will contain a golang workspace called "tests" that will
+// include modified versions of the source tests.
 //
-// The gotests plugin will produce an output golang workspace called "tests" that will
-// include modified versions of the source unit tests.  After running the compiled Blueprint
-// system, you can run the tests with the usual 'go test'.
+// servicesToTest should be the names of golang services instantiated in the wiring spec.
 //
-// Tests must meet the following criteria to be included:
-//   - tests are written using go's standard testing library
-//   - tests are contained in a separate module from the workflow spec
-//     (and thus are black-box tests), needed to prevent circular module
-//     dependencies
-//   - tests make use of the core runtime registry.ServiceRegistry to acquire
-//     client instances (as opposed to manually constructing them).
+// The gotests plugin searches for any workflow packages with tests that make use of [registry.ServiceRegistry].
+// Matching modules are copied to an output golang workspace caled "tests".
+// Matching packges in the output workspace will have a file blueprint_clients.go that registers
+// a service client.
+//
+// Returns the name "gotests" which must be included when later calling [wiring.WiringSpec.BuildIR]
+//
+// For more information about tests see [Workflow Tests].
+//
+// [Workflow Tests]: https://github.com/Blueprint-uServices/blueprint/tree/main/docs/manual/workflow_tests.md
+// [registry.ServiceRegistry]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/core/registry
 func Test(spec wiring.WiringSpec, servicesToTest ...string) string {
 
 	name := "gotests"
@@ -35,7 +61,7 @@ func Test(spec wiring.WiringSpec, servicesToTest ...string) string {
 	}
 
 	// Might redefine gotests multiple times; no big deal
-	spec.Define("gotests", &TestLibrary{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
+	spec.Define("gotests", &testLibrary{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		testLib := newTestsNamespace(namespace, spec, name)
 
 		var serviceNames []string
@@ -67,7 +93,7 @@ type testsNamespace struct {
 
 type testsNamespaceHandler struct {
 	wiring.DefaultNamespaceHandler
-	IRNode *TestLibrary
+	IRNode *testLibrary
 }
 
 func newTestsNamespace(parent wiring.Namespace, spec wiring.WiringSpec, name string) *testsNamespace {

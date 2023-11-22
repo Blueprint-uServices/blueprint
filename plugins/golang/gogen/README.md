@@ -36,11 +36,12 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
   - [func \(n \*NamespaceBuilderImpl\) Info\(\) golang.NamespaceInfo](<#NamespaceBuilderImpl.Info>)
   - [func \(n \*NamespaceBuilderImpl\) Instantiate\(name string\)](<#NamespaceBuilderImpl.Instantiate>)
   - [func \(n \*NamespaceBuilderImpl\) Module\(\) golang.ModuleBuilder](<#NamespaceBuilderImpl.Module>)
-  - [func \(n \*NamespaceBuilderImpl\) Require\(name, description string\)](<#NamespaceBuilderImpl.Require>)
+  - [func \(n \*NamespaceBuilderImpl\) OptionalArg\(name, description string\)](<#NamespaceBuilderImpl.OptionalArg>)
+  - [func \(n \*NamespaceBuilderImpl\) RequiredArg\(name, description string\)](<#NamespaceBuilderImpl.RequiredArg>)
 - [type WorkspaceBuilderImpl](<#WorkspaceBuilderImpl>)
   - [func NewWorkspaceBuilder\(workspaceDir string\) \(\*WorkspaceBuilderImpl, error\)](<#NewWorkspaceBuilder>)
-  - [func \(workspace \*WorkspaceBuilderImpl\) AddLocalModule\(shortName string, moduleSrcPath string\) error](<#WorkspaceBuilderImpl.AddLocalModule>)
-  - [func \(workspace \*WorkspaceBuilderImpl\) AddLocalModuleRelative\(shortName string, relativeModuleSrcPath string\) error](<#WorkspaceBuilderImpl.AddLocalModuleRelative>)
+  - [func \(workspace \*WorkspaceBuilderImpl\) AddLocalModule\(shortName string, moduleSrcPath string\) \(string, error\)](<#WorkspaceBuilderImpl.AddLocalModule>)
+  - [func \(workspace \*WorkspaceBuilderImpl\) AddLocalModuleRelative\(shortName string, relativeModuleSrcPath string\) \(string, error\)](<#WorkspaceBuilderImpl.AddLocalModuleRelative>)
   - [func \(workspace \*WorkspaceBuilderImpl\) CreateModule\(moduleName string, moduleVersion string\) \(string, error\)](<#WorkspaceBuilderImpl.CreateModule>)
   - [func \(workspace \*WorkspaceBuilderImpl\) Finish\(\) error](<#WorkspaceBuilderImpl.Finish>)
   - [func \(workspace \*WorkspaceBuilderImpl\) GetLocalModule\(modulePath string\) \(string, bool\)](<#WorkspaceBuilderImpl.GetLocalModule>)
@@ -249,7 +250,8 @@ type NamespaceBuilderImpl struct {
     FuncName       string            // The name of the function to generate
     Imports        *Imports          // Import declarations in the file; map of shortname to full package import name
     Declarations   map[string]string // The DI declarations
-    Requires       map[string]string
+    Required       map[string]string
+    Optional       map[string]string
     Instantiations map[string]struct{}
     // contains filtered or unexported fields
 }
@@ -345,11 +347,20 @@ func (n *NamespaceBuilderImpl) Module() golang.ModuleBuilder
 
 
 
-<a name="NamespaceBuilderImpl.Require"></a>
-### func \(\*NamespaceBuilderImpl\) Require
+<a name="NamespaceBuilderImpl.OptionalArg"></a>
+### func \(\*NamespaceBuilderImpl\) OptionalArg
 
 ```go
-func (n *NamespaceBuilderImpl) Require(name, description string)
+func (n *NamespaceBuilderImpl) OptionalArg(name, description string)
+```
+
+
+
+<a name="NamespaceBuilderImpl.RequiredArg"></a>
+### func \(\*NamespaceBuilderImpl\) RequiredArg
+
+```go
+func (n *NamespaceBuilderImpl) RequiredArg(name, description string)
 ```
 
 
@@ -386,7 +397,7 @@ Will return an error if the workspacedir already exists
 ### func \(\*WorkspaceBuilderImpl\) AddLocalModule
 
 ```go
-func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSrcPath string) error
+func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSrcPath string) (string, error)
 ```
 
 
@@ -395,7 +406,7 @@ func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSr
 ### func \(\*WorkspaceBuilderImpl\) AddLocalModuleRelative
 
 ```go
-func (workspace *WorkspaceBuilderImpl) AddLocalModuleRelative(shortName string, relativeModuleSrcPath string) error
+func (workspace *WorkspaceBuilderImpl) AddLocalModuleRelative(shortName string, relativeModuleSrcPath string) (string, error)
 ```
 
 This method is used by plugins if they want to copy a locally\-defined module into the generated workspace.

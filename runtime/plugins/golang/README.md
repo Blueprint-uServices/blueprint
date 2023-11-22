@@ -27,7 +27,8 @@ A golang namespace takes care of the following:
   - [func \(b \*NamespaceBuilder\) BuildWithParent\(parent \*Namespace\) \(\*Namespace, error\)](<#NamespaceBuilder.BuildWithParent>)
   - [func \(b \*NamespaceBuilder\) Define\(name string, build BuildFunc\)](<#NamespaceBuilder.Define>)
   - [func \(b \*NamespaceBuilder\) Instantiate\(name string\)](<#NamespaceBuilder.Instantiate>)
-  - [func \(b \*NamespaceBuilder\) Require\(name string, description string\)](<#NamespaceBuilder.Require>)
+  - [func \(b \*NamespaceBuilder\) Optional\(name string, description string\)](<#NamespaceBuilder.Optional>)
+  - [func \(b \*NamespaceBuilder\) Required\(name string, description string\)](<#NamespaceBuilder.Required>)
   - [func \(b \*NamespaceBuilder\) Set\(name string, value string\)](<#NamespaceBuilder.Set>)
 - [type Runnable](<#Runnable>)
 
@@ -41,7 +42,7 @@ Namespaces reuse built nodes; subsequent calls to [Namespace.Get](<#Namespace.Ge
 
 node is a runtime instance such as a service, a wrapper class, etc.
 
-If node implements the [Runnable](<#Runnable>) interface then in addition to building the node. a namespace will also invoke \[node.Run\] in a separate goroutine.
+If node implements the [Runnable](<#Runnable>) interface then in addition to building the node. a namespace will also invoke \[Runnable.Run\] in a separate goroutine.
 
 ```go
 type BuildFunc func(n *Namespace) (node any, err error)
@@ -59,9 +60,9 @@ Nodes in the namespace can either be:
 
 A namespace is constructed using the [NamespaceBuilder](<#NamespaceBuilder>) struct, which can be created with the [NewNamespaceBuilder](<#NewNamespaceBuilder>) method.
 
-The standard usage of a namespace is by a golang process. Any golang services, wrappers, etc. are created using a NamespaceImpl.
+The standard usage of a namespace is by a golang process. Any golang services, wrappers, etc. are created using a Namespace.
 
-Some plugins, such as the ClientPool plugin, also use child Namespaces within the golang process NamespaceImpl.
+Some plugins, such as the ClientPool plugin, also use child Namespaces within the golang process Namespace.
 
 ```go
 type Namespace struct {
@@ -185,11 +186,22 @@ Indicates that name should be eagerly built when the namespace is built.
 
 The typical usage of this is to ensure that servers get started for namespaces that run servers.
 
-<a name="NamespaceBuilder.Require"></a>
-### func \(\*NamespaceBuilder\) Require
+<a name="NamespaceBuilder.Optional"></a>
+### func \(\*NamespaceBuilder\) Optional
 
 ```go
-func (b *NamespaceBuilder) Require(name string, description string)
+func (b *NamespaceBuilder) Optional(name string, description string)
+```
+
+Indicates that name is an optional node. An error will only be returned if the caller attempts to build the node.
+
+The typical usage of this is when using only a single client from a client library
+
+<a name="NamespaceBuilder.Required"></a>
+### func \(\*NamespaceBuilder\) Required
+
+```go
+func (b *NamespaceBuilder) Required(name string, description string)
 ```
 
 Indicates that name is a required node. When the namespace is built, an error will be returned if any required nodes are missing.
