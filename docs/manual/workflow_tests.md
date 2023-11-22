@@ -8,6 +8,31 @@ White-box unit tests can be written alongside the workflow spec using typical [G
 
 Services should be manually instantiated in white-box unit tests.  For services that use backends such as `backend.Cache` there are corresponding simple implementations that can be used, e.g. [simplecache](../../runtime/plugins/simplecache/cache.go) can be instantiated with `simplecache.NewSimpleCache`.
 
+```
+import (
+    "testing"
+    "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplecache"
+)
+
+// A test for the EchoService
+func TestEcho(t *testing.T) {
+    ctx := context.Background()
+    echo, err := NewEchoService(ctx)
+    
+    // ... test code here ...
+}
+
+// A test for the MultiEchoerService
+func TestMultiEchoer(t *testing.T) {
+    ctx := context.Background()
+    echo, err := NewEchoService(ctx)
+    cache, err := simplecache.NewSimpleCache(ctx)
+    multi, err := NewMultiEchoer(ctx, echo, cache)
+
+    // ... test code here ...
+}
+```
+
 
 ## Black-box unit tests
 
@@ -31,7 +56,7 @@ import (
     "gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 )
 
-var echoRegistry = registry.NewServiceRegistry[echo.EchoService]("echo_service")
+var echoRegistry = registry.NewServiceRegistry[echo.EchoService]("echo")
 
 func init() {
     echoRegistry.Register("local", func(ctx context.Context) (echo.EchoService, error) {
@@ -39,10 +64,40 @@ func init() {
     })
 }
 
-func TestEchoService(t *testing.T) {
+// A test for the EchoService
+func TestEcho(t *testing.T) {
     echo, err := echoRegistry.Get(context.Background())
     
     // ... test code here ...
+}
+```
+
+Notice that the code to instantiate the "local" instance of a service is similar to how the white-box test instantiates the service.
+
+
+```
+package tests
+
+import (
+    "testing"
+    "gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
+    "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplecache"
+)
+
+var multiEchoerRegistry = registry.NewServiceRegistry[echo.MultiEchoerService]("multi_echoer")
+
+func init() {
+    multiEchoerRegistry.Register("local", func(ctx context.Context) (echo.MultiEchoerService, error) {
+        ctx := context.Background()
+        echo, err := NewEchoService(ctx)
+        cache, err := simplecache.NewSimpleCache(ctx)
+        return NewMultiEchoer(ctx, echo, cache)
+    })
+}
+
+// A test for the MultiEchoerService
+func TestMultiEchoer(t *testing.T) {
+    multi, err := multiEchoerRegistry.Get(context.Background())
 }
 ```
 
