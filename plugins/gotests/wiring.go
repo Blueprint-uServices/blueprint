@@ -35,21 +35,21 @@ import (
 )
 
 // Auto-generates tests for servicesToTest by converting existing black-box unit tests.
+// After compilation, the output will contain a golang workspace called "tests" that will
+// include modified versions of the source tests.
 //
-// servicesToTest can be zero or more golang services.
+// servicesToTest should be the names of golang services instantiated in the wiring spec.
 //
-// The gotests plugin will produce an output golang workspace called "tests" that will
-// include modified versions of the source unit tests.
-//
-// This func will search all wiring spec directories for package-level variables initialized by
-// [registry.NewServiceRegistry].  Modifies matching packages.
-//
-// The gotests plugin will produce an output golang workspace called "tests" that will
-// include modified versions of the source unit tests.
+// The gotests plugin searches for any workflow packages with tests that make use of [registry.ServiceRegistry].
+// Matching modules are copied to an output golang workspace caled "tests".
+// Matching packges in the output workspace will have a file blueprint_clients.go that registers
+// a service client.
 //
 // For more information about tests see [Workflow Tests].
 //
 // [Workflow Tests]: https://github.com/Blueprint-uServices/blueprint/tree/main/docs/manual/workflow_tests.md
+// [registry.ServiceRegistry]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/core/registry
+//
 // [registry.NewServiceRegistry]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/core/registry
 func Test(spec wiring.WiringSpec, servicesToTest ...string) string {
 
