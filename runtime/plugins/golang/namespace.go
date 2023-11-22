@@ -138,6 +138,7 @@ func (b *NamespaceBuilder) Required(name string, description string) {
 	b.required[name] = &argNode{
 		name:        name,
 		description: description,
+		flag:        flag.String(name, "", description),
 	}
 }
 
@@ -150,6 +151,7 @@ func (b *NamespaceBuilder) Optional(name string, description string) {
 	b.optional[name] = &argNode{
 		name:        name,
 		description: description,
+		flag:        flag.String(name, "", description),
 	}
 }
 
@@ -253,16 +255,10 @@ func (b *NamespaceBuilder) BuildWithParent(parent *Namespace) (*Namespace, error
 
 // Parse required arguments from flags
 func (b *NamespaceBuilder) parseFlags() {
-	if len(b.required) == 0 {
+	if len(b.required) == 0 && len(b.optional) == 0 {
 		return
 	}
 
-	for _, node := range b.required {
-		node.flag = flag.String(node.name, "", node.description)
-	}
-	for _, node := range b.optional {
-		node.flag = flag.String(node.name, "", node.description)
-	}
 	flag.Parse()
 
 	for _, node := range b.required {
@@ -272,6 +268,7 @@ func (b *NamespaceBuilder) parseFlags() {
 			b.Set(node.name, *node.flag)
 		}
 	}
+
 	for _, node := range b.optional {
 		if _, exists := b.buildFuncs[node.name]; exists {
 			slog.Warn(fmt.Sprintf("Ignoring command line arg for %v\n", node.name))
@@ -279,7 +276,7 @@ func (b *NamespaceBuilder) parseFlags() {
 			b.Set(node.name, *node.flag)
 		} else {
 			b.Define(node.name, func(n *Namespace) (any, error) {
-				return nil, fmt.Errorf("optional arg %v was not set", node.name)
+				return nil, fmt.Errorf("Required argument %v is not set", node.name)
 			})
 		}
 	}

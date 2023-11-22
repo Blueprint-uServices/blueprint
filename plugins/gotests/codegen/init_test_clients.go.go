@@ -28,7 +28,7 @@ func AddClientToTests(packageDir, packageName, packageShortName, namespacePackag
 		Imports:              gogen.NewImports(packageName),
 	}
 
-	templateArgs.Imports.AddPackages("context", "golang.org/x/exp/slog", namespacePackage)
+	templateArgs.Imports.AddPackages("context", namespacePackage)
 
 	slog.Info(fmt.Sprintf("Generating %v/%v.go", packageDir, filename))
 	outputFile := filepath.Join(packageDir, filename)
@@ -60,8 +60,6 @@ func init() {
 	clientlib := {{ .NamespaceConstructor }}("{{ .ClientName }}")
 
 	{{ .RegistryVarName }}.Register("{{ .ClientName }}", func(ctx context.Context) ({{ NameOf .ClientType }}, error) {
-		slog.Info("Creating {{ .ClientName }} client")
-
 		// Build the client library
 		namespace, err := clientlib.Build(ctx)
 		if err != nil {
@@ -70,7 +68,7 @@ func init() {
 
 		// Get and return the client
 		var client {{ NameOf .ClientType }}
-		err := namespace.Get("{{ .NodeToInstantiate }}", &client)
+		err = namespace.Get("{{ .NodeToInstantiate }}", &client)
 		return client, err
 	})
 }

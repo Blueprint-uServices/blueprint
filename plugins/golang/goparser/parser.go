@@ -372,28 +372,40 @@ func (f *ParsedField) Parse() error {
 func (f *ParsedFunc) Parse() error {
 	if f.Ast.Params != nil {
 		for _, p := range f.Ast.Params.List {
-			arg := gocode.Variable{}
-			if len(p.Names) > 0 {
-				arg.Name = p.Names[0].Name
-			}
-			arg.Type = f.File.ResolveType(p.Type)
-			if arg.Type == nil {
+			// Determine the argument's type
+			argType := f.File.ResolveType(p.Type)
+			if argType == nil {
 				return blueprint.Errorf("%v unable to resolve type of argument %v", f.Name, p.Type)
 			}
-			f.Arguments = append(f.Arguments, arg)
+
+			if len(p.Names) == 0 {
+				// This is an unnamed argument such as on an interface
+				f.Arguments = append(f.Arguments, gocode.Variable{Type: argType})
+			}
+
+			for _, argName := range p.Names {
+				// Can be 1 or more arguments sharing a type
+				f.Arguments = append(f.Arguments, gocode.Variable{Name: argName.Name, Type: argType})
+			}
 		}
 	}
 	if f.Ast.Results != nil {
 		for _, r := range f.Ast.Results.List {
-			ret := gocode.Variable{}
-			if len(r.Names) > 0 {
-				ret.Name = r.Names[0].Name
-			}
-			ret.Type = f.File.ResolveType(r.Type)
-			if ret.Type == nil {
+			// Determine the retval's type
+			retType := f.File.ResolveType(r.Type)
+			if retType == nil {
 				return blueprint.Errorf("%v unable to resolve type of retval %v", f.Name, r.Type)
 			}
-			f.Returns = append(f.Returns, ret)
+
+			if len(r.Names) == 0 {
+				// An unnamed return value
+				f.Returns = append(f.Returns, gocode.Variable{Type: retType})
+			}
+
+			for _, retName := range r.Names {
+				// Can be 1 or more return values sharing a type
+				f.Returns = append(f.Returns, gocode.Variable{Name: retName.Name, Type: retType})
+			}
 		}
 	}
 	return nil

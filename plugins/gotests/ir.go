@@ -159,7 +159,7 @@ func (lib *TestLibrary) GenerateArtifacts(workspaceDir string) error {
 				namespacePackage := namespaceBuilder.Package.PackageName
 				namespaceConstructor := namespaceBuilder.Package.ShortName + "." + constructorName
 
-				err = codegen.AddClientToTests(packageDir, packageName, packageShortName, registryVar, clientName, nodeToInstantiate, clientType)
+				err = codegen.AddClientToTests(packageDir, packageName, packageShortName, namespacePackage, namespaceConstructor, registryVar, clientName, nodeToInstantiate, clientType)
 				if err != nil {
 					return err
 				}

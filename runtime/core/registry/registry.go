@@ -36,6 +36,7 @@ func (r *ServiceRegistry[T]) SetDefault(name string) {
 }
 
 func (r *ServiceRegistry[T]) Register(name string, build func(ctx context.Context) (T, error)) {
+	slog.Info(fmt.Sprintf("ServiceRegistry \"%v\" added client \"%v\"", r.name, name))
 	if len(r.registered) == 0 {
 		r.defaultBuildFunc = name
 	}
@@ -62,7 +63,7 @@ func (r *ServiceRegistry[T]) Get(ctx context.Context) (T, error) {
 		return r.built, r.buildError
 	}
 
-	slog.Info(fmt.Sprintf("Building %v %v", r.name, r.defaultBuildFunc))
+	slog.Info(fmt.Sprintf("ServiceRegistry \"%v\" building client \"%v\"", r.name, r.defaultBuildFunc))
 	r.built, r.buildError = buildFunc(ctx)
 	return r.built, r.buildError
 }
