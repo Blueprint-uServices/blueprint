@@ -52,9 +52,13 @@ The following sections describe how to structure black-box tests assuming you wi
 
 ### Module structure
 
-Black-box tests should be written in a separate module (typically called `tests` in a sibling directory to `workflow`) and that tests module should have a dependency to the workflow module.
+* Black-box tests must be written in a separate module to the workflow.
 
-Test files can be written following typical [Golang conventions](https://go.dev/doc/tutorial/add-a-test).  However, tests should **not** manually instantiate services.  Instead, a [ServiceRegistry](../../runtime/core/registry/registry.go) should be used.
+Typically this is a module called `tests` residing in a sibling directory to `workflow`.  The `tests` module will need a dependency on the workflow module.
+
+### Writing tests
+
+Test files can be written following typical [Golang conventions](https://go.dev/doc/tutorial/add-a-test).  However, black-box tests should **not** manually instantiate services.  Instead, a [ServiceRegistry](../../runtime/core/registry/) should be used.
 
 ```
 package tests
