@@ -1,0 +1,1 @@
+describes how to implement your own Blueprint plugin

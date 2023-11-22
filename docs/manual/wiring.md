@@ -1,3 +1,5 @@
+describes creating a wiring spec for an application, which will make use of plugins
+
 # Blueprint Wiring
 
 Blueprint's wiring is how an application is assembled out of its constituent pieces.  The underlying type `WiringSpec` is used to assemble a wiring spec, defined in [pkg/blueprint/spec.go](blueprint/pkg/blueprint/spec.go).
