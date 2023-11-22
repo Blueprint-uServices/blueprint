@@ -1,4 +1,4 @@
-// Package gotests provides a plugin for automatically converting black-box workflow spec unit tests into
+// Package gotests provides a Blueprint plugin for automatically converting black-box workflow spec unit tests into
 // tests that can run against a compiled Blueprint system.
 //
 // To use the gotests plugin in a wiring spec, call gotests.[Test] and specify the services to test.  During
@@ -7,6 +7,7 @@
 //
 // Tests are only compatible if they meet the following requirements:
 //   - tests are contained in a separate module from the workflow spec
+//   - the test module is on the workflow spec search path (e.g. using [workflow.Init])
 //   - tests use the [registry.ServiceRegistry] to acquire service clients
 //
 // To run the generated tests:
@@ -21,6 +22,7 @@
 //
 // [Workflow Tests]: https://github.com/Blueprint-uServices/blueprint/tree/main/docs/manual/workflow_tests.md
 // [registry.ServiceRegistry]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/core/registry
+// [workflow.Init]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/workflow
 package gotests
 
 import (
@@ -32,15 +34,22 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
-// A wiring spec function to convert black-box unit tests into tests that can run against
-// the compiled application.
+// Auto-generates tests for servicesToTest by converting existing black-box unit tests.
 //
-// Searches all wiring spec directories for package-level variables initialized by
-// [registry.NewServiceRegistry].  Modifies and outputs matching tests.
+// servicesToTest can be zero or more golang services.
 //
 // The gotests plugin will produce an output golang workspace called "tests" that will
 // include modified versions of the source unit tests.
 //
+// This func will search all wiring spec directories for package-level variables initialized by
+// [registry.NewServiceRegistry].  Modifies matching packages.
+//
+// The gotests plugin will produce an output golang workspace called "tests" that will
+// include modified versions of the source unit tests.
+//
+// For more information about tests see [Workflow Tests].
+//
+// [Workflow Tests]: https://github.com/Blueprint-uServices/blueprint/tree/main/docs/manual/workflow_tests.md
 // [registry.NewServiceRegistry]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/core/registry
 func Test(spec wiring.WiringSpec, servicesToTest ...string) string {
 

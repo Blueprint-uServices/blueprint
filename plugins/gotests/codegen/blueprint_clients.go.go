@@ -1,11 +1,11 @@
 // Package codegen implements the gotest plugin's code generation logic.
 //
-// Generates the blueprint_clients.go file that gets added to the tests package.
+// Generates the blueprint_clients.go file that gets added to test packages.
+// This is used internally by the gotest package.
 //
 // A blueprint_clients.go file is generated for any package where a [registry.ServiceRegistry]
 // is used.  The file adds a static initialization block that registers an instance
 // of the 'real' application client.
-
 //
 // [registry.ServiceRegistry]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/core/registry
 package codegen
@@ -19,7 +19,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-// Used for generating the blueprint_clients.go file
+// Used by the gotests plugin to generate the blueprint_clients.go file
 type ClientBuilder struct {
 	PackageShortName     string // The package name to use in the package declaration
 	NamespaceConstructor string // The func that creates the namespace
@@ -36,14 +36,14 @@ type clientRegistration struct {
 	NodeToInstantiate string          // The node in the namespace to instantiate when creating the client
 }
 
-// Creates a new builder for generating the blueprint_clients.go file.
+// Create a new builder to generate a blueprint_clients.go file.
 //
-// outputDir points to an output directory
-// packageName should correspond to the correct fully-qualified package name of the outputDir
-// packageShortName should correspond to the name to use in the "package" declaration of the file
-// namespacePackage is the package to import that contains namespaceConstructor
-// namespaceConstructor is of the form shortname.Method - it is the method to call to build the client library
-// namespaceName can be any name
+//   - outputDir points to an output directory
+//   - packageName should correspond to the correct fully-qualified package name of the outputDir
+//   - packageShortName should correspond to the name to use in the "package" declaration of the file
+//   - namespacePackage is the package to import that contains namespaceConstructor
+//   - namespaceConstructor is of the form shortname.Method - it is the method to call to build the client library
+//   - namespaceName can be any name
 func NewClientBuilder(packageName, packageShortName, namespaceConstructor, namespacePackage, namespaceName, outputDir string) *ClientBuilder {
 	b := &ClientBuilder{
 		PackageShortName:     packageShortName,
@@ -58,12 +58,12 @@ func NewClientBuilder(packageName, packageShortName, namespaceConstructor, names
 	return b
 }
 
-// Adds a client registration to the generated blueprint_clients.go file
+// Add a client registration to the generated blueprint_clients.go file
 //
-// registryVar is a variable name within the output package of a ServiceRegistry[clientType]
-// clientName can be any name
-// nodeToInstantiate is the node within the namespace to Get to create the client
-// clientType is the service interface being created.
+//   - registryVar is a variable name within the output package of a ServiceRegistry[clientType]
+//   - clientName can be any name
+//   - nodeToInstantiate is the node within the namespace to Get to create the client
+//   - clientType is the service interface being created.
 func (b *ClientBuilder) AddClient(registryVar, clientName, nodeToInstantiate string, clientType gocode.TypeName) {
 	r := &clientRegistration{
 		ClientName:        clientName,
@@ -74,7 +74,7 @@ func (b *ClientBuilder) AddClient(registryVar, clientName, nodeToInstantiate str
 	b.Clients = append(b.Clients, r)
 }
 
-// Generates the blueprint_clients.go file.
+// Generate the blueprint_clients.go file.
 func (b *ClientBuilder) Build() error {
 	filename := "blueprint_clients.go"
 
