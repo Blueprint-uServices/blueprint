@@ -78,7 +78,8 @@ func init() {
 
 // A test for the EchoService
 func TestEcho(t *testing.T) {
-    echo, err := echoRegistry.Get(context.Background())
+    ctx := context.Background()
+    echo, err := echoRegistry.Get(ctx)
     
     // ... test code here ...
 }
@@ -100,7 +101,6 @@ var multiEchoerRegistry = registry.NewServiceRegistry[echo.MultiEchoerService]("
 
 func init() {
     multiEchoerRegistry.Register("local", func(ctx context.Context) (echo.MultiEchoerService, error) {
-        ctx := context.Background()
         echo, err := NewEchoService(ctx)
         cache, err := simplecache.NewSimpleCache(ctx)
         return NewMultiEchoer(ctx, echo, cache)
@@ -109,31 +109,34 @@ func init() {
 
 // A test for the MultiEchoerService
 func TestMultiEchoer(t *testing.T) {
-    multi, err := multiEchoerRegistry.Get(context.Background())
+    ctx := context.Background()
+    multi, err := multiEchoerRegistry.Get(ctx)
 }
 ```
 
 ### Rules for defining gotests tests
 
 * A `ServiceRegistry` is used for definining and subsequently instantiating services.
-* The ServiceRegistry is declared as a ***package variable** (e.g. `echoVegistry`)
+* The ServiceRegistry instance is declared as a ***package variable*** (e.g. `var echoRegistry = ...`)
 * The ServiceRegistry is instantiated using `registry.NewServiceRegistry`
-* A test acquires a service instance by calling `Get`, e.g. `echoRegistry.Get`
-* A package can contain multiple service registries for different service types. 
+* Tests call `Get` on the service registry to acquire the service instances, e.g. `echo, err := echoRegistry.Get(ctx)`
+* A package can contain multiple service registries for different service types, e.g. `echoRegistry` and `multiEchoerRegistry`
 
 ## Running Black-box Tests Directly
 
-The above tests can be run directly, much like white-box tests, by invoking `go test`.  This is because in addition to using the ServiceRegistry, the tests also define the constructor for a simple "local" service.  Running `go test` directly will construct this "local" service and run the tests against it.
+Like white-box tests, black-box tests can be directly invoked using `go test` in the source package.  For this to work, however, at least one service must be registered with the service registry, otherwise the tests will fail.
+
+This can be done using a static initialization block to provide a "local" service; this service creation code is equivalent to how the services were instantiated in the white-box tests.  Running the tests directly will construct this "local" service and run the tests against it.
 
 ### Rules for running Black-box tests directly
 
-* A static initialization block `init()` can register a "local" constructor, for running the tests in white-box style.
+* A static initialization block `init()` should register a "local" constructor to enable directly invoking the tests in the source package.
 
 ## Running Black-box Tests Against the Compiled Application
 
-When Blueprint compiles an application, it can automatically convert black-box tests into tests that can run against the real, compiled application.  To do this, however, the tests require a "real" client to the application.  For example, if the compiled application deploys EchoService over gRPC, then the tests will need the gRPC client in order to contact the service.
+When Blueprint compiles an application, the [gotests plugin](../../plugins/gotests/) can be used to automatically convert black-box tests into tests that can run against the real, compiled application.  To do this, however, the tests require a "real" client to the application.  For example, if the compiled application deploys EchoService over gRPC, then the tests will need the gRPC client in order to contact the service.
 
-The gotests plugin provides this functionality.  If enabled, it will modify the black-box tests to register a client for the compiled application (e.g. it will add a gRPC client to the service registry).
+The gotests plugin provides this functionality.  If enabled, it will inject a "real" client to the compiled applications into the black-box tests, e.g. it will add a gRPC client to the service registry.
 
 Blueprint will auto-generate tests to `tests` in the output directory.  To run the compiled tests:
  1. start the compiled application
