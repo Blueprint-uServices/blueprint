@@ -3,7 +3,7 @@
 Blueprint is:
  * A collection of microservice benchmark applications
  * A library that simplifies developing new microservice applications
- * A tool that for reconfiguring the frameworks, infrastructure, and deployment of a microservice application
+ * A tool for easily reconfiguring the frameworks, infrastructure, and deployment of a microservice application
  * A platform for prototyping new microservice infrastructure and integrating it with existing applications
 
 Blueprint is particularly aimed at **prototyping and experimentation** use cases.  Its central goal is to reduce the amount of effort involved when changing the infrastructure choices of a microservice application.  It is intended for use by anybody, but particularly researchers and practitioners wanting to experiment with microservice applications.
@@ -15,7 +15,9 @@ See [Getting Started](docs/gettingstarted.md) to get started with Blueprint.
 
 ### Publications
 
-[Blueprint: A Toolchain for Highly-Reconfigurable Microservices](https://blueprint-uservices.github.io/assets/pdf/anand2023blueprint.pdf), 29th ACM Symposium on Operating Systems Principles (SOSP '23)
+[Blueprint: A Toolchain for Highly-Reconfigurable Microservices](https://blueprint-uservices.github.io/assets/pdf/anand2023blueprint.pdf)\
+Vaastav Anand, Deepak Garg, Antoine Kaufmann, Jonathan Mace\
+*29th ACM Symposium on Operating Systems Principles (SOSP '23)*
 
 ### Mailing List
 
