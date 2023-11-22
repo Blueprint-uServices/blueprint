@@ -34,7 +34,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
-// Auto-generates tests for servicesToTest by converting existing black-box unit tests.
+// Auto-generates tests for servicesToTest by converting existing black-box workflow unit tests.
 // After compilation, the output will contain a golang workspace called "tests" that will
 // include modified versions of the source tests.
 //
@@ -45,12 +45,12 @@ import (
 // Matching packges in the output workspace will have a file blueprint_clients.go that registers
 // a service client.
 //
+// Returns the name "gotests" which must be included when later calling [wiring.WiringSpec.BuildIR]
+//
 // For more information about tests see [Workflow Tests].
 //
 // [Workflow Tests]: https://github.com/Blueprint-uServices/blueprint/tree/main/docs/manual/workflow_tests.md
 // [registry.ServiceRegistry]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/core/registry
-//
-// [registry.NewServiceRegistry]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/core/registry
 func Test(spec wiring.WiringSpec, servicesToTest ...string) string {
 
 	name := "gotests"
