@@ -3,13 +3,13 @@ package simplecache
 import (
 	"fmt"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"golang.org/x/exp/slog"
 )
 
