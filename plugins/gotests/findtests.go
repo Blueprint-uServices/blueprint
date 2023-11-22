@@ -44,7 +44,7 @@ func (r *serviceRegistries) Get(t *gocode.UserType) []*serviceRegistry {
 // direct call to registry.NewServiceRegistry, e.g.
 //
 //	xxx := registry.NewServiceRegistry[xxx](xxx)
-func FindWorkflowServiceRegistries() (*serviceRegistries, error) {
+func findWorkflowServiceRegistries() (*serviceRegistries, error) {
 	var err error
 	r := &serviceRegistries{}
 
