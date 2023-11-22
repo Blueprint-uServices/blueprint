@@ -14,7 +14,7 @@ An application's IR representation is produced by constructing and then building
 
 - [func CleanName\(name string\) string](<#CleanName>)
 - [func Filter\[T any\]\(nodes \[\]IRNode\) \[\]T](<#Filter>)
-- [func RegisterDefaultBuilder\[T IRNode\]\(name string, buildFunc func\(outputDir string, node IRNode\) error\)](<#RegisterDefaultBuilder>)
+- [func PrettyPrintNamespace\(instanceName string, namespaceType string, argNodes \[\]IRNode, childNodes \[\]IRNode\) string](<#PrettyPrintNamespace>)
 - [func RegisterDefaultNamespace\[T IRNode\]\(name string, buildFunc func\(outputDir string, nodes \[\]IRNode\) error\)](<#RegisterDefaultNamespace>)
 - [type ApplicationNode](<#ApplicationNode>)
   - [func \(app \*ApplicationNode\) GenerateArtifacts\(dir string\) error](<#ApplicationNode.GenerateArtifacts>)
@@ -52,14 +52,1318 @@ func Filter[T any](nodes []IRNode) []T
 
 Returns a slice containing only nodes of type T
 
-<a name="RegisterDefaultBuilder"></a>
-## func RegisterDefaultBuilder
+<a name="PrettyPrintNamespace"></a>
+## func PrettyPrintNamespace
 
 ```go
-func RegisterDefaultBuilder[T IRNode](name string, buildFunc func(outputDir string, node IRNode) error)
+func PrettyPrintNamespace(instanceName string, namespaceType string, argNodes []IRNode, childNodes []IRNode) string
 ```
 
-When building an application, any IR nodes of type T that reside within the top\-level application will be built using the specified buildFunc. The buildFunc will only be invoked if there isn't a default namespace registered for nodes of type T.
+
+
+<a name="RegisterDefaultNamespace"></a>
+## func RegisterDefaultNamespace
+
+```go
+func RegisterDefaultNamespace[T IRNode](name string, buildFunc func(outputDir string, nodes []IRNode) error)
+```
+
+When building an application, any IR nodes of type T that reside within the top\-level application will be built using the specified buildFunc.
+
+<a name="ApplicationNode"></a>
+## type ApplicationNode
+
+The IR Node that represents the whole application. Building a wiring spec will return an ApplicationNode. An ApplicationNode can be built with the GenerateArtifacts method.
+
+```go
+type ApplicationNode struct {
+    IRNode
+    ArtifactGenerator
+
+    ApplicationName string
+    Children        []IRNode
+}
+```
+
+<a name="ApplicationNode.GenerateArtifacts"></a>
+### func \(\*ApplicationNode\) GenerateArtifacts
+
+```go
+func (app *ApplicationNode) GenerateArtifacts(dir string) error
+```
+
+
+
+<a name="ApplicationNode.Name"></a>
+### func \(\*ApplicationNode\) Name
+
+```go
+func (node *ApplicationNode) Name() string
+```
+
+
+
+<a name="ApplicationNode.String"></a>
+### func \(\*ApplicationNode\) String
+
+```go
+func (node *ApplicationNode) String() string
+```
+
+Print the IR graph
+
+<a name="ArtifactGenerator"></a>
+## type ArtifactGenerator
+
+Most IRNodes can generate code artifacts but they do so in the context of some [BuildContext](<#BuildContext>). A few IRNodes, however, can generate artifacts independent of any external context. Those IRNodes implement the ArtifactGenerator interface. Typically these are namespace nodes such as golang processes, linux containers, or docker deployments.
+
+```go
+type ArtifactGenerator interface {
+
+    // Generate all artifacts for this node to the specified dir on the local filesystem.
+    GenerateArtifacts(dir string) error
+}
+```
+
+<a name="BuildContext"></a>
+## type BuildContext
+
+All artifact generation occurs in the context of some BuildContext.
+
+Plugins that control the artifact generation process should implement this interface.
+
+```go
+type BuildContext interface {
+    VisitTracker
+    ImplementsBuildContext()
+}
+```
+
+<a name="IRConfig"></a>
+## type IRConfig
+
+IRConfig is an IR node that represents a configured or configurable variable. In a generated application, IRConfig nodes typically map down to things like environment variables or command line arguments, and can be passed all the way into specific application\-level instances. IRConfig is also used for addressing.
+
+```go
+type IRConfig interface {
+    IRNode
+    Optional() bool
+    // At various points during the build process, an IRConfig node might have a concrete value
+    // set, or it might be left unbound.
+    HasValue() bool
+
+    // Returns the current value of the config node if it has been set.  Config values
+    // are always strings.
+    Value() string
+    ImplementsIRConfig()
+}
+```
+
+<a name="IRMetadata"></a>
+## type IRMetadata
+
+Metadata is an IR node that exists in the IR of an application but does not build any artifacts or provide configuration or anything like that.
+
+```go
+type IRMetadata interface {
+    ImplementsIRMetadata()
+}
+```
+
+<a name="IRNode"></a>
+## type IRNode
+
+All nodes implement the IRNode interface
+
+```go
+type IRNode interface {
+    Name() string
+    String() string
+}
+```
+
+<a name="FilterNodes"></a>
+### func FilterNodes
+
+```go
+func FilterNodes[T any](nodes []IRNode) []IRNode
+```
+
+Returns a slice containing only nodes of type T
+
+<a name="Remove"></a>
+### func Remove
+
+```go
+func Remove[T any](nodes []IRNode) []IRNode
+```
+
+Returns a slice containing all nodes except those of type T
+
+<a name="VisitTracker"></a>
+## type VisitTracker
+
+A Blueprint application can potentially have multiple IR node instances spread across the application that generate the same code.
+
+Visit tracker is a utility method used during artifact generation to prevent nodes from unnecessarily generating the same artifact repeatedly, when once will suffice.
+
+```go
+type VisitTracker interface {
+    // Returns false on the first invocation of name; true on subsequent invocations
+    Visited(name string) bool
+}
+```
+
+<a name="VisitTrackerImpl"></a>
+## type VisitTrackerImpl
+
+Basic implementation of the [VisitTracker](<#VisitTracker>) interface
+
+```go
+type VisitTrackerImpl struct {
+    // contains filtered or unexported fields
+}
+```
+
+<a name="VisitTrackerImpl.Visited"></a>
+### func \(\*VisitTrackerImpl\) Visited
+
+```go
+func (tracker *VisitTrackerImpl) Visited(name string) bool
+```
+
+
+
+Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
+
+
+<!-- Code generated by gomarkdoc. DO NOT EDIT -->
+
+# ir
+
+```go
+import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+```
+
+Package ir provides the basic interfaces for Blueprint's Internal Representation \(IR\) and for subsequently generating application artifacts such as code and container images.
+
+An application's IR representation is produced by constructing and then building a wiring spec using methods from the wiring package and from wiring extensions provided by plugins.
+
+## Index
+
+- [func CleanName\(name string\) string](<#CleanName>)
+- [func Filter\[T any\]\(nodes \[\]IRNode\) \[\]T](<#Filter>)
+- [func PrettyPrintNamespace\(instanceName string, namespaceType string, argNodes \[\]IRNode, childNodes \[\]IRNode\) string](<#PrettyPrintNamespace>)
+- [func RegisterDefaultNamespace\[T IRNode\]\(name string, buildFunc func\(outputDir string, nodes \[\]IRNode\) error\)](<#RegisterDefaultNamespace>)
+- [type ApplicationNode](<#ApplicationNode>)
+  - [func \(app \*ApplicationNode\) GenerateArtifacts\(dir string\) error](<#ApplicationNode.GenerateArtifacts>)
+  - [func \(node \*ApplicationNode\) Name\(\) string](<#ApplicationNode.Name>)
+  - [func \(node \*ApplicationNode\) String\(\) string](<#ApplicationNode.String>)
+- [type ArtifactGenerator](<#ArtifactGenerator>)
+- [type BuildContext](<#BuildContext>)
+- [type IRConfig](<#IRConfig>)
+- [type IRMetadata](<#IRMetadata>)
+- [type IRNode](<#IRNode>)
+  - [func FilterNodes\[T any\]\(nodes \[\]IRNode\) \[\]IRNode](<#FilterNodes>)
+  - [func Remove\[T any\]\(nodes \[\]IRNode\) \[\]IRNode](<#Remove>)
+- [type VisitTracker](<#VisitTracker>)
+- [type VisitTrackerImpl](<#VisitTrackerImpl>)
+  - [func \(tracker \*VisitTrackerImpl\) Visited\(name string\) bool](<#VisitTrackerImpl.Visited>)
+
+
+<a name="CleanName"></a>
+## func CleanName
+
+```go
+func CleanName(name string) string
+```
+
+Returns name with only alphanumeric characters and all other symbols converted to underscores.
+
+CleanName is primarily used by plugins to convert user\-defined service names into names that are valid as e.g. environment variables, command line arguments, etc.
+
+<a name="Filter"></a>
+## func Filter
+
+```go
+func Filter[T any](nodes []IRNode) []T
+```
+
+Returns a slice containing only nodes of type T
+
+<a name="PrettyPrintNamespace"></a>
+## func PrettyPrintNamespace
+
+```go
+func PrettyPrintNamespace(instanceName string, namespaceType string, argNodes []IRNode, childNodes []IRNode) string
+```
+
+
+
+<a name="RegisterDefaultNamespace"></a>
+## func RegisterDefaultNamespace
+
+```go
+func RegisterDefaultNamespace[T IRNode](name string, buildFunc func(outputDir string, nodes []IRNode) error)
+```
+
+When building an application, any IR nodes of type T that reside within the top\-level application will be built using the specified buildFunc.
+
+<a name="ApplicationNode"></a>
+## type ApplicationNode
+
+The IR Node that represents the whole application. Building a wiring spec will return an ApplicationNode. An ApplicationNode can be built with the GenerateArtifacts method.
+
+```go
+type ApplicationNode struct {
+    IRNode
+    ArtifactGenerator
+
+    ApplicationName string
+    Children        []IRNode
+}
+```
+
+<a name="ApplicationNode.GenerateArtifacts"></a>
+### func \(\*ApplicationNode\) GenerateArtifacts
+
+```go
+func (app *ApplicationNode) GenerateArtifacts(dir string) error
+```
+
+
+
+<a name="ApplicationNode.Name"></a>
+### func \(\*ApplicationNode\) Name
+
+```go
+func (node *ApplicationNode) Name() string
+```
+
+
+
+<a name="ApplicationNode.String"></a>
+### func \(\*ApplicationNode\) String
+
+```go
+func (node *ApplicationNode) String() string
+```
+
+Print the IR graph
+
+<a name="ArtifactGenerator"></a>
+## type ArtifactGenerator
+
+Most IRNodes can generate code artifacts but they do so in the context of some [BuildContext](<#BuildContext>). A few IRNodes, however, can generate artifacts independent of any external context. Those IRNodes implement the ArtifactGenerator interface. Typically these are namespace nodes such as golang processes, linux containers, or docker deployments.
+
+```go
+type ArtifactGenerator interface {
+
+    // Generate all artifacts for this node to the specified dir on the local filesystem.
+    GenerateArtifacts(dir string) error
+}
+```
+
+<a name="BuildContext"></a>
+## type BuildContext
+
+All artifact generation occurs in the context of some BuildContext.
+
+Plugins that control the artifact generation process should implement this interface.
+
+```go
+type BuildContext interface {
+    VisitTracker
+    ImplementsBuildContext()
+}
+```
+
+<a name="IRConfig"></a>
+## type IRConfig
+
+IRConfig is an IR node that represents a configured or configurable variable. In a generated application, IRConfig nodes typically map down to things like environment variables or command line arguments, and can be passed all the way into specific application\-level instances. IRConfig is also used for addressing.
+
+```go
+type IRConfig interface {
+    IRNode
+    Optional() bool
+    // At various points during the build process, an IRConfig node might have a concrete value
+    // set, or it might be left unbound.
+    HasValue() bool
+
+    // Returns the current value of the config node if it has been set.  Config values
+    // are always strings.
+    Value() string
+    ImplementsIRConfig()
+}
+```
+
+<a name="IRMetadata"></a>
+## type IRMetadata
+
+Metadata is an IR node that exists in the IR of an application but does not build any artifacts or provide configuration or anything like that.
+
+```go
+type IRMetadata interface {
+    ImplementsIRMetadata()
+}
+```
+
+<a name="IRNode"></a>
+## type IRNode
+
+All nodes implement the IRNode interface
+
+```go
+type IRNode interface {
+    Name() string
+    String() string
+}
+```
+
+<a name="FilterNodes"></a>
+### func FilterNodes
+
+```go
+func FilterNodes[T any](nodes []IRNode) []IRNode
+```
+
+Returns a slice containing only nodes of type T
+
+<a name="Remove"></a>
+### func Remove
+
+```go
+func Remove[T any](nodes []IRNode) []IRNode
+```
+
+Returns a slice containing all nodes except those of type T
+
+<a name="VisitTracker"></a>
+## type VisitTracker
+
+A Blueprint application can potentially have multiple IR node instances spread across the application that generate the same code.
+
+Visit tracker is a utility method used during artifact generation to prevent nodes from unnecessarily generating the same artifact repeatedly, when once will suffice.
+
+```go
+type VisitTracker interface {
+    // Returns false on the first invocation of name; true on subsequent invocations
+    Visited(name string) bool
+}
+```
+
+<a name="VisitTrackerImpl"></a>
+## type VisitTrackerImpl
+
+Basic implementation of the [VisitTracker](<#VisitTracker>) interface
+
+```go
+type VisitTrackerImpl struct {
+    // contains filtered or unexported fields
+}
+```
+
+<a name="VisitTrackerImpl.Visited"></a>
+### func \(\*VisitTrackerImpl\) Visited
+
+```go
+func (tracker *VisitTrackerImpl) Visited(name string) bool
+```
+
+
+
+Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
+
+
+<!-- Code generated by gomarkdoc. DO NOT EDIT -->
+
+# ir
+
+```go
+import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+```
+
+Package ir provides the basic interfaces for Blueprint's Internal Representation \(IR\) and for subsequently generating application artifacts such as code and container images.
+
+An application's IR representation is produced by constructing and then building a wiring spec using methods from the wiring package and from wiring extensions provided by plugins.
+
+## Index
+
+- [func CleanName\(name string\) string](<#CleanName>)
+- [func Filter\[T any\]\(nodes \[\]IRNode\) \[\]T](<#Filter>)
+- [func PrettyPrintNamespace\(instanceName string, namespaceType string, argNodes \[\]IRNode, childNodes \[\]IRNode\) string](<#PrettyPrintNamespace>)
+- [func RegisterDefaultNamespace\[T IRNode\]\(name string, buildFunc func\(outputDir string, nodes \[\]IRNode\) error\)](<#RegisterDefaultNamespace>)
+- [type ApplicationNode](<#ApplicationNode>)
+  - [func \(app \*ApplicationNode\) GenerateArtifacts\(dir string\) error](<#ApplicationNode.GenerateArtifacts>)
+  - [func \(node \*ApplicationNode\) Name\(\) string](<#ApplicationNode.Name>)
+  - [func \(node \*ApplicationNode\) String\(\) string](<#ApplicationNode.String>)
+- [type ArtifactGenerator](<#ArtifactGenerator>)
+- [type BuildContext](<#BuildContext>)
+- [type IRConfig](<#IRConfig>)
+- [type IRMetadata](<#IRMetadata>)
+- [type IRNode](<#IRNode>)
+  - [func FilterNodes\[T any\]\(nodes \[\]IRNode\) \[\]IRNode](<#FilterNodes>)
+  - [func Remove\[T any\]\(nodes \[\]IRNode\) \[\]IRNode](<#Remove>)
+- [type VisitTracker](<#VisitTracker>)
+- [type VisitTrackerImpl](<#VisitTrackerImpl>)
+  - [func \(tracker \*VisitTrackerImpl\) Visited\(name string\) bool](<#VisitTrackerImpl.Visited>)
+
+
+<a name="CleanName"></a>
+## func CleanName
+
+```go
+func CleanName(name string) string
+```
+
+Returns name with only alphanumeric characters and all other symbols converted to underscores.
+
+CleanName is primarily used by plugins to convert user\-defined service names into names that are valid as e.g. environment variables, command line arguments, etc.
+
+<a name="Filter"></a>
+## func Filter
+
+```go
+func Filter[T any](nodes []IRNode) []T
+```
+
+Returns a slice containing only nodes of type T
+
+<a name="PrettyPrintNamespace"></a>
+## func PrettyPrintNamespace
+
+```go
+func PrettyPrintNamespace(instanceName string, namespaceType string, argNodes []IRNode, childNodes []IRNode) string
+```
+
+
+
+<a name="RegisterDefaultNamespace"></a>
+## func RegisterDefaultNamespace
+
+```go
+func RegisterDefaultNamespace[T IRNode](name string, buildFunc func(outputDir string, nodes []IRNode) error)
+```
+
+When building an application, any IR nodes of type T that reside within the top\-level application will be built using the specified buildFunc.
+
+<a name="ApplicationNode"></a>
+## type ApplicationNode
+
+The IR Node that represents the whole application. Building a wiring spec will return an ApplicationNode. An ApplicationNode can be built with the GenerateArtifacts method.
+
+```go
+type ApplicationNode struct {
+    IRNode
+    ArtifactGenerator
+
+    ApplicationName string
+    Children        []IRNode
+}
+```
+
+<a name="ApplicationNode.GenerateArtifacts"></a>
+### func \(\*ApplicationNode\) GenerateArtifacts
+
+```go
+func (app *ApplicationNode) GenerateArtifacts(dir string) error
+```
+
+
+
+<a name="ApplicationNode.Name"></a>
+### func \(\*ApplicationNode\) Name
+
+```go
+func (node *ApplicationNode) Name() string
+```
+
+
+
+<a name="ApplicationNode.String"></a>
+### func \(\*ApplicationNode\) String
+
+```go
+func (node *ApplicationNode) String() string
+```
+
+Print the IR graph
+
+<a name="ArtifactGenerator"></a>
+## type ArtifactGenerator
+
+Most IRNodes can generate code artifacts but they do so in the context of some [BuildContext](<#BuildContext>). A few IRNodes, however, can generate artifacts independent of any external context. Those IRNodes implement the ArtifactGenerator interface. Typically these are namespace nodes such as golang processes, linux containers, or docker deployments.
+
+```go
+type ArtifactGenerator interface {
+
+    // Generate all artifacts for this node to the specified dir on the local filesystem.
+    GenerateArtifacts(dir string) error
+}
+```
+
+<a name="BuildContext"></a>
+## type BuildContext
+
+All artifact generation occurs in the context of some BuildContext.
+
+Plugins that control the artifact generation process should implement this interface.
+
+```go
+type BuildContext interface {
+    VisitTracker
+    ImplementsBuildContext()
+}
+```
+
+<a name="IRConfig"></a>
+## type IRConfig
+
+IRConfig is an IR node that represents a configured or configurable variable. In a generated application, IRConfig nodes typically map down to things like environment variables or command line arguments, and can be passed all the way into specific application\-level instances. IRConfig is also used for addressing.
+
+```go
+type IRConfig interface {
+    IRNode
+    Optional() bool
+    // At various points during the build process, an IRConfig node might have a concrete value
+    // set, or it might be left unbound.
+    HasValue() bool
+
+    // Returns the current value of the config node if it has been set.  Config values
+    // are always strings.
+    Value() string
+    ImplementsIRConfig()
+}
+```
+
+<a name="IRMetadata"></a>
+## type IRMetadata
+
+Metadata is an IR node that exists in the IR of an application but does not build any artifacts or provide configuration or anything like that.
+
+```go
+type IRMetadata interface {
+    ImplementsIRMetadata()
+}
+```
+
+<a name="IRNode"></a>
+## type IRNode
+
+All nodes implement the IRNode interface
+
+```go
+type IRNode interface {
+    Name() string
+    String() string
+}
+```
+
+<a name="FilterNodes"></a>
+### func FilterNodes
+
+```go
+func FilterNodes[T any](nodes []IRNode) []IRNode
+```
+
+Returns a slice containing only nodes of type T
+
+<a name="Remove"></a>
+### func Remove
+
+```go
+func Remove[T any](nodes []IRNode) []IRNode
+```
+
+Returns a slice containing all nodes except those of type T
+
+<a name="VisitTracker"></a>
+## type VisitTracker
+
+A Blueprint application can potentially have multiple IR node instances spread across the application that generate the same code.
+
+Visit tracker is a utility method used during artifact generation to prevent nodes from unnecessarily generating the same artifact repeatedly, when once will suffice.
+
+```go
+type VisitTracker interface {
+    // Returns false on the first invocation of name; true on subsequent invocations
+    Visited(name string) bool
+}
+```
+
+<a name="VisitTrackerImpl"></a>
+## type VisitTrackerImpl
+
+Basic implementation of the [VisitTracker](<#VisitTracker>) interface
+
+```go
+type VisitTrackerImpl struct {
+    // contains filtered or unexported fields
+}
+```
+
+<a name="VisitTrackerImpl.Visited"></a>
+### func \(\*VisitTrackerImpl\) Visited
+
+```go
+func (tracker *VisitTrackerImpl) Visited(name string) bool
+```
+
+
+
+Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
+
+
+<!-- Code generated by gomarkdoc. DO NOT EDIT -->
+
+# ir
+
+```go
+import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+```
+
+Package ir provides the basic interfaces for Blueprint's Internal Representation \(IR\) and for subsequently generating application artifacts such as code and container images.
+
+An application's IR representation is produced by constructing and then building a wiring spec using methods from the wiring package and from wiring extensions provided by plugins.
+
+## Index
+
+- [func CleanName\(name string\) string](<#CleanName>)
+- [func Filter\[T any\]\(nodes \[\]IRNode\) \[\]T](<#Filter>)
+- [func PrettyPrintNamespace\(instanceName string, namespaceType string, argNodes \[\]IRNode, childNodes \[\]IRNode\) string](<#PrettyPrintNamespace>)
+- [func RegisterDefaultNamespace\[T IRNode\]\(name string, buildFunc func\(outputDir string, nodes \[\]IRNode\) error\)](<#RegisterDefaultNamespace>)
+- [type ApplicationNode](<#ApplicationNode>)
+  - [func \(app \*ApplicationNode\) GenerateArtifacts\(dir string\) error](<#ApplicationNode.GenerateArtifacts>)
+  - [func \(node \*ApplicationNode\) Name\(\) string](<#ApplicationNode.Name>)
+  - [func \(node \*ApplicationNode\) String\(\) string](<#ApplicationNode.String>)
+- [type ArtifactGenerator](<#ArtifactGenerator>)
+- [type BuildContext](<#BuildContext>)
+- [type IRConfig](<#IRConfig>)
+- [type IRMetadata](<#IRMetadata>)
+- [type IRNode](<#IRNode>)
+  - [func FilterNodes\[T any\]\(nodes \[\]IRNode\) \[\]IRNode](<#FilterNodes>)
+  - [func Remove\[T any\]\(nodes \[\]IRNode\) \[\]IRNode](<#Remove>)
+- [type VisitTracker](<#VisitTracker>)
+- [type VisitTrackerImpl](<#VisitTrackerImpl>)
+  - [func \(tracker \*VisitTrackerImpl\) Visited\(name string\) bool](<#VisitTrackerImpl.Visited>)
+
+
+<a name="CleanName"></a>
+## func CleanName
+
+```go
+func CleanName(name string) string
+```
+
+Returns name with only alphanumeric characters and all other symbols converted to underscores.
+
+CleanName is primarily used by plugins to convert user\-defined service names into names that are valid as e.g. environment variables, command line arguments, etc.
+
+<a name="Filter"></a>
+## func Filter
+
+```go
+func Filter[T any](nodes []IRNode) []T
+```
+
+Returns a slice containing only nodes of type T
+
+<a name="PrettyPrintNamespace"></a>
+## func PrettyPrintNamespace
+
+```go
+func PrettyPrintNamespace(instanceName string, namespaceType string, argNodes []IRNode, childNodes []IRNode) string
+```
+
+
+
+<a name="RegisterDefaultNamespace"></a>
+## func RegisterDefaultNamespace
+
+```go
+func RegisterDefaultNamespace[T IRNode](name string, buildFunc func(outputDir string, nodes []IRNode) error)
+```
+
+When building an application, any IR nodes of type T that reside within the top\-level application will be built using the specified buildFunc.
+
+<a name="ApplicationNode"></a>
+## type ApplicationNode
+
+The IR Node that represents the whole application. Building a wiring spec will return an ApplicationNode. An ApplicationNode can be built with the GenerateArtifacts method.
+
+```go
+type ApplicationNode struct {
+    IRNode
+    ArtifactGenerator
+
+    ApplicationName string
+    Children        []IRNode
+}
+```
+
+<a name="ApplicationNode.GenerateArtifacts"></a>
+### func \(\*ApplicationNode\) GenerateArtifacts
+
+```go
+func (app *ApplicationNode) GenerateArtifacts(dir string) error
+```
+
+
+
+<a name="ApplicationNode.Name"></a>
+### func \(\*ApplicationNode\) Name
+
+```go
+func (node *ApplicationNode) Name() string
+```
+
+
+
+<a name="ApplicationNode.String"></a>
+### func \(\*ApplicationNode\) String
+
+```go
+func (node *ApplicationNode) String() string
+```
+
+Print the IR graph
+
+<a name="ArtifactGenerator"></a>
+## type ArtifactGenerator
+
+Most IRNodes can generate code artifacts but they do so in the context of some [BuildContext](<#BuildContext>). A few IRNodes, however, can generate artifacts independent of any external context. Those IRNodes implement the ArtifactGenerator interface. Typically these are namespace nodes such as golang processes, linux containers, or docker deployments.
+
+```go
+type ArtifactGenerator interface {
+
+    // Generate all artifacts for this node to the specified dir on the local filesystem.
+    GenerateArtifacts(dir string) error
+}
+```
+
+<a name="BuildContext"></a>
+## type BuildContext
+
+All artifact generation occurs in the context of some BuildContext.
+
+Plugins that control the artifact generation process should implement this interface.
+
+```go
+type BuildContext interface {
+    VisitTracker
+    ImplementsBuildContext()
+}
+```
+
+<a name="IRConfig"></a>
+## type IRConfig
+
+IRConfig is an IR node that represents a configured or configurable variable. In a generated application, IRConfig nodes typically map down to things like environment variables or command line arguments, and can be passed all the way into specific application\-level instances. IRConfig is also used for addressing.
+
+```go
+type IRConfig interface {
+    IRNode
+    Optional() bool
+    // At various points during the build process, an IRConfig node might have a concrete value
+    // set, or it might be left unbound.
+    HasValue() bool
+
+    // Returns the current value of the config node if it has been set.  Config values
+    // are always strings.
+    Value() string
+    ImplementsIRConfig()
+}
+```
+
+<a name="IRMetadata"></a>
+## type IRMetadata
+
+Metadata is an IR node that exists in the IR of an application but does not build any artifacts or provide configuration or anything like that.
+
+```go
+type IRMetadata interface {
+    ImplementsIRMetadata()
+}
+```
+
+<a name="IRNode"></a>
+## type IRNode
+
+All nodes implement the IRNode interface
+
+```go
+type IRNode interface {
+    Name() string
+    String() string
+}
+```
+
+<a name="FilterNodes"></a>
+### func FilterNodes
+
+```go
+func FilterNodes[T any](nodes []IRNode) []IRNode
+```
+
+Returns a slice containing only nodes of type T
+
+<a name="Remove"></a>
+### func Remove
+
+```go
+func Remove[T any](nodes []IRNode) []IRNode
+```
+
+Returns a slice containing all nodes except those of type T
+
+<a name="VisitTracker"></a>
+## type VisitTracker
+
+A Blueprint application can potentially have multiple IR node instances spread across the application that generate the same code.
+
+Visit tracker is a utility method used during artifact generation to prevent nodes from unnecessarily generating the same artifact repeatedly, when once will suffice.
+
+```go
+type VisitTracker interface {
+    // Returns false on the first invocation of name; true on subsequent invocations
+    Visited(name string) bool
+}
+```
+
+<a name="VisitTrackerImpl"></a>
+## type VisitTrackerImpl
+
+Basic implementation of the [VisitTracker](<#VisitTracker>) interface
+
+```go
+type VisitTrackerImpl struct {
+    // contains filtered or unexported fields
+}
+```
+
+<a name="VisitTrackerImpl.Visited"></a>
+### func \(\*VisitTrackerImpl\) Visited
+
+```go
+func (tracker *VisitTrackerImpl) Visited(name string) bool
+```
+
+
+
+Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
+
+
+<!-- Code generated by gomarkdoc. DO NOT EDIT -->
+
+# ir
+
+```go
+import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+```
+
+Package ir provides the basic interfaces for Blueprint's Internal Representation \(IR\) and for subsequently generating application artifacts such as code and container images.
+
+An application's IR representation is produced by constructing and then building a wiring spec using methods from the wiring package and from wiring extensions provided by plugins.
+
+## Index
+
+- [Variables](<#variables>)
+- [func CleanName\(name string\) string](<#CleanName>)
+- [func Filter\[T any\]\(nodes \[\]IRNode\) \[\]T](<#Filter>)
+- [func PrettyPrintNamespace\(instanceName string, namespaceType string, argNodes \[\]IRNode, childNodes \[\]IRNode\) string](<#PrettyPrintNamespace>)
+- [func RegisterDefaultNamespace\[T IRNode\]\(name string, buildFunc func\(outputDir string, nodes \[\]IRNode\) error\)](<#RegisterDefaultNamespace>)
+- [type ApplicationNode](<#ApplicationNode>)
+  - [func \(app \*ApplicationNode\) GenerateArtifacts\(dir string\) error](<#ApplicationNode.GenerateArtifacts>)
+  - [func \(node \*ApplicationNode\) Name\(\) string](<#ApplicationNode.Name>)
+  - [func \(node \*ApplicationNode\) String\(\) string](<#ApplicationNode.String>)
+- [type ArtifactGenerator](<#ArtifactGenerator>)
+- [type BuildContext](<#BuildContext>)
+- [type IRConfig](<#IRConfig>)
+- [type IRMetadata](<#IRMetadata>)
+- [type IRNode](<#IRNode>)
+  - [func FilterNodes\[T any\]\(nodes \[\]IRNode\) \[\]IRNode](<#FilterNodes>)
+  - [func Remove\[T any\]\(nodes \[\]IRNode\) \[\]IRNode](<#Remove>)
+  - [func buildArtifactGeneratorNodes\(outputdir string, nodes \[\]IRNode\) \(\[\]IRNode, error\)](<#buildArtifactGeneratorNodes>)
+- [type VisitTracker](<#VisitTracker>)
+- [type VisitTrackerImpl](<#VisitTrackerImpl>)
+  - [func \(tracker \*VisitTrackerImpl\) Visited\(name string\) bool](<#VisitTrackerImpl.Visited>)
+- [type builder](<#builder>)
+  - [func \(b \*builder\) builds\(node IRNode\) bool](<#builder.builds>)
+- [type namespaceBuilder](<#namespaceBuilder>)
+  - [func \(b \*namespaceBuilder\) buildCompatibleNodes\(outputDir string, nodes \[\]IRNode\) \(\[\]IRNode, error\)](<#namespaceBuilder.buildCompatibleNodes>)
+  - [func \(b \*namespaceBuilder\) builds\(node IRNode\) bool](<#namespaceBuilder.builds>)
+- [type registry](<#registry>)
+  - [func \(r \*registry\) addNamespaceBuilder\(name string, nodeType reflect.Type, buildFunc func\(outputDir string, nodes \[\]IRNode\) error\)](<#registry.addNamespaceBuilder>)
+  - [func \(r \*registry\) buildAll\(outputDir string, nodes \[\]IRNode\) \(err error\)](<#registry.buildAll>)
+
+
+## Variables
+
+<a name="defaultBuilders"></a>
+
+```go
+var defaultBuilders = registry{
+    namespace: make(map[reflect.Type]*namespaceBuilder),
+}
+```
+
+<a name="CleanName"></a>
+## func CleanName
+
+```go
+func CleanName(name string) string
+```
+
+Returns name with only alphanumeric characters and all other symbols converted to underscores.
+
+CleanName is primarily used by plugins to convert user\-defined service names into names that are valid as e.g. environment variables, command line arguments, etc.
+
+<a name="Filter"></a>
+## func Filter
+
+```go
+func Filter[T any](nodes []IRNode) []T
+```
+
+Returns a slice containing only nodes of type T
+
+<a name="PrettyPrintNamespace"></a>
+## func PrettyPrintNamespace
+
+```go
+func PrettyPrintNamespace(instanceName string, namespaceType string, argNodes []IRNode, childNodes []IRNode) string
+```
+
+
+
+<a name="RegisterDefaultNamespace"></a>
+## func RegisterDefaultNamespace
+
+```go
+func RegisterDefaultNamespace[T IRNode](name string, buildFunc func(outputDir string, nodes []IRNode) error)
+```
+
+When building an application, any IR nodes of type T that reside within the top\-level application will be built using the specified buildFunc.
+
+<a name="ApplicationNode"></a>
+## type ApplicationNode
+
+The IR Node that represents the whole application. Building a wiring spec will return an ApplicationNode. An ApplicationNode can be built with the GenerateArtifacts method.
+
+```go
+type ApplicationNode struct {
+    IRNode
+    ArtifactGenerator
+
+    ApplicationName string
+    Children        []IRNode
+}
+```
+
+<a name="ApplicationNode.GenerateArtifacts"></a>
+### func \(\*ApplicationNode\) GenerateArtifacts
+
+```go
+func (app *ApplicationNode) GenerateArtifacts(dir string) error
+```
+
+
+
+<a name="ApplicationNode.Name"></a>
+### func \(\*ApplicationNode\) Name
+
+```go
+func (node *ApplicationNode) Name() string
+```
+
+
+
+<a name="ApplicationNode.String"></a>
+### func \(\*ApplicationNode\) String
+
+```go
+func (node *ApplicationNode) String() string
+```
+
+Print the IR graph
+
+<a name="ArtifactGenerator"></a>
+## type ArtifactGenerator
+
+Most IRNodes can generate code artifacts but they do so in the context of some [BuildContext](<#BuildContext>). A few IRNodes, however, can generate artifacts independent of any external context. Those IRNodes implement the ArtifactGenerator interface. Typically these are namespace nodes such as golang processes, linux containers, or docker deployments.
+
+```go
+type ArtifactGenerator interface {
+
+    // Generate all artifacts for this node to the specified dir on the local filesystem.
+    GenerateArtifacts(dir string) error
+}
+```
+
+<a name="BuildContext"></a>
+## type BuildContext
+
+All artifact generation occurs in the context of some BuildContext.
+
+Plugins that control the artifact generation process should implement this interface.
+
+```go
+type BuildContext interface {
+    VisitTracker
+    ImplementsBuildContext()
+}
+```
+
+<a name="IRConfig"></a>
+## type IRConfig
+
+IRConfig is an IR node that represents a configured or configurable variable. In a generated application, IRConfig nodes typically map down to things like environment variables or command line arguments, and can be passed all the way into specific application\-level instances. IRConfig is also used for addressing.
+
+```go
+type IRConfig interface {
+    IRNode
+    Optional() bool
+    // At various points during the build process, an IRConfig node might have a concrete value
+    // set, or it might be left unbound.
+    HasValue() bool
+
+    // Returns the current value of the config node if it has been set.  Config values
+    // are always strings.
+    Value() string
+    ImplementsIRConfig()
+}
+```
+
+<a name="IRMetadata"></a>
+## type IRMetadata
+
+Metadata is an IR node that exists in the IR of an application but does not build any artifacts or provide configuration or anything like that.
+
+```go
+type IRMetadata interface {
+    ImplementsIRMetadata()
+}
+```
+
+<a name="IRNode"></a>
+## type IRNode
+
+All nodes implement the IRNode interface
+
+```go
+type IRNode interface {
+    Name() string
+    String() string
+}
+```
+
+<a name="FilterNodes"></a>
+### func FilterNodes
+
+```go
+func FilterNodes[T any](nodes []IRNode) []IRNode
+```
+
+Returns a slice containing only nodes of type T
+
+<a name="Remove"></a>
+### func Remove
+
+```go
+func Remove[T any](nodes []IRNode) []IRNode
+```
+
+Returns a slice containing all nodes except those of type T
+
+<a name="buildArtifactGeneratorNodes"></a>
+### func buildArtifactGeneratorNodes
+
+```go
+func buildArtifactGeneratorNodes(outputdir string, nodes []IRNode) ([]IRNode, error)
+```
+
+
+
+<a name="VisitTracker"></a>
+## type VisitTracker
+
+A Blueprint application can potentially have multiple IR node instances spread across the application that generate the same code.
+
+Visit tracker is a utility method used during artifact generation to prevent nodes from unnecessarily generating the same artifact repeatedly, when once will suffice.
+
+```go
+type VisitTracker interface {
+    // Returns false on the first invocation of name; true on subsequent invocations
+    Visited(name string) bool
+}
+```
+
+<a name="VisitTrackerImpl"></a>
+## type VisitTrackerImpl
+
+Basic implementation of the [VisitTracker](<#VisitTracker>) interface
+
+```go
+type VisitTrackerImpl struct {
+    visited map[string]any
+}
+```
+
+<a name="VisitTrackerImpl.Visited"></a>
+### func \(\*VisitTrackerImpl\) Visited
+
+```go
+func (tracker *VisitTrackerImpl) Visited(name string) bool
+```
+
+
+
+<a name="builder"></a>
+## type builder
+
+
+
+```go
+type builder struct {
+    name     string
+    nodeType reflect.Type
+}
+```
+
+<a name="builder.builds"></a>
+### func \(\*builder\) builds
+
+```go
+func (b *builder) builds(node IRNode) bool
+```
+
+True if this builder can build the specified node type; false otherwise
+
+<a name="namespaceBuilder"></a>
+## type namespaceBuilder
+
+
+
+```go
+type namespaceBuilder struct {
+    builder
+    build func(outputDir string, nodes []IRNode) error
+}
+```
+
+<a name="namespaceBuilder.buildCompatibleNodes"></a>
+### func \(\*namespaceBuilder\) buildCompatibleNodes
+
+```go
+func (b *namespaceBuilder) buildCompatibleNodes(outputDir string, nodes []IRNode) ([]IRNode, error)
+```
+
+
+
+<a name="namespaceBuilder.builds"></a>
+### func \(\*namespaceBuilder\) builds
+
+```go
+func (b *namespaceBuilder) builds(node IRNode) bool
+```
+
+True if this builder can build the specified node type; false otherwise
+
+<a name="registry"></a>
+## type registry
+
+Registers default build functions for building nodes of certain types.
+
+```go
+type registry struct {
+    namespace map[reflect.Type]*namespaceBuilder
+}
+```
+
+<a name="registry.addNamespaceBuilder"></a>
+### func \(\*registry\) addNamespaceBuilder
+
+```go
+func (r *registry) addNamespaceBuilder(name string, nodeType reflect.Type, buildFunc func(outputDir string, nodes []IRNode) error)
+```
+
+
+
+<a name="registry.buildAll"></a>
+### func \(\*registry\) buildAll
+
+```go
+func (r *registry) buildAll(outputDir string, nodes []IRNode) (err error)
+```
+
+
+
+Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
+
+
+<!-- Code generated by gomarkdoc. DO NOT EDIT -->
+
+# ir
+
+```go
+import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+```
+
+Package ir provides the basic interfaces for Blueprint's Internal Representation \(IR\) and for subsequently generating application artifacts such as code and container images.
+
+An application's IR representation is produced by constructing and then building a wiring spec using methods from the wiring package and from wiring extensions provided by plugins.
+
+## Index
+
+- [func CleanName\(name string\) string](<#CleanName>)
+- [func Filter\[T any\]\(nodes \[\]IRNode\) \[\]T](<#Filter>)
+- [func PrettyPrintNamespace\(instanceName string, namespaceType string, argNodes \[\]IRNode, childNodes \[\]IRNode\) string](<#PrettyPrintNamespace>)
+- [func RegisterDefaultNamespace\[T IRNode\]\(name string, buildFunc func\(outputDir string, nodes \[\]IRNode\) error\)](<#RegisterDefaultNamespace>)
+- [type ApplicationNode](<#ApplicationNode>)
+  - [func \(app \*ApplicationNode\) GenerateArtifacts\(dir string\) error](<#ApplicationNode.GenerateArtifacts>)
+  - [func \(node \*ApplicationNode\) Name\(\) string](<#ApplicationNode.Name>)
+  - [func \(node \*ApplicationNode\) String\(\) string](<#ApplicationNode.String>)
+- [type ArtifactGenerator](<#ArtifactGenerator>)
+- [type BuildContext](<#BuildContext>)
+- [type IRConfig](<#IRConfig>)
+- [type IRMetadata](<#IRMetadata>)
+- [type IRNode](<#IRNode>)
+  - [func FilterNodes\[T any\]\(nodes \[\]IRNode\) \[\]IRNode](<#FilterNodes>)
+  - [func Remove\[T any\]\(nodes \[\]IRNode\) \[\]IRNode](<#Remove>)
+- [type VisitTracker](<#VisitTracker>)
+- [type VisitTrackerImpl](<#VisitTrackerImpl>)
+  - [func \(tracker \*VisitTrackerImpl\) Visited\(name string\) bool](<#VisitTrackerImpl.Visited>)
+
+
+<a name="CleanName"></a>
+## func CleanName
+
+```go
+func CleanName(name string) string
+```
+
+Returns name with only alphanumeric characters and all other symbols converted to underscores.
+
+CleanName is primarily used by plugins to convert user\-defined service names into names that are valid as e.g. environment variables, command line arguments, etc.
+
+<a name="Filter"></a>
+## func Filter
+
+```go
+func Filter[T any](nodes []IRNode) []T
+```
+
+Returns a slice containing only nodes of type T
+
+<a name="PrettyPrintNamespace"></a>
+## func PrettyPrintNamespace
+
+```go
+func PrettyPrintNamespace(instanceName string, namespaceType string, argNodes []IRNode, childNodes []IRNode) string
+```
+
+
 
 <a name="RegisterDefaultNamespace"></a>
 ## func RegisterDefaultNamespace
