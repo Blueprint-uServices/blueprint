@@ -1,4 +1,4 @@
-package user_test
+package tests
 
 import (
 	"context"
@@ -8,50 +8,26 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/user"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/mongodb"
+	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 )
 
-var dbType = "simple"
-var mongoAddr = "localhost:27017"
+// Tests acquire a UserService instance using a service registry.
+// This enables us to run local unit tests, whiel also enabling
+// the Blueprint test plugin to auto-generate tests
+// for different deployments when compiling an application.
+var userServiceRegistry = registry.NewServiceRegistry[user.UserService]("user_service")
 
-// For convenience so we can run tests against different backends
-func makeUserService(t *testing.T) (context.Context, user.UserService) {
-	switch dbType {
-	case "simple":
-		return makeSimpleUserService(t)
-	case "mongo":
-		return makeMongoUserService(t)
-	default:
-		assert.FailNow(t, "invalid dbtype "+dbType)
-		return context.Background(), nil
-	}
-}
+func init() {
+	// If the tests are run locally, we fall back to this user service implementation
+	userServiceRegistry.Register("local", func(ctx context.Context) (user.UserService, error) {
+		db, err := simplenosqldb.NewSimpleNoSQLDB(ctx)
+		if err != nil {
+			return nil, err
+		}
 
-// Make a user service that uses the simplenosqldb
-func makeSimpleUserService(t *testing.T) (context.Context, user.UserService) {
-	ctx := context.Background()
-
-	db, err := simplenosqldb.NewSimpleNoSQLDB(ctx)
-	assert.NoError(t, err)
-
-	user, err := user.NewUserServiceImpl(ctx, db)
-	assert.NoError(t, err)
-
-	return ctx, user
-}
-
-// Make a user service that uses mongodb
-func makeMongoUserService(t *testing.T) (context.Context, user.UserService) {
-	ctx := context.Background()
-
-	db, err := mongodb.NewMongoDB(ctx, mongoAddr)
-	assert.NoError(t, err)
-
-	user, err := user.NewUserServiceImpl(ctx, db)
-	assert.NoError(t, err)
-
-	return ctx, user
+		return user.NewUserServiceImpl(ctx, db)
+	})
 }
 
 var jon = user.User{
@@ -113,7 +89,9 @@ var deepak = user.User{
 // between tests.
 func TestAll(t *testing.T) {
 
-	ctx, service := makeUserService(t)
+	ctx := context.Background()
+	service, err := userServiceRegistry.Get(ctx)
+	assert.NoError(t, err)
 
 	{
 		// Should be no users in the DB initially
@@ -286,7 +264,6 @@ func TestAll(t *testing.T) {
 		_, err = service.Login(ctx, deepak.Username, deepak.Password)
 		assert.Error(t, err)
 	}
-
 }
 
 func expectUsers(t *testing.T, service user.UserService, expectedCount int) []user.User {

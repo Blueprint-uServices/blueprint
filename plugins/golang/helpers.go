@@ -45,7 +45,8 @@ func GetGoInterface(ctx ir.BuildContext, node ir.IRNode) (*gocode.ServiceInterfa
 func AddRuntimeModule(workspace WorkspaceBuilder) error {
 	if !workspace.Visited("runtime") {
 		slog.Info("Copying local module runtime to workspace")
-		return workspace.AddLocalModuleRelative("runtime", "../../runtime")
+		_, err := workspace.AddLocalModuleRelative("runtime", "../../runtime")
+		return err
 	}
 	return nil
 }

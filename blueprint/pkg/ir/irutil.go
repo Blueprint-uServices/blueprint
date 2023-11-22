@@ -1,6 +1,10 @@
 package ir
 
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
+import (
+	"strings"
+
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
+)
 
 // Returns name with only alphanumeric characters and all other
 // symbols converted to underscores.
@@ -43,4 +47,25 @@ func Remove[T any](nodes []IRNode) []IRNode {
 		}
 	}
 	return remaining
+}
+
+func PrettyPrintNamespace(instanceName string, namespaceType string, argNodes []IRNode, childNodes []IRNode) string {
+	var b strings.Builder
+	b.WriteString(instanceName)
+	b.WriteString(" = ")
+	b.WriteString(namespaceType)
+	b.WriteString("(")
+	var args []string
+	for _, arg := range argNodes {
+		args = append(args, arg.Name())
+	}
+	b.WriteString(strings.Join(args, ", "))
+	b.WriteString(") {\n")
+	var children []string
+	for _, child := range childNodes {
+		children = append(children, child.String())
+	}
+	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
+	b.WriteString("\n}")
+	return b.String()
 }

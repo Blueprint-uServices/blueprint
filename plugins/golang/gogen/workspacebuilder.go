@@ -87,17 +87,17 @@ func (workspace *WorkspaceBuilderImpl) CreateModule(moduleName string, moduleVer
 	return moduleDir, os.WriteFile(modfile, []byte(modfileContents), 0755)
 }
 
-func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSrcPath string) error {
+func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSrcPath string) (string, error) {
 	// First open and parse the go.mod file to make sure it exists and is valid
 	modfileName := filepath.Join(moduleSrcPath, "go.mod")
 	modfileData, err := os.ReadFile(modfileName)
 	if err != nil {
-		return blueprint.Errorf("unable to read go.mod for %s at %s due to %s", shortName, modfileName, err.Error())
+		return "", blueprint.Errorf("unable to read go.mod for %s at %s due to %s", shortName, modfileName, err.Error())
 	}
 
 	mod, err := modfile.Parse(modfileName, modfileData, nil)
 	if err != nil {
-		return blueprint.Errorf("unable to parse go.mod for %s at %s due to %s", shortName, modfileName, err.Error())
+		return "", blueprint.Errorf("unable to parse go.mod for %s at %s due to %s", shortName, modfileName, err.Error())
 	}
 
 	modulePath := mod.Module.Mod.Path
@@ -105,19 +105,19 @@ func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSr
 	// Check we haven't already declared a different module with the same name
 	if existingShortName, exists := workspace.ModuleDirs[modulePath]; exists {
 		if existingShortName != shortName {
-			return blueprint.Errorf("redeclaration of module %s as %s - already exists in %s", modulePath, shortName, existingShortName)
+			return "", blueprint.Errorf("redeclaration of module %s as %s - already exists in %s", modulePath, shortName, existingShortName)
 		} else {
 			// TODO: here, check module versions are the same
-			return nil
+			return filepath.Join(workspace.WorkspaceDir, workspace.ModuleDirs[modulePath]), nil
 		}
 	} else {
 		workspace.ModuleDirs[modulePath] = shortName
 	}
 	if existingModulePath, exists := workspace.Modules[shortName]; exists {
 		if existingModulePath != modulePath {
-			return blueprint.Errorf("cannot copy module %s to %s as it already contains module %s", modulePath, shortName, existingModulePath)
+			return "", blueprint.Errorf("cannot copy module %s to %s as it already contains module %s", modulePath, shortName, existingModulePath)
 		} else {
-			return nil
+			return filepath.Join(workspace.WorkspaceDir, shortName), nil
 		}
 	} else {
 		workspace.Modules[shortName] = modulePath
@@ -126,10 +126,10 @@ func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSr
 	moduleDstPath := filepath.Join(workspace.WorkspaceDir, shortName)
 	err = ioutil.CheckDir(moduleDstPath, true)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return cp.Copy(moduleSrcPath, moduleDstPath)
+	return moduleDstPath, cp.Copy(moduleSrcPath, moduleDstPath)
 }
 
 func (workspace *WorkspaceBuilderImpl) GetLocalModule(modulePath string) (string, bool) {
@@ -143,7 +143,7 @@ This method is used by plugins if they want to copy a locally-defined module int
 The specified relativeModuleSrcPath must point to a valid Go module with a go.mod file, relative to the calling
 file's location.
 */
-func (workspace *WorkspaceBuilderImpl) AddLocalModuleRelative(shortName string, relativeModuleSrcPath string) error {
+func (workspace *WorkspaceBuilderImpl) AddLocalModuleRelative(shortName string, relativeModuleSrcPath string) (string, error) {
 	_, callingFile, _, _ := runtime.Caller(1)
 	dir, _ := filepath.Split(callingFile)
 	moduleSrcPath := filepath.Join(dir, relativeModuleSrcPath)
@@ -223,9 +223,6 @@ func (workspace *WorkspaceBuilderImpl) updateModfile(moduleSubDir string, module
 	if err != nil {
 		return err
 	}
-
-	// Drop all existing replace directives
-	modFile.Replace = nil
 
 	// Now we add replace directives
 	for otherModuleSubDir, otherModuleName := range workspace.Modules {

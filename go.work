@@ -4,6 +4,7 @@ use (
 	./blueprint
 	./examples/leaf/wiring
 	./examples/leaf/workflow
+	./examples/sockshop/tests
 	./examples/sockshop/wiring
 	./examples/sockshop/workflow
 	./plugins

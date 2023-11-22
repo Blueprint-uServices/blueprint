@@ -1,6 +1,7 @@
 package dockerdeployment
 
 import (
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/ioutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 )
@@ -11,7 +12,11 @@ func RegisterAsDefaultBuilder() {
 }
 
 func buildDefaultContainerWorkspace(outputDir string, nodes []ir.IRNode) error {
-	ctr := newContainerDeployment("default")
+	ctr := newContainerDeployment("docker")
 	ctr.ContainedNodes = nodes
-	return ctr.GenerateArtifacts(outputDir)
+	subdir, err := ioutil.CreateNodeDir(outputDir, "docker")
+	if err != nil {
+		return err
+	}
+	return ctr.GenerateArtifacts(subdir)
 }

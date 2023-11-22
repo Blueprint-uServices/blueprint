@@ -172,17 +172,21 @@ type (
 		Info() WorkspaceInfo
 
 		/*
-		   This method is used by plugins if they want to copy a locally-defined module into the generated workspace.
+			   This method is used by plugins if they want to copy a locally-defined module into the generated workspace.
 
-		   The specified moduleSrcPath must point to a valid Go module with a go.mod file.
+			   The specified moduleSrcPath must point to a valid Go module with a go.mod file.
+
+				Returns the path to the module in the output directory
 		*/
-		AddLocalModule(shortName string, moduleSrcPath string) error
+		AddLocalModule(shortName string, moduleSrcPath string) (string, error)
 
 		/*
 			This is a variant of `AddLocalMethod` provided for convenience; instead of an absolute filesystem path, the
 			specified path is relative to the caller
+
+			Returns the path to the module in the output directory
 		*/
-		AddLocalModuleRelative(shortName string, relativeModuleSrcPath string) error
+		AddLocalModuleRelative(shortName string, relativeModuleSrcPath string) (string, error)
 
 		/*
 			This method is used by plugins if they want to create a module in the workspace to then generate code into.
@@ -344,7 +348,14 @@ type (
 			Specify nodes needed by this namespace that exist in a parent namespace
 			and will be passed as runtime arguments
 		*/
-		Require(name, description string)
+		RequiredArg(name, description string)
+
+		/*
+			Specify optional arguments to this namespace.  If an optional argument is not
+			present then a runtime error can occur if a node needs to access the missing
+			argument
+		*/
+		OptionalArg(name, description string)
 
 		/*
 			Specify nodes that should be immediately built when the namespace is instantiated
