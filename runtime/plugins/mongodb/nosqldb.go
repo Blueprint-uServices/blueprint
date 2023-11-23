@@ -128,12 +128,16 @@ func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update
 	return int(result.ModifiedCount), err
 }
 
-func (mc *MongoCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error) {
-	filter := bson.D{{"_id", id}}
+func (mc *MongoCollection) Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error) {
 	update := bson.D{{"$set", document}}
 	opts := options.Update().SetUpsert(true)
 	result, err := mc.collection.UpdateOne(ctx, filter, update, opts)
 	return result.MatchedCount == 1, err
+}
+
+func (mc *MongoCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error) {
+	filter := bson.D{{"_id", id}}
+	return mc.Upsert(ctx, filter, document)
 }
 
 func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error) {

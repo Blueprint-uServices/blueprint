@@ -85,6 +85,12 @@ type NoSQLCollection interface {
 	// Returns the number of updated documents (>= 0)
 	UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error)
 
+	// Attempts to find a document in the collection that matches the filter.
+	// If a match is found, replaces the existing document with the provided document.
+	// If a match is not found, document is inserted into the collection.
+	// Returns true if an existing document was updated; false otherwise
+	Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error)
+
 	// Attempts to match a document in the collection with "_id" = id.
 	// If a match is found, replaces the existing document with the provided document.
 	// If a match is not found, document is inserted into the collection.
