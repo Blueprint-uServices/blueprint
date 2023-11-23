@@ -1,3 +1,8 @@
+// Package payment implements the SockShop payment microservice.
+//
+// The service fakes payments, implementing simple logic whereby payments
+// are authorized when they're below a predefined threshold, and rejected
+// when they are above that threshold.
 package payment
 
 import (
@@ -44,16 +49,14 @@ func (s *paymentImpl) Authorise(ctx context.Context, amount float32) (Authorisat
 	if amount < 0 {
 		return Authorisation{}, ErrInvalidPaymentAmount
 	}
-	authorised := false
-	message := "Payment declined"
 	if amount <= s.declineOverAmount {
-		authorised = true
-		message = "Payment authorised"
-	} else {
-		message = fmt.Sprintf("Payment declined: amount exceeds %.2f", s.declineOverAmount)
+		return Authorisation{
+			Authorised: true,
+			Message:    "Payment authorised",
+		}, nil
 	}
 	return Authorisation{
-		Authorised: authorised,
-		Message:    message,
+		Authorised: false,
+		Message:    fmt.Sprintf("Payment declined: amount exceeds %.2f", s.declineOverAmount),
 	}, nil
 }

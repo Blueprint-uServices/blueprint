@@ -50,11 +50,11 @@ func (impl *SimpleNoSQLDB) GetCollection(ctx context.Context, db_name string, co
 	return collection, nil
 }
 
-func (c *SimpleCursor) One(ctx context.Context, obj interface{}) error {
+func (c *SimpleCursor) One(ctx context.Context, obj interface{}) (bool, error) {
 	if len(c.results) == 0 {
-		return backend.SetZero(obj)
+		return false, backend.SetZero(obj)
 	} else {
-		return fromBson(c.results[0], obj)
+		return true, fromBson(c.results[0], obj)
 	}
 }
 

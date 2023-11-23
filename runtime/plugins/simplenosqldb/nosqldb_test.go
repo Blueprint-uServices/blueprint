@@ -1176,7 +1176,7 @@ func TestPull(t *testing.T) {
 		assert.NoError(t, err)
 
 		var tea Tea
-		err = cursor.One(ctx, &tea)
+		_, err = cursor.One(ctx, &tea)
 		assert.NoError(t, err)
 		assert.Equal(t, "English Breakfast", tea.Type)
 		assert.Len(t, tea.Sizes, 2)
@@ -1200,7 +1200,7 @@ func TestObjectIDGetsSet(t *testing.T) {
 		var id ObjectIDTest
 		assert.Equal(t, id.ID, primitive.NilObjectID)
 
-		err = cursor.One(ctx, &id)
+		_, err = cursor.One(ctx, &id)
 		assert.NoError(t, err)
 		assert.NotEqual(t, id.ID, primitive.NilObjectID)
 		assert.Equal(t, id.Type, "English Breakfast")
@@ -1216,7 +1216,7 @@ func TestUpdateByObjectID(t *testing.T) {
 		assert.NoError(t, err)
 
 		var id ObjectIDTest
-		err = cursor.One(ctx, &id)
+		_, err = cursor.One(ctx, &id)
 		assert.NoError(t, err)
 		assert.Equal(t, id.Type, "English Breakfast")
 
@@ -1224,7 +1224,7 @@ func TestUpdateByObjectID(t *testing.T) {
 		cursor, err = db.FindOne(ctx, idFilter)
 		assert.NoError(t, err)
 
-		err = cursor.One(ctx, &id)
+		_, err = cursor.One(ctx, &id)
 		assert.NoError(t, err)
 		assert.Equal(t, id.Type, "English Breakfast")
 
@@ -1236,14 +1236,14 @@ func TestUpdateByObjectID(t *testing.T) {
 		cursor, err = db.FindOne(ctx, idFilter)
 		assert.NoError(t, err)
 
-		err = cursor.One(ctx, &id)
+		_, err = cursor.One(ctx, &id)
 		assert.NoError(t, err)
 		assert.Equal(t, id.Type, "Scottish Breakfast")
 
 		cursor, err = db.FindOne(ctx, typeFilter)
 		assert.NoError(t, err)
 
-		err = cursor.One(ctx, &id)
+		_, err = cursor.One(ctx, &id)
 		assert.NoError(t, err)
 		assert.Equal(t, id.Type, "")
 	}

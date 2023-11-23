@@ -16,7 +16,15 @@ type NoSQLDatabase interface {
 }
 
 type NoSQLCursor interface {
-	One(ctx context.Context, obj interface{}) error
+	// Copies one result into the target pointer.
+	// If there are no results, returns false; otherwise returns true.
+	// Returns an error if obj is not a compatible type.
+	One(ctx context.Context, obj interface{}) (bool, error)
+
+	// Copies all results into the target pointer.
+	// obj must be a pointer to a slice type.
+	// Returns the number of results copied.
+	// Returns an error if obj is not a compatible type.
 	All(ctx context.Context, obj interface{}) error //similar logic to Decode, but for multiple documents
 }
 

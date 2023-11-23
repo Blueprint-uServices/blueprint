@@ -1,3 +1,16 @@
+// Package user implements the SockShop user microservice.
+//
+// The service stores three kinds of information:
+//   - user accounts
+//   - addresses
+//   - credit cards
+//
+// The sock shop allows customers to check out without creating a user
+// account; in this case the customer's address and credit card data
+// will be stored without a user accont.
+//
+// The UserService thus uses three collections for the above information.
+// To get the data for a user also means more than one database call.
 package user
 
 import (

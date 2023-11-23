@@ -87,7 +87,7 @@ func (s *userStore) getUserByName(ctx context.Context, username string) (User, e
 
 	// Extract query result
 	u := dbUser{}
-	if err := cursor.One(ctx, &u); err != nil {
+	if _, err := cursor.One(ctx, &u); err != nil {
 		return newUser(), err
 	}
 
@@ -112,7 +112,7 @@ func (s *userStore) getUser(ctx context.Context, userid string) (User, error) {
 
 	// Extract query result
 	u := dbUser{}
-	if err := cursor.One(ctx, &u); err != nil {
+	if _, err := cursor.One(ctx, &u); err != nil {
 		return newUser(), err
 	}
 
