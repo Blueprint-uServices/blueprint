@@ -9,14 +9,14 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 )
 
-// Tests acquire a UserService instance using a service registry.
-// This enables us to run local unit tests, whiel also enabling
+// Tests acquire a PaymentService instance using a service registry.
+// This enables us to run local unit tests, while also enabling
 // the Blueprint test plugin to auto-generate tests
 // for different deployments when compiling an application.
 var paymentServiceRegistry = registry.NewServiceRegistry[payment.PaymentService]("payment_service")
 
 func init() {
-	// If the tests are run locally, we fall back to this user service implementation
+	// If the tests are run locally, we fall back to this PaymentService implementation
 	paymentServiceRegistry.Register("local", func(ctx context.Context) (payment.PaymentService, error) {
 		return payment.NewPaymentService(ctx)
 	})

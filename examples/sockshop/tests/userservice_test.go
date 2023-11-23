@@ -13,7 +13,7 @@ import (
 )
 
 // Tests acquire a UserService instance using a service registry.
-// This enables us to run local unit tests, whiel also enabling
+// This enables us to run local unit tests, while also enabling
 // the Blueprint test plugin to auto-generate tests
 // for different deployments when compiling an application.
 var userServiceRegistry = registry.NewServiceRegistry[user.UserService]("user_service")
