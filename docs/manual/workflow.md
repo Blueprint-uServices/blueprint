@@ -134,6 +134,18 @@ func (s *multiEchoerImpl) MultiEcho(ctx context.Context, message string, times i
 
 Backends do not impose any additional rules.  Like services, they must be passed as constructor arguments.
 
+## Background Tasks
+
+Some services might want to run additional background goroutines.  For example, a service that polls a queue will need to have a goroutine to do so.
+
+The recommended way to implement background goroutines is by implementing a method `Run(context.Context) error`.  This will be automatically invoked in the generated code.
+
+```
+func (s *multiEchoerImpl) Run(ctx context.Context) error {
+    fmt.Println("I'm running from a different goroutine!")
+}
+```
+
 ## Next Steps
 
 The above is sufficient for defining an application's workflow.
