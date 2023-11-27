@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/shipping"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
@@ -34,7 +33,7 @@ func init() {
 func TestShippingService(t *testing.T) {
 	ctx := context.Background()
 	service, err := shippingRegistry.Get(ctx)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	shipment := shipping.Shipment{
 		ID:   "hello",
