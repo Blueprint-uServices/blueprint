@@ -1,3 +1,4 @@
+// Package simplecache implements a key-value [backend.Cache] using a golang map.
 package simplecache
 
 import (
@@ -7,12 +8,13 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
 
-/* A simple map-based cache that implements the cache interface */
+// A simple map-based cache that implements the [backend.Cache] interface
 type SimpleCache struct {
 	backend.Cache
 	values map[string]any
 }
 
+// Instantiates a map-based [SimpleCache]
 func NewSimpleCache(ctx context.Context) (*SimpleCache, error) {
 	cache := &SimpleCache{}
 	cache.values = make(map[string]any)
