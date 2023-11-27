@@ -1,6 +1,9 @@
 package backend
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // A Queue backend is used for pushing and popping elements.
 type Queue interface {
@@ -9,8 +12,11 @@ type Queue interface {
 	// with a value of false.  An error will be returned only when an
 	// erroneous state is encountered.
 	//
+	// If the optional timeout argument is provided, then this call will
+	// block up the specified timeout before returning.
+	//
 	// Reports whether the push was successful, and possibly an error
-	TryPush(ctx context.Context, item interface{}) (bool, error)
+	TryPush(ctx context.Context, item interface{}, timeout ...time.Duration) (bool, error)
 
 	// Pushes an item to the tail of the queue, blocking until it can do so.
 	Push(ctx context.Context, item interface{}) error
@@ -20,11 +26,14 @@ type Queue interface {
 	// with a value of false.  An error will only be returned when an erroneous
 	// state is encountered.
 	//
+	// If the optional timeout argument is provided, then this call will
+	// block up the specified timeout before returning.
+	//
 	// dst must be a pointer to a receiver struct type.
 	//
 	// Reports whether the pop was successful, and possibly an error.  If the
 	// pop was successful then the result is set in dst
-	TryPop(ctx context.Context, dst interface{}) (bool, error)
+	TryPop(ctx context.Context, dst interface{}, timeout ...time.Duration) (bool, error)
 
 	// Pops an item from the front of the queue, blocking until it can do so,
 	// and placing the result in dst.

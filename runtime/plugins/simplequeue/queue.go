@@ -7,6 +7,7 @@ package simplequeue
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
@@ -41,14 +42,25 @@ func (q *simpleQueue) Pop(ctx context.Context, dst interface{}) error {
 }
 
 // TryPop implements backend.Queue.
-func (q *simpleQueue) TryPop(ctx context.Context, dst interface{}) (bool, error) {
-	select {
-	case <-ctx.Done():
-		return false, fmt.Errorf("unable to TryPop due to queue shutting down")
-	case v := <-q.q:
-		return true, backend.CopyResult(v, dst)
-	default:
-		return false, nil
+func (q *simpleQueue) TryPop(ctx context.Context, dst interface{}, timeout ...time.Duration) (bool, error) {
+	if len(timeout) > 0 {
+		select {
+		case <-ctx.Done():
+			return false, fmt.Errorf("unable to TryPop due to queue shutting down")
+		case v := <-q.q:
+			return true, backend.CopyResult(v, dst)
+		case <-time.After(timeout[0]):
+			return false, nil
+		}
+	} else {
+		select {
+		case <-ctx.Done():
+			return false, fmt.Errorf("unable to TryPop due to queue shutting down")
+		case v := <-q.q:
+			return true, backend.CopyResult(v, dst)
+		default: // Use default instead of time.After(0) because time.After(0) doesn't necessarily return immediately
+			return false, nil
+		}
 	}
 }
 
@@ -63,13 +75,24 @@ func (q *simpleQueue) Push(ctx context.Context, item interface{}) error {
 }
 
 // TryPush implements backend.Queue.
-func (q *simpleQueue) TryPush(ctx context.Context, item interface{}) (bool, error) {
-	select {
-	case <-ctx.Done():
-		return false, fmt.Errorf("unable to TryPush due to queue shutting down")
-	case q.q <- item:
-		return true, nil
-	default:
-		return false, nil
+func (q *simpleQueue) TryPush(ctx context.Context, item interface{}, timeout ...time.Duration) (bool, error) {
+	if len(timeout) > 0 {
+		select {
+		case <-ctx.Done():
+			return false, fmt.Errorf("unable to TryPush due to queue shutting down")
+		case q.q <- item:
+			return true, nil
+		case <-time.After(timeout[0]):
+			return false, nil
+		}
+	} else {
+		select {
+		case <-ctx.Done():
+			return false, fmt.Errorf("unable to TryPush due to queue shutting down")
+		case q.q <- item:
+			return true, nil
+		default:
+			return false, nil
+		}
 	}
 }

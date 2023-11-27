@@ -168,3 +168,62 @@ func TestPushBlocksAndOrder(t *testing.T) {
 		require.Equal(t, items[i], rcv)
 	}
 }
+
+func TestTryTimeout(t *testing.T) {
+
+	ctx := context.Background()
+
+	q := newSimpleQueueWithCapacity(1)
+
+	first := "hello"
+	second := "world"
+
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+		{
+			// Send an item should succeed
+			err := q.Push(ctx, first)
+			require.NoError(t, err)
+		}
+		time.Sleep(10 * time.Millisecond)
+		{
+			// Send an item should succeed
+			err := q.Push(ctx, second)
+			require.NoError(t, err)
+		}
+	}()
+
+	{
+		// No first item yet
+		var rcv string
+		success, err := q.TryPop(ctx, &rcv)
+		require.NoError(t, err)
+		require.False(t, success)
+	}
+
+	{
+		// Item eventually received
+		var rcv string
+		success, err := q.TryPop(ctx, &rcv, 20*time.Millisecond)
+		require.NoError(t, err)
+		require.True(t, success)
+		require.Equal(t, first, rcv)
+	}
+
+	{
+		// No second item yet
+		var rcv string
+		success, err := q.TryPop(ctx, &rcv)
+		require.NoError(t, err)
+		require.False(t, success)
+	}
+
+	{
+		// Item eventually received
+		var rcv string
+		success, err := q.TryPop(ctx, &rcv, 20*time.Millisecond)
+		require.NoError(t, err)
+		require.True(t, success)
+		require.Equal(t, second, rcv)
+	}
+}
