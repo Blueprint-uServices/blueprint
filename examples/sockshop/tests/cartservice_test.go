@@ -38,13 +38,15 @@ func TestNonExistentCart(t *testing.T) {
 	require.Len(t, items, 0)
 }
 
+var myitem = cart.Item{
+	ID:        "myitem",
+	Quantity:  5,
+	UnitPrice: 37.75,
+}
+
 func TestAddItemToNonExistentCart(t *testing.T) {
 	customerID := "TestAddItemToNonExistentCart"
-	item := cart.Item{
-		ID:        "myitem",
-		Quantity:  5,
-		UnitPrice: 37.75,
-	}
+	item := myitem
 
 	ctx := context.Background()
 	service, err := cartRegistry.Get(ctx)

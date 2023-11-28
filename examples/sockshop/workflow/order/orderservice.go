@@ -184,7 +184,7 @@ func (s *orderImpl) NewOrder(ctx context.Context, customerID, addressID, cardID,
 
 	// Save the order
 	order := Order{
-		ID:         uuid.NewString(),
+		ID:         shipment.ID,
 		CustomerID: customerID,
 		Address:    addresses[0],
 		Card:       cards[0],

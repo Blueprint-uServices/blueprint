@@ -37,8 +37,9 @@ func TestQueueMaster(t *testing.T) {
 	}()
 
 	shipment := shipping.Shipment{
-		ID:   "first",
-		Name: "my first shipment",
+		ID:     "first",
+		Name:   "my first shipment",
+		Status: "unshipped",
 	}
 	_, err = shipService.PostShipping(ctx, shipment)
 	require.NoError(t, err)
@@ -46,6 +47,11 @@ func TestQueueMaster(t *testing.T) {
 	time.Sleep(10 * time.Millisecond)
 
 	require.Equal(t, int32(1), atomic.LoadInt32(&qMaster.processed))
+
+	shipment2, err := shipService.GetShipment(ctx, shipment.ID)
+	require.NoError(t, err)
+	require.NotEqual(t, shipment, shipment2)
+	require.Equal(t, "shipped", shipment2.Status)
 
 	cancel()
 
