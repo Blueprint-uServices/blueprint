@@ -1,17 +1,18 @@
 package loadbalancer
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/core/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
 // Creates a client-side load-balancer for multiple instances of a service. The list of services must be provided as an argument at compile-time when using this plugin.
-func Create(wiring blueprint.WiringSpec, services []string, serviceType string) string {
+func Create(spec wiring.WiringSpec, services []string, serviceType string) string {
 	loadbalancer_name := serviceType + ".lb"
-	wiring.Define(loadbalancer_name, &LoadBalancerClient{}, func(namespace blueprint.Namespace) (blueprint.IRNode, error) {
-		var arg_nodes []blueprint.IRNode
+	spec.Define(loadbalancer_name, &LoadBalancerClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
+		var arg_nodes []ir.IRNode
 		for _, arg_name := range services {
-			var arg blueprint.IRNode
+			var arg ir.IRNode
 			if err := namespace.Get(arg_name, &arg); err != nil {
 				return nil, err
 			}
@@ -22,9 +23,8 @@ func Create(wiring blueprint.WiringSpec, services []string, serviceType string) 
 	})
 
 	dstName := loadbalancer_name + ".dst"
-	wiring.Alias(dstName, loadbalancer_name)
-	pointer.RequireUniqueness(wiring, dstName, &blueprint.ApplicationNode{})
+	spec.Alias(dstName, loadbalancer_name)
 
-	pointer.CreatePointer(wiring, loadbalancer_name, &LoadBalancerClient{}, dstName)
+	pointer.CreatePointer(spec, loadbalancer_name, &LoadBalancerClient{}, dstName)
 	return loadbalancer_name
 }
