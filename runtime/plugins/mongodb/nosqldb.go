@@ -80,9 +80,12 @@ func (mc *MongoCollection) FindOne(ctx context.Context, filter bson.D, projectio
 		singleResult = mc.collection.FindOne(ctx, filter)
 	}
 
-	return &MongoCursor{
-		underlyingResult: singleResult,
-	}, nil
+	err := singleResult.Err()
+	if err == nil || err == mongo.ErrNoDocuments {
+		return &MongoCursor{underlyingResult: singleResult}, nil
+	} else {
+		return nil, err
+	}
 }
 
 func (mc *MongoCollection) FindMany(ctx context.Context, filter bson.D, projection ...bson.D) (backend.NoSQLCursor, error) {
@@ -107,10 +110,11 @@ func (mc *MongoCollection) FindMany(ctx context.Context, filter bson.D, projecti
 	if err != nil {
 		return nil, err
 	}
+	if cursor.Err() != nil {
+		return nil, cursor.Err()
+	}
 
-	return &MongoCursor{
-		underlyingResult: cursor,
-	}, nil
+	return &MongoCursor{underlyingResult: cursor}, nil
 }
 
 // * not sure about the `update` parameter and its conversion
@@ -124,12 +128,16 @@ func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update
 	return int(result.ModifiedCount), err
 }
 
-func (mc *MongoCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error) {
-	filter := bson.D{{"_id", id}}
+func (mc *MongoCollection) Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error) {
 	update := bson.D{{"$set", document}}
 	opts := options.Update().SetUpsert(true)
 	result, err := mc.collection.UpdateOne(ctx, filter, update, opts)
 	return result.MatchedCount == 1, err
+}
+
+func (mc *MongoCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error) {
+	filter := bson.D{{"_id", id}}
+	return mc.Upsert(ctx, filter, document)
 }
 
 func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error) {
@@ -146,14 +154,19 @@ type MongoCursor struct {
 	underlyingResult interface{}
 }
 
-func (mr *MongoCursor) One(ctx context.Context, obj interface{}) error {
-
+func (mr *MongoCursor) One(ctx context.Context, obj interface{}) (bool, error) {
 	//add other types of results from mongo that have a Decode method here
 	switch v := mr.underlyingResult.(type) {
 	case *mongo.SingleResult:
-		return v.Decode(obj)
+		if v.Err() == nil {
+			return true, v.Decode(obj)
+		} else if v.Err() == mongo.ErrNoDocuments {
+			return false, nil
+		} else {
+			return false, v.Err()
+		}
 	default:
-		return errors.New("Result has no decode method")
+		return false, errors.New("result has no decode method")
 	}
 }
 
@@ -163,6 +176,6 @@ func (mr *MongoCursor) All(ctx context.Context, objs interface{}) error {
 	case *mongo.Cursor:
 		return v.All(context.TODO(), objs)
 	default:
-		return errors.New("Result does not return a Cursor")
+		return errors.New("result does not return a Cursor")
 	}
 }

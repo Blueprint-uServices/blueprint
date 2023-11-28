@@ -38,7 +38,7 @@ func (s *addressStore) getAddress(ctx context.Context, addressid string) (Addres
 		return Address{}, err
 	}
 	address := dbAddress{}
-	err = cursor.One(ctx, &address)
+	_, err = cursor.One(ctx, &address)
 
 	// Convert from DB address data to Address object
 	address.Address.ID = address.ID.Hex()

@@ -16,7 +16,15 @@ type NoSQLDatabase interface {
 }
 
 type NoSQLCursor interface {
-	One(ctx context.Context, obj interface{}) error
+	// Copies one result into the target pointer.
+	// If there are no results, returns false; otherwise returns true.
+	// Returns an error if obj is not a compatible type.
+	One(ctx context.Context, obj interface{}) (bool, error)
+
+	// Copies all results into the target pointer.
+	// obj must be a pointer to a slice type.
+	// Returns the number of results copied.
+	// Returns an error if obj is not a compatible type.
 	All(ctx context.Context, obj interface{}) error //similar logic to Decode, but for multiple documents
 }
 
@@ -76,6 +84,12 @@ type NoSQLCollection interface {
 	//
 	// Returns the number of updated documents (>= 0)
 	UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error)
+
+	// Attempts to find a document in the collection that matches the filter.
+	// If a match is found, replaces the existing document with the provided document.
+	// If a match is not found, document is inserted into the collection.
+	// Returns true if an existing document was updated; false otherwise
+	Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error)
 
 	// Attempts to match a document in the collection with "_id" = id.
 	// If a match is found, replaces the existing document with the provided document.

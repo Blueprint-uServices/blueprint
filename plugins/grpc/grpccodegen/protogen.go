@@ -33,7 +33,7 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 	}
 
 	// Construct and validate the GRPC proto builder for the service
-	pb := NewProtoBuilder(modules)
+	pb := NewProtoBuilder(modules, service.BaseName)
 	splits := strings.Split(outputPackage, "/")
 	outputPackageName := splits[len(splits)-1]
 	pb.Module = builder.Info()
@@ -131,6 +131,7 @@ type (
 	}
 
 	GRPCProtoBuilder struct {
+		Name        string
 		Code        *goparser.ParsedModuleSet
 		Package     string // Package shortname
 		Module      golang.ModuleInfo
@@ -141,8 +142,9 @@ type (
 	}
 )
 
-func NewProtoBuilder(code *goparser.ParsedModuleSet) *GRPCProtoBuilder {
+func NewProtoBuilder(code *goparser.ParsedModuleSet, name string) *GRPCProtoBuilder {
 	b := &GRPCProtoBuilder{}
+	b.Name = name
 	b.Code = code
 	b.Services = make(map[string]*GRPCServiceDecl)
 	b.Messages = make(map[string]*GRPCMessageDecl)
@@ -192,7 +194,7 @@ func (b *GRPCProtoBuilder) newMessage(name string) *GRPCMessageDecl {
 	s.Name = name
 	s.FieldList = nil
 	s.GRPCType = &gocode.UserType{Name: name, Package: b.PackageName}
-	b.Messages[name] = s // Not implemented yet: name collision possible for same-named struct from different packages
+	b.Messages[name] = s
 	return s
 }
 
@@ -201,7 +203,7 @@ func (b *GRPCProtoBuilder) newService(name string) *GRPCServiceDecl {
 	s.Builder = b
 	s.Name = name
 	s.Methods = make(map[string]*GRPCMethodDecl)
-	b.Services[name] = s // Not implemented yet: name collision possible for same-named struct from different packages
+	b.Services[name] = s
 	return s
 }
 
@@ -290,8 +292,7 @@ func (b *GRPCProtoBuilder) GetOrAddMessage(t *gocode.UserType) (*GRPCMessageDecl
 	}
 
 	// Create the message
-	// TODO (not implemented yet): edge-case name collision for same-named struct from different packages
-	msg := b.newMessage(t.Name)
+	msg := b.newMessage(fmt.Sprintf("%v_%v", b.Name, t.Name))
 	b.Structs[*t] = msg
 	for _, field := range struc.FieldsList {
 		// We ignore promoted and anonymous struct / interface extensions

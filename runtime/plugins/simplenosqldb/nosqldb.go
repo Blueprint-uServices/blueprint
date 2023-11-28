@@ -50,11 +50,11 @@ func (impl *SimpleNoSQLDB) GetCollection(ctx context.Context, db_name string, co
 	return collection, nil
 }
 
-func (c *SimpleCursor) One(ctx context.Context, obj interface{}) error {
+func (c *SimpleCursor) One(ctx context.Context, obj interface{}) (bool, error) {
 	if len(c.results) == 0 {
-		return backend.SetZero(obj)
+		return false, nil
 	} else {
-		return fromBson(c.results[0], obj)
+		return true, fromBson(c.results[0], obj)
 	}
 }
 
@@ -253,14 +253,21 @@ func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, updat
 	return updated, nil
 }
 
-func (db *SimpleCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error) {
-	filter := bson.D{{"_id", id}}
+func (db *SimpleCollection) Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error) {
 	updatedCount, err := db.ReplaceOne(ctx, filter, document)
 	if updatedCount == 1 || err != nil {
-		fmt.Printf("Upsert replaced existing %v\n", id)
 		return true, err
 	}
 	return false, db.InsertOne(ctx, document)
+}
+
+func (db *SimpleCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error) {
+	filter := bson.D{{"_id", id}}
+	updated, err := db.Upsert(ctx, filter, document)
+	if updated && verbose && err == nil {
+		fmt.Printf("Upsert replaced existing %v\n", id)
+	}
+	return updated, err
 }
 
 func (db *SimpleCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error) {

@@ -38,7 +38,7 @@ func (s *cardStore) getCard(ctx context.Context, cardid string) (Card, error) {
 		return Card{}, err
 	}
 	card := dbCard{}
-	err = cursor.One(ctx, &card)
+	_, err = cursor.One(ctx, &card)
 
 	// Convert from DB card data to Card object
 	card.Card.ID = card.ID.Hex()

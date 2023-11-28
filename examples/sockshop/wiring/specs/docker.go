@@ -7,6 +7,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplequeue"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
@@ -28,9 +29,27 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	payment_service := workflow.Define(spec, "payment_service", "PaymentService")
 	payment_ctr := applyDockerDefaults(spec, payment_service, "payment_proc", "payment_container")
 
-	tests := gotests.Test(spec, user_service, payment_service)
+	cart_db := mongodb.PrebuiltContainer(spec, "cart_db")
+	cart_service := workflow.Define(spec, "cart_service", "CartService", cart_db)
+	cart_ctr := applyDockerDefaults(spec, cart_service, "cart_proc", "cart_ctr")
 
-	return []string{user_ctr, payment_ctr, tests}, nil
+	shipqueue := simplequeue.Define(spec, "shipping_queue")
+	shipdb := mongodb.PrebuiltContainer(spec, "shipping_db")
+	shipping_service := workflow.Define(spec, "shipping_service", "ShippingService", shipqueue, shipdb)
+	shipping_ctr := applyDockerDefaults(spec, shipping_service, "shipping_proc", "shipping_ctr")
+
+	// Deploy queue master to the same process as the shipping proc
+	// TODO: after distributed queue is supported, move to separate containers
+	queue_master := workflow.Define(spec, "queue_master", "QueueMaster", shipqueue, shipping_service)
+	goproc.AddChildToProcess(spec, "shipping_proc", queue_master)
+
+	order_db := mongodb.PrebuiltContainer(spec, "order_db")
+	order_service := workflow.Define(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)
+	order_ctr := applyDockerDefaults(spec, order_service, "order_proc", "order_ctr")
+
+	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service)
+
+	return []string{user_ctr, payment_ctr, cart_ctr, shipping_ctr, order_ctr, tests}, nil
 }
 
 func applyDockerDefaults(spec wiring.WiringSpec, serviceName, procName, ctrName string) string {

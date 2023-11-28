@@ -6,14 +6,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/user"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 )
 
 // Tests acquire a UserService instance using a service registry.
-// This enables us to run local unit tests, whiel also enabling
+// This enables us to run local unit tests, while also enabling
 // the Blueprint test plugin to auto-generate tests
 // for different deployments when compiling an application.
 var userServiceRegistry = registry.NewServiceRegistry[user.UserService]("user_service")
@@ -91,24 +91,24 @@ func TestAll(t *testing.T) {
 
 	ctx := context.Background()
 	service, err := userServiceRegistry.Get(ctx)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	{
 		// Should be no users in the DB initially
 		users, err := service.GetUsers(ctx, "")
-		assert.NoError(t, err)
-		assert.Len(t, users, 0)
+		require.NoError(t, err)
+		require.Len(t, users, 0)
 
 		// Check we cannot login
 		_, err = service.Login(ctx, jon.Username, jon.Password)
-		assert.Error(t, err)
+		require.Error(t, err)
 	}
 
 	{
 		// Register a user and check we can get it back
 		u := jon
 		uid, err := service.Register(ctx, u.Username, u.Password, u.Email, u.FirstName, u.LastName)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		// Check the user we just registered
 		expectUser(t, service, uid, jon)
@@ -126,7 +126,7 @@ func TestAll(t *testing.T) {
 		// Register a second user and check we can get it back
 		u := vaastav
 		uid, err := service.Register(ctx, u.Username, u.Password, u.Email, u.FirstName, u.LastName)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		// Check the user we just registered
 		expectUser(t, service, uid, vaastav)
@@ -144,7 +144,7 @@ func TestAll(t *testing.T) {
 	{
 		// Register an address
 		aid, err := service.PostAddress(ctx, deepak.Addresses[1])
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		// Check the address we just registered
 		expectAddress(t, service, aid, deepak.Addresses[1])
@@ -158,7 +158,7 @@ func TestAll(t *testing.T) {
 	{
 		// Register a card
 		cid, err := service.PostCard(ctx, deepak.Cards[0])
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		// Check the card we just registered
 		expectCard(t, service, cid, deepak.Cards[0])
@@ -172,7 +172,7 @@ func TestAll(t *testing.T) {
 	{
 		// Post the third user and check we can get it back.
 		uid, err := service.PostUser(ctx, deepak)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		// Check the user we just registered
 		u := expectUser(t, service, uid, deepak)
@@ -199,7 +199,7 @@ func TestAll(t *testing.T) {
 
 		toDelete := u.Addresses[0]
 		err := service.Delete(ctx, "addresses", toDelete.ID)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		// Check address was removed from system
 		expectUsers(t, service, 3)
@@ -208,10 +208,10 @@ func TestAll(t *testing.T) {
 
 		// Log in again and check address was removed from user
 		u, err = service.Login(ctx, deepak.Username, deepak.Password)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
-		assert.Len(t, u.Addresses, 1)
-		assert.Len(t, u.Cards, 1)
+		require.Len(t, u.Addresses, 1)
+		require.Len(t, u.Cards, 1)
 
 		expectCard(t, service, u.Cards[0].ID, deepak.Cards[0])
 		expectAddress(t, service, u.Addresses[0].ID, deepak.Addresses[1])
@@ -221,7 +221,7 @@ func TestAll(t *testing.T) {
 		// Delete a user
 		u := expectLogin(t, service, jon)
 		err := service.Delete(ctx, "customers", u.UserID)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		// Check user was removed from system
 		expectUsers(t, service, 2)
@@ -232,11 +232,11 @@ func TestAll(t *testing.T) {
 	{
 		// Delete a card
 		u, err := service.Login(ctx, deepak.Username, deepak.Password)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		toDelete := u.Cards[0]
 		err = service.Delete(ctx, "cards", toDelete.ID)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		// Check card was removed from system
 		expectUsers(t, service, 2)
@@ -245,15 +245,15 @@ func TestAll(t *testing.T) {
 
 		// Log in again and check card was removed from user
 		u, err = service.Login(ctx, deepak.Username, deepak.Password)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
-		assert.Len(t, u.Addresses, 1)
-		assert.Len(t, u.Cards, 0)
+		require.Len(t, u.Addresses, 1)
+		require.Len(t, u.Cards, 0)
 		expectAddress(t, service, u.Addresses[0].ID, deepak.Addresses[1])
 
 		// Delete the user
 		err = service.Delete(ctx, "customers", u.UserID)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		// Check user was removed from system
 		expectUsers(t, service, 1)
@@ -262,47 +262,47 @@ func TestAll(t *testing.T) {
 
 		// Try to log in again, expect error
 		_, err = service.Login(ctx, deepak.Username, deepak.Password)
-		assert.Error(t, err)
+		require.Error(t, err)
 	}
 }
 
 func expectUsers(t *testing.T, service user.UserService, expectedCount int) []user.User {
 	// Get all users
 	users, err := service.GetUsers(context.Background(), "")
-	assert.NoError(t, err)
-	assert.Len(t, users, expectedCount)
+	require.NoError(t, err)
+	require.Len(t, users, expectedCount)
 	return users
 }
 
 func expectCards(t *testing.T, service user.UserService, expectedCount int) []user.Card {
 	// Get all cards
 	cards, err := service.GetCards(context.Background(), "")
-	assert.NoError(t, err)
-	assert.Len(t, cards, expectedCount)
+	require.NoError(t, err)
+	require.Len(t, cards, expectedCount)
 	return cards
 }
 
 func expectAddresses(t *testing.T, service user.UserService, expectedCount int) []user.Address {
 	// Get all addresses
 	addresses, err := service.GetAddresses(context.Background(), "")
-	assert.NoError(t, err)
-	assert.Len(t, addresses, expectedCount)
+	require.NoError(t, err)
+	require.Len(t, addresses, expectedCount)
 	return addresses
 }
 
 func expectUser(t *testing.T, service user.UserService, uid string, expected user.User) user.User {
 	// Make sure the uid isn't the empty string
-	assert.NotEmpty(t, uid)
+	require.NotEmpty(t, uid)
 
 	// Get the user
 	users, err := service.GetUsers(context.Background(), uid)
-	assert.NoError(t, err)
-	assert.Len(t, users, 1)
+	require.NoError(t, err)
+	require.Len(t, users, 1)
 	actual := users[0]
 
 	// Check the user content
 	matchUsers(t, expected, actual)
-	assert.Equal(t, uid, actual.UserID)
+	require.Equal(t, uid, actual.UserID)
 
 	// Load and check addresses
 	for i := range expected.Addresses {
@@ -324,7 +324,7 @@ func expectUser(t *testing.T, service user.UserService, uid string, expected use
 func expectLogin(t *testing.T, service user.UserService, expected user.User) user.User {
 	// Log in the user
 	actual, err := service.Login(context.Background(), expected.Username, expected.Password)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// Check the user content
 	matchUsers(t, expected, actual)
@@ -344,61 +344,61 @@ func expectLogin(t *testing.T, service user.UserService, expected user.User) use
 
 func expectAddress(t *testing.T, service user.UserService, addressId string, expected user.Address) user.Address {
 	// Make sure the addressid isn't the empty string
-	assert.NotEmpty(t, addressId)
+	require.NotEmpty(t, addressId)
 
 	// Get the address
 	addresses, err := service.GetAddresses(context.Background(), addressId)
-	assert.NoError(t, err)
-	assert.Len(t, addresses, 1)
+	require.NoError(t, err)
+	require.Len(t, addresses, 1)
 
 	// Check the address content
 	actual := addresses[0]
 	matchAddresses(t, expected, actual)
-	assert.Equal(t, addressId, actual.ID)
+	require.Equal(t, addressId, actual.ID)
 	return actual
 }
 
 func expectCard(t *testing.T, service user.UserService, cardid string, expected user.Card) user.Card {
 	// Make sure the cardid isn't the empty string
-	assert.NotEmpty(t, cardid)
+	require.NotEmpty(t, cardid)
 
 	// Get the card
 	cards, err := service.GetCards(context.Background(), cardid)
-	assert.NoError(t, err)
-	assert.Len(t, cards, 1)
+	require.NoError(t, err)
+	require.Len(t, cards, 1)
 
 	// Check the cards content
 	actual := cards[0]
 	matchCards(t, expected, actual, false)
-	assert.Equal(t, cardid, actual.ID)
+	require.Equal(t, cardid, actual.ID)
 	return actual
 }
 
 func matchUsers(t *testing.T, expected user.User, actual user.User) {
-	assert.Equal(t, expected.Username, actual.Username)
-	assert.Equal(t, expected.FirstName, actual.FirstName)
-	assert.Equal(t, expected.LastName, actual.LastName)
-	assert.Equal(t, expected.Email, actual.Email)
-	assert.Len(t, actual.Addresses, len(expected.Addresses))
-	assert.Len(t, actual.Cards, len(expected.Cards))
+	require.Equal(t, expected.Username, actual.Username)
+	require.Equal(t, expected.FirstName, actual.FirstName)
+	require.Equal(t, expected.LastName, actual.LastName)
+	require.Equal(t, expected.Email, actual.Email)
+	require.Len(t, actual.Addresses, len(expected.Addresses))
+	require.Len(t, actual.Cards, len(expected.Cards))
 }
 
 func matchAddresses(t *testing.T, expected user.Address, actual user.Address) {
-	assert.Equal(t, expected.Street, actual.Street)
-	assert.Equal(t, expected.Number, actual.Number)
-	assert.Equal(t, expected.Country, actual.Country)
-	assert.Equal(t, expected.City, actual.City)
-	assert.Equal(t, expected.PostCode, actual.PostCode)
+	require.Equal(t, expected.Street, actual.Street)
+	require.Equal(t, expected.Number, actual.Number)
+	require.Equal(t, expected.Country, actual.Country)
+	require.Equal(t, expected.City, actual.City)
+	require.Equal(t, expected.PostCode, actual.PostCode)
 }
 
 func matchCards(t *testing.T, expected user.Card, actual user.Card, isMasked ...bool) {
 	if len(isMasked) > 0 && isMasked[0] == true {
 		l := len(actual.LongNum) - 4
 		expectMasked := fmt.Sprintf("%v%v", strings.Repeat("*", l), actual.LongNum[l:])
-		assert.Equal(t, expectMasked, actual.LongNum)
+		require.Equal(t, expectMasked, actual.LongNum)
 	} else {
-		assert.Equal(t, expected.LongNum, actual.LongNum)
+		require.Equal(t, expected.LongNum, actual.LongNum)
 	}
-	assert.Equal(t, expected.Expires, actual.Expires)
-	assert.Equal(t, expected.CCV, actual.CCV)
+	require.Equal(t, expected.Expires, actual.Expires)
+	require.Equal(t, expected.CCV, actual.CCV)
 }
