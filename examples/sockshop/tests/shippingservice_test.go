@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/shipping"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
+	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplequeue"
 )
 
@@ -23,7 +24,11 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return shipping.NewShippingService(ctx, queue)
+		db, err := simplenosqldb.NewSimpleNoSQLDB(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return shipping.NewShippingService(ctx, queue, db)
 	})
 }
 
@@ -36,10 +41,15 @@ func TestShippingService(t *testing.T) {
 	require.NoError(t, err)
 
 	shipment := shipping.Shipment{
-		ID:   "hello",
-		Name: "world",
+		ID:     "hello",
+		Name:   "world",
+		Status: "awaiting shipment",
 	}
-	sent, err := service.PostShipping(ctx, shipment)
-	require.NoError(t, err)
-	require.Equal(t, shipment, sent)
+
+	{
+		sent, err := service.PostShipping(ctx, shipment)
+		require.NoError(t, err)
+		require.Equal(t, shipment, sent)
+	}
+
 }

@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"sync/atomic"
+	"time"
 
 	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/shipping"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
@@ -23,33 +24,66 @@ type QueueMaster interface {
 	Run(ctx context.Context) error
 }
 
-func NewQueueMaster(ctx context.Context, queue backend.Queue) (QueueMaster, error) {
-	return newQueueMasterImpl(queue), nil
+// Creates a new QueueMaster service.
+//
+// New: once an order is shipped, it will update the order status in the orderservice.
+func NewQueueMaster(ctx context.Context, queue backend.Queue, shipping shipping.ShippingService) (QueueMaster, error) {
+	return newQueueMasterImpl(queue, shipping, false), nil
 }
 
-func newQueueMasterImpl(queue backend.Queue) *queueMasterImpl {
+func newQueueMasterImpl(queue backend.Queue, shipping shipping.ShippingService, exitOnError bool) *queueMasterImpl {
 	return &queueMasterImpl{
-		q:         queue,
-		processed: 0,
+		q:           queue,
+		shipping:    shipping,
+		exitOnError: exitOnError,
+		processed:   0,
 	}
 }
 
 type queueMasterImpl struct {
-	q         backend.Queue
-	processed int32
+	q           backend.Queue
+	shipping    shipping.ShippingService
+	exitOnError bool
+	processed   int32
 }
 
 // Starts a processing loop that continually pulls elements from the queue.
-// Does not return until ctx is cancelled or an error is encountered
+// Does not exit when an error is encountered; only when ctx is cancelled
 func (q *queueMasterImpl) Run(ctx context.Context) error {
 	for {
-		var shipment shipping.Shipment
-		err := q.q.Pop(ctx, &shipment)
-		if err != nil {
-			return err
-		}
-		msgNumber := atomic.AddInt32(&q.processed, 1)
+		select {
+		case <-ctx.Done():
+			return nil
+		default:
+			var shipment shipping.Shipment
+			didPop, err := q.q.Pop(ctx, &shipment)
+			if err != nil {
+				if q.exitOnError {
+					return err
+				} else {
+					slog.Error("QueueMaster unable to pull order from shipping queue due to %v", err)
+					continue
+				}
+			}
+			if didPop {
+				msgNumber := atomic.AddInt32(&q.processed, 1)
+				slog.Info(fmt.Sprintf("Received shipment task %v %v: %v", msgNumber, shipment.ID, shipment.Name))
 
-		slog.Info(fmt.Sprintf("Received shipment task %v %v: %v", msgNumber, shipment.ID, shipment.Name))
+				// Keep attempting to update shipping status
+				for {
+					err := q.shipping.UpdateStatus(ctx, shipment.ID, "shipped")
+					if err != nil {
+						if q.exitOnError {
+							return err
+						} else {
+							slog.Error("Unable to send shipment %v due to %v; waiting 1 second then retrying", shipment.ID, err)
+							time.Sleep(1 * time.Second)
+						}
+					} else {
+						break
+					}
+				}
+			}
+		}
 	}
 }

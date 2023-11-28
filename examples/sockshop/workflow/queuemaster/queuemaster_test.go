@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/shipping"
+	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplequeue"
 )
 
@@ -19,16 +20,19 @@ func TestQueueMaster(t *testing.T) {
 	q, err := simplequeue.NewSimpleQueue(ctx)
 	require.NoError(t, err)
 
-	shipService, err := shipping.NewShippingService(ctx, q)
+	db, err := simplenosqldb.NewSimpleNoSQLDB(ctx)
 	require.NoError(t, err)
 
-	qMaster := newQueueMasterImpl(q)
+	shipService, err := shipping.NewShippingService(ctx, q, db)
+	require.NoError(t, err)
+
+	qMaster := newQueueMasterImpl(q, shipService, true)
 	require.Equal(t, int32(0), qMaster.processed)
 
 	exitCount := int32(0)
 	go func() {
 		err = qMaster.Run(ctx)
-		require.Error(t, err)
+		require.NoError(t, err)
 		atomic.AddInt32(&exitCount, 1)
 	}()
 
