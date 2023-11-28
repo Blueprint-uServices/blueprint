@@ -61,7 +61,7 @@ func (q *queueMasterImpl) Run(ctx context.Context) error {
 				if q.exitOnError {
 					return err
 				} else {
-					slog.Error("QueueMaster unable to pull order from shipping queue due to %v", err)
+					slog.Error(fmt.Sprintf("QueueMaster unable to pull order from shipping queue due to %v", err))
 					continue
 				}
 			}
@@ -76,7 +76,7 @@ func (q *queueMasterImpl) Run(ctx context.Context) error {
 						if q.exitOnError {
 							return err
 						} else {
-							slog.Error("Unable to send shipment %v due to %v; waiting 1 second then retrying", shipment.ID, err)
+							slog.Error(fmt.Sprintf("Unable to send shipment %v due to %v; waiting 1 second then retrying", shipment.ID, err))
 							time.Sleep(1 * time.Second)
 						}
 					} else {
