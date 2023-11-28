@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
-	"log"
 	"strconv"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
@@ -43,17 +42,17 @@ func initUserDB(ctx context.Context, userDB backend.NoSQLDatabase) error {
 	return nil
 }
 
-func NewUserServiceImpl(ctx context.Context, userDB backend.NoSQLDatabase) *UserServiceImpl {
+func NewUserServiceImpl(ctx context.Context, userDB backend.NoSQLDatabase) (*UserServiceImpl, error) {
 	u := &UserServiceImpl{userDB: userDB, users: make(map[string]string)}
 	err := initUserDB(ctx, userDB)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	err = u.LoadUsers(context.Background())
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return u
+	return u, nil
 }
 
 func (u *UserServiceImpl) LoadUsers(ctx context.Context) error {

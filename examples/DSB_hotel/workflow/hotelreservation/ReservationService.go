@@ -129,8 +129,10 @@ func (r *ReservationServiceImpl) MakeReservation(ctx context.Context, customerNa
 		err := r.reserveCache.Get(ctx, key, &room_number)
 		if err != nil {
 			var reservations []Reservation
-			query := `{"HotelId":"` + hotelId + `", "InDate":"` + indate + `", "OutDate":"` + outdate + `"}`
-			res, err := reservation_collection.FindMany(query)
+			//query := `{"HotelId":"` + hotelId + `", "InDate":"` + indate + `", "OutDate":"` + outdate + `"}`
+
+			query := bson.D{{"hotelid", hotelId}, {"indate", indate}, {"outdate", outdate}} // TODO fix this?
+			res, err := reservation_collection.FindMany(ctx, query)
 			if err != nil {
 				return []string{}, err
 			}
@@ -215,7 +217,8 @@ func (r *ReservationServiceImpl) CheckAvailability(ctx context.Context, customer
 			if err != nil {
 				// Check Database
 				var reservations []Reservation
-				query := `{"HotelId":"` + hotelId + `", "InDate":"` + indate + `", "OutDate":"` + outdate + `"}`
+				//query := `{"HotelId":"` + hotelId + `", "InDate":"` + indate + `", "OutDate":"` + outdate + `"}`
+				query := bson.D{{"hotelid", hotelId}, {"indate", indate}, {"outdate", outdate}} // TODO fix this?
 				res, err := reservation_collection.FindMany(ctx, query)
 				if err != nil {
 					return []string{}, err
@@ -239,7 +242,7 @@ func (r *ReservationServiceImpl) CheckAvailability(ctx context.Context, customer
 			err = r.reserveCache.Get(ctx, cap_key, &capacity)
 			r.NumRequests += 1
 			if err != nil {
-				query := `{"HotelId":"` + hotelId + `"}`
+				query := bson.D{{"hotelid", hotelId}}
 				res, err := hnumber_collection.FindOne(ctx, query)
 				if err != nil {
 					return []string{}, err
