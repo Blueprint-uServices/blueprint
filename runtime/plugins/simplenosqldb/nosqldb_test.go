@@ -1,10 +1,11 @@
-package simplenosqldb
+package simplenosqldb_test
 
 import (
 	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -43,10 +44,10 @@ var teacollections = []TeaCollection{
 	{Name: "fun collection", Teas: []Tea{teas[3], teas[4]}},
 }
 
-func MakeTestDB(t *testing.T) (context.Context, *SimpleCollection) {
-	verbose = true
+func MakeTestDB(t *testing.T) (context.Context, *simplenosqldb.SimpleCollection) {
+	simplenosqldb.SetVerbose(true)
 	ctx := context.Background()
-	db, err := NewSimpleNoSQLDB(ctx)
+	db, err := simplenosqldb.NewSimpleNoSQLDB(ctx)
 	require.NoError(t, err)
 
 	coll, err := db.GetCollection(ctx, "testdb", "testcollection")
@@ -58,13 +59,13 @@ func MakeTestDB(t *testing.T) (context.Context, *SimpleCollection) {
 	}
 	err = coll.InsertMany(ctx, docs)
 	require.NoError(t, err)
-	return ctx, coll.(*SimpleCollection)
+	return ctx, coll.(*simplenosqldb.SimpleCollection)
 }
 
-func MakeTestDB2(t *testing.T) (context.Context, *SimpleCollection) {
-	verbose = true
+func MakeTestDB2(t *testing.T) (context.Context, *simplenosqldb.SimpleCollection) {
+	simplenosqldb.SetVerbose(true)
 	ctx := context.Background()
-	db, err := NewSimpleNoSQLDB(ctx)
+	db, err := simplenosqldb.NewSimpleNoSQLDB(ctx)
 	require.NoError(t, err)
 
 	coll, err := db.GetCollection(ctx, "testdb", "testcollection2")
@@ -76,7 +77,7 @@ func MakeTestDB2(t *testing.T) (context.Context, *SimpleCollection) {
 	}
 	err = coll.InsertMany(ctx, docs)
 	require.NoError(t, err)
-	return ctx, coll.(*SimpleCollection)
+	return ctx, coll.(*simplenosqldb.SimpleCollection)
 }
 
 func TestGetAll(t *testing.T) {

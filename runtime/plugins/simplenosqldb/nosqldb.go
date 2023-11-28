@@ -136,6 +136,11 @@ func (db *SimpleCollection) FindOne(ctx context.Context, filter bson.D, projecti
 
 var verbose = false
 
+// Enable or disable verbose logging
+func SetVerbose(enabled bool) {
+	verbose = enabled
+}
+
 func (db *SimpleCollection) FindMany(ctx context.Context, filter bson.D, projection ...bson.D) (backend.NoSQLCursor, error) {
 	query, err := query.ParseFilter(filter)
 	if err != nil {

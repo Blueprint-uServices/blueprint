@@ -10,7 +10,7 @@ import (
 func TestRelDB(t *testing.T) {
 	ctx := context.Background()
 
-	db, err := NewSimpleRelDB(ctx, "TestRelDB")
+	db, err := NewSimpleRelDB(ctx)
 	require.NoError(t, err)
 
 	batch := []string{
