@@ -7,7 +7,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplequeue"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
@@ -33,7 +33,7 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	cart_service := workflow.Define(spec, "cart_service", "CartService", cart_db)
 	cart_ctr := applyDockerDefaults(spec, cart_service, "cart_proc", "cart_ctr")
 
-	shipqueue := simplequeue.Define(spec, "shipping_queue")
+	shipqueue := simple.Queue(spec, "shipping_queue")
 	shipdb := mongodb.PrebuiltContainer(spec, "shipping_db")
 	shipping_service := workflow.Define(spec, "shipping_service", "ShippingService", shipqueue, shipdb)
 	shipping_ctr := applyDockerDefaults(spec, shipping_service, "shipping_proc", "shipping_ctr")

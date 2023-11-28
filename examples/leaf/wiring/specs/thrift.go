@@ -7,7 +7,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/thrift"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
@@ -22,7 +22,7 @@ var Thrift = wiringcmd.SpecOption{
 
 func makeThriftSpec(spec wiring.WiringSpec) ([]string, error) {
 	leaf_db := mongodb.PrebuiltContainer(spec, "leaf_db")
-	leaf_cache := simplecache.Define(spec, "leaf_cache")
+	leaf_cache := simple.Cache(spec, "leaf_cache")
 	leaf_service := workflow.Define(spec, "leaf_service", "LeafServiceImpl", leaf_cache, leaf_db)
 	leaf_proc := applyThriftDefaults(spec, leaf_service)
 
