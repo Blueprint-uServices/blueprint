@@ -10,7 +10,7 @@ import (
 )
 
 // A simple in-memory relational DB that uses the ramsql package
-type SimpleRelDB struct {
+type SimpleRelationalDB struct {
 	name string
 	db   *sql.DB
 }
@@ -21,15 +21,15 @@ func NewSimpleRelDB(ctx context.Context, name string) (backend.RelationalDB, err
 	if err != nil {
 		return nil, err
 	}
-	return &SimpleRelDB{name: name, db: db}, nil
+	return &SimpleRelationalDB{name: name, db: db}, nil
 }
 
 // Exec implements backend.RelationalDB.
-func (s *SimpleRelDB) Exec(ctx context.Context, query string, args ...any) (sql.Result, error) {
+func (s *SimpleRelationalDB) Exec(ctx context.Context, query string, args ...any) (sql.Result, error) {
 	return s.db.ExecContext(ctx, query, args...)
 }
 
 // Query implements backend.RelationalDB.
-func (s *SimpleRelDB) Query(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
+func (s *SimpleRelationalDB) Query(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
 	return s.db.QueryContext(ctx, query, args...)
 }
