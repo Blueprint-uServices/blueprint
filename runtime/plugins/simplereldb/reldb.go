@@ -36,7 +36,7 @@ func (s *SimpleRelationalDB) Query(ctx context.Context, query string, args ...an
 
 // Get implements backend.RelationalDB.
 func (s *SimpleRelationalDB) Get(ctx context.Context, dst interface{}, query string, args ...any) error {
-	return s.db.GetContext(ctx, dst, query, args)
+	return s.db.GetContext(ctx, dst, query, args...)
 }
 
 // Prepare implements backend.RelationalDB.
@@ -46,5 +46,5 @@ func (s *SimpleRelationalDB) Prepare(ctx context.Context, query string) (*sql.St
 
 // Select implements backend.RelationalDB.
 func (s *SimpleRelationalDB) Select(ctx context.Context, dst interface{}, query string, args ...any) error {
-	return s.db.SelectContext(ctx, dst, query, args)
+	return s.db.SelectContext(ctx, dst, query, args...)
 }

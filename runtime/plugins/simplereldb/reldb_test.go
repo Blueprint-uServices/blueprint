@@ -1,16 +1,17 @@
-package simplereldb
+package simplereldb_test
 
 import (
 	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplereldb"
 )
 
 func TestRelDB(t *testing.T) {
 	ctx := context.Background()
 
-	db, err := NewSimpleRelDB(ctx)
+	db, err := simplereldb.NewSimpleRelDB(ctx)
 	require.NoError(t, err)
 
 	batch := []string{
@@ -56,4 +57,22 @@ func TestRelDB(t *testing.T) {
 	require.Equal(t, "chemin du bout du monde", street)
 
 	require.False(t, rows.Next())
+
+	query2 := `SELECT * FROM address
+				JOIN user_addresses ON address.id=user_addresses.address_id 
+				WHERE user_addresses.user_id = $1;`
+
+	var addresses []Address
+	err = db.Select(ctx, &addresses, query2, 1)
+	require.NoError(t, err)
+	require.Len(t, addresses, 2)
+
+	require.Equal(t, Address{"2", "boulevard de la République", 23}, addresses[0])
+	require.Equal(t, Address{"4", "chemin du bout du monde", 323}, addresses[1])
+}
+
+type Address struct {
+	ID     string `db:"id"`
+	Street string `db:"street"`
+	Number int    `db:"street_number"`
 }
