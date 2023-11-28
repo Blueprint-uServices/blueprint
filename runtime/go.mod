@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/proullon/ramsql v0.1.3
 	github.com/stretchr/testify v1.8.4
 	github.com/tracingplane/tracingplane-go v0.0.0-20171025152126-8c4e6f79b148
 	gitlab.mpi-sws.org/cld/tracing/tracing-framework-go v0.0.0-20211206181151-6edc754a9f2a

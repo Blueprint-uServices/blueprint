@@ -10,7 +10,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/healthchecker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workload"
@@ -24,7 +24,7 @@ var Docker = wiringcmd.SpecOption{
 
 func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	leaf_db := mongodb.PrebuiltContainer(spec, "leaf_db")
-	leaf_cache := simplecache.Define(spec, "leaf_cache")
+	leaf_cache := simple.Cache(spec, "leaf_cache")
 	leaf_service := workflow.Define(spec, "leaf_service", "LeafServiceImpl", leaf_cache, leaf_db)
 	leaf_ctr := applyDockerDefaults(spec, leaf_service)
 
