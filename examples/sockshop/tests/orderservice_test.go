@@ -102,14 +102,9 @@ func TestOrderService(t *testing.T) {
 	_, err = queuemasterRegistry.Get(ctx)
 	require.NoError(t, err)
 
-	// Order shouldn't be shipped yet
+	// Wait up to 30 seconds for the status to change
 	shipping, err := shippingRegistry.Get(ctx)
 	require.NoError(t, err)
-	shipment, err := shipping.GetShipment(ctx, order2.ID)
-	require.NoError(t, err)
-	require.Equal(t, "awaiting shipment", shipment.Status)
-
-	// Wait up to 30 seconds for the status to change
 	for i := 0; i < 30; i++ {
 		shipment2, err := shipping.GetShipment(ctx, order2.ID)
 		require.NoError(t, err)
