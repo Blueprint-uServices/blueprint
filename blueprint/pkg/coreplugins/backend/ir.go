@@ -16,4 +16,9 @@ type (
 		ir.IRNode
 		service.ServiceNode
 	}
+
+	Queue interface {
+		ir.IRNode
+		service.ServiceNode
+	}
 )

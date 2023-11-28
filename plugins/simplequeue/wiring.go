@@ -1,4 +1,4 @@
-package simplenosqldb
+package simplequeue
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"

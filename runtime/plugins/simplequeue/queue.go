@@ -11,26 +11,26 @@ import (
 )
 
 // A simple chan-based queue that implements the [backend.Queue] interface
-type simpleQueue struct {
+type SimpleQueue struct {
 	q chan any
 }
 
 // Instantiates a [backend.Queue] that internally uses a golang channel of capacity 10.
 //
 // Calls to [q.Push] will block once the queue capacity reaches 10.
-func NewSimpleQueue(ctx context.Context) (q backend.Queue, err error) {
+func NewSimpleQueue(ctx context.Context) (q *SimpleQueue, err error) {
 	return newSimpleQueueWithCapacity(10), nil
 }
 
 // Instantiates a [simpleQueue] with the specified capacity.
-func newSimpleQueueWithCapacity(capacity int) *simpleQueue {
-	return &simpleQueue{
+func newSimpleQueueWithCapacity(capacity int) *SimpleQueue {
+	return &SimpleQueue{
 		q: make(chan any, capacity),
 	}
 }
 
 // Pop implements backend.Queue.
-func (q *simpleQueue) Pop(ctx context.Context, dst interface{}) (bool, error) {
+func (q *SimpleQueue) Pop(ctx context.Context, dst interface{}) (bool, error) {
 	select {
 	case v := <-q.q:
 		return true, backend.CopyResult(v, dst)
@@ -47,7 +47,7 @@ func (q *simpleQueue) Pop(ctx context.Context, dst interface{}) (bool, error) {
 }
 
 // Push implements backend.Queue.
-func (q *simpleQueue) Push(ctx context.Context, item interface{}) (bool, error) {
+func (q *SimpleQueue) Push(ctx context.Context, item interface{}) (bool, error) {
 	select {
 	case q.q <- item:
 		return true, nil

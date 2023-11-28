@@ -1,4 +1,4 @@
-package simplenosqldb
+package simplequeue
 
 import (
 	"fmt"
