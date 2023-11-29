@@ -42,7 +42,7 @@ func initUserDB(ctx context.Context, userDB backend.NoSQLDatabase) error {
 	return nil
 }
 
-func NewUserServiceImpl(ctx context.Context, userDB backend.NoSQLDatabase) (*UserServiceImpl, error) {
+func NewUserServiceImpl(ctx context.Context, userDB backend.NoSQLDatabase) (UserService, error) {
 	u := &UserServiceImpl{userDB: userDB, users: make(map[string]string)}
 	err := initUserDB(ctx, userDB)
 	if err != nil {

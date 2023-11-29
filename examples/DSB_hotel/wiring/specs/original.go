@@ -5,7 +5,9 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/gotests"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/jaeger"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/memcached"
@@ -67,8 +69,11 @@ func makeOriginalSpec(spec wiring.WiringSpec) ([]string, error) {
 
 	// Define frontend service
 	frontend_service := workflow.Define(spec, "frontend_service", "FrontEndService", search_service, profile_service, recomd_service, user_service, reserv_service)
-	frontend_ctr := applyDefaults(spec, frontend_service, trace_collector)
+	frontend_ctr := applyHTTPDefaults(spec, frontend_service, trace_collector)
 	cntrs = append(cntrs, frontend_ctr)
+
+	tests := gotests.Test(spec, frontend_service)
+	cntrs = append(cntrs, tests)
 
 	return cntrs, nil
 }
@@ -78,6 +83,15 @@ func applyDefaults(spec wiring.WiringSpec, serviceName string, collectorName str
 	ctrName := fmt.Sprintf("%s_container", serviceName)
 	opentelemetry.InstrumentUsingCustomCollector(spec, serviceName, collectorName)
 	grpc.Deploy(spec, serviceName)
+	goproc.CreateProcess(spec, procName, serviceName)
+	return linuxcontainer.CreateContainer(spec, ctrName, procName)
+}
+
+func applyHTTPDefaults(spec wiring.WiringSpec, serviceName string, collectorName string) string {
+	procName := fmt.Sprintf("%s_process", serviceName)
+	ctrName := fmt.Sprintf("%s_container", serviceName)
+	opentelemetry.InstrumentUsingCustomCollector(spec, serviceName, collectorName)
+	http.Deploy(spec, serviceName)
 	goproc.CreateProcess(spec, procName, serviceName)
 	return linuxcontainer.CreateContainer(spec, ctrName, procName)
 }
