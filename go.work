@@ -7,6 +7,9 @@ use (
 	./examples/sockshop/tests
 	./examples/sockshop/wiring
 	./examples/sockshop/workflow
+	./examples/DSB_hotel/tests
+	./examples/DSB_hotel/wiring
+	./examples/DSB_hotel/workflow
 	./plugins
 	./runtime
 	./test/wiring
