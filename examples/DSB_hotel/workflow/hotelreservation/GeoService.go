@@ -2,7 +2,6 @@ package hotelreservation
 
 import (
 	"context"
-	"log"
 	"strconv"
 
 	"github.com/hailocab/go-geoindex"
@@ -68,14 +67,14 @@ func initGeoDB(ctx context.Context, db backend.NoSQLDatabase) error {
 	return nil
 }
 
-func NewGeoServiceImpl(ctx context.Context, geoDB backend.NoSQLDatabase) *GeoServiceImpl {
+func NewGeoServiceImpl(ctx context.Context, geoDB backend.NoSQLDatabase) (GeoService, error) {
 	err := initGeoDB(ctx, geoDB)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	service := &GeoServiceImpl{geoDB: geoDB}
 	service.newGeoIndex(ctx)
-	return service
+	return service, nil
 }
 
 const (
