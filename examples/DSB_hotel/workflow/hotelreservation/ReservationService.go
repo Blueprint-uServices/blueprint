@@ -2,7 +2,6 @@ package hotelreservation
 
 import (
 	"context"
-	"log"
 	"strconv"
 	"time"
 
@@ -96,13 +95,13 @@ func metricFunc(r *ReservationServiceImpl) {
 }
 */
 
-func NewReservationServiceImpl(ctx context.Context, reserveCache backend.Cache, reserveDB backend.NoSQLDatabase) *ReservationServiceImpl {
+func NewReservationServiceImpl(ctx context.Context, reserveCache backend.Cache, reserveDB backend.NoSQLDatabase) (ReservationService, error) {
 	err := initReservationDB(ctx, reserveDB)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	r := &ReservationServiceImpl{reserveCache: reserveCache, reserveDB: reserveDB}
-	return r
+	return r, nil
 }
 
 func (r *ReservationServiceImpl) MakeReservation(ctx context.Context, customerName string, hotelIds []string, inDate string, outDate string, roomNumber int64) ([]string, error) {
