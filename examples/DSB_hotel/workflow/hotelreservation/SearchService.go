@@ -13,8 +13,8 @@ type SearchServiceImpl struct {
 	rateService RateService
 }
 
-func NewSearchServiceImpl(geoService GeoService, rateService RateService) *SearchServiceImpl {
-	return &SearchServiceImpl{geoService: geoService, rateService: rateService}
+func NewSearchServiceImpl(ctx context.Context, geoService GeoService, rateService RateService) (SearchService, error) {
+	return &SearchServiceImpl{geoService: geoService, rateService: rateService}, nil
 }
 
 func (s *SearchServiceImpl) Nearby(ctx context.Context, lat float64, lon float64, inDate string, outDate string) ([]string, error) {
