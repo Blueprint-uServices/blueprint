@@ -7,8 +7,8 @@ import (
 )
 
 // Creates a client-side load-balancer for multiple instances of a service. The list of services must be provided as an argument at compile-time when using this plugin.
-func Create(spec wiring.WiringSpec, services []string, serviceType string) string {
-	loadbalancer_name := serviceType + ".lb"
+func Create(spec wiring.WiringSpec, serviceGroupName string, services []string) string {
+	loadbalancer_name := serviceGroupName + ".lb"
 	spec.Define(loadbalancer_name, &LoadBalancerClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		var arg_nodes []ir.IRNode
 		for _, arg_name := range services {
@@ -19,7 +19,7 @@ func Create(spec wiring.WiringSpec, services []string, serviceType string) strin
 			arg_nodes = append(arg_nodes, arg)
 		}
 
-		return newLoadBalancerClient(serviceType, arg_nodes)
+		return newLoadBalancerClient(serviceGroupName, arg_nodes)
 	})
 
 	dstName := loadbalancer_name + ".dst"
