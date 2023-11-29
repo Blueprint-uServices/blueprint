@@ -47,9 +47,13 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	order_service := workflow.Define(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)
 	order_ctr := applyDockerDefaults(spec, order_service, "order_proc", "order_ctr")
 
-	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service)
+	catalogue_db := simple.RelationalDB(spec, "catalogue_db")
+	catalogue_service := workflow.Define(spec, "catalogue_service", "CatalogueService", catalogue_db)
+	catalogue_ctr := applyDockerDefaults(spec, catalogue_service, "catalogue_proc", "catalogue_ctr")
 
-	return []string{user_ctr, payment_ctr, cart_ctr, shipping_ctr, order_ctr, tests}, nil
+	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service, catalogue_service)
+
+	return []string{user_ctr, payment_ctr, cart_ctr, shipping_ctr, order_ctr, catalogue_ctr, tests}, nil
 }
 
 func applyDockerDefaults(spec wiring.WiringSpec, serviceName, procName, ctrName string) string {
