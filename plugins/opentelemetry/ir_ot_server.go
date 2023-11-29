@@ -63,7 +63,7 @@ func (node *OpenTelemetryServerWrapper) genInterface(ctx ir.BuildContext) (*goco
 	}
 	i := gocode.CopyServiceInterface(fmt.Sprintf("%v_OTServerWrapperInterface", iface.BaseName), module_ctx.Info().Name+"/"+node.outputPackage, iface)
 	for name, method := range i.Methods {
-		method.AddArgument(gocode.Variable{Name: "trace_ctx", Type: &gocode.BasicType{Name: "string"}})
+		method.AddArgument(gocode.Variable{Name: "traceCtx", Type: &gocode.BasicType{Name: "string"}})
 		i.Methods[name] = method
 	}
 	return i, nil
@@ -233,9 +233,9 @@ func New_{{.Name}}(ctx context.Context, service {{.Imports.NameOf .Service.UserT
 {{$service := .Service.Name -}}
 {{$receiver := .Name -}}
 {{range $_, $f := .Service.Methods}}
-func (handler *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}, trace_ctx string) ({{RetVarsAndTypes $f "err error"}}) {
-	if trace_ctx != "" {
-		span_ctx_config, _ := backend.GetSpanContext(trace_ctx)
+func (handler *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}, traceCtx string) ({{RetVarsAndTypes $f "err error"}}) {
+	if traceCtx != "" {
+		span_ctx_config, _ := backend.GetSpanContext(traceCtx)
 		span_ctx := trace.NewSpanContext(span_ctx_config)
 		ctx = trace.ContextWithRemoteSpanContext(ctx, span_ctx)
 	}
