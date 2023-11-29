@@ -2,7 +2,6 @@ package hotelreservation
 
 import (
 	"context"
-	"log"
 	"math"
 	"strconv"
 
@@ -89,17 +88,17 @@ func initRecommendationDB(ctx context.Context, db backend.NoSQLDatabase) error {
 	return nil
 }
 
-func NewRecommendationServiceImpl(ctx context.Context, recommendDB backend.NoSQLDatabase) *RecommendationServiceImpl {
+func NewRecommendationServiceImpl(ctx context.Context, recommendDB backend.NoSQLDatabase) (RecommendationService, error) {
 	service := &RecommendationServiceImpl{recommendDB: recommendDB, hotels: make(map[string]Hotel)}
 	err := initRecommendationDB(ctx, recommendDB)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	err = service.LoadRecommendations(context.Background())
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return service
+	return service, nil
 }
 
 func (r *RecommendationServiceImpl) LoadRecommendations(ctx context.Context) error {
