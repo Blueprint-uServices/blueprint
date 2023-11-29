@@ -2,7 +2,6 @@ package hotelreservation
 
 import (
 	"context"
-	"log"
 	"strconv"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
@@ -159,12 +158,12 @@ func initProfileDB(ctx context.Context, db backend.NoSQLDatabase) error {
 	return nil
 }
 
-func NewProfileServiceImpl(ctx context.Context, profileCache backend.Cache, profileDB backend.NoSQLDatabase) *ProfileServiceImpl {
+func NewProfileServiceImpl(ctx context.Context, profileCache backend.Cache, profileDB backend.NoSQLDatabase) (ProfileService, error) {
 	err := initProfileDB(ctx, profileDB)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return &ProfileServiceImpl{profileCache: profileCache, profileDB: profileDB}
+	return &ProfileServiceImpl{profileCache: profileCache, profileDB: profileDB}, nil
 }
 
 func (p *ProfileServiceImpl) GetProfiles(ctx context.Context, hotelIds []string, locale string) ([]HotelProfile, error) {
@@ -179,7 +178,7 @@ func (p *ProfileServiceImpl) GetProfiles(ctx context.Context, hotelIds []string,
 			if err != nil {
 				return []HotelProfile{}, err
 			}
-			query := bson.D{{"Id", hid}}
+			query := bson.D{{"id", hid}}
 			res, err := collection.FindOne(ctx, query)
 			if err != nil {
 				return profiles, err

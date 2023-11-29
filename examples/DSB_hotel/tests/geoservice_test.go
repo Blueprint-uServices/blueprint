@@ -32,4 +32,5 @@ func TestNearby(t *testing.T) {
 	hotels, err := service.Nearby(ctx, 37.7835, -122.41)
 	assert.NoError(t, err)
 	assert.Len(t, hotels, 5)
+	t.Log(hotels)
 }
