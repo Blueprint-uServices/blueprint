@@ -15,7 +15,9 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.4.0 // indirect
+	github.com/jmoiron/sqlx v1.3.5 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/proullon/ramsql v0.1.3 // indirect
 	github.com/tracingplane/tracingplane-go v0.0.0-20171025152126-8c4e6f79b148 // indirect
 	go.mongodb.org/mongo-driver v1.12.1 // indirect
 	go.opentelemetry.io/otel v1.20.0 // indirect
