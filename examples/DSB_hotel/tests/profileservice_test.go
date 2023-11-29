@@ -40,10 +40,8 @@ func TestGetProfiles(t *testing.T) {
 
 	// Check names of hotels
 	assert.Equal(t, "Clift Hotel", profiles[0].Name)
-	/*
-		assert.Equal(t, "W San Francisco", profiles[1].Name)
-		assert.Equal(t, "Hotel Zetta", profiles[2].Name)
-		assert.Equal(t, "Hotel Vitale", profiles[3].Name)
-		assert.Equal(t, "Phoenix Hotel", profiles[4].Name)
-	*/
+	assert.Equal(t, "W San Francisco", profiles[1].Name)
+	assert.Equal(t, "Hotel Zetta", profiles[2].Name)
+	assert.Equal(t, "Hotel Vitale", profiles[3].Name)
+	assert.Equal(t, "Phoenix Hotel", profiles[4].Name)
 }
