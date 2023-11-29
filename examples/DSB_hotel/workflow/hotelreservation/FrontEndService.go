@@ -20,8 +20,8 @@ type FrontEndServiceImpl struct {
 	reservationService    ReservationService
 }
 
-func NewFrontEndServiceImpl(searchService SearchService, profileService ProfileService, recommendationService RecommendationService, userService UserService, reservationService ReservationService) *FrontEndServiceImpl {
-	return &FrontEndServiceImpl{searchService: searchService, profileService: profileService, recommendationService: recommendationService, userService: userService, reservationService: reservationService}
+func NewFrontEndServiceImpl(ctx context.Context, searchService SearchService, profileService ProfileService, recommendationService RecommendationService, userService UserService, reservationService ReservationService) (FrontEndService, error) {
+	return &FrontEndServiceImpl{searchService: searchService, profileService: profileService, recommendationService: recommendationService, userService: userService, reservationService: reservationService}, nil
 }
 
 func (f *FrontEndServiceImpl) SearchHandler(ctx context.Context, customerName string, inDate string, outDate string, lat float64, lon float64, locale string) ([]HotelProfile, error) {
