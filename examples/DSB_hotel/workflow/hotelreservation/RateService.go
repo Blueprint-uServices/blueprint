@@ -2,7 +2,6 @@ package hotelreservation
 
 import (
 	"context"
-	"log"
 	"strconv"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
@@ -115,12 +114,12 @@ func initRateDB(ctx context.Context, db backend.NoSQLDatabase) error {
 	return nil
 }
 
-func NewRateServiceImpl(ctx context.Context, rateCache backend.Cache, rateDB backend.NoSQLDatabase) *RateServiceImpl {
+func NewRateServiceImpl(ctx context.Context, rateCache backend.Cache, rateDB backend.NoSQLDatabase) (RateService, error) {
 	err := initRateDB(ctx, rateDB)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return &RateServiceImpl{rateCache: rateCache, rateDB: rateDB}
+	return &RateServiceImpl{rateCache: rateCache, rateDB: rateDB}, nil
 }
 
 func (r *RateServiceImpl) GetRates(ctx context.Context, hotelIDs []string, inDate string, outDate string) ([]RatePlan, error) {
