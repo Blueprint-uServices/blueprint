@@ -17,9 +17,10 @@ func NoSQLDB(spec wiring.WiringSpec, name string) string {
 }
 
 // Defines an in-memory [backend.RelationalDB] instance with the specified name.
-// In the compiled application, uses the [simplereldb.SimpleRelationalDB] implementation from the Blueprint runtime package
+// In the compiled application, uses the [sqlitereldb.SqliteRelDB] implementation from the Blueprint runtime package
+// The compiled application might fail to run if gcc is not installed and CGO_ENABLED is not set.
 func RelationalDB(spec wiring.WiringSpec, name string) string {
-	return define(spec, name, "RelationalDB", "SimpleRelationalDB")
+	return define(spec, name, "RelationalDB", "SqliteRelDB")
 }
 
 // Defines an in-memory [backend.Queue] instance with the specified name.
