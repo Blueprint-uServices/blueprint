@@ -3,6 +3,7 @@ package simplecache
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
@@ -30,7 +31,7 @@ func (cache *SimpleCache) Get(ctx context.Context, key string, val interface{}) 
 	if v, exists := cache.values[key]; exists {
 		return backend.CopyResult(v, val)
 	} else {
-		return backend.SetZero(val)
+		return errors.New("Key doesn't exist")
 	}
 }
 
