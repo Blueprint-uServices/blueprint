@@ -1,7 +1,10 @@
-// Package simple provides a Blueprint plugin for using in-memory backend implementations, e.g. in-memory databases and queues.
+// Package simple provides basic in-memory implementations of various Blueprint backends including Cache, Queue, NoSQLDB, and RelationalDB.
 //
-// In most compiled applications it is preferred to use "proper" implementations such as MySQL, Kafka, MongoDB etc.  However,
-// for testing and for all-in-one processes, using the "simple" backend implementations provided here is highly convenient.
+// These simple in-memory implementations are useful when compiling all-in-one applications, and for use during development and testing
+// of workflow specs.
+//
+// For a more fully-fledged microservice application, these simple backends are a poor choice; instead a "proper" implementation
+// such as MySQL, Kafka, MongoDB etc. should be used.
 package simple
 
 import (
@@ -12,6 +15,7 @@ import (
 
 // Defines an in-memory [backend.NoSQLDatabase] instance with the specified name.
 // In the compiled application, uses the [simplenosqldb.SimpleNoSQLDB] implementation from the Blueprint runtime package
+// The SimpleNoSQLDB has limited support for query and update operations.
 func NoSQLDB(spec wiring.WiringSpec, name string) string {
 	return define(spec, name, "NoSQLDatabase", "SimpleNoSQLDB")
 }

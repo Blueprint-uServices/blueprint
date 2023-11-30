@@ -1,7 +1,9 @@
-// Package sqlitereldb implements a [backend.RelationalDB] using in-memory SQLite.
+// Package sqlitereldb implements a [backend.RelationalDB] using the in-memory Golang
+// SQLite package [github.com/mattn/go-sqlite3].
 //
-// There are some pre-requisites for this to work.  CGO_ENABLED must be set to 1 and gcc
-// must be installed.
+// If you are directly running go code (e.g. not from a docker container), the go-sqlite3
+// package requires CGO_ENABLED=1 and you must have gcc installed.  See [https://github.com/mattn/go-sqlite3]
+// for more details about installation instructions.
 package sqlitereldb
 
 import (
@@ -13,12 +15,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// A simple in-memory relational DB that uses the ramsql package
+// An in-memory relational DB that uses the go-sqlite3 package
 type SqliteRelDB struct {
 	db *sqlx.DB
 }
 
-// Instantiates a new [SimpleRelDB] instance that stores query data in-memory
+// Instantiates a new [SqliteRelDB] instance that stores query data in-memory
 func NewSqliteRelDB(ctx context.Context) (*SqliteRelDB, error) {
 	db, err := sqlx.Open("sqlite3", "file:foobar?mode=memory&cache=shared")
 	if err != nil {
