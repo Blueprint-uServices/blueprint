@@ -44,7 +44,7 @@ func TestComposeText(t *testing.T) {
 	require.Len(t, mentions, 0)
 	require.Len(t, urls, 0)
 
-	// Add users to the data before running the test
+	// Add users to the data before running the test as usermention requires that mentioned users be valid
 	db, err := userDBRegistry.Get(ctx)
 	require.NoError(t, err)
 	coll, err := db.GetCollection(ctx, "user", "user")
