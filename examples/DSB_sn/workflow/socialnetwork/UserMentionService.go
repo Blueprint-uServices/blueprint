@@ -3,6 +3,7 @@ package socialnetwork
 import (
 	"context"
 	"fmt"
+	"log"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
@@ -17,7 +18,7 @@ type UserMentionServiceImpl struct {
 	userDB    backend.NoSQLDatabase
 }
 
-func NewUserMentionServiceImpl(userCache backend.Cache, userDB backend.NoSQLDatabase) (UserMentionService, error) {
+func NewUserMentionServiceImpl(ctx context.Context, userCache backend.Cache, userDB backend.NoSQLDatabase) (UserMentionService, error) {
 	return &UserMentionServiceImpl{userCache: userCache, userDB: userDB}, nil
 }
 
@@ -35,17 +36,17 @@ func (u *UserMentionServiceImpl) ComposeUserMentions(ctx context.Context, reqID 
 	for idx, _ := range values {
 		retvals = append(retvals, &values[idx])
 	}
-	err := u.userCache.Mget(ctx, keys, retvals)
-	if err != nil {
-		return []UserMention{}, err
-	}
+	u.userCache.Mget(ctx, keys, retvals)
 	var user_mentions []UserMention
 	for idx, key := range keys {
-		user_mention := UserMention{UserID: values[idx], Username: rev_lookup[key]}
-		user_mentions = append(user_mentions, user_mention)
-		delete(usernames_not_cached, rev_lookup[key])
+		if values[idx] != 0 {
+			user_mention := UserMention{UserID: values[idx], Username: rev_lookup[key]}
+			user_mentions = append(user_mentions, user_mention)
+			delete(usernames_not_cached, rev_lookup[key])
+		}
 	}
 	if len(usernames_not_cached) != 0 {
+		log.Println("Looking for user IDs in the database")
 		var names []string
 		for name := range usernames_not_cached {
 			names = append(names, name)
