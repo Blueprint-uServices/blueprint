@@ -84,6 +84,11 @@ func (node *OpenTelemetryServerWrapper) AddInterfaces(builder golang.ModuleBuild
 		return err
 	}
 
+	// Only generate code once
+	if builder.Visited(iface.Name + ".ot_server_iface") {
+		return nil
+	}
+
 	err = generateClientSideInterfaces(builder, iface, node.outputPackage)
 	if err != nil {
 		return err
@@ -107,6 +112,11 @@ func (node *OpenTelemetryServerWrapper) GenerateFuncs(builder golang.ModuleBuild
 	impl_iface, err := node.genInterface(builder)
 	if err != nil {
 		return err
+	}
+
+	// Only generate code once
+	if builder.Visited(impl_iface.Name + ".ot_server_impl") {
+		return nil
 	}
 
 	return generateServerHandler(builder, wrapped_iface, impl_iface, coll_iface, node.outputPackage)
