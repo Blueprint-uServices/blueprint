@@ -110,7 +110,7 @@ func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*
 		Iface:       validIfaces[0],
 		Constructor: constructors[0],
 	}
-	slog.Info(fmt.Sprintf("Located workflow spec service %v with constructor %v in package %v\n", struc.Name, constructors[0].Name, validIfaces[0].File.Package.Name))
+	slog.Info(fmt.Sprintf("Located workflow spec service %v with constructor %v in package %v", struc.Name, constructors[0].Name, validIfaces[0].File.Package.Name))
 	return service, nil
 }
 
@@ -130,7 +130,7 @@ func (spec *WorkflowSpec) makeServiceFromInterface(iface *goparser.ParsedInterfa
 		Iface:       iface,
 		Constructor: constructors[0],
 	}
-	slog.Info(fmt.Sprintf("Located workflow spec service %v with constructor %v in package %v\n", iface.Name, constructors[0].Name, iface.File.Package.Name))
+	slog.Info(fmt.Sprintf("Located workflow spec service %v with constructor %v in package %v", iface.Name, constructors[0].Name, iface.File.Package.Name))
 	return service, nil
 
 }

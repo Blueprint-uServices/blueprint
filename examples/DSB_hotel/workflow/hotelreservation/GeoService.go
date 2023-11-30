@@ -4,7 +4,7 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/hailocab/go-geoindex"
+	geoindex "github.com/hailocab/go-geoindex"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"go.mongodb.org/mongo-driver/bson"
 )

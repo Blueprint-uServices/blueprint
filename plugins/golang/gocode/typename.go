@@ -11,6 +11,7 @@ import (
 // declaring a variable, including possible imports and go.mod requires
 type TypeName interface {
 	String() string
+	Equals(other TypeName) bool
 	IsTypeName()
 }
 
@@ -275,3 +276,156 @@ func (t *FuncType) IsTypeName()         {}
 func (t *StructType) IsTypeName()       {}
 func (t *GenericType) IsTypeName()      {}
 func (t *GenericTypeParam) IsTypeName() {}
+
+func (t *BasicType) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	t2, isSameType := other.(*BasicType)
+	if !isSameType {
+		return false
+	}
+	return t.Name == t2.Name
+}
+
+func (t *UserType) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	t2, isSameType := other.(*UserType)
+	if !isSameType {
+		return false
+	}
+	return t.Package == t2.Package && t.Name == t2.Name
+}
+
+func (t *Slice) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	t2, isSameType := other.(*Slice)
+	if !isSameType {
+		return false
+	}
+	return t.SliceOf.Equals(t2.SliceOf)
+}
+
+func (t *Ellipsis) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	t2, isSameType := other.(*Ellipsis)
+	if !isSameType {
+		return false
+	}
+	return t.EllipsisOf.Equals(t2.EllipsisOf)
+}
+
+func (t *Pointer) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	t2, isSameType := other.(*Pointer)
+	if !isSameType {
+		return false
+	}
+	return t.PointerTo.Equals(t2.PointerTo)
+}
+
+func (t *Map) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	t2, isSameType := other.(*Map)
+	if !isSameType {
+		return false
+	}
+	return t.KeyType.Equals(t2.KeyType) && t.ValueType.Equals(t2.ValueType)
+}
+
+func (t *Chan) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	t2, isSameType := other.(*Chan)
+	if !isSameType {
+		return false
+	}
+	return t.ChanOf.Equals(t2.ChanOf)
+}
+
+func (t *ReceiveChan) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	t2, isSameType := other.(*ReceiveChan)
+	if !isSameType {
+		return false
+	}
+	return t.ReceiveType.Equals(t2.ReceiveType)
+}
+
+func (t *SendChan) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	t2, isSameType := other.(*SendChan)
+	if !isSameType {
+		return false
+	}
+	return t.SendType.Equals(t2.SendType)
+}
+
+func (t *InterfaceType) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	_, isSameType := other.(*InterfaceType)
+	return isSameType // TODO: interface matching not implemented yet
+}
+
+func (t *AnyType) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	_, isSameType := other.(*AnyType)
+	return isSameType // TODO: interface matching not implemented yet
+}
+
+func (t *FuncType) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	_, isSameType := other.(*FuncType)
+	return isSameType // TODO: functype matching not implemented yet
+}
+
+func (t *StructType) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	_, isSameType := other.(*StructType)
+	return isSameType // TODO: StructType matching not implemented yet
+}
+
+func (t *GenericType) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	t2, isSameType := other.(*GenericType)
+	if !isSameType {
+		return false
+	}
+	return t.BaseType.Equals(t2.BaseType) && t.TypeParam.Equals(t2.TypeParam)
+}
+
+func (t *GenericTypeParam) Equals(other TypeName) bool {
+	if t == nil || other == nil {
+		return false
+	}
+	t2, isSameType := other.(*GenericTypeParam)
+	if !isSameType {
+		return false
+	}
+	return t.ParamName == t2.ParamName
+}

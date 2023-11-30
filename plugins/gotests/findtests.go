@@ -3,18 +3,21 @@ package gotests
 import (
 	"fmt"
 	"go/ast"
+	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"golang.org/x/exp/slog"
 )
 
 // Metadata about a runtime registry.ServiceRegistry variable
 // declaration in the workflow spec's test code
 type serviceRegistry struct {
-	VarName    string              // the var name of the registry
-	RegistryOf gocode.TypeName     // the type parameter of the service registry
-	Var        *goparser.ParsedVar // the parsed var
+	VarName    string                   // the var name of the registry
+	RegistryOf gocode.TypeName          // the type parameter of the service registry
+	Iface      *gocode.ServiceInterface // the interface of the type parameter of the service registry
+	Var        *goparser.ParsedVar      // the parsed var
 }
 
 type serviceRegistries struct {
@@ -22,17 +25,21 @@ type serviceRegistries struct {
 	registries []*serviceRegistry
 }
 
-func (r *serviceRegistries) Get(t *gocode.UserType) []*serviceRegistry {
+func (r *serviceRegistries) Get(iface *gocode.ServiceInterface) []*serviceRegistry {
 	var matches []*serviceRegistry
 	for _, v := range r.registries {
-		if userType, isUserType := v.RegistryOf.(*gocode.UserType); isUserType {
-			if userType.Package == t.Package && userType.Name == t.Name {
-				matches = append(matches, v)
-			}
+		if iface.UserType.Equals(v.RegistryOf) {
+			// A registry exists paramaterized with the same interface as iface
+			matches = append(matches, v)
+		} else if iface.Contains(v.Iface) {
+			// A registry exists paramaterized with a sub-interface of iface
+			matches = append(matches, v)
 		}
 	}
 	return matches
 }
+
+var verbose = false
 
 // Finds all variables within the workflow spec code that are instances of
 // the runtime registry.ServiceRegistry type.
@@ -54,20 +61,38 @@ func findWorkflowServiceRegistries() (*serviceRegistries, error) {
 	}
 
 	// Find instances
+	names := []string{}
 	for _, mod := range r.spec.Parsed.Modules {
 		for _, pkg := range mod.Packages {
 			for _, v := range pkg.Vars {
 				vType, isRegistry := isRegistryVar(v)
 				if isRegistry {
-					fmt.Printf("%v is a registry of %v\n", v.Name, vType)
-					r.registries = append(r.registries, &serviceRegistry{
+					registryInfo := &serviceRegistry{
 						VarName:    v.Name,
 						RegistryOf: vType,
 						Var:        v,
-					})
+					}
+
+					// Try to extract the interface of the registry
+					if u, isU := vType.(*gocode.UserType); isU {
+						srv, err := r.spec.Get(u.Name)
+						if err == nil {
+							registryInfo.Iface = srv.Iface.ServiceInterface(nil)
+							if verbose {
+								slog.Info(fmt.Sprintf("Found %v registry %v\n", registryInfo.Iface, v.Name))
+							}
+						}
+					}
+
+					r.registries = append(r.registries, registryInfo)
+					names = append(names, v.Name)
 				}
 			}
 		}
+	}
+
+	if verbose {
+		slog.Info(fmt.Sprintf("Found %v service registries [%v]", len(r.registries), strings.Join(names, ", ")))
 	}
 
 	return r, nil

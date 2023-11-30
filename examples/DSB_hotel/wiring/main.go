@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	workflow.Init("../workflow")
+	workflow.Init("../workflow", "../tests")
 
 	name := "Hotel"
 	wiringcmd.MakeAndExecute(

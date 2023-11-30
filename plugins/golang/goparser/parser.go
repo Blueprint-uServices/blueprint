@@ -834,6 +834,16 @@ func (f *ParsedStruct) String() string {
 	return b.String()
 }
 
+func (i *ParsedInterface) String() string {
+	b := strings.Builder{}
+	b.WriteString("type " + i.Name + " interface {\n")
+	for _, method := range i.Methods {
+		b.WriteString("  " + method.String() + "\n")
+	}
+	b.WriteString("}")
+	return b.String()
+}
+
 func (f *ParsedFunc) String() string {
 	b := strings.Builder{}
 	b.WriteString(f.Name + "(")

@@ -2,7 +2,6 @@ package gocode
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
@@ -108,10 +107,13 @@ func sameTypes(a []Variable, b []Variable) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	for i, va := range a {
-		if !reflect.DeepEqual(va.Type, b[i].Type) {
+	for i := range a {
+		if !a[i].Type.Equals(b[i].Type) {
 			return false
 		}
+		// if !reflect.DeepEqual(va.Type, b[i].Type) {
+		// 	return false
+		// }
 	}
 	return true
 }
@@ -146,4 +148,25 @@ func (f Func) String() string {
 	} else {
 		return fmt.Sprintf("func %v(%v)", f.Name, args)
 	}
+}
+
+func (i *ServiceInterface) String() string {
+	return i.UserType.String()
+}
+
+// Reports whether all of the methods in j exist on interface i
+func (i *ServiceInterface) Contains(j *ServiceInterface) bool {
+	if i == nil || j == nil {
+		return false
+	}
+	for name, jFunc := range j.Methods {
+		iFunc, iHasFunc := i.Methods[name]
+		if !iHasFunc {
+			return false
+		}
+		if !jFunc.Equals(iFunc) {
+			return false
+		}
+	}
+	return true
 }

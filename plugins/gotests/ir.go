@@ -144,7 +144,7 @@ func (lib *testLibrary) GenerateArtifacts(workspaceDir string) error {
 		}
 
 		// Find registries of that type
-		registries := r.Get(&iface.UserType)
+		registries := r.Get(iface)
 		if len(registries) == 0 {
 			slog.Warn(fmt.Sprintf("Cannot test %v due to no instances found of registry.ServiceRegistry[%v]", name, iface.UserType.String()))
 			continue
