@@ -2,7 +2,6 @@ package socialnetwork
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"strings"
 
@@ -49,15 +48,17 @@ func (u *UserMentionServiceImpl) ComposeUserMentions(ctx context.Context, reqID 
 		log.Println("Looking for user IDs in the database")
 		var names []string
 		for name := range usernames_not_cached {
-			names = append(names, name)
+			names = append(names, `"`+name+`"`)
 		}
 		collection, err := u.userDB.GetCollection(ctx, "user", "user")
 		if err != nil {
 			return user_mentions, err
 		}
-		query := `{"Username": {"$in": ` + strings.Join(strings.Fields(fmt.Sprint(names)), ",") + `}}`
+		in_str := strings.Join(names, ",")
+		query := `{"Username": {"$in": [` + in_str + `]}}`
 		query_d, err := backend.ParseNoSQLDBQuery(query)
 		if err != nil {
+			log.Println(err)
 			return []UserMention{}, err
 		}
 		vals, err := collection.FindMany(ctx, query_d)
