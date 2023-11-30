@@ -275,8 +275,9 @@ func (b *NamespaceBuilder) parseFlags() {
 		} else if *node.flag != "" {
 			b.Set(node.name, *node.flag)
 		} else {
+			name := node.name
 			b.Define(node.name, func(n *Namespace) (any, error) {
-				return nil, fmt.Errorf("Required argument %v is not set", node.name)
+				return nil, fmt.Errorf("Required argument %v is not set", name)
 			})
 		}
 	}
