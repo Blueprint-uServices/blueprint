@@ -30,7 +30,9 @@ func GetMachineID() string {
 				mac += uint64(b)
 			}
 
-			return strconv.FormatUint(mac, 16)
+			// Convert from uint64 to uint16
+			mac_ui16 := uint16(mac)
+			return strconv.FormatUint(uint64(mac_ui16), 16)
 		}
 	}
 

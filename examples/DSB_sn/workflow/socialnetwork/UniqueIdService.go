@@ -2,6 +2,7 @@ package socialnetwork
 
 import (
 	"context"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -43,11 +44,12 @@ func (u *UniqueIdServiceImpl) ComposeUniqueId(ctx context.Context, reqID int64, 
 		timestamp_hex = strings.Repeat("0", 10-len(timestamp_hex)) + timestamp_hex
 	}
 	counter_hex := strconv.FormatInt(idx, 16)
-	if len(counter_hex) > 3 {
-		counter_hex = counter_hex[:3]
-	} else if len(counter_hex) < 3 {
-		counter_hex = strings.Repeat("0", 3-len(counter_hex)) + counter_hex
+	if len(counter_hex) > 1 {
+		counter_hex = counter_hex[:1]
+	} else if len(counter_hex) < 1 {
+		counter_hex = strings.Repeat("0", 1-len(counter_hex)) + counter_hex
 	}
+	log.Println(u.machine_id, timestamp_hex, counter_hex)
 	post_id_str := u.machine_id + timestamp_hex + counter_hex
 	post_id, err := strconv.ParseInt(post_id_str, 16, 64)
 	if err != nil {
