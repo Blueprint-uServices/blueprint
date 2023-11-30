@@ -84,6 +84,11 @@ func (node *OpenTelemetryClientWrapper) GenerateFuncs(builder golang.ModuleBuild
 		return err
 	}
 
+	// Only generate code once
+	if builder.Visited(impl_iface.Name + ".ot_client_impl") {
+		return nil
+	}
+
 	return generateClientHandler(builder, wrapped_iface, impl_iface, coll_iface, node.outputPackage)
 }
 

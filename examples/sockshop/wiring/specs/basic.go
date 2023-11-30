@@ -21,7 +21,7 @@ func makeBasicSpec(spec wiring.WiringSpec) ([]string, error) {
 	user_db := simple.NoSQLDB(spec, "user_db")
 	user_service := workflow.Define(spec, "user_service", "UserService", user_db)
 
-	payment_service := workflow.Define(spec, "payment_service", "PaymentService")
+	payment_service := workflow.Define(spec, "payment_service", "PaymentService", "500")
 
 	cart_db := simple.NoSQLDB(spec, "cart_db")
 	cart_service := workflow.Define(spec, "cart_service", "CartService", cart_db)

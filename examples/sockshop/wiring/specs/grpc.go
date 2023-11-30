@@ -24,7 +24,7 @@ func makeGrpcSpec(spec wiring.WiringSpec) ([]string, error) {
 	user_service := workflow.Define(spec, "user_service", "UserService", user_db)
 	user_proc := applyGrpcDefaults(spec, user_service, "user_proc")
 
-	payment_service := workflow.Define(spec, "payment_service", "PaymentService")
+	payment_service := workflow.Define(spec, "payment_service", "PaymentService", "500")
 	payment_proc := applyGrpcDefaults(spec, payment_service, "payment_proc")
 
 	cart_db := simple.NoSQLDB(spec, "cart_db")

@@ -17,34 +17,34 @@ IRNode representing a Golang GPRC server.
 This node does not introduce any new runtime interfaces or types that can be used by other IRNodes
 GRPC code generation happens during the ModuleBuilder GenerateFuncs pass
 */
-type GolangServer struct {
+type golangServer struct {
 	service.ServiceNode
 	golang.GeneratesFuncs
 	golang.Instantiable
 
 	InstanceName string
-	Addr         *address.Address[*GolangServer]
+	Addr         *address.Address[*golangServer]
 	Wrapped      golang.Service
 
 	outputPackage string
 }
 
 // Represents a service that is exposed over GRPC
-type GRPCInterface struct {
+type gRPCInterface struct {
 	service.ServiceInterface
 	Wrapped service.ServiceInterface
 }
 
-func (grpc *GRPCInterface) GetName() string {
+func (grpc *gRPCInterface) GetName() string {
 	return "grpc(" + grpc.Wrapped.GetName() + ")"
 }
 
-func (grpc *GRPCInterface) GetMethods() []service.Method {
+func (grpc *gRPCInterface) GetMethods() []service.Method {
 	return grpc.Wrapped.GetMethods()
 }
 
-func newGolangServer(name string, addr *address.Address[*GolangServer], service golang.Service) (*GolangServer, error) {
-	node := &GolangServer{}
+func newGolangServer(name string, addr *address.Address[*golangServer], service golang.Service) (*golangServer, error) {
+	node := &golangServer{}
 	node.InstanceName = name
 	node.Addr = addr
 	node.Wrapped = service
@@ -53,16 +53,16 @@ func newGolangServer(name string, addr *address.Address[*GolangServer], service 
 	return node, nil
 }
 
-func (n *GolangServer) String() string {
+func (n *golangServer) String() string {
 	return n.InstanceName + " = GRPCServer(" + n.Wrapped.Name() + ", " + n.Addr.Bind.Name() + ")"
 }
 
-func (n *GolangServer) Name() string {
+func (n *golangServer) Name() string {
 	return n.InstanceName
 }
 
 // Generates proto files and the RPC server handler
-func (node *GolangServer) GenerateFuncs(builder golang.ModuleBuilder) error {
+func (node *golangServer) GenerateFuncs(builder golang.ModuleBuilder) error {
 	// Get the service that we are wrapping
 	iface, err := golang.GetGoInterface(builder, node.Wrapped)
 	if err != nil {
@@ -89,7 +89,7 @@ func (node *GolangServer) GenerateFuncs(builder golang.ModuleBuilder) error {
 	return nil
 }
 
-func (node *GolangServer) AddInstantiation(builder golang.NamespaceBuilder) error {
+func (node *golangServer) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil
@@ -116,8 +116,8 @@ func (node *GolangServer) AddInstantiation(builder golang.NamespaceBuilder) erro
 	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, node.Addr.Bind})
 }
 
-func (node *GolangServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
+func (node *golangServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface, err := node.Wrapped.GetInterface(ctx)
-	return &GRPCInterface{Wrapped: iface}, err
+	return &gRPCInterface{Wrapped: iface}, err
 }
-func (node *GolangServer) ImplementsGolangNode() {}
+func (node *golangServer) ImplementsGolangNode() {}

@@ -24,9 +24,7 @@ type Authorisation struct {
 
 // Returns a payment service where any transaction above the preconfigured
 // threshold will return an invalid payment amount
-// TODO: add declineOverAmount param after implementing config nodes
-func NewPaymentService(ctx context.Context /*, declineOverAmount string*/) (PaymentService, error) {
-	declineOverAmount := "500"
+func NewPaymentService(ctx context.Context, declineOverAmount string) (PaymentService, error) {
 	amount, err := strconv.ParseFloat(declineOverAmount, 32)
 	if err != nil {
 		return nil, fmt.Errorf("invalid declineOverAmount %v; expected a float32", declineOverAmount)

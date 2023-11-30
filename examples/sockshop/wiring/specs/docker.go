@@ -26,7 +26,7 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	user_service := workflow.Define(spec, "user_service", "UserService", user_db)
 	user_ctr := applyDockerDefaults(spec, user_service, "user_proc", "user_container")
 
-	payment_service := workflow.Define(spec, "payment_service", "PaymentService")
+	payment_service := workflow.Define(spec, "payment_service", "PaymentService", "500")
 	payment_ctr := applyDockerDefaults(spec, payment_service, "payment_proc", "payment_container")
 
 	cart_db := mongodb.PrebuiltContainer(spec, "cart_db")

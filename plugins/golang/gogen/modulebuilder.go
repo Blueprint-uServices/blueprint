@@ -59,8 +59,13 @@ func (module *ModuleBuilderImpl) CreatePackage(packageName string) (golang.Packa
 		ShortName:   splits[len(splits)-1],
 		Path:        filepath.Join(module.ModuleDir, filepath.Join(splits...)),
 	}
-	slog.Info(fmt.Sprintf("Creating package %v/%v", module.Name, packageName))
-	return info, os.MkdirAll(info.Path, 0755)
+	if s, err := os.Stat(info.Path); err == nil && s.IsDir() {
+		// Package already exists
+		return info, nil
+	} else {
+		slog.Info(fmt.Sprintf("Creating package %v/%v", module.Name, packageName))
+		return info, os.MkdirAll(info.Path, 0755)
+	}
 }
 
 func (module *ModuleBuilderImpl) Workspace() golang.WorkspaceBuilder {

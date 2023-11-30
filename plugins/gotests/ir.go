@@ -7,8 +7,8 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/gotests/codegen"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 	"golang.org/x/exp/slog"
 )
 
@@ -158,7 +158,7 @@ func (lib *testLibrary) GenerateArtifacts(workspaceDir string) error {
 
 			if _, exists := builders[pkg.Name]; !exists {
 				// The first time we see a package, create a builder
-				moduleDir, err := workflow.CopyModuleToOutputWorkspace(workspace, pkg.Module)
+				moduleDir, err := copyModuleToOutputWorkspace(workspace, pkg.Module)
 				if err != nil {
 					return err
 				}
@@ -183,4 +183,12 @@ func (lib *testLibrary) GenerateArtifacts(workspaceDir string) error {
 
 	// Complete workspace generation
 	return workspace.Finish()
+}
+
+func copyModuleToOutputWorkspace(b golang.WorkspaceBuilder, mod *goparser.ParsedModule) (string, error) {
+	_, subdir := filepath.Split(mod.SrcDir)
+	if !b.Visited(mod.Name) {
+		slog.Info(fmt.Sprintf("Copying local module %v to workspace", subdir))
+	}
+	return b.AddLocalModule(subdir, mod.SrcDir)
 }
