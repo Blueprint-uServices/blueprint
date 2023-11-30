@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
@@ -263,7 +263,7 @@ func TestImplicitServicesInSameProcPartialGRPC(t *testing.T) {
 func TestImplicitCacheInSameProc(t *testing.T) {
 	spec := newWiringSpec("TestImplicitCacheInSameProc")
 
-	leaf_cache := simplecache.Define(spec, "leaf_cache")
+	leaf_cache := simple.Cache(spec, "leaf_cache")
 	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
 	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 

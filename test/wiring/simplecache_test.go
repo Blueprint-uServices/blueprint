@@ -3,14 +3,14 @@ package wiring
 import (
 	"testing"
 
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/simplecache"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
 func TestSimpleCache(t *testing.T) {
 	spec := newWiringSpec("TestSimpleCache")
 
-	leaf_cache := simplecache.Define(spec, "leaf_cache")
+	leaf_cache := simple.Cache(spec, "leaf_cache")
 	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
 
 	app := assertBuildSuccess(t, spec, leaf, leaf_cache)
@@ -26,7 +26,7 @@ func TestSimpleCache(t *testing.T) {
 func TestSimpleCacheAndServices(t *testing.T) {
 	spec := newWiringSpec("TestSimpleCache")
 
-	leaf_cache := simplecache.Define(spec, "leaf_cache")
+	leaf_cache := simple.Cache(spec, "leaf_cache")
 	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
 	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
 
