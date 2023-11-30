@@ -78,7 +78,7 @@ defined as a pointer to the actual service, and can thus be modified and
 func Define(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string {
 	// Define the service
 	handlerName := serviceName + ".handler"
-	spec.Define(handlerName, &WorkflowService{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
+	spec.Define(handlerName, &workflowHandler{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		// Get all of the argument nodes; can error out if the arguments weren't actually defined
 		// For arguments that are pointer types, this will only get the caller-side of the pointer
 		var arg_nodes []ir.IRNode
@@ -91,7 +91,7 @@ func Define(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs
 		}
 
 		// Instantiate and return the service
-		return newWorkflowService(serviceName, serviceType, arg_nodes)
+		return newWorkflowHandler(serviceName, serviceType, arg_nodes)
 	})
 
 	// Mandate that this service with this name must be unique within the application (although, this can be changed by namespaces)
@@ -100,7 +100,18 @@ func Define(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs
 	pointer.RequireUniqueness(spec, dstName, &ir.ApplicationNode{})
 
 	// Define the pointer
-	pointer.CreatePointer(spec, serviceName, &WorkflowService{}, dstName)
+	ptr := pointer.CreatePointer(spec, serviceName, &workflowNode{}, dstName)
+
+	// Add a "service.client" node for convenience
+	clientName := serviceName + ".client"
+	clientNext := ptr.AddSrcModifier(spec, clientName)
+	spec.Define(clientName, &workflowClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
+		var client ir.IRNode
+		if err := namespace.Get(clientNext, &client); err != nil {
+			return nil, err
+		}
+		return newWorkflowClient(clientName, serviceType, client)
+	})
 
 	return serviceName
 }
