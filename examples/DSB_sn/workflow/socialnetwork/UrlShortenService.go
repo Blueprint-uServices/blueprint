@@ -18,7 +18,7 @@ type UrlShortenServiceImpl struct {
 	hostname     string
 }
 
-func NewUrlShortenServiceImpl(urlShortenDB backend.NoSQLDatabase) (UrlShortenService, error) {
+func NewUrlShortenServiceImpl(ctx context.Context, urlShortenDB backend.NoSQLDatabase) (UrlShortenService, error) {
 	rand.Seed(time.Now().UnixNano())
 	return &UrlShortenServiceImpl{urlShortenDB: urlShortenDB, hostname: "http://short-url/"}, nil
 }
