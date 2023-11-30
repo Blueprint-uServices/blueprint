@@ -18,7 +18,7 @@ var paymentServiceRegistry = registry.NewServiceRegistry[payment.PaymentService]
 func init() {
 	// If the tests are run locally, we fall back to this PaymentService implementation
 	paymentServiceRegistry.Register("local", func(ctx context.Context) (payment.PaymentService, error) {
-		return payment.NewPaymentService(ctx)
+		return payment.NewPaymentService(ctx, "500")
 	})
 }
 
