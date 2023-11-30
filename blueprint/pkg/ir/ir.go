@@ -40,6 +40,19 @@ type IRConfig interface {
 	ImplementsIRConfig()
 }
 
+// A hard-coded value
+type IRValue struct {
+	Value string
+}
+
+func (v *IRValue) Name() string {
+	return v.String()
+}
+
+func (v *IRValue) String() string {
+	return "\"" + v.Value + "\""
+}
+
 // Most IRNodes can generate code artifacts but they do so in the context of some
 // [BuildContext].  A few IRNodes, however, can generate artifacts independent of
 // any external context.  Those IRNodes implement the ArtifactGenerator interface.

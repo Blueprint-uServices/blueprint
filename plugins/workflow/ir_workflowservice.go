@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
@@ -62,44 +61,6 @@ func (n *workflowNode) Init(name, serviceType string) error {
 	n.Spec = spec
 
 	return nil
-}
-
-// Creates a node of the specified name and serviceType.  Looks up serviceType in the workflow
-// spec and creates a node representing the handler of this service.
-//
-// The runtime generated code will instantiate that service.
-func newWorkflowHandler(name, serviceType string, args []ir.IRNode) (*workflowHandler, error) {
-	// Create the node
-	node := &workflowHandler{}
-	if err := node.Init(name, serviceType); err != nil {
-		return nil, err
-	}
-
-	// TODO: could optionally eagerly typecheck args here
-	if len(node.ServiceInfo.Constructor.Arguments) != len(args)+1 {
-		var argStrings []string
-		for _, arg := range args {
-			argStrings = append(argStrings, arg.Name())
-		}
-		return nil, blueprint.Errorf("mismatched # arguments for %s, constructor is %v but args are (ctx, %v)", name, node.ServiceInfo.Constructor, strings.Join(argStrings, ", "))
-	}
-	node.Args = args
-
-	return node, nil
-}
-
-// Creates a client node to the specified workflow service.  The client node simply instantiates
-// the wrapped node.  If no modifiers are applied to the service, then wrapped will simply be
-// the handler.
-func newWorkflowClient(name, serviceType string, wrapped ir.IRNode) (*workflowClient, error) {
-	// Create the node
-	node := &workflowClient{}
-	if err := node.Init(name, serviceType); err != nil {
-		return nil, err
-	}
-	node.Wrapped = wrapped
-
-	return node, nil
 }
 
 func (node *workflowNode) Name() string {

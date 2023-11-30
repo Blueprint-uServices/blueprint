@@ -8,6 +8,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 	"golang.org/x/exp/slog"
 )
 
@@ -64,6 +65,8 @@ func GetSpec() (*WorkflowSpec, error) {
 	return workflowSpec, nil
 }
 
+var strtype = &gocode.BasicType{Name: "string"}
+
 /*
 This adds a service to the application, using a definition that was provided in the workflow spec.
 
@@ -79,19 +82,32 @@ func Define(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs
 	// Define the service
 	handlerName := serviceName + ".handler"
 	spec.Define(handlerName, &workflowHandler{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		// Get all of the argument nodes; can error out if the arguments weren't actually defined
-		// For arguments that are pointer types, this will only get the caller-side of the pointer
-		var arg_nodes []ir.IRNode
-		for _, arg_name := range serviceArgs {
-			var arg ir.IRNode
-			if err := namespace.Get(arg_name, &arg); err != nil {
-				return nil, err
-			}
-			arg_nodes = append(arg_nodes, arg)
+		// Create the IR node for the handler
+		handler := &workflowHandler{}
+		if err := handler.Init(serviceName, serviceType); err != nil {
+			return nil, err
 		}
 
-		// Instantiate and return the service
-		return newWorkflowHandler(serviceName, serviceType, arg_nodes)
+		// Check the serviceArgs provided match the constructorArgs from the actual code
+		constructorArgs := handler.ServiceInfo.Constructor.Arguments[1:]
+		if len(constructorArgs) != len(serviceArgs) {
+			return nil, blueprint.Errorf("mismatched constructor arguments for %s, expect %v, got %v", serviceName, handler.ServiceInfo.Constructor, serviceArgs)
+		}
+
+		// Determine if any of the arguments are hard-coded values
+		handler.Args = make([]ir.IRNode, len(constructorArgs))
+		for i, arg := range constructorArgs {
+			if arg.Type.Equals(strtype) && spec.GetDef(serviceArgs[i]) == nil {
+				// A string argument with no node definition in the wiring spec is assumed to be a hard-coded value
+				handler.Args[i] = &ir.IRValue{Value: serviceArgs[i]}
+			} else {
+				if err := namespace.Get(serviceArgs[i], &handler.Args[i]); err != nil {
+					return nil, err
+				}
+			}
+		}
+
+		return handler, nil
 	})
 
 	// Mandate that this service with this name must be unique within the application (although, this can be changed by namespaces)
@@ -106,11 +122,11 @@ func Define(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs
 	clientName := serviceName + ".client"
 	clientNext := ptr.AddSrcModifier(spec, clientName)
 	spec.Define(clientName, &workflowClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		var client ir.IRNode
-		if err := namespace.Get(clientNext, &client); err != nil {
+		client := &workflowClient{}
+		if err := client.Init(serviceName, serviceType); err != nil {
 			return nil, err
 		}
-		return newWorkflowClient(clientName, serviceType, client)
+		return client, namespace.Get(clientNext, &client.Wrapped)
 	})
 
 	return serviceName
