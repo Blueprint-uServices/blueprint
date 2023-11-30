@@ -2,6 +2,7 @@ package tests
 
 import (
 	"context"
+	"sort"
 	"testing"
 	"time"
 
@@ -102,8 +103,12 @@ func TestReadPosts(t *testing.T) {
 
 	posts, err := service.ReadPosts(ctx, 1004, []int64{post1.PostID, post2.PostID})
 	require.NoError(t, err)
+	t.Log(posts)
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].PostID < posts[j].PostID
+	})
 	requirePostEqual(t, post1, posts[0])
-	requirePostEqual(t, post1, posts[1])
+	requirePostEqual(t, post2, posts[1])
 }
 
 func requirePostEqual(t *testing.T, p1, p2 socialnetwork.Post) {

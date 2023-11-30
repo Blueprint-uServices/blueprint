@@ -3,8 +3,10 @@ package socialnetwork
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
+	"strings"
 	"sync"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
@@ -77,18 +79,17 @@ func (p *PostStorageServiceImpl) ReadPosts(ctx context.Context, reqID int64, pos
 	for idx, _ := range values {
 		retvals = append(retvals, &values[idx])
 	}
-	err := p.postStorageCache.Mget(ctx, keys, retvals)
+	p.postStorageCache.Mget(ctx, keys, retvals)
+	var retposts []Post
 	for _, post := range values {
-		delete(unique_post_ids, post.PostID)
-	}
-	if err != nil {
-		log.Println(err)
-		//log.Println("Length of uniqueIDs", len(unique_post_ids), " ", len(postIDs))
+		if post.PostID != 0 {
+			delete(unique_post_ids, post.PostID)
+			retposts = append(retposts, post)
+		}
 	}
 	p.NumReqs += 1
 	if len(unique_post_ids) != 0 {
 		p.CacheMiss += 1
-		//log.Println("Current Cache Miss",p.CacheMiss)
 		var new_posts []Post
 		var unique_pids []int64
 		for k := range unique_post_ids {
@@ -98,26 +99,32 @@ func (p *PostStorageServiceImpl) ReadPosts(ctx context.Context, reqID int64, pos
 		if err != nil {
 			return []Post{}, err
 		}
-		//delim := ","
-		//query := `{"PostID": {"$in": ` + strings.Join(strings.Fields(fmt.Sprint(unique_pids)), delim) + `}}`
-		query := bson.D{} //TODO: Fix this
-		vals, err := collection.FindMany(ctx, query)
+		id_str := strings.Join(strings.Fields(fmt.Sprint(unique_pids)), ",")
+		query := `{"PostID": {"$in": ` + id_str + `}}`
+		query_d, err := backend.ParseNoSQLDBQuery(query)
+		if err != nil {
+			return []Post{}, err
+		}
+		vals, err := collection.FindMany(ctx, query_d)
 		if err != nil {
 			log.Println(err)
 			return []Post{}, err
 		}
-		vals.All(ctx, &new_posts)
-		values = append(values, new_posts...)
+		err = vals.All(ctx, &new_posts)
+		if err != nil {
+			return []Post{}, err
+		}
+		retposts = append(retposts, new_posts...)
 		var wg sync.WaitGroup
 		for _, new_post := range new_posts {
 			wg.Add(1)
 
-			go func() {
+			go func(new_post Post) {
 				defer wg.Done()
 				p.postStorageCache.Put(ctx, strconv.FormatInt(new_post.PostID, 10), new_post)
-			}()
+			}(new_post)
 		}
 		wg.Wait()
 	}
-	return values, nil
+	return retposts, nil
 }
