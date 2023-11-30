@@ -4,7 +4,6 @@ package catalogue
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/google/uuid"
@@ -28,7 +27,7 @@ type (
 		Tags(ctx context.Context) ([]string, error)
 
 		// New for Blueprint: adds tags to the database if they do not already exist.
-		AddTags(ctx context.Context, tags ...string) error
+		AddTags(ctx context.Context, tags []string) error
 
 		// New for Blueprint: adds a sock to the database.
 		// If sock.ID is "" then an ID is generated; otherwise the provided ID is used.
@@ -192,7 +191,7 @@ func (s *catalogueImpl) Tags(ctx context.Context) ([]string, error) {
 }
 
 // AddTags implements CatalogueService.
-func (s *catalogueImpl) AddTags(ctx context.Context, tags ...string) error {
+func (s *catalogueImpl) AddTags(ctx context.Context, tags []string) error {
 	_, err := s.addTags(ctx, tags...)
 	return err
 }
@@ -274,7 +273,6 @@ func (s *catalogueImpl) addTags(ctx context.Context, tags ...string) ([]int, err
 	if err := s.db.Select(ctx, &currentTags, "SELECT * FROM tag;"); err != nil {
 		return nil, err
 	}
-	fmt.Printf("Current Tags: %v\n", currentTags)
 
 	tagLookup := make(map[string]int)
 	for _, tag := range currentTags {

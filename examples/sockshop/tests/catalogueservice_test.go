@@ -44,7 +44,7 @@ func TestCatalogueService(t *testing.T) {
 
 	{
 		// Add new tags
-		err := service.AddTags(ctx, tags...)
+		err := service.AddTags(ctx, tags)
 		require.NoError(t, err)
 	}
 
@@ -57,7 +57,7 @@ func TestCatalogueService(t *testing.T) {
 
 	{
 		// Try re-adding tags
-		err := service.AddTags(ctx, tags...)
+		err := service.AddTags(ctx, tags)
 		require.NoError(t, err)
 	}
 
@@ -72,7 +72,7 @@ func TestCatalogueService(t *testing.T) {
 
 	{
 		// Add new tags
-		err := service.AddTags(ctx, tags2...)
+		err := service.AddTags(ctx, tags2)
 		require.NoError(t, err)
 	}
 
