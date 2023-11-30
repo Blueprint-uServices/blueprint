@@ -134,6 +134,19 @@ func (s *multiEchoerImpl) MultiEcho(ctx context.Context, message string, times i
 
 Backends do not impose any additional rules.  Like services, they must be passed as constructor arguments.
 
+### List of backends
+
+The [runtime/core](../../runtime/core) package provides the interfaces for a number of commonplace backends.
+
+```
+import "gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
+```
+
+* `backend.Cache` an interface for key-value caches; implementations for use in Wiring Specs include [simplecache](../../plugins/simple) and [memcached](../../plugins/memcached)
+* `backend.Queue` an interface for queues with push/pop; implementations for use in Wiring Specs include [simplequeue](../../plugins/simple) and [rabbitmq](../../plugins/rabbitmq)
+* `backend.NoSQLDatabase` an interface for NoSQL databases that uses MongoDB-style BSON queries; implementations for use in Wiring Specs include [simplenosqldb](../../plugins/simple) and [mongodb](../../plugins/mongodb)
+* `backend.RelationalDB` an interface for SQL-based relational databases; implementations for use in Wiring Specs include [simplereldb](../../plugins/simple) and [mysql](../../plugins/mysql)
+
 ## Background Tasks
 
 Some services might want to run additional background goroutines.  For example, a service that polls a queue will need to have a goroutine to do so.
