@@ -9,7 +9,6 @@ import (
 	"database/sql"
 
 	"github.com/jmoiron/sqlx"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -20,7 +19,7 @@ type SqliteRelDB struct {
 }
 
 // Instantiates a new [SimpleRelDB] instance that stores query data in-memory
-func NewSqliteRelDB(ctx context.Context) (backend.RelationalDB, error) {
+func NewSqliteRelDB(ctx context.Context) (*SqliteRelDB, error) {
 	db, err := sqlx.Open("sqlite3", "file:foobar?mode=memory&cache=shared")
 	if err != nil {
 		return nil, err
