@@ -15,26 +15,34 @@ func TestEmptyNamespace(t *testing.T) {
 	n, err := b.Build(context.Background())
 	assert.NoError(t, err)
 
+	key := "something"
+
 	var node any
-	err = n.Get("something", &node)
+	err = n.Get(key, &node)
 	assert.Error(t, err)
 }
 
 func TestMissingNode(t *testing.T) {
 	b := golang.NewNamespaceBuilder("TestMissingNode")
-	b.Required("something", "something required")
+
+	key := "something2"
+
+	b.Required(key, "something required")
 	_, err := b.Build(context.Background())
 	assert.Error(t, err)
 }
 
 func TestExistingNode(t *testing.T) {
 	b := golang.NewNamespaceBuilder("TestExistingNode")
-	b.Set("something", "good")
+
+	key := "something3"
+
+	b.Set(key, "good")
 	n, err := b.Build(context.Background())
 	assert.NoError(t, err)
 
 	var node string
-	err = n.Get("something", &node)
+	err = n.Get(key, &node)
 	assert.NoError(t, err)
 	assert.Equal(t, "good", node)
 }
@@ -45,24 +53,30 @@ func TestMissingNodeWithParent(t *testing.T) {
 	assert.NoError(t, err)
 
 	b2 := golang.NewNamespaceBuilder("TestMissingNodeWithParent-Child")
-	b2.Required("something", "something required")
+
+	key := "something4"
+
+	b2.Required(key, "something required")
 	_, err = b2.BuildWithParent(n1)
 	assert.Error(t, err)
 }
 
 func TestParentNode(t *testing.T) {
 	b1 := golang.NewNamespaceBuilder("TestParentNode-Parent")
-	b1.Set("something", "good")
+
+	key := "something5"
+
+	b1.Set(key, "good")
 	n1, err := b1.Build(context.Background())
 	assert.NoError(t, err)
 
 	b2 := golang.NewNamespaceBuilder("TestParentNode-Child")
-	b2.Required("something", "something required")
+	b2.Required(key, "something required")
 	n2, err := b2.BuildWithParent(n1)
 	assert.NoError(t, err)
 
 	var node string
-	err = n2.Get("something", &node)
+	err = n2.Get(key, &node)
 	assert.NoError(t, err)
 	assert.Equal(t, "good", node)
 }
@@ -70,7 +84,10 @@ func TestParentNode(t *testing.T) {
 func TestBuildOnce(t *testing.T) {
 	b := golang.NewNamespaceBuilder("TestBuildOnce")
 	count := 0
-	b.Define("something", func(n *golang.Namespace) (any, error) {
+
+	key := "something6"
+
+	b.Define(key, func(n *golang.Namespace) (any, error) {
 		count = count + 1
 		return "hello", nil
 	})
@@ -78,12 +95,12 @@ func TestBuildOnce(t *testing.T) {
 	assert.NoError(t, err)
 
 	var node string
-	err = n.Get("something", &node)
+	err = n.Get(key, &node)
 	assert.NoError(t, err)
 	assert.Equal(t, "hello", node)
 	assert.Equal(t, 1, count)
 
-	err = n.Get("something", &node)
+	err = n.Get(key, &node)
 	assert.NoError(t, err)
 	assert.Equal(t, "hello", node)
 	assert.Equal(t, 1, count)
@@ -92,7 +109,10 @@ func TestBuildOnce(t *testing.T) {
 func TestBuildInParentNamespace(t *testing.T) {
 	pb := golang.NewNamespaceBuilder("TestBuildInParentNamespace-Parent")
 	count := 0
-	pb.Define("something", func(n *golang.Namespace) (any, error) {
+
+	key := "something7"
+
+	pb.Define(key, func(n *golang.Namespace) (any, error) {
 		count = count + 1
 		return "hello", nil
 	})
@@ -100,17 +120,17 @@ func TestBuildInParentNamespace(t *testing.T) {
 	assert.NoError(t, err)
 
 	cb := golang.NewNamespaceBuilder("TestBuildInParentNamespace-Child")
-	cb.Required("something", "something required")
+	cb.Required(key, "something required")
 	c, err := cb.BuildWithParent(p)
 	assert.NoError(t, err)
 
 	var node string
-	err = c.Get("something", &node)
+	err = c.Get(key, &node)
 	assert.NoError(t, err)
 	assert.Equal(t, "hello", node)
 	assert.Equal(t, 1, count)
 
-	err = p.Get("something", &node)
+	err = p.Get(key, &node)
 	assert.NoError(t, err)
 	assert.Equal(t, "hello", node)
 	assert.Equal(t, 1, count)
@@ -119,7 +139,10 @@ func TestBuildInParentNamespace(t *testing.T) {
 func TestBuildError(t *testing.T) {
 	b := golang.NewNamespaceBuilder("TestBuildError")
 	count := 0
-	b.Define("something", func(n *golang.Namespace) (any, error) {
+
+	key := "something8"
+
+	b.Define(key, func(n *golang.Namespace) (any, error) {
 		count = count + 1
 		return nil, fmt.Errorf("uhoh")
 	})
@@ -127,10 +150,10 @@ func TestBuildError(t *testing.T) {
 	assert.NoError(t, err)
 
 	var node string
-	err = n.Get("something", &node)
+	err = n.Get(key, &node)
 	assert.Error(t, err)
 	assert.Equal(t, 1, count)
-	err = n.Get("something", &node)
+	err = n.Get(key, &node)
 	assert.Error(t, err)
 	assert.Equal(t, 2, count)
 }
@@ -138,13 +161,16 @@ func TestBuildError(t *testing.T) {
 func TestGetInBuildFunc(t *testing.T) {
 	b := golang.NewNamespaceBuilder("TestBuildError")
 	count := 0
-	b.Define("something", func(n *golang.Namespace) (any, error) {
+
+	key := "something9"
+
+	b.Define(key, func(n *golang.Namespace) (any, error) {
 		count = count + 1
 		return "hello", nil
 	})
 	b.Define("somethingelse", func(n *golang.Namespace) (any, error) {
 		var something string
-		err := n.Get("something", &something)
+		err := n.Get(key, &something)
 		return something + " world", err
 	})
 	n, err := b.Build(context.Background())
@@ -160,11 +186,14 @@ func TestGetInBuildFunc(t *testing.T) {
 func TestInstantiate(t *testing.T) {
 	b := golang.NewNamespaceBuilder("TestBuildError")
 	count := 0
-	b.Define("something", func(n *golang.Namespace) (any, error) {
+
+	key := "something10"
+
+	b.Define(key, func(n *golang.Namespace) (any, error) {
 		count = count + 1
 		return "hello", nil
 	})
-	b.Instantiate("something")
+	b.Instantiate(key)
 	_, err := b.Build(context.Background())
 	assert.NoError(t, err)
 	assert.Equal(t, 1, count)
@@ -188,7 +217,10 @@ func (r *runtester) Run(ctx context.Context) error {
 func TestRun(t *testing.T) {
 	b := golang.NewNamespaceBuilder("TestBuildError")
 	tester := &runtester{}
-	b.Define("something", func(n *golang.Namespace) (any, error) {
+
+	key := "something11"
+
+	b.Define(key, func(n *golang.Namespace) (any, error) {
 		return tester, nil
 	})
 	n, err := b.Build(context.Background())
@@ -197,7 +229,7 @@ func TestRun(t *testing.T) {
 	assert.False(t, tester.done)
 
 	var tester2 *runtester
-	err = n.Get("something", &tester2)
+	err = n.Get(key, &tester2)
 	assert.False(t, tester.done)
 	assert.Equal(t, tester, tester2)
 
@@ -211,7 +243,10 @@ func TestRun(t *testing.T) {
 func TestNestedRun(t *testing.T) {
 	pb := golang.NewNamespaceBuilder("TestBuildInParentNamespace-Parent")
 	tester1 := &runtester{}
-	pb.Define("something", func(n *golang.Namespace) (any, error) {
+
+	key := "something12"
+
+	pb.Define(key, func(n *golang.Namespace) (any, error) {
 		return tester1, nil
 	})
 	p, err := pb.Build(context.Background())
@@ -221,7 +256,7 @@ func TestNestedRun(t *testing.T) {
 	tester2 := &runtester{}
 	cb.Define("somethingelse", func(n *golang.Namespace) (any, error) {
 		var node any
-		err := n.Get("something", &node)
+		err := n.Get(key, &node)
 		return tester2, err
 	})
 	c, err := cb.BuildWithParent(p)

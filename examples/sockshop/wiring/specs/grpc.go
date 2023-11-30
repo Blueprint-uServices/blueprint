@@ -44,9 +44,13 @@ func makeGrpcSpec(spec wiring.WiringSpec) ([]string, error) {
 	order_service := workflow.Define(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)
 	order_proc := applyGrpcDefaults(spec, order_service, "order_proc")
 
-	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service)
+	catalogue_db := simple.RelationalDB(spec, "catalogue_db")
+	catalogue_service := workflow.Define(spec, "catalogue_service", "CatalogueService", catalogue_db)
+	catalogue_proc := applyGrpcDefaults(spec, catalogue_service, "catalogue_proc")
 
-	return []string{user_proc, payment_proc, cart_proc, shipping_proc, order_proc, tests}, nil
+	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service, catalogue_service)
+
+	return []string{user_proc, payment_proc, cart_proc, shipping_proc, order_proc, catalogue_proc, tests}, nil
 }
 
 func applyGrpcDefaults(spec wiring.WiringSpec, serviceName string, procName string) string {
