@@ -2,6 +2,7 @@ package socialnetwork
 
 import (
 	"context"
+	"errors"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"go.mongodb.org/mongo-driver/bson"
@@ -34,7 +35,13 @@ func (u *UserIDServiceImpl) GetUserId(ctx context.Context, reqID int64, username
 		if err != nil {
 			return -1, err
 		}
-		res.One(ctx, &user)
+		result, err := res.One(ctx, &user)
+		if err != nil {
+			return -1, err
+		}
+		if !result {
+			return -1, errors.New("Username " + username + " not found")
+		}
 		user_id = user.UserID
 
 		err = u.userCache.Put(ctx, username+":UserID", user_id)
