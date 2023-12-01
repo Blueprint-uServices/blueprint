@@ -1,4 +1,4 @@
-module gitlab.mpi-sws.org/cld/blueprint/examples/DSB_sn/workflow
+module gitlab.mpi-sws.org/cld/blueprint/examples/dsb_sn/workflow
 
 go 1.20
 

@@ -7,12 +7,21 @@ use (
 	./examples/sockshop/tests
 	./examples/sockshop/wiring
 	./examples/sockshop/workflow
+<<<<<<< HEAD
 	./examples/dsb_hotel/tests
 	./examples/dsb_hotel/wiring
 	./examples/dsb_hotel/workflow
 	./examples/DSB_sn/tests
 	./examples/DSB_sn/wiring
 	./examples/DSB_sn/workflow
+=======
+	./examples/DSB_hotel/tests
+	./examples/DSB_hotel/wiring
+	./examples/DSB_hotel/workflow
+	./examples/dsb_sn/tests
+	./examples/dsb_sn/wiring
+	./examples/dsb_sn/workflow
+>>>>>>> 9574bdd (Change name from DSB_sn to dsb_sn)
 	./plugins
 	./runtime
 	./test/wiring
