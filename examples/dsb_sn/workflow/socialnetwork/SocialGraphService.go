@@ -38,11 +38,11 @@ type UserInfo struct {
 type SocialGraphServiceImpl struct {
 	socialGraphCache backend.Cache
 	socialGraphDB    backend.NoSQLDatabase
-	userService      UserService
+	userIDService    UserIDService
 }
 
-func NewSocialGraphServiceImpl(ctx context.Context, socialGraphCache backend.Cache, socialGraphDB backend.NoSQLDatabase, userService UserService) (SocialGraphService, error) {
-	return &SocialGraphServiceImpl{socialGraphCache: socialGraphCache, socialGraphDB: socialGraphDB, userService: userService}, nil
+func NewSocialGraphServiceImpl(ctx context.Context, socialGraphCache backend.Cache, socialGraphDB backend.NoSQLDatabase, userIDService UserIDService) (SocialGraphService, error) {
+	return &SocialGraphServiceImpl{socialGraphCache: socialGraphCache, socialGraphDB: socialGraphDB, userIDService: userIDService}, nil
 }
 
 func (s *SocialGraphServiceImpl) GetFollowers(ctx context.Context, reqID int64, userID int64) ([]int64, error) {
@@ -272,11 +272,11 @@ func (s *SocialGraphServiceImpl) FollowWithUsername(ctx context.Context, reqID i
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		id, err1 = s.userService.GetUserId(ctx, reqID, username)
+		id, err1 = s.userIDService.GetUserId(ctx, reqID, username)
 	}()
 	go func() {
 		defer wg.Done()
-		followee_id, err2 = s.userService.GetUserId(ctx, reqID, followee_name)
+		followee_id, err2 = s.userIDService.GetUserId(ctx, reqID, followee_name)
 	}()
 	wg.Wait()
 	if err1 != nil {
@@ -297,11 +297,11 @@ func (s *SocialGraphServiceImpl) UnfollowWithUsername(ctx context.Context, reqID
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		id, err1 = s.userService.GetUserId(ctx, reqID, username)
+		id, err1 = s.userIDService.GetUserId(ctx, reqID, username)
 	}()
 	go func() {
 		defer wg.Done()
-		followee_id, err2 = s.userService.GetUserId(ctx, reqID, followee_name)
+		followee_id, err2 = s.userIDService.GetUserId(ctx, reqID, followee_name)
 	}()
 	wg.Wait()
 	if err1 != nil {

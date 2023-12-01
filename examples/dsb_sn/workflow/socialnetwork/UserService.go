@@ -22,7 +22,6 @@ type UserService interface {
 	RegisterUser(ctx context.Context, reqID int64, firstName string, lastName string, username string, password string) error
 	ComposeCreatorWithUserId(ctx context.Context, reqID int64, userID int64, username string) (Creator, error)
 	ComposeCreatorWithUsername(ctx context.Context, reqID int64, username string) (Creator, error)
-	GetUserId(ctx context.Context, reqID int64, username string) (int64, error)
 }
 
 type UserServiceImpl struct {
@@ -48,7 +47,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func NewUserServiceImpl(userCache backend.Cache, userDB backend.NoSQLDatabase, socialGraphService SocialGraphService, secret string) (UserService, error) {
+func NewUserServiceImpl(ctx context.Context, userCache backend.Cache, userDB backend.NoSQLDatabase, socialGraphService SocialGraphService, secret string) (UserService, error) {
 	return &UserServiceImpl{counter: 0, current_timestamp: -1, machine_id: GetMachineID(), userCache: userCache, userDB: userDB, socialGraphService: socialGraphService, secret: secret}, nil
 }
 
@@ -126,31 +125,6 @@ func (u *UserServiceImpl) Login(ctx context.Context, reqID int64, username strin
 		return "", err
 	}
 	return tokenStr, nil
-}
-
-func (u *UserServiceImpl) GetUserId(ctx context.Context, reqID int64, username string) (int64, error) {
-	user_id := int64(-1)
-	err := u.userCache.Get(ctx, username+":UserID", &user_id)
-	if err != nil {
-		var user User
-		collection, err := u.userDB.GetCollection(ctx, "user", "user")
-		if err != nil {
-			return -1, err
-		}
-		query := bson.D{{"username", username}}
-		res, err := collection.FindOne(ctx, query)
-		if err != nil {
-			return -1, err
-		}
-		res.One(ctx, &user)
-		user_id = user.UserID
-
-		err = u.userCache.Put(ctx, username+":UserID", user_id)
-		if err != nil {
-			return -1, err
-		}
-	}
-	return user_id, nil
 }
 
 func (u *UserServiceImpl) ComposeCreatorWithUserId(ctx context.Context, reqID int64, userID int64, username string) (Creator, error) {
