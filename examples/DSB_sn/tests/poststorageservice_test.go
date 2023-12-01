@@ -96,19 +96,24 @@ func TestReadPosts(t *testing.T) {
 	service, err := postStorageServiceRegistry.Get(ctx)
 	require.NoError(t, err)
 
-	err = service.StorePost(ctx, 1002, post1)
+	post1_c := post1
+	post1_c.PostID = 3
+	post2_c := post2
+	post2_c.PostID = 4
+
+	err = service.StorePost(ctx, 1002, post1_c)
 	require.NoError(t, err)
-	err = service.StorePost(ctx, 1003, post2)
+	err = service.StorePost(ctx, 1003, post2_c)
 	require.NoError(t, err)
 
-	posts, err := service.ReadPosts(ctx, 1004, []int64{post1.PostID, post2.PostID})
+	posts, err := service.ReadPosts(ctx, 1004, []int64{post1_c.PostID, post2_c.PostID})
 	require.NoError(t, err)
-	t.Log(posts)
+	require.Len(t, posts, 2)
 	sort.Slice(posts, func(i, j int) bool {
 		return posts[i].PostID < posts[j].PostID
 	})
-	requirePostEqual(t, post1, posts[0])
-	requirePostEqual(t, post2, posts[1])
+	requirePostEqual(t, post1_c, posts[0])
+	requirePostEqual(t, post2_c, posts[1])
 }
 
 func requirePostEqual(t *testing.T, p1, p2 socialnetwork.Post) {
