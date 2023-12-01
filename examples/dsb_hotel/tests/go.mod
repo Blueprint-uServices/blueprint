@@ -1,4 +1,4 @@
-module gitlab.mpi-sws.org/cld/blueprint/examples/DSB_hotel/tests
+module gitlab.mpi-sws.org/cld/blueprint/examples/dsb_hotel/tests
 
 go 1.20
 
@@ -8,7 +8,7 @@ replace gitlab.mpi-sws.org/cld/blueprint/runtime => ../../../runtime
 
 require (
 	github.com/stretchr/testify v1.8.4
-	gitlab.mpi-sws.org/cld/blueprint/examples/DSB_hotel/workflow v0.0.0
+	gitlab.mpi-sws.org/cld/blueprint/examples/dsb_hotel/workflow v0.0.0
 )
 
 require (
@@ -26,4 +26,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace gitlab.mpi-sws.org/cld/blueprint/examples/DSB_hotel/workflow => ../workflow
+replace gitlab.mpi-sws.org/cld/blueprint/examples/dsb_hotel/workflow => ../workflow

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/DSB_hotel/workflow/hotelreservation"
+	"gitlab.mpi-sws.org/cld/blueprint/examples/dsb_hotel/workflow/hotelreservation"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"

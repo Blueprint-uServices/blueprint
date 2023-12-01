@@ -1,4 +1,4 @@
-module gitlab.mpi-sws.org/cld/blueprint/examples/DSB_hotel/wiring
+module gitlab.mpi-sws.org/cld/blueprint/examples/dsb_hotel/wiring
 
 go 1.20
 
