@@ -10,6 +10,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 var userMentionServiceRegistry = registry.NewServiceRegistry[socialnetwork.UserMentionService]("userMention_service")
@@ -96,6 +97,16 @@ func TestComposeUserMentionsCache(t *testing.T) {
 	require.Equal(t, int64(2), mentions[1].UserID)
 	require.Equal(t, int64(1), mentions[2].UserID)
 	require.Equal(t, int64(3), mentions[3].UserID)
+
+	// Cleanup cache
+	err = cache.Delete(ctx, "vaastav:UserID")
+	require.NoError(t, err)
+	err = cache.Delete(ctx, "jcmace:UserID")
+	require.NoError(t, err)
+	err = cache.Delete(ctx, "antoinek:UserID")
+	require.NoError(t, err)
+	err = cache.Delete(ctx, "dg:UserID")
+	require.NoError(t, err)
 }
 
 func TestComposeUserMentionsNoCache(t *testing.T) {
@@ -107,6 +118,7 @@ func TestComposeUserMentionsNoCache(t *testing.T) {
 	require.NoError(t, err)
 	coll, err := db.GetCollection(ctx, "user", "user")
 	require.NoError(t, err)
+
 	err = coll.InsertMany(ctx, []interface{}{vaastav, jcmace, antoinek, dg})
 	require.NoError(t, err)
 
@@ -118,4 +130,14 @@ func TestComposeUserMentionsNoCache(t *testing.T) {
 	require.Equal(t, int64(2), mentions[1].UserID)
 	require.Equal(t, int64(1), mentions[2].UserID)
 	require.Equal(t, int64(3), mentions[3].UserID)
+
+	// cleanup database after the test
+	err = coll.DeleteMany(ctx, bson.D{{"userid", vaastav.UserID}})
+	require.NoError(t, err)
+	err = coll.DeleteMany(ctx, bson.D{{"userid", jcmace.UserID}})
+	require.NoError(t, err)
+	err = coll.DeleteMany(ctx, bson.D{{"userid", antoinek.UserID}})
+	require.NoError(t, err)
+	err = coll.DeleteMany(ctx, bson.D{{"userid", dg.UserID}})
+	require.NoError(t, err)
 }

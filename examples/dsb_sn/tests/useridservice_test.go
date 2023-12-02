@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"gitlab.mpi-sws.org/cld/blueprint/examples/DSB_sn/workflow/socialnetwork"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 var userIDServiceRegistry = registry.NewServiceRegistry[socialnetwork.UserIDService]("userId_service")
@@ -57,4 +58,9 @@ func TestGetUserID(t *testing.T) {
 	id, err = service.GetUserId(ctx, 1001, hello_user.Username)
 	require.NoError(t, err)
 	require.Equal(t, hello_user.UserID, id)
+
+	// Cleanup database
+
+	err = coll.DeleteOne(ctx, bson.D{{"username", hello_user.Username}})
+	require.NoError(t, err)
 }

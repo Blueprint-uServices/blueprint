@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"gitlab.mpi-sws.org/cld/blueprint/examples/DSB_sn/workflow/socialnetwork"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 var textServiceRegistry = registry.NewServiceRegistry[socialnetwork.TextService]("text_service")
@@ -57,4 +58,14 @@ func TestComposeText(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, urls, 1)
 	require.Len(t, mentions, 4)
+
+	// cleanup database
+	err = coll.DeleteMany(ctx, bson.D{{"userid", vaastav.UserID}})
+	require.NoError(t, err)
+	err = coll.DeleteMany(ctx, bson.D{{"userid", jcmace.UserID}})
+	require.NoError(t, err)
+	err = coll.DeleteMany(ctx, bson.D{{"userid", antoinek.UserID}})
+	require.NoError(t, err)
+	err = coll.DeleteMany(ctx, bson.D{{"userid", dg.UserID}})
+	require.NoError(t, err)
 }
