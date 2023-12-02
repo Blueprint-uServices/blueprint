@@ -124,10 +124,16 @@ func (db *SimpleCollection) FindOne(ctx context.Context, filter bson.D, projecti
 	if err != nil {
 		return nil, err
 	}
+	if verbose {
+		fmt.Printf("---- FindOne\n%v\n", query)
+	}
 	cursor := &SimpleCursor{}
 	for _, item := range db.items {
 		if query.Apply(item) {
 			cursor.results = append(cursor.results, item)
+			if verbose {
+				fmt.Printf("MATCH: %v\n", item)
+			}
 			break
 		}
 	}
@@ -212,9 +218,20 @@ func (db *SimpleCollection) UpdateOne(ctx context.Context, filter bson.D, update
 		return 0, err
 	}
 
+	if verbose {
+		fmt.Printf("---- UpdateOne\n%v\n%v\n", filter, update)
+	}
+
 	for i := range db.items {
 		if filterOp.Apply(db.items[i]) {
+			if verbose {
+				fmt.Printf("MATCH: %v\n", db.items[i])
+			}
 			return 1, updateOp.Apply(&db.items[i])
+		} else {
+			if verbose {
+				fmt.Printf("      %v\n", db.items[i])
+			}
 		}
 	}
 	return 0, nil

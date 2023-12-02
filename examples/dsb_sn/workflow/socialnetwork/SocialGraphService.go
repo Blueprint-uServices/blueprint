@@ -109,7 +109,8 @@ func (s *SocialGraphServiceImpl) GetFollowees(ctx context.Context, reqID int64, 
 }
 
 func (s *SocialGraphServiceImpl) Follow(ctx context.Context, reqID int64, userID int64, followeeID int64) error {
-	timestamp := time.Now()
+	now := time.Now().UnixNano()
+	timestamp := strconv.FormatInt(now, 10)
 	userIDstr := strconv.FormatInt(userID, 10)
 	followeeIDstr := strconv.FormatInt(followeeID, 10)
 	var err1, err2, err3 error
@@ -122,8 +123,9 @@ func (s *SocialGraphServiceImpl) Follow(ctx context.Context, reqID int64, userID
 			err1 = err_internal
 			return
 		}
-		query := `{"$and": [{"UserID":` + userIDstr + `}, {"followees": {"$not": {"$elemMatch": {"UserID": ` + followeeIDstr + `}}}}]}`
-		update := `{"$push": {"followees": {"UserID": ` + userIDstr + `,"Timestamp": "` + timestamp.String() + `"}}}`
+		//query := `{"$and": [{"UserID":` + userIDstr + `}, {"followees.userid" : {"$ne":` + followeeIDstr + `}}] }`
+		query := `{"UserID": ` + userIDstr + `}`
+		update := `{"$push": {"followees": {"UserID": ` + followeeIDstr + `,"Timestamp": ` + timestamp + `}}}`
 		query_d, err_internal := backend.ParseNoSQLDBQuery(query)
 		if err_internal != nil {
 			err1 = err_internal
@@ -143,8 +145,9 @@ func (s *SocialGraphServiceImpl) Follow(ctx context.Context, reqID int64, userID
 			err1 = err_internal
 			return
 		}
-		query := `{"$and": [{"UserID":` + followeeIDstr + `}, {"followers": {"$not": {"$elemMatch": {"UserID": ` + followeeIDstr + `}}}}]}`
-		update := `{"$push": {"followers": {"UserID": ` + followeeIDstr + `,"Timestamp": "` + timestamp.String() + `"}}}`
+		//query := `{"$and": [{"UserID":` + followeeIDstr + `}, {"followers.userid" : {"$ne":` + userIDstr + `}}] }`
+		query := `{"UserID": ` + followeeIDstr + `}`
+		update := `{"$push": {"followers": {"UserID": ` + userIDstr + `,"Timestamp": ` + timestamp + `}}}`
 		query_d, err_internal := backend.ParseNoSQLDBQuery(query)
 		if err_internal != nil {
 			err2 = err_internal
@@ -163,8 +166,8 @@ func (s *SocialGraphServiceImpl) Follow(ctx context.Context, reqID int64, userID
 		var followers []FollowerInfo
 		s.socialGraphCache.Get(ctx, userIDstr+":followees", &followees)
 		s.socialGraphCache.Get(ctx, followeeIDstr+":followers", &followers)
-		followees = append(followees, FolloweeInfo{FolloweeID: followeeID, Timestamp: timestamp.UnixNano()})
-		followers = append(followers, FollowerInfo{FollowerID: userID, Timestamp: timestamp.UnixNano()})
+		followees = append(followees, FolloweeInfo{FolloweeID: followeeID, Timestamp: now})
+		followers = append(followers, FollowerInfo{FollowerID: userID, Timestamp: now})
 		err3 = s.socialGraphCache.Put(ctx, userIDstr+":followees", followees)
 		if err3 != nil {
 			return
