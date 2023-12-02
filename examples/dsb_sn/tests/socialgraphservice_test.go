@@ -275,6 +275,118 @@ func TestFollowUsername(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestGetFollowers(t *testing.T) {
+	ctx := context.Background()
+	service, err := socialGraphServiceRegistry.Get(ctx)
+	require.NoError(t, err)
+
+	db, err := socialGraphDBRegistry.Get(ctx)
+	require.NoError(t, err)
+	coll, err := db.GetCollection(ctx, "social-graph", "social-graph")
+	require.NoError(t, err)
+
+	cache, err := socialGraphCacheRegistry.Get(ctx)
+	require.NoError(t, err)
+
+	// Add the users to the database first
+	err = service.InsertUser(ctx, 1000, vaastav.UserID)
+	require.NoError(t, err)
+	err = service.InsertUser(ctx, 1001, jcmace.UserID)
+	require.NoError(t, err)
+
+	// Test GetFollowers before adding a follow
+	followers, err := service.GetFollowers(ctx, 1002, vaastav.UserID)
+	require.NoError(t, err)
+	require.Len(t, followers, 0)
+
+	followers, err = service.GetFollowers(ctx, 1003, jcmace.UserID)
+	require.NoError(t, err)
+	require.Len(t, followers, 0)
+
+	// Test Follow
+	err = service.Follow(ctx, 1003, vaastav.UserID, jcmace.UserID)
+	require.NoError(t, err)
+
+	// Test GetFollowers After adding a follow
+	followers, err = service.GetFollowers(ctx, 1002, vaastav.UserID)
+	require.NoError(t, err)
+	require.Len(t, followers, 0)
+
+	followers, err = service.GetFollowers(ctx, 1003, jcmace.UserID)
+	require.NoError(t, err)
+	require.Len(t, followers, 1)
+	require.Equal(t, vaastav.UserID, followers[0])
+
+	// Cleanup cache
+
+	vaastavID := strconv.FormatInt(vaastav.UserID, 10)
+	jcmaceID := strconv.FormatInt(jcmace.UserID, 10)
+	err = cache.Delete(ctx, vaastavID+":followees")
+	require.NoError(t, err)
+	err = cache.Delete(ctx, jcmaceID+":followers")
+	require.NoError(t, err)
+
+	// Cleanup database
+	err = coll.DeleteMany(ctx, bson.D{})
+	require.NoError(t, err)
+}
+
+func TestGetFollowees(t *testing.T) {
+	ctx := context.Background()
+	service, err := socialGraphServiceRegistry.Get(ctx)
+	require.NoError(t, err)
+
+	db, err := socialGraphDBRegistry.Get(ctx)
+	require.NoError(t, err)
+	coll, err := db.GetCollection(ctx, "social-graph", "social-graph")
+	require.NoError(t, err)
+
+	cache, err := socialGraphCacheRegistry.Get(ctx)
+	require.NoError(t, err)
+
+	// Add the users to the database first
+	err = service.InsertUser(ctx, 1000, vaastav.UserID)
+	require.NoError(t, err)
+	err = service.InsertUser(ctx, 1001, jcmace.UserID)
+	require.NoError(t, err)
+
+	// Test GetFollowers before adding a follow
+	followees, err := service.GetFollowees(ctx, 1002, vaastav.UserID)
+	require.NoError(t, err)
+	require.Len(t, followees, 0)
+
+	followees, err = service.GetFollowees(ctx, 1003, jcmace.UserID)
+	require.NoError(t, err)
+	require.Len(t, followees, 0)
+
+	// Test Follow
+	err = service.Follow(ctx, 1003, vaastav.UserID, jcmace.UserID)
+	require.NoError(t, err)
+
+	// Test GetFollowers After adding a follow
+	followees, err = service.GetFollowees(ctx, 1002, vaastav.UserID)
+	require.NoError(t, err)
+	require.Len(t, followees, 1)
+	require.Equal(t, jcmace.UserID, followees[0])
+
+	followees, err = service.GetFollowees(ctx, 1003, jcmace.UserID)
+	require.NoError(t, err)
+	require.Len(t, followees, 0)
+
+	// Cleanup cache
+
+	vaastavID := strconv.FormatInt(vaastav.UserID, 10)
+	jcmaceID := strconv.FormatInt(jcmace.UserID, 10)
+	err = cache.Delete(ctx, vaastavID+":followees")
+	require.NoError(t, err)
+	err = cache.Delete(ctx, jcmaceID+":followers")
+	require.NoError(t, err)
+
+	// Cleanup database
+	err = coll.DeleteMany(ctx, bson.D{})
+	require.NoError(t, err)
+}
+
 func TestUnfollow(t *testing.T) {
 	ctx := context.Background()
 	service, err := socialGraphServiceRegistry.Get(ctx)
