@@ -81,10 +81,8 @@ func (u *UserServiceImpl) Login(ctx context.Context, reqID int64, username strin
 	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
 	var login LoginObj
 	login.UserID = -1
-	err := u.userCache.Get(ctx, username+":Login", &login)
-	if err != nil {
-		return "", err
-	}
+	// Ignore error for now as we don't have a separate thing for testing if key doesn't exist
+	u.userCache.Get(ctx, username+":Login", &login)
 	if login.UserID == -1 {
 		var user User
 		collection, err := u.userDB.GetCollection(ctx, "user", "user")
@@ -120,7 +118,7 @@ func (u *UserServiceImpl) Login(ctx context.Context, reqID int64, username strin
 			return "", errors.New("Failed to create login token")
 		}
 	}
-	err = u.userCache.Put(ctx, username+":Login", login)
+	err := u.userCache.Put(ctx, username+":Login", login)
 	if err != nil {
 		return "", err
 	}
@@ -145,7 +143,13 @@ func (u *UserServiceImpl) ComposeCreatorWithUsername(ctx context.Context, reqID 
 		if err != nil {
 			return Creator{}, err
 		}
-		res.One(ctx, &user)
+		exists, err := res.One(ctx, &user)
+		if err != nil {
+			return Creator{}, err
+		}
+		if !exists {
+			return Creator{}, errors.New("User doesn't exist")
+		}
 		user_id = user.UserID
 
 		err = u.userCache.Put(ctx, username+":UserID", user_id)
@@ -193,13 +197,13 @@ func (u *UserServiceImpl) RegisterUser(ctx context.Context, reqID int64, firstNa
 		timestamp_hex = strings.Repeat("0", 10-len(timestamp_hex)) + timestamp_hex
 	}
 	counter_hex := strconv.FormatInt(idx, 16)
-	if len(counter_hex) > 3 {
-		counter_hex = counter_hex[:3]
-	} else if len(counter_hex) < 3 {
-		counter_hex = strings.Repeat("0", 3-len(counter_hex)) + counter_hex
+	if len(counter_hex) > 1 {
+		counter_hex = counter_hex[:1]
+	} else if len(counter_hex) < 1 {
+		counter_hex = strings.Repeat("0", 1-len(counter_hex)) + counter_hex
 	}
 	user_id_str := u.machine_id + timestamp_hex + counter_hex
-	user_id, err := strconv.ParseInt(user_id_str, 10, 64)
+	user_id, err := strconv.ParseInt(user_id_str, 16, 64)
 	if err != nil {
 		return err
 	}
