@@ -44,13 +44,13 @@ func (l *TestLeafServiceImplWithDB) HelloInt(ctx ctxx.Context, a int16) (int32, 
 		return 0, err
 	}
 	var myint int32
-	err = l.Cache.Get(ctx, "myint", &myint)
+	_, err = l.Cache.Get(ctx, "myint", &myint)
 	return myint, err
 }
 
 func (l *TestLeafServiceImplWithDB) HelloObject(ctx ctxx.Context, obj workflow.TestLeafObject) (*workflow.TestLeafObject, error) {
 	var count int64
-	err := l.Cache.Get(ctx, "objectcount", &count)
+	_, err := l.Cache.Get(ctx, "objectcount", &count)
 	if err != nil {
 		return nil, err
 	}

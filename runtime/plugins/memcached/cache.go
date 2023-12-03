@@ -30,12 +30,15 @@ func (m *Memcached) Put(ctx context.Context, key string, value interface{}) erro
 	return m.Client.Set(&memcache.Item{Key: key, Value: marshaled_val})
 }
 
-func (m *Memcached) Get(ctx context.Context, key string, value interface{}) error {
+func (m *Memcached) Get(ctx context.Context, key string, value interface{}) (bool, error) {
 	it, err := m.Client.Get(key)
-	if err != nil {
-		return err
+	if err == memcache.ErrCacheMiss {
+		return false, nil
 	}
-	return json.Unmarshal(it.Value, value)
+	if err != nil {
+		return false, err
+	}
+	return true, json.Unmarshal(it.Value, value)
 }
 
 func (m *Memcached) Incr(ctx context.Context, key string) (int64, error) {

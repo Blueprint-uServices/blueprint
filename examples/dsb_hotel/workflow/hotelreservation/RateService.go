@@ -127,8 +127,11 @@ func (r *RateServiceImpl) GetRates(ctx context.Context, hotelIDs []string, inDat
 
 	for _, hotel_id := range hotelIDs {
 		var hotel_rate_plans []RatePlan
-		err := r.rateCache.Get(ctx, hotel_id, &hotel_rate_plans)
+		exists, err := r.rateCache.Get(ctx, hotel_id, &hotel_rate_plans)
 		if err != nil {
+			return rate_plans, err
+		}
+		if !exists {
 			collection, err2 := r.rateDB.GetCollection(ctx, "rate-db", "inventory")
 			if err2 != nil {
 				return []RatePlan{}, err2

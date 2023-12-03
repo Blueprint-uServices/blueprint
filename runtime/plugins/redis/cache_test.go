@@ -8,6 +8,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type someData struct {
@@ -31,7 +33,8 @@ func TestRedisPut(t *testing.T) {
 		t.Error(err)
 	}
 	var resultData someData
-	err = redis.Get(ctx, "testData", &resultData)
+	exists, err := redis.Get(ctx, "testData", &resultData)
+	assert.True(t, exists)
 	if err != nil {
 		t.Error(err)
 	}
@@ -47,7 +50,8 @@ func TestRedisGet(t *testing.T) {
 		t.Error(err)
 	}
 	var resultData someData
-	err = redis.Get(ctx, "testData", &resultData)
+	exists, err := redis.Get(ctx, "testData", &resultData)
+	assert.True(t, exists)
 	if err != nil {
 		t.Error(err)
 	}
@@ -86,7 +90,8 @@ func TestRedisDelete(t *testing.T) {
 		t.Error(err)
 	}
 	var val int
-	err = redis.Get(ctx, "deleteKey", &val)
+	exists, err := redis.Get(ctx, "deleteKey", &val)
+	assert.True(t, exists)
 	if err != nil {
 		t.Error(err)
 	}
@@ -98,10 +103,8 @@ func TestRedisDelete(t *testing.T) {
 		t.Error(err)
 	}
 	var newval int
-	err = redis.Get(ctx, "deleteKey", &newval)
-	if err == nil {
-		t.Errorf("redis Cache miss didn't throw an error")
-	}
+	exists, err = redis.Get(ctx, "deleteKey", &newval)
+	assert.False(t, exists)
 	if newval != 0 {
 		t.Errorf("Delete followed by a Get returned non-zero value")
 	}
@@ -191,7 +194,8 @@ func TestRedisPerformance(t *testing.T) {
 			key_int := rand.Intn(100)
 			key := strconv.FormatInt(int64(key_int), 10)
 			start := time.Now()
-			err := redis.Get(ctx, key, &val)
+			exists, err := redis.Get(ctx, key, &val)
+			assert.True(t, exists)
 			if err != nil {
 				t.Error(err)
 			}

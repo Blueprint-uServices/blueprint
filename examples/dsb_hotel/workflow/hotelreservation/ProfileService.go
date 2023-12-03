@@ -171,8 +171,11 @@ func (p *ProfileServiceImpl) GetProfiles(ctx context.Context, hotelIds []string,
 
 	for _, hid := range hotelIds {
 		var profile HotelProfile
-		err := p.profileCache.Get(ctx, hid, &profile)
+		exists, err := p.profileCache.Get(ctx, hid, &profile)
 		if err != nil {
+			return profiles, err
+		}
+		if !exists {
 			// Check Database
 			collection, err := p.profileDB.GetCollection(ctx, "profile-db", "hotels")
 			if err != nil {

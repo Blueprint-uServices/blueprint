@@ -125,12 +125,14 @@ func (r *ReservationServiceImpl) MakeReservation(ctx context.Context, customerNa
 
 		key := hotelId + "_" + newInDate.String()[0:10] + "_" + outdate
 		var room_number int64
-		err := r.reserveCache.Get(ctx, key, &room_number)
+		exists, err := r.reserveCache.Get(ctx, key, &room_number)
 		if err != nil {
+			return []string{}, err
+		}
+		if !exists {
 			var reservations []Reservation
-			//query := `{"HotelId":"` + hotelId + `", "InDate":"` + indate + `", "OutDate":"` + outdate + `"}`
 
-			query := bson.D{{"hotelid", hotelId}, {"indate", indate}, {"outdate", outdate}} // TODO fix this?
+			query := bson.D{{"hotelid", hotelId}, {"indate", indate}, {"outdate", outdate}}
 			res, err := reservation_collection.FindMany(ctx, query)
 			if err != nil {
 				return []string{}, err
@@ -146,18 +148,21 @@ func (r *ReservationServiceImpl) MakeReservation(ctx context.Context, customerNa
 		cap_key := hotelId + "_cap"
 		var hotelNumber HotelNumber
 		var capacity int64
-		err = r.reserveCache.Get(ctx, cap_key, &capacity)
+		exists, err = r.reserveCache.Get(ctx, cap_key, &capacity)
 		if err != nil {
+			return []string{}, err
+		}
+		if !exists {
 			query := bson.D{{"hotelid", hotelId}}
 			res, err := hnumber_collection.FindOne(ctx, query)
 			if err != nil {
-				return []string{}, nil
+				return []string{}, err
 			}
 			res.One(ctx, &hotelNumber)
 			capacity = hotelNumber.Number
 			err = r.reserveCache.Put(ctx, cap_key, capacity)
 			if err != nil {
-				return []string{}, nil
+				return []string{}, err
 			}
 		}
 		if room_number+roomNumber > capacity {
@@ -212,8 +217,11 @@ func (r *ReservationServiceImpl) CheckAvailability(ctx context.Context, customer
 			key := hotelId + "_" + newInDate.String()[0:10] + "_" + outdate
 			r.NumRequests += 1
 			var count int64
-			err := r.reserveCache.Get(ctx, key, &count)
+			exists, err := r.reserveCache.Get(ctx, key, &count)
 			if err != nil {
+				return []string{}, err
+			}
+			if !exists {
 				// Check Database
 				var reservations []Reservation
 				//query := `{"HotelId":"` + hotelId + `", "InDate":"` + indate + `", "OutDate":"` + outdate + `"}`
@@ -238,9 +246,12 @@ func (r *ReservationServiceImpl) CheckAvailability(ctx context.Context, customer
 			cap_key := hotelId + "_cap"
 			var capacity int64
 			var hotelNumber HotelNumber
-			err = r.reserveCache.Get(ctx, cap_key, &capacity)
+			exists, err = r.reserveCache.Get(ctx, cap_key, &capacity)
 			r.NumRequests += 1
 			if err != nil {
+				return []string{}, err
+			}
+			if !exists {
 				query := bson.D{{"hotelid", hotelId}}
 				res, err := hnumber_collection.FindOne(ctx, query)
 				if err != nil {
