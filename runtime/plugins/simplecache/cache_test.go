@@ -15,19 +15,21 @@ func TestGet(t *testing.T) {
 	assert.NoError(t, err)
 
 	var v string
-	err = cache.Get(ctx, "hello", &v)
+	exists, err := cache.Get(ctx, "hello", &v)
+	assert.True(t, exists)
 	assert.NoError(t, err)
 
 	assert.Equal(t, v, "world")
 
 	var j int
-	err = cache.Get(ctx, "nonexistent", &j)
+	exists, err = cache.Get(ctx, "nonexistent", &j)
 	assert.NoError(t, err)
-	assert.Equal(t, j, 0)
+	assert.False(t, exists)
 
 	// Can't cast string to int
 	var i int
-	err = cache.Get(ctx, "hello", &i)
+	exists, err = cache.Get(ctx, "hello", &i)
+	assert.True(t, exists)
 	assert.Error(t, err)
 }
 
