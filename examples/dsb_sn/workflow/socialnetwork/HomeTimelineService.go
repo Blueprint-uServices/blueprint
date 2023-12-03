@@ -2,7 +2,6 @@ package socialnetwork
 
 import (
 	"context"
-	"log"
 	"strconv"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
@@ -38,9 +37,9 @@ func (h *HomeTimelineServiceImpl) WriteHomeTimeline(ctx context.Context, reqID i
 	for id, _ := range followers_set {
 		id_str := strconv.FormatInt(id, 10)
 		var posts []PostInfo
-		err = h.homeTimelineCache.Get(ctx, id_str, &posts)
+		_, err = h.homeTimelineCache.Get(ctx, id_str, &posts)
 		if err != nil {
-			log.Println(err)
+			return err
 		}
 		posts = append(posts, PostInfo{PostID: postID, Timestamp: timestamp})
 		err = h.homeTimelineCache.Put(ctx, id_str, posts)
@@ -58,9 +57,9 @@ func (h *HomeTimelineServiceImpl) ReadHomeTimeline(ctx context.Context, reqID in
 	userIDStr := strconv.FormatInt(userID, 10)
 	var postIDs []int64
 	var postInfos []PostInfo
-	err := h.homeTimelineCache.Get(ctx, userIDStr, &postInfos)
+	_, err := h.homeTimelineCache.Get(ctx, userIDStr, &postInfos)
 	if err != nil {
-		log.Println(err)
+		return []int64{}, err
 	}
 	for _, pinfo := range postInfos {
 		postIDs = append(postIDs, pinfo.PostID)

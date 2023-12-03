@@ -5,7 +5,6 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"errors"
-	"log"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -161,7 +160,6 @@ func (u *UserServiceImpl) ComposeCreatorWithUsername(ctx context.Context, reqID 
 }
 
 func (u *UserServiceImpl) RegisterUserWithId(ctx context.Context, reqID int64, firstName string, lastName string, username string, password string, userID int64) error {
-	log.Println("Registering UserID:", userID)
 	collection, err := u.userDB.GetCollection(ctx, "user", "user")
 	if err != nil {
 		return err

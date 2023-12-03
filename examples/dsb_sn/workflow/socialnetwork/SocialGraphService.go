@@ -49,8 +49,11 @@ func (s *SocialGraphServiceImpl) GetFollowers(ctx context.Context, reqID int64, 
 	var followers []int64
 	var followerInfos []FollowerInfo
 	userIDstr := strconv.FormatInt(userID, 10)
-	err := s.socialGraphCache.Get(ctx, userIDstr+":followers", &followerInfos)
+	exists, err := s.socialGraphCache.Get(ctx, userIDstr+":followers", &followerInfos)
 	if err != nil {
+		return followers, err
+	}
+	if !exists {
 		collection, err := s.socialGraphDB.GetCollection(ctx, "social-graph", "social-graph")
 		if err != nil {
 			return followers, err
@@ -79,8 +82,11 @@ func (s *SocialGraphServiceImpl) GetFollowees(ctx context.Context, reqID int64, 
 	var followees []int64
 	var followeeInfos []FolloweeInfo
 	userIDstr := strconv.FormatInt(userID, 10)
-	err := s.socialGraphCache.Get(ctx, userIDstr+":followees", &followeeInfos)
+	exists, err := s.socialGraphCache.Get(ctx, userIDstr+":followees", &followeeInfos)
 	if err != nil {
+		return followees, err
+	}
+	if !exists {
 		collection, err := s.socialGraphDB.GetCollection(ctx, "social-graph", "social-graph")
 		if err != nil {
 			return followees, err

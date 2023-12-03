@@ -47,8 +47,11 @@ func (u *UserTimelineServiceImpl) ReadUserTimeline(ctx context.Context, reqID in
 
 	userIDStr := strconv.FormatInt(userID, 10)
 	var post_infos []PostInfo
-	err := u.userTimelineCache.Get(ctx, userIDStr, &post_infos)
-	if err == nil {
+	exists, err := u.userTimelineCache.Get(ctx, userIDStr, &post_infos)
+	if err != nil {
+		return []int64{}, err
+	}
+	if exists {
 		u.CacheHits += 1
 	} else {
 		u.CacheMiss += 1

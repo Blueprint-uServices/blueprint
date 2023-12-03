@@ -97,10 +97,13 @@ func TestFollow(t *testing.T) {
 	antoinekID := strconv.FormatInt(antoinek.UserID, 10)
 	var followeeinfo []socialnetwork.FolloweeInfo
 	var followerinfo []socialnetwork.FollowerInfo
-	err = cache.Get(ctx, vaastavID+":followees", &followeeinfo)
+	exists, err := cache.Get(ctx, vaastavID+":followees", &followeeinfo)
 	require.NoError(t, err)
+	require.True(t, exists)
 	require.Len(t, followeeinfo, 1)
-	err = cache.Get(ctx, jcmaceID+":followers", &followerinfo)
+	exists, err = cache.Get(ctx, jcmaceID+":followers", &followerinfo)
+	require.NoError(t, err)
+	require.True(t, exists)
 	require.Len(t, followerinfo, 1)
 
 	// Add another follow to test multiple follows
@@ -108,10 +111,13 @@ func TestFollow(t *testing.T) {
 	require.NoError(t, err)
 
 	// Check cache contents
-	err = cache.Get(ctx, vaastavID+":followees", &followeeinfo)
+	exists, err = cache.Get(ctx, vaastavID+":followees", &followeeinfo)
 	require.NoError(t, err)
+	require.True(t, exists)
 	require.Len(t, followeeinfo, 2)
-	err = cache.Get(ctx, antoinekID+":followers", &followerinfo)
+	exists, err = cache.Get(ctx, antoinekID+":followers", &followerinfo)
+	require.NoError(t, err)
+	require.True(t, exists)
 	require.Len(t, followerinfo, 1)
 
 	// Cleanup cache
@@ -128,7 +134,7 @@ func TestFollow(t *testing.T) {
 
 	val, err := coll.FindOne(ctx, bson.D{{"userid", vaastav.UserID}})
 	require.NoError(t, err)
-	exists, err := val.One(ctx, &vaasInfo)
+	exists, err = val.One(ctx, &vaasInfo)
 	require.NoError(t, err)
 	require.True(t, exists)
 	require.Equal(t, vaastav.UserID, vaasInfo.UserID)
@@ -206,10 +212,13 @@ func TestFollowUsername(t *testing.T) {
 	antoinekID := strconv.FormatInt(antoinek.UserID, 10)
 	var followeeinfo []socialnetwork.FolloweeInfo
 	var followerinfo []socialnetwork.FollowerInfo
-	err = cache.Get(ctx, vaastavID+":followees", &followeeinfo)
+	exists, err := cache.Get(ctx, vaastavID+":followees", &followeeinfo)
 	require.NoError(t, err)
+	require.True(t, exists)
 	require.Len(t, followeeinfo, 1)
-	err = cache.Get(ctx, jcmaceID+":followers", &followerinfo)
+	exists, err = cache.Get(ctx, jcmaceID+":followers", &followerinfo)
+	require.NoError(t, err)
+	require.True(t, exists)
 	require.Len(t, followerinfo, 1)
 
 	// Add another follow to test multiple follows
@@ -217,10 +226,13 @@ func TestFollowUsername(t *testing.T) {
 	require.NoError(t, err)
 
 	// Check cache contents
-	err = cache.Get(ctx, vaastavID+":followees", &followeeinfo)
+	exists, err = cache.Get(ctx, vaastavID+":followees", &followeeinfo)
 	require.NoError(t, err)
+	require.True(t, exists)
 	require.Len(t, followeeinfo, 2)
-	err = cache.Get(ctx, antoinekID+":followers", &followerinfo)
+	exists, err = cache.Get(ctx, antoinekID+":followers", &followerinfo)
+	require.NoError(t, err)
+	require.True(t, exists)
 	require.Len(t, followerinfo, 1)
 
 	// Cleanup cache
@@ -237,7 +249,7 @@ func TestFollowUsername(t *testing.T) {
 
 	val, err := coll.FindOne(ctx, bson.D{{"userid", vaastav.UserID}})
 	require.NoError(t, err)
-	exists, err := val.One(ctx, &vaasInfo)
+	exists, err = val.One(ctx, &vaasInfo)
 	require.NoError(t, err)
 	require.True(t, exists)
 	require.Equal(t, vaastav.UserID, vaasInfo.UserID)
@@ -419,10 +431,13 @@ func TestUnfollow(t *testing.T) {
 	jcmaceID := strconv.FormatInt(jcmace.UserID, 10)
 	var followeeinfo []socialnetwork.FolloweeInfo
 	var followerinfo []socialnetwork.FollowerInfo
-	err = cache.Get(ctx, vaastavID+":followees", &followeeinfo)
+	exists, err := cache.Get(ctx, vaastavID+":followees", &followeeinfo)
 	require.NoError(t, err)
+	require.True(t, exists)
 	require.Len(t, followeeinfo, 0)
-	err = cache.Get(ctx, jcmaceID+":followers", &followerinfo)
+	exists, err = cache.Get(ctx, jcmaceID+":followers", &followerinfo)
+	require.NoError(t, err)
+	require.True(t, exists)
 	require.Len(t, followerinfo, 0)
 
 	// Test Unfollow
@@ -431,7 +446,7 @@ func TestUnfollow(t *testing.T) {
 
 	val, err := coll.FindOne(ctx, bson.D{{"userid", vaastav.UserID}})
 	require.NoError(t, err)
-	exists, err := val.One(ctx, &vaasInfo)
+	exists, err = val.One(ctx, &vaasInfo)
 	require.NoError(t, err)
 	require.True(t, exists)
 	require.Equal(t, vaastav.UserID, vaasInfo.UserID)

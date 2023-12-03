@@ -42,8 +42,11 @@ func (p *PostStorageServiceImpl) StorePost(ctx context.Context, reqID int64, pos
 
 func (p *PostStorageServiceImpl) ReadPost(ctx context.Context, reqID int64, postID int64) (Post, error) {
 	var post Post
-	err := p.postStorageCache.Get(ctx, strconv.FormatInt(postID, 10), &post)
+	exists, err := p.postStorageCache.Get(ctx, strconv.FormatInt(postID, 10), &post)
 	if err != nil {
+		return post, err
+	}
+	if !exists {
 		// Post was not in Cache, check DB!
 		collection, err := p.postStorageDB.GetCollection(ctx, "post", "post")
 		if err != nil {

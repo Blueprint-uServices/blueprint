@@ -23,8 +23,11 @@ func NewUserIDServiceImpl(ctx context.Context, userCache backend.Cache, userDB b
 
 func (u *UserIDServiceImpl) GetUserId(ctx context.Context, reqID int64, username string) (int64, error) {
 	user_id := int64(-1)
-	err := u.userCache.Get(ctx, username+":UserID", &user_id)
+	exists, err := u.userCache.Get(ctx, username+":UserID", &user_id)
 	if err != nil {
+		return user_id, err
+	}
+	if !exists {
 		var user User
 		collection, err := u.userDB.GetCollection(ctx, "user", "user")
 		if err != nil {
