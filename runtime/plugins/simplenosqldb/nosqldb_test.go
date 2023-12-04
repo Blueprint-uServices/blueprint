@@ -2,9 +2,13 @@ package simplenosqldb_test
 
 import (
 	"context"
+	"flag"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
+	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/mongodb"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -44,13 +48,31 @@ var teacollections = []TeaCollection{
 	{Name: "fun collection", Teas: []Tea{teas[3], teas[4]}},
 }
 
-func MakeTestDB(t *testing.T) (context.Context, *simplenosqldb.SimpleCollection) {
-	simplenosqldb.SetVerbose(true)
+var dbtype = flag.String("db", "simple", "Type of nosqldb to use.  simple or mongodb.  default to simple")
+var collectionid = 0
+
+func getDB(t *testing.T) (context.Context, backend.NoSQLDatabase) {
 	ctx := context.Background()
-	db, err := simplenosqldb.NewSimpleNoSQLDB(ctx)
+
+	var db backend.NoSQLDatabase
+	var err error
+	if *dbtype == "mongodb" || *dbtype == "mongo" {
+		db, err = mongodb.NewMongoDB(ctx, "localhost:27017")
+	} else if *dbtype == "" || *dbtype == "simple" {
+		simplenosqldb.SetVerbose(true)
+		db, err = simplenosqldb.NewSimpleNoSQLDB(ctx)
+	} else {
+		t.Fatalf("Error: unknown db %v; expected simple or mongodb\n", *dbtype)
+	}
 	require.NoError(t, err)
 
-	coll, err := db.GetCollection(ctx, "testdb", "testcollection")
+	return ctx, db
+}
+
+func MakeTestDB(t *testing.T) (context.Context, backend.NoSQLCollection) {
+	ctx, db := getDB(t)
+	coll, err := db.GetCollection(ctx, "testdb", fmt.Sprintf("testcollection%v", collectionid))
+	collectionid += 1
 	require.NoError(t, err)
 
 	var docs []interface{}
@@ -59,16 +81,13 @@ func MakeTestDB(t *testing.T) (context.Context, *simplenosqldb.SimpleCollection)
 	}
 	err = coll.InsertMany(ctx, docs)
 	require.NoError(t, err)
-	return ctx, coll.(*simplenosqldb.SimpleCollection)
+	return ctx, coll
 }
 
-func MakeTestDB2(t *testing.T) (context.Context, *simplenosqldb.SimpleCollection) {
-	simplenosqldb.SetVerbose(true)
-	ctx := context.Background()
-	db, err := simplenosqldb.NewSimpleNoSQLDB(ctx)
-	require.NoError(t, err)
-
-	coll, err := db.GetCollection(ctx, "testdb", "testcollection2")
+func MakeTestDB2(t *testing.T) (context.Context, backend.NoSQLCollection) {
+	ctx, db := getDB(t)
+	coll, err := db.GetCollection(ctx, "testdb", fmt.Sprintf("testcollection%v", collectionid))
+	collectionid += 1
 	require.NoError(t, err)
 
 	var docs []interface{}
@@ -77,7 +96,41 @@ func MakeTestDB2(t *testing.T) (context.Context, *simplenosqldb.SimpleCollection
 	}
 	err = coll.InsertMany(ctx, docs)
 	require.NoError(t, err)
-	return ctx, coll.(*simplenosqldb.SimpleCollection)
+	return ctx, coll
+}
+
+func TestPullNested(t *testing.T) {
+	ctx, db := MakeTestDB2(t)
+
+	fmt.Println("TestPull db before:")
+	fmt.Println(dbtostring(db))
+
+	{
+		update := bson.D{{"$pull", bson.D{{"teas", bson.D{{"$elemMatch", bson.D{{"packaging.width", 10}}}}}}}}
+		_, err := db.UpdateMany(ctx, bson.D{}, update)
+		require.NoError(t, err)
+
+		// filter := bson.D{{"type", "English Breakfast"}}
+		// cursor, err := db.FindOne(ctx, filter)
+		// require.NoError(t, err)
+
+		// var tea Tea
+		// _, err = cursor.One(ctx, &tea)
+		// require.NoError(t, err)
+		// require.Equal(t, "English Breakfast", tea.Type)
+		// require.Len(t, tea.Sizes, 2)
+		// require.ElementsMatch(t, tea.Sizes, []int32{4, 16})
+	}
+
+	fmt.Println("TestPull db after:")
+	fmt.Println(dbtostring(db))
+}
+
+func dbtostring(db backend.NoSQLCollection) string {
+	if simple, isSimple := db.(*simplenosqldb.SimpleCollection); isSimple {
+		return simple.String()
+	}
+	return "not a simplenosqldb"
 }
 
 func TestGetAll(t *testing.T) {
@@ -1169,6 +1222,9 @@ func TestPush(t *testing.T) {
 func TestPull(t *testing.T) {
 	ctx, db := MakeTestDB(t)
 
+	fmt.Println("TestPull db before:")
+	fmt.Println(dbtostring(db))
+
 	{
 		update := bson.D{{"$pull", bson.D{{"sizes", 8}}}}
 		_, err := db.UpdateMany(ctx, bson.D{}, update)
@@ -1185,6 +1241,9 @@ func TestPull(t *testing.T) {
 		require.Len(t, tea.Sizes, 2)
 		require.ElementsMatch(t, tea.Sizes, []int32{4, 16})
 	}
+
+	fmt.Println("TestPull db after:")
+	fmt.Println(dbtostring(db))
 }
 
 type ObjectIDTest struct {

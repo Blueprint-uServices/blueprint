@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb/query"
@@ -340,4 +341,12 @@ func fromBson(d bson.D, dst any) error {
 		return err
 	}
 	return bson.Unmarshal(bytes, dst)
+}
+
+func (db *SimpleCollection) String() string {
+	var strs []string
+	for i := range db.items {
+		strs = append(strs, fmt.Sprintf("%v", db.items[i]))
+	}
+	return strings.Join(strs, "\n")
 }
