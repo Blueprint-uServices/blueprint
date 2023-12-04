@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -103,34 +104,54 @@ func TestPullNested(t *testing.T) {
 	ctx, db := MakeTestDB2(t)
 
 	fmt.Println("TestPull db before:")
-	fmt.Println(dbtostring(db))
+	fmt.Println(dbstring(ctx, db, t))
 
 	{
-		update := bson.D{{"$pull", bson.D{{"teas", bson.D{{"$elemMatch", bson.D{{"packaging.width", 10}}}}}}}}
+		update := bson.D{{"$pull", bson.D{{"teas", bson.D{{"packaging.width", 10}}}}}}
 		_, err := db.UpdateMany(ctx, bson.D{}, update)
 		require.NoError(t, err)
 
-		// filter := bson.D{{"type", "English Breakfast"}}
-		// cursor, err := db.FindOne(ctx, filter)
-		// require.NoError(t, err)
+		filter := bson.D{{"name", "cool collection"}}
+		cursor, err := db.FindOne(ctx, filter)
+		require.NoError(t, err)
 
-		// var tea Tea
-		// _, err = cursor.One(ctx, &tea)
-		// require.NoError(t, err)
-		// require.Equal(t, "English Breakfast", tea.Type)
-		// require.Len(t, tea.Sizes, 2)
-		// require.ElementsMatch(t, tea.Sizes, []int32{4, 16})
+		var newcollection TeaCollection
+		exists, err := cursor.One(ctx, &newcollection)
+		require.NoError(t, err)
+		require.True(t, exists)
+		require.Len(t, newcollection.Teas, 1)
+		require.Equal(t, teas[1], newcollection.Teas[0])
 	}
 
 	fmt.Println("TestPull db after:")
-	fmt.Println(dbtostring(db))
+	fmt.Println(dbstring(ctx, db, t))
 }
 
-func dbtostring(db backend.NoSQLCollection) string {
-	if simple, isSimple := db.(*simplenosqldb.SimpleCollection); isSimple {
-		return simple.String()
+func TestPullNested2(t *testing.T) {
+	ctx, db := MakeTestDB2(t)
+
+	fmt.Println("TestPull db before:")
+	fmt.Println(dbstring(ctx, db, t))
+
+	{
+		update := bson.D{{"$pull", bson.D{{"teas", bson.D{{"packaging", Packaging{Length: 5, Width: 10, Kind: "Paper"}}}}}}}
+		_, err := db.UpdateMany(ctx, bson.D{}, update)
+		require.NoError(t, err)
+
+		filter := bson.D{{"name", "cool collection"}}
+		cursor, err := db.FindOne(ctx, filter)
+		require.NoError(t, err)
+
+		var newcollection TeaCollection
+		exists, err := cursor.One(ctx, &newcollection)
+		require.NoError(t, err)
+		require.True(t, exists)
+		require.Len(t, newcollection.Teas, 1)
+		require.Equal(t, teas[1], newcollection.Teas[0])
 	}
-	return "not a simplenosqldb"
+
+	fmt.Println("TestPull db after:")
+	fmt.Println(dbstring(ctx, db, t))
 }
 
 func TestGetAll(t *testing.T) {
@@ -512,7 +533,7 @@ func TestArrayContains(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Len(t, getteas, 2)
-		require.ElementsMatch(t, getteas, teas[1:3])
+		require.ElementsMatch(t, teas[1:3], getteas)
 	}
 
 	{
@@ -525,7 +546,7 @@ func TestArrayContains(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Len(t, getteas, 4)
-		require.ElementsMatch(t, getteas, teas[1:5])
+		require.ElementsMatch(t, teas[1:5], getteas)
 	}
 
 	{
@@ -538,11 +559,13 @@ func TestArrayContains(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Len(t, getteas, 4)
-		require.ElementsMatch(t, getteas, teas[1:5])
+		require.ElementsMatch(t, teas[1:5], getteas)
 	}
 
+	fmt.Println(dbstring(ctx, db, t))
+
 	{
-		filter := bson.D{{"sizes", bson.D{{"$nin", bson.A{16, 32}}}}}
+		filter := bson.D{{"$nor", bson.A{bson.D{{"sizes", bson.D{{"$in", bson.A{16, 32}}}}}}}}
 		cursor, err := db.FindMany(ctx, filter)
 		require.NoError(t, err)
 
@@ -550,8 +573,8 @@ func TestArrayContains(t *testing.T) {
 		err = cursor.All(ctx, &getteas)
 		require.NoError(t, err)
 
-		require.Len(t, getteas, 3)
-		require.ElementsMatch(t, getteas, teas[0:3])
+		require.Len(t, getteas, 1)
+		require.ElementsMatch(t, teas[0:1], getteas)
 	}
 
 	{
@@ -564,7 +587,7 @@ func TestArrayContains(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Len(t, getteas, 1)
-		require.Equal(t, getteas[0], teas[4])
+		require.Equal(t, teas[4], getteas[0])
 	}
 
 	{
@@ -1222,9 +1245,6 @@ func TestPush(t *testing.T) {
 func TestPull(t *testing.T) {
 	ctx, db := MakeTestDB(t)
 
-	fmt.Println("TestPull db before:")
-	fmt.Println(dbtostring(db))
-
 	{
 		update := bson.D{{"$pull", bson.D{{"sizes", 8}}}}
 		_, err := db.UpdateMany(ctx, bson.D{}, update)
@@ -1241,9 +1261,6 @@ func TestPull(t *testing.T) {
 		require.Len(t, tea.Sizes, 2)
 		require.ElementsMatch(t, tea.Sizes, []int32{4, 16})
 	}
-
-	fmt.Println("TestPull db after:")
-	fmt.Println(dbtostring(db))
 }
 
 type ObjectIDTest struct {
@@ -1524,4 +1541,21 @@ func TestUpsertNew(t *testing.T) {
 		require.Len(t, newteas, 1)
 		require.Equal(t, newteas[0], newtea)
 	}
+}
+
+func dbstring(ctx context.Context, db backend.NoSQLCollection, t *testing.T) string {
+	cursor, err := db.FindMany(ctx, bson.D{})
+	if err != nil {
+		return fmt.Sprintf("unable to print db due to %v", err.Error())
+	}
+	var documents []bson.D
+	err = cursor.All(ctx, &documents)
+	if err != nil {
+		return fmt.Sprintf("unable to print db due to %v", err.Error())
+	}
+	var docstrings []string
+	for i := range documents {
+		docstrings = append(docstrings, fmt.Sprintf("%v", documents[i]))
+	}
+	return fmt.Sprintf("documents in db:\n%v\n", strings.Join(docstrings, "\n"))
 }
