@@ -1,0 +1,87 @@
+package mysql
+
+import (
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/backend"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+)
+
+type MySQLDBContainer struct {
+	docker.Container
+	backend.RelDB
+
+	InstanceName string
+	BindAddr     *address.BindConfig
+	Iface        *goparser.ParsedInterface
+}
+
+type MySQLInterface struct {
+	service.ServiceInterface
+	Wrapped service.ServiceInterface
+}
+
+func (m *MySQLInterface) GetName() string {
+	return "mysql(" + m.Wrapped.GetName() + ")"
+}
+
+func (m *MySQLInterface) GetMethods() []service.Method {
+	return m.Wrapped.GetMethods()
+}
+
+func newMySQLDBContainer(name string, addr *address.BindConfig, username string, password string) (*MySQLDBContainer, error) {
+	cntr := &MySQLDBContainer{}
+	cntr.InstanceName = name
+	cntr.BindAddr = addr
+	err := cntr.init(name)
+	if err != nil {
+		return nil, err
+	}
+	return cntr, nil
+}
+
+func (node *MySQLDBContainer) init(name string) error {
+	workflow.Init("../../runtime")
+
+	spec, err := workflow.GetSpec()
+	if err != nil {
+		return err
+	}
+
+	details, err := spec.Get("MySqlDB")
+	if err != nil {
+		return err
+	}
+
+	node.Iface = details.Iface
+	return nil
+}
+
+func (m *MySQLDBContainer) String() string {
+	return m.InstanceName + " = MySqlDBContainer(" + m.BindAddr.Name() + ")"
+}
+
+func (m *MySQLDBContainer) Name() string {
+	return m.InstanceName
+}
+
+func (m *MySQLDBContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
+	iface := m.Iface.ServiceInterface(ctx)
+	return &MySQLInterface{Wrapped: iface}, nil
+}
+
+func (m *MySQLDBContainer) GenerateArtifacts(outdir string) error {
+	return nil
+}
+
+func (m *MySQLDBContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error {
+	return nil
+}
+
+func (m *MySQLDBContainer) AddContainerInstance(target docker.ContainerWorkspace) error {
+	m.BindAddr.Port = 3306
+	return target.DeclarePrebuiltInstance(m.InstanceName, "mysql/mysql-server", m.BindAddr)
+}

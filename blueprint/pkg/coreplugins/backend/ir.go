@@ -21,4 +21,9 @@ type (
 		ir.IRNode
 		service.ServiceNode
 	}
+
+	RelDB interface {
+		ir.IRNode
+		service.ServiceNode
+	}
 )
