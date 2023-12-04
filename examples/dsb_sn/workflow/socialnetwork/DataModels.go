@@ -29,10 +29,11 @@ type Creator struct {
 	Username string
 }
 
-type PostType int
+type PostType int64
 
+// Enums aren't supported atm. So just use integers instead.
 const (
-	POST PostType = iota
+	POST int64 = iota
 	REPOST
 	REPLY
 	DM
@@ -47,5 +48,5 @@ type Post struct {
 	Medias       []Media
 	Urls         []URL
 	Timestamp    int64
-	PostType     PostType
+	PostType     int64
 }

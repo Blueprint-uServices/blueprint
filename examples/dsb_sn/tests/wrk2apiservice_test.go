@@ -242,28 +242,23 @@ func TestWrk2Compose(t *testing.T) {
 		mediatypes = append(mediatypes, media.MediaType)
 	}
 
-	id, mentions, err := service.ComposePost(ctx, 0, vaastav.Username, "0", post1.Text, mediatypes, mediaids)
+	id, mentions, err := service.ComposePost(ctx, 0, vaastav.Username, post1.PostType, post1.Text, mediatypes, mediaids)
 	require.Error(t, err)
 	require.Equal(t, int64(-1), id)
 	require.Len(t, mentions, 0)
 
-	id, mentions, err = service.ComposePost(ctx, vaastav.UserID, "", "0", post1.Text, mediatypes, mediaids)
+	id, mentions, err = service.ComposePost(ctx, vaastav.UserID, "", post1.PostType, post1.Text, mediatypes, mediaids)
 	require.Error(t, err)
 	require.Equal(t, int64(-1), id)
 	require.Len(t, mentions, 0)
 
-	id, mentions, err = service.ComposePost(ctx, vaastav.UserID, vaastav.Username, "", post1.Text, mediatypes, mediaids)
-	require.Error(t, err)
-	require.Equal(t, int64(-1), id)
-	require.Len(t, mentions, 0)
-
-	id, mentions, err = service.ComposePost(ctx, vaastav.UserID, vaastav.Username, "0", "", mediatypes, mediaids)
+	id, mentions, err = service.ComposePost(ctx, vaastav.UserID, vaastav.Username, post1.PostType, "", mediatypes, mediaids)
 	require.Error(t, err)
 	require.Equal(t, int64(-1), id)
 	require.Len(t, mentions, 0)
 
 	// Test compose with complete arguments
-	id, mentions, err = service.ComposePost(ctx, vaastav.UserID, vaastav.Username, "0", post1.Text, mediatypes, mediaids)
+	id, mentions, err = service.ComposePost(ctx, vaastav.UserID, vaastav.Username, post1.PostType, post1.Text, mediatypes, mediaids)
 	require.NoError(t, err)
 	require.True(t, id > 0)
 	require.Len(t, mentions, len(post1.UserMentions))
@@ -322,7 +317,7 @@ func TestWrk2ReadTimelines(t *testing.T) {
 		mediatypes = append(mediatypes, media.MediaType)
 	}
 
-	id, mentions, err := service.ComposePost(ctx, vaastav.UserID, vaastav.Username, "0", post1.Text, mediatypes, mediaids)
+	id, mentions, err := service.ComposePost(ctx, vaastav.UserID, vaastav.Username, post1.PostType, post1.Text, mediatypes, mediaids)
 	require.NoError(t, err)
 	require.True(t, id > 0)
 	require.Len(t, mentions, len(post1.UserMentions))

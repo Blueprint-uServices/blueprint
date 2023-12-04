@@ -8,7 +8,7 @@ import (
 )
 
 type ComposePostService interface {
-	ComposePost(ctx context.Context, reqID int64, username string, userID int64, text string, mediaIDs []int64, mediaTypes []string, post_type PostType) (int64, []int64, error)
+	ComposePost(ctx context.Context, reqID int64, username string, userID int64, text string, mediaIDs []int64, mediaTypes []string, post_type int64) (int64, []int64, error)
 }
 
 type ComposePostServiceImpl struct {
@@ -25,7 +25,7 @@ func NewComposePostServiceImpl(ctx context.Context, postStorageService PostStora
 	return &ComposePostServiceImpl{postStorageService: postStorageService, userTimelineService: userTimelineService, userService: userService, uniqueIDService: uniqueIDService, mediaService: mediaService, textService: textService, homeTimelineService: homeTimelineService}, nil
 }
 
-func (c *ComposePostServiceImpl) ComposePost(ctx context.Context, reqID int64, username string, userID int64, text string, mediaIDs []int64, mediaTypes []string, post_type PostType) (int64, []int64, error) {
+func (c *ComposePostServiceImpl) ComposePost(ctx context.Context, reqID int64, username string, userID int64, text string, mediaIDs []int64, mediaTypes []string, post_type int64) (int64, []int64, error) {
 	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
 	var err1, err2, err3, err4 error
 	var uniqueID int64

@@ -9,7 +9,7 @@ import (
 )
 
 type UniqueIdService interface {
-	ComposeUniqueId(ctx context.Context, reqID int64, post_type PostType) (int64, error)
+	ComposeUniqueId(ctx context.Context, reqID int64, post_type int64) (int64, error)
 }
 
 type UniqueIdServiceImpl struct {
@@ -34,7 +34,7 @@ func (u *UniqueIdServiceImpl) getCounter(timestamp int64) int64 {
 	}
 }
 
-func (u *UniqueIdServiceImpl) ComposeUniqueId(ctx context.Context, reqID int64, post_type PostType) (int64, error) {
+func (u *UniqueIdServiceImpl) ComposeUniqueId(ctx context.Context, reqID int64, post_type int64) (int64, error) {
 	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
 	idx := u.getCounter(timestamp)
 	timestamp_hex := strconv.FormatInt(timestamp, 16)

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"math/rand"
-	"strconv"
 	"time"
 )
 
@@ -14,7 +13,7 @@ type Wrk2APIService interface {
 	Follow(ctx context.Context, username string, followeeName string, user_id int64, followeeID int64) error
 	Unfollow(ctx context.Context, username string, followeeName string, user_id int64, followeeID int64) error
 	Register(ctx context.Context, firstName string, lastName string, username string, password string, user_id int64) error
-	ComposePost(ctx context.Context, user_id int64, username string, post_type string, text string, media_types []string, media_ids []int64) (int64, []int64, error)
+	ComposePost(ctx context.Context, user_id int64, username string, post_type int64, text string, media_types []string, media_ids []int64) (int64, []int64, error)
 }
 
 type Wrk2APIServiceImpl struct {
@@ -68,15 +67,10 @@ func (w *Wrk2APIServiceImpl) Register(ctx context.Context, firstName string, las
 	return w.userService.RegisterUserWithId(ctx, reqID, firstName, lastName, username, password, user_id)
 }
 
-func (w *Wrk2APIServiceImpl) ComposePost(ctx context.Context, user_id int64, username string, post_type string, text string, media_types []string, media_ids []int64) (int64, []int64, error) {
-	if user_id == 0 || username == "" || post_type == "" || text == "" {
+func (w *Wrk2APIServiceImpl) ComposePost(ctx context.Context, user_id int64, username string, post_type int64, text string, media_types []string, media_ids []int64) (int64, []int64, error) {
+	if user_id == 0 || username == "" || text == "" {
 		return -1, []int64{}, errors.New("Incomplete Arguments")
 	}
 	reqID := rand.Int63()
-	postInt, err := strconv.ParseInt(post_type, 10, 64)
-	if err != nil {
-		return -1, []int64{}, err
-	}
-	postType := PostType(postInt)
-	return w.composePostService.ComposePost(ctx, reqID, username, user_id, text, media_ids, media_types, postType)
+	return w.composePostService.ComposePost(ctx, reqID, username, user_id, text, media_ids, media_types, post_type)
 }
