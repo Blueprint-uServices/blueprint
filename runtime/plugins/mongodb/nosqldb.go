@@ -125,16 +125,20 @@ func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update 
 
 func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error) {
 	result, err := mc.collection.UpdateMany(ctx, filter, update)
-	return int(result.ModifiedCount), err
+	if result == nil || err != nil {
+		return 0, err
+	} else {
+		return int(result.ModifiedCount), nil
+	}
 }
 
 func (mc *MongoCollection) Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error) {
 	opts := options.Replace().SetUpsert(true)
 	result, err := mc.collection.ReplaceOne(ctx, filter, document, opts)
-	if result == nil {
+	if result == nil || err != nil {
 		return false, err
 	} else {
-		return result.MatchedCount == 1, err
+		return result.MatchedCount == 1, nil
 	}
 }
 
