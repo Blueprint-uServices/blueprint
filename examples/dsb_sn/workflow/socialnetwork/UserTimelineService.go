@@ -58,8 +58,10 @@ func (u *UserTimelineServiceImpl) ReadUserTimeline(ctx context.Context, reqID in
 		u.CacheMiss += 1
 	}
 	var post_ids []int64
+	seen_posts := make(map[int64]bool)
 	for _, post_info := range post_infos {
 		post_ids = append(post_ids, post_info.PostID)
+		seen_posts[post_info.PostID] = true
 	}
 	db_start := start + int64(len(post_ids))
 	var new_post_ids []int64
@@ -78,8 +80,6 @@ func (u *UserTimelineServiceImpl) ReadUserTimeline(ctx context.Context, reqID in
 		if err != nil {
 			return []int64{}, err
 		}
-		log.Println(query_d)
-		log.Println(projection_d)
 		post_db_val, err := collection.FindOne(ctx, query_d, projection_d)
 		if err != nil {
 			return []int64{}, err
@@ -93,6 +93,10 @@ func (u *UserTimelineServiceImpl) ReadUserTimeline(ctx context.Context, reqID in
 			return []int64{}, errors.New("Failed to find posts in database")
 		}
 		for _, post := range user_posts.Posts {
+			// Avoid duplicated post_ids
+			if _, ok := seen_posts[post.PostID]; ok {
+				continue
+			}
 			new_post_ids = append(new_post_ids, post.PostID)
 		}
 	}
