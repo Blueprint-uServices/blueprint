@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
@@ -63,19 +64,37 @@ func (u *UserTimelineServiceImpl) ReadUserTimeline(ctx context.Context, reqID in
 	db_start := start + int64(len(post_ids))
 	var new_post_ids []int64
 	if db_start < stop {
-		collection, err := u.userTimelineDB.GetCollection(ctx, "user-timeline", "user-timeline")
+		collection, err := u.userTimelineDB.GetCollection(ctx, "usertimeline", "usertimeline")
 		if err != nil {
 			return []int64{}, err
 		}
-		//query := fmt.Sprintf(`{"UserID": %[1]d}`, userID)
-		//projection := fmt.Sprintf(`{"projection": {"posts": {"$slice": [0, %[1]d]}}}`, stop)
-		query := bson.D{{}}      // TODO: Fix this
-		projection := bson.D{{}} // TODO: Fix this
-		post_db_val, err := collection.FindMany(ctx, query, projection)
+		query := fmt.Sprintf(`{"UserID": %[1]d}`, userID)
+		projection := fmt.Sprintf(`{"posts": {"$slice": [0, %[1]d]}}`, stop)
+		query_d, err := backend.ParseNoSQLDBQuery(query)
 		if err != nil {
 			return []int64{}, err
 		}
-		post_db_val.All(ctx, &new_post_ids)
+		projection_d, err := backend.ParseNoSQLDBQuery(projection)
+		if err != nil {
+			return []int64{}, err
+		}
+		log.Println(query_d)
+		log.Println(projection_d)
+		post_db_val, err := collection.FindOne(ctx, query_d, projection_d)
+		if err != nil {
+			return []int64{}, err
+		}
+		var user_posts UserPosts
+		exists, err = post_db_val.One(ctx, &user_posts)
+		if err != nil {
+			return []int64{}, err
+		}
+		if !exists {
+			return []int64{}, errors.New("Failed to find posts in database")
+		}
+		for _, post := range user_posts.Posts {
+			new_post_ids = append(new_post_ids, post.PostID)
+		}
 	}
 
 	post_ids = append(new_post_ids, post_ids...)
@@ -87,6 +106,7 @@ func (u *UserTimelineServiceImpl) ReadUserTimeline(ctx context.Context, reqID in
 		var err error
 		_, err = u.postStorageService.ReadPosts(ctx, reqID, post_ids)
 		if err != nil {
+			log.Println(err)
 			err_post_channel <- err
 			return
 		}
@@ -109,7 +129,7 @@ func (u *UserTimelineServiceImpl) ReadUserTimeline(ctx context.Context, reqID in
 }
 
 func (u *UserTimelineServiceImpl) WriteUserTimeline(ctx context.Context, reqID int64, postID int64, userID int64, timestamp int64) error {
-	collection, err := u.userTimelineDB.GetCollection(ctx, "user-timeline", "user-timeline")
+	collection, err := u.userTimelineDB.GetCollection(ctx, "usertimeline", "usertimeline")
 	if err != nil {
 		return err
 	}
@@ -146,7 +166,10 @@ func (u *UserTimelineServiceImpl) WriteUserTimeline(ctx context.Context, reqID i
 	var postInfo []PostInfo
 	userIDStr := strconv.FormatInt(userID, 10)
 	// Ignore error check for Get!
-	u.userTimelineCache.Get(ctx, userIDStr, &postInfo)
+	_, err = u.userTimelineCache.Get(ctx, userIDStr, &postInfo)
+	if err != nil {
+		return err
+	}
 	postInfo = append(postInfo, PostInfo{PostID: postID, Timestamp: timestamp})
 	return u.userTimelineCache.Put(ctx, userIDStr, postInfo)
 }

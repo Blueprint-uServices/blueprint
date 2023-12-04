@@ -74,7 +74,7 @@ func (mc *MongoCollection) FindOne(ctx context.Context, filter bson.D, projectio
 
 	var singleResult *mongo.SingleResult
 	if withProjection {
-		opts := options.FindOne().SetProjection(projection)
+		opts := options.FindOne().SetProjection(projection[0])
 		singleResult = mc.collection.FindOne(ctx, filter, opts)
 	} else {
 		singleResult = mc.collection.FindOne(ctx, filter)
@@ -101,7 +101,7 @@ func (mc *MongoCollection) FindMany(ctx context.Context, filter bson.D, projecti
 	var cursor *mongo.Cursor
 	var err error
 	if withProjection {
-		opts := options.Find().SetProjection(projection)
+		opts := options.Find().SetProjection(projection[0])
 		cursor, err = mc.collection.Find(ctx, filter, opts)
 	} else {
 		cursor, err = mc.collection.Find(ctx, filter)
