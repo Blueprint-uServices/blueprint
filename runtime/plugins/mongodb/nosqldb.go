@@ -129,10 +129,13 @@ func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update
 }
 
 func (mc *MongoCollection) Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error) {
-	update := bson.D{{"$set", document}}
-	opts := options.Update().SetUpsert(true)
-	result, err := mc.collection.UpdateOne(ctx, filter, update, opts)
-	return result.MatchedCount == 1, err
+	opts := options.Replace().SetUpsert(true)
+	result, err := mc.collection.ReplaceOne(ctx, filter, document, opts)
+	if result == nil {
+		return false, err
+	} else {
+		return result.MatchedCount == 1, err
+	}
 }
 
 func (mc *MongoCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error) {
@@ -141,7 +144,6 @@ func (mc *MongoCollection) UpsertID(ctx context.Context, id primitive.ObjectID, 
 }
 
 func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error) {
-
 	result, err := mc.collection.ReplaceOne(ctx, filter, replacement)
 	return int(result.MatchedCount), err
 }
