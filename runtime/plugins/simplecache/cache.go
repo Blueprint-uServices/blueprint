@@ -4,6 +4,7 @@ package simplecache
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
@@ -11,6 +12,7 @@ import (
 // A simple map-based cache that implements the [backend.Cache] interface
 type SimpleCache struct {
 	backend.Cache
+	sync.RWMutex
 	values map[string]any
 }
 
@@ -22,6 +24,8 @@ func NewSimpleCache(ctx context.Context) (*SimpleCache, error) {
 }
 
 func (cache *SimpleCache) Put(ctx context.Context, key string, value interface{}) error {
+	cache.Lock()
+	defer cache.Unlock()
 	cache.values[key] = value
 	return nil
 }
@@ -62,6 +66,8 @@ func (cache *SimpleCache) Mget(ctx context.Context, keys []string, values []inte
 	return nil
 }
 func (cache *SimpleCache) Delete(ctx context.Context, key string) error {
+	cache.Lock()
+	defer cache.Unlock()
 	delete(cache.values, key)
 	return nil
 }
