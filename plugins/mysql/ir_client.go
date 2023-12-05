@@ -81,7 +81,7 @@ func (m *MySQLDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) erro
 		return nil
 	}
 
-	slog.Info(fmt.Sprintf("Instantiating MongoClient %v in %v/%v", m.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
+	slog.Info(fmt.Sprintf("Instantiating MySqlClient %v in %v/%v", m.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
 	return builder.DeclareConstructor(m.InstanceName, m.Constructor, []ir.IRNode{m.Addr, m.DBVal, m.Username, m.Password})
 }
