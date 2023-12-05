@@ -180,7 +180,7 @@ func (mr *MongoCursor) All(ctx context.Context, objs interface{}) error {
 	//add other types of results from mongo that are Cursors here
 	switch v := mr.underlyingResult.(type) {
 	case *mongo.Cursor:
-		return v.All(context.TODO(), objs)
+		return v.All(ctx, objs)
 	default:
 		return errors.New("result does not return a Cursor")
 	}
