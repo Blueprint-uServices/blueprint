@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb/query"
@@ -143,8 +144,10 @@ func (db *SimpleCollection) FindOne(ctx context.Context, filter bson.D, projecti
 var verbose = false
 
 // Enable or disable verbose logging
-func SetVerbose(enabled bool) {
+func SetVerbose(enabled bool) bool {
+	before := verbose
 	verbose = enabled
+	return before
 }
 
 func (db *SimpleCollection) FindMany(ctx context.Context, filter bson.D, projection ...bson.D) (backend.NoSQLCursor, error) {
@@ -340,4 +343,12 @@ func fromBson(d bson.D, dst any) error {
 		return err
 	}
 	return bson.Unmarshal(bytes, dst)
+}
+
+func (db *SimpleCollection) String() string {
+	var strs []string
+	for i := range db.items {
+		strs = append(strs, fmt.Sprintf("%v", db.items[i]))
+	}
+	return strings.Join(strs, "\n")
 }

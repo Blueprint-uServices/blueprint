@@ -125,14 +125,21 @@ func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update 
 
 func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error) {
 	result, err := mc.collection.UpdateMany(ctx, filter, update)
-	return int(result.ModifiedCount), err
+	if result == nil || err != nil {
+		return 0, err
+	} else {
+		return int(result.ModifiedCount), nil
+	}
 }
 
 func (mc *MongoCollection) Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error) {
-	update := bson.D{{"$set", document}}
-	opts := options.Update().SetUpsert(true)
-	result, err := mc.collection.UpdateOne(ctx, filter, update, opts)
-	return result.MatchedCount == 1, err
+	opts := options.Replace().SetUpsert(true)
+	result, err := mc.collection.ReplaceOne(ctx, filter, document, opts)
+	if result == nil || err != nil {
+		return false, err
+	} else {
+		return result.MatchedCount == 1, nil
+	}
 }
 
 func (mc *MongoCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error) {
@@ -141,7 +148,6 @@ func (mc *MongoCollection) UpsertID(ctx context.Context, id primitive.ObjectID, 
 }
 
 func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error) {
-
 	result, err := mc.collection.ReplaceOne(ctx, filter, replacement)
 	return int(result.MatchedCount), err
 }
@@ -174,7 +180,7 @@ func (mr *MongoCursor) All(ctx context.Context, objs interface{}) error {
 	//add other types of results from mongo that are Cursors here
 	switch v := mr.underlyingResult.(type) {
 	case *mongo.Cursor:
-		return v.All(context.TODO(), objs)
+		return v.All(ctx, objs)
 	default:
 		return errors.New("result does not return a Cursor")
 	}

@@ -304,8 +304,12 @@ func parseArrayOperator(e bson.E) (Filter, error) {
 func parseExistsOperators(key string, d bson.D) (Filter, error) {
 	for _, e := range d {
 		if e.Key == "$exists" {
-			if v, isBool := e.Value.(bool); isBool && !v {
-				return Not(Lookup(e.Key, Exists())), nil
+			if v, isBool := e.Value.(bool); isBool {
+				if !v {
+					return Not(Lookup(e.Key, Exists())), nil
+				} else {
+					return nil, nil
+				}
 			} else {
 				return nil, fmt.Errorf("$exists requires a bool value but got %v", e)
 			}
@@ -365,8 +369,9 @@ func parseValueOperator(e bson.E) (Filter, error) {
 		}
 	case "$nin":
 		{
-			filter, err := parseValueOperator(bson.E{"$in", e.Value})
-			return Not(filter), err
+			return nil, fmt.Errorf("$nin not implemented; use $nor and $in instead")
+			// filter, err := parseValueOperator(bson.E{"$in", e.Value})
+			// return Not(filter), err
 		}
 	case "$regex":
 		{
