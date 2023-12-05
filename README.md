@@ -25,13 +25,11 @@ Vaastav Anand, Deepak Garg, Antoine Kaufmann, Jonathan Mace\
 
 Join the [blueprint-compiler](https://groups.google.com/g/blueprint-compiler) google groups to contact us.
 
-### About Us
+### Contributors
 
 We are a team of researchers:
  * [Vaastav Anand](https://vaastavanand.com/), PhD student at the Max Planck Institute for Software Systems (MPI-SWS)
  * [Jonathan Mace](https://www.microsoft.com/en-us/research/people/jonathanmace/), Researcher at Microsoft Research and Adjunct Faculty at the Max Planck Institute for Software Systems (MPI-SWS)
- * [Antoine Kaufmann](https://people.mpi-sws.org/~antoinek/), Faculty at the Max Planck Institute for Software Systems (MPI-SWS)
- * [Deepak Garg](https://people.mpi-sws.org/~dg/), Faculty at the Max Planck Institute for Software Systems (MPI-SWS)
 
 
 ### Resources
