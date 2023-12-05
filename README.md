@@ -23,7 +23,7 @@ Vaastav Anand, Deepak Garg, Antoine Kaufmann, Jonathan Mace\
 
 ### Mailing List
 
-Join the [blueprint-uservices Slack](https://blueprint-uservices.slack.com/) and/or the [blueprint-compiler Google group](https://groups.google.com/g/blueprint-compiler) to contact us.
+Join the [blueprint-uservices Slack](https://blueprint-uservices.slack.com/) and/or the [Blueprint-uServices Google Group](https://groups.google.com/g/blueprint-uservices) to contact us.
 
 ### Contributors
 
