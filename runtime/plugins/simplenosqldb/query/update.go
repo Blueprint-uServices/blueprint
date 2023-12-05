@@ -220,7 +220,7 @@ func (p *pull) Apply(itemRef any) error {
 	for i := range a {
 		if p.filter.Apply(a[i]) {
 			if updated == nil {
-				updated = append(updated, a[:i]...)
+				updated = append(bson.A{}, a[:i]...)
 			}
 		} else if updated != nil {
 			updated = append(updated, a[i])

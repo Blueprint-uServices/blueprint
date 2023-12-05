@@ -103,8 +103,26 @@ func MakeTestDB2(t *testing.T) (context.Context, backend.NoSQLCollection) {
 func TestPullNested(t *testing.T) {
 	ctx, db := MakeTestDB2(t)
 
-	fmt.Println("TestPull db before:")
-	fmt.Println(dbstring(ctx, db, t))
+	{
+		update := bson.D{{"$pull", bson.D{{"teas", bson.D{{"packaging", bson.D{{"length", 5}, {"width", 10}, {"kind", "Paper"}}}}}}}}
+		_, err := db.UpdateMany(ctx, bson.D{}, update)
+		require.NoError(t, err)
+
+		filter := bson.D{{"name", "cool collection"}}
+		cursor, err := db.FindOne(ctx, filter)
+		require.NoError(t, err)
+
+		var newcollection TeaCollection
+		exists, err := cursor.One(ctx, &newcollection)
+		require.NoError(t, err)
+		require.True(t, exists)
+		require.Len(t, newcollection.Teas, 1)
+		require.Equal(t, teas[1], newcollection.Teas[0])
+	}
+}
+
+func TestPullNested2(t *testing.T) {
+	ctx, db := MakeTestDB2(t)
 
 	{
 		update := bson.D{{"$pull", bson.D{{"teas", bson.D{{"packaging.width", 10}}}}}}
@@ -122,36 +140,6 @@ func TestPullNested(t *testing.T) {
 		require.Len(t, newcollection.Teas, 1)
 		require.Equal(t, teas[1], newcollection.Teas[0])
 	}
-
-	fmt.Println("TestPull db after:")
-	fmt.Println(dbstring(ctx, db, t))
-}
-
-func TestPullNested2(t *testing.T) {
-	ctx, db := MakeTestDB2(t)
-
-	fmt.Println("TestPull db before:")
-	fmt.Println(dbstring(ctx, db, t))
-
-	{
-		update := bson.D{{"$pull", bson.D{{"teas", bson.D{{"packaging", Packaging{Length: 5, Width: 10, Kind: "Paper"}}}}}}}
-		_, err := db.UpdateMany(ctx, bson.D{}, update)
-		require.NoError(t, err)
-
-		filter := bson.D{{"name", "cool collection"}}
-		cursor, err := db.FindOne(ctx, filter)
-		require.NoError(t, err)
-
-		var newcollection TeaCollection
-		exists, err := cursor.One(ctx, &newcollection)
-		require.NoError(t, err)
-		require.True(t, exists)
-		require.Len(t, newcollection.Teas, 1)
-		require.Equal(t, teas[1], newcollection.Teas[0])
-	}
-
-	fmt.Println("TestPull db after:")
-	fmt.Println(dbstring(ctx, db, t))
 }
 
 func TestGetAll(t *testing.T) {
@@ -1544,6 +1532,8 @@ func TestUpsertNew(t *testing.T) {
 }
 
 func dbstring(ctx context.Context, db backend.NoSQLCollection, t *testing.T) string {
+	before := simplenosqldb.SetVerbose(false)
+	defer simplenosqldb.SetVerbose(before)
 	cursor, err := db.FindMany(ctx, bson.D{})
 	if err != nil {
 		return fmt.Sprintf("unable to print db due to %v", err.Error())
@@ -1555,7 +1545,7 @@ func dbstring(ctx context.Context, db backend.NoSQLCollection, t *testing.T) str
 	}
 	var docstrings []string
 	for i := range documents {
-		docstrings = append(docstrings, fmt.Sprintf("%v", documents[i]))
+		docstrings = append(docstrings, fmt.Sprintf("%v=%v", i, documents[i]))
 	}
-	return fmt.Sprintf("documents in db:\n%v\n", strings.Join(docstrings, "\n"))
+	return fmt.Sprintf("\nDocuments in DB:\n%v\n\n", strings.Join(docstrings, "\n"))
 }
