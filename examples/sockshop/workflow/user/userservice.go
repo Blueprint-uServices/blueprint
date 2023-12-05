@@ -36,7 +36,8 @@ type (
 		// doesn't match the registered password
 		Login(ctx context.Context, username, password string) (User, error)
 
-		// Register a new user account
+		// Register a new user account.
+		// Returns the user ID
 		Register(ctx context.Context, username, password, email, first, last string) (string, error)
 
 		// Look up a user by id.  If id is the empty string, returns all users.
