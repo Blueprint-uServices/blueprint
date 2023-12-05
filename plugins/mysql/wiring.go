@@ -41,7 +41,11 @@ func PrebuiltContainer(spec wiring.WiringSpec, dbName string, username string, p
 			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", clientName, clientNext, err)
 		}
 
-		return newMySQLDBGoClient(clientName, addr.Dial, username, password)
+		user_val := &ir.IRValue{Value: username}
+		pwd_val := &ir.IRValue{Value: password}
+		db_val := &ir.IRValue{Value: dbName}
+
+		return newMySQLDBGoClient(clientName, addr.Dial, user_val, pwd_val, db_val)
 	})
 
 	return dbName

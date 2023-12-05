@@ -18,14 +18,15 @@ type MySQLDBGoClient struct {
 	golang.Service
 	backend.RelDB
 	InstanceName string
-	Username     string
-	Password     string
+	Username     *ir.IRValue
+	Password     *ir.IRValue
+	DBVal        *ir.IRValue
 	Addr         *address.DialConfig
 	Iface        *goparser.ParsedInterface
 	Constructor  *gocode.Constructor
 }
 
-func newMySQLDBGoClient(name string, addr *address.DialConfig, username string, password string) (*MySQLDBGoClient, error) {
+func newMySQLDBGoClient(name string, addr *address.DialConfig, username *ir.IRValue, password *ir.IRValue, dbname *ir.IRValue) (*MySQLDBGoClient, error) {
 	client := &MySQLDBGoClient{}
 	err := client.init(name)
 	if err != nil {
@@ -35,6 +36,7 @@ func newMySQLDBGoClient(name string, addr *address.DialConfig, username string, 
 	client.Addr = addr
 	client.Username = username
 	client.Password = password
+	client.DBVal = dbname
 	return client, nil
 }
 
@@ -81,7 +83,7 @@ func (m *MySQLDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) erro
 
 	slog.Info(fmt.Sprintf("Instantiating MongoClient %v in %v/%v", m.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(m.InstanceName, m.Constructor, []ir.IRNode{m.Addr})
+	return builder.DeclareConstructor(m.InstanceName, m.Constructor, []ir.IRNode{m.Addr, m.DBVal, m.Username, m.Password})
 }
 
 func (node *MySQLDBGoClient) ImplementsGolangNode()    {}
