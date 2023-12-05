@@ -83,7 +83,7 @@ type frontend struct {
 	order     order.OrderService
 }
 
-func NewFrontend(ctx context.Context, user user.UserService, catalogue catalogue.CatalogueService, cart cart.CartService, order order.OrderService) (*frontend, error) {
+func NewFrontend(ctx context.Context, user user.UserService, catalogue catalogue.CatalogueService, cart cart.CartService, order order.OrderService) (Frontend, error) {
 	f := &frontend{
 		user:      user,
 		catalogue: catalogue,
@@ -91,4 +91,94 @@ func NewFrontend(ctx context.Context, user user.UserService, catalogue catalogue
 		order:     order,
 	}
 	return f, nil
+}
+
+// AddItem implements Frontend.
+func (*frontend) AddItem(ctx context.Context, sessionID string, itemID string) (string, error) {
+	panic("unimplemented")
+}
+
+// DeleteCart implements Frontend.
+func (*frontend) DeleteCart(ctx context.Context, sessionID string) error {
+	panic("unimplemented")
+}
+
+// DeleteItem implements Frontend.
+func (*frontend) DeleteItem(ctx context.Context, sessionID string, itemID string) error {
+	panic("unimplemented")
+}
+
+// GetAddresses implements Frontend.
+func (*frontend) GetAddresses(ctx context.Context, userID string) ([]user.Address, error) {
+	panic("unimplemented")
+}
+
+// GetCards implements Frontend.
+func (*frontend) GetCards(ctx context.Context, userID string) ([]user.Card, error) {
+	panic("unimplemented")
+}
+
+// GetCart implements Frontend.
+func (*frontend) GetCart(ctx context.Context, sessionID string) ([]cart.Item, error) {
+	panic("unimplemented")
+}
+
+// GetOrder implements Frontend.
+func (*frontend) GetOrder(ctx context.Context, orderID string) (order.Order, error) {
+	panic("unimplemented")
+}
+
+// GetOrders implements Frontend.
+func (*frontend) GetOrders(ctx context.Context, userID string) ([]order.Order, error) {
+	panic("unimplemented")
+}
+
+// GetSock implements Frontend.
+func (*frontend) GetSock(ctx context.Context, itemID string) (catalogue.Sock, error) {
+	panic("unimplemented")
+}
+
+// GetUser implements Frontend.
+func (*frontend) GetUser(ctx context.Context, userID string) (user.User, error) {
+	panic("unimplemented")
+}
+
+// ListItems implements Frontend.
+func (*frontend) ListItems(ctx context.Context, tags []string, order string, pageNum int, pageSize int) ([]catalogue.Sock, error) {
+	panic("unimplemented")
+}
+
+// ListTags implements Frontend.
+func (*frontend) ListTags(ctx context.Context) ([]string, error) {
+	panic("unimplemented")
+}
+
+// Login implements Frontend.
+func (*frontend) Login(ctx context.Context, sessionID string, username string, password string) (string, user.User, error) {
+	panic("unimplemented")
+}
+
+// NewOrder implements Frontend.
+func (*frontend) NewOrder(ctx context.Context, userID string, addressID string, cardID string, cartID string) (order.Order, error) {
+	panic("unimplemented")
+}
+
+// PostAddress implements Frontend.
+func (*frontend) PostAddress(ctx context.Context, userID string, address user.Address) (string, error) {
+	panic("unimplemented")
+}
+
+// PostCard implements Frontend.
+func (*frontend) PostCard(ctx context.Context, userID string, card user.Card) (string, error) {
+	panic("unimplemented")
+}
+
+// Register implements Frontend.
+func (*frontend) Register(ctx context.Context, username string, password string, email string, first string, last string) (string, error) {
+	panic("unimplemented")
+}
+
+// UpdateItem implements Frontend.
+func (*frontend) UpdateItem(ctx context.Context, sessionID string, itemID string, quantity int) (string, error) {
+	panic("unimplemented")
 }
