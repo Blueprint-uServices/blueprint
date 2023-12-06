@@ -1,3 +1,9 @@
+// Package mysql provides a plugin to generate and include a mysql instance in a Blueprint application.
+//
+// The package provides a built-in mysql container that provides the server-side implementation
+// and a go-client for connecting to the client.
+//
+// The applications must use a backend.RelationalDB (runtime/core/backend) as the interface in the workflow.
 package mysql
 
 import (
@@ -8,6 +14,10 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
+// PrebuiltContainer generate the IRNodes for a mysql server docker container that uses the latest mysql/mysql image
+// and the clients needed by the generated application to communicate with the server.
+//
+// The generated container has the name `dbName` with the root password set to `password`.
 func PrebuiltContainer(spec wiring.WiringSpec, dbName string, username string, password string) string {
 	cntrName := dbName + ".container"
 	clientName := dbName + ".client"
