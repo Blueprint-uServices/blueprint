@@ -4,8 +4,6 @@ import (
 	"context"
 	"database/sql"
 
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
-
 	"github.com/jmoiron/sqlx"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -18,7 +16,7 @@ type MySqlDB struct {
 }
 
 // Instantiates a new [MySqlDB] instance that stores query data in a MySqlDB instance
-func NewMySqlDB(ctx context.Context, addr string, name string, username string, password string) (backend.RelationalDB, error) {
+func NewMySqlDB(ctx context.Context, addr string, name string, username string, password string) (*MySqlDB, error) {
 	db, err := sqlx.Open("mysql", username+":"+password+"@tcp("+addr+")/")
 	if err != nil {
 		return nil, err

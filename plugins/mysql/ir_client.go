@@ -76,6 +76,10 @@ func (m *MySQLDBGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error 
 	return golang.AddRuntimeModule(builder)
 }
 
+func (n *MySQLDBGoClient) AddInterfaces(builder golang.ModuleBuilder) error {
+	return n.AddToWorkspace(builder.Workspace())
+}
+
 func (m *MySQLDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(m.InstanceName) {
 		return nil
