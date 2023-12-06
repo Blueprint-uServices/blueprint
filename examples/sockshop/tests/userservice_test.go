@@ -143,7 +143,7 @@ func TestAll(t *testing.T) {
 
 	{
 		// Register an address
-		aid, err := service.PostAddress(ctx, deepak.Addresses[1])
+		aid, err := service.PostAddress(ctx, "", deepak.Addresses[1])
 		require.NoError(t, err)
 
 		// Check the address we just registered
@@ -157,7 +157,7 @@ func TestAll(t *testing.T) {
 
 	{
 		// Register a card
-		cid, err := service.PostCard(ctx, deepak.Cards[0])
+		cid, err := service.PostCard(ctx, "", deepak.Cards[0])
 		require.NoError(t, err)
 
 		// Check the card we just registered

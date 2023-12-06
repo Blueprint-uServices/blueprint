@@ -139,7 +139,7 @@ func (s *cartImpl) MergeCarts(ctx context.Context, customerID string, sessionID 
 		}
 	}
 
-	_, err = s.db.ReplaceOne(ctx, bson.D{{"id", customerID}}, customerCart)
+	_, err = s.db.Upsert(ctx, bson.D{{"id", customerID}}, customerCart)
 	if err != nil {
 		return err
 	}
@@ -176,7 +176,7 @@ func (s *cartImpl) UpdateItem(ctx context.Context, customerID string, item Item)
 
 	if existing := findItem(cart, item.ID); existing != nil {
 		// Item exists in the cart, update the quantity
-		existing.Quantity += item.Quantity
+		existing.Quantity = item.Quantity
 		existing.UnitPrice = item.UnitPrice
 
 		// After updating, item quantity is gone, so remove item from cart

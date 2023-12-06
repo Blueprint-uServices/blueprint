@@ -33,7 +33,9 @@ type (
 		// If there is no user or session, then a session is created and the sessionID is returned.
 		UpdateItem(ctx context.Context, sessionID string, itemID string, quantity int) (newSessionID string, err error)
 
-		// List socks that match any of the tags specified.  Sort the results in the specified order,
+		// List socks that match any of the tags specified.  Sort the results by the specified database column.
+		// order can be "" in which case the default order is used.
+		// pageNum is 1-indexed
 		// then return a subset of the results.
 		ListItems(ctx context.Context, tags []string, order string, pageNum, pageSize int) ([]catalogue.Sock, error)
 
@@ -64,14 +66,14 @@ type (
 		// Look up a user by customer ID
 		GetUser(ctx context.Context, userID string) (user.User, error)
 
-		// Look up an address by customer ID
-		GetAddresses(ctx context.Context, userID string) ([]user.Address, error)
+		// Look up an address by address ID
+		GetAddress(ctx context.Context, addressID string) (user.Address, error)
 
 		// Adds a new address for a customer
 		PostAddress(ctx context.Context, userID string, address user.Address) (string, error)
 
-		// Look up a card by id.  If id is the empty string, returns all cards.
-		GetCards(ctx context.Context, userID string) ([]user.Card, error)
+		// Look up a card by card id.
+		GetCard(ctx context.Context, cardID string) (user.Card, error)
 
 		// Adds a new card for a customer
 		PostCard(ctx context.Context, userID string, card user.Card) (string, error)
@@ -138,12 +140,10 @@ func (f *frontend) DeleteCart(ctx context.Context, sessionID string) error {
 	return f.cart.DeleteCart(ctx, sessionID)
 }
 
-var ErrNoUserID = fmt.Errorf("no userID specified")
-
 // GetUser implements Frontend.
 func (f *frontend) GetUser(ctx context.Context, userID string) (user.User, error) {
 	if userID == "" {
-		return user.User{}, ErrNoUserID
+		return user.User{}, fmt.Errorf("no userID specified")
 	}
 
 	users, err := f.user.GetUsers(ctx, userID)
@@ -157,19 +157,33 @@ func (f *frontend) GetUser(ctx context.Context, userID string) (user.User, error
 }
 
 // GetAddresses implements Frontend.
-func (f *frontend) GetAddresses(ctx context.Context, userID string) ([]user.Address, error) {
-	if userID == "" {
-		return nil, ErrNoUserID
+func (f *frontend) GetAddress(ctx context.Context, addressID string) (user.Address, error) {
+	if addressID == "" {
+		return user.Address{}, fmt.Errorf("no addressID specified")
 	}
-	return f.user.GetAddresses(ctx, userID)
+	addrs, err := f.user.GetAddresses(ctx, addressID)
+	if err != nil {
+		return user.Address{}, err
+	} else if len(addrs) == 0 {
+		return user.Address{}, fmt.Errorf("invalid addressID %v", addressID)
+	} else {
+		return addrs[0], nil
+	}
 }
 
 // GetCards implements Frontend.
-func (f *frontend) GetCards(ctx context.Context, userID string) ([]user.Card, error) {
-	if userID == "" {
-		return nil, ErrNoUserID
+func (f *frontend) GetCard(ctx context.Context, cardID string) (user.Card, error) {
+	if cardID == "" {
+		return user.Card{}, fmt.Errorf("no cardID specified")
 	}
-	return f.user.GetCards(ctx, userID)
+	cards, err := f.user.GetCards(ctx, cardID)
+	if err != nil {
+		return user.Card{}, err
+	} else if len(cards) == 0 {
+		return user.Card{}, fmt.Errorf("invalid cardID %v", cardID)
+	} else {
+		return cards[0], nil
+	}
 }
 
 // GetOrder implements Frontend.
@@ -180,7 +194,7 @@ func (f *frontend) GetOrder(ctx context.Context, orderID string) (order.Order, e
 // GetOrders implements Frontend.
 func (f *frontend) GetOrders(ctx context.Context, userID string) ([]order.Order, error) {
 	if userID == "" {
-		return nil, ErrNoUserID
+		return nil, fmt.Errorf("no userID specified")
 	}
 	return f.order.GetOrders(ctx, userID)
 }
@@ -223,12 +237,12 @@ func (f *frontend) NewOrder(ctx context.Context, userID string, addressID string
 
 // PostAddress implements Frontend.
 func (f *frontend) PostAddress(ctx context.Context, userID string, address user.Address) (string, error) {
-	return f.user.PostAddress(ctx, address)
+	return f.user.PostAddress(ctx, userID, address)
 }
 
 // PostCard implements Frontend.
 func (f *frontend) PostCard(ctx context.Context, userID string, card user.Card) (string, error) {
-	return f.user.PostCard(ctx, card)
+	return f.user.PostCard(ctx, userID, card)
 }
 
 // Register implements Frontend.

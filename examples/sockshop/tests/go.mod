@@ -7,17 +7,16 @@ require gitlab.mpi-sws.org/cld/blueprint/runtime v0.0.0
 replace gitlab.mpi-sws.org/cld/blueprint/runtime => ../../../runtime
 
 require (
+	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.4
 	gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow v0.0.0
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.4.0 // indirect
 	github.com/jmoiron/sqlx v1.3.5 // indirect
-	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/tracingplane/tracingplane-go v0.0.0-20171025152126-8c4e6f79b148 // indirect

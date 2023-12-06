@@ -266,12 +266,12 @@ func TestUpdateItem(t *testing.T) {
 	}
 
 	{
-		// The cart should still exist with increased quantity
+		// The cart should still exist with new quantity
 		items, err := service.GetCart(ctx, customerID)
 		require.NoError(t, err)
 		require.Len(t, items, 1)
 		require.Equal(t, item.ID, items[0].ID)
-		require.Equal(t, item.Quantity+itemUpdate.Quantity, items[0].Quantity)
+		require.Equal(t, itemUpdate.Quantity, items[0].Quantity)
 		require.Equal(t, itemUpdate.UnitPrice, items[0].UnitPrice)
 	}
 
@@ -280,7 +280,7 @@ func TestUpdateItem(t *testing.T) {
 		item2, err := service.GetItem(ctx, customerID, item.ID)
 		require.NoError(t, err)
 		require.Equal(t, item.ID, item2.ID)
-		require.Equal(t, item.Quantity+itemUpdate.Quantity, item2.Quantity)
+		require.Equal(t, itemUpdate.Quantity, item2.Quantity)
 		require.Equal(t, itemUpdate.UnitPrice, item2.UnitPrice)
 	}
 
@@ -377,7 +377,7 @@ func TestNegativeUpdateItem(t *testing.T) {
 
 	{
 		// Update the item should increment quantity
-		err := service.UpdateItem(ctx, customerID, item)
+		err := service.UpdateItem(ctx, customerID, doubleItem)
 		require.NoError(t, err)
 	}
 
@@ -394,27 +394,6 @@ func TestNegativeUpdateItem(t *testing.T) {
 		item2, err := service.GetItem(ctx, customerID, item.ID)
 		require.NoError(t, err)
 		require.Equal(t, doubleItem, item2)
-	}
-
-	{
-		// Do negative update
-		err := service.UpdateItem(ctx, customerID, negativeItem)
-		require.NoError(t, err)
-	}
-
-	{
-		// The cart should exist
-		items, err := service.GetCart(ctx, customerID)
-		require.NoError(t, err)
-		require.Len(t, items, 1)
-		require.Equal(t, item, items[0])
-	}
-
-	{
-		// The item should exist
-		item2, err := service.GetItem(ctx, customerID, item.ID)
-		require.NoError(t, err)
-		require.Equal(t, item, item2)
 	}
 
 	{

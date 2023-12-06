@@ -139,11 +139,11 @@ func (s *orderImpl) NewOrder(ctx context.Context, customerID, addressID, cardID,
 	}()
 	go func() {
 		defer wg.Done()
-		addresses, err3 = s.users.GetAddresses(ctx, customerID)
+		addresses, err3 = s.users.GetAddresses(ctx, addressID)
 	}()
 	go func() {
 		defer wg.Done()
-		cards, err4 = s.users.GetCards(ctx, customerID)
+		cards, err4 = s.users.GetCards(ctx, cardID)
 	}()
 
 	// Await completion and validate responses
@@ -194,7 +194,12 @@ func (s *orderImpl) NewOrder(ctx context.Context, customerID, addressID, cardID,
 		Total:      amount,
 	}
 	err = s.db.InsertOne(ctx, order)
-	return order, err
+	if err != nil {
+		return Order{}, err
+	}
+
+	// Delete the cart
+	return order, s.carts.DeleteCart(ctx, customerID)
 }
 
 func calculateTotal(items []cart.Item) float32 {

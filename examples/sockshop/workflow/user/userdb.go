@@ -189,6 +189,31 @@ func (s *userStore) createCard(ctx context.Context, userid string, card *Card) e
 	return err
 }
 
+// Adds an address to the address DB and saves it for a user if there is a user
+func (s *userStore) createAddress(ctx context.Context, userid string, address *Address) error {
+	if userid == "" {
+		// An anonymous user; simply insert the address to the DB
+		return s.addresses.createAddress(ctx, address)
+	}
+
+	// A userid is provided; first check it's valid
+	id, err := primitive.ObjectIDFromHex(userid)
+	if err != nil {
+		return errors.New("Invalid ID Hex")
+	}
+
+	// Insert the address to the DB
+	if err := s.addresses.createAddress(ctx, address); err != nil {
+		return err
+	}
+
+	// Update the user
+	filter := bson.D{{"_id", id}}
+	update := bson.D{{"$addToSet", bson.D{{"addresses", address.ID}}}}
+	_, err = s.customers.UpdateOne(ctx, filter, update)
+	return err
+}
+
 func (s *userStore) delete(ctx context.Context, entity string, id string) error {
 	switch entity {
 	case "customers":

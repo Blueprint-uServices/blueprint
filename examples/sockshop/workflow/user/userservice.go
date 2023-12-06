@@ -50,13 +50,13 @@ type (
 		GetAddresses(ctx context.Context, id string) ([]Address, error)
 
 		// Insert a (possibly new) address into the DB.  Returns the address ID
-		PostAddress(ctx context.Context, address Address) (string, error)
+		PostAddress(ctx context.Context, userid string, address Address) (string, error)
 
 		// Look up a card by id.  If id is the empty string, returns all cards.
-		GetCards(ctx context.Context, id string) ([]Card, error)
+		GetCards(ctx context.Context, cardid string) ([]Card, error)
 
 		// Insert a (possibly new) card into the DB.  Returns the card ID
-		PostCard(ctx context.Context, card Card) (string, error)
+		PostCard(ctx context.Context, userid string, card Card) (string, error)
 
 		// Deletes an entity with ID id from the DB.
 		//
@@ -174,8 +174,8 @@ func (s *userServiceImpl) GetAddresses(ctx context.Context, addressid string) ([
 	}
 }
 
-func (s *userServiceImpl) PostAddress(ctx context.Context, address Address) (string, error) {
-	err := s.users.addresses.createAddress(ctx, &address)
+func (s *userServiceImpl) PostAddress(ctx context.Context, userid string, address Address) (string, error) {
+	err := s.users.createAddress(ctx, userid, &address)
 	return address.ID, err
 }
 
@@ -188,8 +188,8 @@ func (s *userServiceImpl) GetCards(ctx context.Context, cardid string) ([]Card, 
 	}
 }
 
-func (s *userServiceImpl) PostCard(ctx context.Context, card Card) (string, error) {
-	err := s.users.cards.createCard(ctx, &card)
+func (s *userServiceImpl) PostCard(ctx context.Context, userid string, card Card) (string, error) {
+	err := s.users.createCard(ctx, userid, &card)
 	return card.ID, err
 }
 
