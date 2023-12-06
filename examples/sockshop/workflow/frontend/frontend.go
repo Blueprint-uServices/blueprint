@@ -85,6 +85,7 @@ type frontend struct {
 	order     order.OrderService
 }
 
+// Instantiates the Frontend service, which makes calls to the user, catalogue, cart, and order services
 func NewFrontend(ctx context.Context, user user.UserService, catalogue catalogue.CatalogueService, cart cart.CartService, order order.OrderService) (Frontend, error) {
 	f := &frontend{
 		user:      user,
