@@ -325,6 +325,7 @@ var createSockTable = `CREATE TABLE IF NOT EXISTS sock (
 	PRIMARY KEY(sock_id)
 );`
 
+// AUTOINCREMENT should be AUTO_INCREMENT in mysql
 var createTagTable = `CREATE TABLE IF NOT EXISTS tag (
 	tag_id INTEGER PRIMARY KEY AUTOINCREMENT, 
 	name varchar(20)

@@ -19,10 +19,19 @@ var catalogueRegistry = registry.NewServiceRegistry[catalogue.CatalogueService](
 func init() {
 	// If the tests are run locally, we fall back to this CatalogueService implementation
 	catalogueRegistry.Register("local", func(ctx context.Context) (catalogue.CatalogueService, error) {
+
 		db, err := sqlitereldb.NewSqliteRelDB(ctx)
 		if err != nil {
 			return nil, err
 		}
+
+		// Test using locally-deployed mysql server.
+		/*
+			db, err := mysql.NewMySqlDB(ctx, "localhost:3306", "catalogue_db", "root", "pass")
+			if err != nil {
+				return nil, err
+			}
+		*/
 
 		return catalogue.NewCatalogueService(ctx, db)
 	})
