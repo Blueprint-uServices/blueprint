@@ -17,6 +17,8 @@ type MySQLDBContainer struct {
 	InstanceName string
 	BindAddr     *address.BindConfig
 	Iface        *goparser.ParsedInterface
+
+	password string
 }
 
 type MySQLInterface struct {
@@ -36,6 +38,7 @@ func newMySQLDBContainer(name string, addr *address.BindConfig, username string,
 	cntr := &MySQLDBContainer{}
 	cntr.InstanceName = name
 	cntr.BindAddr = addr
+	cntr.password = password
 	err := cntr.init(name)
 	if err != nil {
 		return nil, err
@@ -83,5 +86,15 @@ func (m *MySQLDBContainer) AddContainerArtifacts(target docker.ContainerWorkspac
 
 func (m *MySQLDBContainer) AddContainerInstance(target docker.ContainerWorkspace) error {
 	m.BindAddr.Port = 3306
-	return target.DeclarePrebuiltInstance(m.InstanceName, "mysql/mysql-server", m.BindAddr)
+	err := target.DeclarePrebuiltInstance(m.InstanceName, "mysql/mysql-server", m.BindAddr)
+	if err != nil {
+		return err
+	}
+	// Set necessary environment variables
+	err = target.SetEnvironmentVariable(m.InstanceName, "MYSQL_ROOT_HOST", "%")
+	if err != nil {
+		return err
+	}
+
+	return target.SetEnvironmentVariable(m.InstanceName, "MYSQL_ROOT_PASSWORD", m.password)
 }
