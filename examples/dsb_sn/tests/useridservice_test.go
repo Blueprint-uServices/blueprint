@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/DSB_sn/workflow/socialnetwork"
+	"gitlab.mpi-sws.org/cld/blueprint/examples/dsb_sn/workflow/socialnetwork"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 	"go.mongodb.org/mongo-driver/bson"
 )
