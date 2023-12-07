@@ -21,7 +21,7 @@ var Thrift = wiringcmd.SpecOption{
 }
 
 func makeThriftSpec(spec wiring.WiringSpec) ([]string, error) {
-	leaf_db := mongodb.PrebuiltContainer(spec, "leaf_db")
+	leaf_db := mongodb.Container(spec, "leaf_db")
 	leaf_cache := simple.Cache(spec, "leaf_cache")
 	leaf_service := workflow.Define(spec, "leaf_service", "LeafServiceImpl", leaf_cache, leaf_db)
 	leaf_proc := applyThriftDefaults(spec, leaf_service)

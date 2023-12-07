@@ -27,12 +27,12 @@ func makeOriginalSpec(spec wiring.WiringSpec) ([]string, error) {
 	var cntrs []string
 	// Define backends
 	trace_collector := jaeger.DefineJaegerCollector(spec, "jaeger")
-	user_db := mongodb.PrebuiltContainer(spec, "user_db")
-	recommendations_db := mongodb.PrebuiltContainer(spec, "recomd_db")
-	reserv_db := mongodb.PrebuiltContainer(spec, "reserv_db")
-	geo_db := mongodb.PrebuiltContainer(spec, "geo_db")
-	rate_db := mongodb.PrebuiltContainer(spec, "rate_db")
-	profile_db := mongodb.PrebuiltContainer(spec, "profile_db")
+	user_db := mongodb.Container(spec, "user_db")
+	recommendations_db := mongodb.Container(spec, "recomd_db")
+	reserv_db := mongodb.Container(spec, "reserv_db")
+	geo_db := mongodb.Container(spec, "geo_db")
+	rate_db := mongodb.Container(spec, "rate_db")
+	profile_db := mongodb.Container(spec, "profile_db")
 
 	reserv_cache := memcached.PrebuiltContainer(spec, "reserv_cache")
 	rate_cache := memcached.PrebuiltContainer(spec, "rate_cache")

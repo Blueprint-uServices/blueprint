@@ -26,19 +26,19 @@ var Docker = wiringcmd.SpecOption{
 // Creates a basic sockshop wiring spec.
 // Returns the names of the nodes to instantiate or an error
 func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
-	user_db := mongodb.PrebuiltContainer(spec, "user_db")
+	user_db := mongodb.Container(spec, "user_db")
 	user_service := workflow.Define(spec, "user_service", "UserService", user_db)
 	user_ctr := applyDockerDefaults(spec, user_service, "user_proc", "user_container")
 
 	payment_service := workflow.Define(spec, "payment_service", "PaymentService", "500")
 	payment_ctr := applyDockerDefaults(spec, payment_service, "payment_proc", "payment_container")
 
-	cart_db := mongodb.PrebuiltContainer(spec, "cart_db")
+	cart_db := mongodb.Container(spec, "cart_db")
 	cart_service := workflow.Define(spec, "cart_service", "CartService", cart_db)
 	cart_ctr := applyDockerDefaults(spec, cart_service, "cart_proc", "cart_ctr")
 
 	shipqueue := simple.Queue(spec, "shipping_queue")
-	shipdb := mongodb.PrebuiltContainer(spec, "shipping_db")
+	shipdb := mongodb.Container(spec, "shipping_db")
 	shipping_service := workflow.Define(spec, "shipping_service", "ShippingService", shipqueue, shipdb)
 	shipping_ctr := applyDockerDefaults(spec, shipping_service, "shipping_proc", "shipping_ctr")
 
@@ -47,7 +47,7 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	queue_master := workflow.Define(spec, "queue_master", "QueueMaster", shipqueue, shipping_service)
 	goproc.AddChildToProcess(spec, "shipping_proc", queue_master)
 
-	order_db := mongodb.PrebuiltContainer(spec, "order_db")
+	order_db := mongodb.Container(spec, "order_db")
 	order_service := workflow.Define(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)
 	order_ctr := applyDockerDefaults(spec, order_service, "order_proc", "order_ctr")
 
