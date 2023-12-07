@@ -22,26 +22,26 @@ var Basic = wiringcmd.SpecOption{
 // Returns the names of the nodes to instantiate or an error
 func makeBasicSpec(spec wiring.WiringSpec) ([]string, error) {
 	user_db := simple.NoSQLDB(spec, "user_db")
-	user_service := workflow.Define(spec, "user_service", "UserService", user_db)
+	user_service := workflow.Service(spec, "user_service", "UserService", user_db)
 
-	payment_service := workflow.Define(spec, "payment_service", "PaymentService", "500")
+	payment_service := workflow.Service(spec, "payment_service", "PaymentService", "500")
 
 	cart_db := simple.NoSQLDB(spec, "cart_db")
-	cart_service := workflow.Define(spec, "cart_service", "CartService", cart_db)
+	cart_service := workflow.Service(spec, "cart_service", "CartService", cart_db)
 
 	shipqueue := simple.Queue(spec, "shipping_queue")
 	shipdb := simple.NoSQLDB(spec, "shipping_db")
-	shipping_service := workflow.Define(spec, "shipping_service", "ShippingService", shipqueue, shipdb)
+	shipping_service := workflow.Service(spec, "shipping_service", "ShippingService", shipqueue, shipdb)
 
-	queue_master := workflow.Define(spec, "queue_master", "QueueMaster", shipqueue, shipping_service)
+	queue_master := workflow.Service(spec, "queue_master", "QueueMaster", shipqueue, shipping_service)
 
 	order_db := simple.NoSQLDB(spec, "order_db")
-	order_service := workflow.Define(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)
+	order_service := workflow.Service(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)
 
 	catalogue_db := simple.RelationalDB(spec, "catalogue_db")
-	catalogue_service := workflow.Define(spec, "catalogue_service", "CatalogueService", catalogue_db)
+	catalogue_service := workflow.Service(spec, "catalogue_service", "CatalogueService", catalogue_db)
 
-	frontend := workflow.Define(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
+	frontend := workflow.Service(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
 
 	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service, catalogue_service, frontend)
 

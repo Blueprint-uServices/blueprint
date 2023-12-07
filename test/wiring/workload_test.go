@@ -12,8 +12,8 @@ import (
 func TestBasicWorkloadGenerator(t *testing.T) {
 	spec := newWiringSpec("TestBasicWorkloadGenerator")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	grpc.Deploy(spec, leaf)
 	grpc.Deploy(spec, nonleaf)

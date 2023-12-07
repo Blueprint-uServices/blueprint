@@ -17,8 +17,8 @@ Tests for correct IR layout from wiring spec helper functions for GRPC
 func TestServicesOverGRPCNoProcess(t *testing.T) {
 	spec := newWiringSpec("TestServicesOverGRPCNoProcess")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	grpc.Deploy(spec, leaf)
 	grpc.Deploy(spec, nonleaf)
@@ -30,16 +30,16 @@ func TestServicesOverGRPCNoProcess(t *testing.T) {
 			leaf.grpc.addr
 			leaf.grpc.dial_addr = AddressConfig()
 			leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
+			leaf = TestLeafService(leaf.grpc_client)
 			nonleaf.grpc.addr
 			nonleaf.grpc.dial_addr = AddressConfig()
 			nonleaf.grpc_client = GRPCClient(nonleaf.grpc.dial_addr)
+			nonleaf = TestNonLeafService(nonleaf.grpc_client)
 			leaf.grpc.bind_addr = AddressConfig()
 			leaf.handler.visibility
-			leaf = TestLeafService()
 			leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
 			nonleaf.grpc.bind_addr = AddressConfig()
 			nonleaf.handler.visibility
-			nonleaf = TestNonLeafService(leaf.grpc_client)
 			nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 		  }`)
 }
@@ -47,8 +47,8 @@ func TestServicesOverGRPCNoProcess(t *testing.T) {
 func TestServicesOverGRPCSameProcess(t *testing.T) {
 	spec := newWiringSpec("TestServicesOverGRPCSameProcess")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	grpc.Deploy(spec, leaf)
 	grpc.Deploy(spec, nonleaf)
@@ -70,7 +70,7 @@ func TestServicesOverGRPCSameProcess(t *testing.T) {
 			  leaf = TestLeafService()
 			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
 			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			  nonleaf = TestNonLeafService(leaf.grpc_client)
+			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 		  }`)
@@ -79,8 +79,8 @@ func TestServicesOverGRPCSameProcess(t *testing.T) {
 func TestBasicServicesOverGRPCDifferentProcesses(t *testing.T) {
 	spec := newWiringSpec("TestBasicServicesOverGRPCDifferentProcesses")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	grpc.Deploy(spec, leaf)
 	grpc.Deploy(spec, nonleaf)
@@ -105,7 +105,8 @@ func TestBasicServicesOverGRPCDifferentProcesses(t *testing.T) {
 			leaf.grpc.dial_addr = AddressConfig()
 			nonleafproc = GolangProcessNode(nonleaf.grpc.bind_addr, leaf.grpc.dial_addr) {
 			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			  nonleaf = TestNonLeafService(leaf.grpc_client)
+			  leaf = TestLeafService(leaf.grpc_client)
+			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 		  }`)
@@ -114,8 +115,8 @@ func TestBasicServicesOverGRPCDifferentProcesses(t *testing.T) {
 func TestReachabilityErrorForServiceNotDeployedWithGRPC(t *testing.T) {
 	spec := newWiringSpec("TestReachabilityErrorForServiceNotDeployedWithGRPC")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	grpc.Deploy(spec, nonleaf)
 
@@ -129,8 +130,8 @@ func TestReachabilityErrorForServiceNotDeployedWithGRPC(t *testing.T) {
 func TestNoReachabilityErrorForServiceNotDeployedWithGRPC(t *testing.T) {
 	spec := newWiringSpec("TestNoReachabilityErrorForServiceNotDeployedWithGRPC")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	grpc.Deploy(spec, leaf)
 
@@ -152,7 +153,8 @@ func TestNoReachabilityErrorForServiceNotDeployedWithGRPC(t *testing.T) {
 			leaf.grpc.dial_addr = AddressConfig()
 			nonleafproc = GolangProcessNode(leaf.grpc.dial_addr) {
 			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			  nonleaf = TestNonLeafService(leaf.grpc_client)
+			  leaf = TestLeafService(leaf.grpc_client)
+			  nonleaf = TestNonLeafService(leaf)
 			}
 		  }`)
 }
@@ -160,8 +162,8 @@ func TestNoReachabilityErrorForServiceNotDeployedWithGRPC(t *testing.T) {
 func TestClientProc(t *testing.T) {
 	spec := newWiringSpec("TestNoReachabilityErrorForServiceNotDeployedWithGRPC")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	grpc.Deploy(spec, leaf)
 	grpc.Deploy(spec, nonleaf)
@@ -188,12 +190,14 @@ func TestClientProc(t *testing.T) {
 			leaf.grpc.dial_addr = AddressConfig()
 			nonleafproc = GolangProcessNode(nonleaf.grpc.bind_addr, leaf.grpc.dial_addr) {
 			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			  nonleaf = TestNonLeafService(leaf.grpc_client)
+			  leaf = TestLeafService(leaf.grpc_client)
+			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 			nonleaf.grpc.dial_addr = AddressConfig()
 			leafclient = GolangProcessNode(nonleaf.grpc.dial_addr) {
 			  nonleaf.grpc_client = GRPCClient(nonleaf.grpc.dial_addr)
+			  nonleaf = TestNonLeafService(nonleaf.grpc_client)
 			}
 		  }`)
 }
@@ -201,8 +205,8 @@ func TestClientProc(t *testing.T) {
 func TestImplicitServicesInSameProcWithGRPC(t *testing.T) {
 	spec := newWiringSpec("TestImplicitServicesInSameProcWithGRPC")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	grpc.Deploy(spec, leaf)
 	grpc.Deploy(spec, nonleaf)
@@ -217,10 +221,10 @@ func TestImplicitServicesInSameProcWithGRPC(t *testing.T) {
 			nonleaf.grpc.dial_addr = AddressConfig()
 			leafclient = GolangProcessNode(nonleaf.grpc.dial_addr, nonleaf.grpc.bind_addr, leaf.grpc.dial_addr, leaf.grpc.bind_addr) {
 			  nonleaf.grpc_client = GRPCClient(nonleaf.grpc.dial_addr)
+			  nonleaf = TestNonLeafService(nonleaf.grpc_client)
 			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			  nonleaf = TestNonLeafService(leaf.grpc_client)
+			  leaf = TestLeafService(leaf.grpc_client)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
-			  leaf = TestLeafService()
 			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
 			}
 			nonleaf.grpc.bind_addr = AddressConfig()
@@ -235,8 +239,8 @@ func TestImplicitServicesInSameProcWithGRPC(t *testing.T) {
 func TestImplicitServicesInSameProcPartialGRPC(t *testing.T) {
 	spec := newWiringSpec("TestImplicitServicesInSameProcPartialGRPC")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	grpc.Deploy(spec, nonleaf)
 
@@ -250,8 +254,8 @@ func TestImplicitServicesInSameProcPartialGRPC(t *testing.T) {
 			nonleaf.grpc.dial_addr = AddressConfig()
 			leafclient = GolangProcessNode(nonleaf.grpc.dial_addr, nonleaf.grpc.bind_addr) {
 			  nonleaf.grpc_client = GRPCClient(nonleaf.grpc.dial_addr)
+			  nonleaf = TestNonLeafService(nonleaf.grpc_client)
 			  leaf = TestLeafService()
-			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 			nonleaf.grpc.bind_addr = AddressConfig()
@@ -264,8 +268,8 @@ func TestImplicitCacheInSameProc(t *testing.T) {
 	spec := newWiringSpec("TestImplicitCacheInSameProc")
 
 	leaf_cache := simple.Cache(spec, "leaf_cache")
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	grpc.Deploy(spec, leaf)
 	grpc.Deploy(spec, nonleaf)
@@ -294,12 +298,14 @@ func TestImplicitCacheInSameProc(t *testing.T) {
 			leaf.grpc.dial_addr = AddressConfig()
 			nonleafproc = GolangProcessNode(nonleaf.grpc.bind_addr, leaf.grpc.dial_addr) {
 			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			  nonleaf = TestNonLeafService(leaf.grpc_client)
+			  leaf = TestLeafService(leaf.grpc_client)
+			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 			nonleaf.grpc.dial_addr = AddressConfig()
 			leafclient = GolangProcessNode(nonleaf.grpc.dial_addr) {
 			  nonleaf.grpc_client = GRPCClient(nonleaf.grpc.dial_addr)
+			  nonleaf = TestNonLeafService(nonleaf.grpc_client)
 			}
 		  }`)
 

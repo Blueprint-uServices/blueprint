@@ -13,8 +13,8 @@ import (
 func TestBasicClientPool(t *testing.T) {
 	spec := newWiringSpec("TestBasicClientPool")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	clientpool.Create(spec, leaf, 7)
 
@@ -43,7 +43,8 @@ func TestBasicClientPool(t *testing.T) {
 			  leaf.clientpool = ClientPool(leaf.grpc_client, 7) {
 				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 			  }
-			  nonleaf = TestNonLeafService(leaf.clientpool)
+			  leaf = TestLeafService(leaf.clientpool)
+			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 		  }`)
@@ -53,8 +54,8 @@ func TestBasicClientPool(t *testing.T) {
 func TestBasicClientPoolInnerModifier(t *testing.T) {
 	spec := newWiringSpec("TestBasicClientPoolInnerModifier")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	clientpool.Create(spec, leaf, 7)
 	retries.AddRetries(spec, leaf, 10)
@@ -85,7 +86,8 @@ func TestBasicClientPoolInnerModifier(t *testing.T) {
 				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 				leaf.client.retrier = Retrier(leaf.grpc_client)
 			  }
-			  nonleaf = TestNonLeafService(leaf.clientpool)
+			  leaf = TestLeafService(leaf.clientpool)
+			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 		  }`)
@@ -94,8 +96,8 @@ func TestBasicClientPoolInnerModifier(t *testing.T) {
 func TestBasicClientPoolOuterModifier(t *testing.T) {
 	spec := newWiringSpec("TestBasicClientPoolOuterModifier")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	retries.AddRetries(spec, leaf, 10)
 	clientpool.Create(spec, leaf, 7)
@@ -126,7 +128,8 @@ func TestBasicClientPoolOuterModifier(t *testing.T) {
 				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 			  }
 			  leaf.client.retrier = Retrier(leaf.clientpool)
-			  nonleaf = TestNonLeafService(leaf.client.retrier)
+			  leaf = TestLeafService(leaf.client.retrier)
+			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 		  }`)
@@ -136,8 +139,8 @@ func TestBasicClientPoolOuterModifier(t *testing.T) {
 func TestInvalidModifierOrder(t *testing.T) {
 	spec := newWiringSpec("TestBasicClientPool")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	grpc.Deploy(spec, leaf)
 	clientpool.Create(spec, leaf, 7)

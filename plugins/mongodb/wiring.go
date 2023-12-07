@@ -8,7 +8,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
-func PrebuiltContainer(spec wiring.WiringSpec, dbName string) string {
+func Container(spec wiring.WiringSpec, dbName string) string {
 	procName := dbName + ".process"
 	clientName := dbName + ".client"
 	addrName := dbName + ".addr"

@@ -26,37 +26,36 @@ var Docker = wiringcmd.SpecOption{
 // Creates a basic sockshop wiring spec.
 // Returns the names of the nodes to instantiate or an error
 func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
-	user_db := mongodb.PrebuiltContainer(spec, "user_db")
-	user_service := workflow.Define(spec, "user_service", "UserService", user_db)
+	user_db := mongodb.Container(spec, "user_db")
+	user_service := workflow.Service(spec, "user_service", "UserService", user_db)
 	user_ctr := applyDockerDefaults(spec, user_service, "user_proc", "user_container")
 
-	payment_service := workflow.Define(spec, "payment_service", "PaymentService", "500")
+	payment_service := workflow.Service(spec, "payment_service", "PaymentService", "500")
 	payment_ctr := applyDockerDefaults(spec, payment_service, "payment_proc", "payment_container")
 
-	cart_db := mongodb.PrebuiltContainer(spec, "cart_db")
-	cart_service := workflow.Define(spec, "cart_service", "CartService", cart_db)
+	cart_db := mongodb.Container(spec, "cart_db")
+	cart_service := workflow.Service(spec, "cart_service", "CartService", cart_db)
 	cart_ctr := applyDockerDefaults(spec, cart_service, "cart_proc", "cart_ctr")
 
 	shipqueue := simple.Queue(spec, "shipping_queue")
-	shipdb := mongodb.PrebuiltContainer(spec, "shipping_db")
-	shipping_service := workflow.Define(spec, "shipping_service", "ShippingService", shipqueue, shipdb)
+	shipdb := mongodb.Container(spec, "shipping_db")
+	shipping_service := workflow.Service(spec, "shipping_service", "ShippingService", shipqueue, shipdb)
 	shipping_ctr := applyDockerDefaults(spec, shipping_service, "shipping_proc", "shipping_ctr")
 
 	// Deploy queue master to the same process as the shipping proc
 	// TODO: after distributed queue is supported, move to separate containers
-	queue_master := workflow.Define(spec, "queue_master", "QueueMaster", shipqueue, shipping_service)
+	queue_master := workflow.Service(spec, "queue_master", "QueueMaster", shipqueue, shipping_service)
 	goproc.AddChildToProcess(spec, "shipping_proc", queue_master)
 
-	order_db := mongodb.PrebuiltContainer(spec, "order_db")
-	order_service := workflow.Define(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)
+	order_db := mongodb.Container(spec, "order_db")
+	order_service := workflow.Service(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)
 	order_ctr := applyDockerDefaults(spec, order_service, "order_proc", "order_ctr")
 
-	//catalogue_db := simple.RelationalDB(spec, "catalogue_db")
-	catalogue_db := mysql.PrebuiltContainer(spec, "catalogue_db", "root", "pass")
-	catalogue_service := workflow.Define(spec, "catalogue_service", "CatalogueService", catalogue_db)
+	catalogue_db := mysql.Container(spec, "catalogue_db")
+	catalogue_service := workflow.Service(spec, "catalogue_service", "CatalogueService", catalogue_db)
 	catalogue_ctr := applyDockerDefaults(spec, catalogue_service, "catalogue_proc", "catalogue_ctr")
 
-	frontend := workflow.Define(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
+	frontend := workflow.Service(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
 	frontend_ctr := applyDockerDefaults(spec, frontend, "frontend_proc", "frontend_ctr")
 
 	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service, catalogue_service, frontend)

@@ -3,10 +3,10 @@ package catalogue
 
 import (
 	"context"
-	"errors"
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
 
@@ -120,7 +120,7 @@ func (s *catalogueImpl) List(ctx context.Context, tags []string, order string, p
 
 	err := s.db.Select(ctx, &socks, query, args...)
 	if err != nil {
-		return []Sock{}, err
+		return []Sock{}, errors.Wrap(err, "CatalogueService.List")
 	}
 	for i, s := range socks {
 		socks[i].ImageURL = []string{s.ImageURL_1, s.ImageURL_2}
@@ -174,7 +174,7 @@ func (s *catalogueImpl) Get(ctx context.Context, id string) (Sock, error) {
 	var sock Sock
 	err := s.db.Get(ctx, &sock, query, id)
 	if err != nil {
-		return Sock{}, err
+		return Sock{}, errors.Wrapf(err, "CatalogueService.Get %v", id)
 	}
 
 	sock.ImageURL = []string{sock.ImageURL_1, sock.ImageURL_2}
@@ -237,14 +237,14 @@ func (s *catalogueImpl) DeleteSock(ctx context.Context, id string) error {
 		return nil
 	}
 
-	// Delete existing sock
-	_, err := s.db.Exec(ctx, "DELETE FROM sock WHERE sock.sock_id=?;", id)
+	// Delete sock's tags
+	_, err := s.db.Exec(ctx, "DELETE FROM sock_tag WHERE sock_tag.sock_id=?;", id)
 	if err != nil {
 		return err
 	}
 
-	// Delete sock's tags
-	_, err = s.db.Exec(ctx, "DELETE FROM sock_tag WHERE sock_tag.sock_id=?;", id)
+	// Delete existing sock
+	_, err = s.db.Exec(ctx, "DELETE FROM sock WHERE sock.sock_id=?;", id)
 	if err != nil {
 		return err
 	}
@@ -303,13 +303,15 @@ func (s *catalogueImpl) addTags(ctx context.Context, tags ...string) ([]int, err
 // Creates database tables if they don't already exist
 func (c *catalogueImpl) createTables(ctx context.Context) (err error) {
 	if _, err = c.db.Exec(ctx, createSockTable); err != nil {
-		return err
+		return errors.Wrap(err, "unable to create sock table")
 	}
 	if _, err = c.db.Exec(ctx, createTagTable); err != nil {
-		return err
+		if _, err = c.db.Exec(ctx, createTagTable2); err != nil {
+			return errors.Wrap(err, "unable to create Tag table")
+		}
 	}
 	if _, err = c.db.Exec(ctx, createSockTagTable); err != nil {
-		return err
+		return errors.Wrap(err, "unable to create socktag table")
 	}
 	return nil
 }
@@ -327,6 +329,11 @@ var createSockTable = `CREATE TABLE IF NOT EXISTS sock (
 
 // AUTOINCREMENT should be AUTO_INCREMENT in mysql
 var createTagTable = `CREATE TABLE IF NOT EXISTS tag (
+	tag_id INTEGER PRIMARY KEY AUTO_INCREMENT, 
+	name varchar(20)
+);`
+
+var createTagTable2 = `CREATE TABLE IF NOT EXISTS tag (
 	tag_id INTEGER PRIMARY KEY AUTOINCREMENT, 
 	name varchar(20)
 );`
