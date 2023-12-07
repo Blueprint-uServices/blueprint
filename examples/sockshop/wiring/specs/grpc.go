@@ -2,6 +2,7 @@ package specs
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/gotests"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
@@ -58,6 +59,7 @@ func makeGrpcSpec(spec wiring.WiringSpec) ([]string, error) {
 }
 
 func applyGrpcDefaults(spec wiring.WiringSpec, serviceName string, procName string) string {
+	clientpool.Create(spec, serviceName, 10)
 	grpc.Deploy(spec, serviceName)
 	return goproc.CreateProcess(spec, procName, serviceName)
 }

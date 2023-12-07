@@ -39,11 +39,6 @@ type NamespaceBuilder struct {
 	accepts func(any) bool
 }
 
-type namespaceBuilderNamespace struct {
-	wiring.SimpleNamespace
-	handler *namespaceBuilderHandler
-}
-
 type namespaceBuilderHandler struct {
 	wiring.DefaultNamespaceHandler
 	builder *NamespaceBuilder
@@ -62,20 +57,24 @@ func Create[T any](parent wiring.Namespace, spec wiring.WiringSpec, namespacetyp
 // Creates a NamespaceBuilder that will internally build any node for which accepts returns true.  Other node
 // types will be recursively built in the parent namespace.
 func CustomCreate(parent wiring.Namespace, spec wiring.WiringSpec, namespacetype, name string, accepts func(any) bool) *NamespaceBuilder {
-	builder := &NamespaceBuilder{}
-	builder.Name = name
+	builder := &NamespaceBuilder{
+		Name:    name,
+		spec:    spec,
+		accepts: accepts,
+	}
 
-	builder.spec = spec
-	builder.accepts = accepts
+	{
+		namespace := &wiring.SimpleNamespace{}
+		handler := &namespaceBuilderHandler{}
+		handler.builder = builder
 
-	namespace := &namespaceBuilderNamespace{}
-	handler := &namespaceBuilderHandler{}
-	handler.builder = builder
-	namespace.handler = handler
-	builder.Namespace = namespace
+		handler.Init(namespace)
+		namespace.Init(name, namespacetype, parent, spec, handler)
 
-	handler.Init(&namespace.SimpleNamespace)
-	namespace.Init(name, namespacetype, parent, spec, handler)
+		builder.Namespace = namespace
+	}
+
+	builder.InstantiatedNodes = make(map[string]ir.IRNode)
 
 	return builder
 }
@@ -147,7 +146,7 @@ func (b *NamespaceBuilder) InstantiateClientsFromProperty(propertyName string) e
 		return blueprint.Errorf("%v InstantiateClientsFromProperty %v failed due to %s", b.Name, propertyName, err.Error())
 	}
 	b.Namespace.Info("%v = %s", propertyName, strings.Join(nodeNames, ", "))
-	return b.Instantiate(nodeNames...)
+	return b.InstantiateClients(nodeNames...)
 }
 
 // Implements wiring.DefaultNamespaceHandler

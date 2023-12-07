@@ -2,12 +2,15 @@ package specs
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/gotests"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mysql"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
@@ -64,6 +67,9 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 }
 
 func applyDockerDefaults(spec wiring.WiringSpec, serviceName, procName, ctrName string) string {
+	retries.AddRetries(spec, serviceName, 3)
+	clientpool.Create(spec, serviceName, 10)
+	opentelemetry.Instrument(spec, serviceName)
 	grpc.Deploy(spec, serviceName)
 	goproc.CreateProcess(spec, procName, serviceName)
 	return linuxcontainer.CreateContainer(spec, ctrName, procName)
