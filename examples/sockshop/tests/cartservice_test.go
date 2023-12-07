@@ -1,3 +1,6 @@
+// Package tests implements unit tests for the SockShop application that are compatible with the Blueprint gotests plugin.
+//
+// After compiling the SockShop application, tests can be found in the `gotests` subdirectory of the output folder.
 package tests
 
 import (

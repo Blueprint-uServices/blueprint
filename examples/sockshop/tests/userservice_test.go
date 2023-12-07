@@ -19,6 +19,16 @@ import (
 var userServiceRegistry = registry.NewServiceRegistry[user.UserService]("user_service")
 
 func init() {
+	// // For local testing, switching between mongo and local
+	// userServiceRegistry.Register("local-mongo", func(ctx context.Context) (user.UserService, error) {
+	// 	db, err := mongodb.NewMongoDB(ctx, "localhost:27017")
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+
+	// 	return user.NewUserServiceImpl(ctx, db)
+	// })
+
 	// If the tests are run locally, we fall back to this user service implementation
 	userServiceRegistry.Register("local", func(ctx context.Context) (user.UserService, error) {
 		db, err := simplenosqldb.NewSimpleNoSQLDB(ctx)
