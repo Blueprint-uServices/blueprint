@@ -10,7 +10,8 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
-// Used by main.go
+// A simple wiring spec that compiles all services to a single process and therefore directly invoke each other.
+// No RPC, containers, processes etc. are used.
 var Basic = wiringcmd.SpecOption{
 	Name:        "basic",
 	Description: "A basic single-process wiring spec with no modifiers",
