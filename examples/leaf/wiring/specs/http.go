@@ -25,10 +25,10 @@ func makeHTTPSpec(spec wiring.WiringSpec) ([]string, error) {
 
 	leaf_db := mongodb.Container(spec, "leaf_db")
 	leaf_cache := simple.Cache(spec, "leaf_cache")
-	leaf_service := workflow.Define(spec, "leaf_service", "LeafServiceImpl", leaf_cache, leaf_db)
+	leaf_service := workflow.Service(spec, "leaf_service", "LeafServiceImpl", leaf_cache, leaf_db)
 	leaf_proc := applyHTTPDefaults(spec, leaf_service, trace_collector)
 
-	nonleaf_service := workflow.Define(spec, "nonleaf_service", "NonLeafService", leaf_service)
+	nonleaf_service := workflow.Service(spec, "nonleaf_service", "NonLeafService", leaf_service)
 	nonleaf_proc := applyHTTPDefaults(spec, nonleaf_service, trace_collector)
 
 	return []string{leaf_proc, nonleaf_proc}, nil

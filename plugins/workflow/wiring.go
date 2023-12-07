@@ -78,7 +78,7 @@ doesn't exist, then this will result in a build error.
 This call creates several definitions within the wiring spec.  In particular, `serviceName` is
 defined as a pointer to the actual service, and can thus be modified and
 */
-func Define(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string {
+func Service(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string {
 	// Define the service
 	handlerName := serviceName + ".handler"
 	spec.Define(handlerName, &workflowHandler{}, func(namespace wiring.Namespace) (ir.IRNode, error) {

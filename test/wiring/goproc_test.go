@@ -18,8 +18,8 @@ Primarily want visibility tests for nodes that are in separate processes but not
 func TestServicesWithinSameProcess(t *testing.T) {
 	spec := newWiringSpec("TestServicesWithinSameProcess")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	myproc := goproc.CreateProcess(spec, "myproc", leaf, nonleaf)
 
@@ -39,9 +39,9 @@ func TestServicesWithinSameProcess(t *testing.T) {
 func TestSeparateServicesInSeparateProcesses(t *testing.T) {
 	spec := newWiringSpec("TestSeparateServicesInSeparateProcesses")
 
-	leaf1 := workflow.Define(spec, "leaf1", "TestLeafServiceImpl")
-	leaf2 := workflow.Define(spec, "leaf2", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf2)
+	leaf1 := workflow.Service(spec, "leaf1", "TestLeafServiceImpl")
+	leaf2 := workflow.Service(spec, "leaf2", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf2)
 
 	leaf1proc := goproc.CreateProcess(spec, "leaf1proc", leaf1)
 	myproc := goproc.CreateProcess(spec, "myproc", leaf2, nonleaf)
@@ -68,8 +68,8 @@ func TestAddChildrenToProcess(t *testing.T) {
 
 	myproc := goproc.CreateProcess(spec, "myproc")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	goproc.AddChildToProcess(spec, myproc, leaf)
 	goproc.AddChildToProcess(spec, myproc, nonleaf)
@@ -91,8 +91,8 @@ func TestAddChildrenToProcess(t *testing.T) {
 func TestReachabilityErrorForSeparateProcesses(t *testing.T) {
 	spec := newWiringSpec("TestReachabilityErrorForSeparateProcesses")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	leafproc := goproc.CreateProcess(spec, "leafproc", leaf)
 	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
@@ -104,8 +104,8 @@ func TestReachabilityErrorForSeparateProcesses(t *testing.T) {
 func TestClientWithinSameProcess(t *testing.T) {
 	spec := newWiringSpec("TestClientWithinSameProcess")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	nonleafclient := goproc.CreateClientProcess(spec, "nonleafclient", nonleaf)
 
@@ -125,8 +125,8 @@ func TestClientWithinSameProcess(t *testing.T) {
 func TestImplicitServicesWithinSameProcess(t *testing.T) {
 	spec := newWiringSpec("TestImplicitServicesWithinSameProcess")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
 

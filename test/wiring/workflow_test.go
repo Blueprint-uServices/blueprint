@@ -26,8 +26,8 @@ The workflow services used in this test exercise the following:
 func TestBasicServices(t *testing.T) {
 	spec := newWiringSpec("TestBasicServices")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	app := assertBuildSuccess(t, spec, leaf, nonleaf)
 
@@ -43,8 +43,8 @@ func TestBasicServices(t *testing.T) {
 func TestImplicitInstantiation(t *testing.T) {
 	spec := newWiringSpec("TestImplicitInstantiation")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	app := assertBuildSuccess(t, spec, nonleaf)
 
@@ -60,8 +60,8 @@ func TestImplicitInstantiation(t *testing.T) {
 func TestBadServiceConstructor(t *testing.T) {
 	spec := newWiringSpec("TestBadServiceConstructor")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafServiceImpl", leaf) // non-leaf service constructor returns the interface type; matching the impl not currently supported
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafServiceImpl", leaf) // non-leaf service constructor returns the interface type; matching the impl not currently supported
 
 	app, err := build(t, spec, leaf, nonleaf)
 	if !assert.Error(t, err) {
@@ -73,8 +73,8 @@ func TestBadServiceConstructor(t *testing.T) {
 func TestBadServiceConstructor2(t *testing.T) {
 	spec := newWiringSpec("TestBadServiceConstructor2")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafService") // leaf service constructor returns an *impl; matching the interface not currently supported
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafService") // leaf service constructor returns an *impl; matching the interface not currently supported
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	app, err := build(t, spec, leaf, nonleaf)
 	if !assert.Error(t, err) {

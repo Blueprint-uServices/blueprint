@@ -11,7 +11,7 @@ func TestSimpleCache(t *testing.T) {
 	spec := newWiringSpec("TestSimpleCache")
 
 	leaf_cache := simple.Cache(spec, "leaf_cache")
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
 
 	app := assertBuildSuccess(t, spec, leaf, leaf_cache)
 
@@ -27,8 +27,8 @@ func TestSimpleCacheAndServices(t *testing.T) {
 	spec := newWiringSpec("TestSimpleCache")
 
 	leaf_cache := simple.Cache(spec, "leaf_cache")
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	app := assertBuildSuccess(t, spec, leaf, leaf_cache, nonleaf)
 

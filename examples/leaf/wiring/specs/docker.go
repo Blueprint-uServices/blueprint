@@ -25,10 +25,10 @@ var Docker = wiringcmd.SpecOption{
 func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	leaf_db := mongodb.Container(spec, "leaf_db")
 	leaf_cache := simple.Cache(spec, "leaf_cache")
-	leaf_service := workflow.Define(spec, "leaf_service", "LeafServiceImpl", leaf_cache, leaf_db)
+	leaf_service := workflow.Service(spec, "leaf_service", "LeafServiceImpl", leaf_cache, leaf_db)
 	leaf_ctr := applyDockerDefaults(spec, leaf_service)
 
-	nonleaf_service := workflow.Define(spec, "nonleaf_service", "NonLeafService", leaf_service)
+	nonleaf_service := workflow.Service(spec, "nonleaf_service", "NonLeafService", leaf_service)
 	nonleaf_ctr := applyDockerDefaults(spec, nonleaf_service)
 
 	app_client := workload.Generator(spec, nonleaf_service)

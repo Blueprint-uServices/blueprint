@@ -12,8 +12,8 @@ func TestSimpleNoSQLDB(t *testing.T) {
 
 	leaf_cache := simple.Cache(spec, "leaf_cache")
 	leaf_db := simple.NoSQLDB(spec, "leaf_db")
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImplWithDB", leaf_cache, leaf_db)
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImplWithDB", leaf_cache, leaf_db)
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	app := assertBuildSuccess(t, spec, leaf, leaf_db, nonleaf)
 

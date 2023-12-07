@@ -13,8 +13,8 @@ import (
 func TestBasicClientPool(t *testing.T) {
 	spec := newWiringSpec("TestBasicClientPool")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	clientpool.Create(spec, leaf, 7)
 
@@ -53,8 +53,8 @@ func TestBasicClientPool(t *testing.T) {
 func TestBasicClientPoolInnerModifier(t *testing.T) {
 	spec := newWiringSpec("TestBasicClientPoolInnerModifier")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	clientpool.Create(spec, leaf, 7)
 	retries.AddRetries(spec, leaf, 10)
@@ -94,8 +94,8 @@ func TestBasicClientPoolInnerModifier(t *testing.T) {
 func TestBasicClientPoolOuterModifier(t *testing.T) {
 	spec := newWiringSpec("TestBasicClientPoolOuterModifier")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	retries.AddRetries(spec, leaf, 10)
 	clientpool.Create(spec, leaf, 7)
@@ -136,8 +136,8 @@ func TestBasicClientPoolOuterModifier(t *testing.T) {
 func TestInvalidModifierOrder(t *testing.T) {
 	spec := newWiringSpec("TestBasicClientPool")
 
-	leaf := workflow.Define(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Define(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
 	grpc.Deploy(spec, leaf)
 	clientpool.Create(spec, leaf, 7)
