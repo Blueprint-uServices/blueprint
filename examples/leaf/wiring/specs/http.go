@@ -21,7 +21,7 @@ var HTTP = wiringcmd.SpecOption{
 }
 
 func makeHTTPSpec(spec wiring.WiringSpec) ([]string, error) {
-	trace_collector := zipkin.DefineZipkinCollector(spec, "zipkin")
+	trace_collector := zipkin.Collector(spec, "zipkin")
 
 	leaf_db := mongodb.Container(spec, "leaf_db")
 	leaf_cache := simple.Cache(spec, "leaf_cache")

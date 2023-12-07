@@ -20,13 +20,11 @@ func GenerateMain(
 	argNodes []ir.IRNode,
 	nodesToInstantiate []ir.IRNode,
 	module golang.ModuleBuilder,
-	namespacePackage string,
 	namespaceConstructor string) error {
 
 	// Generate the main.go
 	mainArgs := mainTemplateArgs{
 		Name:                 name,
-		NamespacePackage:     namespacePackage,
 		NamespaceConstructor: namespaceConstructor,
 		Args:                 nil,
 		Config:               make(map[string]string),
@@ -68,7 +66,6 @@ type mainArg struct {
 
 type mainTemplateArgs struct {
 	Name                 string
-	NamespacePackage     string
 	NamespaceConstructor string
 	Args                 []mainArg
 	Config               map[string]string
@@ -100,8 +97,6 @@ package main
 import (
 	"context"
 	"os"
-
-	"{{.NamespacePackage}}"
 
 	"golang.org/x/exp/slog"
 )
