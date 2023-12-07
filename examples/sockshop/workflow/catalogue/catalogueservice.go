@@ -73,7 +73,7 @@ var baseQuery = `SELECT sock.sock_id,
 						sock.quantity, 
 						sock.image_url_1, 
 						sock.image_url_2, 
-						GROUP_CONCAT(alltags.name) AS tag_name 
+						GROUP_CONCAT(DISTINCT alltags.name) AS tag_name 
 				FROM sock 
 				JOIN sock_tag allsocktags ON sock.sock_id=allsocktags.sock_id 
 				JOIN tag alltags ON allsocktags.tag_id=alltags.tag_id

@@ -57,7 +57,8 @@ type NamespaceBuilder struct {
 	// The first error encountered while defining nodes on the builder.
 	// Errors encountered by [NamespaceBuilder] are cached here, and then
 	// returned when [NamespaceBuilder.Build] is called.
-	err error
+	err         error
+	flagsparsed bool // flags only get parsed once
 }
 
 // A namespace from which nodes can be fetched by name.
@@ -104,6 +105,7 @@ func NewNamespaceBuilder(name string) *NamespaceBuilder {
 	b.required = make(map[string]*argNode)
 	b.optional = make(map[string]*argNode)
 	b.instantiate = make(map[string]struct{})
+	b.flagsparsed = false
 
 	return b
 }
@@ -255,6 +257,10 @@ func (b *NamespaceBuilder) BuildWithParent(parent *Namespace) (*Namespace, error
 
 // Parse required arguments from flags
 func (b *NamespaceBuilder) parseFlags() {
+	if b.flagsparsed {
+		return
+	}
+	b.flagsparsed = true
 	if len(b.required) == 0 && len(b.optional) == 0 {
 		return
 	}

@@ -1538,6 +1538,139 @@ func TestUpsertNew(t *testing.T) {
 	}
 }
 
+func TestAddToSet(t *testing.T) {
+	ctx, db := MakeTestDB(t)
+
+	masala := teas[0]
+	filter := bson.D{{"type", masala.Type}}
+
+	{
+		// Check the tea exists using FindOne
+		var tea Tea
+		cursor, err := db.FindOne(ctx, filter)
+		require.NoError(t, err)
+
+		hasResult, err := cursor.One(ctx, &tea)
+		require.NoError(t, err)
+		require.True(t, hasResult)
+		require.Equal(t, teas[0], tea)
+	}
+
+	{
+		// Addtoset a new vendor
+		update := bson.D{{"$addToSet", bson.D{{"vendor", "D"}}}}
+		updated, err := db.UpdateOne(ctx, filter, update)
+		require.NoError(t, err)
+		require.Equal(t, 1, updated)
+
+		// Check the vendors
+		var tea Tea
+		cursor, err := db.FindOne(ctx, filter)
+		require.NoError(t, err)
+
+		hasResult, err := cursor.One(ctx, &tea)
+		require.NoError(t, err)
+		require.True(t, hasResult)
+		require.Equal(t, masala.Type, tea.Type)
+		require.ElementsMatch(t, []string{"A", "C", "D"}, tea.Vendor)
+	}
+
+	{
+		// Addtoset an existing vendor
+		update := bson.D{{"$addToSet", bson.D{{"vendor", "A"}}}}
+		updated, err := db.UpdateOne(ctx, filter, update)
+		require.NoError(t, err)
+		require.Equal(t, 1, updated)
+
+		// Check the vendors
+		var tea Tea
+		cursor, err := db.FindOne(ctx, filter)
+		require.NoError(t, err)
+
+		hasResult, err := cursor.One(ctx, &tea)
+		require.NoError(t, err)
+		require.True(t, hasResult)
+		require.Equal(t, masala.Type, tea.Type)
+		require.ElementsMatch(t, []string{"A", "C", "D"}, tea.Vendor)
+	}
+
+	{
+		// Addtoset an existing vendor
+		update := bson.D{{"$addToSet", bson.D{{"vendor", "D"}}}}
+		updated, err := db.UpdateOne(ctx, filter, update)
+		require.NoError(t, err)
+		require.Equal(t, 1, updated)
+
+		// Check the vendors
+		var tea Tea
+		cursor, err := db.FindOne(ctx, filter)
+		require.NoError(t, err)
+
+		hasResult, err := cursor.One(ctx, &tea)
+		require.NoError(t, err)
+		require.True(t, hasResult)
+		require.Equal(t, masala.Type, tea.Type)
+		require.ElementsMatch(t, []string{"A", "C", "D"}, tea.Vendor)
+	}
+
+	{
+		// Addtoset a new vendor
+		update := bson.D{{"$addToSet", bson.D{{"vendor", "F"}}}}
+		updated, err := db.UpdateOne(ctx, filter, update)
+		require.NoError(t, err)
+		require.Equal(t, 1, updated)
+
+		// Check the vendors
+		var tea Tea
+		cursor, err := db.FindOne(ctx, filter)
+		require.NoError(t, err)
+
+		hasResult, err := cursor.One(ctx, &tea)
+		require.NoError(t, err)
+		require.True(t, hasResult)
+		require.Equal(t, masala.Type, tea.Type)
+		require.ElementsMatch(t, []string{"A", "C", "D", "F"}, tea.Vendor)
+	}
+
+	{
+		// Addtoset an existing vendor
+		update := bson.D{{"$addToSet", bson.D{{"vendor", "F"}}}}
+		updated, err := db.UpdateOne(ctx, filter, update)
+		require.NoError(t, err)
+		require.Equal(t, 1, updated)
+
+		// Check the vendors
+		var tea Tea
+		cursor, err := db.FindOne(ctx, filter)
+		require.NoError(t, err)
+
+		hasResult, err := cursor.One(ctx, &tea)
+		require.NoError(t, err)
+		require.True(t, hasResult)
+		require.Equal(t, masala.Type, tea.Type)
+		require.ElementsMatch(t, []string{"A", "C", "D", "F"}, tea.Vendor)
+	}
+
+	{
+		// Addtoset an existing vendor
+		update := bson.D{{"$addToSet", bson.D{{"vendor", "A"}}}}
+		updated, err := db.UpdateOne(ctx, filter, update)
+		require.NoError(t, err)
+		require.Equal(t, 1, updated)
+
+		// Check the vendors
+		var tea Tea
+		cursor, err := db.FindOne(ctx, filter)
+		require.NoError(t, err)
+
+		hasResult, err := cursor.One(ctx, &tea)
+		require.NoError(t, err)
+		require.True(t, hasResult)
+		require.Equal(t, masala.Type, tea.Type)
+		require.ElementsMatch(t, []string{"A", "C", "D", "F"}, tea.Vendor)
+	}
+}
+
 func dbstring(ctx context.Context, db backend.NoSQLCollection, t *testing.T) string {
 	before := simplenosqldb.SetVerbose(false)
 	defer simplenosqldb.SetVerbose(before)

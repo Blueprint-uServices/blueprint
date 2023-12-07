@@ -2,7 +2,6 @@ package tests
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -111,12 +110,10 @@ func TestCatalogueService(t *testing.T) {
 		// Add a sock
 		id, err := service.AddSock(ctx, sock)
 		require.NoError(t, err)
-		fmt.Printf("sock ID is %v\n", id)
 
 		res, err := service.Get(ctx, id)
 		require.NoError(t, err)
 		requireSocksEqual(t, sock, res)
-		fmt.Printf("received sock %v\n", res)
 	}
 
 	{
@@ -124,7 +121,6 @@ func TestCatalogueService(t *testing.T) {
 		socks, err := service.List(ctx, []string{"blue"}, "", 1, 1000)
 		require.NoError(t, err)
 		require.Len(t, socks, 1)
-		fmt.Println(socks[0])
 		requireSocksEqual(t, sock, socks[0])
 	}
 
@@ -184,12 +180,10 @@ func TestCatalogueService(t *testing.T) {
 		// Add another sock
 		id, err := service.AddSock(ctx, sock2)
 		require.NoError(t, err)
-		fmt.Printf("sock ID is %v\n", id)
 
 		res, err := service.Get(ctx, id)
 		require.NoError(t, err)
 		requireSocksEqual(t, sock2, res)
-		fmt.Printf("received sock %v\n", res)
 	}
 
 	{

@@ -95,23 +95,23 @@ func (s *cardStore) getAllCards(ctx context.Context) ([]Card, error) {
 }
 
 // Adds a card to the cards DB
-func (s *cardStore) createCard(ctx context.Context, card *Card) error {
+func (s *cardStore) createCard(ctx context.Context, card *Card) (primitive.ObjectID, error) {
 	// Create and insert to DB
 	dbcard := dbCard{Card: *card, ID: primitive.NewObjectID()}
 	if _, err := s.c.UpsertID(ctx, dbcard.ID, dbcard); err != nil {
-		return err
+		return dbcard.ID, err
 	}
 
 	// Update the provided card
 	dbcard.Card.ID = dbcard.ID.Hex()
 	*card = dbcard.Card
-	return nil
+	return dbcard.ID, nil
 }
 
 // Creates or updates the provided cards in the cardStore.
 func (s *cardStore) createCards(ctx context.Context, cards []Card) ([]primitive.ObjectID, error) {
 	if len(cards) == 0 {
-		return nil, nil
+		return []primitive.ObjectID{}, nil
 	}
 	createdIds := make([]primitive.ObjectID, 0)
 	for _, card := range cards {

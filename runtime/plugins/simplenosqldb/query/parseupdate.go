@@ -52,6 +52,14 @@ func ParseUpdate(update bson.D) (Update, error) {
 				}
 				updates = append(updates, pulls...)
 			}
+		case "$addToSet":
+			{
+				adds, err := parseAddToSet(op.Value)
+				if err != nil {
+					return nil, err
+				}
+				updates = append(updates, adds...)
+			}
 		default:
 			return nil, fmt.Errorf("unsupported update op %v", op.Key)
 		}
@@ -133,6 +141,31 @@ func parsePush(args any) ([]Update, error) {
 		}
 
 		update, err := PushValue(e.Value)
+		if err != nil {
+			return nil, err
+		}
+		updates = append(updates, UpdatePath(e.Key, update))
+	}
+	return updates, nil
+}
+
+func parseAddToSet(args any) ([]Update, error) {
+	d, isD := args.(bson.D)
+	if !isD {
+		return nil, fmt.Errorf("invalid $addToSet operator; expected a bson.D, got %v", args)
+	}
+	var updates []Update
+	for _, e := range d {
+		// Check that the value isn't a bunch of modifiers; not currently implemented
+		if ed, eIsD := e.Value.(bson.D); eIsD {
+			for _, e2 := range ed {
+				if strings.HasPrefix(e2.Key, "$") {
+					return nil, fmt.Errorf("modifiers not currently supported for $push operation; got %v", e2)
+				}
+			}
+		}
+
+		update, err := AddToSet(e.Value)
 		if err != nil {
 			return nil, err
 		}

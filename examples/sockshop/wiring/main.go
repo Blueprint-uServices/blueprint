@@ -1,7 +1,9 @@
 // Package main provides an application for compiling a number of different
 // wiring specs for the SockShop application.
 //
-// Run with go run examples/sockshop/wiring/main.go
+// To display options and usage, invoke:
+//
+//	go run main.go -h
 package main
 
 import (

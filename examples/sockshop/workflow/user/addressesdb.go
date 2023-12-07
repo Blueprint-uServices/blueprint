@@ -95,23 +95,23 @@ func (s *addressStore) getAllAddresses(ctx context.Context) ([]Address, error) {
 }
 
 // Adds an address to the address DB
-func (s *addressStore) createAddress(ctx context.Context, address *Address) error {
+func (s *addressStore) createAddress(ctx context.Context, address *Address) (primitive.ObjectID, error) {
 	// Create and insert to DB
 	dbaddress := dbAddress{Address: *address, ID: primitive.NewObjectID()}
 	if _, err := s.c.UpsertID(ctx, dbaddress.ID, dbaddress); err != nil {
-		return err
+		return dbaddress.ID, err
 	}
 
 	// Update the provided address
 	dbaddress.Address.ID = dbaddress.ID.Hex()
 	*address = dbaddress.Address
-	return nil
+	return dbaddress.ID, nil
 }
 
 // Creates or updates the provided addresses in the addressStore.
 func (s *addressStore) createAddresses(ctx context.Context, addresses []Address) ([]primitive.ObjectID, error) {
 	if len(addresses) == 0 {
-		return nil, nil
+		return []primitive.ObjectID{}, nil
 	}
 	createdIds := make([]primitive.ObjectID, 0)
 	for _, address := range addresses {

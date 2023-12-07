@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/queuemaster"
 	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/shipping"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplequeue"
@@ -18,19 +18,12 @@ import (
 // the Blueprint test plugin to auto-generate tests
 // for different deployments when compiling an application.
 var shippingRegistry = registry.NewServiceRegistry[shipping.ShippingService]("shipping_service")
-var queueRegistry = registry.NewServiceRegistry[backend.Queue]("shipping_queue")
 
 func init() {
-	queueRegistry.Register("local", func(ctx context.Context) (backend.Queue, error) {
-		return simplequeue.NewSimpleQueue(ctx)
-	})
 
 	// If the tests are run locally, we fall back to this ShippingService implementation
 	shippingRegistry.Register("local", func(ctx context.Context) (shipping.ShippingService, error) {
-		queue, err := queueRegistry.Get(ctx)
-		if err != nil {
-			return nil, err
-		}
+		queue, err := simplequeue.NewSimpleQueue(ctx)
 
 		db, err := simplenosqldb.NewSimpleNoSQLDB(ctx)
 		if err != nil {
@@ -41,6 +34,17 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
+
+		// Also create and start the queue master
+		qmaster, err := queuemaster.NewQueueMaster(ctx, queue, ship)
+		if err != nil {
+			return nil, err
+		}
+
+		// Make sure the queue master is started if it's local
+		go func() {
+			qmaster.Run(ctx)
+		}()
 
 		return ship, nil
 	})
@@ -67,8 +71,6 @@ func TestShippingService(t *testing.T) {
 		require.Equal(t, shipment, sent)
 	}
 
-	// Start the queue master if not already started
-	_, err = queuemasterRegistry.Get(ctx)
 	require.NoError(t, err)
 
 	// Sleep for up to 30 seconds checking shipment status

@@ -12,7 +12,10 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
-// Used by main.go
+// A wiring spec that deploys each service into its own Docker container and using gRPC to communicate between services.
+// The user, cart, shipping, and orders services using separate MongoDB instances to store their data.
+// The catalogue service uses MySQL to store catalogue data.
+// The shipping service and queue master service run within the same process (TODO: separate processes)
 var Docker = wiringcmd.SpecOption{
 	Name:        "docker",
 	Description: "Deploys each service in a separate container with gRPC, and uses mongodb as NoSQL database backends.",
@@ -51,9 +54,12 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	catalogue_service := workflow.Define(spec, "catalogue_service", "CatalogueService", catalogue_db)
 	catalogue_ctr := applyDockerDefaults(spec, catalogue_service, "catalogue_proc", "catalogue_ctr")
 
-	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service, catalogue_service)
+	frontend := workflow.Define(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
+	frontend_ctr := applyDockerDefaults(spec, frontend, "frontend_proc", "frontend_ctr")
 
-	return []string{user_ctr, payment_ctr, cart_ctr, shipping_ctr, order_ctr, catalogue_ctr, tests}, nil
+	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service, catalogue_service, frontend)
+
+	return []string{user_ctr, payment_ctr, cart_ctr, shipping_ctr, order_ctr, catalogue_ctr, frontend_ctr, tests}, nil
 }
 
 func applyDockerDefaults(spec wiring.WiringSpec, serviceName, procName, ctrName string) string {

@@ -27,6 +27,11 @@ type (
 		value []byte
 	}
 
+	addtoset struct {
+		t     bsontype.Type
+		value []byte
+	}
+
 	pull struct {
 		filter Filter
 	}
@@ -72,6 +77,11 @@ func SetValue(value any) (Update, error) {
 func PushValue(value any) (Update, error) {
 	t, v, err := bson.MarshalValue(value)
 	return &push{t: t, value: v}, err
+}
+
+func AddToSet(value any) (Update, error) {
+	t, v, err := bson.MarshalValue(value)
+	return &addtoset{t: t, value: v}, err
 }
 
 func PullMatches(filter Filter) (Update, error) {
@@ -197,6 +207,38 @@ func (p *push) Apply(itemRef any) error {
 	}
 
 	a = append(a, v)
+	return backend.CopyResult(a, itemRef)
+}
+
+func (p *addtoset) Apply(itemRef any) error {
+	var v any
+	err := bson.UnmarshalValue(p.t, p.value, &v)
+	if err != nil {
+		return err
+	}
+
+	itemVal, err := backend.GetPointerValue(itemRef)
+	if err != nil {
+		return err
+	}
+
+	if itemVal == nil {
+		itemVal = bson.A{}
+	}
+
+	a, isA := itemVal.(bson.A)
+	if !isA {
+		return fmt.Errorf("expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+	}
+
+	// Check if it exists
+	for i := range a {
+		if reflect.DeepEqual(v, a[i]) {
+			return nil
+		}
+	}
+	a = append(a, v)
+
 	return backend.CopyResult(a, itemRef)
 }
 
@@ -413,6 +455,12 @@ func (p *push) String() string {
 	var v interface{}
 	bson.UnmarshalValue(p.t, p.value, &v)
 	return fmt.Sprintf("push %v", v)
+}
+
+func (p *addtoset) String() string {
+	var v interface{}
+	bson.UnmarshalValue(p.t, p.value, &v)
+	return fmt.Sprintf("addtoset %v", v)
 }
 
 func (p *pull) String() string {
