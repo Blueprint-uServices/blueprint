@@ -98,10 +98,6 @@ func TestOrderService(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, order, order2)
 
-	// Start the queue master if not started already
-	_, err = queuemasterRegistry.Get(ctx)
-	require.NoError(t, err)
-
 	// Wait up to 30 seconds for the status to change
 	shipping, err := shippingRegistry.Get(ctx)
 	require.NoError(t, err)
@@ -115,13 +111,4 @@ func TestOrderService(t *testing.T) {
 		require.Equal(t, "shipped", shipment2.Status)
 	}
 
-}
-
-func any(errors ...error) error {
-	for _, err := range errors {
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }

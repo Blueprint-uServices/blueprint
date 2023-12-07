@@ -71,7 +71,7 @@ After running the application, you can run the unit tests against it.
 
 ```
 cd build/gotests/tests
-go test --payment_service.grpc.dial_addr=localhost:12346 --user_service.grpc.dial_addr=localhost:12347 --cart_service.grpc.dial_addr=localhost:12348 --order_service.grpc.dial_addr=localhost:12349 --shipping_service.grpc.dial_addr=localhost:12351 --catalogue_service.grpc.dial_addr=localhost:12355
+go test --payment_service.grpc.dial_addr=localhost:12346 --user_service.grpc.dial_addr=localhost:12347 --cart_service.grpc.dial_addr=localhost:12348 --order_service.grpc.dial_addr=localhost:12349 --shipping_service.grpc.dial_addr=localhost:12351 --catalogue_service.grpc.dial_addr=localhost:12355 --frontend.grpc.dial_addr=localhost:12356
 ```
 
 ## Next steps
