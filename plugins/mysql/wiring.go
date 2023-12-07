@@ -14,14 +14,16 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
-// PrebuiltContainer generate the IRNodes for a mysql server docker container that uses the latest mysql/mysql image
+// Container generate the IRNodes for a mysql server docker container that uses the latest mysql/mysql image
 // and the clients needed by the generated application to communicate with the server.
 //
 // The generated container has the name `dbName` with the root password set to `password`.
-func PrebuiltContainer(spec wiring.WiringSpec, dbName string, username string, password string) string {
+func Container(spec wiring.WiringSpec, dbName string) string {
 	cntrName := dbName + ".container"
 	clientName := dbName + ".client"
 	addrName := dbName + ".addr"
+	username := "root"
+	password := "pass"
 
 	spec.Define(cntrName, &MySQLDBContainer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Bind[*MySQLDBContainer](ns, addrName)
