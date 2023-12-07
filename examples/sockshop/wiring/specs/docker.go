@@ -7,6 +7,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/mysql"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
@@ -50,7 +51,8 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	order_service := workflow.Define(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)
 	order_ctr := applyDockerDefaults(spec, order_service, "order_proc", "order_ctr")
 
-	catalogue_db := simple.RelationalDB(spec, "catalogue_db")
+	//catalogue_db := simple.RelationalDB(spec, "catalogue_db")
+	catalogue_db := mysql.PrebuiltContainer(spec, "catalogue_db", "root", "pass")
 	catalogue_service := workflow.Define(spec, "catalogue_service", "CatalogueService", catalogue_db)
 	catalogue_ctr := applyDockerDefaults(spec, catalogue_service, "catalogue_proc", "catalogue_ctr")
 

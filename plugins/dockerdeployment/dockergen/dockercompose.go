@@ -62,6 +62,17 @@ func (d *DockerComposeFile) AddBuildInstance(instanceName string, containerTempl
 	return d.addInstance(instanceName, "", containerTemplateName, args...)
 }
 
+func (d *DockerComposeFile) AddEnvVar(instanceName string, key string, val string) error {
+	instanceName = ir.CleanName(instanceName)
+	if i, exists := d.Instances[instanceName]; !exists {
+		return blueprint.Errorf("container instance with name %v not found", instanceName)
+	} else {
+		i.Config[key] = val
+		d.Instances[instanceName] = i
+	}
+	return nil
+}
+
 func (d *DockerComposeFile) addInstance(instanceName string, image string, containerTemplateName string, args ...ir.IRNode) error {
 	instanceName = ir.CleanName(instanceName)
 	if _, exists := d.Instances[instanceName]; exists {
