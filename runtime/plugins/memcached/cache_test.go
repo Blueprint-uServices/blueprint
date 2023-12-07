@@ -3,6 +3,8 @@ package memcached
 import (
 	"context"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type someData struct {
@@ -26,7 +28,8 @@ func TestMemcachedPut(t *testing.T) {
 		t.Error(err)
 	}
 	var resultData someData
-	err = memcached.Get(ctx, "testData", &resultData)
+	exists, err := memcached.Get(ctx, "testData", &resultData)
+	assert.True(t, exists)
 	if err != nil {
 		t.Error(err)
 	}
@@ -42,7 +45,8 @@ func TestMemcachedGet(t *testing.T) {
 		t.Error(err)
 	}
 	var resultData someData
-	err = memcached.Get(ctx, "testData", &resultData)
+	exists, err := memcached.Get(ctx, "testData", &resultData)
+	assert.True(t, exists)
 	if err != nil {
 		t.Error(err)
 	}
@@ -78,7 +82,8 @@ func TestMemcachedDelete(t *testing.T) {
 		t.Error(err)
 	}
 	var val int
-	err = memcached.Get(ctx, "deleteKey", &val)
+	exists, err := memcached.Get(ctx, "deleteKey", &val)
+	assert.True(t, exists)
 	if err != nil {
 		t.Error(err)
 	}
@@ -90,10 +95,9 @@ func TestMemcachedDelete(t *testing.T) {
 		t.Error(err)
 	}
 	var newval int
-	err = memcached.Get(ctx, "deleteKey", &newval)
-	if err == nil {
-		t.Errorf("Memcached Cache miss didn't throw an error")
-	}
+	exists, err = memcached.Get(ctx, "deleteKey", &newval)
+	assert.False(t, exists)
+	assert.NoError(t, err)
 	if newval != 0 {
 		t.Errorf("Delete followed by a Get returned non-zero value")
 	}

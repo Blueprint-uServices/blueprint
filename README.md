@@ -6,10 +6,12 @@ Blueprint is:
  * A tool for easily reconfiguring the frameworks, infrastructure, and deployment of a microservice application
  * A platform for prototyping new microservice infrastructure and integrating it with existing applications
 
-Blueprint is particularly aimed at **prototyping and experimentation** use cases.  Its central goal is to reduce the amount of effort involved when changing the infrastructure choices of a microservice application.  It is intended for use by anybody, but particularly researchers and practitioners wanting to experiment with microservice applications.
+Blueprint is particularly aimed at **prototyping and experimentation** use cases.  It is intended for use by anybody, but particularly researchers and practitioners wanting to experiment with microservice applications.
 
 Blueprint actually is:
  * An extensible compiler for microservice applications
+
+Its central goal is to reduce the amount of effort involved when changing and re-compiling the infrastructure choices of a microservice application.  
 
 See [Getting Started](docs/gettingstarted.md) to get started with Blueprint.
 
@@ -21,15 +23,13 @@ Vaastav Anand, Deepak Garg, Antoine Kaufmann, Jonathan Mace\
 
 ### Mailing List
 
-Join the [blueprint-compiler](https://groups.google.com/g/blueprint-compiler) google groups to contact us.
+Join the [blueprint-uservices Slack](https://blueprint-uservices.slack.com/) and/or the [Blueprint-uServices Google Group](https://groups.google.com/g/blueprint-uservices) to contact us.
 
-### About Us
+### Contributors
 
 We are a team of researchers:
  * [Vaastav Anand](https://vaastavanand.com/), PhD student at the Max Planck Institute for Software Systems (MPI-SWS)
  * [Jonathan Mace](https://www.microsoft.com/en-us/research/people/jonathanmace/), Researcher at Microsoft Research and Adjunct Faculty at the Max Planck Institute for Software Systems (MPI-SWS)
- * [Antoine Kaufmann](https://people.mpi-sws.org/~antoinek/), Faculty at the Max Planck Institute for Software Systems (MPI-SWS)
- * [Deepak Garg](https://people.mpi-sws.org/~dg/), Faculty at the Max Planck Institute for Software Systems (MPI-SWS)
 
 
 ### Resources

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb/query"
@@ -124,10 +125,16 @@ func (db *SimpleCollection) FindOne(ctx context.Context, filter bson.D, projecti
 	if err != nil {
 		return nil, err
 	}
+	if verbose {
+		fmt.Printf("---- FindOne\n%v\n", query)
+	}
 	cursor := &SimpleCursor{}
 	for _, item := range db.items {
 		if query.Apply(item) {
 			cursor.results = append(cursor.results, item)
+			if verbose {
+				fmt.Printf("MATCH: %v\n", item)
+			}
 			break
 		}
 	}
@@ -137,8 +144,10 @@ func (db *SimpleCollection) FindOne(ctx context.Context, filter bson.D, projecti
 var verbose = false
 
 // Enable or disable verbose logging
-func SetVerbose(enabled bool) {
+func SetVerbose(enabled bool) bool {
+	before := verbose
 	verbose = enabled
+	return before
 }
 
 func (db *SimpleCollection) FindMany(ctx context.Context, filter bson.D, projection ...bson.D) (backend.NoSQLCursor, error) {
@@ -212,9 +221,20 @@ func (db *SimpleCollection) UpdateOne(ctx context.Context, filter bson.D, update
 		return 0, err
 	}
 
+	if verbose {
+		fmt.Printf("---- UpdateOne\n%v\n%v\n", filter, update)
+	}
+
 	for i := range db.items {
 		if filterOp.Apply(db.items[i]) {
+			if verbose {
+				fmt.Printf("MATCH: %v\n", db.items[i])
+			}
 			return 1, updateOp.Apply(&db.items[i])
+		} else {
+			if verbose {
+				fmt.Printf("      %v\n", db.items[i])
+			}
 		}
 	}
 	return 0, nil
@@ -323,4 +343,12 @@ func fromBson(d bson.D, dst any) error {
 		return err
 	}
 	return bson.Unmarshal(bytes, dst)
+}
+
+func (db *SimpleCollection) String() string {
+	var strs []string
+	for i := range db.items {
+		strs = append(strs, fmt.Sprintf("%v", db.items[i]))
+	}
+	return strings.Join(strs, "\n")
 }

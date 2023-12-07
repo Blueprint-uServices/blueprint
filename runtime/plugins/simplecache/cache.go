@@ -3,8 +3,8 @@ package simplecache
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"sync"
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
@@ -12,6 +12,7 @@ import (
 // A simple map-based cache that implements the [backend.Cache] interface
 type SimpleCache struct {
 	backend.Cache
+	sync.RWMutex
 	values map[string]any
 }
 
@@ -23,16 +24,17 @@ func NewSimpleCache(ctx context.Context) (*SimpleCache, error) {
 }
 
 func (cache *SimpleCache) Put(ctx context.Context, key string, value interface{}) error {
+	cache.Lock()
+	defer cache.Unlock()
 	cache.values[key] = value
 	return nil
 }
 
-func (cache *SimpleCache) Get(ctx context.Context, key string, val interface{}) error {
+func (cache *SimpleCache) Get(ctx context.Context, key string, val interface{}) (bool, error) {
 	if v, exists := cache.values[key]; exists {
-		return backend.CopyResult(v, val)
-	} else {
-		return errors.New("Key doesn't exist")
+		return true, backend.CopyResult(v, val)
 	}
+	return false, nil
 }
 
 func (cache *SimpleCache) Mset(ctx context.Context, keys []string, values []interface{}) error {
@@ -55,7 +57,7 @@ func (cache *SimpleCache) Mget(ctx context.Context, keys []string, values []inte
 	}
 
 	for i, key := range keys {
-		err := cache.Get(ctx, key, values[i])
+		_, err := cache.Get(ctx, key, values[i])
 		if err != nil {
 			return err
 		}
@@ -64,13 +66,15 @@ func (cache *SimpleCache) Mget(ctx context.Context, keys []string, values []inte
 	return nil
 }
 func (cache *SimpleCache) Delete(ctx context.Context, key string) error {
+	cache.Lock()
+	defer cache.Unlock()
 	delete(cache.values, key)
 	return nil
 }
 
 func (cache *SimpleCache) Incr(ctx context.Context, key string) (int64, error) {
 	cur := int64(0)
-	err := cache.Get(ctx, key, &cur)
+	_, err := cache.Get(ctx, key, &cur)
 	if err != nil {
 		return cur, err
 	}

@@ -30,12 +30,16 @@ func (r *RedisCache) Put(ctx context.Context, key string, value interface{}) err
 	return r.client.Set(ctx, key, val_str, 0).Err()
 }
 
-func (r *RedisCache) Get(ctx context.Context, key string, value interface{}) error {
+func (r *RedisCache) Get(ctx context.Context, key string, value interface{}) (bool, error) {
 	val, err := r.client.Get(ctx, key).Result()
-	if err != nil {
-		return err
+	if err == redis_impl.Nil {
+		// Key doesn't exist
+		return false, nil
 	}
-	return json.Unmarshal([]byte(val), value)
+	if err != nil {
+		return false, err
+	}
+	return true, json.Unmarshal([]byte(val), value)
 }
 
 func (r *RedisCache) Incr(ctx context.Context, key string) (int64, error) {

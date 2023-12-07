@@ -172,12 +172,12 @@ func (s *set) Apply(itemRef any) error {
 
 	dst_ptr := reflect.ValueOf(itemRef)
 	if dst_ptr.Kind() != reflect.Pointer || dst_ptr.IsNil() {
-		return fmt.Errorf("unable to apply update to non-pointer type %v", reflect.TypeOf(itemRef))
+		return fmt.Errorf("set unable to apply update to non-pointer type %v", reflect.TypeOf(itemRef))
 	}
 	dst_val := reflect.Indirect(dst_ptr)
 
 	if dst_val.Kind() != reflect.Interface {
-		return fmt.Errorf("unable to apply update to non-interface type %v", reflect.TypeOf(dst_val))
+		return fmt.Errorf("set unable to apply update to non-interface type %v", reflect.TypeOf(dst_val))
 	}
 
 	dst_val.Set(reflect.ValueOf(v))
@@ -203,7 +203,7 @@ func (p *push) Apply(itemRef any) error {
 
 	a, isA := itemVal.(bson.A)
 	if !isA {
-		return fmt.Errorf("expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+		return fmt.Errorf("push expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
 	}
 
 	a = append(a, v)
@@ -254,7 +254,7 @@ func (p *pull) Apply(itemRef any) error {
 
 	a, isA := itemVal.(bson.A)
 	if !isA {
-		return fmt.Errorf("expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+		return fmt.Errorf("pull expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
 	}
 
 	var updated bson.A
@@ -262,7 +262,7 @@ func (p *pull) Apply(itemRef any) error {
 	for i := range a {
 		if p.filter.Apply(a[i]) {
 			if updated == nil {
-				updated = append(updated, a[:i]...)
+				updated = append(bson.A{}, a[:i]...)
 			}
 		} else if updated != nil {
 			updated = append(updated, a[i])
@@ -283,7 +283,7 @@ func (u *unsetfield) Apply(itemRef any) error {
 
 	v, isD := itemVal.(bson.D)
 	if !isD {
-		return fmt.Errorf("expected a bson.D but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+		return fmt.Errorf("unsetfield expected a bson.D but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
 	}
 
 	// See if the key exists within the document; if so remove it
@@ -304,7 +304,7 @@ func (u *unsetelement) Apply(itemRef any) error {
 
 	v, isA := itemVal.(bson.A)
 	if !isA {
-		return fmt.Errorf("expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+		return fmt.Errorf("unsetelement expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
 	}
 
 	// Ensure the slice length
@@ -340,7 +340,7 @@ func (i *incint) Apply(itemRef any) error {
 	case int:
 		return backend.CopyResult(v+int(i.amount), itemRef)
 	default:
-		return fmt.Errorf("unable to increment non-integer %v", itemVal)
+		return fmt.Errorf("incint unable to increment non-integer %v", itemVal)
 	}
 }
 
@@ -356,7 +356,7 @@ func (s *updatefield) Apply(itemRef any) error {
 
 	v, isD := itemVal.(bson.D)
 	if !isD {
-		return fmt.Errorf("expected a bson.D but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+		return fmt.Errorf("updatefield expected a bson.D but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
 	}
 
 	// See if the key exists within the document; if so update in place
@@ -393,7 +393,7 @@ func (s *updateindex) Apply(itemRef any) error {
 
 	v, isA := itemVal.(bson.A)
 	if !isA {
-		return fmt.Errorf("expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+		return fmt.Errorf("updateindex expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
 	}
 
 	// Ensure the slice length
@@ -428,7 +428,7 @@ func (a *updateall) Apply(itemRef any) error {
 func (b *broadcastupdate) Apply(itemRef any) error {
 	item_ptr := reflect.ValueOf(itemRef)
 	if item_ptr.Kind() != reflect.Pointer {
-		return fmt.Errorf("expect ptr type but got %v", reflect.TypeOf(itemRef))
+		return fmt.Errorf("broadcastupdate expect ptr type but got %v", reflect.TypeOf(itemRef))
 	}
 	item_val := reflect.Indirect(item_ptr)
 

@@ -190,7 +190,14 @@ func parsePull(args any) ([]Update, error) {
 			}
 		}
 
-		filter, err := parseValue(e.Value)
+		var filter Filter
+		var err error
+		switch v := e.Value.(type) {
+		case bson.D:
+			filter, err = parseQuery(v)
+		default:
+			filter = Equals(v)
+		}
 		if err != nil {
 			return nil, err
 		}
