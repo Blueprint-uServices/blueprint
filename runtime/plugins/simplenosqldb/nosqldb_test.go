@@ -1669,7 +1669,8 @@ func TestAddToSet(t *testing.T) {
 		require.Equal(t, masala.Type, tea.Type)
 		require.ElementsMatch(t, []string{"A", "C", "D", "F"}, tea.Vendor)
 	}
-  
+}
+
 func dbstring(ctx context.Context, db backend.NoSQLCollection, t *testing.T) string {
 	before := simplenosqldb.SetVerbose(false)
 	defer simplenosqldb.SetVerbose(before)
