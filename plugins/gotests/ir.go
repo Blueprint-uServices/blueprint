@@ -26,12 +26,15 @@ type testLibrary struct {
 	ServicesToTest map[string]ir.IRNode
 }
 
-func newTestLibrary(name string) *testLibrary {
-	node := testLibrary{}
-	node.LibraryName = name
-	node.ModuleName = "blueprint/testclients"
-	node.ServicesToTest = make(map[string]ir.IRNode)
-	return &node
+func newTestLibrary(name string, argNodes, containedNodes []ir.IRNode, servicesToTest map[string]ir.IRNode) *testLibrary {
+	node := &testLibrary{
+		LibraryName:    name,
+		ModuleName:     "blueprint/testclients",
+		ArgNodes:       argNodes,
+		ContainedNodes: containedNodes,
+		ServicesToTest: servicesToTest,
+	}
+	return node
 }
 
 func (lib *testLibrary) Name() string {

@@ -24,7 +24,7 @@ func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) 
 
 	// The process node is simply a namespace that accepts [golang.Node] nodes
 	spec.Define(procName, &Process{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		proc := namespacebuilder.Create[golang.Node](namespace, spec, procName)
+		proc := namespacebuilder.Create[golang.Node](namespace, spec, "GoProc", procName)
 		err := proc.InstantiateFromProperty(prop_CHILDREN)
 		return newGolangProcessNode(procName, proc.ArgNodes, proc.ContainedNodes), err
 	})
@@ -40,7 +40,7 @@ func CreateClientProcess(spec wiring.WiringSpec, procName string, children ...st
 	}
 
 	spec.Define(procName, &Process{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		proc := namespacebuilder.Create[golang.Node](namespace, spec, procName)
+		proc := namespacebuilder.Create[golang.Node](namespace, spec, "GoClientProc", procName)
 		err := proc.InstantiateClientsFromProperty(prop_CHILDREN)
 		return newGolangProcessNode(procName, proc.ArgNodes, proc.ContainedNodes), err
 	})

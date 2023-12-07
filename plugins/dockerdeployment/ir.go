@@ -1,9 +1,6 @@
 package dockerdeployment
 
 import (
-	"strings"
-
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 )
 
@@ -17,8 +14,13 @@ type Deployment struct {
 	ContainedNodes []ir.IRNode
 }
 
-func newContainerDeployment(name string) *Deployment {
-	return &Deployment{DeploymentName: name}
+func newContainerDeployment(name string, argNodes, containedNodes []ir.IRNode) *Deployment {
+	node := Deployment{
+		DeploymentName: name,
+		ArgNodes:       argNodes,
+		ContainedNodes: containedNodes,
+	}
+	return &node
 }
 
 func (node *Deployment) Name() string {
@@ -26,29 +28,5 @@ func (node *Deployment) Name() string {
 }
 
 func (node *Deployment) String() string {
-	var b strings.Builder
-	b.WriteString(node.DeploymentName)
-	b.WriteString(" = DockerApp(")
-	var args []string
-	for _, arg := range node.ArgNodes {
-		args = append(args, arg.Name())
-	}
-	b.WriteString(strings.Join(args, ", "))
-	b.WriteString(") {\n")
-	var children []string
-	for _, child := range node.ContainedNodes {
-		children = append(children, child.String())
-	}
-	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
-	b.WriteString("\n}")
-	return b.String()
-}
-
-func (node *Deployment) AddArg(argnode ir.IRNode) {
-	node.ArgNodes = append(node.ArgNodes, argnode)
-}
-
-func (node *Deployment) AddChild(child ir.IRNode) error {
-	node.ContainedNodes = append(node.ContainedNodes, child)
-	return nil
+	return ir.PrettyPrintNamespace(node.DeploymentName, "DockerApp", node.ArgNodes, node.ContainedNodes)
 }

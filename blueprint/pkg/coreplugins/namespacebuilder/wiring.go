@@ -25,7 +25,7 @@ type NamespaceBuilder struct {
 
 	// All nodes that were explicitly instantiated through calls to [NamespaceBuilder.Instantiate]
 	// These nodes can either be ContainedNodes or ArgNodes, and will show up in one of those slices
-	InstantiatedNodes []ir.IRNode
+	InstantiatedNodes map[string]ir.IRNode
 
 	// All nodes that have been instantiated explicitly or implicitly within this namespace
 	ContainedNodes []ir.IRNode
@@ -33,9 +33,10 @@ type NamespaceBuilder struct {
 	// All nodes that are required by this namespace, but are passed in from the parent namespace
 	ArgNodes []ir.IRNode
 
-	spec      wiring.WiringSpec
-	accepts   func(any) bool
-	namespace *namespaceBuilderNamespace
+	Namespace wiring.Namespace
+
+	spec    wiring.WiringSpec
+	accepts func(any) bool
 }
 
 type namespaceBuilderNamespace struct {
@@ -50,25 +51,31 @@ type namespaceBuilderHandler struct {
 
 // Creates a NamespaceBuilder that will internally build any node of type [T].  Other node
 // types will be recursively built in the parent namespace.
-func Create[T any](parent wiring.Namespace, spec wiring.WiringSpec, name string) *NamespaceBuilder {
+func Create[T any](parent wiring.Namespace, spec wiring.WiringSpec, namespacetype, name string) *NamespaceBuilder {
 	accepts := func(nodeType any) bool {
 		_, isT := nodeType.(T)
 		return isT
 	}
-	return CustomCreate(parent, spec, name, accepts)
+	return CustomCreate(parent, spec, namespacetype, name, accepts)
 }
 
 // Creates a NamespaceBuilder that will internally build any node for which accepts returns true.  Other node
 // types will be recursively built in the parent namespace.
-func CustomCreate(parent wiring.Namespace, spec wiring.WiringSpec, name string, accepts func(any) bool) *NamespaceBuilder {
+func CustomCreate(parent wiring.Namespace, spec wiring.WiringSpec, namespacetype, name string, accepts func(any) bool) *NamespaceBuilder {
 	builder := &NamespaceBuilder{}
 	builder.Name = name
+
+	builder.spec = spec
 	builder.accepts = accepts
 
-	builder.namespace = &namespaceBuilderNamespace{}
-	builder.namespace.handler = &namespaceBuilderHandler{}
-	builder.namespace.handler.Init(&builder.namespace.SimpleNamespace)
-	builder.namespace.Init(name, name, parent, spec, builder.namespace.handler)
+	namespace := &namespaceBuilderNamespace{}
+	handler := &namespaceBuilderHandler{}
+	handler.builder = builder
+	namespace.handler = handler
+	builder.Namespace = namespace
+
+	handler.Init(&namespace.SimpleNamespace)
+	namespace.Init(name, namespacetype, parent, spec, handler)
 
 	return builder
 }
@@ -85,14 +92,14 @@ func (b *NamespaceBuilder) Instantiate(names ...string) (err error) {
 		var child ir.IRNode
 		ptr := pointer.GetPointer(b.spec, childName)
 		if ptr == nil {
-			err = b.namespace.Get(childName, &child)
+			err = b.Namespace.Get(childName, &child)
 		} else {
-			child, err = ptr.InstantiateDst(b.namespace)
+			child, err = ptr.InstantiateDst(b.Namespace)
 		}
 		if err != nil {
 			return
 		}
-		b.InstantiatedNodes = append(b.InstantiatedNodes, child)
+		b.InstantiatedNodes[childName] = child
 	}
 	return nil
 }
@@ -104,10 +111,10 @@ func (b *NamespaceBuilder) Instantiate(names ...string) (err error) {
 // or if the nodes couldn't be built.
 func (b *NamespaceBuilder) InstantiateFromProperty(propertyName string) error {
 	var nodeNames []string
-	if err := b.namespace.GetProperties(b.Name, propertyName, &nodeNames); err != nil {
+	if err := b.Namespace.GetProperties(b.Name, propertyName, &nodeNames); err != nil {
 		return blueprint.Errorf("%v InstantiateFromProperty %v failed due to %s", b.Name, propertyName, err.Error())
 	}
-	b.namespace.Info("%v = [%s]", propertyName, strings.Join(nodeNames, ", "))
+	b.Namespace.Info("%v = %s", propertyName, strings.Join(nodeNames, ", "))
 	return b.Instantiate(nodeNames...)
 }
 
@@ -121,10 +128,10 @@ func (b *NamespaceBuilder) InstantiateFromProperty(propertyName string) error {
 func (b *NamespaceBuilder) InstantiateClients(names ...string) error {
 	for _, childName := range names {
 		var child ir.IRNode
-		if err := b.namespace.Get(childName, &child); err != nil {
+		if err := b.Namespace.Get(childName, &child); err != nil {
 			return err
 		}
-		b.InstantiatedNodes = append(b.InstantiatedNodes, child)
+		b.InstantiatedNodes[childName] = child
 	}
 	return nil
 }
@@ -136,10 +143,10 @@ func (b *NamespaceBuilder) InstantiateClients(names ...string) error {
 // or if the nodes couldn't be built.
 func (b *NamespaceBuilder) InstantiateClientsFromProperty(propertyName string) error {
 	var nodeNames []string
-	if err := b.namespace.GetProperties(b.Name, propertyName, &nodeNames); err != nil {
+	if err := b.Namespace.GetProperties(b.Name, propertyName, &nodeNames); err != nil {
 		return blueprint.Errorf("%v InstantiateClientsFromProperty %v failed due to %s", b.Name, propertyName, err.Error())
 	}
-	b.namespace.Info("%v = [%s]", propertyName, strings.Join(nodeNames, ", "))
+	b.Namespace.Info("%v = %s", propertyName, strings.Join(nodeNames, ", "))
 	return b.Instantiate(nodeNames...)
 }
 

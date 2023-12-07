@@ -26,13 +26,13 @@
 package gotests
 
 import (
-	"strings"
-
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/namespacebuilder"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
+
+var prop_SERVICESTOTEST = "Services"
 
 // Auto-generates tests for servicesToTest by converting existing black-box workflow unit tests.
 // After compilation, the output will contain a golang workspace called "tests" that will
@@ -62,60 +62,10 @@ func Test(spec wiring.WiringSpec, servicesToTest ...string) string {
 
 	// Might redefine gotests multiple times; no big deal
 	spec.Define("gotests", &testLibrary{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		testLib := newTestsNamespace(namespace, spec, name)
-
-		var serviceNames []string
-		if err := namespace.GetProperties(name, "Services", &serviceNames); err != nil {
-			return nil, blueprint.Errorf("unable to build Golang process as the \"Services\" property is not defined: %s", err.Error())
-		}
-		testLib.Info("converting unit tests for %v services (%s)", len(serviceNames), strings.Join(serviceNames, ", "))
-
-		// Instantiate service clients.  If the child node hasn't actually been defined, then this will error out
-		for _, serviceName := range serviceNames {
-			var client ir.IRNode
-			if err := testLib.Get(serviceName, &client); err != nil {
-				return nil, err
-			}
-			testLib.handler.IRNode.ServicesToTest[serviceName] = client
-		}
-
-		// Instantiate and return the service
-		return testLib.handler.IRNode, nil
+		testLib := namespacebuilder.Create[golang.Node](namespace, spec, "GolangTests", name)
+		err := testLib.InstantiateClientsFromProperty(prop_SERVICESTOTEST)
+		return newTestLibrary(name, testLib.ArgNodes, testLib.ContainedNodes, testLib.InstantiatedNodes), err
 	})
 
 	return name
-}
-
-type testsNamespace struct {
-	wiring.SimpleNamespace
-	handler *testsNamespaceHandler
-}
-
-type testsNamespaceHandler struct {
-	wiring.DefaultNamespaceHandler
-	IRNode *testLibrary
-}
-
-func newTestsNamespace(parent wiring.Namespace, spec wiring.WiringSpec, name string) *testsNamespace {
-	namespace := &testsNamespace{}
-	namespace.handler = &testsNamespaceHandler{}
-	namespace.handler.Init(&namespace.SimpleNamespace)
-	namespace.handler.IRNode = newTestLibrary(name)
-	namespace.Init(name, "GolangTests", parent, spec, namespace.handler)
-	return namespace
-}
-
-func (handler *testsNamespaceHandler) Accepts(nodeType any) bool {
-	_, ok := nodeType.(golang.Node)
-	return ok
-}
-
-func (handler *testsNamespaceHandler) AddNode(name string, node ir.IRNode) error {
-	handler.IRNode.ContainedNodes = append(handler.IRNode.ContainedNodes, node)
-	return nil
-}
-
-func (handler *testsNamespaceHandler) AddEdge(name string, node ir.IRNode) error {
-	handler.IRNode.ArgNodes = append(handler.IRNode.ArgNodes, node)
-	return nil
 }

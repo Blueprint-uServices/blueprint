@@ -25,10 +25,13 @@ type ClientPool struct {
 	ContainedNodes []ir.IRNode
 }
 
-func newClientPool(name string, n int) *ClientPool {
+func newClientPool(name string, n int, client golang.Service, argNodes, containedNodes []ir.IRNode) *ClientPool {
 	return &ClientPool{
-		PoolName: name,
-		N:        n,
+		PoolName:       name,
+		N:              n,
+		Client:         client,
+		ArgNodes:       argNodes,
+		ContainedNodes: containedNodes,
 	}
 }
 
@@ -46,15 +49,6 @@ func (node *ClientPool) String() string {
 	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
 	b.WriteString("\n}")
 	return b.String()
-}
-
-func (pool *ClientPool) AddArg(argnode ir.IRNode) {
-	pool.ArgNodes = append(pool.ArgNodes, argnode)
-}
-
-func (pool *ClientPool) AddChild(child ir.IRNode) error {
-	pool.ContainedNodes = append(pool.ContainedNodes, child)
-	return nil
 }
 
 func (pool *ClientPool) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
