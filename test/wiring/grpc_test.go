@@ -30,16 +30,16 @@ func TestServicesOverGRPCNoProcess(t *testing.T) {
 			leaf.grpc.addr
 			leaf.grpc.dial_addr = AddressConfig()
 			leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
+			leaf = TestLeafService(leaf.grpc_client)
 			nonleaf.grpc.addr
 			nonleaf.grpc.dial_addr = AddressConfig()
 			nonleaf.grpc_client = GRPCClient(nonleaf.grpc.dial_addr)
+			nonleaf = TestNonLeafService(nonleaf.grpc_client)
 			leaf.grpc.bind_addr = AddressConfig()
 			leaf.handler.visibility
-			leaf = TestLeafService()
 			leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
 			nonleaf.grpc.bind_addr = AddressConfig()
 			nonleaf.handler.visibility
-			nonleaf = TestNonLeafService(leaf.grpc_client)
 			nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 		  }`)
 }
@@ -70,7 +70,7 @@ func TestServicesOverGRPCSameProcess(t *testing.T) {
 			  leaf = TestLeafService()
 			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
 			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			  nonleaf = TestNonLeafService(leaf.grpc_client)
+			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 		  }`)
@@ -105,7 +105,8 @@ func TestBasicServicesOverGRPCDifferentProcesses(t *testing.T) {
 			leaf.grpc.dial_addr = AddressConfig()
 			nonleafproc = GolangProcessNode(nonleaf.grpc.bind_addr, leaf.grpc.dial_addr) {
 			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			  nonleaf = TestNonLeafService(leaf.grpc_client)
+			  leaf = TestLeafService(leaf.grpc_client)
+			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 		  }`)
@@ -152,7 +153,8 @@ func TestNoReachabilityErrorForServiceNotDeployedWithGRPC(t *testing.T) {
 			leaf.grpc.dial_addr = AddressConfig()
 			nonleafproc = GolangProcessNode(leaf.grpc.dial_addr) {
 			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			  nonleaf = TestNonLeafService(leaf.grpc_client)
+			  leaf = TestLeafService(leaf.grpc_client)
+			  nonleaf = TestNonLeafService(leaf)
 			}
 		  }`)
 }
@@ -188,12 +190,14 @@ func TestClientProc(t *testing.T) {
 			leaf.grpc.dial_addr = AddressConfig()
 			nonleafproc = GolangProcessNode(nonleaf.grpc.bind_addr, leaf.grpc.dial_addr) {
 			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			  nonleaf = TestNonLeafService(leaf.grpc_client)
+			  leaf = TestLeafService(leaf.grpc_client)
+			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 			nonleaf.grpc.dial_addr = AddressConfig()
 			leafclient = GolangProcessNode(nonleaf.grpc.dial_addr) {
 			  nonleaf.grpc_client = GRPCClient(nonleaf.grpc.dial_addr)
+			  nonleaf = TestNonLeafService(nonleaf.grpc_client)
 			}
 		  }`)
 }
@@ -217,10 +221,10 @@ func TestImplicitServicesInSameProcWithGRPC(t *testing.T) {
 			nonleaf.grpc.dial_addr = AddressConfig()
 			leafclient = GolangProcessNode(nonleaf.grpc.dial_addr, nonleaf.grpc.bind_addr, leaf.grpc.dial_addr, leaf.grpc.bind_addr) {
 			  nonleaf.grpc_client = GRPCClient(nonleaf.grpc.dial_addr)
+			  nonleaf = TestNonLeafService(nonleaf.grpc_client)
 			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			  nonleaf = TestNonLeafService(leaf.grpc_client)
+			  leaf = TestLeafService(leaf.grpc_client)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
-			  leaf = TestLeafService()
 			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
 			}
 			nonleaf.grpc.bind_addr = AddressConfig()
@@ -250,8 +254,8 @@ func TestImplicitServicesInSameProcPartialGRPC(t *testing.T) {
 			nonleaf.grpc.dial_addr = AddressConfig()
 			leafclient = GolangProcessNode(nonleaf.grpc.dial_addr, nonleaf.grpc.bind_addr) {
 			  nonleaf.grpc_client = GRPCClient(nonleaf.grpc.dial_addr)
+			  nonleaf = TestNonLeafService(nonleaf.grpc_client)
 			  leaf = TestLeafService()
-			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 			nonleaf.grpc.bind_addr = AddressConfig()
@@ -294,12 +298,14 @@ func TestImplicitCacheInSameProc(t *testing.T) {
 			leaf.grpc.dial_addr = AddressConfig()
 			nonleafproc = GolangProcessNode(nonleaf.grpc.bind_addr, leaf.grpc.dial_addr) {
 			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			  nonleaf = TestNonLeafService(leaf.grpc_client)
+			  leaf = TestLeafService(leaf.grpc_client)
+			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 			nonleaf.grpc.dial_addr = AddressConfig()
 			leafclient = GolangProcessNode(nonleaf.grpc.dial_addr) {
 			  nonleaf.grpc_client = GRPCClient(nonleaf.grpc.dial_addr)
+			  nonleaf = TestNonLeafService(nonleaf.grpc_client)
 			}
 		  }`)
 

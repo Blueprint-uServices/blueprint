@@ -43,7 +43,8 @@ func TestBasicClientPool(t *testing.T) {
 			  leaf.clientpool = ClientPool(leaf.grpc_client, 7) {
 				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 			  }
-			  nonleaf = TestNonLeafService(leaf.clientpool)
+			  leaf = TestLeafService(leaf.clientpool)
+			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 		  }`)
@@ -85,7 +86,8 @@ func TestBasicClientPoolInnerModifier(t *testing.T) {
 				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 				leaf.client.retrier = Retrier(leaf.grpc_client)
 			  }
-			  nonleaf = TestNonLeafService(leaf.clientpool)
+			  leaf = TestLeafService(leaf.clientpool)
+			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 		  }`)
@@ -126,7 +128,8 @@ func TestBasicClientPoolOuterModifier(t *testing.T) {
 				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 			  }
 			  leaf.client.retrier = Retrier(leaf.clientpool)
-			  nonleaf = TestNonLeafService(leaf.client.retrier)
+			  leaf = TestLeafService(leaf.client.retrier)
+			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}
 		  }`)
