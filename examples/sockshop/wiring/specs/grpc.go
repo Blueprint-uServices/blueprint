@@ -10,15 +10,16 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
-// Used by main.go
+// A wiring spec that deploys each service to a separate process, with services communicating over GRPC.
+// The user, cart, shipping, and order services use simple in-memory NoSQL databases to store their data.
+// The catalogue service uses a simple in-memory sqlite database to store its data.
+// The shipping service and queue master service run within the same process (TODO: separate processes)
 var GRPC = wiringcmd.SpecOption{
 	Name:        "grpc",
 	Description: "Deploys each service in a separate process with gRPC.",
 	Build:       makeGrpcSpec,
 }
 
-// Creates a basic sockshop wiring spec.
-// Returns the names of the nodes to instantiate or an error
 func makeGrpcSpec(spec wiring.WiringSpec) ([]string, error) {
 	user_db := simple.NoSQLDB(spec, "user_db")
 	user_service := workflow.Define(spec, "user_service", "UserService", user_db)
@@ -48,9 +49,12 @@ func makeGrpcSpec(spec wiring.WiringSpec) ([]string, error) {
 	catalogue_service := workflow.Define(spec, "catalogue_service", "CatalogueService", catalogue_db)
 	catalogue_proc := applyGrpcDefaults(spec, catalogue_service, "catalogue_proc")
 
-	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service, catalogue_service)
+	frontend := workflow.Define(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
+	frontend_proc := applyGrpcDefaults(spec, frontend, "frontend_proc")
 
-	return []string{user_proc, payment_proc, cart_proc, shipping_proc, order_proc, catalogue_proc, tests}, nil
+	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service, catalogue_service, frontend)
+
+	return []string{user_proc, payment_proc, cart_proc, shipping_proc, order_proc, catalogue_proc, frontend_proc, tests}, nil
 }
 
 func applyGrpcDefaults(spec wiring.WiringSpec, serviceName string, procName string) string {

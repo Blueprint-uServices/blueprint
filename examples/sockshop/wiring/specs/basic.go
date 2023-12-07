@@ -1,3 +1,5 @@
+// Package specs provides various different wiring specs for the SockShop application.
+// These specs are used when running wiring/main.go.
 package specs
 
 import (
@@ -38,7 +40,9 @@ func makeBasicSpec(spec wiring.WiringSpec) ([]string, error) {
 	catalogue_db := simple.RelationalDB(spec, "catalogue_db")
 	catalogue_service := workflow.Define(spec, "catalogue_service", "CatalogueService", catalogue_db)
 
-	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service, catalogue_service)
+	frontend := workflow.Define(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
 
-	return []string{user_service, payment_service, cart_service, shipping_service, queue_master, order_service, catalogue_service, tests}, nil
+	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service, catalogue_service, frontend)
+
+	return []string{user_service, payment_service, cart_service, shipping_service, queue_master, order_service, catalogue_service, frontend, tests}, nil
 }
