@@ -13,7 +13,6 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workload"
 )
 
 var Docker = wiringcmd.SpecOption{
@@ -31,9 +30,7 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	nonleaf_service := workflow.Service(spec, "nonleaf_service", "NonLeafService", leaf_service)
 	nonleaf_ctr := applyDockerDefaults(spec, nonleaf_service)
 
-	app_client := workload.Generator(spec, nonleaf_service)
-
-	return []string{leaf_ctr, nonleaf_ctr, app_client}, nil
+	return []string{leaf_ctr, nonleaf_ctr}, nil
 }
 
 func applyDockerDefaults(spec wiring.WiringSpec, serviceName string) string {
