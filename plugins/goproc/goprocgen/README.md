@@ -8,14 +8,14 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/goproc/goprocgen"
 
 ## Index
 
-- [func GenerateMain\(name string, argNodes \[\]ir.IRNode, nodesToInstantiate \[\]ir.IRNode, module golang.ModuleBuilder, namespacePackage string, namespaceConstructor string\) error](<#GenerateMain>)
+- [func GenerateMain\(name string, argNodes \[\]ir.IRNode, nodesToInstantiate \[\]ir.IRNode, module golang.ModuleBuilder, namespaceConstructor string\) error](<#GenerateMain>)
 
 
 <a name="GenerateMain"></a>
 ## func GenerateMain
 
 ```go
-func GenerateMain(name string, argNodes []ir.IRNode, nodesToInstantiate []ir.IRNode, module golang.ModuleBuilder, namespacePackage string, namespaceConstructor string) error
+func GenerateMain(name string, argNodes []ir.IRNode, nodesToInstantiate []ir.IRNode, module golang.ModuleBuilder, namespaceConstructor string) error
 ```
 
 Generates a main.go file in the provided module. The main method will call the namespaceConstructor provided to create and instantiate nodes.

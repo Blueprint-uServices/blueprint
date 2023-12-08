@@ -6,20 +6,20 @@
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
 ```
 
+Package clientpool provides a Blueprint modifier for the client side of service calls.
+
+The plugin wraps clients with a ClientPool that can create N instances of clients to a service.
+
 ## Index
 
 - [func Create\(spec wiring.WiringSpec, serviceName string, n int\)](<#Create>)
 - [type ClientPool](<#ClientPool>)
-  - [func \(pool \*ClientPool\) AddArg\(argnode ir.IRNode\)](<#ClientPool.AddArg>)
-  - [func \(pool \*ClientPool\) AddChild\(child ir.IRNode\) error](<#ClientPool.AddChild>)
   - [func \(pool \*ClientPool\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#ClientPool.AddInstantiation>)
   - [func \(pool \*ClientPool\) AddInterfaces\(module golang.ModuleBuilder\) error](<#ClientPool.AddInterfaces>)
   - [func \(pool \*ClientPool\) GenerateFuncs\(module golang.ModuleBuilder\) error](<#ClientPool.GenerateFuncs>)
   - [func \(pool \*ClientPool\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#ClientPool.GetInterface>)
   - [func \(node \*ClientPool\) Name\(\) string](<#ClientPool.Name>)
   - [func \(node \*ClientPool\) String\(\) string](<#ClientPool.String>)
-- [type ClientpoolNamespace](<#ClientpoolNamespace>)
-  - [func NewClientPoolNamespace\(parent wiring.Namespace, spec wiring.WiringSpec, name string, n int\) \*ClientpoolNamespace](<#NewClientPoolNamespace>)
 
 
 <a name="Create"></a>
@@ -29,12 +29,12 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
 func Create(spec wiring.WiringSpec, serviceName string, n int)
 ```
 
-Wraps the client side of a service with a client pool with N client instances
+Wraps the client side of serviceName with a client pool with n client instances
 
 <a name="ClientPool"></a>
 ## type ClientPool
 
-
+Blueprint IR node representing a ClientPool.
 
 ```go
 type ClientPool struct {
@@ -48,24 +48,6 @@ type ClientPool struct {
     ContainedNodes []ir.IRNode
 }
 ```
-
-<a name="ClientPool.AddArg"></a>
-### func \(\*ClientPool\) AddArg
-
-```go
-func (pool *ClientPool) AddArg(argnode ir.IRNode)
-```
-
-
-
-<a name="ClientPool.AddChild"></a>
-### func \(\*ClientPool\) AddChild
-
-```go
-func (pool *ClientPool) AddChild(child ir.IRNode) error
-```
-
-
 
 <a name="ClientPool.AddInstantiation"></a>
 ### func \(\*ClientPool\) AddInstantiation
@@ -117,27 +99,6 @@ func (node *ClientPool) Name() string
 
 ```go
 func (node *ClientPool) String() string
-```
-
-
-
-<a name="ClientpoolNamespace"></a>
-## type ClientpoolNamespace
-
-
-
-```go
-type ClientpoolNamespace struct {
-    wiring.SimpleNamespace
-    // contains filtered or unexported fields
-}
-```
-
-<a name="NewClientPoolNamespace"></a>
-### func NewClientPoolNamespace
-
-```go
-func NewClientPoolNamespace(parent wiring.Namespace, spec wiring.WiringSpec, name string, n int) *ClientpoolNamespace
 ```
 
 

@@ -8,7 +8,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
 
 ## Index
 
-- [func PrebuiltContainer\(spec wiring.WiringSpec, dbName string\) string](<#PrebuiltContainer>)
+- [func Container\(spec wiring.WiringSpec, dbName string\) string](<#Container>)
 - [type MongoDBContainer](<#MongoDBContainer>)
   - [func \(node \*MongoDBContainer\) AddContainerArtifacts\(targer docker.ContainerWorkspace\) error](<#MongoDBContainer.AddContainerArtifacts>)
   - [func \(node \*MongoDBContainer\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#MongoDBContainer.AddContainerInstance>)
@@ -30,11 +30,11 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
   - [func \(m \*MongoInterface\) GetName\(\) string](<#MongoInterface.GetName>)
 
 
-<a name="PrebuiltContainer"></a>
-## func PrebuiltContainer
+<a name="Container"></a>
+## func Container
 
 ```go
-func PrebuiltContainer(spec wiring.WiringSpec, dbName string) string
+func Container(spec wiring.WiringSpec, dbName string) string
 ```
 
 

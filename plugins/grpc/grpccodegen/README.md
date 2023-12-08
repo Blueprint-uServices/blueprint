@@ -18,7 +18,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/grpc/grpccodegen"
 - [type GRPCMessageDecl](<#GRPCMessageDecl>)
 - [type GRPCMethodDecl](<#GRPCMethodDecl>)
 - [type GRPCProtoBuilder](<#GRPCProtoBuilder>)
-  - [func NewProtoBuilder\(code \*goparser.ParsedModuleSet\) \*GRPCProtoBuilder](<#NewProtoBuilder>)
+  - [func NewProtoBuilder\(code \*goparser.ParsedModuleSet, name string\) \*GRPCProtoBuilder](<#NewProtoBuilder>)
   - [func \(b \*GRPCProtoBuilder\) AddService\(iface \*gocode.ServiceInterface\) error](<#GRPCProtoBuilder.AddService>)
   - [func \(b \*GRPCProtoBuilder\) GenerateMarshallingCode\(outputFilePath string\) error](<#GRPCProtoBuilder.GenerateMarshallingCode>)
   - [func \(b \*GRPCProtoBuilder\) GetOrAddMessage\(t \*gocode.UserType\) \(\*GRPCMessageDecl, error\)](<#GRPCProtoBuilder.GetOrAddMessage>)
@@ -136,6 +136,7 @@ A basic structural representation of the GRPC messages and services
 
 ```go
 type GRPCProtoBuilder struct {
+    Name        string
     Code        *goparser.ParsedModuleSet
     Package     string // Package shortname
     Module      golang.ModuleInfo
@@ -150,7 +151,7 @@ type GRPCProtoBuilder struct {
 ### func NewProtoBuilder
 
 ```go
-func NewProtoBuilder(code *goparser.ParsedModuleSet) *GRPCProtoBuilder
+func NewProtoBuilder(code *goparser.ParsedModuleSet, name string) *GRPCProtoBuilder
 ```
 
 

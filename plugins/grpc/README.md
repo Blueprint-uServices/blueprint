@@ -6,28 +6,24 @@
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 ```
 
+Package grpc implements a Blueprint plugin that enables any Golang service to be deployed using a gRPC server.
+
+To use the plugin in a Blueprint wiring spec, import this package and use the [Deploy](<#Deploy>) method, ie.
+
+```
+import "gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
+grpc.Deploy(spec, "my_service")
+```
+
+See the documentation for [Deploy](<#Deploy>) for more information about its behavior.
+
+The plugin implements gRPC code generation, as well as generating a server\-side handler and client\-side library that calls the server. This is implemented within the \[grpccodegen\] package.
+
+To use this plugin requires the protocol buffers and grpc compilers are installed on the machine that is compiling the Blueprint wiring spec. Installation instructions can be found on the \[gRPC Quick Start\].
+
 ## Index
 
 - [func Deploy\(spec wiring.WiringSpec, serviceName string\)](<#Deploy>)
-- [type GRPCInterface](<#GRPCInterface>)
-  - [func \(grpc \*GRPCInterface\) GetMethods\(\) \[\]service.Method](<#GRPCInterface.GetMethods>)
-  - [func \(grpc \*GRPCInterface\) GetName\(\) string](<#GRPCInterface.GetName>)
-- [type GolangClient](<#GolangClient>)
-  - [func \(node \*GolangClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#GolangClient.AddInstantiation>)
-  - [func \(node \*GolangClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#GolangClient.AddInterfaces>)
-  - [func \(node \*GolangClient\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#GolangClient.GenerateFuncs>)
-  - [func \(node \*GolangClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#GolangClient.GetInterface>)
-  - [func \(node \*GolangClient\) ImplementsGolangNode\(\)](<#GolangClient.ImplementsGolangNode>)
-  - [func \(node \*GolangClient\) ImplementsGolangService\(\)](<#GolangClient.ImplementsGolangService>)
-  - [func \(n \*GolangClient\) Name\(\) string](<#GolangClient.Name>)
-  - [func \(n \*GolangClient\) String\(\) string](<#GolangClient.String>)
-- [type GolangServer](<#GolangServer>)
-  - [func \(node \*GolangServer\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#GolangServer.AddInstantiation>)
-  - [func \(node \*GolangServer\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#GolangServer.GenerateFuncs>)
-  - [func \(node \*GolangServer\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#GolangServer.GetInterface>)
-  - [func \(node \*GolangServer\) ImplementsGolangNode\(\)](<#GolangServer.ImplementsGolangNode>)
-  - [func \(n \*GolangServer\) Name\(\) string](<#GolangServer.Name>)
-  - [func \(n \*GolangServer\) String\(\) string](<#GolangServer.String>)
 
 
 <a name="Deploy"></a>
@@ -37,198 +33,12 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 func Deploy(spec wiring.WiringSpec, serviceName string)
 ```
 
-Deploys \`serviceName\` as a GRPC server. This can only be done if \`serviceName\` is a pointer from Golang nodes to Golang nodes.
+Deploys \`serviceName\` as a GRPC server.
 
-This call adds both src and dst\-side modifiers to \`serviceName\`. After this, the pointer will be from addr to addr and can no longer be modified with golang nodes.
+Typically serviceName should be the name of a workflow service that was initially defined using \[workflow.Define\].
 
-<a name="GRPCInterface"></a>
-## type GRPCInterface
+Like many other modifiers, GRPC modifies the service at the golang level, by generating server\-side handler code and a client\-side library. However, GRPC should be the last golang\-level modifier applied to a service, because thereafter communication between the client and server is no longer at the golang level, but at the network level.
 
-Represents a service that is exposed over GRPC
-
-```go
-type GRPCInterface struct {
-    service.ServiceInterface
-    Wrapped service.ServiceInterface
-}
-```
-
-<a name="GRPCInterface.GetMethods"></a>
-### func \(\*GRPCInterface\) GetMethods
-
-```go
-func (grpc *GRPCInterface) GetMethods() []service.Method
-```
-
-
-
-<a name="GRPCInterface.GetName"></a>
-### func \(\*GRPCInterface\) GetName
-
-```go
-func (grpc *GRPCInterface) GetName() string
-```
-
-
-
-<a name="GolangClient"></a>
-## type GolangClient
-
-IRNode representing a client to a Golang server. This node does not introduce any new runtime interfaces or types that can be used by other IRNodes GRPC code generation happens during the ModuleBuilder GenerateFuncs pass
-
-```go
-type GolangClient struct {
-    golang.Service
-    golang.GeneratesFuncs
-
-    InstanceName string
-    ServerAddr   *address.Address[*GolangServer]
-    // contains filtered or unexported fields
-}
-```
-
-<a name="GolangClient.AddInstantiation"></a>
-### func \(\*GolangClient\) AddInstantiation
-
-```go
-func (node *GolangClient) AddInstantiation(builder golang.NamespaceBuilder) error
-```
-
-
-
-<a name="GolangClient.AddInterfaces"></a>
-### func \(\*GolangClient\) AddInterfaces
-
-```go
-func (node *GolangClient) AddInterfaces(builder golang.ModuleBuilder) error
-```
-
-Just makes sure that the interface exposed by the server is included in the built module
-
-<a name="GolangClient.GenerateFuncs"></a>
-### func \(\*GolangClient\) GenerateFuncs
-
-```go
-func (node *GolangClient) GenerateFuncs(builder golang.ModuleBuilder) error
-```
-
-Generates proto files and the RPC client
-
-<a name="GolangClient.GetInterface"></a>
-### func \(\*GolangClient\) GetInterface
-
-```go
-func (node *GolangClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
-```
-
-
-
-<a name="GolangClient.ImplementsGolangNode"></a>
-### func \(\*GolangClient\) ImplementsGolangNode
-
-```go
-func (node *GolangClient) ImplementsGolangNode()
-```
-
-
-
-<a name="GolangClient.ImplementsGolangService"></a>
-### func \(\*GolangClient\) ImplementsGolangService
-
-```go
-func (node *GolangClient) ImplementsGolangService()
-```
-
-
-
-<a name="GolangClient.Name"></a>
-### func \(\*GolangClient\) Name
-
-```go
-func (n *GolangClient) Name() string
-```
-
-
-
-<a name="GolangClient.String"></a>
-### func \(\*GolangClient\) String
-
-```go
-func (n *GolangClient) String() string
-```
-
-
-
-<a name="GolangServer"></a>
-## type GolangServer
-
-IRNode representing a Golang GPRC server. This node does not introduce any new runtime interfaces or types that can be used by other IRNodes GRPC code generation happens during the ModuleBuilder GenerateFuncs pass
-
-```go
-type GolangServer struct {
-    service.ServiceNode
-    golang.GeneratesFuncs
-    golang.Instantiable
-
-    InstanceName string
-    Addr         *address.Address[*GolangServer]
-    Wrapped      golang.Service
-    // contains filtered or unexported fields
-}
-```
-
-<a name="GolangServer.AddInstantiation"></a>
-### func \(\*GolangServer\) AddInstantiation
-
-```go
-func (node *GolangServer) AddInstantiation(builder golang.NamespaceBuilder) error
-```
-
-
-
-<a name="GolangServer.GenerateFuncs"></a>
-### func \(\*GolangServer\) GenerateFuncs
-
-```go
-func (node *GolangServer) GenerateFuncs(builder golang.ModuleBuilder) error
-```
-
-Generates proto files and the RPC server handler
-
-<a name="GolangServer.GetInterface"></a>
-### func \(\*GolangServer\) GetInterface
-
-```go
-func (node *GolangServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
-```
-
-
-
-<a name="GolangServer.ImplementsGolangNode"></a>
-### func \(\*GolangServer\) ImplementsGolangNode
-
-```go
-func (node *GolangServer) ImplementsGolangNode()
-```
-
-
-
-<a name="GolangServer.Name"></a>
-### func \(\*GolangServer\) Name
-
-```go
-func (n *GolangServer) Name() string
-```
-
-
-
-<a name="GolangServer.String"></a>
-### func \(\*GolangServer\) String
-
-```go
-func (n *GolangServer) String() string
-```
-
-
+Deploying a service with GRPC increases the visibility of the service within the application. By default, any other service running in any other container or namespace can now contact this service.
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)

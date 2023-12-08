@@ -8,49 +8,15 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 
 ## Index
 
-- [func CopyModuleToOutputWorkspace\(b golang.WorkspaceBuilder, mod \*goparser.ParsedModule\) \(string, error\)](<#CopyModuleToOutputWorkspace>)
-- [func Define\(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string\) string](<#Define>)
 - [func Init\(srcModulePaths ...string\)](<#Init>)
 - [func Reset\(\)](<#Reset>)
-- [type WorkflowService](<#WorkflowService>)
-  - [func \(node \*WorkflowService\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#WorkflowService.AddInstantiation>)
-  - [func \(node \*WorkflowService\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#WorkflowService.AddInterfaces>)
-  - [func \(node \*WorkflowService\) AddToWorkspace\(builder golang.WorkspaceBuilder\) error](<#WorkflowService.AddToWorkspace>)
-  - [func \(node \*WorkflowService\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#WorkflowService.GetInterface>)
-  - [func \(node \*WorkflowService\) ImplementsGolangNode\(\)](<#WorkflowService.ImplementsGolangNode>)
-  - [func \(node \*WorkflowService\) ImplementsGolangService\(\)](<#WorkflowService.ImplementsGolangService>)
-  - [func \(node \*WorkflowService\) Name\(\) string](<#WorkflowService.Name>)
-  - [func \(n \*WorkflowService\) String\(\) string](<#WorkflowService.String>)
+- [func Service\(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string\) string](<#Service>)
 - [type WorkflowSpec](<#WorkflowSpec>)
   - [func GetSpec\(\) \(\*WorkflowSpec, error\)](<#GetSpec>)
   - [func NewWorkflowSpec\(srcModuleDirs ...string\) \(\*WorkflowSpec, error\)](<#NewWorkflowSpec>)
   - [func \(spec \*WorkflowSpec\) Get\(name string\) \(\*WorkflowSpecService, error\)](<#WorkflowSpec.Get>)
 - [type WorkflowSpecService](<#WorkflowSpecService>)
 
-
-<a name="CopyModuleToOutputWorkspace"></a>
-## func CopyModuleToOutputWorkspace
-
-```go
-func CopyModuleToOutputWorkspace(b golang.WorkspaceBuilder, mod *goparser.ParsedModule) (string, error)
-```
-
-
-
-<a name="Define"></a>
-## func Define
-
-```go
-func Define(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string
-```
-
-This adds a service to the application, using a definition that was provided in the workflow spec.
-
-\`serviceType\` must refer to a named service that was defined in the workflow spec. If the service doesn't exist, then this will result in a build error.
-
-\`serviceArgs\` can be zero or more other named nodes that are provided as arguments to the service.
-
-This call creates several definitions within the wiring spec. In particular, \`serviceName\` is defined as a pointer to the actual service, and can thus be modified and
 
 <a name="Init"></a>
 ## func Init
@@ -76,101 +42,20 @@ func Reset()
 
 
 
-<a name="WorkflowService"></a>
-## type WorkflowService
-
-This Node represents a Golang Workflow spec service in the Blueprint IR.
+<a name="Service"></a>
+## func Service
 
 ```go
-type WorkflowService struct {
-    // IR node types
-    golang.Service
-
-    InstanceName string // Name of this instance
-    ServiceType  string // The short-name serviceType used to initialize this workflow service
-
-    // Details of the service, including its interface and constructor
-    ServiceInfo *WorkflowSpecService
-
-    // The workflow spec where this service originated
-    Spec *WorkflowSpec
-
-    // IR Nodes of arguments that will be passed in to the generated code
-    Args []ir.IRNode
-}
+func Service(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string
 ```
 
-<a name="WorkflowService.AddInstantiation"></a>
-### func \(\*WorkflowService\) AddInstantiation
+This adds a service to the application, using a definition that was provided in the workflow spec.
 
-```go
-func (node *WorkflowService) AddInstantiation(builder golang.NamespaceBuilder) error
-```
+\`serviceType\` must refer to a named service that was defined in the workflow spec. If the service doesn't exist, then this will result in a build error.
 
+\`serviceArgs\` can be zero or more other named nodes that are provided as arguments to the service.
 
-
-<a name="WorkflowService.AddInterfaces"></a>
-### func \(\*WorkflowService\) AddInterfaces
-
-```go
-func (node *WorkflowService) AddInterfaces(builder golang.ModuleBuilder) error
-```
-
-
-
-<a name="WorkflowService.AddToWorkspace"></a>
-### func \(\*WorkflowService\) AddToWorkspace
-
-```go
-func (node *WorkflowService) AddToWorkspace(builder golang.WorkspaceBuilder) error
-```
-
-Part of artifact generation. In addition to the interfaces, adds the constructor to the workspace. Most likely the constructor resides in the same module as the interfaces, but in case it doesn't, it will add the correct module
-
-<a name="WorkflowService.GetInterface"></a>
-### func \(\*WorkflowService\) GetInterface
-
-```go
-func (node *WorkflowService) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
-```
-
-
-
-<a name="WorkflowService.ImplementsGolangNode"></a>
-### func \(\*WorkflowService\) ImplementsGolangNode
-
-```go
-func (node *WorkflowService) ImplementsGolangNode()
-```
-
-
-
-<a name="WorkflowService.ImplementsGolangService"></a>
-### func \(\*WorkflowService\) ImplementsGolangService
-
-```go
-func (node *WorkflowService) ImplementsGolangService()
-```
-
-
-
-<a name="WorkflowService.Name"></a>
-### func \(\*WorkflowService\) Name
-
-```go
-func (node *WorkflowService) Name() string
-```
-
-
-
-<a name="WorkflowService.String"></a>
-### func \(\*WorkflowService\) String
-
-```go
-func (n *WorkflowService) String() string
-```
-
-
+This call creates several definitions within the wiring spec. In particular, \`serviceName\` is defined as a pointer to the actual service, and can thus be modified and
 
 <a name="WorkflowSpec"></a>
 ## type WorkflowSpec
