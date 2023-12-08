@@ -8,7 +8,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/zipkin"
 
 ## Index
 
-- [func DefineZipkinCollector\(spec wiring.WiringSpec, collectorName string\) string](<#DefineZipkinCollector>)
+- [func Collector\(spec wiring.WiringSpec, collectorName string\) string](<#Collector>)
 - [type ZipkinCollectorClient](<#ZipkinCollectorClient>)
   - [func \(node \*ZipkinCollectorClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#ZipkinCollectorClient.AddInstantiation>)
   - [func \(node \*ZipkinCollectorClient\) AddInterfaces\(builder golang.WorkspaceBuilder\) error](<#ZipkinCollectorClient.AddInterfaces>)
@@ -29,11 +29,11 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/zipkin"
   - [func \(j \*ZipkinInterface\) GetName\(\) string](<#ZipkinInterface.GetName>)
 
 
-<a name="DefineZipkinCollector"></a>
-## func DefineZipkinCollector
+<a name="Collector"></a>
+## func Collector
 
 ```go
-func DefineZipkinCollector(spec wiring.WiringSpec, collectorName string) string
+func Collector(spec wiring.WiringSpec, collectorName string) string
 ```
 
 Defines the Zipkin collector as a process node. Also creates a pointer to the collector and a client node that are used by clients.

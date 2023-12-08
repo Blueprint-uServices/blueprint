@@ -78,6 +78,19 @@ type ContainerWorkspace interface {
     DeclareLocalImage(instanceName string, imageName string, args ...ir.IRNode) error
 
     /*
+    	Adds an environment variable to the container with name `instanceName`.
+
+    	The `instanceName` is the name of the container to add the environment variable to.
+
+    	The `key` is the name of the environment variable to be added to the container.
+
+    	The `val` is the value of the environment variable.
+
+    	Returns an error if an instance doesn't exist with the name `instanceName`.
+    */
+    SetEnvironmentVariable(instanceName string, key string, val string) error
+
+    /*
     	Indicates that the caller has finished adding images and instances,
     	and the workspace can generate any subsequent artifacts
     	e.g. the final docker-compose file can be generated

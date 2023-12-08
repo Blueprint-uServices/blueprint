@@ -27,6 +27,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb/query"
   - [func Regex\(regex\_string string\) \(Filter, error\)](<#Regex>)
   - [func Select\(fieldName string, next Filter\) Filter](<#Select>)
 - [type Update](<#Update>)
+  - [func AddToSet\(value any\) \(Update, error\)](<#AddToSet>)
   - [func BroadcastUpdate\(update Update\) Update](<#BroadcastUpdate>)
   - [func IncInt\(amount int64\) Update](<#IncInt>)
   - [func ParseUpdate\(update bson.D\) \(Update, error\)](<#ParseUpdate>)
@@ -230,6 +231,15 @@ type Update interface {
     String() string
 }
 ```
+
+<a name="AddToSet"></a>
+### func AddToSet
+
+```go
+func AddToSet(value any) (Update, error)
+```
+
+
 
 <a name="BroadcastUpdate"></a>
 ### func BroadcastUpdate

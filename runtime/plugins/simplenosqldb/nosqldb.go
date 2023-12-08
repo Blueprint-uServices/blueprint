@@ -1,3 +1,7 @@
+// Package simplenosqldb implements an in-memory NoSQLDB that supports a subset of MongoDB's query and update API.
+//
+// Only a small set of common basic filter and update operators are supported, but typically this is sufficient
+// for most applications and enables writing service-level unit tests.
 package simplenosqldb
 
 import (
@@ -16,6 +20,10 @@ import (
 Simple implementations of the NoSQLDB Interfaces from runtime/core/backend
 */
 type (
+	// Implements the [backend.NoSQLDatabase] interface for a subset of MongoDB's query and update operators.
+	//
+	// Only a small set of common basic filter and update operators are supported, but typically this is sufficient
+	// for most applications and enables writing service-level unit tests.
 	SimpleNoSQLDB struct {
 		collections map[string]map[string]*SimpleCollection
 	}
@@ -29,6 +37,7 @@ type (
 	}
 )
 
+// Instantiate a new in-memory NoSQLDB
 func NewSimpleNoSQLDB(ctx context.Context) (*SimpleNoSQLDB, error) {
 	db := &SimpleNoSQLDB{}
 	db.collections = make(map[string]map[string]*SimpleCollection)
@@ -59,7 +68,7 @@ func (c *SimpleCursor) One(ctx context.Context, obj interface{}) (bool, error) {
 	}
 }
 
-func CopyResult(src []bson.D, dst any) error {
+func copyResult(src []bson.D, dst any) error {
 	dst_ptr := reflect.ValueOf(dst)
 	if dst_ptr.Kind() != reflect.Pointer || dst_ptr.IsNil() {
 		return fmt.Errorf("unable to copy result to type %v", reflect.TypeOf(dst))
@@ -83,7 +92,7 @@ func CopyResult(src []bson.D, dst any) error {
 }
 
 func (c *SimpleCursor) All(ctx context.Context, obj interface{}) error {
-	return CopyResult(c.results, obj)
+	return copyResult(c.results, obj)
 }
 
 func (db *SimpleCollection) InsertOne(ctx context.Context, document interface{}) error {
@@ -143,7 +152,7 @@ func (db *SimpleCollection) FindOne(ctx context.Context, filter bson.D, projecti
 
 var verbose = false
 
-// Enable or disable verbose logging
+// Enable or disable verbose logging; used for testing
 func SetVerbose(enabled bool) bool {
 	before := verbose
 	verbose = enabled

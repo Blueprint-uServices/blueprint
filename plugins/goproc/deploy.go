@@ -75,7 +75,7 @@ func (node *Process) GenerateArtifacts(workspaceDir string) error {
 
 	// Create the method to instantiate the namespace
 	namespaceFileName := strings.ToLower(node.ProcName) + ".go"
-	procPackage := "goproc"
+	procPackage := "main"
 	constructorName := "New_" + node.ProcName
 	namespaceBuilder, err := gogen.NewNamespaceBuilder(module, node.ProcName, namespaceFileName, procPackage, constructorName)
 	if err != nil {
@@ -115,8 +115,7 @@ func (node *Process) GenerateArtifacts(workspaceDir string) error {
 		node.ArgNodes,
 		node.ContainedNodes, // For now just instantiate all contained nodes
 		module,
-		fmt.Sprintf("%s/%s", module.Name, procPackage),
-		fmt.Sprintf("%s.%s", procPackage, constructorName),
+		constructorName,
 	)
 	if err != nil {
 		return err

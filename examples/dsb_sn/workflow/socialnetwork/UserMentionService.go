@@ -56,7 +56,7 @@ func (u *UserMentionServiceImpl) ComposeUserMentions(ctx context.Context, reqID 
 		}
 		in_str := strings.Join(names, ",")
 		query := `{"Username": {"$in": [` + in_str + `]}}`
-		query_d, err := backend.ParseNoSQLDBQuery(query)
+		query_d, err := parseNoSQLDBQuery(query)
 		if err != nil {
 			log.Println(err)
 			return []UserMention{}, err

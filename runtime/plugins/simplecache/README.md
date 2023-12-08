@@ -6,12 +6,14 @@
 import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplecache"
 ```
 
+Package simplecache implements a key\-value \[backend.Cache\] using a golang map.
+
 ## Index
 
 - [type SimpleCache](<#SimpleCache>)
   - [func NewSimpleCache\(ctx context.Context\) \(\*SimpleCache, error\)](<#NewSimpleCache>)
   - [func \(cache \*SimpleCache\) Delete\(ctx context.Context, key string\) error](<#SimpleCache.Delete>)
-  - [func \(cache \*SimpleCache\) Get\(ctx context.Context, key string, val interface\{\}\) error](<#SimpleCache.Get>)
+  - [func \(cache \*SimpleCache\) Get\(ctx context.Context, key string, val interface\{\}\) \(bool, error\)](<#SimpleCache.Get>)
   - [func \(cache \*SimpleCache\) Incr\(ctx context.Context, key string\) \(int64, error\)](<#SimpleCache.Incr>)
   - [func \(cache \*SimpleCache\) Mget\(ctx context.Context, keys \[\]string, values \[\]interface\{\}\) error](<#SimpleCache.Mget>)
   - [func \(cache \*SimpleCache\) Mset\(ctx context.Context, keys \[\]string, values \[\]interface\{\}\) error](<#SimpleCache.Mset>)
@@ -21,11 +23,12 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplecache"
 <a name="SimpleCache"></a>
 ## type SimpleCache
 
-A simple map\-based cache that implements the cache interface
+A simple map\-based cache that implements the \[backend.Cache\] interface
 
 ```go
 type SimpleCache struct {
     backend.Cache
+    sync.RWMutex
     // contains filtered or unexported fields
 }
 ```
@@ -37,7 +40,7 @@ type SimpleCache struct {
 func NewSimpleCache(ctx context.Context) (*SimpleCache, error)
 ```
 
-
+Instantiates a map\-based [SimpleCache](<#SimpleCache>)
 
 <a name="SimpleCache.Delete"></a>
 ### func \(\*SimpleCache\) Delete
@@ -52,7 +55,7 @@ func (cache *SimpleCache) Delete(ctx context.Context, key string) error
 ### func \(\*SimpleCache\) Get
 
 ```go
-func (cache *SimpleCache) Get(ctx context.Context, key string, val interface{}) error
+func (cache *SimpleCache) Get(ctx context.Context, key string, val interface{}) (bool, error)
 ```
 
 

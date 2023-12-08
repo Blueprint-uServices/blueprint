@@ -8,7 +8,7 @@ import (
 )
 
 // Defines the Zipkin collector as a process node. Also creates a pointer to the collector and a client node that are used by clients.
-func DefineZipkinCollector(spec wiring.WiringSpec, collectorName string) string {
+func Collector(spec wiring.WiringSpec, collectorName string) string {
 	collectorAddr := collectorName + ".addr"
 	collectorProc := collectorName + ".proc"
 	collectorDst := collectorName + ".dst"

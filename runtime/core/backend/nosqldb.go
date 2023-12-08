@@ -2,8 +2,6 @@ package backend
 
 import (
 	"context"
-	"encoding/json"
-	"strings"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -118,54 +116,4 @@ type NoSQLCollection interface {
 	//
 	// Returns the number of replaced documents.
 	ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) (int, error)
-}
-
-// Converts a json-encoded string to a bson.D document to be used as arguments for one of the other NoSQLDatabase functions
-func ParseNoSQLDBQuery(query string) (bson.D, error) {
-	return handleFormats(query)
-}
-
-func lower(f interface{}) interface{} {
-	switch f := f.(type) {
-	case []interface{}:
-		for i := range f {
-			f[i] = lower(f[i])
-		}
-		return f
-	case map[string]interface{}:
-		lf := make(map[string]interface{}, len(f))
-		for k, v := range f {
-			if k == "$elemMatch" {
-				lf[k] = lower(v)
-			} else {
-				lf[strings.ToLower(k)] = lower(v)
-			}
-		}
-		return lf
-	default:
-		return f
-	}
-}
-
-func handleFormats(jsonQuery string) (bdoc bson.D, err error) {
-
-	if jsonQuery == "" {
-		bdoc = bson.D{}
-		return
-	}
-
-	var f interface{}
-	err = json.Unmarshal([]byte(jsonQuery), &f)
-	if err != nil {
-		return
-	}
-
-	f = lower(f)
-
-	lowerQuery, err := json.Marshal(f)
-	if err != nil {
-		return
-	}
-	err = bson.UnmarshalExtJSON(lowerQuery, true, &bdoc)
-	return
 }

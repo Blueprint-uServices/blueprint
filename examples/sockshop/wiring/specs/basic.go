@@ -18,8 +18,6 @@ var Basic = wiringcmd.SpecOption{
 	Build:       makeBasicSpec,
 }
 
-// Creates a basic sockshop wiring spec.
-// Returns the names of the nodes to instantiate or an error
 func makeBasicSpec(spec wiring.WiringSpec) ([]string, error) {
 	user_db := simple.NoSQLDB(spec, "user_db")
 	user_service := workflow.Service(spec, "user_service", "UserService", user_db)

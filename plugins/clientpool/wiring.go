@@ -1,6 +1,10 @@
+// Package clientpool provides a Blueprint modifier for the client side of service calls.
+//
+// The plugin wraps clients with a ClientPool that can create N instances of clients to a service.
 package clientpool
 
 import (
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/namespacebuilder"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
@@ -8,9 +12,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-/*
-Wraps the client side of a service with a client pool with N client instances
-*/
+// Wraps the client side of serviceName with a client pool with n client instances
 func Create(spec wiring.WiringSpec, serviceName string, n int) {
 	clientpool := serviceName + ".clientpool"
 
@@ -26,48 +28,9 @@ func Create(spec wiring.WiringSpec, serviceName string, n int) {
 
 	// Define the client pool
 	spec.Define(clientpool, &ClientPool{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		pool := NewClientPoolNamespace(namespace, spec, clientpool, n)
-
-		err := pool.Get(clientNext, &pool.handler.IRNode.Client)
-		return pool.handler.IRNode, err
+		pool := namespacebuilder.Create[golang.Node](namespace, spec, "ClientPool", clientpool)
+		var client golang.Service
+		err := pool.Namespace.Get(clientNext, &client)
+		return newClientPool(clientpool, n, client, pool.ArgNodes, pool.ContainedNodes), err
 	})
-}
-
-type (
-	ClientpoolNamespace struct {
-		wiring.SimpleNamespace
-		handler *clientpoolNamespaceHandler
-	}
-
-	clientpoolNamespaceHandler struct {
-		wiring.DefaultNamespaceHandler
-
-		IRNode *ClientPool
-	}
-)
-
-func NewClientPoolNamespace(parent wiring.Namespace, spec wiring.WiringSpec, name string, n int) *ClientpoolNamespace {
-	namespace := &ClientpoolNamespace{}
-	namespace.handler = &clientpoolNamespaceHandler{}
-	namespace.handler.Init(&namespace.SimpleNamespace)
-	namespace.handler.IRNode = newClientPool(name, n)
-	namespace.Init(name, "ClientPool", parent, spec, namespace.handler)
-	return namespace
-}
-
-// Golang clientpools can only contain golang nodes
-func (namespace *clientpoolNamespaceHandler) Accepts(nodeType any) bool {
-	_, ok := nodeType.(golang.Node)
-	return ok
-}
-
-// When a node is added to this namespace, we just attach it to the IRNode representing the clientpool
-func (handler *clientpoolNamespaceHandler) AddNode(name string, node ir.IRNode) error {
-	return handler.IRNode.AddChild(node)
-}
-
-// When an edge is added to this namespace, we just attach it as an argument to the IRNode representing the clientpool
-func (handler *clientpoolNamespaceHandler) AddEdge(name string, node ir.IRNode) error {
-	handler.IRNode.AddArg(node)
-	return nil
 }

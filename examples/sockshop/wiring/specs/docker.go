@@ -1,19 +1,27 @@
 package specs
 
 import (
+	"strings"
+
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/gotests"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mysql"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/zipkin"
 )
 
 // A wiring spec that deploys each service into its own Docker container and using gRPC to communicate between services.
+// All RPC calls are retried up to 3 times.  RPC clients use a client pool with 10 clients.
+// All services are instrumented with OpenTelemetry and traces are exported to Zipkin
 // The user, cart, shipping, and orders services using separate MongoDB instances to store their data.
 // The catalogue service uses MySQL to store catalogue data.
 // The shipping service and queue master service run within the same process (TODO: separate processes)
@@ -23,24 +31,46 @@ var Docker = wiringcmd.SpecOption{
 	Build:       makeDockerSpec,
 }
 
-// Creates a basic sockshop wiring spec.
-// Returns the names of the nodes to instantiate or an error
 func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
+	var allServices []string
+	var allCtrs []string
+
+	// Define the trace collector, which will be used by all services
+	trace_collector := zipkin.Collector(spec, "zipkin")
+
+	// Modifiers that will be applied to all services
+	applyDockerDefaults := func(serviceName string) string {
+		name, _ := strings.CutSuffix(serviceName, "service")
+
+		// Apply Blueprint modifiers
+		retries.AddRetries(spec, serviceName, 3)
+		clientpool.Create(spec, serviceName, 10)
+		opentelemetry.InstrumentUsingCustomCollector(spec, serviceName, trace_collector)
+		grpc.Deploy(spec, serviceName)
+		proc := goproc.CreateProcess(spec, name+"proc", serviceName)
+		ctr := linuxcontainer.CreateContainer(spec, name+"ctr", proc)
+
+		// Save the service and ctr for later instantiation
+		allServices = append(allServices, serviceName)
+		allCtrs = append(allCtrs, ctr)
+		return ctr
+	}
+
 	user_db := mongodb.Container(spec, "user_db")
 	user_service := workflow.Service(spec, "user_service", "UserService", user_db)
-	user_ctr := applyDockerDefaults(spec, user_service, "user_proc", "user_container")
+	applyDockerDefaults(user_service)
 
 	payment_service := workflow.Service(spec, "payment_service", "PaymentService", "500")
-	payment_ctr := applyDockerDefaults(spec, payment_service, "payment_proc", "payment_container")
+	applyDockerDefaults(payment_service)
 
 	cart_db := mongodb.Container(spec, "cart_db")
 	cart_service := workflow.Service(spec, "cart_service", "CartService", cart_db)
-	cart_ctr := applyDockerDefaults(spec, cart_service, "cart_proc", "cart_ctr")
+	applyDockerDefaults(cart_service)
 
 	shipqueue := simple.Queue(spec, "shipping_queue")
 	shipdb := mongodb.Container(spec, "shipping_db")
 	shipping_service := workflow.Service(spec, "shipping_service", "ShippingService", shipqueue, shipdb)
-	shipping_ctr := applyDockerDefaults(spec, shipping_service, "shipping_proc", "shipping_ctr")
+	applyDockerDefaults(shipping_service)
 
 	// Deploy queue master to the same process as the shipping proc
 	// TODO: after distributed queue is supported, move to separate containers
@@ -49,22 +79,17 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 
 	order_db := mongodb.Container(spec, "order_db")
 	order_service := workflow.Service(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)
-	order_ctr := applyDockerDefaults(spec, order_service, "order_proc", "order_ctr")
+	applyDockerDefaults(order_service)
 
 	catalogue_db := mysql.Container(spec, "catalogue_db")
 	catalogue_service := workflow.Service(spec, "catalogue_service", "CatalogueService", catalogue_db)
-	catalogue_ctr := applyDockerDefaults(spec, catalogue_service, "catalogue_proc", "catalogue_ctr")
+	applyDockerDefaults(catalogue_service)
 
 	frontend := workflow.Service(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
-	frontend_ctr := applyDockerDefaults(spec, frontend, "frontend_proc", "frontend_ctr")
+	applyDockerDefaults(frontend)
 
-	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service, catalogue_service, frontend)
+	tests := gotests.Test(spec, allServices...)
+	allCtrs = append(allCtrs, tests)
 
-	return []string{user_ctr, payment_ctr, cart_ctr, shipping_ctr, order_ctr, catalogue_ctr, frontend_ctr, tests}, nil
-}
-
-func applyDockerDefaults(spec wiring.WiringSpec, serviceName, procName, ctrName string) string {
-	grpc.Deploy(spec, serviceName)
-	goproc.CreateProcess(spec, procName, serviceName)
-	return linuxcontainer.CreateContainer(spec, ctrName, procName)
+	return allCtrs, nil
 }

@@ -11,16 +11,20 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 - [func IsBasicType\(name string\) bool](<#IsBasicType>)
 - [func IsBuiltinPackage\(packageName string\) bool](<#IsBuiltinPackage>)
 - [type AnyType](<#AnyType>)
+  - [func \(t \*AnyType\) Equals\(other TypeName\) bool](<#AnyType.Equals>)
   - [func \(t \*AnyType\) IsTypeName\(\)](<#AnyType.IsTypeName>)
   - [func \(t \*AnyType\) String\(\) string](<#AnyType.String>)
 - [type BasicType](<#BasicType>)
+  - [func \(t \*BasicType\) Equals\(other TypeName\) bool](<#BasicType.Equals>)
   - [func \(t \*BasicType\) IsTypeName\(\)](<#BasicType.IsTypeName>)
   - [func \(t \*BasicType\) String\(\) string](<#BasicType.String>)
 - [type Chan](<#Chan>)
+  - [func \(t \*Chan\) Equals\(other TypeName\) bool](<#Chan.Equals>)
   - [func \(t \*Chan\) IsTypeName\(\)](<#Chan.IsTypeName>)
   - [func \(t \*Chan\) String\(\) string](<#Chan.String>)
 - [type Constructor](<#Constructor>)
 - [type Ellipsis](<#Ellipsis>)
+  - [func \(t \*Ellipsis\) Equals\(other TypeName\) bool](<#Ellipsis.Equals>)
   - [func \(t \*Ellipsis\) IsTypeName\(\)](<#Ellipsis.IsTypeName>)
   - [func \(t \*Ellipsis\) String\(\) string](<#Ellipsis.String>)
 - [type Func](<#Func>)
@@ -32,42 +36,55 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
   - [func \(f \*Func\) GetReturns\(\) \[\]service.Variable](<#Func.GetReturns>)
   - [func \(f Func\) String\(\) string](<#Func.String>)
 - [type FuncType](<#FuncType>)
+  - [func \(t \*FuncType\) Equals\(other TypeName\) bool](<#FuncType.Equals>)
   - [func \(t \*FuncType\) IsTypeName\(\)](<#FuncType.IsTypeName>)
   - [func \(t \*FuncType\) String\(\) string](<#FuncType.String>)
 - [type GenericType](<#GenericType>)
+  - [func \(t \*GenericType\) Equals\(other TypeName\) bool](<#GenericType.Equals>)
   - [func \(t \*GenericType\) IsTypeName\(\)](<#GenericType.IsTypeName>)
   - [func \(t \*GenericType\) String\(\) string](<#GenericType.String>)
 - [type GenericTypeParam](<#GenericTypeParam>)
+  - [func \(t \*GenericTypeParam\) Equals\(other TypeName\) bool](<#GenericTypeParam.Equals>)
   - [func \(t \*GenericTypeParam\) IsTypeName\(\)](<#GenericTypeParam.IsTypeName>)
   - [func \(t \*GenericTypeParam\) String\(\) string](<#GenericTypeParam.String>)
 - [type InterfaceType](<#InterfaceType>)
+  - [func \(t \*InterfaceType\) Equals\(other TypeName\) bool](<#InterfaceType.Equals>)
   - [func \(t \*InterfaceType\) IsTypeName\(\)](<#InterfaceType.IsTypeName>)
   - [func \(t \*InterfaceType\) String\(\) string](<#InterfaceType.String>)
 - [type Map](<#Map>)
+  - [func \(t \*Map\) Equals\(other TypeName\) bool](<#Map.Equals>)
   - [func \(t \*Map\) IsTypeName\(\)](<#Map.IsTypeName>)
   - [func \(m \*Map\) String\(\) string](<#Map.String>)
 - [type Pointer](<#Pointer>)
+  - [func \(t \*Pointer\) Equals\(other TypeName\) bool](<#Pointer.Equals>)
   - [func \(t \*Pointer\) IsTypeName\(\)](<#Pointer.IsTypeName>)
   - [func \(t \*Pointer\) String\(\) string](<#Pointer.String>)
 - [type ReceiveChan](<#ReceiveChan>)
+  - [func \(t \*ReceiveChan\) Equals\(other TypeName\) bool](<#ReceiveChan.Equals>)
   - [func \(t \*ReceiveChan\) IsTypeName\(\)](<#ReceiveChan.IsTypeName>)
   - [func \(t \*ReceiveChan\) String\(\) string](<#ReceiveChan.String>)
 - [type SendChan](<#SendChan>)
+  - [func \(t \*SendChan\) Equals\(other TypeName\) bool](<#SendChan.Equals>)
   - [func \(t \*SendChan\) IsTypeName\(\)](<#SendChan.IsTypeName>)
   - [func \(t \*SendChan\) String\(\) string](<#SendChan.String>)
 - [type ServiceInterface](<#ServiceInterface>)
   - [func CopyServiceInterface\(name string, pkg string, s \*ServiceInterface\) \*ServiceInterface](<#CopyServiceInterface>)
   - [func \(s \*ServiceInterface\) AddMethod\(f Func\)](<#ServiceInterface.AddMethod>)
+  - [func \(i \*ServiceInterface\) Contains\(j \*ServiceInterface\) bool](<#ServiceInterface.Contains>)
   - [func \(s \*ServiceInterface\) GetMethods\(\) \[\]service.Method](<#ServiceInterface.GetMethods>)
   - [func \(s \*ServiceInterface\) GetName\(\) string](<#ServiceInterface.GetName>)
+  - [func \(i \*ServiceInterface\) String\(\) string](<#ServiceInterface.String>)
 - [type Slice](<#Slice>)
+  - [func \(t \*Slice\) Equals\(other TypeName\) bool](<#Slice.Equals>)
   - [func \(t \*Slice\) IsTypeName\(\)](<#Slice.IsTypeName>)
   - [func \(t \*Slice\) String\(\) string](<#Slice.String>)
 - [type StructType](<#StructType>)
+  - [func \(t \*StructType\) Equals\(other TypeName\) bool](<#StructType.Equals>)
   - [func \(t \*StructType\) IsTypeName\(\)](<#StructType.IsTypeName>)
   - [func \(t \*StructType\) String\(\) string](<#StructType.String>)
 - [type TypeName](<#TypeName>)
 - [type UserType](<#UserType>)
+  - [func \(t \*UserType\) Equals\(other TypeName\) bool](<#UserType.Equals>)
   - [func \(t \*UserType\) IsTypeName\(\)](<#UserType.IsTypeName>)
   - [func \(t \*UserType\) String\(\) string](<#UserType.String>)
 - [type Variable](<#Variable>)
@@ -105,6 +122,15 @@ type AnyType struct {
 }
 ```
 
+<a name="AnyType.Equals"></a>
+### func \(\*AnyType\) Equals
+
+```go
+func (t *AnyType) Equals(other TypeName) bool
+```
+
+
+
 <a name="AnyType.IsTypeName"></a>
 ### func \(\*AnyType\) IsTypeName
 
@@ -135,6 +161,15 @@ type BasicType struct {
 }
 ```
 
+<a name="BasicType.Equals"></a>
+### func \(\*BasicType\) Equals
+
+```go
+func (t *BasicType) Equals(other TypeName) bool
+```
+
+
+
 <a name="BasicType.IsTypeName"></a>
 ### func \(\*BasicType\) IsTypeName
 
@@ -164,6 +199,15 @@ type Chan struct {
     ChanOf TypeName
 }
 ```
+
+<a name="Chan.Equals"></a>
+### func \(\*Chan\) Equals
+
+```go
+func (t *Chan) Equals(other TypeName) bool
+```
+
+
 
 <a name="Chan.IsTypeName"></a>
 ### func \(\*Chan\) IsTypeName
@@ -206,6 +250,15 @@ type Ellipsis struct {
     EllipsisOf TypeName // Elipsis of TypeName
 }
 ```
+
+<a name="Ellipsis.Equals"></a>
+### func \(\*Ellipsis\) Equals
+
+```go
+func (t *Ellipsis) Equals(other TypeName) bool
+```
+
+
 
 <a name="Ellipsis.IsTypeName"></a>
 ### func \(\*Ellipsis\) IsTypeName
@@ -319,6 +372,15 @@ type FuncType struct {
 }
 ```
 
+<a name="FuncType.Equals"></a>
+### func \(\*FuncType\) Equals
+
+```go
+func (t *FuncType) Equals(other TypeName) bool
+```
+
+
+
 <a name="FuncType.IsTypeName"></a>
 ### func \(\*FuncType\) IsTypeName
 
@@ -350,6 +412,15 @@ type GenericType struct {
 }
 ```
 
+<a name="GenericType.Equals"></a>
+### func \(\*GenericType\) Equals
+
+```go
+func (t *GenericType) Equals(other TypeName) bool
+```
+
+
+
 <a name="GenericType.IsTypeName"></a>
 ### func \(\*GenericType\) IsTypeName
 
@@ -379,6 +450,15 @@ type GenericTypeParam struct {
     ParamName string
 }
 ```
+
+<a name="GenericTypeParam.Equals"></a>
+### func \(\*GenericTypeParam\) Equals
+
+```go
+func (t *GenericTypeParam) Equals(other TypeName) bool
+```
+
+
 
 <a name="GenericTypeParam.IsTypeName"></a>
 ### func \(\*GenericTypeParam\) IsTypeName
@@ -415,6 +495,15 @@ type InterfaceType struct {
 }
 ```
 
+<a name="InterfaceType.Equals"></a>
+### func \(\*InterfaceType\) Equals
+
+```go
+func (t *InterfaceType) Equals(other TypeName) bool
+```
+
+
+
 <a name="InterfaceType.IsTypeName"></a>
 ### func \(\*InterfaceType\) IsTypeName
 
@@ -446,6 +535,15 @@ type Map struct {
 }
 ```
 
+<a name="Map.Equals"></a>
+### func \(\*Map\) Equals
+
+```go
+func (t *Map) Equals(other TypeName) bool
+```
+
+
+
 <a name="Map.IsTypeName"></a>
 ### func \(\*Map\) IsTypeName
 
@@ -475,6 +573,15 @@ type Pointer struct {
     PointerTo TypeName // Pointer to TypeName
 }
 ```
+
+<a name="Pointer.Equals"></a>
+### func \(\*Pointer\) Equals
+
+```go
+func (t *Pointer) Equals(other TypeName) bool
+```
+
+
 
 <a name="Pointer.IsTypeName"></a>
 ### func \(\*Pointer\) IsTypeName
@@ -506,6 +613,15 @@ type ReceiveChan struct {
 }
 ```
 
+<a name="ReceiveChan.Equals"></a>
+### func \(\*ReceiveChan\) Equals
+
+```go
+func (t *ReceiveChan) Equals(other TypeName) bool
+```
+
+
+
 <a name="ReceiveChan.IsTypeName"></a>
 ### func \(\*ReceiveChan\) IsTypeName
 
@@ -535,6 +651,15 @@ type SendChan struct {
     SendType TypeName
 }
 ```
+
+<a name="SendChan.Equals"></a>
+### func \(\*SendChan\) Equals
+
+```go
+func (t *SendChan) Equals(other TypeName) bool
+```
+
+
 
 <a name="SendChan.IsTypeName"></a>
 ### func \(\*SendChan\) IsTypeName
@@ -585,6 +710,15 @@ func (s *ServiceInterface) AddMethod(f Func)
 
 
 
+<a name="ServiceInterface.Contains"></a>
+### func \(\*ServiceInterface\) Contains
+
+```go
+func (i *ServiceInterface) Contains(j *ServiceInterface) bool
+```
+
+Reports whether all of the methods in j exist on interface i
+
 <a name="ServiceInterface.GetMethods"></a>
 ### func \(\*ServiceInterface\) GetMethods
 
@@ -603,6 +737,15 @@ func (s *ServiceInterface) GetName() string
 
 
 
+<a name="ServiceInterface.String"></a>
+### func \(\*ServiceInterface\) String
+
+```go
+func (i *ServiceInterface) String() string
+```
+
+
+
 <a name="Slice"></a>
 ## type Slice
 
@@ -614,6 +757,15 @@ type Slice struct {
     SliceOf TypeName // Slice of TypeName
 }
 ```
+
+<a name="Slice.Equals"></a>
+### func \(\*Slice\) Equals
+
+```go
+func (t *Slice) Equals(other TypeName) bool
+```
+
+
 
 <a name="Slice.IsTypeName"></a>
 ### func \(\*Slice\) IsTypeName
@@ -649,6 +801,15 @@ type StructType struct {
 }
 ```
 
+<a name="StructType.Equals"></a>
+### func \(\*StructType\) Equals
+
+```go
+func (t *StructType) Equals(other TypeName) bool
+```
+
+
+
 <a name="StructType.IsTypeName"></a>
 ### func \(\*StructType\) IsTypeName
 
@@ -675,6 +836,7 @@ A type name is the fully qualified name of a type that you use when declaring a 
 ```go
 type TypeName interface {
     String() string
+    Equals(other TypeName) bool
     IsTypeName()
 }
 ```
@@ -695,6 +857,15 @@ type UserType struct {
     Name    string // Name of the type within the package
 }
 ```
+
+<a name="UserType.Equals"></a>
+### func \(\*UserType\) Equals
+
+```go
+func (t *UserType) Equals(other TypeName) bool
+```
+
+
 
 <a name="UserType.IsTypeName"></a>
 ### func \(\*UserType\) IsTypeName

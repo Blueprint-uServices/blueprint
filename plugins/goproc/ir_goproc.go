@@ -36,10 +36,13 @@ type Process struct {
 }
 
 // A Golang Process Node can either be given the child nodes ahead of time, or they can be added using AddArtifactNode / AddCodeNode
-func newGolangProcessNode(name string) *Process {
-	node := Process{}
-	node.InstanceName = name
-	node.ProcName = ir.CleanName(name)
+func newGolangProcessNode(name string, argNodes, containedNodes []ir.IRNode) *Process {
+	node := Process{
+		InstanceName:   name,
+		ProcName:       ir.CleanName(name),
+		ArgNodes:       argNodes,
+		ContainedNodes: containedNodes,
+	}
 	node.ModuleName = generatedModulePrefix + "/" + node.ProcName
 	return &node
 }
@@ -50,13 +53,4 @@ func (node *Process) Name() string {
 
 func (node *Process) String() string {
 	return ir.PrettyPrintNamespace(node.InstanceName, "GolangProcessNode", node.ArgNodes, node.ContainedNodes)
-}
-
-func (node *Process) AddArg(argnode ir.IRNode) {
-	node.ArgNodes = append(node.ArgNodes, argnode)
-}
-
-func (node *Process) AddChild(child ir.IRNode) error {
-	node.ContainedNodes = append(node.ContainedNodes, child)
-	return nil
 }

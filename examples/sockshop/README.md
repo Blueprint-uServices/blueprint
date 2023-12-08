@@ -62,6 +62,7 @@ CART_DB_BIND_ADDR=0.0.0.0:12353
 CATALOGUE_DB_BIND_ADDR=0.0.0.0:12354
 CATALOGUE_SERVICE_GRPC_BIND_ADDR=0.0.0.0:12355
 FRONTEND_GRPC_BIND_ADDR=0.0.0.0:12356
+ZIPKIN_BIND_ADDR=0.0.0.0:12357
 ```
 
 
@@ -71,8 +72,10 @@ After running the application, you can run the unit tests against it.
 
 ```
 cd build/gotests/tests
-go test --payment_service.grpc.dial_addr=localhost:12346 --user_service.grpc.dial_addr=localhost:12347 --cart_service.grpc.dial_addr=localhost:12348 --order_service.grpc.dial_addr=localhost:12349 --shipping_service.grpc.dial_addr=localhost:12351 --catalogue_service.grpc.dial_addr=localhost:12355 --frontend.grpc.dial_addr=localhost:12356
+go test --payment_service.grpc.dial_addr=localhost:12346 --user_service.grpc.dial_addr=localhost:12347 --cart_service.grpc.dial_addr=localhost:12348 --order_service.grpc.dial_addr=localhost:12349 --shipping_service.grpc.dial_addr=localhost:12351 --catalogue_service.grpc.dial_addr=localhost:12355 --frontend.grpc.dial_addr=localhost:12356 --zipkin.dial_addr=localhost:12357
 ```
+
+To see traces of the requests issued by the tests, navigate to [http://localhost:12357](http://localhost:12357)
 
 ## Next steps
 

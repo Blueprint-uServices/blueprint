@@ -52,12 +52,25 @@ func (module *ModuleBuilderImpl) Info() golang.ModuleInfo {
 }
 
 func (module *ModuleBuilderImpl) CreatePackage(packageName string) (golang.PackageInfo, error) {
-	splits := strings.Split(packageName, "/")
-	info := golang.PackageInfo{
-		PackageName: module.Name + "/" + packageName,
-		Name:        packageName,
-		ShortName:   splits[len(splits)-1],
-		Path:        filepath.Join(module.ModuleDir, filepath.Join(splits...)),
+	if packageName == "" {
+		packageName = "main"
+	}
+	info := golang.PackageInfo{}
+	if packageName == "main" {
+		info = golang.PackageInfo{
+			PackageName: module.Name,
+			Name:        "main",
+			ShortName:   "main",
+			Path:        module.ModuleDir,
+		}
+	} else {
+		splits := strings.Split(packageName, "/")
+		info = golang.PackageInfo{
+			PackageName: module.Name + "/" + packageName,
+			Name:        packageName,
+			ShortName:   splits[len(splits)-1],
+			Path:        filepath.Join(module.ModuleDir, filepath.Join(splits...)),
+		}
 	}
 	if s, err := os.Stat(info.Path); err == nil && s.IsDir() {
 		// Package already exists

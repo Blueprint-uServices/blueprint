@@ -6,9 +6,13 @@
 import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 ```
 
+Package simplenosqldb implements an in\-memory NoSQLDB that supports a subset of MongoDB's query and update API.
+
+Only a small set of common basic filter and update operators are supported, but typically this is sufficient for most applications and enables writing service\-level unit tests.
+
 ## Index
 
-- [func CopyResult\(src \[\]bson.D, dst any\) error](<#CopyResult>)
+- [func SetVerbose\(enabled bool\) bool](<#SetVerbose>)
 - [type SimpleCollection](<#SimpleCollection>)
   - [func \(db \*SimpleCollection\) DeleteMany\(ctx context.Context, filter bson.D\) error](<#SimpleCollection.DeleteMany>)
   - [func \(db \*SimpleCollection\) DeleteOne\(ctx context.Context, filter bson.D\) error](<#SimpleCollection.DeleteOne>)
@@ -18,25 +22,27 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
   - [func \(db \*SimpleCollection\) InsertOne\(ctx context.Context, document interface\{\}\) error](<#SimpleCollection.InsertOne>)
   - [func \(db \*SimpleCollection\) ReplaceMany\(ctx context.Context, filter bson.D, replacements ...interface\{\}\) \(int, error\)](<#SimpleCollection.ReplaceMany>)
   - [func \(db \*SimpleCollection\) ReplaceOne\(ctx context.Context, filter bson.D, replacement interface\{\}\) \(int, error\)](<#SimpleCollection.ReplaceOne>)
+  - [func \(db \*SimpleCollection\) String\(\) string](<#SimpleCollection.String>)
   - [func \(db \*SimpleCollection\) UpdateMany\(ctx context.Context, filter bson.D, update bson.D\) \(int, error\)](<#SimpleCollection.UpdateMany>)
   - [func \(db \*SimpleCollection\) UpdateOne\(ctx context.Context, filter bson.D, update bson.D\) \(int, error\)](<#SimpleCollection.UpdateOne>)
+  - [func \(db \*SimpleCollection\) Upsert\(ctx context.Context, filter bson.D, document interface\{\}\) \(bool, error\)](<#SimpleCollection.Upsert>)
   - [func \(db \*SimpleCollection\) UpsertID\(ctx context.Context, id primitive.ObjectID, document interface\{\}\) \(bool, error\)](<#SimpleCollection.UpsertID>)
 - [type SimpleCursor](<#SimpleCursor>)
   - [func \(c \*SimpleCursor\) All\(ctx context.Context, obj interface\{\}\) error](<#SimpleCursor.All>)
-  - [func \(c \*SimpleCursor\) One\(ctx context.Context, obj interface\{\}\) error](<#SimpleCursor.One>)
+  - [func \(c \*SimpleCursor\) One\(ctx context.Context, obj interface\{\}\) \(bool, error\)](<#SimpleCursor.One>)
 - [type SimpleNoSQLDB](<#SimpleNoSQLDB>)
   - [func NewSimpleNoSQLDB\(ctx context.Context\) \(\*SimpleNoSQLDB, error\)](<#NewSimpleNoSQLDB>)
   - [func \(impl \*SimpleNoSQLDB\) GetCollection\(ctx context.Context, db\_name string, collection\_name string\) \(backend.NoSQLCollection, error\)](<#SimpleNoSQLDB.GetCollection>)
 
 
-<a name="CopyResult"></a>
-## func CopyResult
+<a name="SetVerbose"></a>
+## func SetVerbose
 
 ```go
-func CopyResult(src []bson.D, dst any) error
+func SetVerbose(enabled bool) bool
 ```
 
-
+Enable or disable verbose logging; used for testing
 
 <a name="SimpleCollection"></a>
 ## type SimpleCollection
@@ -121,6 +127,15 @@ func (db *SimpleCollection) ReplaceOne(ctx context.Context, filter bson.D, repla
 
 
 
+<a name="SimpleCollection.String"></a>
+### func \(\*SimpleCollection\) String
+
+```go
+func (db *SimpleCollection) String() string
+```
+
+
+
 <a name="SimpleCollection.UpdateMany"></a>
 ### func \(\*SimpleCollection\) UpdateMany
 
@@ -135,6 +150,15 @@ func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, updat
 
 ```go
 func (db *SimpleCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) (int, error)
+```
+
+
+
+<a name="SimpleCollection.Upsert"></a>
+### func \(\*SimpleCollection\) Upsert
+
+```go
+func (db *SimpleCollection) Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error)
 ```
 
 
@@ -172,7 +196,7 @@ func (c *SimpleCursor) All(ctx context.Context, obj interface{}) error
 ### func \(\*SimpleCursor\) One
 
 ```go
-func (c *SimpleCursor) One(ctx context.Context, obj interface{}) error
+func (c *SimpleCursor) One(ctx context.Context, obj interface{}) (bool, error)
 ```
 
 
@@ -180,7 +204,9 @@ func (c *SimpleCursor) One(ctx context.Context, obj interface{}) error
 <a name="SimpleNoSQLDB"></a>
 ## type SimpleNoSQLDB
 
-Simple implementations of the NoSQLDB Interfaces from runtime/core/backend
+Implements the \[backend.NoSQLDatabase\] interface for a subset of MongoDB's query and update operators.
+
+Only a small set of common basic filter and update operators are supported, but typically this is sufficient for most applications and enables writing service\-level unit tests.
 
 ```go
 type SimpleNoSQLDB struct {
@@ -195,7 +221,7 @@ type SimpleNoSQLDB struct {
 func NewSimpleNoSQLDB(ctx context.Context) (*SimpleNoSQLDB, error)
 ```
 
-
+Instantiate a new in\-memory NoSQLDB
 
 <a name="SimpleNoSQLDB.GetCollection"></a>
 ### func \(\*SimpleNoSQLDB\) GetCollection

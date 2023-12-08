@@ -13,6 +13,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment/dockergen"
 - [type DockerComposeFile](<#DockerComposeFile>)
   - [func NewDockerComposeFile\(workspaceName, workspaceDir, fileName string\) \*DockerComposeFile](<#NewDockerComposeFile>)
   - [func \(d \*DockerComposeFile\) AddBuildInstance\(instanceName string, containerTemplateName string, args ...ir.IRNode\) error](<#DockerComposeFile.AddBuildInstance>)
+  - [func \(d \*DockerComposeFile\) AddEnvVar\(instanceName string, key string, val string\) error](<#DockerComposeFile.AddEnvVar>)
   - [func \(d \*DockerComposeFile\) AddImageInstance\(instanceName string, image string, args ...ir.IRNode\) error](<#DockerComposeFile.AddImageInstance>)
   - [func \(d \*DockerComposeFile\) Generate\(\) error](<#DockerComposeFile.Generate>)
   - [func \(d \*DockerComposeFile\) ResolveLocalDials\(\) error](<#DockerComposeFile.ResolveLocalDials>)
@@ -66,6 +67,15 @@ func NewDockerComposeFile(workspaceName, workspaceDir, fileName string) *DockerC
 
 ```go
 func (d *DockerComposeFile) AddBuildInstance(instanceName string, containerTemplateName string, args ...ir.IRNode) error
+```
+
+
+
+<a name="DockerComposeFile.AddEnvVar"></a>
+### func \(\*DockerComposeFile\) AddEnvVar
+
+```go
+func (d *DockerComposeFile) AddEnvVar(instanceName string, key string, val string) error
 ```
 
 

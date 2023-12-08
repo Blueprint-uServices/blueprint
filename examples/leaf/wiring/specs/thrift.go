@@ -11,7 +11,6 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/thrift"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workload"
 )
 
 var Thrift = wiringcmd.SpecOption{
@@ -29,9 +28,7 @@ func makeThriftSpec(spec wiring.WiringSpec) ([]string, error) {
 	nonleaf_service := workflow.Service(spec, "nonleaf_service", "NonLeafService", leaf_service)
 	nonleaf_proc := applyThriftDefaults(spec, nonleaf_service)
 
-	app_client := workload.Generator(spec, nonleaf_service)
-
-	return []string{leaf_proc, nonleaf_proc, app_client}, nil
+	return []string{leaf_proc, nonleaf_proc}, nil
 }
 
 func applyThriftDefaults(spec wiring.WiringSpec, serviceName string) string {

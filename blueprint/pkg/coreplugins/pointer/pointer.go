@@ -165,7 +165,7 @@ func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) (ir.IRNode, er
 			if addr.GetDestination() != nil {
 				// Destination has already been instantiated, stop instantiating now
 				namespace.Info("Destination %s of %s has already been instantiated", dstName, addr.Name())
-				return nil, nil
+				return addr.GetDestination(), nil
 			} else {
 				namespace.Info("Instantiating %s of %s", dstName, addr.Name())
 				var dst ir.IRNode
