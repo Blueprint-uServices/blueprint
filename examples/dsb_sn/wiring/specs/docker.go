@@ -33,6 +33,7 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	urlshorten_db := mongodb.Container(spec, "urlshorten_db")
 	usertimeline_cache := memcached.PrebuiltContainer(spec, "usertimeline_cache")
 	usertimeline_db := mongodb.Container(spec, "usertimeline_db")
+	hometimeline_cache := memcached.PrebuiltContainer(spec, "hometimeline_cache")
 
 	// Define url_shorten service
 	urlshorten_service := workflow.Service(spec, "urlshorten_service", "UrlShortenService", urlshorten_db)
@@ -70,7 +71,7 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	containers = append(containers, socialgraph_ctr)
 
 	// Define home_timeline service
-	hometimeline_service := workflow.Service(spec, "hometimeline_service", "HomeTimelineService", post_storage_service, socialgraph_service)
+	hometimeline_service := workflow.Service(spec, "hometimeline_service", "HomeTimelineService", hometimeline_cache, post_storage_service, socialgraph_service)
 	hometimeline_ctr := applyDockerDefaults(spec, hometimeline_service, "hometimeline_proc", "hometimeline_container")
 	containers = append(containers, hometimeline_ctr)
 
