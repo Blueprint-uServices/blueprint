@@ -72,11 +72,11 @@ func (u *UserTimelineServiceImpl) ReadUserTimeline(ctx context.Context, reqID in
 		}
 		query := fmt.Sprintf(`{"UserID": %[1]d}`, userID)
 		projection := fmt.Sprintf(`{"posts": {"$slice": [0, %[1]d]}}`, stop)
-		query_d, err := backend.ParseNoSQLDBQuery(query)
+		query_d, err := parseNoSQLDBQuery(query)
 		if err != nil {
 			return []int64{}, err
 		}
-		projection_d, err := backend.ParseNoSQLDBQuery(projection)
+		projection_d, err := parseNoSQLDBQuery(projection)
 		if err != nil {
 			return []int64{}, err
 		}
@@ -158,7 +158,7 @@ func (u *UserTimelineServiceImpl) WriteUserTimeline(ctx context.Context, reqID i
 		postIDstr := strconv.FormatInt(postID, 10)
 		timestampstr := strconv.FormatInt(timestamp, 10)
 		update := fmt.Sprintf(`{"$push": {"Posts": {"$each": [{"PostID": %s, "Timestamp": %s}], "$position": 0}}}`, postIDstr, timestampstr)
-		update_d, err := backend.ParseNoSQLDBQuery(update)
+		update_d, err := parseNoSQLDBQuery(update)
 		if err != nil {
 			return err
 		}

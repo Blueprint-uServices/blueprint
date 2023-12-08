@@ -104,7 +104,7 @@ func (p *PostStorageServiceImpl) ReadPosts(ctx context.Context, reqID int64, pos
 		}
 		id_str := strings.Join(strings.Fields(fmt.Sprint(unique_pids)), ",")
 		query := `{"PostID": {"$in": ` + id_str + `}}`
-		query_d, err := backend.ParseNoSQLDBQuery(query)
+		query_d, err := parseNoSQLDBQuery(query)
 		if err != nil {
 			return []Post{}, err
 		}
