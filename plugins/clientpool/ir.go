@@ -14,6 +14,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Blueprint IR node representing a ClientPool.
 type ClientPool struct {
 	golang.Service
 	golang.GeneratesFuncs

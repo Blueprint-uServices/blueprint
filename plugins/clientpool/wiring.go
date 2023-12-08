@@ -1,3 +1,6 @@
+// Package clientpool provides a Blueprint modifier for the client side of service calls.
+//
+// The plugin wraps clients with a ClientPool that can create N instances of clients to a service.
 package clientpool
 
 import (
@@ -9,9 +12,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-/*
-Wraps the client side of a service with a client pool with N client instances
-*/
+// Wraps the client side of serviceName with a client pool with n client instances
 func Create(spec wiring.WiringSpec, serviceName string, n int) {
 	clientpool := serviceName + ".clientpool"
 
