@@ -11,7 +11,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/memcached"
 - [type Memcached](<#Memcached>)
   - [func NewMemcachedClient\(ctx context.Context, serverAddress string\) \(\*Memcached, error\)](<#NewMemcachedClient>)
   - [func \(m \*Memcached\) Delete\(ctx context.Context, key string\) error](<#Memcached.Delete>)
-  - [func \(m \*Memcached\) Get\(ctx context.Context, key string, value interface\{\}\) error](<#Memcached.Get>)
+  - [func \(m \*Memcached\) Get\(ctx context.Context, key string, value interface\{\}\) \(bool, error\)](<#Memcached.Get>)
   - [func \(m \*Memcached\) Incr\(ctx context.Context, key string\) \(int64, error\)](<#Memcached.Incr>)
   - [func \(m \*Memcached\) Mget\(ctx context.Context, keys \[\]string, values \[\]interface\{\}\) error](<#Memcached.Mget>)
   - [func \(m \*Memcached\) Mset\(ctx context.Context, keys \[\]string, values \[\]interface\{\}\) error](<#Memcached.Mset>)
@@ -52,7 +52,7 @@ func (m *Memcached) Delete(ctx context.Context, key string) error
 ### func \(\*Memcached\) Get
 
 ```go
-func (m *Memcached) Get(ctx context.Context, key string, value interface{}) error
+func (m *Memcached) Get(ctx context.Context, key string, value interface{}) (bool, error)
 ```
 
 

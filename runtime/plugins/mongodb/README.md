@@ -19,10 +19,11 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/mongodb"
   - [func \(mc \*MongoCollection\) ReplaceOne\(ctx context.Context, filter bson.D, replacement interface\{\}\) \(int, error\)](<#MongoCollection.ReplaceOne>)
   - [func \(mc \*MongoCollection\) UpdateMany\(ctx context.Context, filter bson.D, update bson.D\) \(int, error\)](<#MongoCollection.UpdateMany>)
   - [func \(mc \*MongoCollection\) UpdateOne\(ctx context.Context, filter bson.D, update bson.D\) \(int, error\)](<#MongoCollection.UpdateOne>)
+  - [func \(mc \*MongoCollection\) Upsert\(ctx context.Context, filter bson.D, document interface\{\}\) \(bool, error\)](<#MongoCollection.Upsert>)
   - [func \(mc \*MongoCollection\) UpsertID\(ctx context.Context, id primitive.ObjectID, document interface\{\}\) \(bool, error\)](<#MongoCollection.UpsertID>)
 - [type MongoCursor](<#MongoCursor>)
   - [func \(mr \*MongoCursor\) All\(ctx context.Context, objs interface\{\}\) error](<#MongoCursor.All>)
-  - [func \(mr \*MongoCursor\) One\(ctx context.Context, obj interface\{\}\) error](<#MongoCursor.One>)
+  - [func \(mr \*MongoCursor\) One\(ctx context.Context, obj interface\{\}\) \(bool, error\)](<#MongoCursor.One>)
 - [type MongoDB](<#MongoDB>)
   - [func NewMongoDB\(ctx context.Context, addr string\) \(\*MongoDB, error\)](<#NewMongoDB>)
   - [func \(md \*MongoDB\) GetCollection\(ctx context.Context, db\_name string, collectionName string\) \(backend.NoSQLCollection, error\)](<#MongoDB.GetCollection>)
@@ -129,6 +130,15 @@ func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update 
 
 \* not sure about the \`update\` parameter and its conversion
 
+<a name="MongoCollection.Upsert"></a>
+### func \(\*MongoCollection\) Upsert
+
+```go
+func (mc *MongoCollection) Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error)
+```
+
+
+
 <a name="MongoCollection.UpsertID"></a>
 ### func \(\*MongoCollection\) UpsertID
 
@@ -162,7 +172,7 @@ func (mr *MongoCursor) All(ctx context.Context, objs interface{}) error
 ### func \(\*MongoCursor\) One
 
 ```go
-func (mr *MongoCursor) One(ctx context.Context, obj interface{}) error
+func (mr *MongoCursor) One(ctx context.Context, obj interface{}) (bool, error)
 ```
 
 

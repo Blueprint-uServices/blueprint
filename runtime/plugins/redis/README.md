@@ -11,7 +11,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/redis"
 - [type RedisCache](<#RedisCache>)
   - [func NewRedisCacheClient\(ctx context.Context, addr string\) \(\*RedisCache, error\)](<#NewRedisCacheClient>)
   - [func \(r \*RedisCache\) Delete\(ctx context.Context, key string\) error](<#RedisCache.Delete>)
-  - [func \(r \*RedisCache\) Get\(ctx context.Context, key string, value interface\{\}\) error](<#RedisCache.Get>)
+  - [func \(r \*RedisCache\) Get\(ctx context.Context, key string, value interface\{\}\) \(bool, error\)](<#RedisCache.Get>)
   - [func \(r \*RedisCache\) Incr\(ctx context.Context, key string\) \(int64, error\)](<#RedisCache.Incr>)
   - [func \(r \*RedisCache\) Mget\(ctx context.Context, keys \[\]string, values \[\]interface\{\}\) error](<#RedisCache.Mget>)
   - [func \(r \*RedisCache\) Mset\(ctx context.Context, keys \[\]string, values \[\]interface\{\}\) error](<#RedisCache.Mset>)
@@ -51,7 +51,7 @@ func (r *RedisCache) Delete(ctx context.Context, key string) error
 ### func \(\*RedisCache\) Get
 
 ```go
-func (r *RedisCache) Get(ctx context.Context, key string, value interface{}) error
+func (r *RedisCache) Get(ctx context.Context, key string, value interface{}) (bool, error)
 ```
 
 

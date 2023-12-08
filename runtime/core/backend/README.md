@@ -6,6 +6,14 @@
 import "gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 ```
 
+Package backend provides the interfaces for common backends like caches, queues, databases, etc. that are often used by application workflow specs.
+
+To use a backend, an application's workflow should require this module and import the interfaces from this package. Service constructors should receive the backend interface as an argument, e.g.
+
+```
+func NewMyService(ctx context.Context, db backend.NoSQLDB) (MyService, error) {...}
+```
+
 ## Index
 
 - [func CopyResult\(src any, dst any\) error](<#CopyResult>)
@@ -16,6 +24,8 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 - [type NoSQLCollection](<#NoSQLCollection>)
 - [type NoSQLCursor](<#NoSQLCursor>)
 - [type NoSQLDatabase](<#NoSQLDatabase>)
+- [type Queue](<#Queue>)
+- [type RelationalDB](<#RelationalDB>)
 - [type Tracer](<#Tracer>)
 - [type XTracer](<#XTracer>)
 
@@ -61,17 +71,39 @@ Sets the zero value of a pointer
 <a name="Cache"></a>
 ## type Cache
 
-
+Represents a key\-value cache.
 
 ```go
 type Cache interface {
+    // Store a key-value pair in the cache
     Put(ctx context.Context, key string, value interface{}) error
-    // val is the pointer to which the value will be stored
-    Get(ctx context.Context, key string, val interface{}) error
+
+    // Retrieves a value from the cache.
+    // val should be a pointer in which the value will be stored, e.g.
+    //
+    //   var value interface{}
+    //   cache.Get(ctx, "key", &value)
+    //
+    // Reports whether the key existed in the cache
+    Get(ctx context.Context, key string, val interface{}) (bool, error)
+
+    // Store multiple key-value pairs in the cache.
+    // keys and values must have the same length or an error will be returned
     Mset(ctx context.Context, keys []string, values []interface{}) error
-    // values is the array of pointers to which the value will be stored
+
+    // Retrieve the values for multiple keys from the cache.
+    // keys and values must have the same length or an error will be returned
+    // values is an array of pointers to which the values will be stored, e.g.
+    //
+    //   var a string
+    //   var b int64
+    //   cache.Mget(ctx, []string{"a", "b"}, []any{&a, &b})
     Mget(ctx context.Context, keys []string, values []interface{}) error
+
+    // Delete from the cache
     Delete(ctx context.Context, key string) error
+
+    // Treats the value mapped to key as an integer, and increments it
     Incr(ctx context.Context, key string) (int64, error)
 }
 ```
@@ -139,6 +171,12 @@ type NoSQLCollection interface {
     // Returns the number of updated documents (>= 0)
     UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error)
 
+    // Attempts to find a document in the collection that matches the filter.
+    // If a match is found, replaces the existing document with the provided document.
+    // If a match is not found, document is inserted into the collection.
+    // Returns true if an existing document was updated; false otherwise
+    Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error)
+
     // Attempts to match a document in the collection with "_id" = id.
     // If a match is found, replaces the existing document with the provided document.
     // If a match is not found, document is inserted into the collection.
@@ -174,7 +212,15 @@ type NoSQLCollection interface {
 
 ```go
 type NoSQLCursor interface {
-    One(ctx context.Context, obj interface{}) error
+    // Copies one result into the target pointer.
+    // If there are no results, returns false; otherwise returns true.
+    // Returns an error if obj is not a compatible type.
+    One(ctx context.Context, obj interface{}) (bool, error)
+
+    // Copies all results into the target pointer.
+    // obj must be a pointer to a slice type.
+    // Returns the number of results copied.
+    // Returns an error if obj is not a compatible type.
     All(ctx context.Context, obj interface{}) error //similar logic to Decode, but for multiple documents
 }
 ```
@@ -191,6 +237,76 @@ type NoSQLDatabase interface {
     	or might not have those concepts.
     */
     GetCollection(ctx context.Context, db_name string, collection_name string) (NoSQLCollection, error)
+}
+```
+
+<a name="Queue"></a>
+## type Queue
+
+A Queue backend is used for pushing and popping elements.
+
+```go
+type Queue interface {
+
+    // Pushes an item to the tail of the queue.
+    //
+    // This call will block until the item is successfully pushed, or until the context
+    // is cancelled.
+    //
+    // Reports whether the item was pushed to the queue, or if an error was encountered.
+    // A context cancellation/timeout is not considered an error.
+    Push(ctx context.Context, item interface{}) (bool, error)
+
+    // Pops an item from the front of the queue.
+    //
+    // This call will block until an item is successfully popped, or until the context
+    // is cancelled.
+    //
+    // dst must be a pointer type that can receive the item popped from the queue.
+    //
+    // Reports whether the item was pushed to the queue, or if an error was encountered.
+    // A context cancellation/timeout is not considered an error.
+    Pop(ctx context.Context, dst interface{}) (bool, error)
+}
+```
+
+<a name="RelationalDB"></a>
+## type RelationalDB
+
+A Relational database backend is used for storing and querying structured data using SQL queries.
+
+SQL is relatively standardized in golang under the database/sql interfaces. Blueprint's [RelationalDB](<#RelationalDB>) interface exposes the github.com/jmoiron/sqlx interfaces, which are more convenient for casual usage and help in marshalling structs into rows and back.
+
+```go
+type RelationalDB interface {
+    // Exec executes a query without returning any rows. The args are for any placeholder parameters in the query.
+    //
+    // Returns a [sql.Result] object from the [database/sql] package.
+    Exec(ctx context.Context, query string, args ...any) (sql.Result, error)
+
+    // Query executes a query that returns rows, typically a SELECT. The args are for any placeholder parameters in the query.
+    //
+    // Returns a [sql.Rows] object from the [database/sql] package, that can be used to access query results.
+    // Rows' cursor starts before the first row of the result set. Use Next to advance from row to row.
+    Query(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+
+    // Prepare creates a prepared statement for later queries or executions. Multiple queries or executions may
+    // be run concurrently from the returned statement. The caller must call the statement's Close method
+    // when the statement is no longer needed.
+    //
+    // Returns a [sql.Stmt] object from the [database/sql] package, that can be used to execute the prepared
+    // statement.
+    Prepare(ctx context.Context, query string) (*sql.Stmt, error)
+
+    // Select using this DB. Any placeholder parameters are replaced with supplied args.
+    //
+    // Uses [github.com/jmoiron/sqlx] to marshal query results into dst.
+    Select(ctx context.Context, dst interface{}, query string, args ...any) error
+
+    // Get using this DB. Any placeholder parameters are replaced with supplied args. An error is returned if the result set is empty.
+    //
+    // Uses [github.com/jmoiron/sqlx] to marshal query results into dst.
+    Get(ctx context.Context, dst interface{}, query string, args ...any) error
 }
 ```
 
