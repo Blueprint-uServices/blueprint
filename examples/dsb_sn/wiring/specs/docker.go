@@ -8,7 +8,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/memcached"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/thrift"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
@@ -123,7 +123,7 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 }
 
 func applyDockerDefaults(spec wiring.WiringSpec, serviceName, procName, ctrName string) string {
-	thrift.Deploy(spec, serviceName)
+	grpc.Deploy(spec, serviceName)
 	goproc.CreateProcess(spec, procName, serviceName)
 	return linuxcontainer.CreateContainer(spec, ctrName, procName)
 }
