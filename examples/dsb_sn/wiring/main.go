@@ -7,7 +7,7 @@
 package main
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/examples/leaf/wiring/specs"
+	"gitlab.mpi-sws.org/cld/blueprint/examples/dsb_sn/wiring/specs"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
