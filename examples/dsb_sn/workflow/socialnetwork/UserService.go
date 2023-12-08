@@ -39,7 +39,7 @@ type LoginObj struct {
 	Salt     string
 }
 
-type Claims struct {
+type claimsT struct {
 	Username  string
 	UserID    string
 	Timestamp int64
@@ -104,7 +104,7 @@ func (u *UserServiceImpl) Login(ctx context.Context, reqID int64, username strin
 		return "", errors.New("Invalid credentials")
 	} else {
 		expiration_time := time.Now().Add(6 * time.Minute)
-		claims := &Claims{
+		claims := &claimsT{
 			Username:       username,
 			UserID:         strconv.FormatInt(login.UserID, 10),
 			Timestamp:      timestamp,
