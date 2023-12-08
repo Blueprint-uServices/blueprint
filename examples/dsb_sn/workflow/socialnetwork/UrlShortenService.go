@@ -10,7 +10,7 @@ import (
 
 type UrlShortenService interface {
 	ComposeUrls(ctx context.Context, reqID int64, urls []string) ([]URL, error)
-	GetExtendedUrls(ctx context.Context, reqID int64, shortened_urls []string) ([]string, error)
+	GetExtendedUrls(ctx context.Context, reqID int64, shortenedUrls []string) ([]string, error)
 }
 
 type UrlShortenServiceImpl struct {
@@ -55,7 +55,7 @@ func (u *UrlShortenServiceImpl) ComposeUrls(ctx context.Context, reqID int64, ur
 	return target_urls, nil
 }
 
-func (u *UrlShortenServiceImpl) GetExtendedUrls(ctx context.Context, reqID int64, shortened_urls []string) ([]string, error) {
+func (u *UrlShortenServiceImpl) GetExtendedUrls(ctx context.Context, reqID int64, shortenedUrls []string) ([]string, error) {
 	// Not implemented in Original DSB
 	return []string{}, nil
 }
