@@ -4,6 +4,8 @@ This directory contains some example Blueprint applications, primarily for use i
 
 - [leaf](leaf) is a two-service application where one service calls the other
 - [sockshop](sockshop) re-implements the SockShop microservices benchmark
+- [dsb_hotel](dsb_hotel) re-implements the hotel-reservation application from the DeathStarBench microservices benchmark
+- [dsb_sn](dsb_sn) re-implements the social-network application from the DeathStarBench microservices benchmark
 
 ### Related documentation
 - [../docs/manual/workflow.md](docs/manual/workflow.md) describes how to write a Blueprint application

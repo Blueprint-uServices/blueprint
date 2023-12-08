@@ -14,6 +14,9 @@ import (
 )
 
 // A wiring spec that deploys each service into its own Docker container and using thrift to communicate between services.
+// All services except the Wrk2API service use thrift for communication; WRK2API service provides the http frontend.
+// The user, socialgraph, urlshorten, and usertimeline services use MongoDB instances to store their data.
+// The user, socialgraph, urlshorten, usertimeine, and hometimeline services use memcached instances as the cache data for faster responses.
 var Docker = wiringcmd.SpecOption{
 	Name:        "docker",
 	Description: "Deploys each service in a separate container with thrift, and uses mongodb as NoSQL database backends.",
