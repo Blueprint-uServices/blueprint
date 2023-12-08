@@ -158,11 +158,7 @@ func (u *UserTimelineServiceImpl) WriteUserTimeline(ctx context.Context, reqID i
 		postIDstr := strconv.FormatInt(postID, 10)
 		timestampstr := strconv.FormatInt(timestamp, 10)
 		update := fmt.Sprintf(`{"$push": {"Posts": {"$each": [{"PostID": %s, "Timestamp": %s}], "$position": 0}}}`, postIDstr, timestampstr)
-<<<<<<< HEAD
 		update_d, err := parseNoSQLDBQuery(update)
-=======
-		update_d, err := ParseNoSQLDBQuery(update)
->>>>>>> 56e45eb (Move the string->json->bson hacking out of backend and into the application)
 		if err != nil {
 			return err
 		}

@@ -59,11 +59,7 @@ func (s *SocialGraphServiceImpl) GetFollowers(ctx context.Context, reqID int64, 
 			return followers, err
 		}
 		query := `{"UserID":` + userIDstr + `}`
-<<<<<<< HEAD
 		query_d, err := parseNoSQLDBQuery(query)
-=======
-		query_d, err := ParseNoSQLDBQuery(query)
->>>>>>> 56e45eb (Move the string->json->bson hacking out of backend and into the application)
 		val, err := collection.FindOne(ctx, query_d)
 		if err != nil {
 			return followers, err
@@ -96,11 +92,7 @@ func (s *SocialGraphServiceImpl) GetFollowees(ctx context.Context, reqID int64, 
 			return followees, err
 		}
 		query := `{"UserID":` + userIDstr + `}`
-<<<<<<< HEAD
 		query_d, err := parseNoSQLDBQuery(query)
-=======
-		query_d, err := ParseNoSQLDBQuery(query)
->>>>>>> 56e45eb (Move the string->json->bson hacking out of backend and into the application)
 		if err != nil {
 			return followees, err
 		}
@@ -140,20 +132,12 @@ func (s *SocialGraphServiceImpl) Follow(ctx context.Context, reqID int64, userID
 		//query := `{"$and": [{"UserID":` + userIDstr + `}, {"followees.userid" : {"$ne":` + followeeIDstr + `}}] }`
 		query := `{"UserID": ` + userIDstr + `}`
 		update := `{"$push": {"followees": {"UserID": ` + followeeIDstr + `,"Timestamp": ` + timestamp + `}}}`
-<<<<<<< HEAD
 		query_d, err_internal := parseNoSQLDBQuery(query)
-=======
-		query_d, err_internal := ParseNoSQLDBQuery(query)
->>>>>>> 56e45eb (Move the string->json->bson hacking out of backend and into the application)
 		if err_internal != nil {
 			err1 = err_internal
 			return
 		}
-<<<<<<< HEAD
 		update_d, err_internal := parseNoSQLDBQuery(update)
-=======
-		update_d, err_internal := ParseNoSQLDBQuery(update)
->>>>>>> 56e45eb (Move the string->json->bson hacking out of backend and into the application)
 		if err_internal != nil {
 			err1 = err_internal
 			return
@@ -170,20 +154,12 @@ func (s *SocialGraphServiceImpl) Follow(ctx context.Context, reqID int64, userID
 		//query := `{"$and": [{"UserID":` + followeeIDstr + `}, {"followers.userid" : {"$ne":` + userIDstr + `}}] }`
 		query := `{"UserID": ` + followeeIDstr + `}`
 		update := `{"$push": {"followers": {"UserID": ` + userIDstr + `,"Timestamp": ` + timestamp + `}}}`
-<<<<<<< HEAD
 		query_d, err_internal := parseNoSQLDBQuery(query)
-=======
-		query_d, err_internal := ParseNoSQLDBQuery(query)
->>>>>>> 56e45eb (Move the string->json->bson hacking out of backend and into the application)
 		if err_internal != nil {
 			err2 = err_internal
 			return
 		}
-<<<<<<< HEAD
 		update_d, err_internal := parseNoSQLDBQuery(update)
-=======
-		update_d, err_internal := ParseNoSQLDBQuery(update)
->>>>>>> 56e45eb (Move the string->json->bson hacking out of backend and into the application)
 		if err_internal != nil {
 			err2 = err_internal
 			return
@@ -249,22 +225,13 @@ func (s *SocialGraphServiceImpl) Unfollow(ctx context.Context, reqID int64, user
 			return
 		}
 		query := `{"UserID": ` + followeeIDstr + `}`
-<<<<<<< HEAD
 		update := `{"$pull": {"followees": {"UserID": ` + userIDstr + `}}}`
 		query_d, err_internal := parseNoSQLDBQuery(query)
-=======
-		update := `{"$pull": {"followers": {"UserID": ` + userIDstr + `}}}`
-		query_d, err_internal := ParseNoSQLDBQuery(query)
->>>>>>> 56e45eb (Move the string->json->bson hacking out of backend and into the application)
 		if err_internal != nil {
 			err2 = err_internal
 			return
 		}
-<<<<<<< HEAD
 		update_d, err_internal := parseNoSQLDBQuery(update)
-=======
-		update_d, err_internal := ParseNoSQLDBQuery(update)
->>>>>>> 56e45eb (Move the string->json->bson hacking out of backend and into the application)
 		if err_internal != nil {
 			err2 = err_internal
 			return
