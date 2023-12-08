@@ -27,6 +27,9 @@ An application's IR representation is produced by constructing and then building
 - [type IRNode](<#IRNode>)
   - [func FilterNodes\[T any\]\(nodes \[\]IRNode\) \[\]IRNode](<#FilterNodes>)
   - [func Remove\[T any\]\(nodes \[\]IRNode\) \[\]IRNode](<#Remove>)
+- [type IRValue](<#IRValue>)
+  - [func \(v \*IRValue\) Name\(\) string](<#IRValue.Name>)
+  - [func \(v \*IRValue\) String\(\) string](<#IRValue.String>)
 - [type VisitTracker](<#VisitTracker>)
 - [type VisitTrackerImpl](<#VisitTrackerImpl>)
   - [func \(tracker \*VisitTrackerImpl\) Visited\(name string\) bool](<#VisitTrackerImpl.Visited>)
@@ -199,6 +202,35 @@ func Remove[T any](nodes []IRNode) []IRNode
 ```
 
 Returns a slice containing all nodes except those of type T
+
+<a name="IRValue"></a>
+## type IRValue
+
+A hard\-coded value
+
+```go
+type IRValue struct {
+    Value string
+}
+```
+
+<a name="IRValue.Name"></a>
+### func \(\*IRValue\) Name
+
+```go
+func (v *IRValue) Name() string
+```
+
+
+
+<a name="IRValue.String"></a>
+### func \(\*IRValue\) String
+
+```go
+func (v *IRValue) String() string
+```
+
+
 
 <a name="VisitTracker"></a>
 ## type VisitTracker

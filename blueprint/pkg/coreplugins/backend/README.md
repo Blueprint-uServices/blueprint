@@ -12,6 +12,8 @@ Package backend provides IR node interfaces for common backend components.
 
 - [type Cache](<#Cache>)
 - [type NoSQLDB](<#NoSQLDB>)
+- [type Queue](<#Queue>)
+- [type RelDB](<#RelDB>)
 
 
 <a name="Cache"></a>
@@ -33,6 +35,30 @@ type Cache interface {
 
 ```go
 type NoSQLDB interface {
+    ir.IRNode
+    service.ServiceNode
+}
+```
+
+<a name="Queue"></a>
+## type Queue
+
+
+
+```go
+type Queue interface {
+    ir.IRNode
+    service.ServiceNode
+}
+```
+
+<a name="RelDB"></a>
+## type RelDB
+
+
+
+```go
+type RelDB interface {
     ir.IRNode
     service.ServiceNode
 }
