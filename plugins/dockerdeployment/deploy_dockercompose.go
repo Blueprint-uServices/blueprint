@@ -2,6 +2,7 @@ package dockerdeployment
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
@@ -40,7 +41,8 @@ type (
 
 		info docker.ContainerWorkspaceInfo
 
-		ImageDirs map[string]string // map from image name to directory
+		ImageDirs   map[string]string // map from image name to directory
+		LocalImages map[string]string // map from image name to directory
 
 		DockerComposeFile *dockergen.DockerComposeFile
 	}
@@ -89,6 +91,7 @@ func NewDockerComposeWorkspace(name string, dir string) *dockerComposeWorkspace 
 			Target: "docker-compose",
 		},
 		ImageDirs:         make(map[string]string),
+		LocalImages:       make(map[string]string),
 		DockerComposeFile: dockergen.NewDockerComposeFile(name, dir, "docker-compose.yml"),
 	}
 }
@@ -120,6 +123,9 @@ func (d *dockerComposeWorkspace) DeclareLocalImage(instanceName string, imageDir
 		return blueprint.Errorf("unable to add docker instance %v due to %v", instanceName, err.Error())
 	}
 
+	// Save the existance of a local image, for later building
+	d.LocalImages[instanceName] = imageDir
+
 	return d.DockerComposeFile.AddBuildInstance(instanceName, imageDir, args...)
 }
 
@@ -128,6 +134,28 @@ func (d *dockerComposeWorkspace) SetEnvironmentVariable(instanceName string, key
 }
 
 func (d *dockerComposeWorkspace) Finish() error {
+	// Build container images
+	for name, dir := range d.LocalImages {
+		dockerContext, err := filepath.Abs(filepath.Join(d.info.Path, dir))
+		if err != nil {
+			return err
+		}
+
+		tags := []string{name}
+
+		fmt.Printf("Building Dockerfile %v in %v\n", name, dir)
+		err = docker.BuildDockerfile("Dockerfile", dockerContext, tags)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Build %v\n", name)
+	}
+	err := docker.PruneBuildCache()
+	if err != nil {
+		return err
+	}
+	os.Exit(1)
+
 	// Now that all images and instances have been declared, we can generate the docker-compose file
 	return d.DockerComposeFile.Generate()
 }
