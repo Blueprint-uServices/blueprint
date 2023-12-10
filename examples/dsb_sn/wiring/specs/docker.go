@@ -41,6 +41,17 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	usertimeline_db := mongodb.Container(spec, "usertimeline_db")
 	hometimeline_cache := memcached.PrebuiltContainer(spec, "hometimeline_cache")
 
+	// Add backends to services list so that their client libraries are used in the generated tests!
+	allServices = append(allServices, user_cache)
+	allServices = append(allServices, user_db)
+	allServices = append(allServices, post_cache)
+	allServices = append(allServices, post_db)
+	allServices = append(allServices, social_cache)
+	allServices = append(allServices, social_db)
+	allServices = append(allServices, usertimeline_cache)
+	allServices = append(allServices, usertimeline_db)
+	allServices = append(allServices, hometimeline_cache)
+
 	// Define url_shorten service
 	urlshorten_service := workflow.Service(spec, "urlshorten_service", "UrlShortenService", urlshorten_db)
 	urlshorten_ctr := applyDockerDefaults(spec, urlshorten_service, "urlshorten_proc", "urlshorten_container")

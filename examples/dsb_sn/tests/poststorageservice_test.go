@@ -3,26 +3,39 @@ package tests
 import (
 	"context"
 	"sort"
+	"strconv"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 	"gitlab.mpi-sws.org/cld/blueprint/examples/dsb_sn/workflow/socialnetwork"
+	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplecache"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 var postStorageServiceRegistry = registry.NewServiceRegistry[socialnetwork.PostStorageService]("postStorage_service")
+var postCacheRegistry = registry.NewServiceRegistry[backend.Cache]("post_cache")
+var postDBRegistry = registry.NewServiceRegistry[backend.NoSQLDatabase]("post_db")
 
 func init() {
+	postCacheRegistry.Register("local", func(ctx context.Context) (backend.Cache, error) {
+		return simplecache.NewSimpleCache(ctx)
+	})
+
+	postDBRegistry.Register("local", func(ctx context.Context) (backend.NoSQLDatabase, error) {
+		return simplenosqldb.NewSimpleNoSQLDB(ctx)
+	})
+
 	postStorageServiceRegistry.Register("local", func(ctx context.Context) (socialnetwork.PostStorageService, error) {
-		cache, err := simplecache.NewSimpleCache(ctx)
+		cache, err := postCacheRegistry.Get(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		db, err := simplenosqldb.NewSimpleNoSQLDB(ctx)
+		db, err := postDBRegistry.Get(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -69,10 +82,29 @@ var post2 = socialnetwork.Post{
 	PostType:  socialnetwork.POST,
 }
 
+func cleanup_post_backends(t *testing.T, ctx context.Context, pids []int64) {
+	cache, err := postCacheRegistry.Get(ctx)
+	require.NoError(t, err)
+	db, err := postDBRegistry.Get(ctx)
+	require.NoError(t, err)
+	coll, err := db.GetCollection(ctx, "post", "post")
+	require.NoError(t, err)
+	err = coll.DeleteMany(ctx, bson.D{})
+	require.NoError(t, err)
+	for _, pid := range pids {
+		pid_string := strconv.FormatInt(pid, 10)
+		cache.Delete(ctx, pid_string)
+	}
+}
+
 func TestStorePost(t *testing.T) {
 	ctx := context.Background()
 	service, err := postStorageServiceRegistry.Get(ctx)
 	require.NoError(t, err)
+
+	defer func() {
+		cleanup_post_backends(t, ctx, []int64{post1.PostID})
+	}()
 
 	err = service.StorePost(ctx, 1002, post1)
 	require.NoError(t, err)
@@ -82,6 +114,10 @@ func TestReadPost(t *testing.T) {
 	ctx := context.Background()
 	service, err := postStorageServiceRegistry.Get(ctx)
 	require.NoError(t, err)
+
+	defer func() {
+		cleanup_post_backends(t, ctx, []int64{post1.PostID})
+	}()
 
 	err = service.StorePost(ctx, 1002, post1)
 	require.NoError(t, err)
@@ -100,6 +136,10 @@ func TestReadPosts(t *testing.T) {
 	post1_c.PostID = 3
 	post2_c := post2
 	post2_c.PostID = 4
+
+	defer func() {
+		cleanup_post_backends(t, ctx, []int64{post1_c.PostID, post2_c.PostID})
+	}()
 
 	err = service.StorePost(ctx, 1002, post1_c)
 	require.NoError(t, err)

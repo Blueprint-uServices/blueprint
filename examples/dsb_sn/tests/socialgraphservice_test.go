@@ -15,8 +15,8 @@ import (
 )
 
 var socialGraphServiceRegistry = registry.NewServiceRegistry[socialnetwork.SocialGraphService]("socialgraph_service")
-var socialGraphDBRegistry = registry.NewServiceRegistry[backend.NoSQLDatabase]("socialgraph_db")
-var socialGraphCacheRegistry = registry.NewServiceRegistry[backend.Cache]("socialgraph_cache")
+var socialGraphDBRegistry = registry.NewServiceRegistry[backend.NoSQLDatabase]("social_db")
+var socialGraphCacheRegistry = registry.NewServiceRegistry[backend.Cache]("social_cache")
 
 func init() {
 
