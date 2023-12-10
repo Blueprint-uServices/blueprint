@@ -75,6 +75,7 @@ func TestComposePost(t *testing.T) {
 	require.Len(t, mentions, len(post1.UserMentions))
 
 	cleanup_dbs(t, ctx)
+	cleanup_post_backends(t, ctx, []int64{id})
 }
 
 func load_users(t *testing.T, ctx context.Context) {
