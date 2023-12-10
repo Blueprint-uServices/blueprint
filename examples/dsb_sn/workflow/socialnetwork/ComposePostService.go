@@ -7,10 +7,13 @@ import (
 	"time"
 )
 
+// The ComposePostService interface
 type ComposePostService interface {
+	// Compose a post from the provided arguments
 	ComposePost(ctx context.Context, reqID int64, username string, userID int64, text string, mediaIDs []int64, mediaTypes []string, postType int64) (int64, []int64, error)
 }
 
+// Implementation of [ComposePostService]
 type ComposePostServiceImpl struct {
 	postStorageService  PostStorageService
 	userTimelineService UserTimelineService
@@ -21,10 +24,12 @@ type ComposePostServiceImpl struct {
 	homeTimelineService HomeTimelineService
 }
 
+// Creates a [ComposePostService] instance that creates a post from the provided arguments and connects to the various internal services to store the newly created post and update the state.
 func NewComposePostServiceImpl(ctx context.Context, postStorageService PostStorageService, userTimelineService UserTimelineService, userService UserService, uniqueIDService UniqueIdService, mediaService MediaService, textService TextService, homeTimelineService HomeTimelineService) (ComposePostService, error) {
 	return &ComposePostServiceImpl{postStorageService: postStorageService, userTimelineService: userTimelineService, userService: userService, uniqueIDService: uniqueIDService, mediaService: mediaService, textService: textService, homeTimelineService: homeTimelineService}, nil
 }
 
+// ComposePost implements ComposePostService
 func (c *ComposePostServiceImpl) ComposePost(ctx context.Context, reqID int64, username string, userID int64, text string, mediaIDs []int64, mediaTypes []string, postType int64) (int64, []int64, error) {
 	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
 	var err1, err2, err3, err4 error
