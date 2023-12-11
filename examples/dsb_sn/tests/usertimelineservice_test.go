@@ -2,7 +2,6 @@ package tests
 
 import (
 	"context"
-	"log"
 	"strconv"
 	"testing"
 	"time"
@@ -66,10 +65,8 @@ func TestWriteUserTimeline(t *testing.T) {
 	require.NoError(t, err)
 
 	defer func() {
-		// Cleanup database
-		log.Println("Cleaning up database")
-		err = coll.DeleteMany(ctx, bson.D{})
-		require.NoError(t, err)
+		ids := []int64{vaastav.UserID}
+		cleanup_usertimeline_backends(t, ctx, ids)
 	}()
 
 	cache, err := userTimelineCacheRegistry.Get(ctx)
@@ -111,16 +108,10 @@ func TestReadUserTimeline(t *testing.T) {
 	service, err := userTimelineServiceRegistry.Get(ctx)
 	require.NoError(t, err)
 
-	db, err := userTimelineDBRegistry.Get(ctx)
-	require.NoError(t, err)
-	coll, err := db.GetCollection(ctx, "usertimeline", "usertimeline")
-	require.NoError(t, err)
 	defer func() {
 
-		// Cleanup database
-		log.Println("Cleaning up database")
-		err = coll.DeleteMany(ctx, bson.D{})
-		require.NoError(t, err)
+		ids := []int64{vaastav.UserID}
+		cleanup_usertimeline_backends(t, ctx, ids)
 	}()
 	cache, err := userTimelineCacheRegistry.Get(ctx)
 	require.NoError(t, err)
@@ -155,4 +146,19 @@ func TestReadUserTimeline(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, read_ids, 10)
 
+}
+
+func cleanup_usertimeline_backends(t *testing.T, ctx context.Context, ids []int64) {
+	db, err := userTimelineDBRegistry.Get(ctx)
+	require.NoError(t, err)
+	coll, err := db.GetCollection(ctx, "usertimeline", "usertimeline")
+	require.NoError(t, err)
+	err = coll.DeleteMany(ctx, bson.D{})
+	require.NoError(t, err)
+	cache, err := userTimelineCacheRegistry.Get(ctx)
+	require.NoError(t, err)
+	for _, id := range ids {
+		idstr := strconv.FormatInt(id, 10)
+		cache.Delete(ctx, idstr)
+	}
 }

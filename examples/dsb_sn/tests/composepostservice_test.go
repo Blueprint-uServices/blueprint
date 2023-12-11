@@ -76,6 +76,13 @@ func TestComposePost(t *testing.T) {
 
 	cleanup_dbs(t, ctx)
 	cleanup_post_backends(t, ctx, []int64{id})
+	var all_ids []int64
+	for _, um := range post1.UserMentions {
+		all_ids = append(all_ids, um.UserID)
+	}
+	all_ids = append(all_ids, post1.Creator.UserID)
+	cleanup_hometimeline_cache(t, ctx, all_ids)
+	cleanup_usertimeline_backends(t, ctx, []int64{post1.Creator.UserID})
 }
 
 func load_users(t *testing.T, ctx context.Context) {

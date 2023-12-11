@@ -223,10 +223,16 @@ func TestWrk2Compose(t *testing.T) {
 	require.NoError(t, err)
 
 	var all_ids []int64
+	var user_ids []int64
 
 	defer func() {
 		cleanup_utimeline_db(t, ctx)
 		cleanup_post_backends(t, ctx, all_ids)
+		cleanup_usertimeline_backends(t, ctx, user_ids)
+		for _, um := range post1.UserMentions {
+			user_ids = append(user_ids, um.UserID)
+		}
+		cleanup_hometimeline_cache(t, ctx, user_ids)
 	}()
 
 	// Register some users
@@ -266,6 +272,7 @@ func TestWrk2Compose(t *testing.T) {
 	require.True(t, id > 0)
 	require.Len(t, mentions, len(post1.UserMentions))
 	all_ids = append(all_ids, id)
+	user_ids = append(user_ids, vaastav.UserID)
 
 	// Cleanup databases
 	user_db, err := userDBRegistry.Get(ctx)

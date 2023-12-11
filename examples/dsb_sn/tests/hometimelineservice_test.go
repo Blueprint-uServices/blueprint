@@ -53,12 +53,19 @@ func TestWriteHomeTimeline(t *testing.T) {
 	// Add some followers using social graph service!
 	setup_social(t, ctx)
 
+	ids := []int64{jcmace.UserID, antoinek.UserID, dg.UserID}
+	defer func() {
+		cleanup_social_database(t, ctx)
+		ids = append(ids, vaastav.UserID)
+		cleanup_hometimeline_cache(t, ctx, ids)
+	}()
+
 	err = service.WriteHomeTimeline(ctx, 1001, post1.PostID, vaastav.UserID, time.Now().UnixNano(), []int64{dg.UserID})
 	require.NoError(t, err)
 
 	// Check cache entries to ensure the posts are loaded.
-	ids := []int64{jcmace.UserID, antoinek.UserID, dg.UserID}
 	for _, id := range ids {
+		t.Log("CHecking hometimeline for", id)
 		idstr := strconv.FormatInt(id, 10)
 		var posts []socialnetwork.PostInfo
 		exists, err := cache.Get(ctx, idstr, &posts)
@@ -105,8 +112,6 @@ func TestWriteHomeTimeline(t *testing.T) {
 	vaasIDstr := strconv.FormatInt(vaastav.UserID, 10)
 	err = socialcache.Delete(ctx, vaasIDstr+":followers")
 	require.NoError(t, err)
-
-	cleanup_social_database(t, ctx)
 }
 
 func TestReadHomeTimeline(t *testing.T) {
@@ -119,12 +124,17 @@ func TestReadHomeTimeline(t *testing.T) {
 
 	// Add some followers using social graph service!
 	setup_social(t, ctx)
+	ids := []int64{jcmace.UserID, antoinek.UserID, dg.UserID}
+	defer func() {
+		cleanup_social_database(t, ctx)
+		ids = append(ids, vaastav.UserID)
+		cleanup_hometimeline_cache(t, ctx, ids)
+	}()
 
 	err = service.WriteHomeTimeline(ctx, 1001, post1.PostID, vaastav.UserID, time.Now().UnixNano(), []int64{dg.UserID})
 	require.NoError(t, err)
 
 	// Check cache entries to ensure the posts are loaded.
-	ids := []int64{jcmace.UserID, antoinek.UserID, dg.UserID}
 
 	// Add another post
 	err = service.WriteHomeTimeline(ctx, 1002, post2.PostID, vaastav.UserID, time.Now().UnixNano(), []int64{jcmace.UserID})
@@ -170,8 +180,6 @@ func TestReadHomeTimeline(t *testing.T) {
 	vaasIDstr := strconv.FormatInt(vaastav.UserID, 10)
 	err = socialcache.Delete(ctx, vaasIDstr+":followers")
 	require.NoError(t, err)
-
-	cleanup_social_database(t, ctx)
 }
 
 func setup_social(t *testing.T, ctx context.Context) {
@@ -200,4 +208,15 @@ func cleanup_social_database(t *testing.T, ctx context.Context) {
 	require.NoError(t, err)
 	err = socialcoll.DeleteMany(ctx, bson.D{})
 	require.NoError(t, err)
+}
+
+func cleanup_hometimeline_cache(t *testing.T, ctx context.Context, ids []int64) {
+	t.Log("cleanup hometimeline ids:", ids)
+	cache, err := homeTimelineCacheRegistry.Get(ctx)
+	require.NoError(t, err)
+	for _, id := range ids {
+		idstr := strconv.FormatInt(id, 10)
+		err = cache.Delete(ctx, idstr)
+		require.NoError(t, err)
+	}
 }

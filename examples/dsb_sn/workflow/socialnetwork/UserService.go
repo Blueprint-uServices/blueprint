@@ -187,9 +187,11 @@ func (u *UserServiceImpl) RegisterUserWithId(ctx context.Context, reqID int64, f
 		return err
 	}
 	var user User
-	user.UserID = -1
-	res.One(ctx, &user)
-	if user.UserID != -1 {
+	exists, err := res.One(ctx, &user)
+	if err != nil {
+		return err
+	}
+	if exists {
 		return errors.New("Username already registered")
 	}
 	salt := u.genRandomStr(32)
