@@ -10,6 +10,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
+// Blueprint IR Node that represents a memcached container
 type MemcachedContainer struct {
 	backend.Cache
 	docker.Container
@@ -19,6 +20,8 @@ type MemcachedContainer struct {
 	Iface        *goparser.ParsedInterface
 }
 
+// Memcached interface exposed to other services.
+// This interface can not be modified further.
 type MemcachedInterface struct {
 	service.ServiceInterface
 	Wrapped service.ServiceInterface

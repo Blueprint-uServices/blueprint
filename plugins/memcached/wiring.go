@@ -1,3 +1,8 @@
+// Package memcached provides the Blueprint wiring and IR implementations of a memcached plugin that
+// provides a Cache interface implementation via a pre-built memcached container image.
+//
+// Usage: To add a memcached container named `fooCache`
+//   PrebuiltContainer(spec, "fooCache")
 package memcached
 
 import (
@@ -8,9 +13,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
-/*
-Defines a cache called `cacheName` that uses the pre-built memcached process image
-*/
+// Adds a memcached container to the application that defines a cache called `cacheName` which uses the pre-built memcached process container
 func PrebuiltContainer(spec wiring.WiringSpec, cacheName string) string {
 	// The nodes that we are defining
 	procName := cacheName + ".process"
