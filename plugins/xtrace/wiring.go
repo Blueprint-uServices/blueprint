@@ -5,7 +5,7 @@
 // The package provides a built-in xtrace container that provides the server-side implementation
 // and a go-client for connecting to the server.
 //
-// The applications muse use a backend.XTracer (runtime/core/backend) as the interface in the workflow.
+// The applications must use a backend.XTracer (runtime/core/backend) as the interface in the workflow.
 package xtrace
 
 import (

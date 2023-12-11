@@ -1,3 +1,11 @@
+// Package opentelemetry provides two plugins:
+// (i)  a plugin to generate and include an opentelemetry collector instance in a Blueprint application
+// (ii) provides a modifier plugin to wrap the service with an OpenTelemetry wrapper to generate OT compatible traces/logs.
+//
+// The package provides an in-memory trace exporter implementation and a go-client for generating traces on both the server and client side.
+// The generated clients handle context propagation correctly on both the server and client sides.
+//
+// The applications must use a backend.Tracer (runtime/core/backend) as the interface in the workflow.
 package opentelemetry
 
 import (
@@ -10,22 +18,20 @@ import (
 )
 
 /*
-Instruments `serviceName` with OpenTelemetry.  This can only be done if `serviceName` is a
-pointer from Golang nodes to Golang nodes.
+Instruments `serviceName` with OpenTelemetry.  This can only be done if `serviceName` is a service declared in the wiring spec using [workflow.Define]
 
-This call will also define the OpenTelemetry collector.
-
-Instrumenting `serviceName` will add both src and dst-side modifiers to the pointer.
+This call will only export traces to stdout and no external collector will be defined.
+Use the InstrumentUsingCustomCollector for exporting traces to a custom collector such as the ones provided by jaeger or zipkin.
 */
 func Instrument(spec wiring.WiringSpec, serviceName string) {
 	DefineOpenTelemetryCollector(spec, DefaultOpenTelemetryCollectorName)
 	InstrumentUsingCustomCollector(spec, serviceName, DefaultOpenTelemetryCollectorName)
 }
 
-/*
-This is the same as the Instrument function, but uses `collectorName` as the OpenTelemetry
-collector and does not attempt to define or redefine the collector.
-*/
+// Instruments `serviceName` with OpenTelemetry.  This can only be done if `serviceName` is a service declared in the wiring spec using [workflow.Define]
+//
+// This call will configure the generated clients on server and client side to use the exporter provided by the custom collector indicated by the `collectorName`.
+// The `collectorName` must be declared in the wiring spec.
 func InstrumentUsingCustomCollector(spec wiring.WiringSpec, serviceName string, collectorName string) {
 	// The nodes that we are defining
 	clientWrapper := serviceName + ".client.ot"
@@ -89,6 +95,8 @@ Defines the OpenTelemetry collector as a process node
 
 This doesn't need to be explicitly called, although it can if users want to control
 the placement of the opentelemetry collector
+
+NOTE: Currently does not include the opentelemetry collector. This might change in the future.
 */
 func DefineOpenTelemetryCollector(spec wiring.WiringSpec, collectorName string) string {
 	// The nodes that we are defining

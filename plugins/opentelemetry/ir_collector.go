@@ -9,6 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
+// Blueprint IR Node representing an OT COllector
 type OpenTelemetryCollector struct {
 	docker.Container
 
@@ -17,6 +18,7 @@ type OpenTelemetryCollector struct {
 	Iface         *goparser.ParsedInterface
 }
 
+// Represents the OT interface exposed to the workflow.
 type OTCollectorInterface struct {
 	service.ServiceInterface
 	Wrapped service.ServiceInterface

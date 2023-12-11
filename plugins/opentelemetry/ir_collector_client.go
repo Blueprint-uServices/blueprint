@@ -13,12 +13,15 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Interface that indicates if an IRNode implements the OTCollector interface
+// All custom collector clients **must** implement this interface
 type OpenTelemetryCollectorInterface interface {
 	golang.Node
 	golang.Instantiable
 	ImplementsOTCollectorClient()
 }
 
+// Blueprint IR Node that represents a client to the ot container
 type OpenTelemetryCollectorClient struct {
 	golang.Node
 	golang.Instantiable
