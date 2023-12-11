@@ -14,6 +14,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Blueprint IR Node that wraps the client-side of a service to generate xtrace compatible logs
 type XtraceClientWrapper struct {
 	golang.Service
 	golang.Instantiable
