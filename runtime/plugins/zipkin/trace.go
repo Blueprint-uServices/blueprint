@@ -1,3 +1,4 @@
+// Package zipkin implements a tracer [backend.Tracer] client interface for the zipkin tracer.
 package zipkin
 
 import (

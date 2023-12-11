@@ -1,3 +1,4 @@
+// Package jaeger implements a tracer [backend.Tracer] client interface for the jaeger tracer.
 package jaeger
 
 import (
