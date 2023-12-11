@@ -11,6 +11,9 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// This function is used by the Thrift plugin to generate the client-side caller of the Thrift service.
+//
+// It is assumed that outputPackage is the same as the one where the .thrift is generated to
 func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error {
 	pkg, err := builder.CreatePackage(outputPackage)
 	if err != nil {
@@ -40,6 +43,7 @@ func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 	return gogen.ExecuteTemplateToFile("ThriftClient", clientTemplate, client, outputFile)
 }
 
+// Arguments to the template code
 type clientArgs struct {
 	Package      golang.PackageInfo
 	Service      *gocode.ServiceInterface

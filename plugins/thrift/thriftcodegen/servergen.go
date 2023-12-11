@@ -11,6 +11,9 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// This function is used by the Thrift plugin to generate the server-side Thrift service.
+//
+// It is assumed that outputPackage is the same as the one where the .thrift is generated to
 func GenerateServerHandler(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error {
 	pkg, err := builder.CreatePackage(outputPackage)
 	if err != nil {
@@ -37,6 +40,7 @@ func GenerateServerHandler(builder golang.ModuleBuilder, service *gocode.Service
 	return gogen.ExecuteTemplateToFile("ThriftServer", serverTemplate, server, outputFile)
 }
 
+// Arguments to the template code
 type serverArgs struct {
 	Package      golang.PackageInfo
 	Service      *gocode.ServiceInterface

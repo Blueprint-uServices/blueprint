@@ -92,6 +92,7 @@ func CompileThriftFile(thriftFileName string) error {
 	return nil
 }
 
+// A basic structural representation of the Thrift messages and services
 type ThriftField struct {
 	SrcType      gocode.TypeName
 	ThriftType   string

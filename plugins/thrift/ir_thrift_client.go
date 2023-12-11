@@ -13,19 +13,22 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-type GolangThriftClient struct {
+// IRNode representing a client to a Golang server.
+// This node does not introduce any new runtime interfaces or types that can be used by other IRNodes
+// Thrift code generation happens during the ModuleBuilder GeneratesFuncs pass
+type golangThriftClient struct {
 	golang.Node
 	golang.Service
 	golang.GeneratesFuncs
 	golang.Instantiable
 
 	InstanceName  string
-	ServerAddr    *address.Address[*GolangThriftServer]
+	ServerAddr    *address.Address[*golangThriftServer]
 	outputPackage string
 }
 
-func newGolangThriftClient(name string, addr *address.Address[*GolangThriftServer]) (*GolangThriftClient, error) {
-	node := &GolangThriftClient{}
+func newGolangThriftClient(name string, addr *address.Address[*golangThriftServer]) (*golangThriftClient, error) {
+	node := &golangThriftClient{}
 	node.InstanceName = name
 	node.ServerAddr = addr
 	node.outputPackage = "thrift"
@@ -33,15 +36,15 @@ func newGolangThriftClient(name string, addr *address.Address[*GolangThriftServe
 	return node, nil
 }
 
-func (n *GolangThriftClient) String() string {
+func (n *golangThriftClient) String() string {
 	return n.InstanceName + " = ThriftClient(" + n.ServerAddr.Dial.Name() + ")"
 }
 
-func (n *GolangThriftClient) Name() string {
+func (n *golangThriftClient) Name() string {
 	return n.InstanceName
 }
 
-func (node *GolangThriftClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
+func (node *golangThriftClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface, err := node.ServerAddr.Server.GetInterface(ctx)
 	if err != nil {
 		return nil, err
@@ -57,11 +60,11 @@ func (node *GolangThriftClient) GetInterface(ctx ir.BuildContext) (service.Servi
 	return wrapped, nil
 }
 
-func (node *GolangThriftClient) AddInterfaces(builder golang.ModuleBuilder) error {
+func (node *golangThriftClient) AddInterfaces(builder golang.ModuleBuilder) error {
 	return node.ServerAddr.Server.Wrapped.AddInterfaces(builder)
 }
 
-func (node *GolangThriftClient) GenerateFuncs(builder golang.ModuleBuilder) error {
+func (node *golangThriftClient) GenerateFuncs(builder golang.ModuleBuilder) error {
 	iface, err := golang.GetGoInterface(builder, node)
 	if err != nil {
 		return nil
@@ -85,7 +88,7 @@ func (node *GolangThriftClient) GenerateFuncs(builder golang.ModuleBuilder) erro
 	return nil
 }
 
-func (node *GolangThriftClient) AddInstantiation(builder golang.NamespaceBuilder) error {
+func (node *golangThriftClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.InstanceName) {
 		return nil
 	}
@@ -110,5 +113,5 @@ func (node *GolangThriftClient) AddInstantiation(builder golang.NamespaceBuilder
 	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.ServerAddr.Dial})
 }
 
-func (node *GolangThriftClient) ImplementsGolangNode()    {}
-func (node *GolangThriftClient) ImplementsGolangService() {}
+func (node *golangThriftClient) ImplementsGolangNode()    {}
+func (node *golangThriftClient) ImplementsGolangService() {}

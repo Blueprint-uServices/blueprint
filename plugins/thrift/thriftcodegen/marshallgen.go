@@ -14,6 +14,9 @@ type marshallArgs struct {
 	Imports *gogen.Imports
 }
 
+// Generates marshalling functions that convert between Go objects and Thrift struct objects
+//
+// This extends the code in thriftgen.go and is called from thriftgen.go
 func (b *ThriftBuilder) GenerateMarshallingCode(outputFilePath string) error {
 	args := &marshallArgs{}
 	args.ThriftBuilder = *b
