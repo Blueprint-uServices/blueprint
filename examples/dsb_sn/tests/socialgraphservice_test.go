@@ -21,6 +21,7 @@ var socialGraphCacheRegistry = registry.NewServiceRegistry[backend.Cache]("socia
 func init() {
 
 	socialGraphDBRegistry.Register("local", func(ctx context.Context) (backend.NoSQLDatabase, error) {
+		//return mongodb.NewMongoDB(ctx, "localhost:27017")
 		return simplenosqldb.NewSimpleNoSQLDB(ctx)
 	})
 

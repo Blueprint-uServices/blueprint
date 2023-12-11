@@ -257,7 +257,7 @@ func (s *SocialGraphServiceImpl) Unfollow(ctx context.Context, reqID int64, user
 			return
 		}
 		query := `{"UserID": ` + followeeIDstr + `}`
-		update := `{"$pull": {"followees": {"UserID": ` + userIDstr + `}}}`
+		update := `{"$pull": {"followers": {"UserID": ` + userIDstr + `}}}`
 		query_d, err_internal := parseNoSQLDBQuery(query)
 		if err_internal != nil {
 			err2 = err_internal
