@@ -22,7 +22,7 @@ type MySQLDBContainer struct {
 	password string
 }
 
-// MongoDB interface exposed by the docker container.
+// MySQL interface exposed by the docker container.
 type MySQLInterface struct {
 	service.ServiceInterface
 	Wrapped service.ServiceInterface
