@@ -10,6 +10,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
+// Blueprint IR Node that represents the server side docker container
 type MongoDBContainer struct {
 	docker.Container
 	backend.NoSQLDB
@@ -19,6 +20,7 @@ type MongoDBContainer struct {
 	Iface        *goparser.ParsedInterface
 }
 
+// MongoDB interface exposed by the docker container.
 type MongoInterface struct {
 	service.ServiceInterface
 	Wrapped service.ServiceInterface

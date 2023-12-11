@@ -14,6 +14,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Blueprint IR Node that represents a client to a redis container
 type RedisGoClient struct {
 	golang.Service
 	backend.Cache

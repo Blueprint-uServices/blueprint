@@ -1,3 +1,9 @@
+// Package mongodb provides a plugin to generate and include a mongodb instance in a Blueprint application.
+//
+// The package provides a built-in mongodb container that provides the server-side implementation
+// and a go-client for connecting to the client.
+//
+// The applications must use a backend.NoSQLDatabase (runtime/core/backend) as the interface in the application workflow.
 package mongodb
 
 import (
@@ -8,6 +14,10 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
+// Container generates the IRNodes for a mongodb server docker container that uses the latest mongodb image
+// and the clients needed by the generated application to communicate with the server.
+//
+// The generated container has the name `dbName`.
 func Container(spec wiring.WiringSpec, dbName string) string {
 	procName := dbName + ".process"
 	clientName := dbName + ".client"

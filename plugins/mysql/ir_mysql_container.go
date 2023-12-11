@@ -10,6 +10,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
+// Blueprint IR Node that represents the server side docker container
 type MySQLDBContainer struct {
 	docker.Container
 	backend.RelDB
@@ -21,6 +22,7 @@ type MySQLDBContainer struct {
 	password string
 }
 
+// MySQL interface exposed by the docker container.
 type MySQLInterface struct {
 	service.ServiceInterface
 	Wrapped service.ServiceInterface

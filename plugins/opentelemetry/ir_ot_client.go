@@ -13,6 +13,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Blueprint IR Node that wraps the client-side of a service to generate ot compatible logs
 type OpenTelemetryClientWrapper struct {
 	golang.Service
 	golang.GeneratesFuncs

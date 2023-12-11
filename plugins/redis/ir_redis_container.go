@@ -10,6 +10,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
+// Blueprint IR Node that represents a redis container
 type RedisContainer struct {
 	docker.Container
 	backend.Cache
@@ -19,6 +20,8 @@ type RedisContainer struct {
 	Iface        *goparser.ParsedInterface
 }
 
+// Redis interface exposed to other services.
+// This interface can not be modified further.
 type RedisInterface struct {
 	service.ServiceInterface
 	Wrapped service.ServiceInterface

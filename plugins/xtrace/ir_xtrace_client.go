@@ -13,6 +13,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Blueprint IR Node that represents a client to the Xtrace container
 type XTraceClient struct {
 	golang.Node
 	golang.Instantiable

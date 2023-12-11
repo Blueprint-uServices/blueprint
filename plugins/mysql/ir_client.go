@@ -14,6 +14,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Blueprint IR Node that represents the generated client for the mysql container
 type MySQLDBGoClient struct {
 	golang.Service
 	backend.RelDB

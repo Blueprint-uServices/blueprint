@@ -1,3 +1,11 @@
+// Package xtrace provides two plugins:
+// (i)  a plugin to generate and include an xtrace instance in a Blueprint application.
+// (ii) provides a modifier plugin to wrap the service with an XTrace wrapper to generate XTrace compatible traces/logs.
+//
+// The package provides a built-in xtrace container that provides the server-side implementation
+// and a go-client for connecting to the server.
+//
+// The applications must use a backend.XTracer (runtime/core/backend) as the interface in the workflow.
 package xtrace
 
 import (
@@ -10,7 +18,9 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-// Instruments the service with an entry + exit point xtrace wrapper to generate xtrace compatible logs
+// Instruments the service with an entry + exit point xtrace wrapper to generate xtrace compatible logs.
+// Usage:
+//   Instrument(spec, "serviceA")
 func Instrument(spec wiring.WiringSpec, serviceName string) {
 	DefineXTraceServerContainer(spec)
 	clientWrapper := serviceName + ".client.xtrace"
@@ -58,6 +68,10 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 	})
 }
 
+// Generates the IRNodes for a xtrace docker container that uses the latest xtrace image
+// and the clients needed by the generated application to communicate with the server.
+//
+// The generated container has the name `serviceName`.
 func DefineXTraceServerContainer(spec wiring.WiringSpec) {
 	xtrace_server := "xtrace_server"
 	xtrace_addr := xtrace_server + ".addr"

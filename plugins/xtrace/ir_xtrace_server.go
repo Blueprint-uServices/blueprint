@@ -9,6 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
+// Blueprint IR Node that represents the Xtrace container
 type XTraceServerContainer struct {
 	docker.Container
 
@@ -17,6 +18,7 @@ type XTraceServerContainer struct {
 	Iface      *goparser.ParsedInterface
 }
 
+// The interface exposed by the XTrace server.
 type XTraceInterface struct {
 	service.ServiceInterface
 	Wrapped service.ServiceInterface

@@ -14,6 +14,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Blueprint IR Node that represents a client to a memcached container
 type MemcachedGoClient struct {
 	golang.Service
 	backend.Cache

@@ -9,6 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
+// Blueprint IR node that represents the Jaeger container
 type JaegerCollectorContainer struct {
 	docker.Container
 
@@ -17,6 +18,7 @@ type JaegerCollectorContainer struct {
 	Iface         *goparser.ParsedInterface
 }
 
+// Jaeger interface exposed to the application.
 type JaegerInterface struct {
 	service.ServiceInterface
 	Wrapped service.ServiceInterface

@@ -13,6 +13,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Blueprint IR node representing a client to the zipkin container
 type ZipkinCollectorClient struct {
 	golang.Node
 	golang.Instantiable

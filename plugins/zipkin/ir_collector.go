@@ -9,6 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
+// Blueprint IR node that represents the Zipkin container
 type ZipkinCollectorContainer struct {
 	docker.Container
 
@@ -17,6 +18,7 @@ type ZipkinCollectorContainer struct {
 	Iface         *goparser.ParsedInterface
 }
 
+// Zipkin interface exposed to the application.
 type ZipkinInterface struct {
 	service.ServiceInterface
 	Wrapped service.ServiceInterface

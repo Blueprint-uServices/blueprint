@@ -1,7 +1,7 @@
 // Package mysql provides a plugin to generate and include a mysql instance in a Blueprint application.
 //
 // The package provides a built-in mysql container that provides the server-side implementation
-// and a go-client for connecting to the client.
+// and a go-client for connecting to the server.
 //
 // The applications must use a backend.RelationalDB (runtime/core/backend) as the interface in the workflow.
 package mysql
