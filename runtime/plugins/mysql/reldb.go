@@ -1,3 +1,4 @@
+// Package mysql provides a client-wrapper implementation of the [backend.RelationalDB] interface for a mysql server.
 package mysql
 
 import (
@@ -9,7 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// A relational DB that uses the mysql package
+// Implements a RelationalDB that uses the mysql package
 type MySqlDB struct {
 	name string
 	db   *sqlx.DB
@@ -51,14 +52,17 @@ func (s *MySqlDB) Query(ctx context.Context, query string, args ...any) (*sql.Ro
 	return s.db.QueryContext(ctx, query, args...)
 }
 
+// Prepare implements backend.RelationalDB
 func (s *MySqlDB) Prepare(ctx context.Context, query string) (*sql.Stmt, error) {
 	return s.db.PrepareContext(ctx, query)
 }
 
+// Select implements backend.RelationalDB
 func (s *MySqlDB) Select(ctx context.Context, dst interface{}, query string, args ...any) error {
 	return s.db.SelectContext(ctx, dst, query, args...)
 }
 
+// Get implements backend.RelationalDB
 func (s *MySqlDB) Get(ctx context.Context, dst interface{}, query string, args ...any) error {
 	return s.db.GetContext(ctx, dst, query, args...)
 }
