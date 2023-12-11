@@ -14,6 +14,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Blueprint IR Node that represents the generated client for the mongodb container
 type MongoDBGoClient struct {
 	golang.Service
 	backend.NoSQLDB
