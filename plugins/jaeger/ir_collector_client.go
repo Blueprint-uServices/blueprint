@@ -13,6 +13,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Blueprint IR node representing a client to the jaeger container
 type JaegerCollectorClient struct {
 	golang.Node
 	golang.Instantiable
