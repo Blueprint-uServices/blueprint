@@ -10,6 +10,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// This function is used by the HTTP plugin to generate the client-side HTTP service
 func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error {
 	pkg, err := builder.CreatePackage(outputPackage)
 	if err != nil {
@@ -32,6 +33,7 @@ func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 	return gogen.ExecuteTemplateToFile("HTTPClient", clientTemplate, client, outputFile)
 }
 
+// Arguments to the template code
 type clientArgs struct {
 	Package golang.PackageInfo
 	Service *gocode.ServiceInterface

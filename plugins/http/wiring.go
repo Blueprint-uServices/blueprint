@@ -1,3 +1,14 @@
+// Package http implements a Blueprint plugin that enables any Golang service to be deployed using a http server.
+
+// To use the plugin in a Blueprint wiring spec, import this package and use the [Deploy] method, i.e.
+//
+//   import "gitlab.mpi-sws.org/cld/blueprint/plugins/http"
+//   http.Deploy(spec, "my_service")
+//
+// See the documentation for [Deploy] for more information about its behavior.
+//
+// The plugin implements a server-side handler and client-side
+// library that calls the server. This is implemented within the [httpcodegen] package.
 package http
 
 import (
@@ -10,11 +21,18 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-/*
-Deploys `serviceName` as a HTTP server. This can only be done if `serviceName` is a pointer from Golang nodes to Golang nodes.
+//Deploys `serviceName` as a HTTP server.
 
-This call adds both src and dst side modifiers to `serviceName`. After this, the pointer will be from addr to addr and can no longer modified with golang nodes.
-*/
+// Typcially serviceName should be the name of a workflow service that was initially defined using [workflow.Define].
+//
+// Like many other modifiers, HTTP modifier the service at the golang level, by generating
+// server-side handler code and a client-side library. However, HTTP
+// should be the last golang-level modifier applied to a service, because
+// thereafter communication between the client and server
+// is no longer at the golang level, but at the network level.
+//
+// Deploying a service with HTTP increases the visibility of the service within the application.
+// By default, any other service running in any other container or namespace can now contact this service.
 func Deploy(spec wiring.WiringSpec, serviceName string) {
 	// The nodes that we are defining
 	httpClient := serviceName + ".http_client"
