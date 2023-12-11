@@ -1,3 +1,4 @@
+// Package memcached implements a key-value [backend.Cache] client interface to a vanilla memcached implementation.
 package memcached
 
 import (
@@ -9,11 +10,13 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
 
+// A memcached client wrapper that implements the [backend.Cache] interface
 type Memcached struct {
 	backend.Cache
 	Client *memcache.Client
 }
 
+// Instantiates a new memcached client to a memcached instance running at `serverAddress`
 func NewMemcachedClient(ctx context.Context, serverAddress string) (*Memcached, error) {
 	cache := &Memcached{}
 	client := memcache.New(serverAddress)
@@ -22,6 +25,7 @@ func NewMemcachedClient(ctx context.Context, serverAddress string) (*Memcached, 
 	return cache, nil
 }
 
+// Implements the backend.Cache interface
 func (m *Memcached) Put(ctx context.Context, key string, value interface{}) error {
 	marshaled_val, err := json.Marshal(value)
 	if err != nil {
@@ -30,6 +34,7 @@ func (m *Memcached) Put(ctx context.Context, key string, value interface{}) erro
 	return m.Client.Set(&memcache.Item{Key: key, Value: marshaled_val})
 }
 
+// Implements the backend.Cache interface
 func (m *Memcached) Get(ctx context.Context, key string, value interface{}) (bool, error) {
 	it, err := m.Client.Get(key)
 	if err == memcache.ErrCacheMiss {
@@ -41,15 +46,18 @@ func (m *Memcached) Get(ctx context.Context, key string, value interface{}) (boo
 	return true, json.Unmarshal(it.Value, value)
 }
 
+// Implements the backend.Cache interface
 func (m *Memcached) Incr(ctx context.Context, key string) (int64, error) {
 	val, err := m.Client.Increment(key, 1)
 	return int64(val), err
 }
 
+// Implements the backend.Cache interface
 func (m *Memcached) Delete(ctx context.Context, key string) error {
 	return m.Client.Delete(key)
 }
 
+// Implements the backend.Cache interface
 func (m *Memcached) Mget(ctx context.Context, keys []string, values []interface{}) error {
 	val_map, err := m.Client.GetMulti(keys)
 	if err != nil {
@@ -66,6 +74,7 @@ func (m *Memcached) Mget(ctx context.Context, keys []string, values []interface{
 	return nil
 }
 
+// Implements the backend.Cache interface
 func (m *Memcached) Mset(ctx context.Context, keys []string, values []interface{}) error {
 	var wg sync.WaitGroup
 	wg.Add(len(keys))
