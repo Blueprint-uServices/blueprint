@@ -8,16 +8,21 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
 
+// The UrlShortenService interface
 type UrlShortenService interface {
+	// Converts raw `urls` into shortened urls to be used within the application. Returns the list of shortened urls.
 	ComposeUrls(ctx context.Context, reqID int64, urls []string) ([]URL, error)
-	GetExtendedUrls(ctx context.Context, reqID int64, shortened_urls []string) ([]string, error)
+	// Converts the list of shortened urls into their extended forms.
+	GetExtendedUrls(ctx context.Context, reqID int64, shortenedUrls []string) ([]string, error)
 }
 
+// Implementation of [UrlShortenService]
 type UrlShortenServiceImpl struct {
 	urlShortenDB backend.NoSQLDatabase
 	hostname     string
 }
 
+// Creates a [UrlShortenService] instance for converting raw urls to shortened urls and vice versa.
 func NewUrlShortenServiceImpl(ctx context.Context, urlShortenDB backend.NoSQLDatabase) (UrlShortenService, error) {
 	rand.Seed(time.Now().UnixNano())
 	return &UrlShortenServiceImpl{urlShortenDB: urlShortenDB, hostname: "http://short-url/"}, nil
@@ -31,6 +36,7 @@ func (u *UrlShortenServiceImpl) genRandomStr(length int) string {
 	return string(b)
 }
 
+// Implements ComposeUrls interface
 func (u *UrlShortenServiceImpl) ComposeUrls(ctx context.Context, reqID int64, urls []string) ([]URL, error) {
 	var target_urls []URL
 	var target_url_docs []interface{}
@@ -55,7 +61,9 @@ func (u *UrlShortenServiceImpl) ComposeUrls(ctx context.Context, reqID int64, ur
 	return target_urls, nil
 }
 
-func (u *UrlShortenServiceImpl) GetExtendedUrls(ctx context.Context, reqID int64, shortened_urls []string) ([]string, error) {
+// Implements UrlShortenService interface.
+// Currently not implemented as the original DSB application doesn't implement this function either.
+func (u *UrlShortenServiceImpl) GetExtendedUrls(ctx context.Context, reqID int64, shortenedUrls []string) ([]string, error) {
 	// Not implemented in Original DSB
 	return []string{}, nil
 }

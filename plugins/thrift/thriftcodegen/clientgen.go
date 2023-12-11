@@ -33,7 +33,7 @@ func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 	innerPkgPath := builder.Info().Name + "/" + outputPackage + "/" + innerPkg
 
 	client.Imports.AddPackages(
-		"context", "time",
+		"context", "time", "errors",
 		"github.com/apache/thrift/lib/go/thrift",
 		innerPkgPath,
 	)
@@ -115,6 +115,10 @@ func (client *{{$receiver}}) {{SignatureWithRetVars $f}} {
 		err = ctx.Err()
 	}
 	if err != nil {
+		return
+	}
+	if rsp == nil {
+		err = errors.New("Response object is nil")
 		return
 	}
 

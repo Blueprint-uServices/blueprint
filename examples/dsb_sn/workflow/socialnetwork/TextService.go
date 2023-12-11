@@ -7,19 +7,24 @@ import (
 	"sync"
 )
 
+// The TextService interface
 type TextService interface {
+	// Parses the raw `text` to return an edited text with the urls replaced with shortened urls, usermention objects to be stored with the post, and the url objects to be stored with the post.
 	ComposeText(ctx context.Context, reqID int64, text string) (string, []UserMention, []URL, error)
 }
 
+// Implementation of [TextService]
 type TextServiceImpl struct {
 	urlShortenService  UrlShortenService
 	userMentionService UserMentionService
 }
 
+// Creates a [TextService] instance for parsing texts in created posts.
 func NewTextServiceImpl(ctx context.Context, urlShortenService UrlShortenService, userMentionService UserMentionService) (TextService, error) {
 	return &TextServiceImpl{urlShortenService: urlShortenService, userMentionService: userMentionService}, nil
 }
 
+// Implements TextService interface
 func (t *TextServiceImpl) ComposeText(ctx context.Context, reqID int64, text string) (string, []UserMention, []URL, error) {
 	r := regexp.MustCompile(`@[a-zA-Z0-9-_]+`)
 	matches := r.FindAllString(text, -1)
