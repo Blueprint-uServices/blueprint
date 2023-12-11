@@ -118,7 +118,8 @@ func (client *{{$receiver}}) {{SignatureWithRetVars $f}} {
 		return
 	}
 	if rsp == nil {
-		return errors.New("Response object is nil")
+		err = errors.New("Response object is nil")
+		return
 	}
 
 	{{RetVarsEquals $f}} unmarshall_{{$f.Name}}_rsp(rsp)
