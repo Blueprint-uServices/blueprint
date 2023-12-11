@@ -11,6 +11,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 )
 
+// Blueprint IR node representing a Retrier
 type RetrierClient struct {
 	golang.Service
 	golang.GeneratesFuncs
