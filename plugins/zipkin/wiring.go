@@ -1,3 +1,9 @@
+// Package zipkin provides a plugin to generate and include a zipkin collector instance in a Blueprint application.
+//
+// The package provides a zipkin container that provides the server-side implementation
+// and a go-client for connecting to the server.
+//
+// The applications must use a backend.Tracer (runtime/core/backend) as the interface in the workflow.
 package zipkin
 
 import (
@@ -7,7 +13,10 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
-// Defines the Zipkin collector as a process node. Also creates a pointer to the collector and a client node that are used by clients.
+// Generates the IRNodes for a zipkin docker container named `collectorName` that uses the latest zipkin container
+// and the clients needed by the generated application to communicate with the server.
+//
+// The returned collectorName must be used as an argument to the opentelemetry.InstrumentUsingCustomCollector(spec, serviceName, `collectorName`).
 func Collector(spec wiring.WiringSpec, collectorName string) string {
 	collectorAddr := collectorName + ".addr"
 	collectorProc := collectorName + ".proc"
