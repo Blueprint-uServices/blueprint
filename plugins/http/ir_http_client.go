@@ -11,6 +11,8 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/http/httpcodegen"
 )
 
+// IRNode representing a client to a Golang server.
+// This node does not introduce any new runtime interfaces or types that can be used by other IRNodes.
 type GolangHttpClient struct {
 	golang.Node
 	golang.Service
@@ -18,12 +20,12 @@ type GolangHttpClient struct {
 	golang.Instantiable
 
 	InstanceName string
-	ServerAddr   *address.Address[*GolangHttpServer]
+	ServerAddr   *address.Address[*golangHttpServer]
 
 	outputPackage string
 }
 
-func newGolangHttpClient(name string, addr *address.Address[*GolangHttpServer]) (*GolangHttpClient, error) {
+func newGolangHttpClient(name string, addr *address.Address[*golangHttpServer]) (*GolangHttpClient, error) {
 	node := &GolangHttpClient{}
 	node.InstanceName = name
 	node.ServerAddr = addr

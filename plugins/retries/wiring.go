@@ -1,3 +1,10 @@
+// Package retries provides a Blueprint modifier for the client side of service calls.
+//
+// The plugin wraps clients with a retrier using that retries a request until one of the two conditions is met:
+// i)  the requests returns without an error
+// ii) the number of failed tries has reached the maximum number of failures.
+// Usage:
+//  AddRetries(spec, "my_service", 10)
 package retries
 
 import (
@@ -9,7 +16,11 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Add retrier functionality to all clients of the specified service.
+// Uses a [blueprint.WiringSpec]
 // Modifies the given service such that all clients to that service retry `max_retries` number of times on error.
+// Usage:
+//   AddRetries(spec, "my_service", 10)
 func AddRetries(spec wiring.WiringSpec, serviceName string, max_retries int64) {
 	clientWrapper := serviceName + ".client.retrier"
 

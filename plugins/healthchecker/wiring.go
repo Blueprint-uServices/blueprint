@@ -1,3 +1,7 @@
+// Package healthchecker provides a Blueprint modifier for the server side of a service.
+//
+// The plugin extends the service interface with a `Health` method that returns a success string if the service is healthy.
+// Note: The plugin __does not__ check the health of all of the dependencies of the service.
 package healthchecker
 
 import (
@@ -9,6 +13,26 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// Adds a health check API to the server side implementation of the specified service.
+// Uses a [blueprint.WiringSpec].
+// Usage:
+//
+//  AddHealthCheckAPI(spec, "serviceA")
+//
+// Result:
+//  Old interface:
+//  type ServiceA interface {
+//     Method1(ctx context.Context, ...) (..., error)
+//     ...
+//     MethodN(ctx context.Context, ...) (..., error)
+//  }
+//  New interface:
+//  type ServiceAHealth interface {
+//     Method1(ctx context.Context, ...) (..., error)
+//     ...
+//     MethodN(ctx context.Context, ...) (..., error)
+//     Health(ctx context.Context) (string, error)
+//  }
 func AddHealthCheckAPI(spec wiring.WiringSpec, serviceName string) {
 	// The node that we are defining
 	serverWrapper := serviceName + ".server.hc"

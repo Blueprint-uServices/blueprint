@@ -14,7 +14,6 @@ import (
 This function is used by the HTTP plugin to generate the server-side HTTP service.
 */
 func GenerateServerHandler(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error {
-	// TODO: Implement
 	pkg, err := builder.CreatePackage(outputPackage)
 	if err != nil {
 		return err

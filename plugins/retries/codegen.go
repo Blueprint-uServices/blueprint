@@ -10,6 +10,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+// code generation function called from the ir.go file.
 func generateClient(builder golang.ModuleBuilder, wrapped *gocode.ServiceInterface, outputPackage string, Max int64) error {
 	pkg, err := builder.CreatePackage(outputPackage)
 	if err != nil {

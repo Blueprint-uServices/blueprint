@@ -12,13 +12,16 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-type GolangThriftServer struct {
+// IRNode representing a Golang thrift server.
+// This node does not introduce any new runtime interfaces or types that can be used by other IRNodes.
+// Thrift code generation happens during the ModuleBuilder GeneratesFuncs pass
+type golangThriftServer struct {
 	service.ServiceNode
 	golang.GeneratesFuncs
 	golang.Instantiable
 
 	InstanceName string
-	Addr         *address.Address[*GolangThriftServer]
+	Addr         *address.Address[*golangThriftServer]
 	Wrapped      golang.Service
 
 	outputPackage string
@@ -37,8 +40,8 @@ func (thrift *ThriftInterface) GetMethods() []service.Method {
 	return thrift.Wrapped.GetMethods()
 }
 
-func newGolangThriftServer(name string, addr *address.Address[*GolangThriftServer], service golang.Service) (*GolangThriftServer, error) {
-	node := &GolangThriftServer{}
+func newGolangThriftServer(name string, addr *address.Address[*golangThriftServer], service golang.Service) (*golangThriftServer, error) {
+	node := &golangThriftServer{}
 	node.InstanceName = name
 	node.Addr = addr
 	node.Wrapped = service
@@ -46,15 +49,16 @@ func newGolangThriftServer(name string, addr *address.Address[*GolangThriftServe
 	return node, nil
 }
 
-func (n *GolangThriftServer) String() string {
+func (n *golangThriftServer) String() string {
 	return n.InstanceName + " = ThriftServer(" + n.Wrapped.Name() + ", " + n.Addr.Bind.Name() + ")"
 }
 
-func (n *GolangThriftServer) Name() string {
+func (n *golangThriftServer) Name() string {
 	return n.InstanceName
 }
 
-func (node *GolangThriftServer) GenerateFuncs(builder golang.ModuleBuilder) error {
+// Generates thrift files and the RPC server handler
+func (node *golangThriftServer) GenerateFuncs(builder golang.ModuleBuilder) error {
 	iface, err := golang.GetGoInterface(builder, node.Wrapped)
 	if err != nil {
 		return err
@@ -76,7 +80,7 @@ func (node *GolangThriftServer) GenerateFuncs(builder golang.ModuleBuilder) erro
 	return nil
 }
 
-func (node *GolangThriftServer) AddInstantiation(builder golang.NamespaceBuilder) error {
+func (node *golangThriftServer) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.InstanceName) {
 		return nil
 	}
@@ -102,7 +106,7 @@ func (node *GolangThriftServer) AddInstantiation(builder golang.NamespaceBuilder
 	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, node.Addr.Bind})
 }
 
-func (node *GolangThriftServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
+func (node *golangThriftServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface, err := node.Wrapped.GetInterface(ctx)
 	if err != nil {
 		return nil, err
@@ -110,4 +114,4 @@ func (node *GolangThriftServer) GetInterface(ctx ir.BuildContext) (service.Servi
 	return &ThriftInterface{Wrapped: iface}, err
 }
 
-func (node *GolangThriftServer) ImplementsGolangNode() {}
+func (node *golangThriftServer) ImplementsGolangNode() {}
