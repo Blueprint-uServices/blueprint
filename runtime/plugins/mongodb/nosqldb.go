@@ -1,3 +1,4 @@
+// Package mongodb implements a cleint interface to a mongodb server that supports MongoDB's query and update API.
 package mongodb
 
 import (
@@ -11,7 +12,18 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// * constructor
+// Implements the [backend.NoSQLDatabase] interface as a client-wrapper to a mongodb server.
+type MongoDB struct {
+	client *mongo.Client
+}
+
+// Implements the [backend.NoSQLCollection] interface as a client-wrapper to a mongodb server
+type MongoCollection struct {
+	collection *mongo.Collection
+}
+
+// Instantiates a new MongoDB client-wrapper instance which connects to a mongodb server running at `addr`.
+// REQUIRED: A mongodb server should be running at `addr`
 func NewMongoDB(ctx context.Context, addr string) (*MongoDB, error) {
 	clientOptions := options.Client().ApplyURI("mongodb://" + addr)
 	client, err := mongo.Connect(ctx, clientOptions)
@@ -24,10 +36,7 @@ func NewMongoDB(ctx context.Context, addr string) (*MongoDB, error) {
 	}, nil
 }
 
-type MongoDB struct {
-	client *mongo.Client
-}
-
+// Implements the [backend.NoSQLDatabase] interface
 func (md *MongoDB) GetCollection(ctx context.Context, db_name string, collectionName string) (backend.NoSQLCollection, error) {
 	db := md.client.Database(db_name)
 	coll := db.Collection(collectionName)
@@ -36,10 +45,7 @@ func (md *MongoDB) GetCollection(ctx context.Context, db_name string, collection
 	}, nil
 }
 
-type MongoCollection struct {
-	collection *mongo.Collection
-}
-
+// Implements the [backend.NoSQLCollection] interface
 func (mc *MongoCollection) DeleteOne(ctx context.Context, filter bson.D) error {
 
 	_, err := mc.collection.DeleteOne(ctx, filter)
@@ -47,21 +53,28 @@ func (mc *MongoCollection) DeleteOne(ctx context.Context, filter bson.D) error {
 	return err
 
 }
+
+// Implements the [backend.NoSQLCollection] interface
 func (mc *MongoCollection) DeleteMany(ctx context.Context, filter bson.D) error {
 	_, err := mc.collection.DeleteMany(ctx, filter)
 	return err
 }
+
+// Implements the [backend.NoSQLCollection] interface
 func (mc *MongoCollection) InsertOne(ctx context.Context, document interface{}) error {
 	_, err := mc.collection.InsertOne(ctx, document)
 
 	return err
 }
+
+// Implements the [backend.NoSQLCollection] interface
 func (mc *MongoCollection) InsertMany(ctx context.Context, documents []interface{}) error {
 	_, err := mc.collection.InsertMany(ctx, documents)
 
 	return err
 }
 
+// Implements the [backend.NoSQLCollection] interface
 func (mc *MongoCollection) FindOne(ctx context.Context, filter bson.D, projection ...bson.D) (backend.NoSQLCursor, error) {
 
 	withProjection := false
@@ -88,6 +101,7 @@ func (mc *MongoCollection) FindOne(ctx context.Context, filter bson.D, projectio
 	}
 }
 
+// Implements the [backend.NoSQLCollection] interface
 func (mc *MongoCollection) FindMany(ctx context.Context, filter bson.D, projection ...bson.D) (backend.NoSQLCursor, error) {
 
 	withProjection := false
@@ -117,7 +131,7 @@ func (mc *MongoCollection) FindMany(ctx context.Context, filter bson.D, projecti
 	return &MongoCursor{underlyingResult: cursor}, nil
 }
 
-// * not sure about the `update` parameter and its conversion
+// Implements the [backend.NoSQLCollection] interface
 func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) (int, error) {
 	result, err := mc.collection.UpdateOne(ctx, filter, update)
 	if result == nil {
@@ -127,6 +141,7 @@ func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update 
 	}
 }
 
+// Implements the [backend.NoSQLCollection] interface
 func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error) {
 	result, err := mc.collection.UpdateMany(ctx, filter, update)
 	if result == nil {
@@ -136,6 +151,7 @@ func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update
 	}
 }
 
+// Implements the [backend.NoSQLCollection] interface
 func (mc *MongoCollection) Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error) {
 	update := bson.D{{"$set", document}}
 	opts := options.Update().SetUpsert(true)
@@ -147,11 +163,13 @@ func (mc *MongoCollection) Upsert(ctx context.Context, filter bson.D, document i
 	}
 }
 
+// Implements the [backend.NoSQLCollection] interface
 func (mc *MongoCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error) {
 	filter := bson.D{{"_id", id}}
 	return mc.Upsert(ctx, filter, document)
 }
 
+// Implements the [backend.NoSQLCollection] interface
 func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error) {
 	result, err := mc.collection.ReplaceOne(ctx, filter, replacement)
 	if result == nil {
@@ -161,14 +179,17 @@ func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replac
 	}
 }
 
+// Implements the [backend.NoSQLCollection] interface
 func (mc *MongoCollection) ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) (int, error) {
 	return 0, errors.New("ReplaceMany not implemented")
 }
 
+// Implements the [backend.NoSQLCursor] interface as a client-wrapper to the Cursor returned by a mongodb server
 type MongoCursor struct {
 	underlyingResult interface{}
 }
 
+// Implements the [backend.NoSQLCursor] interface
 func (mr *MongoCursor) One(ctx context.Context, obj interface{}) (bool, error) {
 	//add other types of results from mongo that have a Decode method here
 	switch v := mr.underlyingResult.(type) {
@@ -185,6 +206,7 @@ func (mr *MongoCursor) One(ctx context.Context, obj interface{}) (bool, error) {
 	}
 }
 
+// Implements the [backend.NoSQLCursor] interface
 func (mr *MongoCursor) All(ctx context.Context, objs interface{}) error {
 	//add other types of results from mongo that are Cursors here
 	switch v := mr.underlyingResult.(type) {
