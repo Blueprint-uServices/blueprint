@@ -45,10 +45,10 @@ type BuildFunc func(Namespace) (ir.IRNode, error)
 ```
 ```go
 type DefaultNamespaceHandler struct {
-	SimpleNamespaceHandler
+	NamespaceHandler
 	Namespace *SimpleNamespace
 ```
-A basic SimpleNamespaceHandler implementation that accepts nodes of all
+A basic NamespaceHandler implementation that accepts nodes of all
 types.
 ```go
 	Nodes []ir.IRNode
@@ -157,7 +157,7 @@ type SimpleNamespace struct {
 	NamespaceType   string                 // The type of this namespace
 	ParentNamespace Namespace              // The parent namespace that created this namespace; can be nil
 	Wiring          WiringSpec             // The wiring spec
-	Handler         SimpleNamespaceHandler // User-provided handler
+	Handler         NamespaceHandler // User-provided handler
 	Seen            map[string]ir.IRNode   // Cache of built nodes
 	Added           map[string]any         // Nodes that have been passed to the handler
 	Deferred        []func() error         // Deferred functions to execute
@@ -169,10 +169,10 @@ implementations of most methods.
 }
 ```
 Most plugins that want to implement a Namespace will want to use
-SimpleNamespace and only provide a SimpleNamespaceHandler implementation for
+SimpleNamespace and only provide a NamespaceHandler implementation for
 a few of the custom namespace logics.
 
-See the documentation of SimpleNamespaceHandler for methods to implement.
+See the documentation of NamespaceHandler for methods to implement.
 
 ## func 
 ```go
@@ -211,10 +211,10 @@ func (namespace *SimpleNamespace) Info(message string, args ...any)
 
 ## func 
 ```go
-func (namespace *SimpleNamespace) Init(name, namespacetype string, parent Namespace, wiring WiringSpec, handler SimpleNamespaceHandler)
+func (namespace *SimpleNamespace) Init(name, namespacetype string, parent Namespace, wiring WiringSpec, handler NamespaceHandler)
 ```
 Initializes a SimpleNamespace. To do so, a parent namespace, wiring spec,
-and SimpleNamespaceHandler implementation must be provided.
+and NamespaceHandler implementation must be provided.
 
 ## func 
 ```go
@@ -232,7 +232,7 @@ func (namespace *SimpleNamespace) Put(name string, node ir.IRNode) error
 ```
 
 ```go
-type SimpleNamespaceHandler interface {
+type NamespaceHandler interface {
 	// Initialize the handler with a namespace
 	Init(*SimpleNamespace)
 ```
@@ -253,7 +253,7 @@ type SimpleNamespaceHandler interface {
 	// as an argument.
 	AddEdge(string, ir.IRNode) error
 ```
-SimpleNamespaceHandler is an interface intended for use by any Blueprint
+NamespaceHandler is an interface intended for use by any Blueprint
 plugin that wants to provide a custom namespace.
 ```go
 	// After a node has been built in this namespace, AddNode will be called

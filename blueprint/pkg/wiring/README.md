@@ -14,26 +14,9 @@ The starting point for a Blueprint application is the [NewWiringSpec](<#NewWirin
 
 - [func BuildApplicationIR\(spec WiringSpec, name string, nodesToInstantiate ...string\) \(\*ir.ApplicationNode, error\)](<#BuildApplicationIR>)
 - [type BuildFunc](<#BuildFunc>)
-- [type DefaultNamespaceHandler](<#DefaultNamespaceHandler>)
-  - [func \(handler \*DefaultNamespaceHandler\) Accepts\(nodeType any\) bool](<#DefaultNamespaceHandler.Accepts>)
-  - [func \(handler \*DefaultNamespaceHandler\) AddEdge\(name string, node ir.IRNode\) error](<#DefaultNamespaceHandler.AddEdge>)
-  - [func \(handler \*DefaultNamespaceHandler\) AddNode\(name string, node ir.IRNode\) error](<#DefaultNamespaceHandler.AddNode>)
-  - [func \(handler \*DefaultNamespaceHandler\) Init\(namespace \*SimpleNamespace\)](<#DefaultNamespaceHandler.Init>)
-  - [func \(handler \*DefaultNamespaceHandler\) LookupDef\(name string\) \(\*WiringDef, error\)](<#DefaultNamespaceHandler.LookupDef>)
+- [type IRNamespace](<#IRNamespace>)
 - [type Namespace](<#Namespace>)
-- [type SimpleNamespace](<#SimpleNamespace>)
-  - [func \(namespace \*SimpleNamespace\) Debug\(message string, args ...any\)](<#SimpleNamespace.Debug>)
-  - [func \(namespace \*SimpleNamespace\) Defer\(f func\(\) error\)](<#SimpleNamespace.Defer>)
-  - [func \(namespace \*SimpleNamespace\) Error\(message string, args ...any\) error](<#SimpleNamespace.Error>)
-  - [func \(namespace \*SimpleNamespace\) Get\(name string, dst any\) error](<#SimpleNamespace.Get>)
-  - [func \(namespace \*SimpleNamespace\) GetProperties\(name string, key string, dst any\) error](<#SimpleNamespace.GetProperties>)
-  - [func \(namespace \*SimpleNamespace\) GetProperty\(name string, key string, dst any\) error](<#SimpleNamespace.GetProperty>)
-  - [func \(namespace \*SimpleNamespace\) Info\(message string, args ...any\)](<#SimpleNamespace.Info>)
-  - [func \(namespace \*SimpleNamespace\) Init\(name, namespacetype string, parent Namespace, wiring WiringSpec, handler SimpleNamespaceHandler\)](<#SimpleNamespace.Init>)
-  - [func \(namespace \*SimpleNamespace\) Instantiate\(name string, dst any\) error](<#SimpleNamespace.Instantiate>)
-  - [func \(namespace \*SimpleNamespace\) Name\(\) string](<#SimpleNamespace.Name>)
-  - [func \(namespace \*SimpleNamespace\) Put\(name string, node ir.IRNode\) error](<#SimpleNamespace.Put>)
-- [type SimpleNamespaceHandler](<#SimpleNamespaceHandler>)
+- [type NamespaceHandler](<#NamespaceHandler>)
 - [type WiringDef](<#WiringDef>)
   - [func \(def \*WiringDef\) AddProperty\(key string, value any\)](<#WiringDef.AddProperty>)
   - [func \(def \*WiringDef\) GetProperties\(key string, dst any\) error](<#WiringDef.GetProperties>)
@@ -67,65 +50,17 @@ Creates an IR node within the provided namespace or within a new child namespace
 type BuildFunc func(Namespace) (ir.IRNode, error)
 ```
 
-<a name="DefaultNamespaceHandler"></a>
-## type DefaultNamespaceHandler
+<a name="IRNamespace"></a>
+## type IRNamespace
 
-A basic [SimpleNamespaceHandler](<#SimpleNamespaceHandler>) implementation that accepts nodes of all types.
+An IRNamespace is an IRNode that also implements [NamespaceHandler](<#NamespaceHandler>). Plugins that implement IRNamespace can make use of \[CreateNamespace\] which is an easy way of deriving child namespaces.
 
 ```go
-type DefaultNamespaceHandler struct {
-    SimpleNamespaceHandler
-    Namespace *SimpleNamespace
-
-    Nodes []ir.IRNode
-    Edges []ir.IRNode
+type IRNamespace interface {
+    ir.IRNode
+    NamespaceHandler
 }
 ```
-
-<a name="DefaultNamespaceHandler.Accepts"></a>
-### func \(\*DefaultNamespaceHandler\) Accepts
-
-```go
-func (handler *DefaultNamespaceHandler) Accepts(nodeType any) bool
-```
-
-
-
-<a name="DefaultNamespaceHandler.AddEdge"></a>
-### func \(\*DefaultNamespaceHandler\) AddEdge
-
-```go
-func (handler *DefaultNamespaceHandler) AddEdge(name string, node ir.IRNode) error
-```
-
-
-
-<a name="DefaultNamespaceHandler.AddNode"></a>
-### func \(\*DefaultNamespaceHandler\) AddNode
-
-```go
-func (handler *DefaultNamespaceHandler) AddNode(name string, node ir.IRNode) error
-```
-
-
-
-<a name="DefaultNamespaceHandler.Init"></a>
-### func \(\*DefaultNamespaceHandler\) Init
-
-```go
-func (handler *DefaultNamespaceHandler) Init(namespace *SimpleNamespace)
-```
-
-
-
-<a name="DefaultNamespaceHandler.LookupDef"></a>
-### func \(\*DefaultNamespaceHandler\) LookupDef
-
-```go
-func (handler *DefaultNamespaceHandler) LookupDef(name string) (*WiringDef, error)
-```
-
-
 
 <a name="Namespace"></a>
 ## type Namespace
@@ -180,145 +115,13 @@ type Namespace interface {
 }
 ```
 
-<a name="SimpleNamespace"></a>
-## type SimpleNamespace
+<a name="NamespaceHandler"></a>
+## type NamespaceHandler
 
-SimpleNamespace is a base implementation of a [Namespace](<#Namespace>) that provides implementations of most methods.
-
-Most plugins that want to implement a [Namespace](<#Namespace>) will want to use [SimpleNamespace](<#SimpleNamespace>) and only provide a [SimpleNamespaceHandler](<#SimpleNamespaceHandler>) implementation for a few of the custom namespace logics.
-
-See the documentation of [SimpleNamespaceHandler](<#SimpleNamespaceHandler>) for methods to implement.
+NamespaceHandler is an interface intended for use by any Blueprint plugin that wants to provide a custom namespace.
 
 ```go
-type SimpleNamespace struct {
-    Namespace
-
-    NamespaceName   string                 // A name for this namespace
-    NamespaceType   string                 // The type of this namespace
-    ParentNamespace Namespace              // The parent namespace that created this namespace; can be nil
-    Wiring          WiringSpec             // The wiring spec
-    Handler         SimpleNamespaceHandler // User-provided handler
-    Seen            map[string]ir.IRNode   // Cache of built nodes
-    Added           map[string]any         // Nodes that have been passed to the handler
-    Deferred        []func() error         // Deferred functions to execute
-    // contains filtered or unexported fields
-}
-```
-
-<a name="SimpleNamespace.Debug"></a>
-### func \(\*SimpleNamespace\) Debug
-
-```go
-func (namespace *SimpleNamespace) Debug(message string, args ...any)
-```
-
-
-
-<a name="SimpleNamespace.Defer"></a>
-### func \(\*SimpleNamespace\) Defer
-
-```go
-func (namespace *SimpleNamespace) Defer(f func() error)
-```
-
-
-
-<a name="SimpleNamespace.Error"></a>
-### func \(\*SimpleNamespace\) Error
-
-```go
-func (namespace *SimpleNamespace) Error(message string, args ...any) error
-```
-
-
-
-<a name="SimpleNamespace.Get"></a>
-### func \(\*SimpleNamespace\) Get
-
-```go
-func (namespace *SimpleNamespace) Get(name string, dst any) error
-```
-
-
-
-<a name="SimpleNamespace.GetProperties"></a>
-### func \(\*SimpleNamespace\) GetProperties
-
-```go
-func (namespace *SimpleNamespace) GetProperties(name string, key string, dst any) error
-```
-
-
-
-<a name="SimpleNamespace.GetProperty"></a>
-### func \(\*SimpleNamespace\) GetProperty
-
-```go
-func (namespace *SimpleNamespace) GetProperty(name string, key string, dst any) error
-```
-
-
-
-<a name="SimpleNamespace.Info"></a>
-### func \(\*SimpleNamespace\) Info
-
-```go
-func (namespace *SimpleNamespace) Info(message string, args ...any)
-```
-
-
-
-<a name="SimpleNamespace.Init"></a>
-### func \(\*SimpleNamespace\) Init
-
-```go
-func (namespace *SimpleNamespace) Init(name, namespacetype string, parent Namespace, wiring WiringSpec, handler SimpleNamespaceHandler)
-```
-
-Initializes a SimpleNamespace. To do so, a parent namespace, wiring spec, and [SimpleNamespaceHandler](<#SimpleNamespaceHandler>) implementation must be provided.
-
-<a name="SimpleNamespace.Instantiate"></a>
-### func \(\*SimpleNamespace\) Instantiate
-
-```go
-func (namespace *SimpleNamespace) Instantiate(name string, dst any) error
-```
-
-
-
-<a name="SimpleNamespace.Name"></a>
-### func \(\*SimpleNamespace\) Name
-
-```go
-func (namespace *SimpleNamespace) Name() string
-```
-
-
-
-<a name="SimpleNamespace.Put"></a>
-### func \(\*SimpleNamespace\) Put
-
-```go
-func (namespace *SimpleNamespace) Put(name string, node ir.IRNode) error
-```
-
-
-
-<a name="SimpleNamespaceHandler"></a>
-## type SimpleNamespaceHandler
-
-SimpleNamespaceHandler is an interface intended for use by any Blueprint plugin that wants to provide a custom namespace.
-
-The plugin should implement the methods of this handler and then create a [SimpleNamespace](<#SimpleNamespace>) and call [SimpleNamespace.Init](<#SimpleNamespace.Init>)
-
-```go
-type SimpleNamespaceHandler interface {
-    // Initialize the handler with a namespace
-    Init(*SimpleNamespace)
-
-    // Look up a [WiringDef] from the wiring spec.
-    LookupDef(string) (*WiringDef, error)
-
+type NamespaceHandler interface {
     // Reports true if this namespace can build nodes of the specified node type.
     //
     // For some node type T, if Accepts(T) returns false, then nodes of type T will

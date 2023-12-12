@@ -44,19 +44,19 @@ func (pool *ClientPool) String() string {
 	return b.String()
 }
 
-// Implements SimpleNamespaceHandler
+// Implements NamespaceHandler
 func (pool *ClientPool) Accepts(nodeType any) bool {
 	_, isGolangNode := nodeType.(golang.Node)
 	return isGolangNode
 }
 
-// Implements SimpleNamespaceHandler
+// Implements NamespaceHandler
 func (pool *ClientPool) AddEdge(name string, edge ir.IRNode) error {
 	pool.Edges = append(pool.Edges, edge)
 	return nil
 }
 
-// Implements SimpleNamespaceHandler
+// Implements NamespaceHandler
 func (pool *ClientPool) AddNode(name string, node ir.IRNode) error {
 	pool.Nodes = append(pool.Nodes, node)
 	return nil

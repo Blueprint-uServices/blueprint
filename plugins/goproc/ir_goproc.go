@@ -56,19 +56,19 @@ func (proc *Process) String() string {
 	return ir.PrettyPrintNamespace(proc.InstanceName, "GolangProcessNode", proc.Edges, proc.Nodes)
 }
 
-// Implements SimpleNamespaceHandler
+// Implements NamespaceHandler
 func (proc *Process) Accepts(nodeType any) bool {
 	_, isGolangNode := nodeType.(golang.Node)
 	return isGolangNode
 }
 
-// Implements SimpleNamespaceHandler
+// Implements NamespaceHandler
 func (proc *Process) AddEdge(name string, edge ir.IRNode) error {
 	proc.Edges = append(proc.Edges, edge)
 	return nil
 }
 
-// Implements SimpleNamespaceHandler
+// Implements NamespaceHandler
 func (proc *Process) AddNode(name string, node ir.IRNode) error {
 	proc.Nodes = append(proc.Nodes, node)
 	return nil

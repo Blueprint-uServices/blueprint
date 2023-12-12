@@ -6,6 +6,10 @@
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/circuitbreaker"
 ```
 
+Package circuitbreaker provides a Blueprint modifier for the client side of service calls.
+
+The plugin wraps clients with a circuitbreaker that blocks any new requests from being sent out over a connection if the failure rate exceeds a provided number in a fixed duration. The block is removed after the completion of the fixed duration interval.
+
 ## Index
 
 - [func AddCircuitBreaker\(spec wiring.WiringSpec, serviceName string, min\_reqs int64, failure\_rate float64, interval string\)](<#AddCircuitBreaker>)
@@ -35,7 +39,7 @@ AddCircuitBreaker(spec, "serviceA", 1000, 0.1, "1s")
 <a name="CircuitBreakerClient"></a>
 ## type CircuitBreakerClient
 
-
+Blueprint IR node representing a CircuitBreaker
 
 ```go
 type CircuitBreakerClient struct {

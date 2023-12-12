@@ -63,33 +63,30 @@ type Namespace interface {
 	Error(message string, args ...any) error
 }
 
-// SimpleNamespace is a base implementation of a [Namespace] that provides implementations of most methods.
+// namespaceimpl is a base implementation of a [Namespace] that provides implementations of most methods.
 //
-// Most plugins that want to implement a [Namespace] will want to use [SimpleNamespace] and only provide
-// a [SimpleNamespaceHandler] implementation for a few of the custom namespace logics.
+// Most plugins that want to implement a [Namespace] will want to use [namespaceimpl] and only provide
+// a [NamespaceHandler] implementation for a few of the custom namespace logics.
 //
-// See the documentation of [SimpleNamespaceHandler] for methods to implement.
-type SimpleNamespace struct {
+// See the documentation of [NamespaceHandler] for methods to implement.
+type namespaceimpl struct {
 	Namespace
 
-	NamespaceName   string                 // A name for this namespace
-	NamespaceType   string                 // The type of this namespace
-	ParentNamespace Namespace              // The parent namespace that created this namespace; can be nil
-	Wiring          WiringSpec             // The wiring spec
-	Handler         SimpleNamespaceHandler // User-provided handler
-	Seen            map[string]ir.IRNode   // Cache of built nodes
-	Added           map[string]any         // Nodes that have been passed to the handler
-	Deferred        []func() error         // Deferred functions to execute
+	NamespaceName   string               // A name for this namespace
+	NamespaceType   string               // The type of this namespace
+	ParentNamespace Namespace            // The parent namespace that created this namespace; can be nil
+	Wiring          WiringSpec           // The wiring spec
+	Handler         NamespaceHandler     // User-provided handler
+	Seen            map[string]ir.IRNode // Cache of built nodes
+	Added           map[string]any       // Nodes that have been passed to the handler
+	Deferred        []func() error       // Deferred functions to execute
 
 	stack []*WiringDef // Used when building; the stack of wiring defs currently being built
 }
 
-// SimpleNamespaceHandler is an interface intended for use by any Blueprint plugin that wants to
+// NamespaceHandler is an interface intended for use by any Blueprint plugin that wants to
 // provide a custom namespace.
-//
-// The plugin should implement the methods of this handler and then create a [SimpleNamespace] and call
-// [SimpleNamespace.Init]
-type SimpleNamespaceHandler interface {
+type NamespaceHandler interface {
 	// Reports true if this namespace can build nodes of the specified node type.
 	//
 	// For some node type T, if Accepts(T) returns false, then nodes of type T will
@@ -106,23 +103,23 @@ type SimpleNamespaceHandler interface {
 	AddNode(string, ir.IRNode) error
 }
 
-// An IRNamespace is an IRNode that also implements [SimpleNamespaceHandler].  Plugins that
+// An IRNamespace is an IRNode that also implements [NamespaceHandler].  Plugins that
 // implement IRNamespace can make use of [CreateNamespace] which is an easy way of deriving
 // child namespaces.
 type IRNamespace interface {
 	ir.IRNode
-	SimpleNamespaceHandler
+	NamespaceHandler
 }
 
 // Creates a child namespace from the provided parent namespace.
 //
-// The namespaceNode argument is an IRNode that also implements the [SimpleNamespaceHandler] interface,
+// The namespaceNode argument is an IRNode that also implements the [NamespaceHandler] interface,
 // which enables it to (a) specify the compatible node types for the new namespace; (b) receive
 // created instances of nodes; and (c) receive edge nodes that come from the parent namespace
 //
 // Most Blueprint plugins that implement custom namespaces will want to use this method to create
 // their namespace.
-func CreateNamespace(spec WiringSpec, parent Namespace, namespaceNode IRNamespace) *SimpleNamespace {
+func CreateNamespace(spec WiringSpec, parent Namespace, namespaceNode IRNamespace) *namespaceimpl {
 	name := namespaceNode.Name()
 	namespacetype := reflect.TypeOf(namespaceNode).Elem().Name()
 	return CreateNamespaceWithHandler(spec, parent, name, namespacetype, namespaceNode)
@@ -130,14 +127,14 @@ func CreateNamespace(spec WiringSpec, parent Namespace, namespaceNode IRNamespac
 
 // Creates a child namespace from the provided parent namespace.
 //
-// To create a namespace with this method, the caller provides a [SimpleNamespaceHandler] that
+// To create a namespace with this method, the caller provides a [NamespaceHandler] that
 // handles the logic for which nodes should be created within the namespace, and callbacks for
 // saving created nodes and argument nodes.
 //
 // Most plugins will probably prefer to use the simpler [CreateNamespace] func to create
 // namespaces
-func CreateNamespaceWithHandler(spec WiringSpec, parent Namespace, name, namespacetype string, handler SimpleNamespaceHandler) *SimpleNamespace {
-	return &SimpleNamespace{
+func CreateNamespaceWithHandler(spec WiringSpec, parent Namespace, name, namespacetype string, handler NamespaceHandler) *namespaceimpl {
+	return &namespaceimpl{
 		NamespaceName:   name,
 		NamespaceType:   namespacetype,
 		ParentNamespace: parent,
@@ -149,21 +146,21 @@ func CreateNamespaceWithHandler(spec WiringSpec, parent Namespace, name, namespa
 }
 
 // Implements [Namespace]
-func (namespace *SimpleNamespace) Name() string {
+func (namespace *namespaceimpl) Name() string {
 	return namespace.NamespaceName
 }
 
 // Implements [Namespace]
-func (namespace *SimpleNamespace) Instantiate(name string, dst any) error {
+func (namespace *namespaceimpl) Instantiate(name string, dst any) error {
 	return namespace.get(name, false, dst)
 }
 
 // Implements [Namespace]
-func (namespace *SimpleNamespace) Get(name string, dst any) error {
+func (namespace *namespaceimpl) Get(name string, dst any) error {
 	return namespace.get(name, true, dst)
 }
 
-func (namespace *SimpleNamespace) lookupDef(name string) (*WiringDef, error) {
+func (namespace *namespaceimpl) lookupDef(name string) (*WiringDef, error) {
 	def := namespace.Wiring.GetDef(name)
 	if def == nil {
 		return nil, blueprint.Errorf("%s does not exist in the wiring spec of namespace %s", name, namespace.NamespaceName)
@@ -171,7 +168,7 @@ func (namespace *SimpleNamespace) lookupDef(name string) (*WiringDef, error) {
 	return def, nil
 }
 
-func (namespace *SimpleNamespace) get(name string, addEdge bool, dst any) error {
+func (namespace *namespaceimpl) get(name string, addEdge bool, dst any) error {
 	// If it already exists, return it
 	if node, ok := namespace.Seen[name]; ok {
 		return copyResult(node, dst)
@@ -250,7 +247,7 @@ func (namespace *SimpleNamespace) get(name string, addEdge bool, dst any) error 
 }
 
 // Implements [Namespace]
-func (namespace *SimpleNamespace) Put(name string, node ir.IRNode) error {
+func (namespace *namespaceimpl) Put(name string, node ir.IRNode) error {
 	namespace.Seen[name] = node
 
 	if namespace.Handler.Accepts(node) {
@@ -273,7 +270,7 @@ func (namespace *SimpleNamespace) Put(name string, node ir.IRNode) error {
 }
 
 // Implements [Namespace]
-func (namespace *SimpleNamespace) Defer(f func() error) {
+func (namespace *namespaceimpl) Defer(f func() error) {
 	if namespace.ParentNamespace == nil {
 		namespace.Deferred = append(namespace.Deferred, f)
 	} else {
@@ -282,7 +279,7 @@ func (namespace *SimpleNamespace) Defer(f func() error) {
 }
 
 // Implements [Namespace]
-func (namespace *SimpleNamespace) GetProperty(name string, key string, dst any) error {
+func (namespace *namespaceimpl) GetProperty(name string, key string, dst any) error {
 	def, err := namespace.lookupDef(name)
 	if err != nil {
 		return err
@@ -291,7 +288,7 @@ func (namespace *SimpleNamespace) GetProperty(name string, key string, dst any) 
 }
 
 // Implements [Namespace]
-func (namespace *SimpleNamespace) GetProperties(name string, key string, dst any) error {
+func (namespace *namespaceimpl) GetProperties(name string, key string, dst any) error {
 	def, err := namespace.lookupDef(name)
 	if err != nil {
 		return err
@@ -300,7 +297,7 @@ func (namespace *SimpleNamespace) GetProperties(name string, key string, dst any
 }
 
 // Implements [Namespace]
-func (namespace *SimpleNamespace) Info(message string, args ...any) {
+func (namespace *namespaceimpl) Info(message string, args ...any) {
 	if len(namespace.stack) > 0 {
 		src := namespace.stack[len(namespace.stack)-1]
 		callstack := src.Properties["callsite"][0].(*logging.Callstack)
@@ -311,7 +308,7 @@ func (namespace *SimpleNamespace) Info(message string, args ...any) {
 }
 
 // Implements [Namespace]
-func (namespace *SimpleNamespace) Debug(message string, args ...any) {
+func (namespace *namespaceimpl) Debug(message string, args ...any) {
 	if len(namespace.stack) > 0 {
 		src := namespace.stack[len(namespace.stack)-1]
 		callstack := src.Properties["callsite"][0].(*logging.Callstack)
@@ -323,7 +320,7 @@ func (namespace *SimpleNamespace) Debug(message string, args ...any) {
 }
 
 // Implements [Namespace]
-func (namespace *SimpleNamespace) Error(message string, args ...any) error {
+func (namespace *namespaceimpl) Error(message string, args ...any) error {
 	formattedMessage := fmt.Sprintf(message, args...)
 	if len(namespace.stack) > 0 {
 		src := namespace.stack[len(namespace.stack)-1]

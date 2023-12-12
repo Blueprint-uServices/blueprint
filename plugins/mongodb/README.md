@@ -6,6 +6,12 @@
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
 ```
 
+Package mongodb provides a plugin to generate and include a mongodb instance in a Blueprint application.
+
+The package provides a built\-in mongodb container that provides the server\-side implementation and a go\-client for connecting to the client.
+
+The applications must use a backend.NoSQLDatabase \(runtime/core/backend\) as the interface in the application workflow.
+
 ## Index
 
 - [func Container\(spec wiring.WiringSpec, dbName string\) string](<#Container>)
@@ -37,12 +43,14 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
 func Container(spec wiring.WiringSpec, dbName string) string
 ```
 
+Container generates the IRNodes for a mongodb server docker container that uses the latest mongodb image and the clients needed by the generated application to communicate with the server.
 
+The generated container has the name \`dbName\`.
 
 <a name="MongoDBContainer"></a>
 ## type MongoDBContainer
 
-
+Blueprint IR Node that represents the server side docker container
 
 ```go
 type MongoDBContainer struct {
@@ -112,7 +120,7 @@ func (m *MongoDBContainer) String() string
 <a name="MongoDBGoClient"></a>
 ## type MongoDBGoClient
 
-
+Blueprint IR Node that represents the generated client for the mongodb container
 
 ```go
 type MongoDBGoClient struct {
@@ -200,7 +208,7 @@ func (m *MongoDBGoClient) String() string
 <a name="MongoInterface"></a>
 ## type MongoInterface
 
-
+MongoDB interface exposed by the docker container.
 
 ```go
 type MongoInterface struct {

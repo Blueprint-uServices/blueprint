@@ -6,6 +6,14 @@
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
 ```
 
+Package retries provides a Blueprint modifier for the client side of service calls.
+
+The plugin wraps clients with a retrier using that retries a request until one of the two conditions is met: i\) the requests returns without an error ii\) the number of failed tries has reached the maximum number of failures. Usage:
+
+```
+AddRetries(spec, "my_service", 10)
+```
+
 ## Index
 
 - [func AddRetries\(spec wiring.WiringSpec, serviceName string, max\_retries int64\)](<#AddRetries>)
@@ -26,12 +34,16 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
 func AddRetries(spec wiring.WiringSpec, serviceName string, max_retries int64)
 ```
 
-Modifies the given service such that all clients to that service retry \`max\_retries\` number of times on error.
+Add retrier functionality to all clients of the specified service. Uses a \[blueprint.WiringSpec\] Modifies the given service such that all clients to that service retry \`max\_retries\` number of times on error. Usage:
+
+```
+AddRetries(spec, "my_service", 10)
+```
 
 <a name="RetrierClient"></a>
 ## type RetrierClient
 
-
+Blueprint IR node representing a Retrier
 
 ```go
 type RetrierClient struct {

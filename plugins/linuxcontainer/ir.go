@@ -42,19 +42,19 @@ func (ctr *Container) String() string {
 	return ir.PrettyPrintNamespace(ctr.InstanceName, NamespaceType, ctr.Edges, ctr.Nodes)
 }
 
-// Implements SimpleNamespaceHandler
+// Implements NamespaceHandler
 func (ctr *Container) Accepts(nodeType any) bool {
 	_, isLinuxProcess := nodeType.(linux.Process)
 	return isLinuxProcess
 }
 
-// Implements SimpleNamespaceHandler
+// Implements NamespaceHandler
 func (ctr *Container) AddEdge(name string, edge ir.IRNode) error {
 	ctr.Edges = append(ctr.Edges, edge)
 	return nil
 }
 
-// Implements SimpleNamespaceHandler
+// Implements NamespaceHandler
 func (ctr *Container) AddNode(name string, node ir.IRNode) error {
 	ctr.Nodes = append(ctr.Nodes, node)
 	return nil

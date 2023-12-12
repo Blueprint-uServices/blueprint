@@ -25,19 +25,19 @@ func (node *Deployment) String() string {
 	return ir.PrettyPrintNamespace(node.DeploymentName, "DockerApp", node.Edges, node.Nodes)
 }
 
-// Implements SimpleNamespaceHandler
+// Implements NamespaceHandler
 func (deployment *Deployment) Accepts(nodeType any) bool {
 	_, isDockerContainerNode := nodeType.(docker.Container)
 	return isDockerContainerNode
 }
 
-// Implements SimpleNamespaceHandler
+// Implements NamespaceHandler
 func (deployment *Deployment) AddEdge(name string, edge ir.IRNode) error {
 	deployment.Edges = append(deployment.Edges, edge)
 	return nil
 }
 
-// Implements SimpleNamespaceHandler
+// Implements NamespaceHandler
 func (deployment *Deployment) AddNode(name string, node ir.IRNode) error {
 	deployment.Nodes = append(deployment.Nodes, node)
 	return nil

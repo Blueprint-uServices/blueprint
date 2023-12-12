@@ -51,21 +51,21 @@ func BuildApplicationIR(spec WiringSpec, name string, nodesToInstantiate ...stri
 }
 
 type applicationNamespaceHandler struct {
-	SimpleNamespaceHandler
+	NamespaceHandler
 	app *ir.ApplicationNode
 }
 
-// SimpleNamespaceHandler
+// NamespaceHandler
 func (handler *applicationNamespaceHandler) Accepts(any) bool {
 	return true
 }
 
-// SimpleNamespaceHandler
+// NamespaceHandler
 func (handler *applicationNamespaceHandler) AddEdge(name string, node ir.IRNode) error {
 	return fmt.Errorf("BlueprintApplication %v encountered unexpected edge %v %v", handler.app.ApplicationName, name, node)
 }
 
-// SimpleNamespaceHandler
+// NamespaceHandler
 func (handler *applicationNamespaceHandler) AddNode(name string, node ir.IRNode) error {
 	handler.app.Children = append(handler.app.Children, node)
 	return nil

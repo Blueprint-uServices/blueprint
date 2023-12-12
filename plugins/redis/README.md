@@ -6,6 +6,14 @@
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/redis"
 ```
 
+Package memcached provides the Blueprint wiring and IR implementations of a memcached plugin that provides a Cache interface implementation via a pre\-built redis container image.
+
+Usage: To add a redis container named \`fooCache\`
+
+```
+PrebuiltContainer(spec, "fooCache")
+```
+
 ## Index
 
 - [func PrebuiltContainer\(spec wiring.WiringSpec, cacheName string\) string](<#PrebuiltContainer>)
@@ -37,12 +45,12 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/redis"
 func PrebuiltContainer(spec wiring.WiringSpec, cacheName string) string
 ```
 
-Defines a cache called \`cacheName\` that uses the pre\-built redis image
+Adds a redis container to the application that defines a cache called \`cacheName\` which uses the pre\-built memcached process container
 
 <a name="RedisContainer"></a>
 ## type RedisContainer
 
-
+Blueprint IR Node that represents a redis container
 
 ```go
 type RedisContainer struct {
@@ -112,7 +120,7 @@ func (r *RedisContainer) String() string
 <a name="RedisGoClient"></a>
 ## type RedisGoClient
 
-
+Blueprint IR Node that represents a client to a redis container
 
 ```go
 type RedisGoClient struct {
@@ -201,7 +209,7 @@ func (n *RedisGoClient) String() string
 <a name="RedisInterface"></a>
 ## type RedisInterface
 
-
+Redis interface exposed to other services. This interface can not be modified further.
 
 ```go
 type RedisInterface struct {

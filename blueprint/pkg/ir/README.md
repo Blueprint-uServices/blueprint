@@ -14,6 +14,7 @@ An application's IR representation is produced by constructing and then building
 
 - [func CleanName\(name string\) string](<#CleanName>)
 - [func Filter\[T any\]\(nodes \[\]IRNode\) \[\]T](<#Filter>)
+- [func Is\[T any\]\(nodeType any\) bool](<#Is>)
 - [func PrettyPrintNamespace\(instanceName string, namespaceType string, argNodes \[\]IRNode, childNodes \[\]IRNode\) string](<#PrettyPrintNamespace>)
 - [func RegisterDefaultNamespace\[T IRNode\]\(name string, buildFunc func\(outputDir string, nodes \[\]IRNode\) error\)](<#RegisterDefaultNamespace>)
 - [type ApplicationNode](<#ApplicationNode>)
@@ -54,6 +55,15 @@ func Filter[T any](nodes []IRNode) []T
 ```
 
 Returns a slice containing only nodes of type T
+
+<a name="Is"></a>
+## func Is
+
+```go
+func Is[T any](nodeType any) bool
+```
+
+Reports whether nodeType is an instance of type T
 
 <a name="PrettyPrintNamespace"></a>
 ## func PrettyPrintNamespace
