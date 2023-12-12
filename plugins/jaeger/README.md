@@ -6,6 +6,12 @@
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/jaeger"
 ```
 
+Package jaeger provides a plugin to generate and include a jaeger collector instance in a Blueprint application.
+
+The package provides a jaeger container that provides the server\-side implementation and a go\-client for connecting to the server.
+
+The applications must use a backend.Tracer \(runtime/core/backend\) as the interface in the workflow.
+
 ## Index
 
 - [func DefineJaegerCollector\(spec wiring.WiringSpec, collectorName string\) string](<#DefineJaegerCollector>)
@@ -36,12 +42,14 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/jaeger"
 func DefineJaegerCollector(spec wiring.WiringSpec, collectorName string) string
 ```
 
-Defines the Jaeger collector as a process node. Also creates a pointer to the collector and a client node that are used by clients.
+Generates the IRNodes for a jaeger docker container named \`collectorName\` that uses the latest jaeger:all\-in\-one container and the clients needed by the generated application to communicate with the server.
+
+The returned collectorName must be used as an argument to the opentelemetry.InstrumentUsingCustomCollector\(spec, serviceName, \`collectorName\`\).
 
 <a name="JaegerCollectorClient"></a>
 ## type JaegerCollectorClient
 
-
+Blueprint IR node representing a client to the jaeger container
 
 ```go
 type JaegerCollectorClient struct {
@@ -131,7 +139,7 @@ func (node *JaegerCollectorClient) String() string
 <a name="JaegerCollectorContainer"></a>
 ## type JaegerCollectorContainer
 
-
+Blueprint IR node that represents the Jaeger container
 
 ```go
 type JaegerCollectorContainer struct {
@@ -191,7 +199,7 @@ func (node *JaegerCollectorContainer) String() string
 <a name="JaegerInterface"></a>
 ## type JaegerInterface
 
-
+Jaeger interface exposed to the application.
 
 ```go
 type JaegerInterface struct {

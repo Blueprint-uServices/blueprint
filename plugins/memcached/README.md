@@ -6,6 +6,14 @@
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/memcached"
 ```
 
+Package memcached provides the Blueprint wiring and IR implementations of a memcached plugin that provides a Cache interface implementation via a pre\-built memcached container image.
+
+Usage: To add a memcached container named \`fooCache\`
+
+```
+PrebuiltContainer(spec, "fooCache")
+```
+
 ## Index
 
 - [func PrebuiltContainer\(spec wiring.WiringSpec, cacheName string\) string](<#PrebuiltContainer>)
@@ -36,12 +44,12 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/memcached"
 func PrebuiltContainer(spec wiring.WiringSpec, cacheName string) string
 ```
 
-Defines a cache called \`cacheName\` that uses the pre\-built memcached process image
+Adds a memcached container to the application that defines a cache called \`cacheName\` which uses the pre\-built memcached process container
 
 <a name="MemcachedContainer"></a>
 ## type MemcachedContainer
 
-
+Blueprint IR Node that represents a memcached container
 
 ```go
 type MemcachedContainer struct {
@@ -102,7 +110,7 @@ func (n *MemcachedContainer) String() string
 <a name="MemcachedGoClient"></a>
 ## type MemcachedGoClient
 
-
+Blueprint IR Node that represents a client to a memcached container
 
 ```go
 type MemcachedGoClient struct {
@@ -192,7 +200,7 @@ func (n *MemcachedGoClient) String() string
 <a name="MemcachedInterface"></a>
 ## type MemcachedInterface
 
-
+Memcached interface exposed to other services. This interface can not be modified further.
 
 ```go
 type MemcachedInterface struct {

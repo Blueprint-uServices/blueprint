@@ -12,7 +12,7 @@ func RegisterAsDefaultBuilder() {
 }
 
 func buildDefaultContainerWorkspace(outputDir string, nodes []ir.IRNode) error {
-	ctr := newContainerDeployment("docker", nil, nodes)
+	ctr := &Deployment{DeploymentName: "docker", Nodes: nodes}
 	subdir, err := ioutil.CreateNodeDir(outputDir, "docker")
 	if err != nil {
 		return err

@@ -16,7 +16,8 @@ func RegisterAsDefaultBuilder() {
 }
 
 func buildDefaultLinuxWorkspace(outputDir string, nodes []ir.IRNode) error {
-	ctr := newLinuxContainerNode("linuxprocesses", nil, nodes)
+	ctr := newLinuxContainerNode("linuxprocesses")
+	ctr.Nodes = nodes
 	ctrDir, err := ioutil.CreateNodeDir(outputDir, "linuxprocesses")
 	if err != nil {
 		return err

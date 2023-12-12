@@ -6,6 +6,12 @@
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
 ```
 
+Package opentelemetry provides two plugins: \(i\) a plugin to generate and include an opentelemetry collector instance in a Blueprint application \(ii\) provides a modifier plugin to wrap the service with an OpenTelemetry wrapper to generate OT compatible traces/logs.
+
+The package provides an in\-memory trace exporter implementation and a go\-client for generating traces on both the server and client side. The generated clients handle context propagation correctly on both the server and client sides.
+
+The applications must use a backend.Tracer \(runtime/core/backend\) as the interface in the workflow.
+
 ## Index
 
 - [Variables](<#variables>)
@@ -72,6 +78,8 @@ Defines the OpenTelemetry collector as a process node
 
 This doesn't need to be explicitly called, although it can if users want to control the placement of the opentelemetry collector
 
+NOTE: Currently does not include the opentelemetry collector. This might change in the future.
+
 <a name="Instrument"></a>
 ## func Instrument
 
@@ -79,11 +87,9 @@ This doesn't need to be explicitly called, although it can if users want to cont
 func Instrument(spec wiring.WiringSpec, serviceName string)
 ```
 
-Instruments \`serviceName\` with OpenTelemetry. This can only be done if \`serviceName\` is a pointer from Golang nodes to Golang nodes.
+Instruments \`serviceName\` with OpenTelemetry. This can only be done if \`serviceName\` is a service declared in the wiring spec using \[workflow.Define\]
 
-This call will also define the OpenTelemetry collector.
-
-Instrumenting \`serviceName\` will add both src and dst\-side modifiers to the pointer.
+This call will only export traces to stdout and no external collector will be defined. Use the InstrumentUsingCustomCollector for exporting traces to a custom collector such as the ones provided by jaeger or zipkin.
 
 <a name="InstrumentUsingCustomCollector"></a>
 ## func InstrumentUsingCustomCollector
@@ -92,12 +98,14 @@ Instrumenting \`serviceName\` will add both src and dst\-side modifiers to the p
 func InstrumentUsingCustomCollector(spec wiring.WiringSpec, serviceName string, collectorName string)
 ```
 
-This is the same as the Instrument function, but uses \`collectorName\` as the OpenTelemetry collector and does not attempt to define or redefine the collector.
+Instruments \`serviceName\` with OpenTelemetry. This can only be done if \`serviceName\` is a service declared in the wiring spec using \[workflow.Define\]
+
+This call will configure the generated clients on server and client side to use the exporter provided by the custom collector indicated by the \`collectorName\`. The \`collectorName\` must be declared in the wiring spec.
 
 <a name="OTCollectorInterface"></a>
 ## type OTCollectorInterface
 
-
+Represents the OT interface exposed to the workflow.
 
 ```go
 type OTCollectorInterface struct {
@@ -127,7 +135,7 @@ func (xt *OTCollectorInterface) GetName() string
 <a name="OpenTelemetryClientWrapper"></a>
 ## type OpenTelemetryClientWrapper
 
-
+Blueprint IR Node that wraps the client\-side of a service to generate ot compatible logs
 
 ```go
 type OpenTelemetryClientWrapper struct {
@@ -217,7 +225,7 @@ func (node *OpenTelemetryClientWrapper) String() string
 <a name="OpenTelemetryCollector"></a>
 ## type OpenTelemetryCollector
 
-
+Blueprint IR Node representing an OT COllector
 
 ```go
 type OpenTelemetryCollector struct {
@@ -277,7 +285,7 @@ func (node *OpenTelemetryCollector) String() string
 <a name="OpenTelemetryCollectorClient"></a>
 ## type OpenTelemetryCollectorClient
 
-
+Blueprint IR Node that represents a client to the ot container
 
 ```go
 type OpenTelemetryCollectorClient struct {
@@ -368,7 +376,7 @@ func (node *OpenTelemetryCollectorClient) String() string
 <a name="OpenTelemetryCollectorInterface"></a>
 ## type OpenTelemetryCollectorInterface
 
-
+Interface that indicates if an IRNode implements the OTCollector interface All custom collector clients \*\*must\*\* implement this interface
 
 ```go
 type OpenTelemetryCollectorInterface interface {
@@ -381,7 +389,7 @@ type OpenTelemetryCollectorInterface interface {
 <a name="OpenTelemetryServerWrapper"></a>
 ## type OpenTelemetryServerWrapper
 
-
+Blueprint IR Node that wraps the server\-side of a service to generate ot compatible logs
 
 ```go
 type OpenTelemetryServerWrapper struct {

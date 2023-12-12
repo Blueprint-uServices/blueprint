@@ -16,6 +16,12 @@ func CleanName(name string) string {
 	return stringutil.CleanName(name)
 }
 
+// Reports whether nodeType is an instance of type T
+func Is[T any](nodeType any) bool {
+	_, isT := nodeType.(T)
+	return isT
+}
+
 // Returns a slice containing only nodes of type T
 func Filter[T any](nodes []IRNode) []T {
 	var ts []T

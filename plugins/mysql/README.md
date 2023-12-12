@@ -8,7 +8,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/mysql"
 
 Package mysql provides a plugin to generate and include a mysql instance in a Blueprint application.
 
-The package provides a built\-in mysql container that provides the server\-side implementation and a go\-client for connecting to the client.
+The package provides a built\-in mysql container that provides the server\-side implementation and a go\-client for connecting to the server.
 
 The applications must use a backend.RelationalDB \(runtime/core/backend\) as the interface in the workflow.
 
@@ -50,7 +50,7 @@ The generated container has the name \`dbName\` with the root password set to \`
 <a name="MySQLDBContainer"></a>
 ## type MySQLDBContainer
 
-
+Blueprint IR Node that represents the server side docker container
 
 ```go
 type MySQLDBContainer struct {
@@ -121,7 +121,7 @@ func (m *MySQLDBContainer) String() string
 <a name="MySQLDBGoClient"></a>
 ## type MySQLDBGoClient
 
-
+Blueprint IR Node that represents the generated client for the mysql container
 
 ```go
 type MySQLDBGoClient struct {
@@ -212,7 +212,7 @@ func (m *MySQLDBGoClient) String() string
 <a name="MySQLInterface"></a>
 ## type MySQLInterface
 
-
+MySQL interface exposed by the docker container.
 
 ```go
 type MySQLInterface struct {

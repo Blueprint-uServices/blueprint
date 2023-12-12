@@ -1,17 +1,16 @@
 package dockerdeployment
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/namespacebuilder"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 )
 
 var prop_CHILDREN = "Children"
 
 // Adds a child node to an existing container deployment
 func AddContainerToDeployment(spec wiring.WiringSpec, deploymentName, containerName string) {
-	spec.AddProperty(deploymentName, "Children", containerName)
+	spec.AddProperty(deploymentName, prop_CHILDREN, containerName)
 }
 
 // Adds a deployment that explicitly instantiates all of the containers provided.
@@ -23,9 +22,10 @@ func NewDeployment(spec wiring.WiringSpec, deploymentName string, containers ...
 	}
 
 	spec.Define(deploymentName, &Deployment{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		deployment := namespacebuilder.Create[docker.Container](namespace, spec, "DockerApp", deploymentName)
-		err := deployment.InstantiateFromProperty(prop_CHILDREN)
-		return newContainerDeployment(deploymentName, deployment.ArgNodes, deployment.ContainedNodes), err
+		deployment := &Deployment{DeploymentName: deploymentName}
+		deploymentNamespace := wiring.CreateNamespace(spec, namespace, deployment)
+		_, err := pointer.InstantiateFromProperty(spec, deploymentNamespace, prop_CHILDREN)
+		return deployment, err
 	})
 
 	return deploymentName

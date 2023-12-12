@@ -6,6 +6,17 @@
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/http"
 ```
 
+To use the plugin in a Blueprint wiring spec, import this package and use the [Deploy](<#Deploy>) method, i.e.
+
+```
+import "gitlab.mpi-sws.org/cld/blueprint/plugins/http"
+http.Deploy(spec, "my_service")
+```
+
+See the documentation for [Deploy](<#Deploy>) for more information about its behavior.
+
+The plugin implements a server\-side handler and client\-side library that calls the server. This is implemented within the \[httpcodegen\] package.
+
 ## Index
 
 - [func Deploy\(spec wiring.WiringSpec, serviceName string\)](<#Deploy>)
@@ -18,13 +29,6 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/http"
   - [func \(node \*GolangHttpClient\) ImplementsGolangService\(\)](<#GolangHttpClient.ImplementsGolangService>)
   - [func \(n \*GolangHttpClient\) Name\(\) string](<#GolangHttpClient.Name>)
   - [func \(n \*GolangHttpClient\) String\(\) string](<#GolangHttpClient.String>)
-- [type GolangHttpServer](<#GolangHttpServer>)
-  - [func \(node \*GolangHttpServer\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#GolangHttpServer.AddInstantiation>)
-  - [func \(node \*GolangHttpServer\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#GolangHttpServer.GenerateFuncs>)
-  - [func \(node \*GolangHttpServer\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#GolangHttpServer.GetInterface>)
-  - [func \(node \*GolangHttpServer\) ImplementsGolangNode\(\)](<#GolangHttpServer.ImplementsGolangNode>)
-  - [func \(n \*GolangHttpServer\) Name\(\) string](<#GolangHttpServer.Name>)
-  - [func \(n \*GolangHttpServer\) String\(\) string](<#GolangHttpServer.String>)
 - [type HttpInterface](<#HttpInterface>)
   - [func \(i \*HttpInterface\) GetMethods\(\) \[\]service.Method](<#HttpInterface.GetMethods>)
   - [func \(i \*HttpInterface\) GetName\(\) string](<#HttpInterface.GetName>)
@@ -37,14 +41,16 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/http"
 func Deploy(spec wiring.WiringSpec, serviceName string)
 ```
 
-Deploys \`serviceName\` as a HTTP server. This can only be done if \`serviceName\` is a pointer from Golang nodes to Golang nodes.
+Typcially serviceName should be the name of a workflow service that was initially defined using \[workflow.Define\].
 
-This call adds both src and dst side modifiers to \`serviceName\`. After this, the pointer will be from addr to addr and can no longer modified with golang nodes.
+Like many other modifiers, HTTP modifier the service at the golang level, by generating server\-side handler code and a client\-side library. However, HTTP should be the last golang\-level modifier applied to a service, because thereafter communication between the client and server is no longer at the golang level, but at the network level.
+
+Deploying a service with HTTP increases the visibility of the service within the application. By default, any other service running in any other container or namespace can now contact this service.
 
 <a name="GolangHttpClient"></a>
 ## type GolangHttpClient
 
-
+IRNode representing a client to a Golang server. This node does not introduce any new runtime interfaces or types that can be used by other IRNodes.
 
 ```go
 type GolangHttpClient struct {
@@ -54,7 +60,7 @@ type GolangHttpClient struct {
     golang.Instantiable
 
     InstanceName string
-    ServerAddr   *address.Address[*GolangHttpServer]
+    ServerAddr   *address.Address[*golangHttpServer]
     // contains filtered or unexported fields
 }
 ```
@@ -127,78 +133,6 @@ func (n *GolangHttpClient) Name() string
 
 ```go
 func (n *GolangHttpClient) String() string
-```
-
-
-
-<a name="GolangHttpServer"></a>
-## type GolangHttpServer
-
-
-
-```go
-type GolangHttpServer struct {
-    service.ServiceNode
-    golang.GeneratesFuncs
-    golang.Instantiable
-
-    InstanceName string
-    Addr         *address.Address[*GolangHttpServer]
-    Wrapped      golang.Service
-    // contains filtered or unexported fields
-}
-```
-
-<a name="GolangHttpServer.AddInstantiation"></a>
-### func \(\*GolangHttpServer\) AddInstantiation
-
-```go
-func (node *GolangHttpServer) AddInstantiation(builder golang.NamespaceBuilder) error
-```
-
-
-
-<a name="GolangHttpServer.GenerateFuncs"></a>
-### func \(\*GolangHttpServer\) GenerateFuncs
-
-```go
-func (node *GolangHttpServer) GenerateFuncs(builder golang.ModuleBuilder) error
-```
-
-Generates the HTTP Server handler
-
-<a name="GolangHttpServer.GetInterface"></a>
-### func \(\*GolangHttpServer\) GetInterface
-
-```go
-func (node *GolangHttpServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
-```
-
-
-
-<a name="GolangHttpServer.ImplementsGolangNode"></a>
-### func \(\*GolangHttpServer\) ImplementsGolangNode
-
-```go
-func (node *GolangHttpServer) ImplementsGolangNode()
-```
-
-
-
-<a name="GolangHttpServer.Name"></a>
-### func \(\*GolangHttpServer\) Name
-
-```go
-func (n *GolangHttpServer) Name() string
-```
-
-
-
-<a name="GolangHttpServer.String"></a>
-### func \(\*GolangHttpServer\) String
-
-```go
-func (n *GolangHttpServer) String() string
 ```
 
 

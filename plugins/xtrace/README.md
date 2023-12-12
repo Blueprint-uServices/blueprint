@@ -6,6 +6,12 @@
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/xtrace"
 ```
 
+Package xtrace provides two plugins: \(i\) a plugin to generate and include an xtrace instance in a Blueprint application. \(ii\) provides a modifier plugin to wrap the service with an XTrace wrapper to generate XTrace compatible traces/logs.
+
+The package provides a built\-in xtrace container that provides the server\-side implementation and a go\-client for connecting to the server.
+
+The applications must use a backend.XTracer \(runtime/core/backend\) as the interface in the workflow.
+
 ## Index
 
 - [func DefineXTraceServerContainer\(spec wiring.WiringSpec\)](<#DefineXTraceServerContainer>)
@@ -54,7 +60,9 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/xtrace"
 func DefineXTraceServerContainer(spec wiring.WiringSpec)
 ```
 
+Generates the IRNodes for a xtrace docker container that uses the latest xtrace image and the clients needed by the generated application to communicate with the server.
 
+The generated container has the name \`serviceName\`.
 
 <a name="Instrument"></a>
 ## func Instrument
@@ -63,12 +71,16 @@ func DefineXTraceServerContainer(spec wiring.WiringSpec)
 func Instrument(spec wiring.WiringSpec, serviceName string)
 ```
 
-Instruments the service with an entry \+ exit point xtrace wrapper to generate xtrace compatible logs
+Instruments the service with an entry \+ exit point xtrace wrapper to generate xtrace compatible logs. Usage:
+
+```
+Instrument(spec, "serviceA")
+```
 
 <a name="XTraceClient"></a>
 ## type XTraceClient
 
-
+Blueprint IR Node that represents a client to the Xtrace container
 
 ```go
 type XTraceClient struct {
@@ -150,7 +162,7 @@ func (node *XTraceClient) String() string
 <a name="XTraceInterface"></a>
 ## type XTraceInterface
 
-
+The interface exposed by the XTrace server.
 
 ```go
 type XTraceInterface struct {
@@ -180,7 +192,7 @@ func (xt *XTraceInterface) GetName() string
 <a name="XTraceServerContainer"></a>
 ## type XTraceServerContainer
 
-
+Blueprint IR Node that represents the Xtrace container
 
 ```go
 type XTraceServerContainer struct {
@@ -240,7 +252,7 @@ func (node *XTraceServerContainer) String() string
 <a name="XtraceClientWrapper"></a>
 ## type XtraceClientWrapper
 
-
+Blueprint IR Node that wraps the client\-side of a service to generate xtrace compatible logs
 
 ```go
 type XtraceClientWrapper struct {
@@ -331,7 +343,7 @@ func (node *XtraceClientWrapper) String() string
 <a name="XtraceServerWrapper"></a>
 ## type XtraceServerWrapper
 
-
+Blueprint IR Node that wraps the server\-side of a service to generate xtrace compatible logs
 
 ```go
 type XtraceServerWrapper struct {

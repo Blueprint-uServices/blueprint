@@ -26,6 +26,10 @@ The method \[InstantiateDst\] is used by other Blueprint plugins that wish to ex
 
 ## Index
 
+- [func Instantiate\(spec wiring.WiringSpec, namespace wiring.Namespace, names ...string\) \(nodes map\[string\]ir.IRNode, err error\)](<#Instantiate>)
+- [func InstantiateClients\(spec wiring.WiringSpec, namespace wiring.Namespace, names ...string\) \(map\[string\]ir.IRNode, error\)](<#InstantiateClients>)
+- [func InstantiateClientsFromProperty\(spec wiring.WiringSpec, namespace wiring.Namespace, propertyName string\) \(map\[string\]ir.IRNode, error\)](<#InstantiateClientsFromProperty>)
+- [func InstantiateFromProperty\(spec wiring.WiringSpec, namespace wiring.Namespace, propertyName string\) \(map\[string\]ir.IRNode, error\)](<#InstantiateFromProperty>)
 - [func RequireUniqueness\(spec wiring.WiringSpec, alias string, visibility any\)](<#RequireUniqueness>)
 - [type PointerDef](<#PointerDef>)
   - [func CreatePointer\(spec wiring.WiringSpec, name string, ptrType any, dst string\) \*PointerDef](<#CreatePointer>)
@@ -35,6 +39,44 @@ The method \[InstantiateDst\] is used by other Blueprint plugins that wish to ex
   - [func \(ptr \*PointerDef\) InstantiateDst\(namespace wiring.Namespace\) \(ir.IRNode, error\)](<#PointerDef.InstantiateDst>)
   - [func \(ptr PointerDef\) String\(\) string](<#PointerDef.String>)
 
+
+<a name="Instantiate"></a>
+## func Instantiate
+
+```go
+func Instantiate(spec wiring.WiringSpec, namespace wiring.Namespace, names ...string) (nodes map[string]ir.IRNode, err error)
+```
+
+A helper function for use by Blueprint plugins. Instantiates the server\-side nodes of the specified pointer\(s\) within the provided namespace.
+
+Returns a map of the instantiated node\(s\).
+
+<a name="InstantiateClients"></a>
+## func InstantiateClients
+
+```go
+func InstantiateClients(spec wiring.WiringSpec, namespace wiring.Namespace, names ...string) (map[string]ir.IRNode, error)
+```
+
+This effectively just calls namespace.Get\(\) for the names provided. Included here for convenience
+
+<a name="InstantiateClientsFromProperty"></a>
+## func InstantiateClientsFromProperty
+
+```go
+func InstantiateClientsFromProperty(spec wiring.WiringSpec, namespace wiring.Namespace, propertyName string) (map[string]ir.IRNode, error)
+```
+
+Similar to InstantiateClients, but first consulting the propertyName property of the namespace to discover which nodes should be instantiated.
+
+<a name="InstantiateFromProperty"></a>
+## func InstantiateFromProperty
+
+```go
+func InstantiateFromProperty(spec wiring.WiringSpec, namespace wiring.Namespace, propertyName string) (map[string]ir.IRNode, error)
+```
+
+Similar to Instantiate, but first consulting the propertyName property of the namespace to discover which nodes should be instantiated.
 
 <a name="RequireUniqueness"></a>
 ## func RequireUniqueness

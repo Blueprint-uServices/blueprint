@@ -6,25 +6,24 @@
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/thrift"
 ```
 
+Package thrift implements a Blueprint plugin that enables any Golang service to be deployed using a Thrift server.
+
+To use the plugin in a Blueprint wiring spec, import this package and use the [Deploy](<#Deploy>) method, i.e.
+
+```
+import "gitlab.mpi-sws.org/cld/blueprint/plugins/thrift"
+thrift.Deploy(spec, "my_service")
+```
+
+See the documentation for [Deploy](<#Deploy>) for more information about its behavior.
+
+The plugin implements thrift code generation, as well as generating a server\-side handler and a client\-side library that calls the server. This is implemented within the \[thriftcodegen\] pacakge.
+
+To use this plugin, the thrift compiler and version\-matching go bindings are required to be installed on the machine that is compiling the Blueprint wiring spec. Installation instructions can be found: https://thrift.apache.org/download
+
 ## Index
 
 - [func Deploy\(spec wiring.WiringSpec, serviceName string\)](<#Deploy>)
-- [type GolangThriftClient](<#GolangThriftClient>)
-  - [func \(node \*GolangThriftClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#GolangThriftClient.AddInstantiation>)
-  - [func \(node \*GolangThriftClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#GolangThriftClient.AddInterfaces>)
-  - [func \(node \*GolangThriftClient\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#GolangThriftClient.GenerateFuncs>)
-  - [func \(node \*GolangThriftClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#GolangThriftClient.GetInterface>)
-  - [func \(node \*GolangThriftClient\) ImplementsGolangNode\(\)](<#GolangThriftClient.ImplementsGolangNode>)
-  - [func \(node \*GolangThriftClient\) ImplementsGolangService\(\)](<#GolangThriftClient.ImplementsGolangService>)
-  - [func \(n \*GolangThriftClient\) Name\(\) string](<#GolangThriftClient.Name>)
-  - [func \(n \*GolangThriftClient\) String\(\) string](<#GolangThriftClient.String>)
-- [type GolangThriftServer](<#GolangThriftServer>)
-  - [func \(node \*GolangThriftServer\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#GolangThriftServer.AddInstantiation>)
-  - [func \(node \*GolangThriftServer\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#GolangThriftServer.GenerateFuncs>)
-  - [func \(node \*GolangThriftServer\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#GolangThriftServer.GetInterface>)
-  - [func \(node \*GolangThriftServer\) ImplementsGolangNode\(\)](<#GolangThriftServer.ImplementsGolangNode>)
-  - [func \(n \*GolangThriftServer\) Name\(\) string](<#GolangThriftServer.Name>)
-  - [func \(n \*GolangThriftServer\) String\(\) string](<#GolangThriftServer.String>)
 - [type ThriftInterface](<#ThriftInterface>)
   - [func \(thrift \*ThriftInterface\) GetMethods\(\) \[\]service.Method](<#ThriftInterface.GetMethods>)
   - [func \(thrift \*ThriftInterface\) GetName\(\) string](<#ThriftInterface.GetName>)
@@ -37,169 +36,13 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/thrift"
 func Deploy(spec wiring.WiringSpec, serviceName string)
 ```
 
+Deploys \`serviceName\` as a Thrift server.
 
+Typically serviceName should be the name of a workflow service that was initially defined using \[workflow.Define\].
 
-<a name="GolangThriftClient"></a>
-## type GolangThriftClient
+Like many other modifiers, Thrift modifies the service at the golang level, by generating server\-side handler code and a client\-side library. However, Thrift should be the last golang\-level modifier applied to a service, because thereafter communication between the client and server is no longer at the golang level, but at the network level.
 
-
-
-```go
-type GolangThriftClient struct {
-    golang.Node
-    golang.Service
-    golang.GeneratesFuncs
-    golang.Instantiable
-
-    InstanceName string
-    ServerAddr   *address.Address[*GolangThriftServer]
-    // contains filtered or unexported fields
-}
-```
-
-<a name="GolangThriftClient.AddInstantiation"></a>
-### func \(\*GolangThriftClient\) AddInstantiation
-
-```go
-func (node *GolangThriftClient) AddInstantiation(builder golang.NamespaceBuilder) error
-```
-
-
-
-<a name="GolangThriftClient.AddInterfaces"></a>
-### func \(\*GolangThriftClient\) AddInterfaces
-
-```go
-func (node *GolangThriftClient) AddInterfaces(builder golang.ModuleBuilder) error
-```
-
-
-
-<a name="GolangThriftClient.GenerateFuncs"></a>
-### func \(\*GolangThriftClient\) GenerateFuncs
-
-```go
-func (node *GolangThriftClient) GenerateFuncs(builder golang.ModuleBuilder) error
-```
-
-
-
-<a name="GolangThriftClient.GetInterface"></a>
-### func \(\*GolangThriftClient\) GetInterface
-
-```go
-func (node *GolangThriftClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
-```
-
-
-
-<a name="GolangThriftClient.ImplementsGolangNode"></a>
-### func \(\*GolangThriftClient\) ImplementsGolangNode
-
-```go
-func (node *GolangThriftClient) ImplementsGolangNode()
-```
-
-
-
-<a name="GolangThriftClient.ImplementsGolangService"></a>
-### func \(\*GolangThriftClient\) ImplementsGolangService
-
-```go
-func (node *GolangThriftClient) ImplementsGolangService()
-```
-
-
-
-<a name="GolangThriftClient.Name"></a>
-### func \(\*GolangThriftClient\) Name
-
-```go
-func (n *GolangThriftClient) Name() string
-```
-
-
-
-<a name="GolangThriftClient.String"></a>
-### func \(\*GolangThriftClient\) String
-
-```go
-func (n *GolangThriftClient) String() string
-```
-
-
-
-<a name="GolangThriftServer"></a>
-## type GolangThriftServer
-
-
-
-```go
-type GolangThriftServer struct {
-    service.ServiceNode
-    golang.GeneratesFuncs
-    golang.Instantiable
-
-    InstanceName string
-    Addr         *address.Address[*GolangThriftServer]
-    Wrapped      golang.Service
-    // contains filtered or unexported fields
-}
-```
-
-<a name="GolangThriftServer.AddInstantiation"></a>
-### func \(\*GolangThriftServer\) AddInstantiation
-
-```go
-func (node *GolangThriftServer) AddInstantiation(builder golang.NamespaceBuilder) error
-```
-
-
-
-<a name="GolangThriftServer.GenerateFuncs"></a>
-### func \(\*GolangThriftServer\) GenerateFuncs
-
-```go
-func (node *GolangThriftServer) GenerateFuncs(builder golang.ModuleBuilder) error
-```
-
-
-
-<a name="GolangThriftServer.GetInterface"></a>
-### func \(\*GolangThriftServer\) GetInterface
-
-```go
-func (node *GolangThriftServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
-```
-
-
-
-<a name="GolangThriftServer.ImplementsGolangNode"></a>
-### func \(\*GolangThriftServer\) ImplementsGolangNode
-
-```go
-func (node *GolangThriftServer) ImplementsGolangNode()
-```
-
-
-
-<a name="GolangThriftServer.Name"></a>
-### func \(\*GolangThriftServer\) Name
-
-```go
-func (n *GolangThriftServer) Name() string
-```
-
-
-
-<a name="GolangThriftServer.String"></a>
-### func \(\*GolangThriftServer\) String
-
-```go
-func (n *GolangThriftServer) String() string
-```
-
-
+Deploying a service with Thrift increases the visibility of the service within the application. By default, any other service running in any other container or namespace can now contact this service.
 
 <a name="ThriftInterface"></a>
 ## type ThriftInterface

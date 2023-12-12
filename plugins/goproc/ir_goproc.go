@@ -2,6 +2,7 @@ package goproc
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
 /*
@@ -28,29 +29,47 @@ type Process struct {
 	filesystemDeployer /* Can be deployed as a basic go process; implemented in deploy.go */
 	linuxDeployer      /* Can be deployed to linux; implemented in deploylinux.go */
 
-	InstanceName   string
-	ProcName       string
-	ModuleName     string
-	ArgNodes       []ir.IRNode
-	ContainedNodes []ir.IRNode
+	InstanceName string
+	ProcName     string
+	ModuleName   string
+	Nodes        []ir.IRNode
+	Edges        []ir.IRNode
 }
 
 // A Golang Process Node can either be given the child nodes ahead of time, or they can be added using AddArtifactNode / AddCodeNode
-func newGolangProcessNode(name string, argNodes, containedNodes []ir.IRNode) *Process {
-	node := Process{
-		InstanceName:   name,
-		ProcName:       ir.CleanName(name),
-		ArgNodes:       argNodes,
-		ContainedNodes: containedNodes,
+func newGolangProcessNode(name string) *Process {
+	proc := Process{
+		InstanceName: name,
+		ProcName:     ir.CleanName(name),
 	}
-	node.ModuleName = generatedModulePrefix + "/" + node.ProcName
-	return &node
+	proc.ModuleName = generatedModulePrefix + "/" + proc.ProcName
+	return &proc
 }
 
-func (node *Process) Name() string {
-	return node.InstanceName
+// Implements ir.IRNode
+func (proc *Process) Name() string {
+	return proc.InstanceName
 }
 
-func (node *Process) String() string {
-	return ir.PrettyPrintNamespace(node.InstanceName, "GolangProcessNode", node.ArgNodes, node.ContainedNodes)
+// Implements ir.IRNode
+func (proc *Process) String() string {
+	return ir.PrettyPrintNamespace(proc.InstanceName, "GolangProcessNode", proc.Edges, proc.Nodes)
+}
+
+// Implements NamespaceHandler
+func (proc *Process) Accepts(nodeType any) bool {
+	_, isGolangNode := nodeType.(golang.Node)
+	return isGolangNode
+}
+
+// Implements NamespaceHandler
+func (proc *Process) AddEdge(name string, edge ir.IRNode) error {
+	proc.Edges = append(proc.Edges, edge)
+	return nil
+}
+
+// Implements NamespaceHandler
+func (proc *Process) AddNode(name string, node ir.IRNode) error {
+	proc.Nodes = append(proc.Nodes, node)
+	return nil
 }

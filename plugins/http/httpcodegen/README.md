@@ -19,7 +19,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/http/httpcodegen"
 func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error
 ```
 
-
+This function is used by the HTTP plugin to generate the client\-side HTTP service
 
 <a name="GenerateServerHandler"></a>
 ## func GenerateServerHandler

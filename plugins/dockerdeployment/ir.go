@@ -2,6 +2,7 @@ package dockerdeployment
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 )
 
 /* A deployment is a collection of containers */
@@ -10,23 +11,34 @@ type Deployment struct {
 	dockerComposeDeployer /* Can be deployed as a docker-compose file; implemented in deploydockercompose.go */
 
 	DeploymentName string
-	ArgNodes       []ir.IRNode
-	ContainedNodes []ir.IRNode
+	Nodes          []ir.IRNode
+	Edges          []ir.IRNode
 }
 
-func newContainerDeployment(name string, argNodes, containedNodes []ir.IRNode) *Deployment {
-	node := Deployment{
-		DeploymentName: name,
-		ArgNodes:       argNodes,
-		ContainedNodes: containedNodes,
-	}
-	return &node
-}
-
+// Implements IRNode
 func (node *Deployment) Name() string {
 	return node.DeploymentName
 }
 
+// Implements IRNode
 func (node *Deployment) String() string {
-	return ir.PrettyPrintNamespace(node.DeploymentName, "DockerApp", node.ArgNodes, node.ContainedNodes)
+	return ir.PrettyPrintNamespace(node.DeploymentName, "DockerApp", node.Edges, node.Nodes)
+}
+
+// Implements NamespaceHandler
+func (deployment *Deployment) Accepts(nodeType any) bool {
+	_, isDockerContainerNode := nodeType.(docker.Container)
+	return isDockerContainerNode
+}
+
+// Implements NamespaceHandler
+func (deployment *Deployment) AddEdge(name string, edge ir.IRNode) error {
+	deployment.Edges = append(deployment.Edges, edge)
+	return nil
+}
+
+// Implements NamespaceHandler
+func (deployment *Deployment) AddNode(name string, node ir.IRNode) error {
+	deployment.Nodes = append(deployment.Nodes, node)
+	return nil
 }

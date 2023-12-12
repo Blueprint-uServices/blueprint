@@ -16,7 +16,8 @@ If the Blueprint application contains any floating golang nodes, they get
 built by this function.
 */
 func buildDefaultGolangWorkspace(outputDir string, nodes []ir.IRNode) error {
-	proc := newGolangProcessNode("golang", nil, nodes)
+	proc := newGolangProcessNode("golang")
+	proc.Nodes = nodes
 	procDir, err := ioutil.CreateNodeDir(outputDir, "golang")
 	if err != nil {
 		return err

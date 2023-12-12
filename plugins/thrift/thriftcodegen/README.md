@@ -44,7 +44,9 @@ func CompileThriftFile(thriftFileName string) error
 func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error
 ```
 
+This function is used by the Thrift plugin to generate the client\-side caller of the Thrift service.
 
+It is assumed that outputPackage is the same as the one where the .thrift is generated to
 
 <a name="GenerateServerHandler"></a>
 ## func GenerateServerHandler
@@ -53,7 +55,9 @@ func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 func GenerateServerHandler(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error
 ```
 
+This function is used by the Thrift plugin to generate the server\-side Thrift service.
 
+It is assumed that outputPackage is the same as the one where the .thrift is generated to
 
 <a name="GenerateThrift"></a>
 ## func GenerateThrift
@@ -108,7 +112,9 @@ Adds a service declaration for the provided golang service interface.
 func (b *ThriftBuilder) GenerateMarshallingCode(outputFilePath string) error
 ```
 
+Generates marshalling functions that convert between Go objects and Thrift struct objects
 
+This extends the code in thriftgen.go and is called from thriftgen.go
 
 <a name="ThriftBuilder.GetOrAddMessage"></a>
 ### func \(\*ThriftBuilder\) GetOrAddMessage
@@ -131,7 +137,7 @@ func (b *ThriftBuilder) WriteThriftFile(outputFilePath string) error
 <a name="ThriftField"></a>
 ## type ThriftField
 
-
+A basic structural representation of the Thrift messages and services
 
 ```go
 type ThriftField struct {

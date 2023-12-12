@@ -6,6 +6,12 @@
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/zipkin"
 ```
 
+Package zipkin provides a plugin to generate and include a zipkin collector instance in a Blueprint application.
+
+The package provides a zipkin container that provides the server\-side implementation and a go\-client for connecting to the server.
+
+The applications must use a backend.Tracer \(runtime/core/backend\) as the interface in the workflow.
+
 ## Index
 
 - [func Collector\(spec wiring.WiringSpec, collectorName string\) string](<#Collector>)
@@ -36,12 +42,14 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/zipkin"
 func Collector(spec wiring.WiringSpec, collectorName string) string
 ```
 
-Defines the Zipkin collector as a process node. Also creates a pointer to the collector and a client node that are used by clients.
+Generates the IRNodes for a zipkin docker container named \`collectorName\` that uses the latest zipkin container and the clients needed by the generated application to communicate with the server.
+
+The returned collectorName must be used as an argument to the opentelemetry.InstrumentUsingCustomCollector\(spec, serviceName, \`collectorName\`\).
 
 <a name="ZipkinCollectorClient"></a>
 ## type ZipkinCollectorClient
 
-
+Blueprint IR node representing a client to the zipkin container
 
 ```go
 type ZipkinCollectorClient struct {
@@ -131,7 +139,7 @@ func (node *ZipkinCollectorClient) String() string
 <a name="ZipkinCollectorContainer"></a>
 ## type ZipkinCollectorContainer
 
-
+Blueprint IR node that represents the Zipkin container
 
 ```go
 type ZipkinCollectorContainer struct {
@@ -191,7 +199,7 @@ func (node *ZipkinCollectorContainer) String() string
 <a name="ZipkinInterface"></a>
 ## type ZipkinInterface
 
-
+Zipkin interface exposed to the application.
 
 ```go
 type ZipkinInterface struct {

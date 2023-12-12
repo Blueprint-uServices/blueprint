@@ -6,6 +6,8 @@
 import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/mongodb"
 ```
 
+Package mongodb implements a cleint interface to a mongodb server that supports MongoDB's query and update API.
+
 ## Index
 
 - [type MongoCollection](<#MongoCollection>)
@@ -32,7 +34,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/mongodb"
 <a name="MongoCollection"></a>
 ## type MongoCollection
 
-
+Implements the \[backend.NoSQLCollection\] interface as a client\-wrapper to a mongodb server
 
 ```go
 type MongoCollection struct {
@@ -47,7 +49,7 @@ type MongoCollection struct {
 func (mc *MongoCollection) DeleteMany(ctx context.Context, filter bson.D) error
 ```
 
-
+Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.DeleteOne"></a>
 ### func \(\*MongoCollection\) DeleteOne
@@ -56,7 +58,7 @@ func (mc *MongoCollection) DeleteMany(ctx context.Context, filter bson.D) error
 func (mc *MongoCollection) DeleteOne(ctx context.Context, filter bson.D) error
 ```
 
-
+Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.FindMany"></a>
 ### func \(\*MongoCollection\) FindMany
@@ -65,7 +67,7 @@ func (mc *MongoCollection) DeleteOne(ctx context.Context, filter bson.D) error
 func (mc *MongoCollection) FindMany(ctx context.Context, filter bson.D, projection ...bson.D) (backend.NoSQLCursor, error)
 ```
 
-
+Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.FindOne"></a>
 ### func \(\*MongoCollection\) FindOne
@@ -74,7 +76,7 @@ func (mc *MongoCollection) FindMany(ctx context.Context, filter bson.D, projecti
 func (mc *MongoCollection) FindOne(ctx context.Context, filter bson.D, projection ...bson.D) (backend.NoSQLCursor, error)
 ```
 
-
+Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.InsertMany"></a>
 ### func \(\*MongoCollection\) InsertMany
@@ -83,7 +85,7 @@ func (mc *MongoCollection) FindOne(ctx context.Context, filter bson.D, projectio
 func (mc *MongoCollection) InsertMany(ctx context.Context, documents []interface{}) error
 ```
 
-
+Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.InsertOne"></a>
 ### func \(\*MongoCollection\) InsertOne
@@ -92,7 +94,7 @@ func (mc *MongoCollection) InsertMany(ctx context.Context, documents []interface
 func (mc *MongoCollection) InsertOne(ctx context.Context, document interface{}) error
 ```
 
-
+Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.ReplaceMany"></a>
 ### func \(\*MongoCollection\) ReplaceMany
@@ -101,7 +103,7 @@ func (mc *MongoCollection) InsertOne(ctx context.Context, document interface{}) 
 func (mc *MongoCollection) ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) (int, error)
 ```
 
-
+Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.ReplaceOne"></a>
 ### func \(\*MongoCollection\) ReplaceOne
@@ -110,7 +112,7 @@ func (mc *MongoCollection) ReplaceMany(ctx context.Context, filter bson.D, repla
 func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error)
 ```
 
-
+Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.UpdateMany"></a>
 ### func \(\*MongoCollection\) UpdateMany
@@ -119,7 +121,7 @@ func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replac
 func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error)
 ```
 
-
+Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.UpdateOne"></a>
 ### func \(\*MongoCollection\) UpdateOne
@@ -128,7 +130,7 @@ func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update
 func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) (int, error)
 ```
 
-\* not sure about the \`update\` parameter and its conversion
+Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.Upsert"></a>
 ### func \(\*MongoCollection\) Upsert
@@ -137,7 +139,7 @@ func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update 
 func (mc *MongoCollection) Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error)
 ```
 
-
+Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.UpsertID"></a>
 ### func \(\*MongoCollection\) UpsertID
@@ -146,12 +148,12 @@ func (mc *MongoCollection) Upsert(ctx context.Context, filter bson.D, document i
 func (mc *MongoCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error)
 ```
 
-
+Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCursor"></a>
 ## type MongoCursor
 
-
+Implements the \[backend.NoSQLCursor\] interface as a client\-wrapper to the Cursor returned by a mongodb server
 
 ```go
 type MongoCursor struct {
@@ -166,7 +168,7 @@ type MongoCursor struct {
 func (mr *MongoCursor) All(ctx context.Context, objs interface{}) error
 ```
 
-
+Implements the \[backend.NoSQLCursor\] interface
 
 <a name="MongoCursor.One"></a>
 ### func \(\*MongoCursor\) One
@@ -175,12 +177,12 @@ func (mr *MongoCursor) All(ctx context.Context, objs interface{}) error
 func (mr *MongoCursor) One(ctx context.Context, obj interface{}) (bool, error)
 ```
 
-
+Implements the \[backend.NoSQLCursor\] interface
 
 <a name="MongoDB"></a>
 ## type MongoDB
 
-
+Implements the \[backend.NoSQLDatabase\] interface as a client\-wrapper to a mongodb server.
 
 ```go
 type MongoDB struct {
@@ -195,7 +197,7 @@ type MongoDB struct {
 func NewMongoDB(ctx context.Context, addr string) (*MongoDB, error)
 ```
 
-\* constructor
+Instantiates a new MongoDB client\-wrapper instance which connects to a mongodb server running at \`addr\`. REQUIRED: A mongodb server should be running at \`addr\`
 
 <a name="MongoDB.GetCollection"></a>
 ### func \(\*MongoDB\) GetCollection
@@ -204,6 +206,6 @@ func NewMongoDB(ctx context.Context, addr string) (*MongoDB, error)
 func (md *MongoDB) GetCollection(ctx context.Context, db_name string, collectionName string) (backend.NoSQLCollection, error)
 ```
 
-
+Implements the \[backend.NoSQLDatabase\] interface
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)

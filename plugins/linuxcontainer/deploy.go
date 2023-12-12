@@ -57,7 +57,7 @@ type (
 )
 
 /*
-From the core.ArtifactGenerator interface
+Implements ir.ArtifactGenerator
 
 This is the starting point for generating process workspace artifacts.
 
@@ -83,7 +83,7 @@ can typecheck the workspace to utilize those platform-specific commands.
 */
 func (node *Container) generateArtifacts(workspace linux.ProcessWorkspace) error {
 	// Add all processes artifacts to the workspace
-	for _, child := range node.ContainedNodes {
+	for _, child := range node.Nodes {
 		if n, valid := child.(linux.ProvidesProcessArtifacts); valid {
 			if err := n.AddProcessArtifacts(workspace); err != nil {
 				return err
@@ -92,7 +92,7 @@ func (node *Container) generateArtifacts(workspace linux.ProcessWorkspace) error
 	}
 
 	// Collect the scripts to run the processes
-	for _, child := range node.ContainedNodes {
+	for _, child := range node.Nodes {
 		if n, valid := child.(linux.InstantiableProcess); valid {
 			if err := n.AddProcessInstance(workspace); err != nil {
 				return err
@@ -105,10 +105,8 @@ func (node *Container) generateArtifacts(workspace linux.ProcessWorkspace) error
 	return workspace.Finish()
 }
 
-/*
-Creates a BasicWorkspace, which is the simplest process workspace
-that can write processes to an output directory
-*/
+// Creates a BasicWorkspace, which is the simplest process workspace
+// that can write processes to an output directory
 func NewBasicWorkspace(name string, dir string) *filesystemWorkspace {
 	return &filesystemWorkspace{
 		info: linux.ProcessWorkspaceInfo{
@@ -121,10 +119,13 @@ func NewBasicWorkspace(name string, dir string) *filesystemWorkspace {
 	}
 }
 
+// Implements linux.ProcessWorkspace
 func (workspace *filesystemWorkspace) Info() linux.ProcessWorkspaceInfo {
 	return workspace.info
 }
 
+// Implements linux.ProcessWorkspace
+//
 // Creates a subdirectory for a process to output its artifacts.
 // Saves the metadata about the process
 func (ws *filesystemWorkspace) CreateProcessDir(name string) (string, error) {
@@ -133,11 +134,15 @@ func (ws *filesystemWorkspace) CreateProcessDir(name string) (string, error) {
 	return path, err
 }
 
+// Implements linux.ProcessWorkspace
+//
 // Adds a build script provided by a process
 func (ws *filesystemWorkspace) AddBuildScript(path string) error {
 	return ws.Build.Add(path)
 }
 
+// Implements linux.ProcessWorkspace
+//
 // Adds a command to the run.sh file for running the specified process node
 func (ws *filesystemWorkspace) DeclareRunCommand(name string, runfunc string, deps ...ir.IRNode) error {
 	// Generate the runfunc
@@ -146,14 +151,14 @@ func (ws *filesystemWorkspace) DeclareRunCommand(name string, runfunc string, de
 	return err
 }
 
-/*
-Creates a build.sh and a run.sh file in the root of the proc workspace
-
-When invoked, the build.sh file will sequentially invoke any
-build scripts that were provided by processes in the workspace.
-
-The build.sh will typically be invoked by e.g. a Dockerfile
-*/
+// Implements linux.ProcessWorkspace
+//
+// # Creates a build.sh and a run.sh file in the root of the proc workspace
+//
+// When invoked, the build.sh file will sequentially invoke any
+// build scripts that were provided by processes in the workspace.
+//
+// The build.sh will typically be invoked by e.g. a Dockerfile
 func (ws *filesystemWorkspace) Finish() error {
 	// Generate the build.sh
 	if err := ws.Build.GenerateBuildScript(); err != nil {
