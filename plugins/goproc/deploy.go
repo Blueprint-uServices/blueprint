@@ -24,6 +24,8 @@ type filesystemDeployer interface {
 }
 
 /*
+Implements ir.ArtifactGenerator
+
 Generates a golang process to a directory on the local filesystem.
 
 This will collect and package all of the code for the contained Golang nodes

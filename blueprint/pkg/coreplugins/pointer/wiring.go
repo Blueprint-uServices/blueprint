@@ -12,7 +12,7 @@ import (
 // nodes of the specified pointer(s) within the provided namespace.
 //
 // Returns a map of the instantiated node(s).
-func Instantiate(namespace wiring.Namespace, spec wiring.WiringSpec, names ...string) (nodes map[string]ir.IRNode, err error) {
+func Instantiate(spec wiring.WiringSpec, namespace wiring.Namespace, names ...string) (nodes map[string]ir.IRNode, err error) {
 	nodes = make(map[string]ir.IRNode)
 	for _, childName := range names {
 		var child ir.IRNode
@@ -32,18 +32,18 @@ func Instantiate(namespace wiring.Namespace, spec wiring.WiringSpec, names ...st
 
 // Similar to Instantiate, but first consulting the propertyName property of the namespace
 // to discover which nodes should be instantiated.
-func InstantiateFromProperty(namespace wiring.Namespace, spec wiring.WiringSpec, propertyName string) (map[string]ir.IRNode, error) {
+func InstantiateFromProperty(spec wiring.WiringSpec, namespace wiring.Namespace, propertyName string) (map[string]ir.IRNode, error) {
 	var nodeNames []string
 	if err := namespace.GetProperties(namespace.Name(), propertyName, &nodeNames); err != nil {
 		return nil, blueprint.Errorf("%v InstantiateFromProperty %v failed due to %s", namespace.Name(), propertyName, err.Error())
 	}
 	namespace.Info("%v = %s", propertyName, strings.Join(nodeNames, ", "))
-	return Instantiate(namespace, spec, nodeNames...)
+	return Instantiate(spec, namespace, nodeNames...)
 }
 
 // This effectively just calls namespace.Get() for the names provided. Included here
 // for convenience
-func InstantiateClients(namespace wiring.Namespace, spec wiring.WiringSpec, names ...string) (map[string]ir.IRNode, error) {
+func InstantiateClients(spec wiring.WiringSpec, namespace wiring.Namespace, names ...string) (map[string]ir.IRNode, error) {
 	nodes := make(map[string]ir.IRNode)
 	for _, childName := range names {
 		var child ir.IRNode
@@ -57,11 +57,11 @@ func InstantiateClients(namespace wiring.Namespace, spec wiring.WiringSpec, name
 
 // Similar to InstantiateClients, but first consulting the propertyName property of the namespace
 // to discover which nodes should be instantiated.
-func InstantiateClientsFromProperty(namespace wiring.Namespace, spec wiring.WiringSpec, propertyName string) (map[string]ir.IRNode, error) {
+func InstantiateClientsFromProperty(spec wiring.WiringSpec, namespace wiring.Namespace, propertyName string) (map[string]ir.IRNode, error) {
 	var nodeNames []string
 	if err := namespace.GetProperties(namespace.Name(), propertyName, &nodeNames); err != nil {
 		return nil, blueprint.Errorf("%v InstantiateClientsFromProperty %v failed due to %s", namespace.Name(), propertyName, err.Error())
 	}
 	namespace.Info("%v = %s", propertyName, strings.Join(nodeNames, ", "))
-	return InstantiateClients(namespace, spec, nodeNames...)
+	return InstantiateClients(spec, namespace, nodeNames...)
 }

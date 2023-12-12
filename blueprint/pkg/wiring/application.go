@@ -1,6 +1,10 @@
 package wiring
 
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+import (
+	"fmt"
+
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+)
 
 // Builds the IR of an application using the definitions of the provided spec.  Returns
 // an [ir.ApplicationNode] of the application.
@@ -15,8 +19,10 @@ import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 func BuildApplicationIR(spec WiringSpec, name string, nodesToInstantiate ...string) (*ir.ApplicationNode, error) {
 	// Create the root application namespace
 	app := &ir.ApplicationNode{ApplicationName: name}
-	filter := func(any) bool { return true }
-	namespace := CreateFilterNamespace(spec, nil, name, "BlueprintApplication", filter, &app.Children, nil)
+	handler := &applicationNamespaceHandler{
+		app: app,
+	}
+	namespace := CreateNamespaceWithHandler(spec, nil, name, "BlueprintApplication", handler)
 
 	// If no nodes were specified, then instead we will instantiate all defined nodes
 	if len(nodesToInstantiate) == 0 {
@@ -42,4 +48,25 @@ func BuildApplicationIR(spec WiringSpec, name string, nodesToInstantiate ...stri
 		}
 	}
 	return app, nil
+}
+
+type applicationNamespaceHandler struct {
+	SimpleNamespaceHandler
+	app *ir.ApplicationNode
+}
+
+// SimpleNamespaceHandler
+func (handler *applicationNamespaceHandler) Accepts(any) bool {
+	return true
+}
+
+// SimpleNamespaceHandler
+func (handler *applicationNamespaceHandler) AddEdge(name string, node ir.IRNode) error {
+	return fmt.Errorf("BlueprintApplication %v encountered unexpected edge %v %v", handler.app.ApplicationName, name, node)
+}
+
+// SimpleNamespaceHandler
+func (handler *applicationNamespaceHandler) AddNode(name string, node ir.IRNode) error {
+	handler.app.Children = append(handler.app.Children, node)
+	return nil
 }

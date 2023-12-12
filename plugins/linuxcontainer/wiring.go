@@ -4,7 +4,6 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 )
 
 var NamespaceType = "LinuxContainer"
@@ -30,10 +29,10 @@ func CreateContainer(spec wiring.WiringSpec, containerName string, children ...s
 
 	// A linux container node is simply a namespace that accumulates linux process nodes
 	spec.Define(containerName, &Container{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		node := newLinuxContainerNode(containerName)
-		ctr := wiring.CreateNamespace[linux.Process](spec, namespace, containerName, NamespaceType, &node.Nodes, &node.Edges)
-		_, err := pointer.InstantiateFromProperty(ctr, spec, prop_CHILDREN)
-		return node, err
+		ctr := newLinuxContainerNode(containerName)
+		ctrNamespace := wiring.CreateNamespace(spec, namespace, ctr)
+		_, err := pointer.InstantiateFromProperty(spec, ctrNamespace, prop_CHILDREN)
+		return ctr, err
 	})
 
 	return containerName

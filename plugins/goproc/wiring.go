@@ -4,7 +4,6 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
 var prop_CHILDREN = "Children"
@@ -24,10 +23,10 @@ func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) 
 
 	// The process node is simply a namespace that accepts [golang.Node] nodes
 	spec.Define(procName, &Process{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		node := newGolangProcessNode(procName)
-		proc := wiring.CreateNamespace[golang.Node](spec, namespace, procName, "GoProc", &node.Nodes, &node.Edges)
-		_, err := pointer.InstantiateFromProperty(proc, spec, prop_CHILDREN)
-		return node, err
+		proc := newGolangProcessNode(procName)
+		procNamespace := wiring.CreateNamespace(spec, namespace, proc)
+		_, err := pointer.InstantiateFromProperty(spec, procNamespace, prop_CHILDREN)
+		return proc, err
 	})
 
 	return procName
@@ -41,10 +40,10 @@ func CreateClientProcess(spec wiring.WiringSpec, procName string, children ...st
 	}
 
 	spec.Define(procName, &Process{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		node := newGolangProcessNode(procName)
-		proc := wiring.CreateNamespace[golang.Node](spec, namespace, procName, "GoClientProc", &node.Nodes, &node.Edges)
-		_, err := pointer.InstantiateClientsFromProperty(proc, spec, prop_CHILDREN)
-		return node, err
+		proc := newGolangProcessNode(procName)
+		procNamespace := wiring.CreateNamespace(spec, namespace, proc)
+		_, err := pointer.InstantiateClientsFromProperty(spec, procNamespace, prop_CHILDREN)
+		return proc, err
 	})
 
 	return procName

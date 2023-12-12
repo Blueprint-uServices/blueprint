@@ -2,6 +2,7 @@ package linuxcontainer
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 )
 
 /*
@@ -31,10 +32,30 @@ func newLinuxContainerNode(name string) *Container {
 	return &node
 }
 
-func (node *Container) Name() string {
-	return node.InstanceName
+// Implements ir.IRNode
+func (ctr *Container) Name() string {
+	return ctr.InstanceName
 }
 
-func (node *Container) String() string {
-	return ir.PrettyPrintNamespace(node.InstanceName, NamespaceType, node.Edges, node.Nodes)
+// Implements ir.IRNode
+func (ctr *Container) String() string {
+	return ir.PrettyPrintNamespace(ctr.InstanceName, NamespaceType, ctr.Edges, ctr.Nodes)
+}
+
+// Implements SimpleNamespaceHandler
+func (ctr *Container) Accepts(nodeType any) bool {
+	_, isLinuxProcess := nodeType.(linux.Process)
+	return isLinuxProcess
+}
+
+// Implements SimpleNamespaceHandler
+func (ctr *Container) AddEdge(name string, edge ir.IRNode) error {
+	ctr.Edges = append(ctr.Edges, edge)
+	return nil
+}
+
+// Implements SimpleNamespaceHandler
+func (ctr *Container) AddNode(name string, node ir.IRNode) error {
+	ctr.Nodes = append(ctr.Nodes, node)
+	return nil
 }

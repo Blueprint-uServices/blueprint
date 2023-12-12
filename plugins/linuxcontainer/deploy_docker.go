@@ -28,7 +28,6 @@ type (
 	   Each process within the container can optionally provide additional
 	   commands to add to the Dockerfile, if implemented.
 	*/
-
 	dockerDeployer interface {
 		docker.Container
 		docker.ProvidesContainerImage
@@ -36,16 +35,14 @@ type (
 	}
 
 	/*
-	   Most of the time, processes will be packaged into a Docker container.
+		Implements docker.ProcessWorkspace which extends linux.ProcessWorkspace
 
-	   This is the Docker ipmlementation of the linux.ProcessWorkspace defined
-	   in linux/ir.go.
+		The implementation extends filesystemWorkspace
 
-	   This workspace performs the same actions as the BasicWorkspace but also
-	   allows processes to optionally provide Dockerfile build commands in lieu
-	   of adding a build script to the build.sh
+		In addition to the actions of BasicWorkspace, this workspace allows
+		processes to optionally provide Dockerfile build commands in lieu
+		of adding a build script to the build.sh
 	*/
-
 	dockerWorkspaceImpl struct {
 		filesystemWorkspace
 
@@ -53,6 +50,7 @@ type (
 	}
 )
 
+// Implements dockerDeployer docker.ProvidesContainerImage
 func (node *Container) AddContainerArtifacts(target docker.ContainerWorkspace) error {
 	// The image only needs to be created in the output directory once
 	if target.Visited(node.ImageName + ".artifacts") {
@@ -78,6 +76,7 @@ func (node *Container) AddContainerArtifacts(target docker.ContainerWorkspace) e
 	return nil
 }
 
+// Implements dockerDeployer docker.ProvidesContainerInstance
 func (node *Container) AddContainerInstance(target docker.ContainerWorkspace) error {
 	// The instance only needs to be added to the output directory once
 	if target.Visited(node.InstanceName + ".instance") {
@@ -93,6 +92,9 @@ func (node *Container) AddContainerInstance(target docker.ContainerWorkspace) er
 	return target.DeclareLocalImage(node.InstanceName, node.ImageName, node.Edges...)
 }
 
+// Create a new process workspace that is going to be deployed within a docker container,
+// and therefore allows processes to add additional docker-specific commands by typechecking
+// the linux.ProcessWorkspace
 func NewDockerWorkspace(name string, dir string) *dockerWorkspaceImpl {
 	ws := &dockerWorkspaceImpl{}
 	ws.info.Target = "docker"
@@ -101,13 +103,15 @@ func NewDockerWorkspace(name string, dir string) *dockerWorkspaceImpl {
 	return ws
 }
 
+// Implements docker.ProcessWorkspace
 func (ws *dockerWorkspaceImpl) AddDockerfileCommands(procName, commands string) {
 	ws.Dockerfile.AddCustomCommands(procName, commands)
 }
 
-/*
-Generates the build.sh and run.sh as well as Dockerfile
-*/
+// Implements linux.ProcessWorkspace
+//
+// Invokes Finish() of filesystemWorkspace, then additionally
+// generates the build.sh and run.sh as well as Dockerfile
 func (ws *dockerWorkspaceImpl) Finish() error {
 	// Create the BasicWorkspace's build.sh and run.sh
 	if err := ws.filesystemWorkspace.Finish(); err != nil {

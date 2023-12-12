@@ -14,7 +14,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-// Blueprint IR node representing a ClientPool.
+// Blueprint IR node representing a ClientPool that uses [N] instances of [Client]
 type ClientPool struct {
 	golang.Service
 	golang.GeneratesFuncs
@@ -26,22 +26,17 @@ type ClientPool struct {
 	Nodes    []ir.IRNode
 }
 
-func newClientPool(name string, n int) *ClientPool {
-	return &ClientPool{
-		PoolName: name,
-		N:        n,
-	}
+// Implements ir.IRNode
+func (pool *ClientPool) Name() string {
+	return pool.PoolName
 }
 
-func (node *ClientPool) Name() string {
-	return node.PoolName
-}
-
-func (node *ClientPool) String() string {
+// Implements ir.IRNode
+func (pool *ClientPool) String() string {
 	var b strings.Builder
-	b.WriteString(fmt.Sprintf("%v = ClientPool(%v, %v) {\n", node.PoolName, node.Client.Name(), node.N))
+	b.WriteString(fmt.Sprintf("%v = ClientPool(%v, %v) {\n", pool.PoolName, pool.Client.Name(), pool.N))
 	var children []string
-	for _, child := range node.Nodes {
+	for _, child := range pool.Nodes {
 		children = append(children, child.String())
 	}
 	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
@@ -49,11 +44,31 @@ func (node *ClientPool) String() string {
 	return b.String()
 }
 
+// Implements SimpleNamespaceHandler
+func (pool *ClientPool) Accepts(nodeType any) bool {
+	_, isGolangNode := nodeType.(golang.Node)
+	return isGolangNode
+}
+
+// Implements SimpleNamespaceHandler
+func (pool *ClientPool) AddEdge(name string, edge ir.IRNode) error {
+	pool.Edges = append(pool.Edges, edge)
+	return nil
+}
+
+// Implements SimpleNamespaceHandler
+func (pool *ClientPool) AddNode(name string, node ir.IRNode) error {
+	pool.Nodes = append(pool.Nodes, node)
+	return nil
+}
+
+// Implements golang.Service service.ServiceNode
 func (pool *ClientPool) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	/* ClientPool doesn't modify the client's interface and doesn't introduce new interfaces */
 	return pool.Client.GetInterface(ctx)
 }
 
+// Implements golang.Service golang.ProvidesInterface
 func (pool *ClientPool) AddInterfaces(module golang.ModuleBuilder) error {
 	/* ClientPool doesn't modify the client's interface and doesn't introduce new interfaces */
 	for _, node := range pool.Nodes {
@@ -66,6 +81,7 @@ func (pool *ClientPool) AddInterfaces(module golang.ModuleBuilder) error {
 	return nil
 }
 
+// Implements golang.GeneratesFuncs
 func (pool *ClientPool) GenerateFuncs(module golang.ModuleBuilder) error {
 	/* Only generate clientpool code for the wrapped client once */
 	iface, err := golang.GetGoInterface(module, pool.Client)
@@ -114,6 +130,7 @@ func (pool *ClientPool) GenerateFuncs(module golang.ModuleBuilder) error {
 	return gogen.ExecuteTemplateToFile("clientpool_client_constructor", poolTemplate, args, poolFileName)
 }
 
+// Implements golang.Service golang.Instantiable
 func (pool *ClientPool) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(pool.PoolName) {
 		return nil

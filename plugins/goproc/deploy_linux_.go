@@ -24,9 +24,7 @@ type linuxDeployer interface {
 	linux.InstantiableProcess
 }
 
-/*
-From process.ProvidesProcessArtifacts
-*/
+// Implements linux.ProvidesProcessArtifacts
 func (node *Process) AddProcessArtifacts(builder linux.ProcessWorkspace) error {
 	if builder.Visited(node.Name() + ".artifacts") {
 		return nil
@@ -53,9 +51,7 @@ func (node *Process) AddProcessArtifacts(builder linux.ProcessWorkspace) error {
 	return nil
 }
 
-/*
-From process.InstantiableProcess
-*/
+// Implements linux.InstantiableProcess
 func (node *Process) AddProcessInstance(builder linux.ProcessWorkspace) error {
 	if builder.Visited(node.InstanceName + ".instance") {
 		return nil

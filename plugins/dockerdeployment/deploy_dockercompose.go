@@ -46,6 +46,7 @@ type (
 	}
 )
 
+// Implements ir.ArtifactGenerator
 func (node *Deployment) GenerateArtifacts(dir string) error {
 	slog.Info(fmt.Sprintf("Collecting container instances for deployment %s in %s", node.Name(), dir))
 	workspace := NewDockerComposeWorkspace(node.Name(), dir)
@@ -93,10 +94,12 @@ func NewDockerComposeWorkspace(name string, dir string) *dockerComposeWorkspace 
 	}
 }
 
+// Implements docker.ContainerWorkspace
 func (d *dockerComposeWorkspace) Info() docker.ContainerWorkspaceInfo {
 	return d.info
 }
 
+// Implements docker.ContainerWorkspace
 func (d *dockerComposeWorkspace) CreateImageDir(imageName string) (string, error) {
 	// Only alphanumeric and underscores are allowed in an proc name
 	imageName = ir.CleanName(imageName)
@@ -105,6 +108,7 @@ func (d *dockerComposeWorkspace) CreateImageDir(imageName string) (string, error
 	return imageDir, err
 }
 
+// Implements docker.ContainerWorkspace
 func (d *dockerComposeWorkspace) DeclarePrebuiltInstance(instanceName string, image string, args ...ir.IRNode) error {
 	// Docker containers should assign all internal server ports (typically using address.AssignPorts) before adding an instance
 	if err := address.CheckPorts(args); err != nil {
@@ -114,6 +118,7 @@ func (d *dockerComposeWorkspace) DeclarePrebuiltInstance(instanceName string, im
 	return d.DockerComposeFile.AddImageInstance(instanceName, image, args...)
 }
 
+// Implements docker.ContainerWorkspace
 func (d *dockerComposeWorkspace) DeclareLocalImage(instanceName string, imageDir string, args ...ir.IRNode) error {
 	// Docker containers should assign all internal server ports (typically using address.AssignPorts) before adding an instance
 	if err := address.CheckPorts(args); err != nil {
@@ -123,10 +128,12 @@ func (d *dockerComposeWorkspace) DeclareLocalImage(instanceName string, imageDir
 	return d.DockerComposeFile.AddBuildInstance(instanceName, imageDir, args...)
 }
 
+// Implements docker.ContainerWorkspace
 func (d *dockerComposeWorkspace) SetEnvironmentVariable(instanceName string, key string, val string) error {
 	return d.DockerComposeFile.AddEnvVar(instanceName, key, val)
 }
 
+// Implements docker.ContainerWorkspace
 func (d *dockerComposeWorkspace) Finish() error {
 	// Now that all images and instances have been declared, we can generate the docker-compose file
 	return d.DockerComposeFile.Generate()

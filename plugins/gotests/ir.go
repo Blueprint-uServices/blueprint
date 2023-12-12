@@ -34,15 +34,37 @@ func newTestLibrary(name string) *testLibrary {
 	return node
 }
 
+// Implements ir.IRNode
 func (lib *testLibrary) Name() string {
 	return lib.LibraryName
 }
 
+// Implements ir.IRNode
 func (lib *testLibrary) String() string {
 	return ir.PrettyPrintNamespace(lib.LibraryName, "GolangTests", lib.Edges, lib.Nodes)
 }
 
+// Implements SimpleNamespaceHandler
+func (*testLibrary) Accepts(nodeType any) bool {
+	_, isGolangNode := nodeType.(golang.Node)
+	return isGolangNode
+}
+
+// Implements SimpleNamespaceHandler
+func (lib *testLibrary) AddEdge(name string, edge ir.IRNode) error {
+	lib.Edges = append(lib.Edges, edge)
+	return nil
+}
+
+// Implements SimpleNamespaceHandler
+func (lib *testLibrary) AddNode(name string, node ir.IRNode) error {
+	lib.Nodes = append(lib.Nodes, node)
+	return nil
+}
+
 /*
+Implements ir.ArtifactGenerator
+
 Generates a golang workspace to a directory on the local filesystem.
 
 Within the workspace will have converted all compatible unit tests into
