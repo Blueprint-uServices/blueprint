@@ -1,5 +1,7 @@
 # Blueprint API Documentation
 
+Deprecated: do not use this any more.
+
 Blueprint API documentation for the core plugins, external plugins, and blueprint runtime packages is available in [api](api/).
 
 ## Updating Documentation
