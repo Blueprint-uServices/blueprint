@@ -4,7 +4,6 @@
 package clientpool
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/namespacebuilder"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
@@ -28,9 +27,9 @@ func Create(spec wiring.WiringSpec, serviceName string, n int) {
 
 	// Define the client pool
 	spec.Define(clientpool, &ClientPool{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		pool := namespacebuilder.Create[golang.Node](namespace, spec, "ClientPool", clientpool)
-		var client golang.Service
-		err := pool.Namespace.Get(clientNext, &client)
-		return newClientPool(clientpool, n, client, pool.ArgNodes, pool.ContainedNodes), err
+		node := newClientPool(clientpool, n)
+		pool := wiring.CreateNamespace[golang.Node](spec, namespace, clientpool, "ClientPool", &node.Nodes, &node.Edges)
+		err := pool.Get(clientNext, &node.Client)
+		return node, err
 	})
 }

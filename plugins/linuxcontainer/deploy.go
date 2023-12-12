@@ -83,7 +83,7 @@ can typecheck the workspace to utilize those platform-specific commands.
 */
 func (node *Container) generateArtifacts(workspace linux.ProcessWorkspace) error {
 	// Add all processes artifacts to the workspace
-	for _, child := range node.ContainedNodes {
+	for _, child := range node.Nodes {
 		if n, valid := child.(linux.ProvidesProcessArtifacts); valid {
 			if err := n.AddProcessArtifacts(workspace); err != nil {
 				return err
@@ -92,7 +92,7 @@ func (node *Container) generateArtifacts(workspace linux.ProcessWorkspace) error
 	}
 
 	// Collect the scripts to run the processes
-	for _, child := range node.ContainedNodes {
+	for _, child := range node.Nodes {
 		if n, valid := child.(linux.InstantiableProcess); valid {
 			if err := n.AddProcessInstance(workspace); err != nil {
 				return err

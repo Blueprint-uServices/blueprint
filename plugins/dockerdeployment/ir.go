@@ -10,15 +10,13 @@ type Deployment struct {
 	dockerComposeDeployer /* Can be deployed as a docker-compose file; implemented in deploydockercompose.go */
 
 	DeploymentName string
-	ArgNodes       []ir.IRNode
-	ContainedNodes []ir.IRNode
+	Nodes          []ir.IRNode
+	Edges          []ir.IRNode
 }
 
-func newContainerDeployment(name string, argNodes, containedNodes []ir.IRNode) *Deployment {
+func newContainerDeployment(name string) *Deployment {
 	node := Deployment{
 		DeploymentName: name,
-		ArgNodes:       argNodes,
-		ContainedNodes: containedNodes,
 	}
 	return &node
 }
@@ -28,5 +26,5 @@ func (node *Deployment) Name() string {
 }
 
 func (node *Deployment) String() string {
-	return ir.PrettyPrintNamespace(node.DeploymentName, "DockerApp", node.ArgNodes, node.ContainedNodes)
+	return ir.PrettyPrintNamespace(node.DeploymentName, "DockerApp", node.Edges, node.Nodes)
 }

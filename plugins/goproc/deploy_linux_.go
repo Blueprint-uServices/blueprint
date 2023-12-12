@@ -67,15 +67,15 @@ func (node *Process) AddProcessInstance(builder linux.ProcessWorkspace) error {
 	var err error
 	switch builder.(type) {
 	case docker.ProcessWorkspace:
-		runfunc, err = linuxgen.GenerateBinaryRunFunc(procName, node.ArgNodes...)
+		runfunc, err = linuxgen.GenerateBinaryRunFunc(procName, node.Edges...)
 	default:
-		runfunc, err = linuxgen.GenerateRunFunc(procName, node.ArgNodes...)
+		runfunc, err = linuxgen.GenerateRunFunc(procName, node.Edges...)
 	}
 	if err != nil {
 		return err
 	}
 
-	return builder.DeclareRunCommand(node.InstanceName, runfunc, node.ArgNodes...)
+	return builder.DeclareRunCommand(node.InstanceName, runfunc, node.Edges...)
 }
 
 func (node *Process) ImplementsLinuxProcess() {}

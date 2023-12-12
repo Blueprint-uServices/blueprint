@@ -26,7 +26,7 @@
 package gotests
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/namespacebuilder"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
@@ -61,10 +61,12 @@ func Test(spec wiring.WiringSpec, servicesToTest ...string) string {
 	}
 
 	// Might redefine gotests multiple times; no big deal
-	spec.Define("gotests", &testLibrary{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		testLib := namespacebuilder.Create[golang.Node](namespace, spec, "GolangTests", name)
-		err := testLib.InstantiateClientsFromProperty(prop_SERVICESTOTEST)
-		return newTestLibrary(name, testLib.ArgNodes, testLib.ContainedNodes, testLib.InstantiatedNodes), err
+	spec.Define(name, &testLibrary{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
+		node := newTestLibrary(name)
+		testlib := wiring.CreateNamespace[golang.Node](spec, namespace, name, "GolangTests", &node.Nodes, &node.Edges)
+		var err error
+		node.ServicesToTest, err = pointer.InstantiateClientsFromProperty(testlib, spec, prop_SERVICESTOTEST)
+		return node, err
 	})
 
 	return name

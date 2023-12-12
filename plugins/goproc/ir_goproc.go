@@ -28,20 +28,18 @@ type Process struct {
 	filesystemDeployer /* Can be deployed as a basic go process; implemented in deploy.go */
 	linuxDeployer      /* Can be deployed to linux; implemented in deploylinux.go */
 
-	InstanceName   string
-	ProcName       string
-	ModuleName     string
-	ArgNodes       []ir.IRNode
-	ContainedNodes []ir.IRNode
+	InstanceName string
+	ProcName     string
+	ModuleName   string
+	Nodes        []ir.IRNode
+	Edges        []ir.IRNode
 }
 
 // A Golang Process Node can either be given the child nodes ahead of time, or they can be added using AddArtifactNode / AddCodeNode
-func newGolangProcessNode(name string, argNodes, containedNodes []ir.IRNode) *Process {
+func newGolangProcessNode(name string) *Process {
 	node := Process{
-		InstanceName:   name,
-		ProcName:       ir.CleanName(name),
-		ArgNodes:       argNodes,
-		ContainedNodes: containedNodes,
+		InstanceName: name,
+		ProcName:     ir.CleanName(name),
 	}
 	node.ModuleName = generatedModulePrefix + "/" + node.ProcName
 	return &node
@@ -52,5 +50,5 @@ func (node *Process) Name() string {
 }
 
 func (node *Process) String() string {
-	return ir.PrettyPrintNamespace(node.InstanceName, "GolangProcessNode", node.ArgNodes, node.ContainedNodes)
+	return ir.PrettyPrintNamespace(node.InstanceName, "GolangProcessNode", node.Edges, node.Nodes)
 }

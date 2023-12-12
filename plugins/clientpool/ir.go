@@ -19,20 +19,17 @@ type ClientPool struct {
 	golang.Service
 	golang.GeneratesFuncs
 
-	PoolName       string
-	N              int
-	Client         golang.Service
-	ArgNodes       []ir.IRNode
-	ContainedNodes []ir.IRNode
+	PoolName string
+	N        int
+	Client   golang.Service
+	Edges    []ir.IRNode
+	Nodes    []ir.IRNode
 }
 
-func newClientPool(name string, n int, client golang.Service, argNodes, containedNodes []ir.IRNode) *ClientPool {
+func newClientPool(name string, n int) *ClientPool {
 	return &ClientPool{
-		PoolName:       name,
-		N:              n,
-		Client:         client,
-		ArgNodes:       argNodes,
-		ContainedNodes: containedNodes,
+		PoolName: name,
+		N:        n,
 	}
 }
 
@@ -44,7 +41,7 @@ func (node *ClientPool) String() string {
 	var b strings.Builder
 	b.WriteString(fmt.Sprintf("%v = ClientPool(%v, %v) {\n", node.PoolName, node.Client.Name(), node.N))
 	var children []string
-	for _, child := range node.ContainedNodes {
+	for _, child := range node.Nodes {
 		children = append(children, child.String())
 	}
 	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
@@ -59,7 +56,7 @@ func (pool *ClientPool) GetInterface(ctx ir.BuildContext) (service.ServiceInterf
 
 func (pool *ClientPool) AddInterfaces(module golang.ModuleBuilder) error {
 	/* ClientPool doesn't modify the client's interface and doesn't introduce new interfaces */
-	for _, node := range pool.ContainedNodes {
+	for _, node := range pool.Nodes {
 		if n, valid := node.(golang.ProvidesInterface); valid {
 			if err := n.AddInterfaces(module); err != nil {
 				return err
@@ -80,7 +77,7 @@ func (pool *ClientPool) GenerateFuncs(module golang.ModuleBuilder) error {
 	}
 
 	// Make sure we have all necessary code of contained nodes
-	for _, node := range pool.ContainedNodes {
+	for _, node := range pool.Nodes {
 		if n, valid := node.(golang.GeneratesFuncs); valid {
 			if err := n.GenerateFuncs(module); err != nil {
 				return err
@@ -99,7 +96,7 @@ func (pool *ClientPool) GenerateFuncs(module golang.ModuleBuilder) error {
 	}
 
 	// Add instantiation code for everything within the pool
-	for _, node := range pool.ContainedNodes {
+	for _, node := range pool.Nodes {
 		if inst, canInstantiate := node.(golang.Instantiable); canInstantiate {
 			if err := inst.AddInstantiation(namespaceBuilder); err != nil {
 				return err

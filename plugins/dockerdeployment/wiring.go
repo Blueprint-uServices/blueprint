@@ -1,7 +1,7 @@
 package dockerdeployment
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/namespacebuilder"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
@@ -23,9 +23,10 @@ func NewDeployment(spec wiring.WiringSpec, deploymentName string, containers ...
 	}
 
 	spec.Define(deploymentName, &Deployment{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		deployment := namespacebuilder.Create[docker.Container](namespace, spec, "DockerApp", deploymentName)
-		err := deployment.InstantiateFromProperty(prop_CHILDREN)
-		return newContainerDeployment(deploymentName, deployment.ArgNodes, deployment.ContainedNodes), err
+		node := newContainerDeployment(deploymentName)
+		deployment := wiring.CreateNamespace[docker.Container](spec, namespace, deploymentName, "DockerApp", &node.Nodes, &node.Edges)
+		_, err := pointer.InstantiateFromProperty(deployment, spec, prop_CHILDREN)
+		return node, err
 	})
 
 	return deploymentName

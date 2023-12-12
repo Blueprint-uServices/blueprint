@@ -58,14 +58,14 @@ The basic build process of a docker-compose deployment
 func (node *Deployment) generateArtifacts(workspace *dockerComposeWorkspace) error {
 
 	// Add any locally-built container images
-	for _, node := range ir.Filter[docker.ProvidesContainerImage](node.ContainedNodes) {
+	for _, node := range ir.Filter[docker.ProvidesContainerImage](node.Nodes) {
 		if err := node.AddContainerArtifacts(workspace); err != nil {
 			return err
 		}
 	}
 
 	// Collect all container instances
-	for _, node := range ir.Filter[docker.ProvidesContainerInstance](node.ContainedNodes) {
+	for _, node := range ir.Filter[docker.ProvidesContainerInstance](node.Nodes) {
 		if err := node.AddContainerInstance(workspace); err != nil {
 			return err
 		}
@@ -78,7 +78,7 @@ func (node *Deployment) generateArtifacts(workspace *dockerComposeWorkspace) err
 
 	// Reset any port assignments for externally-visible servers, since they will currently
 	// be assigned to docker-internal ports
-	address.ResetPorts(node.ArgNodes)
+	address.ResetPorts(node.Edges)
 	return nil
 }
 

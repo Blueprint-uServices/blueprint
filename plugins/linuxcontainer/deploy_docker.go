@@ -85,12 +85,12 @@ func (node *Container) AddContainerInstance(target docker.ContainerWorkspace) er
 	}
 
 	// Assign ports to addresses that are bound inside this container
-	if err := address.AssignPorts(node.InstanceName, append(node.ContainedNodes, node.ArgNodes...)); err != nil {
+	if err := address.AssignPorts(node.InstanceName, append(node.Nodes, node.Edges...)); err != nil {
 		return err
 	}
 
 	slog.Info(fmt.Sprintf("Declaring container instance %v", node.InstanceName))
-	return target.DeclareLocalImage(node.InstanceName, node.ImageName, node.ArgNodes...)
+	return target.DeclareLocalImage(node.InstanceName, node.ImageName, node.Edges...)
 }
 
 func NewDockerWorkspace(name string, dir string) *dockerWorkspaceImpl {

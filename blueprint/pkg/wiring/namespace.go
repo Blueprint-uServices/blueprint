@@ -90,12 +90,6 @@ type SimpleNamespace struct {
 // The plugin should implement the methods of this handler and then create a [SimpleNamespace] and call
 // [SimpleNamespace.Init]
 type SimpleNamespaceHandler interface {
-	// Initialize the handler with a namespace
-	Init(*SimpleNamespace)
-
-	// Look up a [WiringDef] from the wiring spec.
-	LookupDef(string) (*WiringDef, error)
-
 	// Reports true if this namespace can build nodes of the specified node type.
 	//
 	// For some node type T, if Accepts(T) returns false, then nodes of type T will
@@ -112,51 +106,66 @@ type SimpleNamespaceHandler interface {
 	AddNode(string, ir.IRNode) error
 }
 
-// A basic [SimpleNamespaceHandler] implementation that accepts nodes of all types.
-type DefaultNamespaceHandler struct {
-	SimpleNamespaceHandler
-	Namespace *SimpleNamespace
-
-	Nodes []ir.IRNode
-	Edges []ir.IRNode
-}
-
-func (handler *DefaultNamespaceHandler) Init(namespace *SimpleNamespace) {
-	handler.Namespace = namespace
-}
-
-func (handler *DefaultNamespaceHandler) LookupDef(name string) (*WiringDef, error) {
-	def := handler.Namespace.Wiring.GetDef(name)
-	if def == nil {
-		return nil, blueprint.Errorf("%s does not exist in the wiring spec of namespace %s", name, handler.Namespace.Name())
+// Creates a child namespace from the provided parent namespace.
+//
+// To create a namespace with this method, the caller provides a [SimpleNamespaceHandler] that
+// handles the logic for which nodes should be created within the namespace, and callbacks for
+// saving created nodes and argument nodes.
+func CreateHandlerNamespace(wiring WiringSpec, parent Namespace, name, namespacetype string, handler SimpleNamespaceHandler) *SimpleNamespace {
+	return &SimpleNamespace{
+		NamespaceName:   name,
+		NamespaceType:   namespacetype,
+		ParentNamespace: parent,
+		Wiring:          wiring,
+		Handler:         handler,
+		Seen:            make(map[string]ir.IRNode),
+		Added:           make(map[string]any),
 	}
-	return def, nil
 }
 
-func (handler *DefaultNamespaceHandler) Accepts(nodeType any) bool {
-	return true
+// Creates a child namespace from the provided parent namespace.
+//
+// The created namespace uses the provided filter func to determine which nodes should be created
+// within the namespace.  Created nodes are appended into the provided nodes slice and edges
+// are appended to the provided edges slice.
+func CreateFilterNamespace(wiring WiringSpec, parent Namespace, name, namespacetype string, filter func(any) bool, nodes *[]ir.IRNode, edges *[]ir.IRNode) *SimpleNamespace {
+	return CreateHandlerNamespace(wiring, parent, name, namespacetype, &funcHandler{filter, nodes, edges})
 }
 
-func (handler *DefaultNamespaceHandler) AddEdge(name string, node ir.IRNode) error {
-	handler.Edges = append(handler.Edges, node)
+// Creates a child namespace from the provided parent namespace.
+//
+// The created namespace will create nodes of type [T] and fetch other nodes from the parent namespace.
+// Created nodes are appended into the provided nodes slice and edges
+// are appended to the provided edges slice.
+func CreateNamespace[T any](wiring WiringSpec, parent Namespace, name, namespacetype string, nodes *[]ir.IRNode, edges *[]ir.IRNode) *SimpleNamespace {
+	filter := func(v any) bool {
+		_, isT := v.(T)
+		return isT
+	}
+	return CreateFilterNamespace(wiring, parent, name, namespacetype, filter, nodes, edges)
+}
+
+type funcHandler struct {
+	filter func(any) bool
+	nodes  *[]ir.IRNode
+	edges  *[]ir.IRNode
+}
+
+// Accepts implements SimpleNamespaceHandler.
+func (f *funcHandler) Accepts(nodeType any) bool {
+	return f.filter(nodeType)
+}
+
+// AddEdge implements SimpleNamespaceHandler.
+func (f *funcHandler) AddEdge(name string, edge ir.IRNode) error {
+	*f.edges = append(*f.edges, edge)
 	return nil
 }
 
-func (handler *DefaultNamespaceHandler) AddNode(name string, node ir.IRNode) error {
-	handler.Nodes = append(handler.Nodes, node)
+// AddNode implements SimpleNamespaceHandler.
+func (f *funcHandler) AddNode(name string, node ir.IRNode) error {
+	*f.nodes = append(*f.nodes, node)
 	return nil
-}
-
-// Initializes a SimpleNamespace.  To do so, a parent namespace, wiring spec,
-// and [SimpleNamespaceHandler] implementation must be provided.
-func (namespace *SimpleNamespace) Init(name, namespacetype string, parent Namespace, wiring WiringSpec, handler SimpleNamespaceHandler) {
-	namespace.NamespaceName = name
-	namespace.NamespaceType = namespacetype
-	namespace.ParentNamespace = parent
-	namespace.Wiring = wiring
-	namespace.Handler = handler
-	namespace.Seen = make(map[string]ir.IRNode)
-	namespace.Added = make(map[string]any)
 }
 
 func (namespace *SimpleNamespace) Name() string {
@@ -171,6 +180,14 @@ func (namespace *SimpleNamespace) Get(name string, dst any) error {
 	return namespace.get(name, true, dst)
 }
 
+func (namespace *SimpleNamespace) lookupDef(name string) (*WiringDef, error) {
+	def := namespace.Wiring.GetDef(name)
+	if def == nil {
+		return nil, blueprint.Errorf("%s does not exist in the wiring spec of namespace %s", name, namespace.NamespaceName)
+	}
+	return def, nil
+}
+
 func (namespace *SimpleNamespace) get(name string, addEdge bool, dst any) error {
 	// If it already exists, return it
 	if node, ok := namespace.Seen[name]; ok {
@@ -178,7 +195,7 @@ func (namespace *SimpleNamespace) get(name string, addEdge bool, dst any) error 
 	}
 
 	// Look up the definition
-	def, err := namespace.Handler.LookupDef(name)
+	def, err := namespace.lookupDef(name)
 	if err != nil {
 		return err
 	}
@@ -280,7 +297,7 @@ func (namespace *SimpleNamespace) Defer(f func() error) {
 }
 
 func (namespace *SimpleNamespace) GetProperty(name string, key string, dst any) error {
-	def, err := namespace.Handler.LookupDef(name)
+	def, err := namespace.lookupDef(name)
 	if err != nil {
 		return err
 	}
@@ -288,7 +305,7 @@ func (namespace *SimpleNamespace) GetProperty(name string, key string, dst any) 
 }
 
 func (namespace *SimpleNamespace) GetProperties(name string, key string, dst any) error {
-	def, err := namespace.Handler.LookupDef(name)
+	def, err := namespace.lookupDef(name)
 	if err != nil {
 		return err
 	}
