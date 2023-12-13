@@ -24,7 +24,7 @@ func generateClient(builder golang.ModuleBuilder, wrapped *gocode.ServiceInterfa
 		Imports: gogen.NewImports(pkg.Name),
 	}
 
-	client.Imports.AddPackages("context")
+	client.Imports.AddPackages("context", "time", "errors")
 	slog.Info(fmt.Sprintf("Generating %v/%v", client.Package.PackageName, wrapped.BaseName+"_TimeoutClient"))
 	outputFile := filepath.Join(client.Package.Path, wrapped.BaseName+"_TimeoutClient.go")
 
