@@ -11,9 +11,13 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
+var compilerLogging = false
+
 func newWiringSpec(name string) wiring.WiringSpec {
-	logging.DisableCompilerLogging()
-	defer logging.EnableCompilerLogging()
+	if !compilerLogging {
+		logging.DisableCompilerLogging()
+		defer logging.EnableCompilerLogging()
+	}
 	workflow.Reset()
 	spec := wiring.NewWiringSpec(name)
 	workflow.Init("../workflow")
@@ -21,8 +25,10 @@ func newWiringSpec(name string) wiring.WiringSpec {
 }
 
 func build(t *testing.T, spec wiring.WiringSpec, toInstantiate ...string) (*ir.ApplicationNode, error) {
-	logging.DisableCompilerLogging()
-	defer logging.EnableCompilerLogging()
+	if !compilerLogging {
+		logging.DisableCompilerLogging()
+		defer logging.EnableCompilerLogging()
+	}
 	return spec.BuildIR(toInstantiate...)
 }
 

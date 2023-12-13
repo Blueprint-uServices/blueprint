@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 
 	"github.com/stretchr/testify/assert"
@@ -16,6 +17,7 @@ Primarily want visibility tests for nodes that are in separate processes but not
 */
 
 func TestServicesWithinSameProcess(t *testing.T) {
+	compilerLogging = true
 	spec := newWiringSpec("TestServicesWithinSameProcess")
 
 	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
@@ -141,4 +143,40 @@ func TestImplicitServicesWithinSameProcess(t *testing.T) {
               nonleaf = TestNonLeafService(leaf)
             }
           }`)
+}
+
+func TestProcessModifier(t *testing.T) {
+	spec := newWiringSpec("TestProcessModifier")
+
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+
+	grpc.Deploy(spec, leaf)
+	grpc.Deploy(spec, nonleaf)
+
+	goproc.CreateProcess(spec, "leafproc", leaf)
+	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
+
+	app := assertBuildSuccess(t, spec, nonleafproc)
+
+	assertIR(t, app,
+		`TestProcessModifier = BlueprintApplication() {
+			nonleaf.grpc.addr
+			nonleaf.grpc.bind_addr = AddressConfig()
+			nonleaf.handler.visibility
+			leaf.grpc.addr
+			leaf.grpc.bind_addr = AddressConfig()
+			leaf.handler.visibility
+			leafproc = GolangProcessNode(leaf.grpc.bind_addr) {
+			  leaf = TestLeafService()
+			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
+			}
+			leaf.grpc.dial_addr = AddressConfig()
+			nonleafproc = GolangProcessNode(nonleaf.grpc.bind_addr, leaf.grpc.dial_addr) {
+			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
+			  leaf = TestLeafService(leaf.grpc_client)
+			  nonleaf = TestNonLeafService(leaf)
+			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
+			}
+		  }`)
 }
