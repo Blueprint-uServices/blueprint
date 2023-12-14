@@ -1,12 +1,18 @@
 package latencyinjector
 
 import (
+	"fmt"
+	"reflect"
+
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
 )
 
 // Blueprint IR Node representing a server side latency injector
-type LatencyInjector struct {
+type LatencyInjectorWrapper struct {
 	golang.Service
 	golang.GeneratesFuncs
 	golang.Instantiable
@@ -17,6 +23,71 @@ type LatencyInjector struct {
 	LatencyValue  *ir.IRValue
 }
 
-func newLatencyInjector(name string, server ir.IRNode, latency string) (*LatencyInjector, error) {
-	return nil, nil
+func newLatencyInjectorWrapper(name string, server ir.IRNode, latency string) (*LatencyInjectorWrapper, error) {
+	serverNode, is_callable := server.(golang.Service)
+	if !is_callable {
+		return nil, blueprint.Errorf("latency injector wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
+	}
+
+	node := &LatencyInjectorWrapper{}
+	node.InstanceName = name
+	node.Wrapped = serverNode
+	node.outputPackage = "latencyinjector"
+	node.LatencyValue = &ir.IRValue{Value: latency}
+	return node, nil
+}
+
+func (node *LatencyInjectorWrapper) ImplementsGolangNode() {}
+
+func (node *LatencyInjectorWrapper) Name() string {
+	return node.InstanceName
+}
+
+func (node *LatencyInjectorWrapper) String() string {
+	return node.Name() + " = LatencyInjector(" + node.Wrapped.Name() + ")"
+}
+
+func (node *LatencyInjectorWrapper) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.Wrapped.AddInterfaces(builder)
+}
+
+func (node *LatencyInjectorWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
+	return node.Wrapped.GetInterface(ctx)
+}
+
+func (node *LatencyInjectorWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
+	if builder.Visited(node.InstanceName + ".generateFuncs") {
+		return nil
+	}
+
+	iface, err := golang.GetGoInterface(builder, node)
+	if err != nil {
+		return err
+	}
+
+	return generateServerWrapper(builder, iface, node.outputPackage)
+}
+
+func (node *LatencyInjectorWrapper) AddInstantiation(builder golang.NamespaceBuilder) error {
+	if builder.Visited(node.InstanceName) {
+		return nil
+	}
+
+	iface, err := golang.GetGoInterface(builder, node.Wrapped)
+	if err != nil {
+		return err
+	}
+
+	constructor := &gocode.Constructor{
+		Package: builder.Module().Info().Name + "/" + node.outputPackage,
+		Func: gocode.Func{
+			Name: fmt.Sprintf("New_%v_LatencyInjector", iface.BaseName),
+			Arguments: []gocode.Variable{
+				{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}},
+				{Name: "server", Type: iface},
+			},
+		},
+	}
+
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped})
 }

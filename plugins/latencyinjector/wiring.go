@@ -27,13 +27,13 @@ func AddFixedLatency(spec wiring.WiringSpec, serviceName string, latency string)
 
 	serverNext := ptr.AddDstModifier(spec, serverWrapper)
 
-	spec.Define(serverWrapper, &LatencyInjector{}, func(ns wiring.Namespace) (ir.IRNode, error) {
+	spec.Define(serverWrapper, &LatencyInjectorWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
 
 		if err := ns.Get(serverNext, &wrapped); err != nil {
 			return nil, blueprint.Errorf("LatencyInjector %s expected %s to be a golang.Service, but encountered %s", serverWrapper, serverNext, err)
 		}
 
-		return newLatencyInjector(serverWrapper, wrapped, latency)
+		return newLatencyInjectorWrapper(serverWrapper, wrapped, latency)
 	})
 }
