@@ -32,7 +32,6 @@ package pointer
 import (
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
@@ -90,10 +89,10 @@ func CreatePointer(spec wiring.WiringSpec, name string, ptrType any, dst string)
 			return nil, err
 		}
 
-		namespace.Defer(func() error {
-			_, err := ptr.InstantiateDst(namespace)
-			return err
-		})
+		// namespace.Defer(func() error {
+		// 	_, err := ptr.InstantiateDst(namespace)
+		// 	return err
+		// })
 
 		return node, nil
 	})
@@ -151,38 +150,39 @@ func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName strin
 //
 // This is primarily used by namespace plugins.
 func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) (ir.IRNode, error) {
-	namespace.Info("Instantiating pointer %s.dst from namespace %s", ptr.name, namespace.Name())
-	for _, modifier := range ptr.dstModifiers {
-		var addr address.Node
-		err := namespace.Get(modifier, &addr)
+	return nil, nil
+	// namespace.Info("Instantiating pointer %s.dst from namespace %s", ptr.name, namespace.Name())
+	// for _, modifier := range ptr.dstModifiers {
+	// 	var addr address.Node
+	// 	err := namespace.Get(modifier, &addr)
 
-		// Want to find the final dstModifier that points to an address, then instantiate the address
-		if err == nil {
-			dstName, err := address.PointsTo(namespace, modifier)
-			if err != nil {
-				return nil, err
-			}
-			if addr.GetDestination() != nil {
-				// Destination has already been instantiated, stop instantiating now
-				namespace.Info("Destination %s of %s has already been instantiated", dstName, addr.Name())
-				return addr.GetDestination(), nil
-			} else {
-				namespace.Info("Instantiating %s of %s", dstName, addr.Name())
-				var dst ir.IRNode
-				if err := namespace.Instantiate(dstName, &dst); err != nil {
-					return nil, err
-				}
-				err = addr.SetDestination(dst)
-				if err != nil {
-					return nil, err
-				}
-			}
-		} else {
-			namespace.Info("Skipping %v, not an address", modifier)
-		}
-	}
+	// 	// Want to find the final dstModifier that points to an address, then instantiate the address
+	// 	if err == nil {
+	// 		dstName, err := address.PointsTo(namespace, modifier)
+	// 		if err != nil {
+	// 			return nil, err
+	// 		}
+	// 		if addr.GetDestination() != nil {
+	// 			// Destination has already been instantiated, stop instantiating now
+	// 			namespace.Info("Destination %s of %s has already been instantiated", dstName, addr.Name())
+	// 			return addr.GetDestination(), nil
+	// 		} else {
+	// 			namespace.Info("Instantiating %s of %s", dstName, addr.Name())
+	// 			var dst ir.IRNode
+	// 			if err := namespace.Instantiate(dstName, &dst); err != nil {
+	// 				return nil, err
+	// 			}
+	// 			err = addr.SetDestination(dst)
+	// 			if err != nil {
+	// 				return nil, err
+	// 			}
+	// 		}
+	// 	} else {
+	// 		namespace.Info("Skipping %v, not an address", modifier)
+	// 	}
+	// }
 
-	var node ir.IRNode
-	err := namespace.Get(ptr.dst, &node)
-	return node, err
+	// var node ir.IRNode
+	// err := namespace.Get(ptr.dst, &node)
+	// return node, err
 }

@@ -84,7 +84,13 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 			return nil, blueprint.Errorf("GRPC server %s expected %s to be a golang.Service, but encountered %s", grpcServer, serverNext, err)
 		}
 
-		return newGolangServer(grpcServer, addr, wrapped)
+		server, err := newGolangServer(grpcServer, addr, wrapped)
+		if err != nil {
+			return nil, err
+		}
+
+		// TODO: can easily reorder calls above and make this part of bind
+		return server, addr.SetDestination(server)
 	})
 
 	// Define the address and add it to the pointer dst

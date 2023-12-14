@@ -16,12 +16,12 @@ func Instantiate(spec wiring.WiringSpec, namespace wiring.Namespace, names ...st
 	nodes = make(map[string]ir.IRNode)
 	for _, childName := range names {
 		var child ir.IRNode
-		ptr := GetPointer(spec, childName)
-		if ptr == nil {
-			err = namespace.Get(childName, &child)
-		} else {
-			child, err = ptr.InstantiateDst(namespace)
-		}
+		// ptr := GetPointer(spec, childName)
+		// if ptr == nil {
+		err = namespace.Get(childName, &child)
+		// } else {
+		// 	child, err = ptr.InstantiateDst(namespace)
+		// }
 		if err != nil {
 			return
 		}

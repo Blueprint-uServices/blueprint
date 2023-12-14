@@ -2,6 +2,7 @@ package goproc
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
@@ -34,6 +35,8 @@ type Process struct {
 	ModuleName   string
 	Nodes        []ir.IRNode
 	Edges        []ir.IRNode
+
+	namespace wiring.Namespace // Can be used to Get more nodes into this process
 }
 
 // A Golang Process Node can either be given the child nodes ahead of time, or they can be added using AddArtifactNode / AddCodeNode
