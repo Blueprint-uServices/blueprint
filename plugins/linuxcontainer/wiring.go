@@ -7,15 +7,16 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 )
 
-var NamespaceType = "LinuxContainer"
-
-var prop_CHILDREN = "Children"
-
-/*
-Adds a process to an existing container
-*/
+// Adds a process to an existing container
 func AddProcessToContainer(spec wiring.WiringSpec, containerName, childName string) {
-	spec.AddProperty(containerName, prop_CHILDREN, childName)
+	namespaceutil.AddNodeTo[Container](spec, containerName, childName)
+}
+
+// Wraps serviceName with a modifier that deploys the service inside a container
+func Deploy(spec wiring.WiringSpec, serviceName string) string {
+	ctrName := serviceName + "_ctr"
+	CreateContainer(spec, ctrName, serviceName)
+	return serviceName
 }
 
 /*

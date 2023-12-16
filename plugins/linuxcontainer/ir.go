@@ -38,5 +38,5 @@ func (ctr *Container) Name() string {
 
 // Implements ir.IRNode
 func (ctr *Container) String() string {
-	return ir.PrettyPrintNamespace(ctr.InstanceName, NamespaceType, ctr.Edges, ctr.Nodes)
+	return ir.PrettyPrintNamespace(ctr.InstanceName, "LinuxContainer", ctr.Edges, ctr.Nodes)
 }

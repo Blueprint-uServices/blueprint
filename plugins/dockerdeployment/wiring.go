@@ -7,8 +7,6 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 )
 
-var prop_CHILDREN = "Children"
-
 // Adds a child node to an existing container deployment
 func AddContainerToDeployment(spec wiring.WiringSpec, deploymentName, containerName string) {
 	namespaceutil.AddNodeTo[Deployment](spec, deploymentName, containerName)
