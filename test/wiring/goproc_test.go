@@ -162,20 +162,20 @@ func TestProcessModifier(t *testing.T) {
 
 	assertIR(t, app,
 		`TestProcessModifier = BlueprintApplication() {
-			nonleaf.grpc.addr
-			nonleaf.grpc.bind_addr = AddressConfig()
-			nonleaf.handler.visibility
 			leaf.grpc.addr
 			leaf.grpc.bind_addr = AddressConfig()
+			leaf.grpc.dial_addr = AddressConfig()
 			leaf.handler.visibility
 			leafproc = GolangProcessNode(leaf.grpc.bind_addr) {
 			  leaf = TestLeafService()
 			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
 			}
-			leaf.grpc.dial_addr = AddressConfig()
-			nonleafproc = GolangProcessNode(nonleaf.grpc.bind_addr, leaf.grpc.dial_addr) {
+			nonleaf.grpc.addr
+			nonleaf.grpc.bind_addr = AddressConfig()
+			nonleaf.handler.visibility
+			nonleafproc = GolangProcessNode(leaf.grpc.dial_addr, nonleaf.grpc.bind_addr) {
+			  leaf = leaf.grpc_client
 			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			  leaf = TestLeafService(leaf.grpc_client)
 			  nonleaf = TestNonLeafService(leaf)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			}

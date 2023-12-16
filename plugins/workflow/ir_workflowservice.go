@@ -167,11 +167,7 @@ func (n *workflowClient) String() string {
 	var b strings.Builder
 	b.WriteString(n.InstanceName)
 	b.WriteString(" = ")
-	b.WriteString(n.ServiceInfo.Iface.Name)
-
-	b.WriteString("(")
 	b.WriteString(n.Wrapped.Name())
-	b.WriteString(")")
 
 	return b.String()
 }

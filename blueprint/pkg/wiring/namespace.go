@@ -284,6 +284,8 @@ func (namespace *namespaceimpl) DeriveNamespace(name string, handler NamespaceHa
 		Added:           make(map[string]any),
 		ChildNamespaces: make(map[string]Namespace),
 	}
+	namespace.ChildNamespaces[name] = child
+	namespace.Info("Created child namespace %v", name)
 	return child, nil
 }
 

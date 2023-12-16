@@ -22,6 +22,7 @@ package namespaceutil
 
 import (
 	"fmt"
+	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
@@ -52,10 +53,10 @@ func AddNodeTo[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName stri
 	}
 
 	// Add a modifier to child that enters the namespace before instantiating the child
-	modifierName := fmt.Sprintf("%v.instantiate_%v", childName, namespaceName)
+	modifierName := fmt.Sprintf("%v.%v", childName, namespaceName)
 	ptrNext := ptr.AddDstModifier(spec, modifierName)
 	var nodeType NamespaceNodeType
-	spec.Define(modifierName, nodeType, func(parentNamespace wiring.Namespace) (ir.IRNode, error) {
+	spec.Define(modifierName, &nodeType, func(parentNamespace wiring.Namespace) (ir.IRNode, error) {
 		// Namespace node must exist so that namespace exists
 		var namespaceNode ir.IRNode
 		if err := parentNamespace.Get(namespaceName, &namespaceNode); err != nil {
@@ -73,7 +74,7 @@ func AddNodeTo[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName stri
 		err = namespace.Get(ptrNext, &ptrNextNode)
 		return ptrNextNode, err
 	})
-	spec.AddProperty(namespaceName, prop_CHILDREN, modifierName)
+	spec.AddProperty(namespaceName, prop_CHILDREN, ptrNext)
 }
 
 // Used in conjunction with [AddNodeTo].  InstantiateNamespace derives a new child namespace
@@ -92,6 +93,7 @@ func InstantiateNamespace(parentNamespace wiring.Namespace, namespaceNode IRName
 		return nil, err
 	}
 
+	namespace.Info("Deferring instantiation of child nodes")
 	namespace.Defer(func() error {
 		return instantiateNamespaceNodes(namespace)
 	})
@@ -108,6 +110,7 @@ func instantiateNamespaceNodes(namespace wiring.Namespace) error {
 	if err := namespace.GetProperties(namespaceName, prop_CHILDREN, &nodeNames); err != nil {
 		return namespace.Error("InstantiateNamespace failed due to %v", err.Error())
 	}
+	namespace.Info("Deferred instantiation of children [%v]", strings.Join(nodeNames, ", "))
 
 	for _, childName := range nodeNames {
 		// Instantiate the child
@@ -123,6 +126,7 @@ func instantiateNamespaceNodes(namespace wiring.Namespace) error {
 				return err
 			}
 
+			namespace.Info("Instantiating destination of address %v (%v)", childName, addrDst)
 			if err := namespace.Get(addrDst, &child); err != nil {
 				return err
 			}
