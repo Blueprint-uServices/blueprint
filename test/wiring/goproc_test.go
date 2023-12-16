@@ -73,8 +73,8 @@ func TestAddChildrenToProcess(t *testing.T) {
 	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
 	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	goproc.AddChildToProcess(spec, myproc, leaf)
-	goproc.AddChildToProcess(spec, myproc, nonleaf)
+	goproc.AddToProcess(spec, myproc, leaf)
+	goproc.AddToProcess(spec, myproc, nonleaf)
 
 	app := assertBuildSuccess(t, spec, myproc)
 
@@ -146,6 +146,7 @@ func TestImplicitServicesWithinSameProcess(t *testing.T) {
 }
 
 func TestProcessModifier(t *testing.T) {
+	compilerLogging = true
 	spec := newWiringSpec("TestProcessModifier")
 
 	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")

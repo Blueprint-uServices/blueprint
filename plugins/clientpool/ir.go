@@ -44,24 +44,6 @@ func (pool *ClientPool) String() string {
 	return b.String()
 }
 
-// Implements NamespaceHandler
-func (pool *ClientPool) Accepts(nodeType any) bool {
-	_, isGolangNode := nodeType.(golang.Node)
-	return isGolangNode
-}
-
-// Implements NamespaceHandler
-func (pool *ClientPool) AddEdge(name string, edge ir.IRNode) error {
-	pool.Edges = append(pool.Edges, edge)
-	return nil
-}
-
-// Implements NamespaceHandler
-func (pool *ClientPool) AddNode(name string, node ir.IRNode) error {
-	pool.Nodes = append(pool.Nodes, node)
-	return nil
-}
-
 // Implements golang.Service service.ServiceNode
 func (pool *ClientPool) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	/* ClientPool doesn't modify the client's interface and doesn't introduce new interfaces */

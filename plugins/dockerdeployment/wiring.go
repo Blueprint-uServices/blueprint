@@ -1,16 +1,17 @@
 package dockerdeployment
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/namespaceutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 )
 
 var prop_CHILDREN = "Children"
 
 // Adds a child node to an existing container deployment
 func AddContainerToDeployment(spec wiring.WiringSpec, deploymentName, containerName string) {
-	spec.AddProperty(deploymentName, prop_CHILDREN, containerName)
+	namespaceutil.AddNodeTo[Deployment](spec, deploymentName, containerName)
 }
 
 // Adds a deployment that explicitly instantiates all of the containers provided.
@@ -23,10 +24,32 @@ func NewDeployment(spec wiring.WiringSpec, deploymentName string, containers ...
 
 	spec.Define(deploymentName, &Deployment{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		deployment := &Deployment{DeploymentName: deploymentName}
-		deploymentNamespace := wiring.CreateNamespace(spec, namespace, deployment)
-		_, err := pointer.InstantiateFromProperty(spec, deploymentNamespace, prop_CHILDREN)
+		_, err := namespaceutil.InstantiateNamespace(namespace, &DeploymentNamespace{deployment})
 		return deployment, err
 	})
 
 	return deploymentName
+}
+
+// A [wiring.NamespaceHandler] used to build container deployments
+type DeploymentNamespace struct {
+	*Deployment
+}
+
+// Implements [wiring.NamespaceHandler]
+func (deployment *Deployment) Accepts(nodeType any) bool {
+	_, isDockerContainerNode := nodeType.(docker.Container)
+	return isDockerContainerNode
+}
+
+// Implements [wiring.NamespaceHandler]
+func (deployment *Deployment) AddEdge(name string, edge ir.IRNode) error {
+	deployment.Edges = append(deployment.Edges, edge)
+	return nil
+}
+
+// Implements [wiring.NamespaceHandler]
+func (deployment *Deployment) AddNode(name string, node ir.IRNode) error {
+	deployment.Nodes = append(deployment.Nodes, node)
+	return nil
 }

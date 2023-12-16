@@ -2,8 +2,6 @@ package goproc
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
 /*
@@ -35,8 +33,6 @@ type Process struct {
 	ModuleName   string
 	Nodes        []ir.IRNode
 	Edges        []ir.IRNode
-
-	namespace wiring.Namespace // Can be used to Get more nodes into this process
 }
 
 // A Golang Process Node can either be given the child nodes ahead of time, or they can be added using AddArtifactNode / AddCodeNode
@@ -57,22 +53,4 @@ func (proc *Process) Name() string {
 // Implements ir.IRNode
 func (proc *Process) String() string {
 	return ir.PrettyPrintNamespace(proc.InstanceName, "GolangProcessNode", proc.Edges, proc.Nodes)
-}
-
-// Implements NamespaceHandler
-func (proc *Process) Accepts(nodeType any) bool {
-	_, isGolangNode := nodeType.(golang.Node)
-	return isGolangNode
-}
-
-// Implements NamespaceHandler
-func (proc *Process) AddEdge(name string, edge ir.IRNode) error {
-	proc.Edges = append(proc.Edges, edge)
-	return nil
-}
-
-// Implements NamespaceHandler
-func (proc *Process) AddNode(name string, node ir.IRNode) error {
-	proc.Nodes = append(proc.Nodes, node)
-	return nil
 }

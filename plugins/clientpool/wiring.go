@@ -7,6 +7,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
 
@@ -26,9 +27,34 @@ func Create(spec wiring.WiringSpec, serviceName string, numClients int) {
 
 	// Define the client pool
 	spec.Define(poolName, &ClientPool{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		poolNode := &ClientPool{PoolName: poolName, N: numClients}
-		poolNamespace := wiring.CreateNamespace(spec, namespace, poolNode)
-		err := poolNamespace.Get(clientNext, &poolNode.Client)
-		return poolNode, err
+		pool := &ClientPool{PoolName: poolName, N: numClients}
+		poolNamespace, err := namespace.DeriveNamespace(poolName, &ClientPoolNamespace{pool})
+		if err != nil {
+			return nil, err
+		}
+		return pool, poolNamespace.Get(clientNext, &pool.Client)
 	})
+}
+
+// A [wiring.NamespaceHandler] used to build [ClientPool] IRNodes
+type ClientPoolNamespace struct {
+	*ClientPool
+}
+
+// Implements [wiring.NamespaceHandler]
+func (pool *ClientPool) Accepts(nodeType any) bool {
+	_, isGolangNode := nodeType.(golang.Node)
+	return isGolangNode
+}
+
+// Implements [wiring.NamespaceHandler]
+func (pool *ClientPool) AddEdge(name string, edge ir.IRNode) error {
+	pool.Edges = append(pool.Edges, edge)
+	return nil
+}
+
+// Implements [wiring.NamespaceHandler]
+func (pool *ClientPool) AddNode(name string, node ir.IRNode) error {
+	pool.Nodes = append(pool.Nodes, node)
+	return nil
 }
