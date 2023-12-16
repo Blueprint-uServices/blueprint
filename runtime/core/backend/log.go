@@ -10,12 +10,16 @@ import (
 type Priority int
 
 const (
-	TRACE Priority = iota
-	DEBUG
+	DEBUG Priority = iota
 	INFO
 	WARN
 	ERROR
 )
+
+// String representation for Priority enum
+func (p Priority) String() string {
+	return [...]string{"DEBUG", "INFO", "WARN", "ERROR"}[p]
+}
 
 // Represents a Key-Value pair associated with a particular log msg
 type Attribute struct {
@@ -42,7 +46,6 @@ func (l *defaultLogger) Log(ctx context.Context, priority Priority, msg string, 
 		args = append(args, attr.Value)
 	}
 	switch priority {
-	case TRACE:
 	case DEBUG:
 		slog.Debug(msg, args)
 		break

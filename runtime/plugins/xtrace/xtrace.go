@@ -15,10 +15,23 @@ type XTracerImpl struct {
 	backend.XTracer
 }
 
+var isConnected bool
+
+func connectClient(addr string) error {
+	if !isConnected {
+		err := client.Connect(addr)
+		if err != nil {
+			return err
+		}
+		isConnected = true
+	}
+	return nil
+}
+
 // Returns a new instance of [XTracerImpl] that connects to a xtrace server running at `addr`.
 // REQUIRED: An xtrace server must be running at `addr`
 func NewXTracerImpl(ctx context.Context, addr string) (*XTracerImpl, error) {
-	err := client.Connect(addr)
+	err := connectClient(addr)
 	if err != nil {
 		return nil, err
 	}
