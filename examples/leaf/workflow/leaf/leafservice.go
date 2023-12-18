@@ -56,13 +56,13 @@ func NewLeafServiceImpl(ctx ctxx.Context, cache backend.Cache, db backend.NoSQLD
 
 func (l *LeafServiceImpl) HelloNothing(ctx ctxx.Context) error {
 	l.Counter.Add(ctx, 1)
-	fmt.Println("hello nothing!")
+	ctx = backend.Log(ctx, backend.INFO, "hello nothing!")
 	return nil
 }
 
 func (l *LeafServiceImpl) HelloInt(ctx ctxx.Context, a int64) (int64, error) {
 	l.Counter.Add(ctx, 1)
-	fmt.Println("hello")
+	ctx = backend.Log(ctx, backend.INFO, "hello")
 	l.Cache.Put(ctx, "helloint", a)
 	var b int64
 	l.Cache.Get(ctx, "helloint", &b)

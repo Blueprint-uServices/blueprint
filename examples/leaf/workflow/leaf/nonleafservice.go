@@ -3,6 +3,8 @@ package leaf
 import (
 	"context"
 	"fmt"
+
+	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
 
 type NonLeafService interface {
@@ -54,11 +56,11 @@ func (nl *NonLeafServiceImpl) Hello(ctx context.Context, a int64) (int64, error)
 		return a, err
 	}
 
-	fmt.Println(ra)
-	fmt.Println(rb)
-	fmt.Println(rc)
-	fmt.Println(rd)
-	fmt.Println(re)
+	ctx = backend.Log(ctx, backend.INFO, ra)
+	ctx = backend.Log(ctx, backend.INFO, fmt.Sprintf("%v", rb))
+	ctx = backend.Log(ctx, backend.INFO, fmt.Sprintf("%v", rc))
+	ctx = backend.Log(ctx, backend.INFO, fmt.Sprintf("%v", rd))
+	ctx = backend.Log(ctx, backend.INFO, fmt.Sprintf("%v", re))
 
 	return a, nil
 }
