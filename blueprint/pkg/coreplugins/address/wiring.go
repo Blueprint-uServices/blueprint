@@ -41,29 +41,6 @@ func Define[ServerType ir.IRNode](spec wiring.WiringSpec, addressName string, po
 	})
 }
 
-func Define2[ServerType ir.IRNode](spec wiring.WiringSpec, addressName string, ptrNext string, reachability any) {
-	// Define the metadata for the address, used during the build process
-	spec.Define(addressName, reachability, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		addr := &Address[ServerType]{}
-		addr.AddrName = addressName
-		return addr, nil
-	})
-
-	// Add Config nodes for the server bind address and client address
-	spec.Define(bind(addressName), reachability, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		conf := &BindConfig{}
-		conf.AddressName = addressName
-		conf.Key = bind(addressName)
-		return conf, nil
-	})
-	spec.Define(dial(addressName), reachability, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		conf := &DialConfig{}
-		conf.AddressName = addressName
-		conf.Key = dial(addressName)
-		return conf, nil
-	})
-}
-
 // Gets the [DialConfig] configuration node of addressName from the namespace.
 //
 // This method is intended for use by other Blueprint plugins within their own BuildFuncs.
@@ -123,6 +100,9 @@ func PointsTo(namespace wiring.Namespace, addressName string) (string, error) {
 	var pointsTo string
 	if err := namespace.GetProperty(addressName, "pointsTo", &pointsTo); err != nil {
 		return "", blueprint.Errorf("expected pointsTo property of %v to be a string; %v", addressName, err.Error())
+	}
+	if pointsTo == "" {
+		return "", blueprint.Errorf("pointsTo is not set for %v", addressName)
 	}
 	return pointsTo, nil
 }

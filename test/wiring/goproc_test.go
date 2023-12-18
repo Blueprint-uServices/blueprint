@@ -206,18 +206,22 @@ func TestContainerModifier(t *testing.T) {
 			leaf.grpc.bind_addr = AddressConfig()
 			leaf.grpc.dial_addr = AddressConfig()
 			leaf.handler.visibility
-			leafproc = GolangProcessNode(leaf.grpc.bind_addr) {
-			  leaf = TestLeafService()
-			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
+			leaf_ctr = LinuxContainer(leaf.grpc.bind_addr) {
+			  leaf_proc = GolangProcessNode(leaf.grpc.bind_addr) {
+				leaf = TestLeafService()
+				leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
+			  }
 			}
 			nonleaf.grpc.addr
 			nonleaf.grpc.bind_addr = AddressConfig()
 			nonleaf.handler.visibility
-			nonleafproc = GolangProcessNode(leaf.grpc.dial_addr, nonleaf.grpc.bind_addr) {
-			  leaf = leaf.grpc_client
-			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			  nonleaf = TestNonLeafService(leaf)
-			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
+			nonleaf_ctr = LinuxContainer(leaf.grpc.dial_addr, nonleaf.grpc.bind_addr) {
+			  nonleaf_proc = GolangProcessNode(leaf.grpc.dial_addr, nonleaf.grpc.bind_addr) {
+				leaf = leaf.grpc_client
+				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
+				nonleaf = TestNonLeafService(leaf)
+				nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
+			  }
 			}
 		  }`)
 }

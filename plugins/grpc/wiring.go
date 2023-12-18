@@ -47,6 +47,7 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 	// The nodes that we are defining
 	grpcClient := serviceName + ".grpc_client"
 	grpcServer := serviceName + ".grpc_server"
+	grpcServerModifier := serviceName + ".instantiate_grpc_server"
 	grpcAddr := serviceName + ".grpc.addr"
 
 	// Get the pointer metadata
@@ -56,10 +57,14 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 		return
 	}
 
-	// Add the client wrapper to the pointer src
-	clientNext := ptr.AddSrcModifier(spec, grpcClient)
+	// Define the address which is used by both clients and server
+	address.Define[*golangServer](spec, grpcAddr, grpcServer, &ir.ApplicationNode{})
 
-	// Define the client wrapper
+	// Add the client-side modifier
+	//
+	// The client-side modifier creates a gRPC client and dials the server address.
+	// It assumes the next src modifier node is a golangServer address.
+	clientNext := ptr.AddSrcModifier(spec, grpcClient)
 	spec.Define(grpcClient, &golangClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*golangServer](namespace, clientNext)
 		if err != nil {
@@ -69,10 +74,12 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 		return newGolangClient(grpcClient, addr)
 	})
 
-	// Add the server wrapper to the pointer dst
-	serverNext := ptr.AddDstModifier(spec, grpcServer)
+	// Add the server modifier to the pointer
+	serverNext := ptr.AddDstModifier(spec, grpcServerModifier)
 
-	// Define the server
+	// Define the server.
+	//
+	// The server instantiates the wrapper server handler (serverNext).
 	spec.Define(grpcServer, &golangServer{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Bind[*golangServer](namespace, grpcAddr)
 		if err != nil {
@@ -93,8 +100,24 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 		return server, addr.SetDestination(server)
 	})
 
-	// Define the address and add it to the pointer dst
-	address.Define[*golangServer](spec, grpcAddr, grpcServer, &ir.ApplicationNode{})
-	ptr.AddDstModifier(spec, grpcAddr)
+	// Add the server-side modifier which will (deferred) instantiate the server.
+	//
+	// The modifier defers grpcServer instantiation and instead of returning the grpcServer it returns the server's
+	// address, which is all that clients require.
+	spec.Define(grpcServerModifier, &golangServer{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
+		// Trigger delayed instantiation of the server
+		namespace.Defer(func() error {
+			var server *golangServer
+			if err := namespace.Get(grpcServer, &server); err != nil {
+				return err
+			}
+			return nil
+		})
+
+		// Return the server address
+		var addr address.Node
+		err := namespace.Get(grpcAddr, &addr)
+		return addr, err
+	})
 
 }

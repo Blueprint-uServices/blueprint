@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
@@ -119,18 +118,18 @@ func instantiateNamespaceNodes(namespace wiring.Namespace) error {
 			return err
 		}
 
-		// Special handling for addresses, where we instantiate the address destination
-		if _, isAddr := child.(address.Node); isAddr {
-			addrDst, err := address.PointsTo(namespace, childName)
-			if err != nil {
-				return err
-			}
+		// // Special handling for addresses, where we instantiate the address destination
+		// if _, isAddr := child.(address.Node); isAddr {
+		// 	addrDst, err := address.PointsTo(namespace, child.Name())
+		// 	if err != nil {
+		// 		return err
+		// 	}
 
-			namespace.Info("Instantiating destination of address %v (%v)", childName, addrDst)
-			if err := namespace.Get(addrDst, &child); err != nil {
-				return err
-			}
-		}
+		// 	namespace.Info("Instantiating destination of address %v (%v)", child.Name(), addrDst)
+		// 	if err := namespace.Get(addrDst, &child); err != nil {
+		// 		return err
+		// 	}
+		// }
 	}
 	return nil
 }
