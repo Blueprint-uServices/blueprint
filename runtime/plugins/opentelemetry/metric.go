@@ -25,6 +25,7 @@ func NewStdoutMetricCollector(ctx context.Context) (*StdoutMetricCollector, erro
 			// Default is 1m. Set to 3s for demonstrative purposes.
 			metricsdk.WithInterval(3*time.Second))),
 	)
+	// Globally set this as the default meter provider
 	otel.SetMeterProvider(mp)
 	return &StdoutMetricCollector{mp}, nil
 }
