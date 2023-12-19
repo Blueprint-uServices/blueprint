@@ -42,6 +42,12 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	allServices = append(allServices, price_service)
 	containers = append(containers, price_cntr)
 
+	station_db := mongodb.Container(spec, "station_db")
+	station_service := workflow.Service(spec, "station_service", "StationServiceImpl", station_db)
+	station_cntr := applyDockerDefaults(spec, station_service, "station_proc", "station_container")
+	allServices = append(allServices, station_service)
+	containers = append(containers, station_cntr)
+
 	tests := gotests.Test(spec, allServices...)
 	containers = append(containers, tests)
 	return containers, nil
