@@ -1,3 +1,5 @@
+// Package user provides an implementation of the UserService
+// UserService uses a backend.NoSQLDatabase to store user data
 package user
 
 import (

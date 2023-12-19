@@ -12,7 +12,7 @@ type ContactsService interface {
 	FindContactsById(ctx context.Context, id string) (Contact, error)
 	FindContactsByAccountId(ctx context.Context, id string) ([]Contact, error)
 	CreateContacts(ctx context.Context, c Contact) error
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, c Contact) error
 	GetAllContacts(ctx context.Context) ([]Contact, error)
 	Modify(ctx context.Context, contact Contact) (bool, error)
 }
@@ -69,20 +69,20 @@ func (c *ContactsServiceImpl) CreateContacts(ctx context.Context, contact Contac
 	if err != nil {
 		return err
 	}
-	query := bson.D{{"accountid", contact.AccountID}, {"documentnum", contact.DocumentNumber}, {"documenttype", contact.DocumentType}}
+	query := bson.D{{"accountid", contact.AccountID}, {"documentnumber", contact.DocumentNumber}, {"documenttype", contact.DocumentType}}
 	res, err := coll.FindOne(ctx, query)
 	if err != nil {
 		return err
 	}
 	var existing Contact
 	exists, err := res.One(ctx, existing)
+	if exists {
+		return errors.New("Contact already exists")
+	}
 	if err != nil {
 		return err
 	}
-	if !exists {
-		return errors.New("Contact already exists")
-	}
-	return nil
+	return coll.InsertOne(ctx, contact)
 }
 
 func (c *ContactsServiceImpl) Delete(ctx context.Context, contact Contact) error {
