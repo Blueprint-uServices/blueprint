@@ -58,11 +58,11 @@ func TestSeparateServicesInSeparateProcesses(t *testing.T) {
               leaf1 = TestLeafService()
             }
             leaf2.handler.visibility
-            nonleaf.handler.visibility
             myproc = GolangProcessNode() {
               leaf2 = TestLeafService()
               nonleaf = TestNonLeafService(leaf2)
             }
+            nonleaf.handler.visibility
           }`)
 }
 
@@ -82,11 +82,11 @@ func TestAddChildrenToProcess(t *testing.T) {
 	assertIR(t, app,
 		`TestAddChildrenToProcess = BlueprintApplication() {
             leaf.handler.visibility
-            nonleaf.handler.visibility
             myproc = GolangProcessNode() {
               leaf = TestLeafService()
               nonleaf = TestNonLeafService(leaf)
             }
+            nonleaf.handler.visibility
           }`)
 
 }
@@ -116,8 +116,8 @@ func TestClientWithinSameProcess(t *testing.T) {
 
 	assertIR(t, app,
 		`TestClientWithinSameProcess = BlueprintApplication() {
-            nonleaf.handler.visibility
             leaf.handler.visibility
+            nonleaf.handler.visibility
             nonleafclient = GolangProcessNode() {
               leaf = TestLeafService()
               nonleaf = TestNonLeafService(leaf)
@@ -137,8 +137,8 @@ func TestImplicitServicesWithinSameProcess(t *testing.T) {
 
 	assertIR(t, app,
 		`TestImplicitServicesWithinSameProcess = BlueprintApplication() {
-            nonleaf.handler.visibility
             leaf.handler.visibility
+            nonleaf.handler.visibility
             nonleafproc = GolangProcessNode() {
               leaf = TestLeafService()
               nonleaf = TestNonLeafService(leaf)
@@ -147,7 +147,6 @@ func TestImplicitServicesWithinSameProcess(t *testing.T) {
 }
 
 func TestProcessModifier(t *testing.T) {
-	compilerLogging = true
 	spec := newWiringSpec("TestProcessModifier")
 
 	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
@@ -184,7 +183,6 @@ func TestProcessModifier(t *testing.T) {
 }
 
 func TestContainerModifier(t *testing.T) {
-	compilerLogging = true
 	spec := newWiringSpec("TestContainerModifier")
 
 	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
