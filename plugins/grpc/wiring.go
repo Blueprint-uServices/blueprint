@@ -86,6 +86,7 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 		}
 
 		err = address.Bind[*golangServer](namespace, grpcAddr, server, &server.Bind)
+		server.Bind.PreferredPort = 12345
 		return server, err
 	})
 }

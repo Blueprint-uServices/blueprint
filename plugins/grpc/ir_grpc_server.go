@@ -48,7 +48,6 @@ func newGolangServer(name string, service golang.Service) (*golangServer, error)
 	node.InstanceName = name
 	node.Wrapped = service
 	node.outputPackage = "grpc"
-	node.Bind.PreferredPort = 12345 // Optional to do this
 	return node, nil
 }
 
