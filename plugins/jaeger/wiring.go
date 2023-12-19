@@ -18,31 +18,32 @@ import (
 //
 // The returned collectorName must be used as an argument to the opentelemetry.InstrumentUsingCustomCollector(spec, serviceName, `collectorName`).
 func DefineJaegerCollector(spec wiring.WiringSpec, collectorName string) string {
+	// The nodes that we are defining
 	collectorAddr := collectorName + ".addr"
-	collectorProc := collectorName + ".proc"
-	collectorDst := collectorName + ".dst"
+	collectorCtr := collectorName + ".ctr"
 	collectorClient := collectorName + ".client"
 
-	spec.Define(collectorProc, &JaegerCollectorContainer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
-		addr, err := address.Bind[*JaegerCollectorContainer](ns, collectorAddr)
+	// Define the Jaeger collector
+	spec.Define(collectorCtr, &JaegerCollectorContainer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
+		collector, err := newJaegerCollectorContainer(collectorCtr)
 		if err != nil {
 			return nil, err
 		}
-
-		return newJaegerCollectorContainer(collectorProc, addr.Bind)
+		err = address.Bind[*JaegerCollectorContainer](ns, collectorAddr, collector, &collector.BindAddr)
+		return collector, err
 	})
 
-	spec.Alias(collectorDst, collectorProc)
-	pointer.RequireUniqueness(spec, collectorDst, &ir.ApplicationNode{})
+	// Create a pointer to the collector
+	ptr := pointer.CreatePointer[*JaegerCollectorClient](spec, collectorName, collectorCtr)
 
-	pointer.CreatePointer(spec, collectorName, &JaegerCollectorClient{}, collectorDst)
+	// Define the address that points to the Jaeger collector
+	address.Define[*JaegerCollectorContainer](spec, collectorAddr, collectorCtr)
 
-	ptr := pointer.GetPointer(spec, collectorName)
+	// Add the address to the pointer
+	ptr.AddAddrModifier(spec, collectorAddr)
 
-	ptr.AddDstModifier(spec, collectorAddr)
-
+	// Define the Jaeger client and add it to the client side of the pointer
 	clientNext := ptr.AddSrcModifier(spec, collectorClient)
-
 	spec.Define(collectorClient, &JaegerCollectorClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*JaegerCollectorContainer](ns, clientNext)
 		if err != nil {
@@ -52,8 +53,6 @@ func DefineJaegerCollector(spec wiring.WiringSpec, collectorName string) string 
 		return newJaegerCollectorClient(collectorClient, addr.Dial)
 	})
 
-	address.Define[*JaegerCollectorContainer](spec, collectorAddr, collectorProc, &ir.ApplicationNode{})
-	ptr.AddDstModifier(spec, collectorAddr)
-
+	// Return the pointer; anybody who wants to access the Jaeger collector should do so through the pointer
 	return collectorName
 }

@@ -21,7 +21,7 @@ type golangHttpServer struct {
 	golang.Instantiable
 
 	InstanceName string
-	Addr         *address.Address[*golangHttpServer]
+	Bind         *address.BindConfig
 	Wrapped      golang.Service
 
 	outputPackage string
@@ -41,12 +41,7 @@ func (i *HttpInterface) GetMethods() []service.Method {
 	return i.Wrapped.GetMethods()
 }
 
-func newGolangHttpServer(name string, serverAddr ir.IRNode, wrapped ir.IRNode) (*golangHttpServer, error) {
-	addr, is_addr := serverAddr.(*address.Address[*golangHttpServer])
-	if !is_addr {
-		return nil, blueprint.Errorf("HTTP server %s expected %s to be an address, but got %s", name, serverAddr.Name(), reflect.TypeOf(serverAddr).String())
-	}
-
+func newGolangHttpServer(name string, wrapped ir.IRNode) (*golangHttpServer, error) {
 	service, is_service := wrapped.(golang.Service)
 	if !is_service {
 		return nil, blueprint.Errorf("HTTP server %s expected %s to be a golang service, but got %s", name, wrapped.Name(), reflect.TypeOf(wrapped).String())
@@ -54,14 +49,13 @@ func newGolangHttpServer(name string, serverAddr ir.IRNode, wrapped ir.IRNode) (
 
 	node := &golangHttpServer{}
 	node.InstanceName = name
-	node.Addr = addr
 	node.Wrapped = service
 	node.outputPackage = "http"
 	return node, nil
 }
 
 func (n *golangHttpServer) String() string {
-	return n.InstanceName + " = HTTPServer(" + n.Wrapped.Name() + ", " + n.Addr.Bind.Name() + ")"
+	return n.InstanceName + " = HTTPServer(" + n.Wrapped.Name() + ", " + n.Bind.Name() + ")"
 }
 
 func (n *golangHttpServer) Name() string {
@@ -104,7 +98,7 @@ func (node *golangHttpServer) AddInstantiation(builder golang.NamespaceBuilder) 
 			},
 		},
 	}
-	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, node.Addr.Bind})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, node.Bind})
 }
 
 func (node *golangHttpServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {

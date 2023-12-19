@@ -30,8 +30,10 @@
 package pointer
 
 import (
+	"fmt"
 	"strings"
 
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
@@ -60,18 +62,41 @@ func (ptr PointerDef) String() string {
 	return b.String()
 }
 
-// Creates a pointer called name that points to the specified node dst.  ptrType is the
-// node type of dst.
+// Additional options that can be specified when creating a pointer.
+// If not specified, defaults are used.
+type PointerOpts struct {
+	// If specified, applies [RequireUniqueness] to the pointer destination
+	// before creating the pointer.  Set to nil to disable.  Defaults to
+	// &ir.ApplicationNode{}
+	RequireUniqueness any
+}
+
+var defaultOpts = PointerOpts{
+	RequireUniqueness: &ir.ApplicationNode{},
+}
+
+// Creates a pointer called name that points to the specified node dst.
+// Type parameter [SrcNodeType] is the nodeType of the client side of the pointer.
 //
 // Any plugin that defines client and server nodes should typically declare a pointer to
-// the server node.  This will provide some useful functionality:
+// the server node.  Declaring a pointer will enable other plugins to apply client or
+// server modifiers to the pointer.  Additionally, pointers will automatically instantiate
+// the server side of the pointer when using addresses
 //
-// First, declaring a pointer will enable other plugins to apply client or server modifiers
-// to the pointer.
-//
-// Second, pointers provide functionality for lazily instantiating the server side of
-// the pointer if the server is not explicitly instantiated by the wiring spec.
-func CreatePointer(spec wiring.WiringSpec, name string, ptrType any, dst string) *PointerDef {
+// Additional pointer options can be specified by providing optional PointerOpts.
+func CreatePointer[SrcNodeType any](spec wiring.WiringSpec, name string, dst string, options ...PointerOpts) *PointerDef {
+	opts := defaultOpts
+	if len(options) > 0 {
+		opts = options[0]
+	}
+
+	if opts.RequireUniqueness != nil {
+		dstName := name + ".dst"
+		spec.Alias(dstName, dst)
+		RequireUniqueness(spec, dstName, opts.RequireUniqueness)
+		dst = dstName
+	}
+
 	ptr := &PointerDef{}
 	ptr.name = name
 	ptr.srcModifiers = nil
@@ -83,18 +108,11 @@ func CreatePointer(spec wiring.WiringSpec, name string, ptrType any, dst string)
 
 	spec.Alias(ptr.srcTail, ptr.dstHead)
 
+	var ptrType SrcNodeType
 	spec.Define(name, ptrType, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		var node ir.IRNode
-		if err := namespace.Get(ptr.srcHead, &node); err != nil {
-			return nil, err
-		}
-
-		// namespace.Defer(func() error {
-		// 	_, err := ptr.InstantiateDst(namespace)
-		// 	return err
-		// })
-
-		return node, nil
+		err := namespace.Get(ptr.srcHead, &node)
+		return node, err
 	})
 
 	spec.SetProperty(name, "ptr", ptr)
@@ -102,7 +120,7 @@ func CreatePointer(spec wiring.WiringSpec, name string, ptrType any, dst string)
 	return ptr
 }
 
-// Gets the PointerDef metadata for a pointer name that was defined using CreatePointer
+// Gets the PointerDef metadata for a pointer name that was defined using [CreatePointer]
 func GetPointer(spec wiring.WiringSpec, name string) *PointerDef {
 	var ptr *PointerDef
 	spec.GetProperty(name, "ptr", &ptr)
@@ -144,4 +162,46 @@ func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName strin
 	spec.Alias(ptr.srcTail, ptr.dstHead)
 	ptr.dstModifiers = append([]string{ptr.dstHead}, ptr.dstModifiers...)
 	return nextDst
+}
+
+// AddAddrModifier is a special case of AddDstModifier where the modifier is an address node.
+//
+// It immediately instantiates the address, and returns it.  It defers instantiation of the
+// server side of the address.
+//
+// The return value of AddAddrModifier is the name of the _previous_ server side modifier.  This
+// can be used within the BuildFunc of the destination (PointsTo) of addrName
+func (ptr *PointerDef) AddAddrModifier(spec wiring.WiringSpec, addrName string) string {
+	// Get the address metadata
+	def := address.GetAddress(spec, addrName)
+	if def == nil {
+		return ""
+	}
+
+	// Try to give the modifier a readable name
+	after, _ := strings.CutPrefix(def.PointsTo, ptr.name+".")
+	modifierName := fmt.Sprintf("%v.instantiate_%v", ptr.name, after)
+
+	// Add the modifier
+	nextModifierName := ptr.AddDstModifier(spec, modifierName)
+
+	// Provide the modifier definition, using information from the address metadata
+	spec.Define(modifierName, def.ServerType, func(namespace wiring.Namespace) (ir.IRNode, error) {
+		// We defer instantiation of the actual server node until later.
+		namespace.Defer(func() error {
+			var nextNode ir.IRNode
+			if err := namespace.Get(nextModifierName, &nextNode); err != nil {
+				return err
+			}
+			// Also instantiate PointsTo in case nextModifierName is not the same as PointsTo
+			return namespace.Get(def.PointsTo, &nextNode)
+		})
+
+		// All we need to return for now is the address to the server
+		var addr address.Node
+		err := namespace.Get(addrName, &addr)
+		return addr, err
+	})
+
+	return nextModifierName
 }

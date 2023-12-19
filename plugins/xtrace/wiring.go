@@ -18,14 +18,16 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+var default_xtrace_server_name = "xtrace_server"
+
 // Instruments the service with an entry + exit point xtrace wrapper to generate xtrace compatible logs.
 // Usage:
-//   Instrument(spec, "serviceA")
+//
+//	Instrument(spec, "serviceA")
 func Instrument(spec wiring.WiringSpec, serviceName string) {
-	DefineXTraceServerContainer(spec)
+	xtraceServer := DefineXTraceServerContainer(spec, default_xtrace_server_name)
 	clientWrapper := serviceName + ".client.xtrace"
 	serverWrapper := serviceName + ".server.xtrace"
-	xtrace_server := "xtrace_server"
 
 	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {
@@ -33,8 +35,6 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 	}
 
 	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
-	slog.Info("Next client is ", clientNext)
-
 	spec.Define(clientWrapper, &XtraceClientWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
 		if err := ns.Get(clientNext, &wrapped); err != nil {
@@ -42,7 +42,7 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 		}
 
 		var xtraceClient *XTraceClient
-		err := ns.Get(xtrace_server, &xtraceClient)
+		err := ns.Get(xtraceServer, &xtraceClient)
 		if err != nil {
 			return nil, err
 		}
@@ -51,7 +51,6 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 	})
 
 	serverNext := ptr.AddDstModifier(spec, serverWrapper)
-
 	spec.Define(serverWrapper, &XtraceServerWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
 		if err := ns.Get(serverNext, &wrapped); err != nil {
@@ -59,7 +58,7 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 		}
 
 		var xtraceClient *XTraceClient
-		err := ns.Get(xtrace_server, &xtraceClient)
+		err := ns.Get(xtraceServer, &xtraceClient)
 		if err != nil {
 			return nil, err
 		}
@@ -72,31 +71,34 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 // and the clients needed by the generated application to communicate with the server.
 //
 // The generated container has the name `serviceName`.
-func DefineXTraceServerContainer(spec wiring.WiringSpec) {
-	xtrace_server := "xtrace_server"
-	xtrace_addr := xtrace_server + ".addr"
-	xtraceClient := xtrace_server + ".client"
-	xtraceProc := xtrace_server + ".proc"
-	xtraceDst := xtrace_server + ".dst"
+func DefineXTraceServerContainer(spec wiring.WiringSpec, serverName string) string {
+	// The nodes that we are defining
+	xtraceAddr := serverName + ".addr"
+	xtraceClient := serverName + ".client"
+	xtraceCtr := serverName + ".ctr"
 
-	spec.Define(xtraceProc, &XTraceServerContainer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
-		addr, err := address.Bind[*XTraceServerContainer](ns, xtrace_addr)
+	// Define the X-Trace server container
+	spec.Define(xtraceCtr, &XTraceServerContainer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
+		xtrace, err := newXTraceServerContainer(xtraceCtr)
 		if err != nil {
 			return nil, err
 		}
 
-		return newXTraceServerContainer(xtraceProc, addr.Bind)
+		err = address.Bind[*XTraceServerContainer](ns, xtraceAddr, xtrace, &xtrace.BindAddr)
+		return xtrace, err
 	})
 
-	spec.Alias(xtraceDst, xtraceProc)
-	pointer.RequireUniqueness(spec, xtraceDst, &ir.ApplicationNode{})
+	// Create a pointer to the server
+	ptr := pointer.CreatePointer[*XTraceClient](spec, serverName, xtraceCtr)
 
-	pointer.CreatePointer(spec, xtrace_server, &XTraceClient{}, xtraceDst)
-	ptr := pointer.GetPointer(spec, xtrace_server)
-	ptr.AddDstModifier(spec, xtrace_addr)
+	// Define the address that points to the X-Trace collector
+	address.Define[*XTraceServerContainer](spec, xtraceAddr, xtraceCtr)
 
+	// Add the address to the pointer
+	ptr.AddAddrModifier(spec, xtraceAddr)
+
+	// Define the X-Trace client and add it to the client side of the pointer
 	clientNext := ptr.AddSrcModifier(spec, xtraceClient)
-
 	spec.Define(xtraceClient, &XTraceClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*XTraceServerContainer](ns, clientNext)
 		if err != nil {
@@ -106,6 +108,6 @@ func DefineXTraceServerContainer(spec wiring.WiringSpec) {
 		return newXTraceClient(xtraceClient, addr.Dial)
 	})
 
-	address.Define[*XTraceServerContainer](spec, xtrace_addr, xtraceProc, &ir.ApplicationNode{})
-	ptr.AddDstModifier(spec, xtrace_addr)
+	// Return the pointer; anybody who wants to access the X-Trace server should do so through the pointer
+	return serverName
 }

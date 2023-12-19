@@ -34,10 +34,9 @@ func (m *MongoInterface) GetMethods() []service.Method {
 	return m.Wrapped.GetMethods()
 }
 
-func newMongoDBContainer(name string, addr *address.BindConfig) (*MongoDBContainer, error) {
+func newMongoDBContainer(name string) (*MongoDBContainer, error) {
 	proc := &MongoDBContainer{}
 	proc.InstanceName = name
-	proc.BindAddr = addr
 	err := proc.init(name)
 	if err != nil {
 		return nil, err

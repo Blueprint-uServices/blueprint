@@ -23,7 +23,7 @@ type golangServer struct {
 	golang.Instantiable
 
 	InstanceName string
-	Addr         *address.Address[*golangServer]
+	Bind         *address.BindConfig
 	Wrapped      golang.Service
 
 	outputPackage string
@@ -43,18 +43,17 @@ func (grpc *gRPCInterface) GetMethods() []service.Method {
 	return grpc.Wrapped.GetMethods()
 }
 
-func newGolangServer(name string, addr *address.Address[*golangServer], service golang.Service) (*golangServer, error) {
+func newGolangServer(name string, service golang.Service) (*golangServer, error) {
 	node := &golangServer{}
 	node.InstanceName = name
-	node.Addr = addr
 	node.Wrapped = service
 	node.outputPackage = "grpc"
-	node.Addr.Bind.PreferredPort = 12345 // Optional to do this
+	node.Bind.PreferredPort = 12345 // Optional to do this
 	return node, nil
 }
 
 func (n *golangServer) String() string {
-	return n.InstanceName + " = GRPCServer(" + n.Wrapped.Name() + ", " + n.Addr.Bind.Name() + ")"
+	return n.InstanceName + " = GRPCServer(" + n.Wrapped.Name() + ", " + n.Bind.Name() + ")"
 }
 
 func (n *golangServer) Name() string {
@@ -113,7 +112,7 @@ func (node *golangServer) AddInstantiation(builder golang.NamespaceBuilder) erro
 	}
 
 	slog.Info(fmt.Sprintf("Instantiating GRPCServer %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
-	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, node.Addr.Bind})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, node.Bind})
 }
 
 func (node *golangServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {

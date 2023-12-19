@@ -40,18 +40,17 @@ func Cache(spec wiring.WiringSpec, name string) string {
 }
 
 func define(spec wiring.WiringSpec, name, backendType, backendImpl string) string {
+	// The nodes that we are defining
 	backendName := name + ".backend"
+
+	// Define the backend instance
 	spec.Define(backendName, &SimpleBackend{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		return newSimpleBackend(name, backendType, backendImpl)
 	})
 
-	// Mandate that this backend with this name must be unique within the application (although, this can be changed by namespaces)
-	dstName := name + ".dst"
-	spec.Alias(dstName, backendName)
-	pointer.RequireUniqueness(spec, dstName, &ir.ApplicationNode{})
+	// Create a pointer to the backend instance
+	pointer.CreatePointer[*SimpleBackend](spec, name, backendName)
 
-	// Define the pointer
-	pointer.CreatePointer(spec, name, &SimpleBackend{}, dstName)
-
+	// Return the pointer; anybody who wants to access the backend instance should do so through the pointer
 	return name
 }

@@ -19,31 +19,32 @@ import (
 //
 // The generated container has the name `dbName`.
 func Container(spec wiring.WiringSpec, dbName string) string {
-	procName := dbName + ".process"
+	// The nodes that we are defining
+	ctrName := dbName + ".ctr"
 	clientName := dbName + ".client"
 	addrName := dbName + ".addr"
 
-	spec.Define(procName, &MongoDBContainer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
-		addr, err := address.Bind[*MongoDBContainer](ns, addrName)
+	// Define the MongoDB container
+	spec.Define(ctrName, &MongoDBContainer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
+		ctr, err := newMongoDBContainer(ctrName)
 		if err != nil {
-			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", procName, addrName, err)
+			return nil, err
 		}
-		return newMongoDBContainer(procName, addr.Bind)
+		err = address.Bind[*MongoDBContainer](ns, addrName, ctr, &ctr.BindAddr)
+		return ctr, err
 	})
 
-	dstName := dbName + ".dst"
-	spec.Alias(dstName, procName)
-	pointer.RequireUniqueness(spec, dstName, &ir.ApplicationNode{})
+	// Create a pointer to the MongoDB container
+	ptr := pointer.CreatePointer[*MongoDBGoClient](spec, dbName, ctrName)
 
-	pointer.CreatePointer(spec, dbName, &MongoDBGoClient{}, dstName)
-	ptr := pointer.GetPointer(spec, dbName)
+	// Define the address that points to the MongoDB container
+	address.Define[*MongoDBContainer](spec, addrName, ctrName)
 
-	address.Define[*MongoDBContainer](spec, addrName, procName, &ir.ApplicationNode{})
+	// Add the address to the pointer
+	ptr.AddAddrModifier(spec, addrName)
 
-	ptr.AddDstModifier(spec, addrName)
-
+	// Define the MongoDB client and add it to the client side of the pointer
 	clientNext := ptr.AddSrcModifier(spec, clientName)
-
 	spec.Define(clientName, &MongoDBGoClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*MongoDBContainer](ns, clientNext)
 		if err != nil {
@@ -53,5 +54,6 @@ func Container(spec wiring.WiringSpec, dbName string) string {
 		return newMongoDBGoClient(clientName, addr.Dial)
 	})
 
+	// Return the pointer; anybody who wants to access the MongoDB instance should do so through the pointer
 	return dbName
 }

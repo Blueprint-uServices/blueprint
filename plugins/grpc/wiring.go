@@ -47,7 +47,6 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 	// The nodes that we are defining
 	grpcClient := serviceName + ".grpc_client"
 	grpcServer := serviceName + ".grpc_server"
-	grpcServerModifier := serviceName + ".instantiate_grpc_server"
 	grpcAddr := serviceName + ".grpc.addr"
 
 	// Get the pointer metadata
@@ -57,67 +56,36 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 		return
 	}
 
-	// Define the address which is used by both clients and server
-	address.Define[*golangServer](spec, grpcAddr, grpcServer, &ir.ApplicationNode{})
+	// Define the address that will be used by clients and the server
+	address.Define[*golangServer](spec, grpcAddr, grpcServer)
 
 	// Add the client-side modifier
 	//
 	// The client-side modifier creates a gRPC client and dials the server address.
-	// It assumes the next src modifier node is a golangServer address.
+	// It assumes the next src modifier node will be a golangServer address.
 	clientNext := ptr.AddSrcModifier(spec, grpcClient)
 	spec.Define(grpcClient, &golangClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*golangServer](namespace, clientNext)
 		if err != nil {
 			return nil, blueprint.Errorf("GRPC client %s expected %s to be an address, but encountered %s", grpcClient, clientNext, err)
 		}
-
 		return newGolangClient(grpcClient, addr)
 	})
 
-	// Add the server modifier to the pointer
-	serverNext := ptr.AddDstModifier(spec, grpcServerModifier)
-
-	// Define the server.
-	//
-	// The server instantiates the wrapper server handler (serverNext).
+	// Add the server-side modifier, which is an address that PointsTo the grpcServer
+	serverNext := ptr.AddAddrModifier(spec, grpcAddr)
 	spec.Define(grpcServer, &golangServer{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		addr, err := address.Bind[*golangServer](namespace, grpcAddr)
-		if err != nil {
-			return nil, blueprint.Errorf("GRPC server %s expected %s to be an address, but encountered %s", grpcServer, grpcAddr, err)
-		}
-
 		var wrapped golang.Service
 		if err := namespace.Get(serverNext, &wrapped); err != nil {
 			return nil, blueprint.Errorf("GRPC server %s expected %s to be a golang.Service, but encountered %s", grpcServer, serverNext, err)
 		}
 
-		server, err := newGolangServer(grpcServer, addr, wrapped)
+		server, err := newGolangServer(grpcServer, wrapped)
 		if err != nil {
 			return nil, err
 		}
 
-		// TODO: can easily reorder calls above and make this part of bind
-		return server, addr.SetDestination(server)
+		err = address.Bind[*golangServer](namespace, grpcAddr, server, &server.Bind)
+		return server, err
 	})
-
-	// Add the server-side modifier which will (deferred) instantiate the server.
-	//
-	// The modifier defers grpcServer instantiation and instead of returning the grpcServer it returns the server's
-	// address, which is all that clients require.
-	spec.Define(grpcServerModifier, &golangServer{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		// Trigger delayed instantiation of the server
-		namespace.Defer(func() error {
-			var server *golangServer
-			if err := namespace.Get(grpcServer, &server); err != nil {
-				return err
-			}
-			return nil
-		})
-
-		// Return the server address
-		var addr address.Node
-		err := namespace.Get(grpcAddr, &addr)
-		return addr, err
-	})
-
 }
