@@ -186,8 +186,8 @@ func (namespace *namespaceimpl) get(name string, addEdge bool, dst any) error {
 			return err
 		}
 		if _, already_added := namespace.Added[node.Name()]; !already_added {
-			if _, is_metadata := node.(ir.IRMetadata); !is_metadata && addEdge {
-				// Don't bother adding edges for metadata
+			if _, is_metadata := node.(ir.IRMetadata); !is_metadata && addEdge && !def.Options.ProxyNode {
+				// Don't bother adding edges for metadata or proxy nodes, or instantiate (vs get) nodes
 				namespace.Handler.AddEdge(name, node)
 			}
 			namespace.Added[node.Name()] = true
@@ -210,7 +210,9 @@ func (namespace *namespaceimpl) get(name string, addEdge bool, dst any) error {
 	}
 
 	if _, already_added := namespace.Added[node.Name()]; !already_added {
-		namespace.Handler.AddNode(name, node)
+		if !def.Options.ProxyNode {
+			namespace.Handler.AddNode(name, node)
+		}
 		namespace.Added[node.Name()] = true
 	}
 	namespace.Info("Finished building %s of type %s", name, reflect.TypeOf(node).String())

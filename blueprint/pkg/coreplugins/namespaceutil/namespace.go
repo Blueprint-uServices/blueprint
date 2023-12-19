@@ -54,6 +54,15 @@ func AddNodeTo[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName stri
 	// Add a modifier to child that enters the namespace before instantiating the child
 	modifierName := fmt.Sprintf("%v.%v", childName, namespaceName)
 	ptrNext := ptr.AddDstModifier(spec, modifierName)
+
+	// We are proxying the ptrNext node, so must provide wiring spec options
+	ptrNextDef := spec.GetDef(ptrNext)
+	opts := wiring.WiringOpts{ProxyNode: true}
+	if ptrNextDef != nil {
+		opts.ReturnType = ptrNextDef.Options.ReturnType
+	}
+
+	// opts := wiring.WiringOpts{ProxyNode: true, ReturnType: }
 	var nodeType NamespaceNodeType
 	spec.Define(modifierName, &nodeType, func(parentNamespace wiring.Namespace) (ir.IRNode, error) {
 		// Namespace node must exist so that namespace exists
@@ -70,9 +79,9 @@ func AddNodeTo[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName stri
 
 		// Continue building the pointer from inside the namespace
 		var ptrNextNode ir.IRNode
-		err = namespace.Get(ptrNext, &ptrNextNode)
+		err = namespace.Instantiate(ptrNext, &ptrNextNode)
 		return ptrNextNode, err
-	})
+	}, opts)
 	spec.AddProperty(namespaceName, prop_CHILDREN, ptrNext)
 }
 
@@ -117,19 +126,6 @@ func instantiateNamespaceNodes(namespace wiring.Namespace) error {
 		if err := namespace.Get(childName, &child); err != nil {
 			return err
 		}
-
-		// // Special handling for addresses, where we instantiate the address destination
-		// if _, isAddr := child.(address.Node); isAddr {
-		// 	addrDst, err := address.PointsTo(namespace, child.Name())
-		// 	if err != nil {
-		// 		return err
-		// 	}
-
-		// 	namespace.Info("Instantiating destination of address %v (%v)", child.Name(), addrDst)
-		// 	if err := namespace.Get(addrDst, &child); err != nil {
-		// 		return err
-		// 	}
-		// }
 	}
 	return nil
 }

@@ -30,12 +30,12 @@ func TestServicesWithinSameProcess(t *testing.T) {
 
 	assertIR(t, app,
 		`TestServicesWithinSameProcess = BlueprintApplication() {
-            leaf.handler.visibility
-            nonleaf.handler.visibility
-            myproc = GolangProcessNode() {
-              leaf = TestLeafService()
-              nonleaf = TestNonLeafService(leaf)
-            }
+			leaf.handler.visibility
+			myproc = GolangProcessNode() {
+			  leaf = TestLeafService()
+			  nonleaf = TestNonLeafService(leaf)
+			}
+			nonleaf.handler.visibility
           }`)
 }
 
