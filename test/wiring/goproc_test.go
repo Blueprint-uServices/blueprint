@@ -215,9 +215,9 @@ func TestContainerModifier(t *testing.T) {
 			nonleaf.handler.visibility
 			nonleaf_ctr = LinuxContainer(leaf.grpc.dial_addr, nonleaf.grpc.bind_addr) {
 			  nonleaf_proc = GolangProcessNode(leaf.grpc.dial_addr, nonleaf.grpc.bind_addr) {
-				leaf = leaf.grpc_client
+				leaf.client = leaf.grpc_client
 				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-				nonleaf = TestNonLeafService(leaf)
+				nonleaf = TestNonLeafService(leaf.client)
 				nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
 			  }
 			}

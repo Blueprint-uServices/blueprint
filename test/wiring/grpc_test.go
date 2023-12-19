@@ -27,17 +27,17 @@ func TestServicesOverGRPCNoProcess(t *testing.T) {
 
 	assertIR(t, app,
 		`TestServicesOverGRPCNoProcess = BlueprintApplication() {
+			leaf = TestLeafService(leaf.grpc_client)
 			leaf.grpc.addr
+			leaf.grpc.bind_addr = AddressConfig()
 			leaf.grpc.dial_addr = AddressConfig()
 			leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
-			leaf = TestLeafService(leaf.grpc_client)
+			leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
+			leaf.handler.visibility
 			nonleaf.grpc.addr
 			nonleaf.grpc.dial_addr = AddressConfig()
 			nonleaf.grpc_client = GRPCClient(nonleaf.grpc.dial_addr)
 			nonleaf = TestNonLeafService(nonleaf.grpc_client)
-			leaf.grpc.bind_addr = AddressConfig()
-			leaf.handler.visibility
-			leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
 			nonleaf.grpc.bind_addr = AddressConfig()
 			nonleaf.handler.visibility
 			nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)

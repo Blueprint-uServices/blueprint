@@ -118,7 +118,7 @@ func Service(spec wiring.WiringSpec, serviceName, serviceType string, serviceArg
 	clientNext := ptr.AddSrcModifier(spec, clientName)
 	spec.Define(clientName, &workflowClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		client := &workflowClient{}
-		if err := client.Init(serviceName, serviceType); err != nil {
+		if err := client.Init(clientName, serviceType); err != nil {
 			return nil, err
 		}
 		return client, namespace.Get(clientNext, &client.Wrapped)
