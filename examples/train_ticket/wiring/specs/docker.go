@@ -48,6 +48,11 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	allServices = append(allServices, station_service)
 	containers = append(containers, station_cntr)
 
+	news_service := workflow.Service(spec, "news_service", "NewsServiceImpl")
+	news_cntr := applyDockerDefaults(spec, news_service, "news_proc", "news_container")
+	allServices = append(allServices, news_service)
+	containers = append(containers, news_cntr)
+
 	tests := gotests.Test(spec, allServices...)
 	containers = append(containers, tests)
 	return containers, nil
