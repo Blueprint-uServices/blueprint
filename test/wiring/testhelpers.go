@@ -1,6 +1,7 @@
 package wiring
 
 import (
+	"flag"
 	"strings"
 	"testing"
 
@@ -11,10 +12,10 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
-var compilerLogging = false
+var compilerLogging = flag.Bool("blueprint_verbose", false, "Enables verbose Blueprint compiler logging")
 
 func newWiringSpec(name string) wiring.WiringSpec {
-	if !compilerLogging {
+	if !*compilerLogging {
 		logging.DisableCompilerLogging()
 		defer logging.EnableCompilerLogging()
 	}
@@ -25,7 +26,7 @@ func newWiringSpec(name string) wiring.WiringSpec {
 }
 
 func build(t *testing.T, spec wiring.WiringSpec, toInstantiate ...string) (*ir.ApplicationNode, error) {
-	if !compilerLogging {
+	if !*compilerLogging {
 		logging.DisableCompilerLogging()
 		defer logging.EnableCompilerLogging()
 	}

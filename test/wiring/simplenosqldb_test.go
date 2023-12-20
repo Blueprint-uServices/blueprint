@@ -19,13 +19,15 @@ func TestSimpleNoSQLDB(t *testing.T) {
 
 	assertIR(t, app,
 		`TestSimpleNoSQLDB = BlueprintApplication() {
-			leaf.handler.visibility
-			leaf_cache.backend.visibility
-			leaf_cache = SimpleCache()
-			leaf_db.backend.visibility
-			leaf_db = SimpleNoSQLDB()
 			leaf = TestLeafService(leaf_cache, leaf_db)
+			leaf.client = leaf
+			leaf.handler.visibility
+			leaf_cache = SimpleCache()
+			leaf_cache.backend.visibility
+			leaf_db = SimpleNoSQLDB()
+			leaf_db.backend.visibility
+			nonleaf = TestNonLeafService(leaf.client)
+			nonleaf.client = nonleaf
 			nonleaf.handler.visibility
-			nonleaf = TestNonLeafService(leaf)
 		  }`)
 }
