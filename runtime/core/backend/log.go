@@ -40,23 +40,23 @@ var logger Logger
 type defaultLogger struct{}
 
 func (l *defaultLogger) Log(ctx context.Context, priority Priority, msg string, attrs ...Attribute) context.Context {
-	var args []interface{}
+	var args []any
 	for _, attr := range attrs {
 		args = append(args, attr.Key)
 		args = append(args, attr.Value)
 	}
 	switch priority {
 	case DEBUG:
-		slog.Debug(msg, args)
+		slog.Debug(msg, args...)
 		break
 	case INFO:
-		slog.Info(msg, args)
+		slog.Info(msg, args...)
 		break
 	case WARN:
-		slog.Info(msg, args)
+		slog.Warn(msg, args...)
 		break
 	case ERROR:
-		slog.Error(msg, args)
+		slog.Error(msg, args...)
 	}
 	return ctx
 }
@@ -71,4 +71,8 @@ func SetDefaultLogger(l Logger) {
 // Wraps around the currently set default logger's Logger API calls.
 func Log(ctx context.Context, priority Priority, msg string, attrs ...Attribute) context.Context {
 	return logger.Log(ctx, priority, msg, attrs...)
+}
+
+func init() {
+	logger = &defaultLogger{}
 }
