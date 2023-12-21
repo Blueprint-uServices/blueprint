@@ -24,5 +24,6 @@ func main() {
 		specs.TimeoutDemo,
 		specs.TimeoutRetriesDemo,
 		specs.Logging,
+		specs.XtraceLogging,
 	)
 }
