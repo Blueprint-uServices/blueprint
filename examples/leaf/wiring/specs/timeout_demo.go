@@ -10,8 +10,8 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/latencyinjector"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/timeouts"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
@@ -38,7 +38,9 @@ func applyDockerTimeoutDefaults(spec wiring.WiringSpec, serviceName string) stri
 	procName := fmt.Sprintf("%s_process", serviceName)
 	ctrName := fmt.Sprintf("%s_container", serviceName)
 	// opentelemetry.Instrument(spec, serviceName)
-	timeouts.AddTimeouts(spec, serviceName, "100ms")
+	//timeouts.AddTimeouts(spec, serviceName, "100ms")
+	// Uncomment this to try out retries with timeouts functionality
+	retries.AddRetriesWithTimeouts(spec, serviceName, 10, "100ms")
 	latencyinjector.AddFixedLatency(spec, serviceName, "200ms")
 	healthchecker.AddHealthCheckAPI(spec, serviceName)
 	http.Deploy(spec, serviceName)
