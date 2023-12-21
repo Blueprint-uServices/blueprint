@@ -23,7 +23,7 @@ func NewOTTraceLogger(ctx context.Context) (*OTTraceLogger, error) {
 	return l, nil
 }
 
-func (l *OTTraceLogger) Log(ctx context.Context, priority backend.Priority, msg string, attrs ...backend.Attribute) context.Context {
+func (l *OTTraceLogger) Log(ctx context.Context, priority backend.Priority, msg string, attrs ...backend.Attribute) (context.Context, error) {
 	span := trace.SpanFromContext(ctx)
 	var all_attributes []attribute.KeyValue
 	all_attributes = append(all_attributes, attribute.String("Priority", priority.String()))
@@ -31,5 +31,5 @@ func (l *OTTraceLogger) Log(ctx context.Context, priority backend.Priority, msg 
 		all_attributes = append(all_attributes, attribute.String(a.Key, fmt.Sprintf("%v", a.Value)))
 	}
 	span.AddEvent(msg, trace.WithAttributes(all_attributes...))
-	return ctx
+	return ctx, nil
 }

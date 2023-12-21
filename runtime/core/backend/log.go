@@ -31,7 +31,7 @@ type Attribute struct {
 type Logger interface {
 	// Log creates a new log record at the desired `priority` level with `msg` as the log message and `attr` as list of optional key-value pairs for logging messages.
 	// Returns a context that may-be updated by the logger with some logger specific state. If no state is set, then the passed-in context is returned as is.
-	Log(ctx context.Context, priority Priority, msg string, attr ...Attribute) context.Context
+	Log(ctx context.Context, priority Priority, msg string, attr ...Attribute) (context.Context, error)
 }
 
 var logger Logger
@@ -39,7 +39,7 @@ var logger Logger
 // Blueprint's default logger that uses the slog package
 type defaultLogger struct{}
 
-func (l *defaultLogger) Log(ctx context.Context, priority Priority, msg string, attrs ...Attribute) context.Context {
+func (l *defaultLogger) Log(ctx context.Context, priority Priority, msg string, attrs ...Attribute) (context.Context, error) {
 	var args []any
 	for _, attr := range attrs {
 		args = append(args, attr.Key)
@@ -58,7 +58,7 @@ func (l *defaultLogger) Log(ctx context.Context, priority Priority, msg string, 
 	case ERROR:
 		slog.Error(msg, args...)
 	}
-	return ctx
+	return ctx, nil
 }
 
 // Set's the default logger to be used by the Blueprint application.
@@ -69,7 +69,7 @@ func SetDefaultLogger(l Logger) {
 
 // Log function exposed to Blueprint workflow applications.
 // Wraps around the currently set default logger's Logger API calls.
-func Log(ctx context.Context, priority Priority, msg string, attrs ...Attribute) context.Context {
+func Log(ctx context.Context, priority Priority, msg string, attrs ...Attribute) (context.Context, error) {
 	return logger.Log(ctx, priority, msg, attrs...)
 }
 

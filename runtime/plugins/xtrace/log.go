@@ -26,14 +26,14 @@ func NewXTraceLogger(ctx context.Context, addr string) (*XTraceLogger, error) {
 	return l, nil
 }
 
-func (l *XTraceLogger) Log(ctx context.Context, priority backend.Priority, msg string, attrs ...backend.Attribute) context.Context {
+func (l *XTraceLogger) Log(ctx context.Context, priority backend.Priority, msg string, attrs ...backend.Attribute) (context.Context, error) {
 	if !client.HasTask(ctx) {
 		// Only do logging if there is an active task running
-		return ctx
+		return ctx, nil
 	}
 	formatted_msg := fmt.Sprintf("%s: %s", priority.String(), msg)
 	if len(attrs) > 0 {
 		formatted_msg = fmt.Sprintf("%s, %v", formatted_msg, attrs)
 	}
-	return client.Log(ctx, formatted_msg)
+	return client.Log(ctx, formatted_msg), nil
 }
