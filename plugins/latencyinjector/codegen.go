@@ -64,7 +64,7 @@ func New_{{.Name}} (ctx context.Context, server {{.Imports.NameOf .Service.UserT
 {{ range $_, $f := .Service.Methods }}
 func (server *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
 	time.Sleep(server.Latency)
-	return server.Server.{{$f.Name}}({{ArgVars $f "ctx}})
+	return server.Server.{{$f.Name}}({{ArgVars $f "ctx"}})
 }
 {{end}}
 `

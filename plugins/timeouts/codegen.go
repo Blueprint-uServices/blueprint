@@ -62,7 +62,7 @@ func New_{{.Name}} (ctx context.Context, client {{.Imports.NameOf .Service.UserT
 {{$service := .Service.Name -}}
 {{$receiver := .Name -}}
 {{ range $_, $f := .Service.Methods }}
-func (client *{{receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
+func (client *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
 	ctx, cancel := context.WithDeadline(ctx, time.Now().Add(client.Timeout))
 	defer cancel()
 	is_complete := make(chan bool)
@@ -73,10 +73,10 @@ func (client *{{receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Con
 
 	// Wait till we either complete the request or it gets timed out
 	select {
-	<-ctx.Done():
+	case <-ctx.Done():
 		err = errors.New("Request was timed out")
 		return
-	<-is_complete:
+	case <-is_complete:
 		return
 	}
 }

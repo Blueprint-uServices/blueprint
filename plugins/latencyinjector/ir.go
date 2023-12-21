@@ -85,9 +85,10 @@ func (node *LatencyInjectorWrapper) AddInstantiation(builder golang.NamespaceBui
 			Arguments: []gocode.Variable{
 				{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}},
 				{Name: "server", Type: iface},
+				{Name: "latency", Type: &gocode.BasicType{Name: "string"}},
 			},
 		},
 	}
 
-	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, node.LatencyValue})
 }
