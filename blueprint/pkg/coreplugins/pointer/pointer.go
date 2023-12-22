@@ -128,7 +128,7 @@ func CreatePointer[SrcNodeType any](spec wiring.WiringSpec, name string, dst str
 		// it hasn't explicitly been instantiated somewhere in the wiring spec.
 		namespace.Defer(func() error {
 			return ptr.InstantiateDst(namespace)
-		})
+		}, wiring.DeferOpts{Front: false})
 
 		var node ir.IRNode
 		err := namespace.Get(ptr.srcHead, &node)

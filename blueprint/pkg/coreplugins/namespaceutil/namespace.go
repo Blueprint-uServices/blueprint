@@ -109,7 +109,7 @@ func InstantiateNamespace(parentNamespace wiring.Namespace, namespaceNode IRName
 	namespace.Info("Deferring instantiation of child nodes")
 	namespace.Defer(func() error {
 		return instantiateNamespaceNodes(namespace)
-	})
+	}, wiring.DeferOpts{Front: true})
 
 	return namespace, err
 }

@@ -43,7 +43,7 @@ func BuildApplicationIR(spec WiringSpec, name string, nodesToInstantiate ...stri
 			namespace.Info("Instantiating %v", nodeName)
 			var node ir.IRNode
 			return namespace.Get(nodeName, &node)
-		})
+		}, DeferOpts{Front: true})
 	}
 
 	// Execute deferred functions until empty

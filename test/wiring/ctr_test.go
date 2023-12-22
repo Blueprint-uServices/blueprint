@@ -194,7 +194,7 @@ func TestContainerExplicitNamespaceInstantiation(t *testing.T) {
 	nonleafproc := goproc.CreateProcess(spec, "nonleaf_proc", nonleaf)
 	nonleafctr := linuxcontainer.CreateContainer(spec, "nonleaf_ctr", nonleafproc)
 
-	app := assertBuildSuccess(t, spec, leafctr, nonleafctr)
+	app := assertBuildSuccess(t, spec, nonleafctr, leafctr)
 
 	assertIR(t, app,
 		`TestContainerExplicitNamespaceInstantiation = BlueprintApplication() {

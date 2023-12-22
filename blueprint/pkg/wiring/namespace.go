@@ -64,7 +64,8 @@ type Namespace interface {
 
 	// Enqueue a function to be executed after all currently-queued functions have finished executing.
 	// Most plugins should not need to use this.
-	Defer(f func() error)
+	// [DeferOpts] can be optionally specified.
+	Defer(f func() error, options ...DeferOpts)
 
 	// Log an info-level message
 	Info(message string, args ...any)
@@ -74,6 +75,16 @@ type Namespace interface {
 
 	// Log an error-level message
 	Error(message string, args ...any) error
+}
+
+// Options for deferred functions provided with [Namespace.Defer]
+type DeferOpts struct {
+	// Defaults to false. If set to true, pushes the deferred function to the front of the queue instead of the back.
+	Front bool
+}
+
+var defaultDeferOpts = DeferOpts{
+	Front: false,
 }
 
 // namespaceimpl is a base implementation of a [Namespace] that provides implementations of most methods.
@@ -244,11 +255,19 @@ func (namespace *namespaceimpl) Put(name string, node ir.IRNode) error {
 }
 
 // Implements [Namespace]
-func (namespace *namespaceimpl) Defer(f func() error) {
+func (namespace *namespaceimpl) Defer(f func() error, options ...DeferOpts) {
+	opts := defaultDeferOpts
+	if len(options) > 0 {
+		opts = options[0]
+	}
 	if namespace.ParentNamespace == nil {
-		namespace.Deferred = append(namespace.Deferred, f)
+		if opts.Front {
+			namespace.Deferred = append([]func() error{f}, namespace.Deferred...)
+		} else {
+			namespace.Deferred = append(namespace.Deferred, f)
+		}
 	} else {
-		namespace.ParentNamespace.Defer(f)
+		namespace.ParentNamespace.Defer(f, options...)
 	}
 }
 

@@ -6,9 +6,11 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/gotests"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/mysql"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
@@ -72,22 +74,22 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 
 	// Deploy queue master to the same process as the shipping proc
 	// TODO: after distributed queue is supported, move to separate containers
-	// queue_master := workflow.Service(spec, "queue_master", "QueueMaster", shipqueue, shipping_service)
-	// goproc.AddToProcess(spec, "shipping_proc", queue_master)
+	queue_master := workflow.Service(spec, "queue_master", "QueueMaster", shipqueue, shipping_service)
+	goproc.AddToProcess(spec, "shipping_proc", queue_master)
 
 	order_db := mongodb.Container(spec, "order_db")
 	order_service := workflow.Service(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)
 	applyDockerDefaults(order_service)
 
-	// catalogue_db := mysql.Container(spec, "catalogue_db")
-	// catalogue_service := workflow.Service(spec, "catalogue_service", "CatalogueService", catalogue_db)
-	// applyDockerDefaults(catalogue_service)
+	catalogue_db := mysql.Container(spec, "catalogue_db")
+	catalogue_service := workflow.Service(spec, "catalogue_service", "CatalogueService", catalogue_db)
+	applyDockerDefaults(catalogue_service)
 
-	// frontend := workflow.Service(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
-	// applyDockerDefaults(frontend)
+	frontend := workflow.Service(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
+	applyDockerDefaults(frontend)
 
-	// tests := gotests.Test(spec, allServices...)
-	// allCtrs = append(allCtrs, tests)
+	tests := gotests.Test(spec, allServices...)
+	allCtrs = append(allCtrs, tests)
 
 	return allCtrs, nil
 }
