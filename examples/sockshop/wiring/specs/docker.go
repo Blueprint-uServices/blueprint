@@ -1,8 +1,6 @@
 package specs
 
 import (
-	"strings"
-
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
@@ -32,28 +30,23 @@ var Docker = wiringcmd.SpecOption{
 }
 
 func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
-	var allServices []string
-	var allCtrs []string
-
 	// Define the trace collector, which will be used by all services
 	trace_collector := zipkin.Collector(spec, "zipkin")
 
 	// Modifiers that will be applied to all services
-	applyDockerDefaults := func(serviceName string) string {
-		name, _ := strings.CutSuffix(serviceName, "_service")
-
-		// Apply Blueprint modifiers
+	applyDockerDefaults := func(serviceName string) {
+		// Golang-level modifiers that add functionality
 		retries.AddRetries(spec, serviceName, 3)
 		clientpool.Create(spec, serviceName, 10)
 		opentelemetry.InstrumentUsingCustomCollector(spec, serviceName, trace_collector)
 		grpc.Deploy(spec, serviceName)
-		proc := goproc.CreateProcess(spec, name+"_proc", serviceName)
-		ctr := linuxcontainer.CreateContainer(spec, name+"_ctr", proc)
 
-		// Save the service and ctr for later instantiation
-		allServices = append(allServices, serviceName)
-		allCtrs = append(allCtrs, ctr)
-		return ctr
+		// Deploying to namespaces
+		goproc.Deploy(spec, serviceName)
+		linuxcontainer.Deploy(spec, serviceName)
+
+		// Also add to tests
+		gotests.Test(spec, serviceName)
 	}
 
 	user_db := mongodb.Container(spec, "user_db")
@@ -88,8 +81,7 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	frontend := workflow.Service(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
 	applyDockerDefaults(frontend)
 
-	tests := gotests.Test(spec, allServices...)
-	allCtrs = append(allCtrs, tests)
-
-	return allCtrs, nil
+	// Instantiate starting with the frontend which will trigger all other services to be instantiated
+	// Also include the tests
+	return []string{frontend, "gotests"}, nil
 }
