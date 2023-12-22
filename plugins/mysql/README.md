@@ -45,8 +45,6 @@ func Container(spec wiring.WiringSpec, dbName string) string
 
 Container generate the IRNodes for a mysql server docker container that uses the latest mysql/mysql image and the clients needed by the generated application to communicate with the server.
 
-The generated container has the name \`dbName\` with the root password set to \`password\`.
-
 <a name="MySQLDBContainer"></a>
 ## type MySQLDBContainer
 

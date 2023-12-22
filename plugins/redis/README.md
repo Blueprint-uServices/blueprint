@@ -6,7 +6,7 @@
 import "gitlab.mpi-sws.org/cld/blueprint/plugins/redis"
 ```
 
-Package memcached provides the Blueprint wiring and IR implementations of a memcached plugin that provides a Cache interface implementation via a pre\-built redis container image.
+Package redis provides the Blueprint wiring and IR implementations of a redis plugin that provides a Cache interface implementation via a pre\-built redis container image.
 
 Usage: To add a redis container named \`fooCache\`
 
@@ -16,7 +16,7 @@ PrebuiltContainer(spec, "fooCache")
 
 ## Index
 
-- [func PrebuiltContainer\(spec wiring.WiringSpec, cacheName string\) string](<#PrebuiltContainer>)
+- [func Container\(spec wiring.WiringSpec, cacheName string\) string](<#Container>)
 - [type RedisContainer](<#RedisContainer>)
   - [func \(node \*RedisContainer\) AddContainerArtifacts\(target docker.ContainerWorkspace\) error](<#RedisContainer.AddContainerArtifacts>)
   - [func \(node \*RedisContainer\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#RedisContainer.AddContainerInstance>)
@@ -38,14 +38,14 @@ PrebuiltContainer(spec, "fooCache")
   - [func \(r \*RedisInterface\) GetName\(\) string](<#RedisInterface.GetName>)
 
 
-<a name="PrebuiltContainer"></a>
-## func PrebuiltContainer
+<a name="Container"></a>
+## func Container
 
 ```go
-func PrebuiltContainer(spec wiring.WiringSpec, cacheName string) string
+func Container(spec wiring.WiringSpec, cacheName string) string
 ```
 
-Adds a redis container to the application that defines a cache called \`cacheName\` which uses the pre\-built memcached process container
+Adds a redis container to the application that defines a cache called \`cacheName\` which uses the pre\-built redis process container
 
 <a name="RedisContainer"></a>
 ## type RedisContainer

@@ -14,7 +14,7 @@ The applications must use a backend.XTracer \(runtime/core/backend\) as the inte
 
 ## Index
 
-- [func DefineXTraceServerContainer\(spec wiring.WiringSpec\)](<#DefineXTraceServerContainer>)
+- [func DefineXTraceServerContainer\(spec wiring.WiringSpec, serverName string\) string](<#DefineXTraceServerContainer>)
 - [func Instrument\(spec wiring.WiringSpec, serviceName string\)](<#Instrument>)
 - [type XTraceClient](<#XTraceClient>)
   - [func \(node \*XTraceClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#XTraceClient.AddInstantiation>)
@@ -57,7 +57,7 @@ The applications must use a backend.XTracer \(runtime/core/backend\) as the inte
 ## func DefineXTraceServerContainer
 
 ```go
-func DefineXTraceServerContainer(spec wiring.WiringSpec)
+func DefineXTraceServerContainer(spec wiring.WiringSpec, serverName string) string
 ```
 
 Generates the IRNodes for a xtrace docker container that uses the latest xtrace image and the clients needed by the generated application to communicate with the server.

@@ -26,57 +26,18 @@ The method \[InstantiateDst\] is used by other Blueprint plugins that wish to ex
 
 ## Index
 
-- [func Instantiate\(spec wiring.WiringSpec, namespace wiring.Namespace, names ...string\) \(nodes map\[string\]ir.IRNode, err error\)](<#Instantiate>)
-- [func InstantiateClients\(spec wiring.WiringSpec, namespace wiring.Namespace, names ...string\) \(map\[string\]ir.IRNode, error\)](<#InstantiateClients>)
-- [func InstantiateClientsFromProperty\(spec wiring.WiringSpec, namespace wiring.Namespace, propertyName string\) \(map\[string\]ir.IRNode, error\)](<#InstantiateClientsFromProperty>)
-- [func InstantiateFromProperty\(spec wiring.WiringSpec, namespace wiring.Namespace, propertyName string\) \(map\[string\]ir.IRNode, error\)](<#InstantiateFromProperty>)
 - [func RequireUniqueness\(spec wiring.WiringSpec, alias string, visibility any\)](<#RequireUniqueness>)
+- [type ModifierOpts](<#ModifierOpts>)
 - [type PointerDef](<#PointerDef>)
-  - [func CreatePointer\(spec wiring.WiringSpec, name string, ptrType any, dst string\) \*PointerDef](<#CreatePointer>)
+  - [func CreatePointer\[SrcNodeType any\]\(spec wiring.WiringSpec, name string, dst string, options ...PointerOpts\) \*PointerDef](<#CreatePointer>)
   - [func GetPointer\(spec wiring.WiringSpec, name string\) \*PointerDef](<#GetPointer>)
-  - [func \(ptr \*PointerDef\) AddDstModifier\(spec wiring.WiringSpec, modifierName string\) string](<#PointerDef.AddDstModifier>)
+  - [func \(ptr \*PointerDef\) AddAddrModifier\(spec wiring.WiringSpec, addrName string\) string](<#PointerDef.AddAddrModifier>)
+  - [func \(ptr \*PointerDef\) AddDstModifier\(spec wiring.WiringSpec, modifierName string, options ...ModifierOpts\) string](<#PointerDef.AddDstModifier>)
   - [func \(ptr \*PointerDef\) AddSrcModifier\(spec wiring.WiringSpec, modifierName string\) string](<#PointerDef.AddSrcModifier>)
-  - [func \(ptr \*PointerDef\) InstantiateDst\(namespace wiring.Namespace\) \(ir.IRNode, error\)](<#PointerDef.InstantiateDst>)
+  - [func \(ptr \*PointerDef\) InstantiateDst\(namespace wiring.Namespace\) error](<#PointerDef.InstantiateDst>)
   - [func \(ptr PointerDef\) String\(\) string](<#PointerDef.String>)
+- [type PointerOpts](<#PointerOpts>)
 
-
-<a name="Instantiate"></a>
-## func Instantiate
-
-```go
-func Instantiate(spec wiring.WiringSpec, namespace wiring.Namespace, names ...string) (nodes map[string]ir.IRNode, err error)
-```
-
-A helper function for use by Blueprint plugins. Instantiates the server\-side nodes of the specified pointer\(s\) within the provided namespace.
-
-Returns a map of the instantiated node\(s\).
-
-<a name="InstantiateClients"></a>
-## func InstantiateClients
-
-```go
-func InstantiateClients(spec wiring.WiringSpec, namespace wiring.Namespace, names ...string) (map[string]ir.IRNode, error)
-```
-
-This effectively just calls namespace.Get\(\) for the names provided. Included here for convenience
-
-<a name="InstantiateClientsFromProperty"></a>
-## func InstantiateClientsFromProperty
-
-```go
-func InstantiateClientsFromProperty(spec wiring.WiringSpec, namespace wiring.Namespace, propertyName string) (map[string]ir.IRNode, error)
-```
-
-Similar to InstantiateClients, but first consulting the propertyName property of the namespace to discover which nodes should be instantiated.
-
-<a name="InstantiateFromProperty"></a>
-## func InstantiateFromProperty
-
-```go
-func InstantiateFromProperty(spec wiring.WiringSpec, namespace wiring.Namespace, propertyName string) (map[string]ir.IRNode, error)
-```
-
-Similar to Instantiate, but first consulting the propertyName property of the namespace to discover which nodes should be instantiated.
 
 <a name="RequireUniqueness"></a>
 ## func RequireUniqueness
@@ -92,6 +53,18 @@ It requires that the specified node must be unique up to a certain granularity.
 This is independent of whether it can be addressed by any node within that granularity.
 
 The name argument should be an alias that this call will redefine.
+
+<a name="ModifierOpts"></a>
+## type ModifierOpts
+
+Additional options that can be specified when adding a modifier to a pointer. If not specified, defaults are used.
+
+```go
+type ModifierOpts struct {
+    // Defaults to true.  When true, the pointer's interface node is updated
+    IsInterfaceNode bool
+}
+```
 
 <a name="PointerDef"></a>
 ## type PointerDef
@@ -110,16 +83,14 @@ type PointerDef struct {
 ### func CreatePointer
 
 ```go
-func CreatePointer(spec wiring.WiringSpec, name string, ptrType any, dst string) *PointerDef
+func CreatePointer[SrcNodeType any](spec wiring.WiringSpec, name string, dst string, options ...PointerOpts) *PointerDef
 ```
 
-Creates a pointer called name that points to the specified node dst. ptrType is the node type of dst.
+Creates a pointer called name that points to the specified node dst. Type parameter \[SrcNodeType\] is the nodeType of the client side of the pointer.
 
-Any plugin that defines client and server nodes should typically declare a pointer to the server node. This will provide some useful functionality:
+Any plugin that defines client and server nodes should typically declare a pointer to the server node. Declaring a pointer will enable other plugins to apply client or server modifiers to the pointer. Additionally, pointers will automatically instantiate the server side of the pointer when using addresses
 
-First, declaring a pointer will enable other plugins to apply client or server modifiers to the pointer.
-
-Second, pointers provide functionality for lazily instantiating the server side of the pointer if the server is not explicitly instantiated by the wiring spec.
+Additional pointer options can be specified by providing optional PointerOpts.
 
 <a name="GetPointer"></a>
 ### func GetPointer
@@ -128,13 +99,26 @@ Second, pointers provide functionality for lazily instantiating the server side 
 func GetPointer(spec wiring.WiringSpec, name string) *PointerDef
 ```
 
-Gets the PointerDef metadata for a pointer name that was defined using CreatePointer
+Gets the PointerDef metadata for a pointer name that was defined using [CreatePointer](<#CreatePointer>)
+
+<a name="PointerDef.AddAddrModifier"></a>
+### func \(\*PointerDef\) AddAddrModifier
+
+```go
+func (ptr *PointerDef) AddAddrModifier(spec wiring.WiringSpec, addrName string) string
+```
+
+AddAddrModifier is a special case of AddDstModifier where the modifier is an address node.
+
+It immediately instantiates the address, and returns it. It defers instantiation of the server side of the address.
+
+The return value of AddAddrModifier is the name of the \_previous\_ server side modifier. This can be used within the BuildFunc of the destination \(PointsTo\) of addrName
 
 <a name="PointerDef.AddDstModifier"></a>
 ### func \(\*PointerDef\) AddDstModifier
 
 ```go
-func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName string) string
+func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName string, options ...ModifierOpts) string
 ```
 
 Appends a modifier node called modifierName to the server side modifiers of a pointer.
@@ -164,7 +148,7 @@ The return value of AddSrcModifier is the name of the \_next\_ client side modif
 ### func \(\*PointerDef\) InstantiateDst
 
 ```go
-func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) (ir.IRNode, error)
+func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) error
 ```
 
 If any pointer modifiers are addresses, this will instantiate the server side of the addresses.
@@ -179,5 +163,19 @@ func (ptr PointerDef) String() string
 ```
 
 
+
+<a name="PointerOpts"></a>
+## type PointerOpts
+
+Additional options that can be specified when creating a pointer. If not specified, defaults are used.
+
+```go
+type PointerOpts struct {
+    // If specified, applies [RequireUniqueness] to the pointer destination
+    // before creating the pointer.  Set to nil to disable.  Defaults to
+    // &ir.ApplicationNode{}
+    RequireUniqueness any
+}
+```
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)

@@ -20,12 +20,11 @@ To implement addressing, several concerns are addressed:
 ## Index
 
 - [func AssignPorts\(hostname string, nodes \[\]ir.IRNode\) error](<#AssignPorts>)
+- [func Bind\[ServerType ir.IRNode\]\(namespace wiring.Namespace, addressName string, serverNode ServerType, dst \*\*BindConfig\) error](<#Bind>)
 - [func CheckPorts\(nodes \[\]ir.IRNode\) error](<#CheckPorts>)
-- [func Define\[ServerType ir.IRNode\]\(spec wiring.WiringSpec, addressName string, pointsTo string, reachability any\)](<#Define>)
-- [func PointsTo\(namespace wiring.Namespace, addressName string\) \(string, error\)](<#PointsTo>)
+- [func Define\[ServerType ir.IRNode\]\(spec wiring.WiringSpec, addressName string, pointsTo string, opts ...AddressOpts\)](<#Define>)
 - [func ResetPorts\(nodes \[\]ir.IRNode\)](<#ResetPorts>)
 - [type Address](<#Address>)
-  - [func Bind\[ServerType ir.IRNode\]\(namespace wiring.Namespace, addressName string\) \(\*Address\[ServerType\], error\)](<#Bind>)
   - [func Dial\[ServerType ir.IRNode\]\(namespace wiring.Namespace, addressName string\) \(\*Address\[ServerType\], error\)](<#Dial>)
   - [func \(addr \*Address\[ServerType\]\) GetDestination\(\) ir.IRNode](<#Address[ServerType].GetDestination>)
   - [func \(addr \*Address\[ServerType\]\) ImplementsAddressNode\(\)](<#Address[ServerType].ImplementsAddressNode>)
@@ -33,6 +32,9 @@ To implement addressing, several concerns are addressed:
   - [func \(addr \*Address\[ServerType\]\) Name\(\) string](<#Address[ServerType].Name>)
   - [func \(addr \*Address\[ServerType\]\) SetDestination\(node ir.IRNode\) error](<#Address[ServerType].SetDestination>)
   - [func \(addr \*Address\[ServerType\]\) String\(\) string](<#Address[ServerType].String>)
+- [type AddressDef](<#AddressDef>)
+  - [func GetAddress\(spec wiring.WiringSpec, name string\) \*AddressDef](<#GetAddress>)
+- [type AddressOpts](<#AddressOpts>)
 - [type BindConfig](<#BindConfig>)
   - [func \(conf \*BindConfig\) ImplementsBindConfig\(\)](<#BindConfig.ImplementsBindConfig>)
 - [type DialConfig](<#DialConfig>)
@@ -57,6 +59,21 @@ Ports will be assigned either ascending from port 2000, or ascending from a node
 
 After calling this method, any provided [BindConfig](<#BindConfig>) IR nodes will have their hostname and port set.
 
+<a name="Bind"></a>
+## func Bind
+
+```go
+func Bind[ServerType ir.IRNode](namespace wiring.Namespace, addressName string, serverNode ServerType, dst **BindConfig) error
+```
+
+Gets the [BindConfig](<#BindConfig>) configuration node of addressName from the namespace and places it in dst
+
+This method is intended for use by other Blueprint plugins within their own BuildFuncs.
+
+This is a convenience method for use when only the bind address is needed. It is equivalent to getting addressName directly from namespace and then reading then \[Address.Bind\] field.
+
+In addition to setting the [BindConfig](<#BindConfig>) node in dst, this call sets the destination of the address to be serverNode
+
 <a name="CheckPorts"></a>
 ## func CheckPorts
 
@@ -70,7 +87,7 @@ Returns an error if there are [BindConfig](<#BindConfig>) nodes in the provided 
 ## func Define
 
 ```go
-func Define[ServerType ir.IRNode](spec wiring.WiringSpec, addressName string, pointsTo string, reachability any)
+func Define[ServerType ir.IRNode](spec wiring.WiringSpec, addressName string, pointsTo string, opts ...AddressOpts)
 ```
 
 Defines an address called addressName whose server\-side node has name pointsTo.
@@ -79,18 +96,7 @@ This method is primarily intended for use by other Blueprint plugins.
 
 The type parameter ServerType should correspond to the node type of pointsTo.
 
-Reachability of an address defines how far up the parent namespaces the address should exist and be reachable. By default most addresses will want to use ir.ApplicationNode as the reachability to indicate that the address can be reached by any node anywhere in the application.
-
-<a name="PointsTo"></a>
-## func PointsTo
-
-```go
-func PointsTo(namespace wiring.Namespace, addressName string) (string, error)
-```
-
-Returns the value of pointsTo that was provided when addressName was defined.
-
-Used by the pointer plugin.
+By default the address is reachable application wide. [AddressOpts](<#AddressOpts>) can be optionally provided to further configure the address.
 
 <a name="ResetPorts"></a>
 ## func ResetPorts
@@ -118,19 +124,6 @@ type Address[ServerType ir.IRNode] struct {
     Dial     *DialConfig // Configuration value for the dial address
 }
 ```
-
-<a name="Bind"></a>
-### func Bind
-
-```go
-func Bind[ServerType ir.IRNode](namespace wiring.Namespace, addressName string) (*Address[ServerType], error)
-```
-
-Gets the [BindConfig](<#BindConfig>) configuration node of addressName from the namespace.
-
-This method is intended for use by other Blueprint plugins within their own BuildFuncs.
-
-This is a convenience method for use when only the dial address is needed. It is equivalent to getting addressName directly from namespace and then reading then \[Address.Bind\] field.
 
 <a name="Dial"></a>
 ### func Dial
@@ -198,6 +191,43 @@ func (addr *Address[ServerType]) String() string
 ```
 
 
+
+<a name="AddressDef"></a>
+## type AddressDef
+
+
+
+```go
+type AddressDef struct {
+    Name       string
+    PointsTo   string
+    ServerType any
+}
+```
+
+<a name="GetAddress"></a>
+### func GetAddress
+
+```go
+func GetAddress(spec wiring.WiringSpec, name string) *AddressDef
+```
+
+Gets the AddressDef metadata for an address that was defined using [Define](<#Define>)
+
+<a name="AddressOpts"></a>
+## type AddressOpts
+
+Additional optional options for use when defining an address
+
+```go
+type AddressOpts struct {
+    // Defines the nodes that can reach this address.  If left unspecified, an address
+    // will be reachable application-wide (ie, Reachability uses the value &ir.ApplicationNode{}).
+    // Plugins can restrict an address's reachability by specifying a more restrictive node type,
+    // e.g. to restrict an address to only being reachable by nodes within the same container or machine.
+    Reachability any
+}
+```
 
 <a name="BindConfig"></a>
 ## type BindConfig

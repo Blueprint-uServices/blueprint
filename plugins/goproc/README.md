@@ -8,14 +8,16 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 
 ## Index
 
-- [func AddChildToProcess\(spec wiring.WiringSpec, procName, childName string\)](<#AddChildToProcess>)
+- [func AddToProcess\(spec wiring.WiringSpec, procName, childName string\)](<#AddToProcess>)
 - [func CreateClientProcess\(spec wiring.WiringSpec, procName string, children ...string\) string](<#CreateClientProcess>)
 - [func CreateProcess\(spec wiring.WiringSpec, procName string, children ...string\) string](<#CreateProcess>)
+- [func Deploy\(spec wiring.WiringSpec, serviceName string\) string](<#Deploy>)
 - [func RegisterAsDefaultBuilder\(\)](<#RegisterAsDefaultBuilder>)
+- [type GolangProcessNamespace](<#GolangProcessNamespace>)
+  - [func \(proc \*GolangProcessNamespace\) Accepts\(nodeType any\) bool](<#GolangProcessNamespace.Accepts>)
+  - [func \(proc \*GolangProcessNamespace\) AddEdge\(name string, edge ir.IRNode\) error](<#GolangProcessNamespace.AddEdge>)
+  - [func \(proc \*GolangProcessNamespace\) AddNode\(name string, node ir.IRNode\) error](<#GolangProcessNamespace.AddNode>)
 - [type Process](<#Process>)
-  - [func \(proc \*Process\) Accepts\(nodeType any\) bool](<#Process.Accepts>)
-  - [func \(proc \*Process\) AddEdge\(name string, edge ir.IRNode\) error](<#Process.AddEdge>)
-  - [func \(proc \*Process\) AddNode\(name string, node ir.IRNode\) error](<#Process.AddNode>)
   - [func \(node \*Process\) AddProcessArtifacts\(builder linux.ProcessWorkspace\) error](<#Process.AddProcessArtifacts>)
   - [func \(node \*Process\) AddProcessInstance\(builder linux.ProcessWorkspace\) error](<#Process.AddProcessInstance>)
   - [func \(node \*Process\) GenerateArtifacts\(workspaceDir string\) error](<#Process.GenerateArtifacts>)
@@ -24,11 +26,11 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
   - [func \(proc \*Process\) String\(\) string](<#Process.String>)
 
 
-<a name="AddChildToProcess"></a>
-## func AddChildToProcess
+<a name="AddToProcess"></a>
+## func AddToProcess
 
 ```go
-func AddChildToProcess(spec wiring.WiringSpec, procName, childName string)
+func AddToProcess(spec wiring.WiringSpec, procName, childName string)
 ```
 
 Adds a child node to an existing process
@@ -49,7 +51,16 @@ Creates a process that contains clients to the specified children. This is for c
 func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) string
 ```
 
-Adds a process that explicitly instantiates all of the children provided. The process will also implicitly instantiate any of the dependencies of the children
+Creates a process with a given name, and adds the provided nodes as children. This method is only needed when creating processes with more than one child node; otherwise it is easier to use [Deploy](<#Deploy>)
+
+<a name="Deploy"></a>
+## func Deploy
+
+```go
+func Deploy(spec wiring.WiringSpec, serviceName string) string
+```
+
+Wraps serviceName with a modifier that deploys the service inside a Golang process
 
 <a name="RegisterAsDefaultBuilder"></a>
 ## func RegisterAsDefaultBuilder
@@ -59,6 +70,44 @@ func RegisterAsDefaultBuilder()
 ```
 
 
+
+<a name="GolangProcessNamespace"></a>
+## type GolangProcessNamespace
+
+A \[wiring.NamespaceHandler\] used to build [Process](<#Process>) IRNodes
+
+```go
+type GolangProcessNamespace struct {
+    *Process
+}
+```
+
+<a name="GolangProcessNamespace.Accepts"></a>
+### func \(\*GolangProcessNamespace\) Accepts
+
+```go
+func (proc *GolangProcessNamespace) Accepts(nodeType any) bool
+```
+
+Implements \[wiring.NamespaceHandler\]
+
+<a name="GolangProcessNamespace.AddEdge"></a>
+### func \(\*GolangProcessNamespace\) AddEdge
+
+```go
+func (proc *GolangProcessNamespace) AddEdge(name string, edge ir.IRNode) error
+```
+
+Implements \[wiring.NamespaceHandler\]
+
+<a name="GolangProcessNamespace.AddNode"></a>
+### func \(\*GolangProcessNamespace\) AddNode
+
+```go
+func (proc *GolangProcessNamespace) AddNode(name string, node ir.IRNode) error
+```
+
+Implements \[wiring.NamespaceHandler\]
 
 <a name="Process"></a>
 ## type Process
@@ -75,33 +124,6 @@ type Process struct {
     // contains filtered or unexported fields
 }
 ```
-
-<a name="Process.Accepts"></a>
-### func \(\*Process\) Accepts
-
-```go
-func (proc *Process) Accepts(nodeType any) bool
-```
-
-Implements NamespaceHandler
-
-<a name="Process.AddEdge"></a>
-### func \(\*Process\) AddEdge
-
-```go
-func (proc *Process) AddEdge(name string, edge ir.IRNode) error
-```
-
-Implements NamespaceHandler
-
-<a name="Process.AddNode"></a>
-### func \(\*Process\) AddNode
-
-```go
-func (proc *Process) AddNode(name string, node ir.IRNode) error
-```
-
-Implements NamespaceHandler
 
 <a name="Process.AddProcessArtifacts"></a>
 ### func \(\*Process\) AddProcessArtifacts
