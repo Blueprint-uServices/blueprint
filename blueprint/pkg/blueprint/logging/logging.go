@@ -15,7 +15,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"strings"
 
 	"golang.org/x/exp/slog"
@@ -31,6 +30,21 @@ type blueprintLoggerHandler struct {
 
 type blueprintLoggerHandlerOptions struct {
 	SlogOpts slog.HandlerOptions
+}
+
+var ignore = make(map[string]struct{})
+
+func init() {
+	funcNames := []string{
+		"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring.(*namespaceimpl).Info",
+		"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring.(*namespaceimpl).Warn",
+		"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring.(*namespaceimpl).Error",
+		"golang.org/x/exp/slog.Info",
+		"golang.org/x/exp/slog.(*Logger).log",
+	}
+	for _, funcName := range funcNames {
+		ignore[funcName] = struct{}{}
+	}
 }
 
 // Implementation of a slog logger
@@ -54,10 +68,23 @@ func (h *blueprintLoggerHandler) Handle(ctx context.Context, r slog.Record) erro
 		return err
 	}
 
-	fs := runtime.CallersFrames([]uintptr{r.PC})
-	f, _ := fs.Next()
-	info := getSourceFileInfo(f.File)
-	source_str := "[" + info.WorkspaceFilename + ":" + strconv.Itoa(f.Line) + "]"
+	// fs := runtime.CallersFrames([]uintptr{r.PC})
+	// f, _ := fs.Next()
+	// info := getSourceFileInfo(f.File)
+	// if info.WorkspaceFilename == filepath.Join("blueprint", "pkg", "wiring", "namespace.go") {
+	// 	f, _ = fs.Next()
+	// }
+	// source_str := fmt.Sprintf("[%v:%v]", info.WorkspaceFilename, f.Line)
+	cs := GetCallstack()
+	frameNumber := 0
+	for ; frameNumber < len(cs.Stack)-1; frameNumber++ {
+		if _, ignoreFunc := ignore[cs.Stack[frameNumber].FuncName]; !ignoreFunc {
+			break
+		}
+	}
+
+	f := cs.Stack[frameNumber]
+	source_str := fmt.Sprintf("[%v:%v]", f.Source.WorkspaceFilename, f.LineNumber)
 
 	if len(fields) != 0 {
 		h.l.Println(timeStr, source_str, level, r.Message, string(b))

@@ -35,10 +35,9 @@ func (r *RedisInterface) GetMethods() []service.Method {
 	return r.Wrapped.GetMethods()
 }
 
-func newRedisContainer(name string, addr *address.BindConfig) (*RedisContainer, error) {
+func newRedisContainer(name string) (*RedisContainer, error) {
 	proc := &RedisContainer{}
 	proc.InstanceName = name
-	proc.BindAddr = addr
 	err := proc.init(name)
 	if err != nil {
 		return nil, err

@@ -1,6 +1,7 @@
 package ir
 
 import (
+	"sort"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
@@ -61,16 +62,18 @@ func PrettyPrintNamespace(instanceName string, namespaceType string, argNodes []
 	b.WriteString(" = ")
 	b.WriteString(namespaceType)
 	b.WriteString("(")
-	var args []string
+	var args sort.StringSlice
 	for _, arg := range argNodes {
 		args = append(args, arg.Name())
 	}
+	args.Sort()
 	b.WriteString(strings.Join(args, ", "))
 	b.WriteString(") {\n")
-	var children []string
+	var children sort.StringSlice
 	for _, child := range childNodes {
 		children = append(children, child.String())
 	}
+	children.Sort()
 	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
 	b.WriteString("\n}")
 	return b.String()

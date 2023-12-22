@@ -26,9 +26,10 @@
 package gotests
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/namespaceutil"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 )
 
 var prop_SERVICESTOTEST = "Services"
@@ -54,19 +55,54 @@ func Test(spec wiring.WiringSpec, servicesToTest ...string) string {
 
 	name := "gotests"
 
-	// The output gotests package can include tests for multiple services
 	for _, serviceName := range servicesToTest {
 		spec.AddProperty(name, prop_SERVICESTOTEST, serviceName)
 	}
 
-	// Might redefine gotests multiple times; no big deal
 	spec.Define(name, &testLibrary{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		lib := newTestLibrary(name)
-		libNamespace := wiring.CreateNamespace(spec, namespace, lib)
-		var err error
-		lib.ServicesToTest, err = pointer.InstantiateClientsFromProperty(spec, libNamespace, prop_SERVICESTOTEST)
+		libNamespace, err := namespaceutil.InstantiateNamespace(namespace, &gotests{lib})
+		if err != nil {
+			return nil, err
+		}
+
+		var servicesToTest []string
+		if err := namespace.GetProperties(name, prop_SERVICESTOTEST, &servicesToTest); err != nil {
+			return nil, err
+		}
+
+		for _, serviceName := range servicesToTest {
+			var service ir.IRNode
+			if err := libNamespace.Get(serviceName, &service); err != nil {
+				return nil, err
+			}
+			lib.ServicesToTest[serviceName] = service
+		}
 		return lib, err
 	})
 
 	return name
+}
+
+// A [wiring.NamespaceHandler] used to build the test library
+type gotests struct {
+	*testLibrary
+}
+
+// Implements [wiring.NamespaceHandler]
+func (*gotests) Accepts(nodeType any) bool {
+	_, isGolangNode := nodeType.(golang.Node)
+	return isGolangNode
+}
+
+// Implements [wiring.NamespaceHandler]
+func (lib *gotests) AddEdge(name string, edge ir.IRNode) error {
+	lib.Edges = append(lib.Edges, edge)
+	return nil
+}
+
+// Implements [wiring.NamespaceHandler]
+func (lib *gotests) AddNode(name string, node ir.IRNode) error {
+	lib.Nodes = append(lib.Nodes, node)
+	return nil
 }

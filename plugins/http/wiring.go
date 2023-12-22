@@ -2,8 +2,8 @@
 
 // To use the plugin in a Blueprint wiring spec, import this package and use the [Deploy] method, i.e.
 //
-//   import "gitlab.mpi-sws.org/cld/blueprint/plugins/http"
-//   http.Deploy(spec, "my_service")
+//	import "gitlab.mpi-sws.org/cld/blueprint/plugins/http"
+//	http.Deploy(spec, "my_service")
 //
 // See the documentation for [Deploy] for more information about its behavior.
 //
@@ -45,10 +45,14 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 		slog.Error("Unable to deploy " + serviceName + " using HTTP as it not a pointer")
 	}
 
-	// Add the client wrapper to the pointer src
-	clientNext := ptr.AddSrcModifier(spec, httpClient)
+	// Define the address that will be used by clients and the server
+	address.Define[*golangHttpServer](spec, httpAddr, httpServer)
 
-	// Define the client wrapper
+	// Add the client-side modifier
+	//
+	// The client-side modifier creates an HTTP client and dials the server address.
+	// It assumes that the next src modifier node will be a golangHttpServer address.
+	clientNext := ptr.AddSrcModifier(spec, httpClient)
 	spec.Define(httpClient, &GolangHttpClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*golangHttpServer](ns, clientNext)
 		if err != nil {
@@ -57,25 +61,20 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 		return newGolangHttpClient(httpClient, addr)
 	})
 
-	// Add the server wrapper to the pointer dst
-	serverNext := ptr.AddDstModifier(spec, httpServer)
-
-	// Define the server
+	// Add the server-side modifier, which is an address that PointsTo the grpcServer
+	serverNext := ptr.AddAddrModifier(spec, httpAddr)
 	spec.Define(httpServer, &golangHttpServer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
-		addr, err := address.Bind[*golangHttpServer](ns, httpAddr)
-		if err != nil {
-			return nil, blueprint.Errorf("HTTP server %s expected %s to be an address, but encountered %s", httpServer, httpAddr, err)
-		}
-
 		var wrapped golang.Service
 		if err := ns.Get(serverNext, &wrapped); err != nil {
 			return nil, blueprint.Errorf("HTTP server %s expected %s to be a golang.Service, but encountered %s", httpServer, serverNext, err)
 		}
 
-		return newGolangHttpServer(httpServer, addr, wrapped)
-	})
+		server, err := newGolangHttpServer(httpServer, wrapped)
+		if err != nil {
+			return nil, err
+		}
 
-	// Define the address and add it to the pointer dst
-	address.Define[*golangHttpServer](spec, httpAddr, httpServer, &ir.ApplicationNode{})
-	ptr.AddDstModifier(spec, httpAddr)
+		err = address.Bind[*golangHttpServer](ns, httpAddr, server, &server.Bind)
+		return server, err
+	})
 }

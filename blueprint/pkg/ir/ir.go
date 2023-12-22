@@ -5,12 +5,6 @@
 // spec using methods from the wiring package and from wiring extensions provided by plugins.
 package ir
 
-import (
-	"strings"
-
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
-)
-
 // All nodes implement the IRNode interface
 type IRNode interface {
 	Name() string
@@ -81,16 +75,7 @@ func (node *ApplicationNode) Name() string {
 
 // Print the IR graph
 func (node *ApplicationNode) String() string {
-	var b strings.Builder
-	b.WriteString(node.ApplicationName)
-	b.WriteString(" = BlueprintApplication() {\n")
-	var children []string
-	for _, node := range node.Children {
-		children = append(children, node.String())
-	}
-	b.WriteString(stringutil.Indent(strings.Join(children, "\n"), 2))
-	b.WriteString("\n}")
-	return b.String()
+	return PrettyPrintNamespace(node.ApplicationName, "BlueprintApplication", nil, node.Children)
 }
 
 func (app *ApplicationNode) GenerateArtifacts(dir string) error {

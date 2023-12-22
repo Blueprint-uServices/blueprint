@@ -21,7 +21,7 @@ type golangThriftServer struct {
 	golang.Instantiable
 
 	InstanceName string
-	Addr         *address.Address[*golangThriftServer]
+	Bind         *address.BindConfig
 	Wrapped      golang.Service
 
 	outputPackage string
@@ -40,17 +40,16 @@ func (thrift *ThriftInterface) GetMethods() []service.Method {
 	return thrift.Wrapped.GetMethods()
 }
 
-func newGolangThriftServer(name string, addr *address.Address[*golangThriftServer], service golang.Service) (*golangThriftServer, error) {
+func newGolangThriftServer(name string, service golang.Service) (*golangThriftServer, error) {
 	node := &golangThriftServer{}
 	node.InstanceName = name
-	node.Addr = addr
 	node.Wrapped = service
 	node.outputPackage = "thrift"
 	return node, nil
 }
 
 func (n *golangThriftServer) String() string {
-	return n.InstanceName + " = ThriftServer(" + n.Wrapped.Name() + ", " + n.Addr.Bind.Name() + ")"
+	return n.InstanceName + " = ThriftServer(" + n.Wrapped.Name() + ", " + n.Bind.Name() + ")"
 }
 
 func (n *golangThriftServer) Name() string {
@@ -103,7 +102,7 @@ func (node *golangThriftServer) AddInstantiation(builder golang.NamespaceBuilder
 	}
 
 	slog.Info(fmt.Sprintf("Instantiating ThriftServer %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
-	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, node.Addr.Bind})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, node.Bind})
 }
 
 func (node *golangThriftServer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {

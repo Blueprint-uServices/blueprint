@@ -49,9 +49,23 @@ type Namespace interface {
 	// Puts a node into this namespace
 	Put(name string, node ir.IRNode) error
 
+	// Creates and returns a child namespace within this namespaces.
+	// handler will be used to determine what nodes can be built in the child namespace, and
+	// handler's callbacks will be invoked when nodes get created within the child namespace.
+	//
+	// Subsequently, the namespace can be retrieved with GetNamespace
+	//
+	// Returns an error if the namespace has already been created
+	DeriveNamespace(name string, handler NamespaceHandler) (Namespace, error)
+
+	// Returns the child namespace with the given name.  The child namespace must have been created in this
+	// namespace, using DeriveNamespace, otherwise an error will be returned.
+	GetNamespace(name string) (Namespace, error)
+
 	// Enqueue a function to be executed after all currently-queued functions have finished executing.
 	// Most plugins should not need to use this.
-	Defer(f func() error)
+	// [DeferOpts] can be optionally specified.
+	Defer(f func() error, options ...DeferOpts)
 
 	// Log an info-level message
 	Info(message string, args ...any)
@@ -61,6 +75,16 @@ type Namespace interface {
 
 	// Log an error-level message
 	Error(message string, args ...any) error
+}
+
+// Options for deferred functions provided with [Namespace.Defer]
+type DeferOpts struct {
+	// Defaults to false. If set to true, pushes the deferred function to the front of the queue instead of the back.
+	Front bool
+}
+
+var defaultDeferOpts = DeferOpts{
+	Front: false,
 }
 
 // namespaceimpl is a base implementation of a [Namespace] that provides implementations of most methods.
@@ -80,6 +104,7 @@ type namespaceimpl struct {
 	Seen            map[string]ir.IRNode // Cache of built nodes
 	Added           map[string]any       // Nodes that have been passed to the handler
 	Deferred        []func() error       // Deferred functions to execute
+	ChildNamespaces map[string]Namespace // Child namespaces
 
 	stack []*WiringDef // Used when building; the stack of wiring defs currently being built
 }
@@ -101,48 +126,6 @@ type NamespaceHandler interface {
 	// After a node has been built in this namespace, AddNode will be called
 	// to enable the handler to save the built node.
 	AddNode(string, ir.IRNode) error
-}
-
-// An IRNamespace is an IRNode that also implements [NamespaceHandler].  Plugins that
-// implement IRNamespace can make use of [CreateNamespace] which is an easy way of deriving
-// child namespaces.
-type IRNamespace interface {
-	ir.IRNode
-	NamespaceHandler
-}
-
-// Creates a child namespace from the provided parent namespace.
-//
-// The namespaceNode argument is an IRNode that also implements the [NamespaceHandler] interface,
-// which enables it to (a) specify the compatible node types for the new namespace; (b) receive
-// created instances of nodes; and (c) receive edge nodes that come from the parent namespace
-//
-// Most Blueprint plugins that implement custom namespaces will want to use this method to create
-// their namespace.
-func CreateNamespace(spec WiringSpec, parent Namespace, namespaceNode IRNamespace) *namespaceimpl {
-	name := namespaceNode.Name()
-	namespacetype := reflect.TypeOf(namespaceNode).Elem().Name()
-	return CreateNamespaceWithHandler(spec, parent, name, namespacetype, namespaceNode)
-}
-
-// Creates a child namespace from the provided parent namespace.
-//
-// To create a namespace with this method, the caller provides a [NamespaceHandler] that
-// handles the logic for which nodes should be created within the namespace, and callbacks for
-// saving created nodes and argument nodes.
-//
-// Most plugins will probably prefer to use the simpler [CreateNamespace] func to create
-// namespaces
-func CreateNamespaceWithHandler(spec WiringSpec, parent Namespace, name, namespacetype string, handler NamespaceHandler) *namespaceimpl {
-	return &namespaceimpl{
-		NamespaceName:   name,
-		NamespaceType:   namespacetype,
-		ParentNamespace: parent,
-		Wiring:          spec,
-		Handler:         handler,
-		Seen:            make(map[string]ir.IRNode),
-		Added:           make(map[string]any),
-	}
 }
 
 // Implements [Namespace]
@@ -214,8 +197,8 @@ func (namespace *namespaceimpl) get(name string, addEdge bool, dst any) error {
 			return err
 		}
 		if _, already_added := namespace.Added[node.Name()]; !already_added {
-			if _, is_metadata := node.(ir.IRMetadata); !is_metadata && addEdge {
-				// Don't bother adding edges for metadata
+			if _, is_metadata := node.(ir.IRMetadata); !is_metadata && addEdge && !def.Options.ProxyNode {
+				// Don't bother adding edges for metadata or proxy nodes, or instantiate (vs get) nodes
 				namespace.Handler.AddEdge(name, node)
 			}
 			namespace.Added[node.Name()] = true
@@ -238,7 +221,9 @@ func (namespace *namespaceimpl) get(name string, addEdge bool, dst any) error {
 	}
 
 	if _, already_added := namespace.Added[node.Name()]; !already_added {
-		namespace.Handler.AddNode(name, node)
+		if !def.Options.ProxyNode {
+			namespace.Handler.AddNode(name, node)
+		}
 		namespace.Added[node.Name()] = true
 	}
 	namespace.Info("Finished building %s of type %s", name, reflect.TypeOf(node).String())
@@ -270,11 +255,19 @@ func (namespace *namespaceimpl) Put(name string, node ir.IRNode) error {
 }
 
 // Implements [Namespace]
-func (namespace *namespaceimpl) Defer(f func() error) {
+func (namespace *namespaceimpl) Defer(f func() error, options ...DeferOpts) {
+	opts := defaultDeferOpts
+	if len(options) > 0 {
+		opts = options[0]
+	}
 	if namespace.ParentNamespace == nil {
-		namespace.Deferred = append(namespace.Deferred, f)
+		if opts.Front {
+			namespace.Deferred = append([]func() error{f}, namespace.Deferred...)
+		} else {
+			namespace.Deferred = append(namespace.Deferred, f)
+		}
 	} else {
-		namespace.ParentNamespace.Defer(f)
+		namespace.ParentNamespace.Defer(f, options...)
 	}
 }
 
@@ -294,6 +287,35 @@ func (namespace *namespaceimpl) GetProperties(name string, key string, dst any) 
 		return err
 	}
 	return def.GetProperties(key, dst)
+}
+
+// Implements [Namespace]
+func (namespace *namespaceimpl) DeriveNamespace(name string, handler NamespaceHandler) (Namespace, error) {
+	if _, exists := namespace.ChildNamespaces[name]; exists {
+		return nil, namespace.Error("attempt to create child namespace %v that already exists", name)
+	}
+
+	child := &namespaceimpl{
+		NamespaceName:   name,
+		NamespaceType:   reflect.TypeOf(handler).Elem().Name(),
+		ParentNamespace: namespace,
+		Wiring:          namespace.Wiring,
+		Handler:         handler,
+		Seen:            make(map[string]ir.IRNode),
+		Added:           make(map[string]any),
+		ChildNamespaces: make(map[string]Namespace),
+	}
+	namespace.ChildNamespaces[name] = child
+	namespace.Info("Created child namespace %v", name)
+	return child, nil
+}
+
+// Implements [Namespace]
+func (namespace *namespaceimpl) GetNamespace(name string) (Namespace, error) {
+	if child, exists := namespace.ChildNamespaces[name]; exists {
+		return child, nil
+	}
+	return nil, namespace.Error("child namespace %v does not exist", name)
 }
 
 // Implements [Namespace]

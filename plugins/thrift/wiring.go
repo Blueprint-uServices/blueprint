@@ -2,8 +2,8 @@
 //
 // To use the plugin in a Blueprint wiring spec, import this package and use the [Deploy] method, i.e.
 //
-//  import "gitlab.mpi-sws.org/cld/blueprint/plugins/thrift"
-//  thrift.Deploy(spec, "my_service")
+//	import "gitlab.mpi-sws.org/cld/blueprint/plugins/thrift"
+//	thrift.Deploy(spec, "my_service")
 //
 // See the documentation for [Deploy] for more information about its behavior.
 //
@@ -39,18 +39,26 @@ import (
 // Deploying a service with Thrift increases the visibility of the service within the application.
 // By default, any other service running in any other container or namespace can now contact this service.
 func Deploy(spec wiring.WiringSpec, serviceName string) {
+	// The nodes that we are defining
 	thrift_client := serviceName + ".thrift_client"
 	thrift_server := serviceName + ".thrift_server"
 	thrift_addr := serviceName + ".thrift.addr"
 
+	// Get the pointer metadata
 	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {
 		slog.Error("Unable to deploy " + serviceName + " using Thrift as it is not a pointer")
 		return
 	}
 
-	clientNext := ptr.AddSrcModifier(spec, thrift_client)
+	// Define the address that will be used by clients and the server
+	address.Define[*golangThriftServer](spec, thrift_addr, thrift_server)
 
+	// Add the client-side modifier
+	//
+	// The client-side modifier creates a Thrift client and dials the server address.
+	// It assumes the next src modifier node will be a golangThriftServer address.
+	clientNext := ptr.AddSrcModifier(spec, thrift_client)
 	spec.Define(thrift_client, &golangThriftClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*golangThriftServer](namespace, clientNext)
 		if err != nil {
@@ -59,22 +67,20 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 		return newGolangThriftClient(thrift_client, addr)
 	})
 
-	serverNext := ptr.AddDstModifier(spec, thrift_server)
-
+	// Add the server-side modifier, which is an address that PointsTo the grpcServer
+	serverNext := ptr.AddAddrModifier(spec, thrift_addr)
 	spec.Define(thrift_server, &golangThriftServer{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		addr, err := address.Bind[*golangThriftServer](namespace, thrift_addr)
-		if err != nil {
-			return nil, blueprint.Errorf("Thrift server %s expected %s to be an address, but encountered %s", thrift_server, thrift_addr, err)
-		}
-
 		var wrapped golang.Service
 		if err := namespace.Get(serverNext, &wrapped); err != nil {
-			return nil, blueprint.Errorf("Thrift server %s expected %s to be a golang.Service, but encountered %s", thrift_server, serverNext, err)
+			return nil, err
 		}
 
-		return newGolangThriftServer(thrift_server, addr, wrapped)
-	})
+		server, err := newGolangThriftServer(thrift_server, wrapped)
+		if err != nil {
+			return nil, err
+		}
 
-	address.Define[*golangThriftServer](spec, thrift_addr, thrift_server, &ir.ApplicationNode{})
-	ptr.AddDstModifier(spec, thrift_addr)
+		err = address.Bind[*golangThriftServer](namespace, thrift_addr, server, &server.Bind)
+		return server, err
+	})
 }

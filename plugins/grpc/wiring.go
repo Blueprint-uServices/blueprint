@@ -56,39 +56,37 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 		return
 	}
 
-	// Add the client wrapper to the pointer src
-	clientNext := ptr.AddSrcModifier(spec, grpcClient)
+	// Define the address that will be used by clients and the server
+	address.Define[*golangServer](spec, grpcAddr, grpcServer)
 
-	// Define the client wrapper
+	// Add the client-side modifier
+	//
+	// The client-side modifier creates a gRPC client and dials the server address.
+	// It assumes the next src modifier node will be a golangServer address.
+	clientNext := ptr.AddSrcModifier(spec, grpcClient)
 	spec.Define(grpcClient, &golangClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*golangServer](namespace, clientNext)
 		if err != nil {
 			return nil, blueprint.Errorf("GRPC client %s expected %s to be an address, but encountered %s", grpcClient, clientNext, err)
 		}
-
 		return newGolangClient(grpcClient, addr)
 	})
 
-	// Add the server wrapper to the pointer dst
-	serverNext := ptr.AddDstModifier(spec, grpcServer)
-
-	// Define the server
+	// Add the server-side modifier, which is an address that PointsTo the grpcServer
+	serverNext := ptr.AddAddrModifier(spec, grpcAddr)
 	spec.Define(grpcServer, &golangServer{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		addr, err := address.Bind[*golangServer](namespace, grpcAddr)
-		if err != nil {
-			return nil, blueprint.Errorf("GRPC server %s expected %s to be an address, but encountered %s", grpcServer, grpcAddr, err)
-		}
-
 		var wrapped golang.Service
 		if err := namespace.Get(serverNext, &wrapped); err != nil {
 			return nil, blueprint.Errorf("GRPC server %s expected %s to be a golang.Service, but encountered %s", grpcServer, serverNext, err)
 		}
 
-		return newGolangServer(grpcServer, addr, wrapped)
+		server, err := newGolangServer(grpcServer, wrapped)
+		if err != nil {
+			return nil, err
+		}
+
+		err = address.Bind[*golangServer](namespace, grpcAddr, server, &server.Bind)
+		server.Bind.PreferredPort = 12345
+		return server, err
 	})
-
-	// Define the address and add it to the pointer dst
-	address.Define[*golangServer](spec, grpcAddr, grpcServer, &ir.ApplicationNode{})
-	ptr.AddDstModifier(spec, grpcAddr)
-
 }

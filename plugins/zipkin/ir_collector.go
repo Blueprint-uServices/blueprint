@@ -32,10 +32,9 @@ func (j *ZipkinInterface) GetMethods() []service.Method {
 	return j.Wrapped.GetMethods()
 }
 
-func newZipkinCollectorContainer(name string, addr *address.BindConfig) (*ZipkinCollectorContainer, error) {
+func newZipkinCollectorContainer(name string) (*ZipkinCollectorContainer, error) {
 	collector := &ZipkinCollectorContainer{
 		CollectorName: name,
-		BindAddr:      addr,
 	}
 	err := collector.init(name)
 	if err != nil {

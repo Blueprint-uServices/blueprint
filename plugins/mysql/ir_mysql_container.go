@@ -36,11 +36,10 @@ func (m *MySQLInterface) GetMethods() []service.Method {
 	return m.Wrapped.GetMethods()
 }
 
-func newMySQLDBContainer(name string, addr *address.BindConfig, username string, password string) (*MySQLDBContainer, error) {
+func newMySQLDBContainer(name, root_password string) (*MySQLDBContainer, error) {
 	cntr := &MySQLDBContainer{}
 	cntr.InstanceName = name
-	cntr.BindAddr = addr
-	cntr.password = password
+	cntr.password = root_password
 	err := cntr.init(name)
 	if err != nil {
 		return nil, err

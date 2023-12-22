@@ -59,7 +59,7 @@ func makeGrpcSpec(spec wiring.WiringSpec) ([]string, error) {
 
 	// Deploy queue master to the same process as the shipping proc
 	queue_master := workflow.Service(spec, "queue_master", "QueueMaster", shipqueue, shipping_service)
-	goproc.AddChildToProcess(spec, shipping_proc, queue_master)
+	goproc.AddToProcess(spec, shipping_proc, queue_master)
 
 	order_db := simple.NoSQLDB(spec, "order_db")
 	order_service := workflow.Service(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)

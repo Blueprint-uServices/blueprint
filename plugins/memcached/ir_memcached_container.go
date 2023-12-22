@@ -35,10 +35,9 @@ func (m *MemcachedInterface) GetMethods() []service.Method {
 	return m.Wrapped.GetMethods()
 }
 
-func newMemcachedContainer(name string, addr *address.BindConfig) (*MemcachedContainer, error) {
+func newMemcachedContainer(name string) (*MemcachedContainer, error) {
 	proc := &MemcachedContainer{}
 	proc.InstanceName = name
-	proc.BindAddr = addr
 	err := proc.init(name)
 	if err != nil {
 		return nil, err

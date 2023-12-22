@@ -28,42 +28,25 @@ type testLibrary struct {
 
 func newTestLibrary(name string) *testLibrary {
 	node := &testLibrary{
-		LibraryName: name,
-		ModuleName:  "blueprint/testclients",
+		LibraryName:    name,
+		ModuleName:     "blueprint/testclients",
+		ServicesToTest: make(map[string]ir.IRNode),
 	}
 	return node
 }
 
-// Implements ir.IRNode
+// Implements [ir.IRNode]
 func (lib *testLibrary) Name() string {
 	return lib.LibraryName
 }
 
-// Implements ir.IRNode
+// Implements [ir.IRNode]
 func (lib *testLibrary) String() string {
 	return ir.PrettyPrintNamespace(lib.LibraryName, "GolangTests", lib.Edges, lib.Nodes)
 }
 
-// Implements NamespaceHandler
-func (*testLibrary) Accepts(nodeType any) bool {
-	_, isGolangNode := nodeType.(golang.Node)
-	return isGolangNode
-}
-
-// Implements NamespaceHandler
-func (lib *testLibrary) AddEdge(name string, edge ir.IRNode) error {
-	lib.Edges = append(lib.Edges, edge)
-	return nil
-}
-
-// Implements NamespaceHandler
-func (lib *testLibrary) AddNode(name string, node ir.IRNode) error {
-	lib.Nodes = append(lib.Nodes, node)
-	return nil
-}
-
 /*
-Implements ir.ArtifactGenerator
+Implements [ir.ArtifactGenerator]
 
 Generates a golang workspace to a directory on the local filesystem.
 

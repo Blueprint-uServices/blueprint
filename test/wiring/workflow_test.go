@@ -33,10 +33,12 @@ func TestBasicServices(t *testing.T) {
 
 	assertIR(t, app,
 		`TestBasicServices = BlueprintApplication() {
-			leaf.handler.visibility
 			leaf = TestLeafService()
+			leaf.client = leaf
+			leaf.handler.visibility
+			nonleaf = TestNonLeafService(leaf.client)
+			nonleaf.client = nonleaf
 			nonleaf.handler.visibility
-			nonleaf = TestNonLeafService(leaf)
 		}`)
 }
 
@@ -50,10 +52,12 @@ func TestImplicitInstantiation(t *testing.T) {
 
 	assertIR(t, app,
 		`TestImplicitInstantiation = BlueprintApplication() {
-			nonleaf.handler.visibility
-			leaf.handler.visibility
 			leaf = TestLeafService()
-			nonleaf = TestNonLeafService(leaf)
+			leaf.client = leaf
+			leaf.handler.visibility
+			nonleaf = TestNonLeafService(leaf.client)
+			nonleaf.client = nonleaf
+			nonleaf.handler.visibility
 		  }`)
 }
 

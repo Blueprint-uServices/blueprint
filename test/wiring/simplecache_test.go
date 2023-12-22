@@ -17,14 +17,15 @@ func TestSimpleCache(t *testing.T) {
 
 	assertIR(t, app,
 		`TestSimpleCache = BlueprintApplication() {
-            leaf.handler.visibility
-            leaf_cache.backend.visibility
-            leaf_cache = SimpleCache()
-            leaf = TestLeafService(leaf_cache)
+			leaf = TestLeafService(leaf_cache)
+			leaf.client = leaf
+			leaf.handler.visibility
+			leaf_cache = SimpleCache()
+			leaf_cache.backend.visibility
           }`)
 }
 func TestSimpleCacheAndServices(t *testing.T) {
-	spec := newWiringSpec("TestSimpleCache")
+	spec := newWiringSpec("TestSimpleCacheAndServices")
 
 	leaf_cache := simple.Cache(spec, "leaf_cache")
 	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
@@ -33,12 +34,14 @@ func TestSimpleCacheAndServices(t *testing.T) {
 	app := assertBuildSuccess(t, spec, leaf, leaf_cache, nonleaf)
 
 	assertIR(t, app,
-		`TestSimpleCache = BlueprintApplication() {
-            leaf.handler.visibility
-            leaf_cache.backend.visibility
-            leaf_cache = SimpleCache()
-            leaf = TestLeafService(leaf_cache)
-            nonleaf.handler.visibility
-            nonleaf = TestNonLeafService(leaf)
+		`TestSimpleCacheAndServices = BlueprintApplication() {
+			leaf = TestLeafService(leaf_cache)
+			leaf.client = leaf
+			leaf.handler.visibility
+			leaf_cache = SimpleCache()
+			leaf_cache.backend.visibility
+			nonleaf = TestNonLeafService(leaf.client)
+			nonleaf.client = nonleaf
+			nonleaf.handler.visibility
           }`)
 }

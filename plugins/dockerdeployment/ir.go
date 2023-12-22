@@ -2,7 +2,6 @@ package dockerdeployment
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
 )
 
 /* A deployment is a collection of containers */
@@ -23,22 +22,4 @@ func (node *Deployment) Name() string {
 // Implements IRNode
 func (node *Deployment) String() string {
 	return ir.PrettyPrintNamespace(node.DeploymentName, "DockerApp", node.Edges, node.Nodes)
-}
-
-// Implements NamespaceHandler
-func (deployment *Deployment) Accepts(nodeType any) bool {
-	_, isDockerContainerNode := nodeType.(docker.Container)
-	return isDockerContainerNode
-}
-
-// Implements NamespaceHandler
-func (deployment *Deployment) AddEdge(name string, edge ir.IRNode) error {
-	deployment.Edges = append(deployment.Edges, edge)
-	return nil
-}
-
-// Implements NamespaceHandler
-func (deployment *Deployment) AddNode(name string, node ir.IRNode) error {
-	deployment.Nodes = append(deployment.Nodes, node)
-	return nil
 }

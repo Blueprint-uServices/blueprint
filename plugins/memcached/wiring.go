@@ -2,7 +2,8 @@
 // provides a Cache interface implementation via a pre-built memcached container image.
 //
 // Usage: To add a memcached container named `fooCache`
-//   PrebuiltContainer(spec, "fooCache")
+//
+//	PrebuiltContainer(spec, "fooCache")
 package memcached
 
 import (
@@ -13,39 +14,35 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
-// Adds a memcached container to the application that defines a cache called `cacheName` which uses the pre-built memcached process container
+// Adds a memcached container to the application that defines a cache called `cacheName`
+// which uses the pre-built memcached process container
 func PrebuiltContainer(spec wiring.WiringSpec, cacheName string) string {
 	// The nodes that we are defining
-	procName := cacheName + ".process"
-	clientName := cacheName + ".client"
+	ctrName := cacheName + ".ctr"
 	addrName := cacheName + ".addr"
+	clientName := cacheName + ".client"
 
-	// First define the process
-	spec.Define(procName, &MemcachedContainer{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		addr, err := address.Bind[*MemcachedContainer](namespace, addrName)
+	// Define the Memcached container
+	spec.Define(ctrName, &MemcachedContainer{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
+		ctr, err := newMemcachedContainer(ctrName)
 		if err != nil {
-			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", procName, addrName, err)
+			return nil, err
 		}
-		return newMemcachedContainer(procName, addr.Bind)
+		err = address.Bind[*MemcachedContainer](namespace, addrName, ctr, &ctr.BindAddr)
+		return ctr, err
 	})
 
-	// Mandate that this cache with this name must be unique within the application (although, this can be changed by namespaces)
-	dstName := cacheName + ".dst"
-	spec.Alias(dstName, procName)
-	pointer.RequireUniqueness(spec, dstName, &ir.ApplicationNode{})
+	// Create a pointer to the Memcached container
+	ptr := pointer.CreatePointer[*MemcachedGoClient](spec, cacheName, ctrName)
 
-	// Define the pointer to the memcached process for golang clients
-	pointer.CreatePointer(spec, cacheName, &MemcachedGoClient{}, dstName)
-	ptr := pointer.GetPointer(spec, cacheName)
+	// Define the address that points to the Memcached container
+	address.Define[*MemcachedContainer](spec, addrName, ctrName)
 
-	// Define the address and add the collectorAddr to the pointer dst
-	address.Define[*MemcachedContainer](spec, addrName, procName, &ir.ApplicationNode{})
-	ptr.AddDstModifier(spec, addrName)
+	// Add the address to the pointer
+	ptr.AddAddrModifier(spec, addrName)
 
-	// Add the client to the pointer
+	// Define the memcached client add it to the client side of the pointer
 	clientNext := ptr.AddSrcModifier(spec, clientName)
-
-	// Define the memcached go client
 	spec.Define(clientName, &MemcachedGoClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*MemcachedContainer](namespace, clientNext)
 		if err != nil {
@@ -54,5 +51,6 @@ func PrebuiltContainer(spec wiring.WiringSpec, cacheName string) string {
 		return newMemcachedGoClient(clientName, addr.Dial)
 	})
 
+	// Return the pointer; anybody who wants to access the Memcached instance should do so through the pointer
 	return cacheName
 }

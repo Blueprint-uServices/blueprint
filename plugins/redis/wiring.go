@@ -1,8 +1,9 @@
-// Package memcached provides the Blueprint wiring and IR implementations of a memcached plugin that
+// Package redis provides the Blueprint wiring and IR implementations of a redis plugin that
 // provides a Cache interface implementation via a pre-built redis container image.
 //
 // Usage: To add a redis container named `fooCache`
-//   PrebuiltContainer(spec, "fooCache")
+//
+//	PrebuiltContainer(spec, "fooCache")
 package redis
 
 import (
@@ -13,33 +14,36 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 )
 
-// Adds a redis container to the application that defines a cache called `cacheName` which uses the pre-built memcached process container
-func PrebuiltContainer(spec wiring.WiringSpec, cacheName string) string {
-	procName := cacheName + ".process"
+// Adds a redis container to the application that defines a cache called `cacheName` which uses
+// the pre-built redis process container
+func Container(spec wiring.WiringSpec, cacheName string) string {
+	// The nodes that we are defining
+	ctrName := cacheName + ".ctr"
 	clientName := cacheName + ".client"
 	addrName := cacheName + ".addr"
 
-	spec.Define(procName, &RedisContainer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
-		addr, err := address.Bind[*RedisContainer](ns, addrName)
+	// Define the Redis container
+	spec.Define(ctrName, &RedisContainer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
+		redis, err := newRedisContainer(ctrName)
 		if err != nil {
-			return nil, blueprint.Errorf("%s expected %s to be an address but encountered %s", procName, addrName, err)
+			return nil, err
 		}
-		return newRedisContainer(procName, addr.Bind)
+
+		err = address.Bind[*RedisContainer](ns, addrName, redis, &redis.BindAddr)
+		return redis, err
 	})
 
-	dstName := cacheName + ".dst"
-	spec.Alias(dstName, procName)
-	pointer.RequireUniqueness(spec, dstName, &ir.ApplicationNode{})
+	// Create a pointer to the Redis container
+	ptr := pointer.CreatePointer[*RedisGoClient](spec, cacheName, ctrName)
 
-	pointer.CreatePointer(spec, cacheName, &RedisGoClient{}, dstName)
-	ptr := pointer.GetPointer(spec, cacheName)
+	// Define the address that points to the Redis container
+	address.Define[*RedisContainer](spec, addrName, ctrName)
 
-	address.Define[*RedisContainer](spec, addrName, procName, &ir.ApplicationNode{})
+	// Add the address to the pointer
+	ptr.AddAddrModifier(spec, addrName)
 
-	ptr.AddDstModifier(spec, addrName)
-
+	// Define the Redis client and add it to the client side of the pointer
 	clientNext := ptr.AddSrcModifier(spec, clientName)
-
 	spec.Define(clientName, &RedisGoClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*RedisContainer](ns, clientNext)
 		if err != nil {
@@ -48,5 +52,6 @@ func PrebuiltContainer(spec wiring.WiringSpec, cacheName string) string {
 		return newRedisGoClient(clientName, addr.Dial)
 	})
 
+	// Return the pointer; anybody who wants to access the Redis instance should do so through the pointer
 	return cacheName
 }

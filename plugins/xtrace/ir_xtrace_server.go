@@ -32,10 +32,9 @@ func (xt *XTraceInterface) GetMethods() []service.Method {
 	return xt.Wrapped.GetMethods()
 }
 
-func newXTraceServerContainer(name string, addr *address.BindConfig) (*XTraceServerContainer, error) {
+func newXTraceServerContainer(name string) (*XTraceServerContainer, error) {
 	server := &XTraceServerContainer{
 		ServerName: name,
-		BindAddr:   addr,
 	}
 	err := server.init(name)
 	if err != nil {

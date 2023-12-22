@@ -110,20 +110,15 @@ func Service(spec wiring.WiringSpec, serviceName, serviceType string, serviceArg
 		return handler, nil
 	})
 
-	// Mandate that this service with this name must be unique within the application (although, this can be changed by namespaces)
-	dstName := serviceName + ".dst"
-	spec.Alias(dstName, handlerName)
-	pointer.RequireUniqueness(spec, dstName, &ir.ApplicationNode{})
-
-	// Define the pointer
-	ptr := pointer.CreatePointer(spec, serviceName, &workflowNode{}, dstName)
+	// Create a pointer to the handler
+	ptr := pointer.CreatePointer[*workflowNode](spec, serviceName, handlerName)
 
 	// Add a "service.client" node for convenience
 	clientName := serviceName + ".client"
 	clientNext := ptr.AddSrcModifier(spec, clientName)
 	spec.Define(clientName, &workflowClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		client := &workflowClient{}
-		if err := client.Init(serviceName, serviceType); err != nil {
+		if err := client.Init(clientName, serviceType); err != nil {
 			return nil, err
 		}
 		return client, namespace.Get(clientNext, &client.Wrapped)

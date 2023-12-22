@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 
 	"github.com/stretchr/testify/assert"
@@ -27,12 +28,13 @@ func TestServicesWithinSameProcess(t *testing.T) {
 
 	assertIR(t, app,
 		`TestServicesWithinSameProcess = BlueprintApplication() {
-            leaf.handler.visibility
-            nonleaf.handler.visibility
-            myproc = GolangProcessNode() {
-              leaf = TestLeafService()
-              nonleaf = TestNonLeafService(leaf)
-            }
+			leaf.handler.visibility
+			myproc = GolangProcessNode() {
+			  leaf = TestLeafService()
+			  leaf.client = leaf
+			  nonleaf = TestNonLeafService(leaf.client)
+			}
+			nonleaf.handler.visibility
           }`)
 }
 
@@ -55,11 +57,12 @@ func TestSeparateServicesInSeparateProcesses(t *testing.T) {
               leaf1 = TestLeafService()
             }
             leaf2.handler.visibility
-            nonleaf.handler.visibility
             myproc = GolangProcessNode() {
               leaf2 = TestLeafService()
-              nonleaf = TestNonLeafService(leaf2)
+			  leaf2.client = leaf2
+              nonleaf = TestNonLeafService(leaf2.client)
             }
+            nonleaf.handler.visibility
           }`)
 }
 
@@ -71,19 +74,20 @@ func TestAddChildrenToProcess(t *testing.T) {
 	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
 	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
 
-	goproc.AddChildToProcess(spec, myproc, leaf)
-	goproc.AddChildToProcess(spec, myproc, nonleaf)
+	goproc.AddToProcess(spec, myproc, leaf)
+	goproc.AddToProcess(spec, myproc, nonleaf)
 
 	app := assertBuildSuccess(t, spec, myproc)
 
 	assertIR(t, app,
 		`TestAddChildrenToProcess = BlueprintApplication() {
             leaf.handler.visibility
-            nonleaf.handler.visibility
             myproc = GolangProcessNode() {
               leaf = TestLeafService()
-              nonleaf = TestNonLeafService(leaf)
+			  leaf.client = leaf
+              nonleaf = TestNonLeafService(leaf.client)
             }
+            nonleaf.handler.visibility
           }`)
 
 }
@@ -113,11 +117,13 @@ func TestClientWithinSameProcess(t *testing.T) {
 
 	assertIR(t, app,
 		`TestClientWithinSameProcess = BlueprintApplication() {
-            nonleaf.handler.visibility
             leaf.handler.visibility
+            nonleaf.handler.visibility
             nonleafclient = GolangProcessNode() {
               leaf = TestLeafService()
-              nonleaf = TestNonLeafService(leaf)
+			  leaf.client = leaf
+              nonleaf = TestNonLeafService(leaf.client)
+			  nonleaf.client = nonleaf
             }
           }`)
 }
@@ -134,11 +140,48 @@ func TestImplicitServicesWithinSameProcess(t *testing.T) {
 
 	assertIR(t, app,
 		`TestImplicitServicesWithinSameProcess = BlueprintApplication() {
-            nonleaf.handler.visibility
             leaf.handler.visibility
+            nonleaf.handler.visibility
             nonleafproc = GolangProcessNode() {
               leaf = TestLeafService()
-              nonleaf = TestNonLeafService(leaf)
+			  leaf.client = leaf
+              nonleaf = TestNonLeafService(leaf.client)
             }
           }`)
+}
+
+func TestProcessModifier(t *testing.T) {
+	spec := newWiringSpec("TestProcessModifier")
+
+	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
+	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+
+	grpc.Deploy(spec, leaf)
+	grpc.Deploy(spec, nonleaf)
+
+	goproc.CreateProcess(spec, "leafproc", leaf)
+	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
+
+	app := assertBuildSuccess(t, spec, nonleafproc)
+
+	assertIR(t, app,
+		`TestProcessModifier = BlueprintApplication() {
+			leaf.grpc.addr
+			leaf.grpc.bind_addr = AddressConfig()
+			leaf.grpc.dial_addr = AddressConfig()
+			leaf.handler.visibility
+			leafproc = GolangProcessNode(leaf.grpc.bind_addr) {
+			  leaf = TestLeafService()
+			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
+			}
+			nonleaf.grpc.addr
+			nonleaf.grpc.bind_addr = AddressConfig()
+			nonleaf.handler.visibility
+			nonleafproc = GolangProcessNode(leaf.grpc.dial_addr, nonleaf.grpc.bind_addr) {
+			  leaf.client = leaf.grpc_client
+			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
+			  nonleaf = TestNonLeafService(leaf.client)
+			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
+			}
+		  }`)
 }

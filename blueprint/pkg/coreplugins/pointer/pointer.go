@@ -42,13 +42,17 @@ import (
 //
 // Stored as metadata within a wiring spec.
 type PointerDef struct {
-	name         string
+	name string
+
 	srcHead      string
 	srcModifiers []string
 	srcTail      string
+
+	// The node that is the interface from src to dst.  Typically this is an address
+	interfaceNode string
+
 	dstHead      string
 	dstModifiers []string
-	dst          string
 }
 
 func (ptr PointerDef) String() string {
@@ -61,41 +65,74 @@ func (ptr PointerDef) String() string {
 	return b.String()
 }
 
-// Creates a pointer called name that points to the specified node dst.  ptrType is the
-// node type of dst.
+// Additional options that can be specified when creating a pointer.
+// If not specified, defaults are used.
+type PointerOpts struct {
+	// If specified, applies [RequireUniqueness] to the pointer destination
+	// before creating the pointer.  Set to nil to disable.  Defaults to
+	// &ir.ApplicationNode{}
+	RequireUniqueness any
+}
+
+// Additional options that can be specified when adding a modifier to a pointer.
+// If not specified, defaults are used.
+type ModifierOpts struct {
+	// Defaults to true.  When true, the pointer's interface node is updated
+	IsInterfaceNode bool
+}
+
+var defaultPointerOpts = PointerOpts{
+	RequireUniqueness: &ir.ApplicationNode{},
+}
+
+var defaultModifierOpts = ModifierOpts{
+	IsInterfaceNode: true,
+}
+
+// Creates a pointer called name that points to the specified node dst.
+// Type parameter [SrcNodeType] is the nodeType of the client side of the pointer.
 //
 // Any plugin that defines client and server nodes should typically declare a pointer to
-// the server node.  This will provide some useful functionality:
+// the server node.  Declaring a pointer will enable other plugins to apply client or
+// server modifiers to the pointer.  Additionally, pointers will automatically instantiate
+// the server side of the pointer when using addresses
 //
-// First, declaring a pointer will enable other plugins to apply client or server modifiers
-// to the pointer.
-//
-// Second, pointers provide functionality for lazily instantiating the server side of
-// the pointer if the server is not explicitly instantiated by the wiring spec.
-func CreatePointer(spec wiring.WiringSpec, name string, ptrType any, dst string) *PointerDef {
+// Additional pointer options can be specified by providing optional PointerOpts.
+func CreatePointer[SrcNodeType any](spec wiring.WiringSpec, name string, dst string, options ...PointerOpts) *PointerDef {
+	opts := defaultPointerOpts
+	if len(options) > 0 {
+		opts = options[0]
+	}
+
+	if opts.RequireUniqueness != nil {
+		dstName := name + ".dst"
+		spec.Alias(dstName, dst)
+		RequireUniqueness(spec, dstName, opts.RequireUniqueness)
+		dst = dstName
+	}
+
 	ptr := &PointerDef{}
 	ptr.name = name
 	ptr.srcModifiers = nil
 	ptr.srcHead = name + ".src"
 	ptr.srcTail = ptr.srcHead
+	ptr.interfaceNode = dst
 	ptr.dstHead = dst
-	ptr.dstModifiers = nil
-	ptr.dst = dst
+	ptr.dstModifiers = []string{dst}
 
-	spec.Alias(ptr.srcTail, ptr.dstHead)
+	spec.Alias(ptr.srcTail, ptr.interfaceNode)
 
+	var ptrType SrcNodeType
 	spec.Define(name, ptrType, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		var node ir.IRNode
-		if err := namespace.Get(ptr.srcHead, &node); err != nil {
-			return nil, err
-		}
-
+		// This is the lazy implicit instantiation of the Dst side of the pointer, if
+		// it hasn't explicitly been instantiated somewhere in the wiring spec.
 		namespace.Defer(func() error {
-			_, err := ptr.InstantiateDst(namespace)
-			return err
-		})
+			return ptr.InstantiateDst(namespace)
+		}, wiring.DeferOpts{Front: false})
 
-		return node, nil
+		var node ir.IRNode
+		err := namespace.Get(ptr.srcHead, &node)
+		return node, err
 	})
 
 	spec.SetProperty(name, "ptr", ptr)
@@ -103,7 +140,7 @@ func CreatePointer(spec wiring.WiringSpec, name string, ptrType any, dst string)
 	return ptr
 }
 
-// Gets the PointerDef metadata for a pointer name that was defined using CreatePointer
+// Gets the PointerDef metadata for a pointer name that was defined using [CreatePointer]
 func GetPointer(spec wiring.WiringSpec, name string) *PointerDef {
 	var ptr *PointerDef
 	spec.GetProperty(name, "ptr", &ptr)
@@ -123,7 +160,7 @@ func GetPointer(spec wiring.WiringSpec, name string) *PointerDef {
 func (ptr *PointerDef) AddSrcModifier(spec wiring.WiringSpec, modifierName string) string {
 	spec.Alias(ptr.srcTail, modifierName)
 	ptr.srcTail = modifierName + ".ptr.src.next"
-	spec.Alias(ptr.srcTail, ptr.dstHead)
+	spec.Alias(ptr.srcTail, ptr.interfaceNode)
 	ptr.srcModifiers = append(ptr.srcModifiers, modifierName)
 
 	return ptr.srcTail
@@ -139,50 +176,81 @@ func (ptr *PointerDef) AddSrcModifier(spec wiring.WiringSpec, modifierName strin
 //
 // The return value of AddDstModifier is the name of the _previous_ server side modifier.  This
 // can be used within the BuildFunc of modifierName.
-func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName string) string {
+func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName string, options ...ModifierOpts) string {
+	opts := defaultModifierOpts
+	if len(options) > 0 {
+		opts = options[0]
+	}
 	nextDst := ptr.dstHead
 	ptr.dstHead = modifierName
-	spec.Alias(ptr.srcTail, ptr.dstHead)
+	if opts.IsInterfaceNode {
+		ptr.interfaceNode = ptr.dstHead
+		spec.Alias(ptr.srcTail, ptr.interfaceNode)
+	}
 	ptr.dstModifiers = append([]string{ptr.dstHead}, ptr.dstModifiers...)
+	return nextDst
+}
+
+// AddAddrModifier is a special case of AddDstModifier where the modifier is an address node.
+//
+// It immediately instantiates the address, and returns it.  It defers instantiation of the
+// server side of the address.
+//
+// The return value of AddAddrModifier is the name of the _previous_ server side modifier.  This
+// can be used within the BuildFunc of the destination (PointsTo) of addrName
+func (ptr *PointerDef) AddAddrModifier(spec wiring.WiringSpec, addrName string) string {
+	// Get the address metadata
+	def := address.GetAddress(spec, addrName)
+	if def == nil {
+		return ""
+	}
+
+	// Add a modifier to instantiate address PointsTo
+	nextDst := ptr.AddDstModifier(spec, def.PointsTo)
+
+	// Set the pointer interface to be the address, rather than the node
+	ptr.interfaceNode = addrName
+	spec.Alias(ptr.srcTail, ptr.interfaceNode)
+
 	return nextDst
 }
 
 // If any pointer modifiers are addresses, this will instantiate the server side of the addresses.
 //
 // This is primarily used by namespace plugins.
-func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) (ir.IRNode, error) {
+func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) error {
 	namespace.Info("Instantiating pointer %s.dst from namespace %s", ptr.name, namespace.Name())
-	for _, modifier := range ptr.dstModifiers {
-		var addr address.Node
-		err := namespace.Get(modifier, &addr)
 
-		// Want to find the final dstModifier that points to an address, then instantiate the address
-		if err == nil {
-			dstName, err := address.PointsTo(namespace, modifier)
-			if err != nil {
-				return nil, err
-			}
-			if addr.GetDestination() != nil {
-				// Destination has already been instantiated, stop instantiating now
-				namespace.Info("Destination %s of %s has already been instantiated", dstName, addr.Name())
-				return addr.GetDestination(), nil
-			} else {
-				namespace.Info("Instantiating %s of %s", dstName, addr.Name())
-				var dst ir.IRNode
-				if err := namespace.Instantiate(dstName, &dst); err != nil {
-					return nil, err
-				}
-				err = addr.SetDestination(dst)
-				if err != nil {
-					return nil, err
-				}
-			}
-		} else {
-			namespace.Info("Skipping %v, not an address", modifier)
-		}
+	// Instantiating dst starts from the interface node between src and dst
+	var node ir.IRNode
+	err := namespace.Get(ptr.interfaceNode, &node)
+	if err != nil {
+		return err
 	}
 
-	var node ir.IRNode
-	err := namespace.Get(ptr.dst, &node)
-	return node, err
+	// We only have to handle the case where the interface between src and dst is an addr, which means
+	// the dst side of the addr might not yet be instantiated.  If it's not an addr, then either the client,
+	// or the above call to namespace.Get, will have triggered dst instantiation
+	addr, isAddr := node.(address.Node)
+	if !isAddr {
+		return nil
+	}
+
+	// The addr destination might already have been explicitly instantiated, or instantiated by a different client
+	if addr.GetDestination() != nil {
+		return nil
+	}
+
+	// Getting the first dst modifier should cause all of the dst side of the pointer to be instantiated
+	var dst ir.IRNode
+	if namespace.Instantiate(ptr.dstModifiers[0], &dst) != nil {
+		return err
+	}
+
+	// Currently we don't support multiple addresses within a pointer; so getting the first dst modifier
+	// should cause a cascade where the addr destination gets set.  Error out if not.
+	if addr.GetDestination() == nil {
+		return namespace.Error("Attempted to instantiate the server-side of address %v starting with %v but the server failed to instantiate", addr.Name(), ptr.dstModifiers[0])
+	}
+	return nil
 }

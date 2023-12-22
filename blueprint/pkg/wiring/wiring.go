@@ -24,9 +24,13 @@ import (
 type BuildFunc func(Namespace) (ir.IRNode, error)
 
 type WiringSpec interface {
-	Define(name string, nodeType any, build BuildFunc) // Adds a named node definition to the spec that can be built with the provided build function
-	GetDef(name string) *WiringDef                     // For use by plugins to access the defined build functions and metadata
-	Defs() []string                                    // Returns names of all defined nodes
+	// Provides a node definition for name.  The provided [BuildFunc] build will be used to build
+	// the node.  nodeType indicates the type of node that gets built.  Additional [WiringOpts] can
+	// be optionally provided to fine-tune the node's build behavior.
+	Define(name string, nodeType any, build BuildFunc, options ...WiringOpts)
+
+	GetDef(name string) *WiringDef // For use by plugins to access the defined build functions and metadata
+	Defs() []string                // Returns names of all defined nodes
 
 	Alias(name string, pointsto string)   // Defines an alias to another defined node; these can be recursive
 	GetAlias(alias string) (string, bool) // Gets the value of the specified alias, if it exists
@@ -45,11 +49,25 @@ type WiringSpec interface {
 	BuildIR(nodesToInstantiate ...string) (*ir.ApplicationNode, error) // After defining everything, this builds the IR for the specified named nodes (implicitly including dependencies of those nodes)
 }
 
+// Additional options that can be specified when defining a WiringSpec node.
+type WiringOpts struct {
+	// The type of node returned by the BuildFunc.  By default this is assumed to be the same
+	// as nodeType.  Specifying this property does not currently have any effect.
+	ReturnType any
+
+	// Used by plugins to indicate whether the BuildFunc builds new nodes, or simply gets
+	// and returns other nodes.  Defaults to false.  When set to true, the returned node of
+	// a BuildFunc is not added as a node to the namespace or as an edge, since the node originated
+	// from some other BuildFunc and therefore was already added as a node or edge.
+	ProxyNode bool
+}
+
 type WiringDef struct {
 	Name       string
 	NodeType   any
 	Build      BuildFunc
 	Properties map[string][]any
+	Options    WiringOpts
 }
 
 type wiringSpecImpl struct {
@@ -135,10 +153,16 @@ func (spec *wiringSpecImpl) getDef(name string, createIfAbsent bool) *WiringDef 
 
 // Adds a named node to the spec that can be built with the provided build function.
 // The nodeType is used as an indicator of where to build the node; the buildfunc is not required to actually return a node of that type
-func (spec *wiringSpecImpl) Define(name string, nodeType any, build BuildFunc) {
+func (spec *wiringSpecImpl) Define(name string, nodeType any, build BuildFunc, options ...WiringOpts) {
 	def := spec.getDef(name, true)
 	def.NodeType = nodeType
 	def.Build = build
+	if len(options) > 0 {
+		def.Options = options[0]
+	}
+	if def.Options.ReturnType == nil {
+		def.Options.ReturnType = nodeType
+	}
 	def.Properties["callsite"] = []any{logging.GetCallstack()}
 }
 

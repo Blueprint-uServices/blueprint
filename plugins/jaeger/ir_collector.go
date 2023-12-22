@@ -32,10 +32,9 @@ func (j *JaegerInterface) GetMethods() []service.Method {
 	return j.Wrapped.GetMethods()
 }
 
-func newJaegerCollectorContainer(name string, addr *address.BindConfig) (*JaegerCollectorContainer, error) {
+func newJaegerCollectorContainer(name string) (*JaegerCollectorContainer, error) {
 	collector := &JaegerCollectorContainer{
 		CollectorName: name,
-		BindAddr:      addr,
 	}
 	err := collector.init(name)
 	if err != nil {

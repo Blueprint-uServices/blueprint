@@ -19,10 +19,17 @@ import (
 func BuildApplicationIR(spec WiringSpec, name string, nodesToInstantiate ...string) (*ir.ApplicationNode, error) {
 	// Create the root application namespace
 	app := &ir.ApplicationNode{ApplicationName: name}
-	handler := &applicationNamespaceHandler{
-		app: app,
+
+	namespace := &namespaceimpl{
+		NamespaceName:   name,
+		NamespaceType:   "BlueprintApplication",
+		ParentNamespace: nil,
+		Wiring:          spec,
+		Handler:         &applicationNamespaceHandler{app: app},
+		Seen:            make(map[string]ir.IRNode),
+		Added:           make(map[string]any),
+		ChildNamespaces: make(map[string]Namespace),
 	}
-	namespace := CreateNamespaceWithHandler(spec, nil, name, "BlueprintApplication", handler)
 
 	// If no nodes were specified, then instead we will instantiate all defined nodes
 	if len(nodesToInstantiate) == 0 {
@@ -36,7 +43,7 @@ func BuildApplicationIR(spec WiringSpec, name string, nodesToInstantiate ...stri
 			namespace.Info("Instantiating %v", nodeName)
 			var node ir.IRNode
 			return namespace.Get(nodeName, &node)
-		})
+		}, DeferOpts{Front: true})
 	}
 
 	// Execute deferred functions until empty

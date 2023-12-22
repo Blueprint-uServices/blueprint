@@ -18,31 +18,33 @@ import (
 //
 // The returned collectorName must be used as an argument to the opentelemetry.InstrumentUsingCustomCollector(spec, serviceName, `collectorName`).
 func Collector(spec wiring.WiringSpec, collectorName string) string {
+	// The nodes that we are defining
 	collectorAddr := collectorName + ".addr"
-	collectorProc := collectorName + ".proc"
-	collectorDst := collectorName + ".dst"
+	collectorCtr := collectorName + ".ctr"
 	collectorClient := collectorName + ".client"
 
-	spec.Define(collectorProc, &ZipkinCollectorContainer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
-		addr, err := address.Bind[*ZipkinCollectorContainer](ns, collectorAddr)
+	// Define the Zipkin collector container
+	spec.Define(collectorCtr, &ZipkinCollectorContainer{}, func(ns wiring.Namespace) (ir.IRNode, error) {
+		zipkin, err := newZipkinCollectorContainer(collectorCtr)
 		if err != nil {
 			return nil, err
 		}
 
-		return newZipkinCollectorContainer(collectorProc, addr.Bind)
+		err = address.Bind[*ZipkinCollectorContainer](ns, collectorAddr, zipkin, &zipkin.BindAddr)
+		return zipkin, err
 	})
 
-	spec.Alias(collectorDst, collectorProc)
-	pointer.RequireUniqueness(spec, collectorDst, &ir.ApplicationNode{})
+	// Create a pointer to the Zipkin collector container
+	ptr := pointer.CreatePointer[*ZipkinCollectorClient](spec, collectorName, collectorCtr)
 
-	pointer.CreatePointer(spec, collectorName, &ZipkinCollectorClient{}, collectorDst)
+	// Define the address that points to the Zipkin collector container
+	address.Define[*ZipkinCollectorContainer](spec, collectorAddr, collectorCtr)
 
-	ptr := pointer.GetPointer(spec, collectorName)
+	// Add the address to the pointer
+	ptr.AddAddrModifier(spec, collectorAddr)
 
-	ptr.AddDstModifier(spec, collectorAddr)
-
+	// Define the Zipkin collector client and add it to the client side of the pointer
 	clientNext := ptr.AddSrcModifier(spec, collectorClient)
-
 	spec.Define(collectorClient, &ZipkinCollectorClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*ZipkinCollectorContainer](ns, clientNext)
 		if err != nil {
@@ -52,8 +54,6 @@ func Collector(spec wiring.WiringSpec, collectorName string) string {
 		return newZipkinCollectorClient(collectorClient, addr.Dial)
 	})
 
-	address.Define[*ZipkinCollectorContainer](spec, collectorAddr, collectorProc, &ir.ApplicationNode{})
-	ptr.AddDstModifier(spec, collectorAddr)
-
+	// Return the pointer; anybody who wants to access the Zipkin collector instance should do so through the pointer
 	return collectorName
 }

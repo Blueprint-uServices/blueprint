@@ -14,7 +14,7 @@ The starting point for a Blueprint application is the [NewWiringSpec](<#NewWirin
 
 - [func BuildApplicationIR\(spec WiringSpec, name string, nodesToInstantiate ...string\) \(\*ir.ApplicationNode, error\)](<#BuildApplicationIR>)
 - [type BuildFunc](<#BuildFunc>)
-- [type IRNamespace](<#IRNamespace>)
+- [type DeferOpts](<#DeferOpts>)
 - [type Namespace](<#Namespace>)
 - [type NamespaceHandler](<#NamespaceHandler>)
 - [type WiringDef](<#WiringDef>)
@@ -24,6 +24,7 @@ The starting point for a Blueprint application is the [NewWiringSpec](<#NewWirin
   - [func \(def \*WiringDef\) String\(\) string](<#WiringDef.String>)
 - [type WiringError](<#WiringError>)
   - [func \(e WiringError\) Error\(\) string](<#WiringError.Error>)
+- [type WiringOpts](<#WiringOpts>)
 - [type WiringSpec](<#WiringSpec>)
   - [func NewWiringSpec\(name string\) WiringSpec](<#NewWiringSpec>)
 
@@ -50,15 +51,15 @@ Creates an IR node within the provided namespace or within a new child namespace
 type BuildFunc func(Namespace) (ir.IRNode, error)
 ```
 
-<a name="IRNamespace"></a>
-## type IRNamespace
+<a name="DeferOpts"></a>
+## type DeferOpts
 
-An IRNamespace is an IRNode that also implements [NamespaceHandler](<#NamespaceHandler>). Plugins that implement IRNamespace can make use of \[CreateNamespace\] which is an easy way of deriving child namespaces.
+Options for deferred functions provided with \[Namespace.Defer\]
 
 ```go
-type IRNamespace interface {
-    ir.IRNode
-    NamespaceHandler
+type DeferOpts struct {
+    // Defaults to false. If set to true, pushes the deferred function to the front of the queue instead of the back.
+    Front bool
 }
 ```
 
@@ -100,9 +101,23 @@ type Namespace interface {
     // Puts a node into this namespace
     Put(name string, node ir.IRNode) error
 
+    // Creates and returns a child namespace within this namespaces.
+    // handler will be used to determine what nodes can be built in the child namespace, and
+    // handler's callbacks will be invoked when nodes get created within the child namespace.
+    //
+    // Subsequently, the namespace can be retrieved with GetNamespace
+    //
+    // Returns an error if the namespace has already been created
+    DeriveNamespace(name string, handler NamespaceHandler) (Namespace, error)
+
+    // Returns the child namespace with the given name.  The child namespace must have been created in this
+    // namespace, using DeriveNamespace, otherwise an error will be returned.
+    GetNamespace(name string) (Namespace, error)
+
     // Enqueue a function to be executed after all currently-queued functions have finished executing.
     // Most plugins should not need to use this.
-    Defer(f func() error)
+    // [DeferOpts] can be optionally specified.
+    Defer(f func() error, options ...DeferOpts)
 
     // Log an info-level message
     Info(message string, args ...any)
@@ -150,6 +165,7 @@ type WiringDef struct {
     NodeType   any
     Build      BuildFunc
     Properties map[string][]any
+    Options    WiringOpts
 }
 ```
 
@@ -209,6 +225,25 @@ func (e WiringError) Error() string
 
 
 
+<a name="WiringOpts"></a>
+## type WiringOpts
+
+Additional options that can be specified when defining a WiringSpec node.
+
+```go
+type WiringOpts struct {
+    // The type of node returned by the BuildFunc.  By default this is assumed to be the same
+    // as nodeType.  Specifying this property does not currently have any effect.
+    ReturnType any
+
+    // Used by plugins to indicate whether the BuildFunc builds new nodes, or simply gets
+    // and returns other nodes.  Defaults to false.  When set to true, the returned node of
+    // a BuildFunc is not added as a node to the namespace or as an edge, since the node originated
+    // from some other BuildFunc and therefore was already added as a node or edge.
+    ProxyNode bool
+}
+```
+
 <a name="WiringSpec"></a>
 ## type WiringSpec
 
@@ -216,9 +251,13 @@ func (e WiringError) Error() string
 
 ```go
 type WiringSpec interface {
-    Define(name string, nodeType any, build BuildFunc) // Adds a named node definition to the spec that can be built with the provided build function
-    GetDef(name string) *WiringDef                     // For use by plugins to access the defined build functions and metadata
-    Defs() []string                                    // Returns names of all defined nodes
+    // Provides a node definition for name.  The provided [BuildFunc] build will be used to build
+    // the node.  nodeType indicates the type of node that gets built.  Additional [WiringOpts] can
+    // be optionally provided to fine-tune the node's build behavior.
+    Define(name string, nodeType any, build BuildFunc, options ...WiringOpts)
+
+    GetDef(name string) *WiringDef // For use by plugins to access the defined build functions and metadata
+    Defs() []string                // Returns names of all defined nodes
 
     Alias(name string, pointsto string)   // Defines an alias to another defined node; these can be recursive
     GetAlias(alias string) (string, bool) // Gets the value of the specified alias, if it exists
