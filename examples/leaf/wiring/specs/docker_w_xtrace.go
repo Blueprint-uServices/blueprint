@@ -42,6 +42,6 @@ func applyXTLoggerDefaults(spec wiring.WiringSpec, serviceName string) string {
 	http.Deploy(spec, serviceName)
 	goproc.CreateProcess(spec, procName, serviceName)
 	logger := xtrace.DefineXTraceLogger(spec, procName)
-	goproc.AddChildToProcess(spec, procName, logger)
+	goproc.AddToProcess(spec, procName, logger)
 	return linuxcontainer.CreateContainer(spec, ctrName, procName)
 }

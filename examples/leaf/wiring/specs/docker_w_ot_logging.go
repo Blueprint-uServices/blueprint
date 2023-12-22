@@ -43,6 +43,6 @@ func applyOTLoggerDefaults(spec wiring.WiringSpec, serviceName string, collector
 	http.Deploy(spec, serviceName)
 	goproc.CreateProcess(spec, procName, serviceName)
 	logger := opentelemetry.DefineOTTraceLogger(spec, procName)
-	goproc.AddChildToProcess(spec, procName, logger)
+	goproc.AddToProcess(spec, procName, logger)
 	return linuxcontainer.CreateContainer(spec, ctrName, procName)
 }
