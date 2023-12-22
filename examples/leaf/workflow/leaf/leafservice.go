@@ -6,6 +6,7 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.opentelemetry.io/otel/metric"
 )
 
 type MyInt int64
@@ -34,6 +35,7 @@ type LeafServiceImpl struct {
 	LeafService
 	Cache      backend.Cache
 	Collection backend.NoSQLCollection
+	Counter    metric.Int64Counter
 }
 
 func NewLeafServiceImpl(ctx ctxx.Context, cache backend.Cache, db backend.NoSQLDatabase) (*LeafServiceImpl, error) {
@@ -41,15 +43,25 @@ func NewLeafServiceImpl(ctx ctxx.Context, cache backend.Cache, db backend.NoSQLD
 	if err != nil {
 		return nil, err
 	}
-	return &LeafServiceImpl{Cache: cache, Collection: collection}, nil
+	meter, err := backend.Meter(ctx, "leafService")
+	if err != nil {
+		return nil, err
+	}
+	counter, err := meter.Int64Counter("num_requests")
+	if err != nil {
+		return nil, err
+	}
+	return &LeafServiceImpl{Cache: cache, Collection: collection, Counter: counter}, nil
 }
 
 func (l *LeafServiceImpl) HelloNothing(ctx ctxx.Context) error {
+	l.Counter.Add(ctx, 1)
 	fmt.Println("hello nothing!")
 	return nil
 }
 
 func (l *LeafServiceImpl) HelloInt(ctx ctxx.Context, a int64) (int64, error) {
+	l.Counter.Add(ctx, 1)
 	fmt.Println("hello")
 	l.Cache.Put(ctx, "helloint", a)
 	var b int64
@@ -84,10 +96,12 @@ func (l *LeafServiceImpl) HelloInt(ctx ctxx.Context, a int64) (int64, error) {
 }
 
 func (l *LeafServiceImpl) HelloObject(ctx ctxx.Context, obj *LeafObject) (*LeafObject, error) {
+	l.Counter.Add(ctx, 1)
 	return obj, nil
 }
 
 func (l *LeafServiceImpl) HelloMate(ctx ctxx.Context, a int, b int32, c string, d map[string]LeafObject, elems []string, elems2 []NestedLeafObject) (string, []string, int32, int, map[string]LeafObject, error) {
+	l.Counter.Add(ctx, 1)
 	return c, elems, b, a, d, nil
 }
 
