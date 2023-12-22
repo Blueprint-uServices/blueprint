@@ -213,33 +213,6 @@ func (ptr *PointerDef) AddAddrModifier(spec wiring.WiringSpec, addrName string) 
 	spec.Alias(ptr.srcTail, ptr.interfaceNode)
 
 	return nextDst
-
-	// // Try to give the modifier a readable name
-	// after, _ := strings.CutPrefix(def.PointsTo, ptr.name+".")
-	// modifierName := fmt.Sprintf("%v.instantiate_%v", ptr.name, after)
-
-	// // Add the modifier
-	// nextModifierName := ptr.AddDstModifier(spec, modifierName)
-
-	// // Provide the modifier definition, using information from the address metadata
-	// spec.Define(modifierName, def.ServerType, func(namespace wiring.Namespace) (ir.IRNode, error) {
-	// 	// We defer instantiation of the actual server node until later.
-	// 	namespace.Defer(func() error {
-	// 		var nextNode ir.IRNode
-	// 		if err := namespace.Get(nextModifierName, &nextNode); err != nil {
-	// 			return err
-	// 		}
-	// 		// Also instantiate PointsTo in case nextModifierName is not the same as PointsTo
-	// 		return namespace.Get(def.PointsTo, &nextNode)
-	// 	})
-
-	// 	// All we need to return for now is the address to the server
-	// 	var addr address.Node
-	// 	err := namespace.Get(addrName, &addr)
-	// 	return addr, err
-	// })
-
-	// return nextModifierName
 }
 
 // If any pointer modifiers are addresses, this will instantiate the server side of the addresses.
@@ -263,7 +236,7 @@ func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) error {
 		return nil
 	}
 
-	// The addr destination might have been explicitly instantiated, or instantiated by a different client
+	// The addr destination might already have been explicitly instantiated, or instantiated by a different client
 	if addr.GetDestination() != nil {
 		return nil
 	}

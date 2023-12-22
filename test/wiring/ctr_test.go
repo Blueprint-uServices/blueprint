@@ -188,7 +188,7 @@ func TestContainerExplicitNamespaceInstantiation(t *testing.T) {
 
 	grpc.Deploy(spec, leaf)
 	leafproc := goproc.CreateProcess(spec, "leaf_proc", leaf)
-	leafctr := linuxcontainer.CreateContainer(spec, "nonleaf_ctr", leafproc)
+	leafctr := linuxcontainer.CreateContainer(spec, "leaf_ctr", leafproc)
 
 	grpc.Deploy(spec, nonleaf)
 	nonleafproc := goproc.CreateProcess(spec, "nonleaf_proc", nonleaf)
@@ -197,7 +197,7 @@ func TestContainerExplicitNamespaceInstantiation(t *testing.T) {
 	app := assertBuildSuccess(t, spec, leafctr, nonleafctr)
 
 	assertIR(t, app,
-		`TestContainerMixedInstantiation2 = BlueprintApplication() {
+		`TestContainerExplicitNamespaceInstantiation = BlueprintApplication() {
 			leaf.grpc.addr
 			leaf.grpc.bind_addr = AddressConfig()
 			leaf.grpc.dial_addr = AddressConfig()
