@@ -43,10 +43,13 @@ import (
 //
 // Stored as metadata within a wiring spec.
 type PointerDef struct {
-	name         string
-	srcHead      string
-	srcModifiers []string
-	srcTail      string
+	name string
+
+	srcHead              string
+	srcModifiers         []string
+	srcTail              string
+	dstEntrypointFromSrc string
+
 	dstHead      string
 	dstModifiers []string
 	dst          string
@@ -71,8 +74,19 @@ type PointerOpts struct {
 	RequireUniqueness any
 }
 
-var defaultOpts = PointerOpts{
+// Additional options that can be specified when adding a modifier to a pointer.
+// If not specified, defaults are used.
+type ModifierOpts struct {
+	// Defaults to true
+	UpdateDstEntrypoint bool
+}
+
+var defaultPointerOpts = PointerOpts{
 	RequireUniqueness: &ir.ApplicationNode{},
+}
+
+var defaultModifierOpts = ModifierOpts{
+	UpdateDstEntrypoint: true,
 }
 
 // Creates a pointer called name that points to the specified node dst.
@@ -85,7 +99,7 @@ var defaultOpts = PointerOpts{
 //
 // Additional pointer options can be specified by providing optional PointerOpts.
 func CreatePointer[SrcNodeType any](spec wiring.WiringSpec, name string, dst string, options ...PointerOpts) *PointerDef {
-	opts := defaultOpts
+	opts := defaultPointerOpts
 	if len(options) > 0 {
 		opts = options[0]
 	}
@@ -102,14 +116,22 @@ func CreatePointer[SrcNodeType any](spec wiring.WiringSpec, name string, dst str
 	ptr.srcModifiers = nil
 	ptr.srcHead = name + ".src"
 	ptr.srcTail = ptr.srcHead
+	ptr.dstEntrypointFromSrc = dst
 	ptr.dstHead = dst
 	ptr.dstModifiers = nil
 	ptr.dst = dst
 
-	spec.Alias(ptr.srcTail, ptr.dstHead)
+	spec.Alias(ptr.srcTail, ptr.dstEntrypointFromSrc)
 
 	var ptrType SrcNodeType
 	spec.Define(name, ptrType, func(namespace wiring.Namespace) (ir.IRNode, error) {
+		// This is the lazy implicit instantiation of the Dst side of the pointer, if
+		// it hasn't explicitly been instantiated somewhere in the wiring spec.
+		namespace.Defer(func() error {
+			_, err := ptr.InstantiateDst(namespace)
+			return err
+		})
+
 		var node ir.IRNode
 		err := namespace.Get(ptr.srcHead, &node)
 		return node, err
@@ -140,7 +162,7 @@ func GetPointer(spec wiring.WiringSpec, name string) *PointerDef {
 func (ptr *PointerDef) AddSrcModifier(spec wiring.WiringSpec, modifierName string) string {
 	spec.Alias(ptr.srcTail, modifierName)
 	ptr.srcTail = modifierName + ".ptr.src.next"
-	spec.Alias(ptr.srcTail, ptr.dstHead)
+	spec.Alias(ptr.srcTail, ptr.dstEntrypointFromSrc)
 	ptr.srcModifiers = append(ptr.srcModifiers, modifierName)
 
 	return ptr.srcTail
@@ -156,10 +178,17 @@ func (ptr *PointerDef) AddSrcModifier(spec wiring.WiringSpec, modifierName strin
 //
 // The return value of AddDstModifier is the name of the _previous_ server side modifier.  This
 // can be used within the BuildFunc of modifierName.
-func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName string) string {
+func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName string, options ...ModifierOpts) string {
+	opts := defaultModifierOpts
+	if len(options) > 0 {
+		opts = options[0]
+	}
 	nextDst := ptr.dstHead
 	ptr.dstHead = modifierName
-	spec.Alias(ptr.srcTail, ptr.dstHead)
+	if opts.UpdateDstEntrypoint {
+		ptr.dstEntrypointFromSrc = ptr.dstHead
+		spec.Alias(ptr.srcTail, ptr.dstEntrypointFromSrc)
+	}
 	ptr.dstModifiers = append([]string{ptr.dstHead}, ptr.dstModifiers...)
 	return nextDst
 }
@@ -205,3 +234,43 @@ func (ptr *PointerDef) AddAddrModifier(spec wiring.WiringSpec, addrName string) 
 
 	return nextModifierName
 }
+
+// // If any pointer modifiers are addresses, this will instantiate the server side of the addresses.
+// //
+// // This is primarily used by namespace plugins.
+// func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) (ir.IRNode, error) {
+// 	namespace.Info("Instantiating pointer %s.dst from namespace %s", ptr.name, namespace.Name())
+// 	for _, modifier := range ptr.dstModifiers {
+// 		var addr address.Node
+// 		err := namespace.Get(modifier, &addr)
+
+// 		// Want to find the final dstModifier that points to an address, then instantiate the address
+// 		if err == nil {
+// 			dstName, err := address.PointsTo(namespace, modifier)
+// 			if err != nil {
+// 				return nil, err
+// 			}
+// 			if addr.GetDestination() != nil {
+// 				// Destination has already been instantiated, stop instantiating now
+// 				namespace.Info("Destination %s of %s has already been instantiated", dstName, addr.Name())
+// 				return addr.GetDestination(), nil
+// 			} else {
+// 				namespace.Info("Instantiating %s of %s", dstName, addr.Name())
+// 				var dst ir.IRNode
+// 				if err := namespace.Instantiate(dstName, &dst); err != nil {
+// 					return nil, err
+// 				}
+// 				err = addr.SetDestination(dst)
+// 				if err != nil {
+// 					return nil, err
+// 				}
+// 			}
+// 		} else {
+// 			namespace.Info("Skipping %v, not an address", modifier)
+// 		}
+// 	}
+
+// 	var node ir.IRNode
+// 	err := namespace.Get(ptr.dst, &node)
+// 	return node, err
+// }

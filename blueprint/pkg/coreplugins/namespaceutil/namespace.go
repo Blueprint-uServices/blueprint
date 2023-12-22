@@ -52,8 +52,10 @@ func AddNodeTo[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName stri
 	}
 
 	// Add a modifier to child that enters the namespace before instantiating the child
+	// Unlike most modifiers, we don't want this modifier to change which node the client side of the
+	// pointer receives
 	modifierName := fmt.Sprintf("%v.%v", childName, namespaceName)
-	ptrNext := ptr.AddDstModifier(spec, modifierName)
+	ptrNext := ptr.AddDstModifier(spec, modifierName, pointer.ModifierOpts{UpdateDstEntrypoint: false})
 
 	// We are proxying the ptrNext node, so must provide wiring spec options
 	ptrNextDef := spec.GetDef(ptrNext)
@@ -62,7 +64,8 @@ func AddNodeTo[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName stri
 		opts.ReturnType = ptrNextDef.Options.ReturnType
 	}
 
-	// opts := wiring.WiringOpts{ProxyNode: true, ReturnType: }
+	// The modifier gets the namespace (creating if it doesn't exist) then immediately gets the next
+	// modifier node from within the namespace
 	var nodeType NamespaceNodeType
 	spec.Define(modifierName, &nodeType, func(parentNamespace wiring.Namespace) (ir.IRNode, error) {
 		// Namespace node must exist so that namespace exists
@@ -82,6 +85,8 @@ func AddNodeTo[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName stri
 		err = namespace.Instantiate(ptrNext, &ptrNextNode)
 		return ptrNextNode, err
 	}, opts)
+
+	// The namespace also instantiates the modifier
 	spec.AddProperty(namespaceName, prop_CHILDREN, ptrNext)
 }
 
