@@ -55,7 +55,7 @@ func AddNodeTo[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName stri
 	// Unlike most modifiers, we don't want this modifier to change which node the client side of the
 	// pointer receives
 	modifierName := fmt.Sprintf("%v.%v", childName, namespaceName)
-	ptrNext := ptr.AddDstModifier(spec, modifierName, pointer.ModifierOpts{UpdateDstEntrypoint: false})
+	ptrNext := ptr.AddDstModifier(spec, modifierName, pointer.ModifierOpts{IsInterfaceNode: false})
 
 	// We are proxying the ptrNext node, so must provide wiring spec options
 	ptrNextDef := spec.GetDef(ptrNext)

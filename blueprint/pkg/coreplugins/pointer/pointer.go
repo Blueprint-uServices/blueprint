@@ -30,7 +30,6 @@
 package pointer
 
 import (
-	"fmt"
 	"strings"
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
@@ -45,14 +44,15 @@ import (
 type PointerDef struct {
 	name string
 
-	srcHead              string
-	srcModifiers         []string
-	srcTail              string
-	dstEntrypointFromSrc string
+	srcHead      string
+	srcModifiers []string
+	srcTail      string
+
+	// The node that is the interface from src to dst.  Typically this is an address
+	interfaceNode string
 
 	dstHead      string
 	dstModifiers []string
-	dst          string
 }
 
 func (ptr PointerDef) String() string {
@@ -77,8 +77,8 @@ type PointerOpts struct {
 // Additional options that can be specified when adding a modifier to a pointer.
 // If not specified, defaults are used.
 type ModifierOpts struct {
-	// Defaults to true
-	UpdateDstEntrypoint bool
+	// Defaults to true.  When true, the pointer's interface node is updated
+	IsInterfaceNode bool
 }
 
 var defaultPointerOpts = PointerOpts{
@@ -86,7 +86,7 @@ var defaultPointerOpts = PointerOpts{
 }
 
 var defaultModifierOpts = ModifierOpts{
-	UpdateDstEntrypoint: true,
+	IsInterfaceNode: true,
 }
 
 // Creates a pointer called name that points to the specified node dst.
@@ -116,20 +116,18 @@ func CreatePointer[SrcNodeType any](spec wiring.WiringSpec, name string, dst str
 	ptr.srcModifiers = nil
 	ptr.srcHead = name + ".src"
 	ptr.srcTail = ptr.srcHead
-	ptr.dstEntrypointFromSrc = dst
+	ptr.interfaceNode = dst
 	ptr.dstHead = dst
-	ptr.dstModifiers = nil
-	ptr.dst = dst
+	ptr.dstModifiers = []string{dst}
 
-	spec.Alias(ptr.srcTail, ptr.dstEntrypointFromSrc)
+	spec.Alias(ptr.srcTail, ptr.interfaceNode)
 
 	var ptrType SrcNodeType
 	spec.Define(name, ptrType, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		// This is the lazy implicit instantiation of the Dst side of the pointer, if
 		// it hasn't explicitly been instantiated somewhere in the wiring spec.
 		namespace.Defer(func() error {
-			_, err := ptr.InstantiateDst(namespace)
-			return err
+			return ptr.InstantiateDst(namespace)
 		})
 
 		var node ir.IRNode
@@ -162,7 +160,7 @@ func GetPointer(spec wiring.WiringSpec, name string) *PointerDef {
 func (ptr *PointerDef) AddSrcModifier(spec wiring.WiringSpec, modifierName string) string {
 	spec.Alias(ptr.srcTail, modifierName)
 	ptr.srcTail = modifierName + ".ptr.src.next"
-	spec.Alias(ptr.srcTail, ptr.dstEntrypointFromSrc)
+	spec.Alias(ptr.srcTail, ptr.interfaceNode)
 	ptr.srcModifiers = append(ptr.srcModifiers, modifierName)
 
 	return ptr.srcTail
@@ -185,9 +183,9 @@ func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName strin
 	}
 	nextDst := ptr.dstHead
 	ptr.dstHead = modifierName
-	if opts.UpdateDstEntrypoint {
-		ptr.dstEntrypointFromSrc = ptr.dstHead
-		spec.Alias(ptr.srcTail, ptr.dstEntrypointFromSrc)
+	if opts.IsInterfaceNode {
+		ptr.interfaceNode = ptr.dstHead
+		spec.Alias(ptr.srcTail, ptr.interfaceNode)
 	}
 	ptr.dstModifiers = append([]string{ptr.dstHead}, ptr.dstModifiers...)
 	return nextDst
@@ -207,70 +205,79 @@ func (ptr *PointerDef) AddAddrModifier(spec wiring.WiringSpec, addrName string) 
 		return ""
 	}
 
-	// Try to give the modifier a readable name
-	after, _ := strings.CutPrefix(def.PointsTo, ptr.name+".")
-	modifierName := fmt.Sprintf("%v.instantiate_%v", ptr.name, after)
+	// Add a modifier to instantiate address PointsTo
+	nextDst := ptr.AddDstModifier(spec, def.PointsTo)
 
-	// Add the modifier
-	nextModifierName := ptr.AddDstModifier(spec, modifierName)
+	// Set the pointer interface to be the address, rather than the node
+	ptr.interfaceNode = addrName
+	spec.Alias(ptr.srcTail, ptr.interfaceNode)
 
-	// Provide the modifier definition, using information from the address metadata
-	spec.Define(modifierName, def.ServerType, func(namespace wiring.Namespace) (ir.IRNode, error) {
-		// We defer instantiation of the actual server node until later.
-		namespace.Defer(func() error {
-			var nextNode ir.IRNode
-			if err := namespace.Get(nextModifierName, &nextNode); err != nil {
-				return err
-			}
-			// Also instantiate PointsTo in case nextModifierName is not the same as PointsTo
-			return namespace.Get(def.PointsTo, &nextNode)
-		})
+	return nextDst
 
-		// All we need to return for now is the address to the server
-		var addr address.Node
-		err := namespace.Get(addrName, &addr)
-		return addr, err
-	})
+	// // Try to give the modifier a readable name
+	// after, _ := strings.CutPrefix(def.PointsTo, ptr.name+".")
+	// modifierName := fmt.Sprintf("%v.instantiate_%v", ptr.name, after)
 
-	return nextModifierName
+	// // Add the modifier
+	// nextModifierName := ptr.AddDstModifier(spec, modifierName)
+
+	// // Provide the modifier definition, using information from the address metadata
+	// spec.Define(modifierName, def.ServerType, func(namespace wiring.Namespace) (ir.IRNode, error) {
+	// 	// We defer instantiation of the actual server node until later.
+	// 	namespace.Defer(func() error {
+	// 		var nextNode ir.IRNode
+	// 		if err := namespace.Get(nextModifierName, &nextNode); err != nil {
+	// 			return err
+	// 		}
+	// 		// Also instantiate PointsTo in case nextModifierName is not the same as PointsTo
+	// 		return namespace.Get(def.PointsTo, &nextNode)
+	// 	})
+
+	// 	// All we need to return for now is the address to the server
+	// 	var addr address.Node
+	// 	err := namespace.Get(addrName, &addr)
+	// 	return addr, err
+	// })
+
+	// return nextModifierName
 }
 
-// // If any pointer modifiers are addresses, this will instantiate the server side of the addresses.
-// //
-// // This is primarily used by namespace plugins.
-// func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) (ir.IRNode, error) {
-// 	namespace.Info("Instantiating pointer %s.dst from namespace %s", ptr.name, namespace.Name())
-// 	for _, modifier := range ptr.dstModifiers {
-// 		var addr address.Node
-// 		err := namespace.Get(modifier, &addr)
+// If any pointer modifiers are addresses, this will instantiate the server side of the addresses.
+//
+// This is primarily used by namespace plugins.
+func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) error {
+	namespace.Info("Instantiating pointer %s.dst from namespace %s", ptr.name, namespace.Name())
 
-// 		// Want to find the final dstModifier that points to an address, then instantiate the address
-// 		if err == nil {
-// 			dstName, err := address.PointsTo(namespace, modifier)
-// 			if err != nil {
-// 				return nil, err
-// 			}
-// 			if addr.GetDestination() != nil {
-// 				// Destination has already been instantiated, stop instantiating now
-// 				namespace.Info("Destination %s of %s has already been instantiated", dstName, addr.Name())
-// 				return addr.GetDestination(), nil
-// 			} else {
-// 				namespace.Info("Instantiating %s of %s", dstName, addr.Name())
-// 				var dst ir.IRNode
-// 				if err := namespace.Instantiate(dstName, &dst); err != nil {
-// 					return nil, err
-// 				}
-// 				err = addr.SetDestination(dst)
-// 				if err != nil {
-// 					return nil, err
-// 				}
-// 			}
-// 		} else {
-// 			namespace.Info("Skipping %v, not an address", modifier)
-// 		}
-// 	}
+	// Instantiating dst starts from the interface node between src and dst
+	var node ir.IRNode
+	err := namespace.Get(ptr.interfaceNode, &node)
+	if err != nil {
+		return err
+	}
 
-// 	var node ir.IRNode
-// 	err := namespace.Get(ptr.dst, &node)
-// 	return node, err
-// }
+	// We only have to handle the case where the interface between src and dst is an addr, which means
+	// the dst side of the addr might not yet be instantiated.  If it's not an addr, then either the client,
+	// or the above call to namespace.Get, will have triggered dst instantiation
+	addr, isAddr := node.(address.Node)
+	if !isAddr {
+		return nil
+	}
+
+	// The addr destination might have been explicitly instantiated, or instantiated by a different client
+	if addr.GetDestination() != nil {
+		return nil
+	}
+
+	// Getting the first dst modifier should cause all of the dst side of the pointer to be instantiated
+	var dst ir.IRNode
+	if namespace.Instantiate(ptr.dstModifiers[0], &dst) != nil {
+		return err
+	}
+
+	// Currently we don't support multiple addresses within a pointer; so getting the first dst modifier
+	// should cause a cascade where the addr destination gets set.  Error out if not.
+	if addr.GetDestination() == nil {
+		return namespace.Error("Attempted to instantiate the server-side of address %v starting with %v but the server failed to instantiate", addr.Name(), ptr.dstModifiers[0])
+	}
+	return nil
+}
