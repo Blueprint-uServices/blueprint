@@ -1,14 +1,15 @@
+// Package rabbitmq provides a client-wrapper implementation of the [backend.Queue] interface for a rabbitmq server.
 package rabbitmq
 
 import (
-	"bytes"
 	"context"
-	"encoding/gob"
+	"encoding/json"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
 
+// Implements a Queue that uses the rabbitmq package
 type RabbitMQ struct {
 	name  string
 	queue amqp.Queue
@@ -17,6 +18,7 @@ type RabbitMQ struct {
 	msgs  <-chan amqp.Delivery
 }
 
+// Instantiates a new [Queue] instances that provides a queue interface via a RabbitMQ instance
 func NewRabbitMQ(ctx context.Context, addr string, queue_name string) (*RabbitMQ, error) {
 	conn, err := amqp.Dial("amqp://guest:guest@" + addr + "/")
 	if err != nil {
@@ -37,22 +39,13 @@ func NewRabbitMQ(ctx context.Context, addr string, queue_name string) (*RabbitMQ
 	return &RabbitMQ{name: queue_name, conn: conn, ch: ch, queue: q, msgs: msgs}, nil
 }
 
-// Encoding requires that the real type of the interface is already registered with gob.
 func getBytes(key interface{}) ([]byte, error) {
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(key)
-	if err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+	return json.Marshal(key)
 }
 
 func decodeBytes(val []byte) (interface{}, error) {
-	encoded := bytes.NewBuffer(val)
-	dec := gob.NewDecoder(encoded)
 	var res interface{}
-	err := dec.Decode(&res)
+	err := json.Unmarshal(val, &res)
 	return res, err
 }
 
