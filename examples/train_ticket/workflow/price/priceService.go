@@ -44,9 +44,6 @@ func (p *PriceServiceImpl) FindByID(ctx context.Context, id string) (PriceConfig
 	if err != nil {
 		return PriceConfig{}, err
 	}
-	if err != nil {
-		return PriceConfig{}, err
-	}
 	if !exists {
 		return PriceConfig{}, errors.New("PriceConfig with ID " + id + " does not exist")
 	}
