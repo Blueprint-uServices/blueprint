@@ -98,7 +98,7 @@ func (ts *TrainServiceImpl) RetrieveByNames(ctx context.Context, names []string)
 	var trainTypes []TrainType
 	for _, name := range names {
 		tt, err := ts.RetrieveByName(ctx, name)
-		if err != nil {
+		if err == nil {
 			trainTypes = append(trainTypes, tt)
 		} else {
 			trainTypes = append(trainTypes, TrainType{})
@@ -134,7 +134,7 @@ func (ts *TrainServiceImpl) AllTrains(ctx context.Context) ([]TrainType, error) 
 	if err != nil {
 		return trains, err
 	}
-	res, err := coll.FindMany(ctx, bson.D{{}})
+	res, err := coll.FindMany(ctx, bson.D{})
 	if err != nil {
 		return trains, err
 	}
