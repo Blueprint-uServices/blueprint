@@ -108,7 +108,7 @@ func (a *AssuranceServiceImpl) DeleteByOrderId(ctx context.Context, order_id str
 }
 
 func (a *AssuranceServiceImpl) Modify(ctx context.Context, assurance Assurance) (Assurance, error) {
-	as, err := a.FindAssuranceById(ctx, assurance.ID)
+	_, err := a.FindAssuranceById(ctx, assurance.ID)
 	if err != nil {
 		return assurance, err
 	}
@@ -117,14 +117,14 @@ func (a *AssuranceServiceImpl) Modify(ctx context.Context, assurance Assurance) 
 		return assurance, err
 	}
 	query := bson.D{{"id", assurance.ID}}
-	ok, err := coll.Upsert(ctx, query, as)
+	ok, err := coll.Upsert(ctx, query, assurance)
 	if err != nil {
-		return as, err
+		return assurance, err
 	}
 	if !ok {
-		return as, errors.New("Failed to update assurance with ID " + assurance.ID)
+		return assurance, errors.New("Failed to update assurance with ID " + assurance.ID)
 	}
-	return as, nil
+	return assurance, nil
 }
 
 func (a *AssuranceServiceImpl) Create(ctx context.Context, typeindex int64, orderid string) (Assurance, error) {
@@ -137,5 +137,9 @@ func (a *AssuranceServiceImpl) Create(ctx context.Context, typeindex int64, orde
 	assurance.ID = id
 	assurance.OrderID = orderid
 	assurance.AT = at
-	return assurance, nil
+	coll, err := a.db.GetCollection(ctx, "assurance", "assurance")
+	if err != nil {
+		return Assurance{}, err
+	}
+	return assurance, coll.InsertOne(ctx, assurance)
 }
