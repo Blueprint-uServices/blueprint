@@ -60,20 +60,13 @@ func makeDockerRabbitSpec(spec wiring.WiringSpec) ([]string, error) {
 	cart_service := workflow.Service(spec, "cart_service", "CartService", cart_db)
 	applyDockerDefaults(cart_service)
 
-	//shipqueue := simple.Queue(spec, "shipping_queue")
 	shipqueue := rabbitmq.Container(spec, "shipping_queue", "shippingq")
 	shipdb := mongodb.Container(spec, "shipping_db")
 	shipping_service := workflow.Service(spec, "shipping_service", "ShippingService", shipqueue, shipdb)
 	applyDockerDefaults(shipping_service)
 
-	// Deploy queue master to the same process as the shipping proc
-	// TODO: now that distributed queue is supported, move to separate containers
 	queue_master := workflow.Service(spec, "queue_master", "QueueMaster", shipqueue, shipping_service)
-	goproc.AddToProcess(spec, "shipping_service_proc", queue_master)
-
-	// Uncomment the following to move queue_master to a separate container
-	// goproc.Deploy(spec, queue_master)
-	// linuxcontainer.Deploy(spec, queue_master)
+	applyDockerDefaults(queue_master)
 
 	order_db := mongodb.Container(spec, "order_db")
 	order_service := workflow.Service(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)
