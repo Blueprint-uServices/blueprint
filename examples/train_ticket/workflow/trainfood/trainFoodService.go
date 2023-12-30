@@ -14,6 +14,7 @@ type TrainFoodService interface {
 	CreateTrainFood(ctx context.Context, tf TrainFood) (TrainFood, error)
 	ListTrainFood(ctx context.Context) ([]TrainFood, error)
 	ListTrainFoodByTripID(ctx context.Context, tripid string) ([]food.Food, error)
+	Cleanup(ctx context.Context) error
 }
 
 type TrainFoodServiceImpl struct {
@@ -87,4 +88,12 @@ func (t *TrainFoodServiceImpl) CreateTrainFood(ctx context.Context, tf TrainFood
 		return TrainFood{}, errors.New("Failed to set the train food")
 	}
 	return tf, err
+}
+
+func (t *TrainFoodServiceImpl) Cleanup(ctx context.Context) error {
+	coll, err := t.db.GetCollection(ctx, "trainfood", "trainfood")
+	if err != nil {
+		return err
+	}
+	return coll.DeleteMany(ctx, bson.D{})
 }

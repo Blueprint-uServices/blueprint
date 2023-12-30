@@ -15,6 +15,7 @@ type StationFoodService interface {
 	ListFoodStoresByStationName(ctx context.Context, station string) ([]StationFoodStore, error)
 	GetFoodStoresByStationNames(ctx context.Context, stations []string) ([]StationFoodStore, error)
 	GetFoodStoreByID(ctx context.Context, id string) (StationFoodStore, error)
+	Cleanup(ctx context.Context) error
 }
 
 type StationFoodServiceImpl struct {
@@ -121,4 +122,12 @@ func (s *StationFoodServiceImpl) GetFoodStoreByID(ctx context.Context, id string
 		return StationFoodStore{}, errors.New("Station with ID " + id + " does not exist")
 	}
 	return store, err
+}
+
+func (s *StationFoodServiceImpl) Cleanup(ctx context.Context) error {
+	coll, err := s.db.GetCollection(ctx, "stationfood", "stationfood")
+	if err != nil {
+		return err
+	}
+	return coll.DeleteMany(ctx, bson.D{})
 }
