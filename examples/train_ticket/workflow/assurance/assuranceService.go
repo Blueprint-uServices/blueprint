@@ -16,7 +16,7 @@ type AssuranceService interface {
 	Create(ctx context.Context, typeindex int64, orderId string) (Assurance, error)
 	DeleteById(ctx context.Context, id string) error
 	DeleteByOrderId(ctx context.Context, orderId string) error
-	Modify(ctx context.Context, assurance Assurance) (Assurance, error)
+	Modify(ctx context.Context, a Assurance) (Assurance, error)
 	GetAllAssurances(ctx context.Context) ([]Assurance, error)
 	GetAllAssuranceTypes(ctx context.Context) ([]AssuranceType, error)
 }
