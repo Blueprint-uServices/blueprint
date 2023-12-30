@@ -64,7 +64,8 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	applyDockerDefaults(consignprice_service, "consignprice_proc", "consignprice_container")
 
 	payments_db := mongodb.Container(spec, "payments_db")
-	payments_service := workflow.Service(spec, "payments_service", "PaymentServiceImpl", payments_db)
+	money_db := mongodb.Container(spec, "money_db")
+	payments_service := workflow.Service(spec, "payments_service", "PaymentServiceImpl", payments_db, money_db)
 	applyDockerDefaults(payments_service, "payments_proc", "payments_container")
 
 	route_db := mongodb.Container(spec, "route_db")

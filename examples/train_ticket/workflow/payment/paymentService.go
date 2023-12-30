@@ -15,6 +15,7 @@ type PaymentService interface {
 	AddMoney(ctx context.Context, payment Payment) error
 	Query(ctx context.Context) ([]Payment, error)
 	InitPayment(ctx context.Context, payment Payment) error
+	Cleanup(ctx context.Context) error
 }
 
 type PaymentServiceImpl struct {
@@ -22,7 +23,7 @@ type PaymentServiceImpl struct {
 	moneyDB   backend.NoSQLDatabase
 }
 
-func NewStationServiceImpl(ctx context.Context, payDB backend.NoSQLDatabase, moneyDB backend.NoSQLDatabase) (*PaymentServiceImpl, error) {
+func NewPaymentServiceImpl(ctx context.Context, payDB backend.NoSQLDatabase, moneyDB backend.NoSQLDatabase) (*PaymentServiceImpl, error) {
 	return &PaymentServiceImpl{paymentDB: payDB, moneyDB: moneyDB}, nil
 }
 
@@ -86,4 +87,20 @@ func (p *PaymentServiceImpl) AddMoney(ctx context.Context, payment Payment) erro
 		return err
 	}
 	return coll.InsertOne(ctx, m)
+}
+
+func (p *PaymentServiceImpl) Cleanup(ctx context.Context) error {
+	pay_coll, err := p.moneyDB.GetCollection(ctx, "payment", "payment")
+	if err != nil {
+		return err
+	}
+	err = pay_coll.DeleteMany(ctx, bson.D{})
+	if err != nil {
+		return err
+	}
+	money_coll, err := p.moneyDB.GetCollection(ctx, "payment", "money")
+	if err != nil {
+		return err
+	}
+	return money_coll.DeleteMany(ctx, bson.D{})
 }
