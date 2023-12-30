@@ -133,6 +133,7 @@ func (r *RouteServiceImpl) CreateAndModify(ctx context.Context, info RouteInfo) 
 	}
 	route := Route{}
 	const MAXIDLEN = 32
+	old_exists := false
 	if info.ID == "" || len(info.ID) < MAXIDLEN {
 		route.ID = uuid.New().String()
 	} else {
@@ -150,11 +151,22 @@ func (r *RouteServiceImpl) CreateAndModify(ctx context.Context, info RouteInfo) 
 		} else {
 			route.ID = info.ID
 		}
+		old_exists = exists
 	}
 	route.Stations = stations
 	route.Distances = distances
 	route.StartStation = info.StartStation
 	route.EndStation = info.EndStation
+	if old_exists {
+		ok, err := coll.Upsert(ctx, bson.D{{"id", info.ID}}, route)
+		if err != nil {
+			return route, err
+		}
+		if !ok {
+			return route, errors.New("Failed to update route")
+		}
+		return route, nil
+	}
 
-	return route, nil
+	return route, coll.InsertOne(ctx, route)
 }
