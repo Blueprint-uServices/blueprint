@@ -1,3 +1,6 @@
+// Package GoVector adds support for instrumenting applications with GoVector logger.
+// GoVector is a vector clock logging library developed for educational purposes.
+// More information on GoVector: https://github.com/DistributedClocks/GoVector
 package govector
 
 import (
@@ -10,7 +13,7 @@ import (
 )
 
 // Instruments the service with an entry + exit point govector wrapper to generate govector logs.
-func Instrument(spec wiring.WiringSpec, serviceName string) {
+func Instrument(spec wiring.WiringSpec, serviceName string, logger_name string) {
 	clientWrapper := serviceName + ".client.govec"
 	serverWrapper := serviceName + ".server.govec"
 
@@ -21,23 +24,23 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 
 	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
 
-	spec.Define(clientWrapper, &govecClientWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {
+	spec.Define(clientWrapper, &GovecClientWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
 		if err := ns.Get(clientNext, &wrapped); err != nil {
 			return nil, blueprint.Errorf("GoVector client %s expected %s to be a golang.Service, but encountered %s", clientWrapper, clientNext, err)
 		}
 
-		return newGovecClientWrapper(clientWrapper, wrapped)
+		return newGovecClientWrapper(clientWrapper, wrapped, logger_name)
 	})
 
 	serverNext := ptr.AddDstModifier(spec, serverWrapper)
 
-	spec.Define(serverWrapper, &govecServerWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {
+	spec.Define(serverWrapper, &GovecServerWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
 		if err := ns.Get(serverNext, &wrapped); err != nil {
 			return nil, blueprint.Errorf("GoVector server %s expected %s to be a golang.Service, but encountered %s", serverWrapper, serverNext, wrapped)
 		}
 
-		return newGovecServerWrappe(serverWrapper, wrapped)
+		return newGovecServerWrapper(serverWrapper, wrapped, logger_name)
 	})
 }
