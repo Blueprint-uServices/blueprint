@@ -26,5 +26,6 @@ func main() {
 		specs.Logging,
 		specs.XtraceLogging,
 		specs.OTtraceLogging,
+		specs.GoVec,
 	)
 }
