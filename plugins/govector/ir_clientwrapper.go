@@ -1,8 +1,16 @@
 package govector
 
 import (
+	"fmt"
+	"path/filepath"
+
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
+	"golang.org/x/exp/slog"
 )
 
 // Blueprint IR Node that wraps the client-side of a service to generate govec logs
@@ -14,7 +22,7 @@ type GovecClientWrapper struct {
 	InstanceName  string
 	outputPackage string
 	Wrapped       golang.Service
-	LoggerName    *ir.IRValue
+	GoVecClient   *GoVecLoggerClient
 }
 
 func (node *GovecClientWrapper) Name() string {
@@ -28,11 +36,155 @@ func (node *GovecClientWrapper) String() string {
 func (node *GovecClientWrapper) ImplementsGolangNode()    {}
 func (node *GovecClientWrapper) ImplementsGolangService() {}
 
-func newGovecClientWrapper(name string, wrapped golang.Service, logger_name string) (*GovecClientWrapper, error) {
+func newGovecClientWrapper(name string, wrapped golang.Service, logger *GoVecLoggerClient) (*GovecClientWrapper, error) {
 	node := &GovecClientWrapper{}
 	node.InstanceName = name
 	node.outputPackage = "govec"
 	node.Wrapped = wrapped
-	node.LoggerName = &ir.IRValue{Value: logger_name}
+	node.GoVecClient = logger
 	return node, nil
 }
+
+func (node *GovecClientWrapper) genInterface(ctx ir.BuildContext) (*gocode.ServiceInterface, error) {
+	iface, err := golang.GetGoInterface(ctx, node.Wrapped)
+	if err != nil {
+		return nil, err
+	}
+	module_ctx, valid := ctx.(golang.ModuleBuilder)
+	if !valid {
+		return nil, blueprint.Errorf("GoVecClientWrapper expected build context to be a ModuleBuilder, got %v", ctx)
+	}
+	i := gocode.CopyServiceInterface(fmt.Sprintf("%v_GoVecClientWrapperInterface", iface.BaseName), module_ctx.Info().Name+"/"+node.outputPackage, iface)
+	for name, method := range i.Methods {
+		method.Arguments = method.Arguments[:len(method.Arguments)-1]
+		method.Returns = method.Returns[:len(method.Returns)-1]
+		i.Methods[name] = method
+	}
+	return i, nil
+}
+
+func (node *GovecClientWrapper) AddInstantiation(builder golang.NamespaceBuilder) error {
+	if builder.Visited(node.InstanceName) {
+		return nil
+	}
+
+	iface, err := golang.GetGoInterface(builder, node.Wrapped)
+	if err != nil {
+		return err
+	}
+
+	govec_iface, err := golang.GetGoInterface(builder, node.GoVecClient)
+	if err != nil {
+		return err
+	}
+
+	constructor := &gocode.Constructor{
+		Package: builder.Module().Info().Name + "/" + node.outputPackage,
+		Func: gocode.Func{
+			Name: fmt.Sprintf("New_%v_GoVecClientWrapper", iface.BaseName),
+			Arguments: []gocode.Variable{
+				{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}},
+				{Name: "client", Type: iface},
+				{Name: "logger", Type: govec_iface},
+			},
+		},
+	}
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, node.GoVecClient})
+}
+
+func (node *GovecClientWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
+	wrapped_iface, err := golang.GetGoInterface(builder, node.Wrapped)
+	if err != nil {
+		return err
+	}
+
+	govec_iface, err := golang.GetGoInterface(builder, node.GoVecClient)
+	if err != nil {
+		return err
+	}
+
+	impl_iface, err := node.genInterface(builder)
+	if err != nil {
+		return err
+	}
+
+	return generateClientHandler(builder, wrapped_iface, impl_iface, govec_iface, node.outputPackage)
+}
+
+func (node *GovecClientWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
+	return node.genInterface(ctx)
+}
+
+func (node *GovecClientWrapper) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.Wrapped.AddInterfaces(builder)
+}
+
+func generateClientHandler(builder golang.ModuleBuilder, wrapped *gocode.ServiceInterface, impl *gocode.ServiceInterface, govec_iface *gocode.ServiceInterface, outputPackage string) error {
+	pkg, err := builder.CreatePackage(outputPackage)
+	if err != nil {
+		return err
+	}
+
+	client := &clientArgs{
+		Package:         pkg,
+		Service:         wrapped,
+		Impl:            impl,
+		GoVecIface:      govec_iface,
+		Name:            wrapped.BaseName + "_GoVecClientWrapper",
+		IfaceName:       impl.Name,
+		ServerIfaceName: wrapped.BaseName + "_GoVecServerWrapperInterface",
+		Imports:         gogen.NewImports(pkg.Name),
+	}
+
+	client.Imports.AddPackages("context")
+
+	slog.Info(fmt.Sprintf("Generating %v/%v", client.Package.PackageName, impl.Name))
+	outputFile := filepath.Join(client.Package.Path, impl.Name+".go")
+	return gogen.ExecuteTemplateToFile("GoVector", clientTemplate, client, outputFile)
+}
+
+type clientArgs struct {
+	Package         golang.PackageInfo
+	Service         *gocode.ServiceInterface
+	Impl            *gocode.ServiceInterface
+	GoVecIface      *gocode.ServiceInterface
+	Name            string
+	IfaceName       string
+	ServerIfaceName string
+	Imports         *gogen.Imports
+}
+
+var clientTemplate = `// Blueprint: Auto-generated by GoVector Plugin
+package {{.Package.ShortName}}
+
+{{.Imports}}
+
+type {{.IfaceName}} interface {
+	{{range $_, $f := .Impl.Methods -}}
+	{{Signature $f}}
+	{{end}}
+}
+
+type {{.Name}} struct {
+	Client {{.ServerIfaceName}}
+	Logger {{.Imports.NameOf .GoVecIface.UserType}}
+}
+
+func New_{{.Name}}(ctx context.Context, client {{.ServerIfaceName}}, logger {{.Imports.NameOf .GoVecIface.UserType}}) (*{{.Name}}, error) {
+	handler := &{{.Name}}{}
+	handler.Client = client
+	handler.Logger = logger
+	return handler, nil
+}
+
+{{$service := .Service.Name -}}
+{{$receiver := .Name -}}
+{{range $_, $f := .Impl.Methods}}
+func (handler *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
+	govec_bytes, _ = handler.Logger.GetSendCtx(ctx, "Preparing to make request for function {{$f.Name}}")
+	{{RetVars $f "govec_ret" "err"}} = handler.Client.({{$f.Name}}) ({{ArgVars $f "ctx"}}, govec_bytes)
+	handler.Logger.UnpackReceiveCtx(ctx, "Unpacking response from server", govec_ret)
+	return
+}
+{{end}}
+`
