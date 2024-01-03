@@ -13,8 +13,8 @@ import (
 )
 
 // Instruments the service with an entry + exit point govector wrapper to generate govector logs.
-func Instrument(spec wiring.WiringSpec, serviceName string, logger_name string) {
-	logger := DefineLogger(spec, logger_name)
+// Ensures that the logs are sent to a GoVector logger defined with name `logger`
+func Instrument(spec wiring.WiringSpec, serviceName string) {
 	clientWrapper := serviceName + ".client.govec"
 	serverWrapper := serviceName + ".server.govec"
 
@@ -30,14 +30,7 @@ func Instrument(spec wiring.WiringSpec, serviceName string, logger_name string) 
 		if err := ns.Get(clientNext, &wrapped); err != nil {
 			return nil, blueprint.Errorf("GoVector client %s expected %s to be a golang.Service, but encountered %s", clientWrapper, clientNext, err)
 		}
-
-		var loggerClient *GoVecLoggerClient
-		err := ns.Get(logger, &loggerClient)
-		if err != nil {
-			return nil, err
-		}
-
-		return newGovecClientWrapper(clientWrapper, wrapped, loggerClient)
+		return newGovecClientWrapper(clientWrapper, wrapped)
 	})
 
 	serverNext := ptr.AddDstModifier(spec, serverWrapper)
@@ -47,14 +40,7 @@ func Instrument(spec wiring.WiringSpec, serviceName string, logger_name string) 
 		if err := ns.Get(serverNext, &wrapped); err != nil {
 			return nil, blueprint.Errorf("GoVector server %s expected %s to be a golang.Service, but encountered %s", serverWrapper, serverNext, wrapped)
 		}
-
-		var loggerClient *GoVecLoggerClient
-		err := ns.Get(logger, &loggerClient)
-		if err != nil {
-			return nil, err
-		}
-
-		return newGovecServerWrapper(serverWrapper, wrapped, loggerClient)
+		return newGovecServerWrapper(serverWrapper, wrapped)
 	})
 }
 

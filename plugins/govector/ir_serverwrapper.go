@@ -22,7 +22,6 @@ type GovecServerWrapper struct {
 	InstanceName  string
 	outputPackage string
 	Wrapped       golang.Service
-	GoVecClient   *GoVecLoggerClient
 }
 
 func (node *GovecServerWrapper) Name() string {
@@ -36,12 +35,11 @@ func (node *GovecServerWrapper) String() string {
 func (node *GovecServerWrapper) ImplementsGolangNode()    {}
 func (node *GovecServerWrapper) ImplementsGolangService() {}
 
-func newGovecServerWrapper(name string, wrapped golang.Service, client *GoVecLoggerClient) (*GovecServerWrapper, error) {
+func newGovecServerWrapper(name string, wrapped golang.Service) (*GovecServerWrapper, error) {
 	node := &GovecServerWrapper{}
 	node.InstanceName = name
 	node.outputPackage = "govec"
 	node.Wrapped = wrapped
-	node.GoVecClient = client
 	return node, nil
 }
 
@@ -72,10 +70,6 @@ func (node *GovecServerWrapper) AddInstantiation(builder golang.NamespaceBuilder
 	if err != nil {
 		return err
 	}
-	govec_iface, err := golang.GetGoInterface(builder, node.GoVecClient)
-	if err != nil {
-		return err
-	}
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
@@ -83,20 +77,14 @@ func (node *GovecServerWrapper) AddInstantiation(builder golang.NamespaceBuilder
 			Arguments: []gocode.Variable{
 				{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}},
 				{Name: "service", Type: iface},
-				{Name: "goveclogger", Type: govec_iface},
 			},
 		},
 	}
-	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, node.GoVecClient})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped})
 }
 
 func (node *GovecServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
 	wrapped_iface, err := golang.GetGoInterface(builder, node.Wrapped)
-	if err != nil {
-		return err
-	}
-
-	govec_iface, err := golang.GetGoInterface(builder, node.GoVecClient)
 	if err != nil {
 		return err
 	}
@@ -106,7 +94,7 @@ func (node *GovecServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) erro
 		return err
 	}
 
-	return generateServerHandler(builder, wrapped_iface, impl_iface, govec_iface, node.outputPackage)
+	return generateServerHandler(builder, wrapped_iface, impl_iface, node.outputPackage)
 }
 
 func (node *GovecServerWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
@@ -127,23 +115,22 @@ func (node *GovecServerWrapper) AddInterfaces(builder golang.ModuleBuilder) erro
 	return node.Wrapped.AddInterfaces(builder)
 }
 
-func generateServerHandler(builder golang.ModuleBuilder, wrapped *gocode.ServiceInterface, impl *gocode.ServiceInterface, govec_iface *gocode.ServiceInterface, outputPackage string) error {
+func generateServerHandler(builder golang.ModuleBuilder, wrapped *gocode.ServiceInterface, impl *gocode.ServiceInterface, outputPackage string) error {
 	pkg, err := builder.CreatePackage(outputPackage)
 	if err != nil {
 		return err
 	}
 
 	server := &serverArgs{
-		Package:    pkg,
-		Service:    wrapped,
-		Impl:       impl,
-		GoVecIface: govec_iface,
-		Name:       wrapped.BaseName + "_GoVecServerWrapper",
-		IfaceName:  impl.Name,
-		Imports:    gogen.NewImports(pkg.Name),
+		Package:   pkg,
+		Service:   wrapped,
+		Impl:      impl,
+		Name:      wrapped.BaseName + "_GoVecServerWrapper",
+		IfaceName: impl.Name,
+		Imports:   gogen.NewImports(pkg.Name),
 	}
 
-	server.Imports.AddPackages("context")
+	server.Imports.AddPackages("context", "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/govector")
 
 	slog.Info(fmt.Sprintf("Generating %v/%v", server.Package.PackageName, impl.Name))
 	outputFile := filepath.Join(server.Package.Path, impl.Name+".go")
@@ -151,13 +138,12 @@ func generateServerHandler(builder golang.ModuleBuilder, wrapped *gocode.Service
 }
 
 type serverArgs struct {
-	Package    golang.PackageInfo
-	Service    *gocode.ServiceInterface
-	Impl       *gocode.ServiceInterface
-	GoVecIface *gocode.ServiceInterface
-	Name       string
-	IfaceName  string
-	Imports    *gogen.Imports
+	Package   golang.PackageInfo
+	Service   *gocode.ServiceInterface
+	Impl      *gocode.ServiceInterface
+	Name      string
+	IfaceName string
+	Imports   *gogen.Imports
 }
 
 func generateClientSideInterfaces(builder golang.ModuleBuilder, iface *gocode.ServiceInterface, outputPackage string) error {
@@ -194,13 +180,11 @@ type {{.IfaceName}} interface {
 
 type {{.Name}} struct {
 	Service {{.Imports.NameOf .Service.UserType}}
-	Logger {{.Imports.NameOf .GoVecIface.UserType}}
 }
 
-func New_{{.Name}} (ctx context.Context, service {{.Imports.NameOf .Service.UserType}}, logger {{.Imports.NameOf .GoVecIface.UserType}}) (*{{.Name}}, error) {
+func New_{{.Name}} (ctx context.Context, service {{.Imports.NameOf .Service.UserType}}) (*{{.Name}}, error) {
 	handler := &{{.Name}}{}
 	handler.Service = service
-	handler.Logger = logger
 	return handler, nil
 }
 
@@ -208,9 +192,9 @@ func New_{{.Name}} (ctx context.Context, service {{.Imports.NameOf .Service.User
 {{$receiver := .Name -}}
 {{range $_, $f := .Service.Methods}}
 func (handler *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}, govecctx []byte) ({{RetVarsAndTypes $f "govecret []byte" "err error"}}) {
-	handler.Logger.UnpackReceiveCtx(ctx, "Unpacking go vec context from client request", govecctx)
+	govector.GetLogger().UnpackReceiveCtx(ctx, "Unpacking go vec context from client request", govecctx)
 	{{RetVars $f "err"}} = handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
-	govecret, _ = handler.Logger.GetSendCtx(ctx, "Sending response to the client")
+	govecret, _ = govector.GetLogger().GetSendCtx(ctx, "Sending response to the client")
 	return
 }
 {{end}}
