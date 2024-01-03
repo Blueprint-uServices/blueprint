@@ -11,9 +11,8 @@ type GoVecLogger struct {
 }
 
 func NewGoVecLogger(ctx context.Context, proc_name string) (*GoVecLogger, error) {
-	// TODO Export other options from the config
+	// TODO Export options from the config
 	config := govec.GetDefaultConfig()
-	config.Buffered = true
 	return &GoVecLogger{govec.InitGoVector(proc_name, proc_name, config)}, nil
 }
 

@@ -181,8 +181,9 @@ func New_{{.Name}}(ctx context.Context, client {{.ServerIfaceName}}, logger {{.I
 {{$receiver := .Name -}}
 {{range $_, $f := .Impl.Methods}}
 func (handler *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
+	var govec_bytes, govec_ret []byte
 	govec_bytes, _ = handler.Logger.GetSendCtx(ctx, "Preparing to make request for function {{$f.Name}}")
-	{{RetVars $f "govec_ret" "err"}} = handler.Client.({{$f.Name}}) ({{ArgVars $f "ctx"}}, govec_bytes)
+	{{RetVars $f "govec_ret" "err"}} = handler.Client.{{$f.Name}}({{ArgVars $f "ctx"}}, govec_bytes)
 	handler.Logger.UnpackReceiveCtx(ctx, "Unpacking response from server", govec_ret)
 	return
 }
