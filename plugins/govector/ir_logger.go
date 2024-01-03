@@ -12,7 +12,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-// Blueprint IR Node that represents a client to the govec container
+// Blueprint IR Node that represents a GoVector logger instance
 type GoVecLoggerClient struct {
 	golang.Node
 	golang.Instantiable

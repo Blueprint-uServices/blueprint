@@ -34,11 +34,9 @@ func makeGoVecSpec(spec wiring.WiringSpec) ([]string, error) {
 
 func applyGoVecDefaults(spec wiring.WiringSpec, serviceName string) string {
 	procName := fmt.Sprintf("%s_process", serviceName)
-	//cntrName := fmt.Sprintf("%s_cntr", serviceName)
 	logger_name := fmt.Sprintf("%s_logger", serviceName)
 	logger := govector.DefineLogger(spec, logger_name)
 	govector.Instrument(spec, serviceName)
 	http.Deploy(spec, serviceName)
 	return goproc.CreateProcess(spec, procName, serviceName, logger)
-	//return linuxcontainer.CreateContainer(spec, cntrName, procName)
 }
