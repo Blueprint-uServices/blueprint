@@ -21,6 +21,5 @@ func main() {
 		specs.Docker,
 		specs.Thrift,
 		specs.HTTP,
-		specs.GoVec,
 	)
 }
