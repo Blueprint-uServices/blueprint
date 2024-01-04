@@ -5,7 +5,8 @@
 // The plugin will generate a wrapper class that will sleep for a fixed amount of time (the specified latency to be injected)
 // before invoking the handler for handling the request.
 // Example Usage to add 100ms latency to each request:
-//    AddFixedLatency(spec, "my_service", "100ms")
+//    import "gitlab.mpi-sws.org/cld/blueprint/plugins/latency"
+//    latency.AddFixed(spec, "my_service", "100ms")
 //
 // TODO: Allow latency to be injected selectively to a subset of requests based using
 // random sampling or by matching attributes of a request.
@@ -14,7 +15,7 @@
 //
 // If you need the above feature(s) consider submitting a PR, raising a feature request,
 // or posting on the Blueprint slack/mailing list.
-package latencyinjector
+package latency
 
 import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
@@ -30,8 +31,8 @@ import (
 // Modifies the given service such that the server adds a fixed amount of `latency` while processing the request.
 // The `latency` string must be a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "300ms", "1.5h" or "2h45m". Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". Negative signed values such as "-1.5h" would result in no explicit latency being added; although it might result in the go runtime re-scheduling the running goroutine.
 // Usage:
-//   AddFixedLatency(spec, "my_service", "100ms")
-func AddFixedLatency(spec wiring.WiringSpec, serviceName string, latency string) {
+//   AddFixed(spec, "my_service", "100ms")
+func AddFixed(spec wiring.WiringSpec, serviceName string, latency string) {
 	serverWrapper := serviceName + ".server.latency"
 	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {

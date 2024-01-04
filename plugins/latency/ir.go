@@ -1,4 +1,4 @@
-package latencyinjector
+package latency
 
 import (
 	"fmt"
@@ -37,24 +37,33 @@ func newLatencyInjectorWrapper(name string, server ir.IRNode, latency string) (*
 	return node, nil
 }
 
+// Implements [ir.IRNode]
 func (node *LatencyInjectorWrapper) ImplementsGolangNode() {}
 
+// Implements [golang.Service]
+func (node *LatencyInjectorWrapper) ImplementsGolangService() {}
+
+// Implements [ir.IRNode]
 func (node *LatencyInjectorWrapper) Name() string {
 	return node.InstanceName
 }
 
+// Implements [ir.IRNode]
 func (node *LatencyInjectorWrapper) String() string {
 	return node.Name() + " = LatencyInjector(" + node.Wrapped.Name() + ")"
 }
 
+// Implements [golang.Service]
 func (node *LatencyInjectorWrapper) AddInterfaces(builder golang.ModuleBuilder) error {
 	return node.Wrapped.AddInterfaces(builder)
 }
 
+// Implements [golang.Service]
 func (node *LatencyInjectorWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.Wrapped.GetInterface(ctx)
 }
 
+// Implements [golang.GeneratesFuncs]
 func (node *LatencyInjectorWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
 	if builder.Visited(node.InstanceName + ".generateFuncs") {
 		return nil
@@ -68,6 +77,7 @@ func (node *LatencyInjectorWrapper) GenerateFuncs(builder golang.ModuleBuilder) 
 	return generateServerWrapper(builder, iface, node.outputPackage)
 }
 
+// Implements golang.Instantiable
 func (node *LatencyInjectorWrapper) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.InstanceName) {
 		return nil

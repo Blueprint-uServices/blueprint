@@ -6,7 +6,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/latencyinjector"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/latency"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
@@ -44,7 +44,7 @@ func makeDockerTimeoutSpecGeneric(spec wiring.WiringSpec, use_retries bool) ([]s
 		if use_retries {
 			retries.AddRetriesWithTimeouts(spec, serviceName, 10, "100ms")
 		}
-		latencyinjector.AddFixedLatency(spec, serviceName, "200ms")
+		latency.AddFixed(spec, serviceName, "200ms")
 		http.Deploy(spec, serviceName)
 		goproc.CreateProcess(spec, procName, serviceName)
 		return linuxcontainer.CreateContainer(spec, ctrName, procName)

@@ -1,4 +1,4 @@
-package latencyinjector
+package latency
 
 import (
 	"fmt"
