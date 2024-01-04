@@ -10,10 +10,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// UserService manages the registered users for the application
 type UserService interface {
+	// Returns true if the provided credentials are for a valid user and match the stored credentials.
+	// Returns false otherwise.
 	CheckUser(ctx context.Context, username string, password string) (bool, error)
 }
 
+// Implementation of the UserService
 type UserServiceImpl struct {
 	users  map[string]string
 	userDB backend.NoSQLDatabase
@@ -42,6 +46,7 @@ func initUserDB(ctx context.Context, userDB backend.NoSQLDatabase) error {
 	return nil
 }
 
+// Creates and returns a new UserService object
 func NewUserServiceImpl(ctx context.Context, userDB backend.NoSQLDatabase) (UserService, error) {
 	u := &UserServiceImpl{userDB: userDB, users: make(map[string]string)}
 	err := initUserDB(ctx, userDB)

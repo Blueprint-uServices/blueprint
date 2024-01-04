@@ -1,3 +1,4 @@
+// Package hotelreservation implements the workflow specification of the Hotel Reservation application
 package hotelreservation
 
 type Point struct {

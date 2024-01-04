@@ -5,13 +5,19 @@ import (
 	"errors"
 )
 
+// FrontEndService implements the front end server from the hotel reservation application
 type FrontEndService interface {
+	// Returns a list of hotels that fit the search criteria provided by the user.
 	SearchHandler(ctx context.Context, customerName string, inDate string, outDate string, lat float64, lon float64, locale string) ([]HotelProfile, error)
+	// Returns a list of recommended hotels based on the provided location (`lat`, `lon`) and the criteria for ranking hotels (`require`)
 	RecommendHandler(ctx context.Context, lat float64, lon float64, require string, locale string) ([]HotelProfile, error)
+	// Logs in a user based on the username and password provided
 	UserHandler(ctx context.Context, username string, password string) (string, error)
+	// Makes a reservation at the user-requested hotel for the provided dates
 	ReservationHandler(ctx context.Context, inDate string, outDate string, hotelId string, customerName string, username string, password string, roomNumber int64) (string, error)
 }
 
+// Implementation of the FrontEndService
 type FrontEndServiceImpl struct {
 	searchService         SearchService
 	profileService        ProfileService
@@ -20,6 +26,7 @@ type FrontEndServiceImpl struct {
 	reservationService    ReservationService
 }
 
+// Creates and Returns a new FrontEndService object
 func NewFrontEndServiceImpl(ctx context.Context, searchService SearchService, profileService ProfileService, recommendationService RecommendationService, userService UserService, reservationService ReservationService) (FrontEndService, error) {
 	return &FrontEndServiceImpl{searchService: searchService, profileService: profileService, recommendationService: recommendationService, userService: userService, reservationService: reservationService}, nil
 }

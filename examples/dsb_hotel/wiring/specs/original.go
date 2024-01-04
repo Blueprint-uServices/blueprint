@@ -17,6 +17,10 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
+// Wiring spec that represents the original configuration of the HotelReservation application.
+// Each service is deployed in a separate container with all inter-service communication happening via GRPC.
+// FrontEnd service provides a http frontend for making requests.
+// All services are instrumented with opentelemetry tracing with spans being exported to a central Jaeger collector.
 var Original = wiringcmd.SpecOption{
 	Name:        "original",
 	Description: "Deploys the original configuration of the DeathStarBench application.",

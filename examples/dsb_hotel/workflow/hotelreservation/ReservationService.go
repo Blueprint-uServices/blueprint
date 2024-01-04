@@ -9,8 +9,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// ReservationService implements ReservationService from hotel reservation application
 type ReservationService interface {
+	// Makes a reservation at the desired hotel (`hotelIds[0]`, len(hotelIds) == 1). Returns the hotelID if the reservation is successful.
 	MakeReservation(ctx context.Context, customerName string, hotelIds []string, inDate string, outDate string, roomNumber int64) ([]string, error)
+	// Returns the subset of hotels from desired hotels that are available for reservation
 	CheckAvailability(ctx context.Context, customerName string, hotelIDs []string, inDate string, outDate string, roomNumber int64) ([]string, error)
 }
 
@@ -80,20 +83,6 @@ func initReservationDB(ctx context.Context, db backend.NoSQLDatabase) error {
 
 	return nil
 }
-
-/*
-func metricFunc(r *ReservationServiceImpl) {
-	ticker := time.NewTicker(1 * time.Second)
-	for {
-		select {
-		case <-ticker.C:
-			debug.ReportMetric("CacheHitRate", float64(r.CacheHits)/float64(r.NumRequests))
-			r.CacheHits = 0
-			r.NumRequests = 0
-		}
-	}
-}
-*/
 
 func NewReservationServiceImpl(ctx context.Context, reserveCache backend.Cache, reserveDB backend.NoSQLDatabase) (ReservationService, error) {
 	err := initReservationDB(ctx, reserveDB)
