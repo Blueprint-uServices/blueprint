@@ -22,6 +22,17 @@ var TimeoutDemo = wiringcmd.SpecOption{
 }
 
 func makeDockerTimeoutSpec(spec wiring.WiringSpec) ([]string, error) {
+	applyDockerTimeoutDefaults := func(spec wiring.WiringSpec, serviceName string) string {
+		procName := fmt.Sprintf("%s_process", serviceName)
+		ctrName := fmt.Sprintf("%s_container", serviceName)
+		timeouts.AddTimeouts(spec, serviceName, "100ms")
+		// Uncomment this to try out retries with timeouts functionality
+		//retries.AddRetriesWithTimeouts(spec, serviceName, 10, "100ms")
+		latencyinjector.AddFixedLatency(spec, serviceName, "200ms")
+		http.Deploy(spec, serviceName)
+		goproc.CreateProcess(spec, procName, serviceName)
+		return linuxcontainer.CreateContainer(spec, ctrName, procName)
+	}
 	leaf_db := mongodb.Container(spec, "leaf_db")
 	leaf_cache := simple.Cache(spec, "leaf_cache")
 	leaf_service := workflow.Service(spec, "leaf_service", "LeafServiceImpl", leaf_cache, leaf_db)
@@ -31,16 +42,4 @@ func makeDockerTimeoutSpec(spec wiring.WiringSpec) ([]string, error) {
 	nonleaf_ctr := applyDockerTimeoutDefaults(spec, nonleaf_service)
 
 	return []string{leaf_ctr, nonleaf_ctr}, nil
-}
-
-func applyDockerTimeoutDefaults(spec wiring.WiringSpec, serviceName string) string {
-	procName := fmt.Sprintf("%s_process", serviceName)
-	ctrName := fmt.Sprintf("%s_container", serviceName)
-	timeouts.AddTimeouts(spec, serviceName, "100ms")
-	// Uncomment this to try out retries with timeouts functionality
-	//retries.AddRetriesWithTimeouts(spec, serviceName, 10, "100ms")
-	latencyinjector.AddFixedLatency(spec, serviceName, "200ms")
-	http.Deploy(spec, serviceName)
-	goproc.CreateProcess(spec, procName, serviceName)
-	return linuxcontainer.CreateContainer(spec, ctrName, procName)
 }
