@@ -16,12 +16,24 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
+// A wiring spec that demonstrates how to add timeouts to a blueprint application.
+// The spec deploys each service in a separate container.
+// The services use GRPC to communicate with each other.
+// Server side of each service is configured with a latency injector which adds a fixed amount of latency for every request.
+// Client side for each service is configured with timeouts.
+// All requests in the generated system with this wiring specification result in a TimeOut error.
 var TimeoutDemo = wiringcmd.SpecOption{
 	Name:        "timeout_demo",
 	Description: "Deploys each service in a separate container with gRPC and configures the clients with timeouts and the servers with latency injectors to demonstrate timeouts in blueprint",
 	Build:       makeDockerTimeoutSpec,
 }
 
+// A wiring spec that demonstrates how to add timeouts with retries to a blueprint application.
+// The spec deploys each service in a separate container.
+// The services use GRPC to communicate with each other.
+// Server side of each service is configured with a latency injector which adds a fixed amount of latency for every request.
+// Client side for each service is configured with retries where each separate request results in a timeout.
+// All requests in the generated system with this wiring specification result in a TimeOut error.
 var TimeoutRetriesDemo = wiringcmd.SpecOption{
 	Name:        "timeout_retries_demo",
 	Description: "Deploys each service in a separate container with gRPC and configures the clients with both retries and timeouts and the servers with latency injectors to demonstrate timeouts in blueprint",
