@@ -1,6 +1,6 @@
 # DeathStarBench Social Network
 
-This is a Blueprint re-implementation / translation of the [social-network application]() from the DeathStarBench microservices benchmark.
+This is a Blueprint re-implementation / translation of the [social-network application](https://github.com/delimitrou/DeathStarBench/tree/master/socialNetwork) from the DeathStarBench microservices benchmark.
 
 The application provides a mostly-direct translation of the original code. In terms of the APIs and functionality, this implementation is intended to be as close to unmodified from the original as possible.
 
@@ -35,7 +35,7 @@ To compile the application, we execute `wiring/main.go` and specify which wiring
 go run wiring/main.go -h
 ```
 
-The following will compile the `docker` wiring spec to the directory `build`. This will if the pre-requisite thrift compiler is not installed.
+The following will compile the `docker` wiring spec to the directory `build`. This will fail if the pre-requisite thrift compiler is not installed.
 
 ```
 go run wiring/main.go -w docker -o build

@@ -25,6 +25,8 @@ var Original = wiringcmd.SpecOption{
 
 func makeOriginalSpec(spec wiring.WiringSpec) ([]string, error) {
 	var cntrs []string
+
+	var allServices []string
 	// Define backends
 	trace_collector := jaeger.DefineJaegerCollector(spec, "jaeger")
 	user_db := mongodb.Container(spec, "user_db")
@@ -42,37 +44,45 @@ func makeOriginalSpec(spec wiring.WiringSpec) ([]string, error) {
 	user_service := workflow.Service(spec, "user_service", "UserService", user_db)
 	user_ctr := applyDefaults(spec, user_service, trace_collector)
 	cntrs = append(cntrs, user_ctr)
+	allServices = append(allServices, "user_service")
 
 	recomd_service := workflow.Service(spec, "recomd_service", "RecommendationService", recommendations_db)
 	recomd_ctr := applyDefaults(spec, recomd_service, trace_collector)
 	cntrs = append(cntrs, recomd_ctr)
+	allServices = append(allServices, "recomd_service")
 
 	reserv_service := workflow.Service(spec, "reserv_service", "ReservationService", reserv_cache, reserv_db)
 	reserv_ctr := applyDefaults(spec, reserv_service, trace_collector)
 	cntrs = append(cntrs, reserv_ctr)
+	allServices = append(allServices, "reserv_service")
 
 	geo_service := workflow.Service(spec, "geo_service", "GeoService", geo_db)
 	geo_ctr := applyDefaults(spec, geo_service, trace_collector)
 	cntrs = append(cntrs, geo_ctr)
+	allServices = append(allServices, "geo_service")
 
 	rate_service := workflow.Service(spec, "rate_service", "RateService", rate_cache, rate_db)
 	rate_ctr := applyDefaults(spec, rate_service, trace_collector)
 	cntrs = append(cntrs, rate_ctr)
+	allServices = append(allServices, "rate_service")
 
 	profile_service := workflow.Service(spec, "profile_service", "ProfileService", profile_cache, profile_db)
 	profile_ctr := applyDefaults(spec, profile_service, trace_collector)
 	cntrs = append(cntrs, profile_ctr)
+	allServices = append(allServices, "profile_service")
 
 	search_service := workflow.Service(spec, "search_service", "SearchService", geo_service, rate_service)
 	search_ctr := applyDefaults(spec, search_service, trace_collector)
 	cntrs = append(cntrs, search_ctr)
+	allServices = append(allServices, "search_service")
 
 	// Define frontend service
 	frontend_service := workflow.Service(spec, "frontend_service", "FrontEndService", search_service, profile_service, recomd_service, user_service, reserv_service)
 	frontend_ctr := applyHTTPDefaults(spec, frontend_service, trace_collector)
 	cntrs = append(cntrs, frontend_ctr)
+	allServices = append(allServices, "frontend_service")
 
-	tests := gotests.Test(spec, frontend_service)
+	tests := gotests.Test(spec, allServices...)
 	cntrs = append(cntrs, tests)
 
 	return cntrs, nil
