@@ -11,12 +11,15 @@ Package retries provides a Blueprint modifier for the client side of service cal
 The plugin wraps clients with a retrier using that retries a request until one of the two conditions is met: i\) the requests returns without an error ii\) the number of failed tries has reached the maximum number of failures. Usage:
 
 ```
-AddRetries(spec, "my_service", 10)
+import "gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
+retries.AddRetries(spec, "my_service", 10) // Only adds retries
+retries.AddRetriesWithTimeouts(spec, "my_service", 10, "1s") // Adds retries and timeouts
 ```
 
 ## Index
 
 - [func AddRetries\(spec wiring.WiringSpec, serviceName string, max\_retries int64\)](<#AddRetries>)
+- [func AddRetriesWithTimeouts\(spec wiring.WiringSpec, serviceName string, max\_retries int64, timeout string\)](<#AddRetriesWithTimeouts>)
 - [type RetrierClient](<#RetrierClient>)
   - [func \(node \*RetrierClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#RetrierClient.AddInstantiation>)
   - [func \(node \*RetrierClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#RetrierClient.AddInterfaces>)
@@ -28,7 +31,7 @@ AddRetries(spec, "my_service", 10)
 
 
 <a name="AddRetries"></a>
-## func AddRetries
+## func [AddRetries](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/wiring.go#L27>)
 
 ```go
 func AddRetries(spec wiring.WiringSpec, serviceName string, max_retries int64)
@@ -40,8 +43,35 @@ Add retrier functionality to all clients of the specified service. Uses a \[blue
 AddRetries(spec, "my_service", 10)
 ```
 
+<a name="AddRetriesWithTimeouts"></a>
+## func [AddRetriesWithTimeouts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/wiring.go#L63>)
+
+```go
+func AddRetriesWithTimeouts(spec wiring.WiringSpec, serviceName string, max_retries int64, timeout string)
+```
+
+Add retrier \+ timeout functionality to all clients of the specified service. Uses a \[blueprint.WiringSpec\] Modifies the given service in the following ways: \(i\) all clients to that service have a user\-specified \`timeout\` for each request. \(ii\) all clients to that service retry at most \`max\_retries\` number of times on error.
+
+Ordering of functionality depicted via example call\-chain: Before:
+
+```
+workflow -> plugin grpc
+```
+
+After:
+
+```
+workflow -> retrier -> timeout -> plugin grpc
+```
+
+Usage:
+
+```
+AddRetriesWithTimeouts(spec, "my_service", 10, "1s")
+```
+
 <a name="RetrierClient"></a>
-## type RetrierClient
+## type [RetrierClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L15-L25>)
 
 Blueprint IR node representing a Retrier
 
@@ -60,7 +90,7 @@ type RetrierClient struct {
 ```
 
 <a name="RetrierClient.AddInstantiation"></a>
-### func \(\*RetrierClient\) AddInstantiation
+### func \(\*RetrierClient\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L73>)
 
 ```go
 func (node *RetrierClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -69,7 +99,7 @@ func (node *RetrierClient) AddInstantiation(builder golang.NamespaceBuilder) err
 
 
 <a name="RetrierClient.AddInterfaces"></a>
-### func \(\*RetrierClient\) AddInterfaces
+### func \(\*RetrierClient\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L52>)
 
 ```go
 func (node *RetrierClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -78,7 +108,7 @@ func (node *RetrierClient) AddInterfaces(builder golang.ModuleBuilder) error
 
 
 <a name="RetrierClient.GenerateFuncs"></a>
-### func \(\*RetrierClient\) GenerateFuncs
+### func \(\*RetrierClient\) [GenerateFuncs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L60>)
 
 ```go
 func (node *RetrierClient) GenerateFuncs(builder golang.ModuleBuilder) error
@@ -87,7 +117,7 @@ func (node *RetrierClient) GenerateFuncs(builder golang.ModuleBuilder) error
 
 
 <a name="RetrierClient.GetInterface"></a>
-### func \(\*RetrierClient\) GetInterface
+### func \(\*RetrierClient\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L56>)
 
 ```go
 func (node *RetrierClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -96,7 +126,7 @@ func (node *RetrierClient) GetInterface(ctx ir.BuildContext) (service.ServiceInt
 
 
 <a name="RetrierClient.ImplementsGolangNode"></a>
-### func \(\*RetrierClient\) ImplementsGolangNode
+### func \(\*RetrierClient\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L27>)
 
 ```go
 func (node *RetrierClient) ImplementsGolangNode()
@@ -105,7 +135,7 @@ func (node *RetrierClient) ImplementsGolangNode()
 
 
 <a name="RetrierClient.Name"></a>
-### func \(\*RetrierClient\) Name
+### func \(\*RetrierClient\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L29>)
 
 ```go
 func (node *RetrierClient) Name() string
@@ -114,7 +144,7 @@ func (node *RetrierClient) Name() string
 
 
 <a name="RetrierClient.String"></a>
-### func \(\*RetrierClient\) String
+### func \(\*RetrierClient\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L33>)
 
 ```go
 func (node *RetrierClient) String() string
