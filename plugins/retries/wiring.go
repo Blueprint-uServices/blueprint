@@ -4,7 +4,9 @@
 // i)  the requests returns without an error
 // ii) the number of failed tries has reached the maximum number of failures.
 // Usage:
-//  AddRetries(spec, "my_service", 10)
+//  import "gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
+//  retries.AddRetries(spec, "my_service", 10) // Only adds retries
+//  retries.AddRetriesWithTimeouts(spec, "my_service", 10, "1s") // Adds retries and timeouts
 package retries
 
 import (
@@ -57,7 +59,7 @@ func AddRetries(spec wiring.WiringSpec, serviceName string, max_retries int64) {
 //   workflow -> retrier -> timeout -> plugin grpc
 //
 // Usage:
-//   AddRetries(spec, "my_service", 10, "1s")
+//   AddRetriesWithTimeouts(spec, "my_service", 10, "1s")
 func AddRetriesWithTimeouts(spec wiring.WiringSpec, serviceName string, max_retries int64, timeout string) {
 	AddRetries(spec, serviceName, max_retries)
 	timeouts.Add(spec, serviceName, timeout)
