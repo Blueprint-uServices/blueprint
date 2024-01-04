@@ -38,24 +38,33 @@ func newTimeoutClient(name string, server ir.IRNode, timeout string) (*TimeoutCl
 	return node, nil
 }
 
+// Implements ir.IRNode
 func (node *TimeoutClient) ImplementsGolangNode() {}
 
+// Implements golang.Service
+func (node *TimeoutClient) ImplementsGolangService() {}
+
+// Implements ir.IRNode
 func (node *TimeoutClient) Name() string {
 	return node.InstanceName
 }
 
+// Implements ir.IRNode
 func (node *TimeoutClient) String() string {
 	return node.Name() + " = TimeoutClient(" + node.Wrapped.Name() + ")"
 }
 
+// Implements golang.Service
 func (node *TimeoutClient) AddInterfaces(builder golang.ModuleBuilder) error {
 	return node.Wrapped.AddInterfaces(builder)
 }
 
+// Implements golang.Service
 func (node *TimeoutClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.Wrapped.GetInterface(ctx)
 }
 
+// Implements golang.GeneratesFuncs
 func (node *TimeoutClient) GenerateFuncs(builder golang.ModuleBuilder) error {
 	if builder.Visited(node.InstanceName + ".generateFuncs") {
 		return nil
@@ -69,6 +78,7 @@ func (node *TimeoutClient) GenerateFuncs(builder golang.ModuleBuilder) error {
 	return generateClient(builder, iface, node.outputPackage)
 }
 
+// Implements golang.Instantiable
 func (node *TimeoutClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.InstanceName) {
 		return nil

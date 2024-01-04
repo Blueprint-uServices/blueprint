@@ -60,5 +60,5 @@ func AddRetries(spec wiring.WiringSpec, serviceName string, max_retries int64) {
 //   AddRetries(spec, "my_service", 10, "1s")
 func AddRetriesWithTimeouts(spec wiring.WiringSpec, serviceName string, max_retries int64, timeout string) {
 	AddRetries(spec, serviceName, max_retries)
-	timeouts.AddTimeouts(spec, serviceName, timeout)
+	timeouts.Add(spec, serviceName, timeout)
 }

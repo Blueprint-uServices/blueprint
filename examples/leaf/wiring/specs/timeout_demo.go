@@ -40,7 +40,7 @@ func makeDockerTimeoutSpecGeneric(spec wiring.WiringSpec, use_retries bool) ([]s
 	applyDockerTimeoutDefaults := func(spec wiring.WiringSpec, serviceName string) string {
 		procName := fmt.Sprintf("%s_process", serviceName)
 		ctrName := fmt.Sprintf("%s_container", serviceName)
-		timeouts.AddTimeouts(spec, serviceName, "100ms")
+		timeouts.Add(spec, serviceName, "100ms")
 		if use_retries {
 			retries.AddRetriesWithTimeouts(spec, serviceName, 10, "100ms")
 		}
