@@ -22,5 +22,6 @@ func main() {
 		specs.Thrift,
 		specs.HTTP,
 		specs.TimeoutDemo,
+		specs.TimeoutRetriesDemo,
 	)
 }

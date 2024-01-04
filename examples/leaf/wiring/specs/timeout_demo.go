@@ -9,6 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/latencyinjector"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/timeouts"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
@@ -21,13 +22,28 @@ var TimeoutDemo = wiringcmd.SpecOption{
 	Build:       makeDockerTimeoutSpec,
 }
 
+var TimeoutRetriesDemo = wiringcmd.SpecOption{
+	Name:        "timeout_retries_demo",
+	Description: "Deploys each service in a separate container with gRPC and configures the clients with both retries and timeouts and the servers with latency injectors to demonstrate timeouts in blueprint",
+	Build:       makeDockerTimeoutRetriesSpec,
+}
+
 func makeDockerTimeoutSpec(spec wiring.WiringSpec) ([]string, error) {
+	return makeDockerTimeoutSpecGeneric(spec, false)
+}
+
+func makeDockerTimeoutRetriesSpec(spec wiring.WiringSpec) ([]string, error) {
+	return makeDockerTimeoutSpecGeneric(spec, true)
+}
+
+func makeDockerTimeoutSpecGeneric(spec wiring.WiringSpec, use_retries bool) ([]string, error) {
 	applyDockerTimeoutDefaults := func(spec wiring.WiringSpec, serviceName string) string {
 		procName := fmt.Sprintf("%s_process", serviceName)
 		ctrName := fmt.Sprintf("%s_container", serviceName)
 		timeouts.AddTimeouts(spec, serviceName, "100ms")
-		// Uncomment this to try out retries with timeouts functionality
-		//retries.AddRetriesWithTimeouts(spec, serviceName, 10, "100ms")
+		if use_retries {
+			retries.AddRetriesWithTimeouts(spec, serviceName, 10, "100ms")
+		}
 		latencyinjector.AddFixedLatency(spec, serviceName, "200ms")
 		http.Deploy(spec, serviceName)
 		goproc.CreateProcess(spec, procName, serviceName)
