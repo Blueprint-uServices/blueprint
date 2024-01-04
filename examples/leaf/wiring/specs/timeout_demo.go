@@ -5,7 +5,6 @@ import (
 
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/healthchecker"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/latencyinjector"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
@@ -41,7 +40,6 @@ func applyDockerTimeoutDefaults(spec wiring.WiringSpec, serviceName string) stri
 	// Uncomment this to try out retries with timeouts functionality
 	//retries.AddRetriesWithTimeouts(spec, serviceName, 10, "100ms")
 	latencyinjector.AddFixedLatency(spec, serviceName, "200ms")
-	healthchecker.AddHealthCheckAPI(spec, serviceName)
 	http.Deploy(spec, serviceName)
 	goproc.CreateProcess(spec, procName, serviceName)
 	return linuxcontainer.CreateContainer(spec, ctrName, procName)
