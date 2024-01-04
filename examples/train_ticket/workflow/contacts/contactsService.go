@@ -8,12 +8,19 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// Contacts Service manages contacts for users
 type ContactsService interface {
+	// Find a contact using its `id`
 	FindContactsById(ctx context.Context, id string) (Contact, error)
+	// Find all contacts associated with an account with ID `id`
 	FindContactsByAccountId(ctx context.Context, id string) ([]Contact, error)
+	// Create a new contact
 	CreateContacts(ctx context.Context, c Contact) error
+	// Delete an existing contact
 	Delete(ctx context.Context, c Contact) error
+	// Get all existing contacts
 	GetAllContacts(ctx context.Context) ([]Contact, error)
+	// Modify an existing contact
 	Modify(ctx context.Context, contact Contact) (bool, error)
 }
 

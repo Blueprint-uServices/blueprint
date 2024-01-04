@@ -10,19 +10,28 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// UserService manages the users in the application
 type UserService interface {
+	// Finds a user given `username`
 	FindByUsername(ctx context.Context, username string) (User, error)
+	// Finds a user ID given `userID`
 	FindByUserID(ctx context.Context, userID string) (User, error)
+	// Deletes a user with ID `userID`
 	DeleteUser(ctx context.Context, userID string) error
+	// Gets all users
 	GetAllUsers(ctx context.Context) ([]User, error)
+	// Saves a new user
 	SaveUser(ctx context.Context, user User) error
+	// Updates an existing user
 	UpdateUser(ctx context.Context, user User) (bool, error)
 }
 
+// Implementation of UserService
 type UserServiceImpl struct {
 	userDB backend.NoSQLDatabase
 }
 
+// Creates and returns a UserService object
 func NewUserServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*UserServiceImpl, error) {
 	return &UserServiceImpl{userDB: db}, nil
 }

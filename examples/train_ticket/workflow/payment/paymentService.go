@@ -10,19 +10,27 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// PaymentService manages payments in the application
 type PaymentService interface {
+	// Pay `payment`
 	Pay(ctx context.Context, payment Payment) error
+	// Adds Money to an existing user's account
 	AddMoney(ctx context.Context, payment Payment) error
+	// Get all payments
 	Query(ctx context.Context) ([]Payment, error)
+	// Create an initial payment
 	InitPayment(ctx context.Context, payment Payment) error
+	// Remove all payments; Only used in testing
 	Cleanup(ctx context.Context) error
 }
 
+// Implementation of PaymentService
 type PaymentServiceImpl struct {
 	paymentDB backend.NoSQLDatabase
 	moneyDB   backend.NoSQLDatabase
 }
 
+// Creates a new PaymentService object
 func NewPaymentServiceImpl(ctx context.Context, payDB backend.NoSQLDatabase, moneyDB backend.NoSQLDatabase) (*PaymentServiceImpl, error) {
 	return &PaymentServiceImpl{paymentDB: payDB, moneyDB: moneyDB}, nil
 }

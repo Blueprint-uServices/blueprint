@@ -3,10 +3,12 @@ package news
 
 import "context"
 
+// News Service provides the latest news about the application
 type NewsService interface {
 	Hello(ctx context.Context, val string) (string, error)
 }
 
+// News Service Implementation
 type NewsServiceImpl struct{}
 
 func NewNewsServiceImpl(ctx context.Context) (*NewsServiceImpl, error) {

@@ -10,17 +10,24 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// TrainFoodService manages food items in Trains
 type TrainFoodService interface {
+	// Creates a new Train Food item
 	CreateTrainFood(ctx context.Context, tf TrainFood) (TrainFood, error)
+	// Get all train food items
 	ListTrainFood(ctx context.Context) ([]TrainFood, error)
+	// List all food items based on `tripid`
 	ListTrainFoodByTripID(ctx context.Context, tripid string) ([]food.Food, error)
+	// Remove all train food items; Only used during testing
 	Cleanup(ctx context.Context) error
 }
 
+// Implementation of TrainFoodService
 type TrainFoodServiceImpl struct {
 	db backend.NoSQLDatabase
 }
 
+// Creates a NewTrainFoodService
 func NewTrainFoodServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*TrainFoodServiceImpl, error) {
 	return &TrainFoodServiceImpl{db: db}, nil
 }

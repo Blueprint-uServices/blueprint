@@ -8,20 +8,30 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// TrainService manages the different types of trains in the application
 type TrainService interface {
+	// Creates a new type of train
 	Create(ctx context.Context, ttype TrainType) (bool, error)
+	// Retrieves the type of train using its `id`
 	Retrieve(ctx context.Context, id string) (TrainType, error)
+	// Retrieves the type of train using its `name`
 	RetrieveByName(ctx context.Context, name string) (TrainType, error)
+	// Retrieves all train types using its `names`
 	RetrieveByNames(ctx context.Context, names []string) ([]TrainType, error)
+	// Updates an existing train type
 	Update(ctx context.Context, ttype TrainType) (bool, error)
+	// Delete an existing train type
 	Delete(ctx context.Context, id string) (bool, error)
+	// Returns all types of trains
 	AllTrains(ctx context.Context) ([]TrainType, error)
 }
 
+// Implementation of TrainService
 type TrainServiceImpl struct {
 	db backend.NoSQLDatabase
 }
 
+// Creates a new TrainService object
 func NewTrainServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*TrainServiceImpl, error) {
 	return &TrainServiceImpl{db: db}, nil
 }

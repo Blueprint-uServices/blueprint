@@ -10,10 +10,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// ConsignPriceService manages the prices of consignments
 type ConsignPriceService interface {
+	// Calculates the price of the consignment based on the weight and the region
 	GetPriceByWeightAndRegion(ctx context.Context, weight float64, isWithinRegion bool) (float64, error)
+	// Get the price configuration for calculating consignment prices as a string
 	GetPriceInfo(ctx context.Context) (string, error)
+	// Get the price configuration for calculating consignment prices
 	GetPriceConfig(ctx context.Context) (ConsignPrice, error)
+	// Creates a price config or modifies the existing price configuration
 	CreateAndModifyPriceConfig(ctx context.Context, priceConfig ConsignPrice) (ConsignPrice, error)
 }
 

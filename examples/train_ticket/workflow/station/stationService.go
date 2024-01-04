@@ -9,21 +9,32 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// StationService manages all stations
 type StationService interface {
+	// Creates a new station
 	CreateStation(ctx context.Context, station Station) error
+	// Check if a station exists
 	Exists(ctx context.Context, name string) (bool, error)
+	// Updates an existing station
 	UpdateStation(ctx context.Context, station Station) (bool, error)
+	// Deletes an existing station based on `id`
 	DeleteStation(ctx context.Context, id string) error
+	// Find a station based on `id`
 	FindByID(ctx context.Context, id string) (Station, error)
+	// Find all stations based on `ids`
 	FindByIDs(ctx context.Context, ids []string) ([]Station, error)
+	// Find the station `id` for the station with Name `name`
 	FindID(ctx context.Context, name string) (string, error)
+	// Find the station `ids` for stations with Names `names`
 	FindIDs(ctx context.Context, names []string) ([]string, error)
 }
 
+// Implementation of the StationService
 type StationServiceImpl struct {
 	stationDB backend.NoSQLDatabase
 }
 
+// Returns a new StationService object
 func NewStationServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*StationServiceImpl, error) {
 	return &StationServiceImpl{stationDB: db}, nil
 }

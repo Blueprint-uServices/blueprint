@@ -9,18 +9,26 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// Config Service manages Config variables in the application
 type ConfigService interface {
+	// Creates a new config variable
 	Create(ctx context.Context, conf Config) error
+	// Updates an existing `conf` config variable
 	Update(ctx context.Context, conf Config) (bool, error)
+	// Find a config variable using its `name`
 	Find(ctx context.Context, name string) (Config, error)
+	// Deletes an existing config variable using its `name`
 	Delete(ctx context.Context, name string) error
+	// Find all config variables
 	FindAll(ctx context.Context) ([]Config, error)
 }
 
+// Implementation of Config Service
 type ConfigServiceImpl struct {
 	db backend.NoSQLDatabase
 }
 
+// Creates a new ConfigService object
 func NewConfigServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*ConfigServiceImpl, error) {
 	return &ConfigServiceImpl{db: db}, nil
 }

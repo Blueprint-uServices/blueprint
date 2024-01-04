@@ -9,19 +9,28 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// StationFoodService manages food stores across all stations
 type StationFoodService interface {
+	// Creates a new food store
 	CreateFoodStore(ctx context.Context, store StationFoodStore) error
+	// List all food stores
 	ListFoodStores(ctx context.Context) ([]StationFoodStore, error)
+	// List all food stores at a given `station`
 	ListFoodStoresByStationName(ctx context.Context, station string) ([]StationFoodStore, error)
+	// List all food stores at all `stations`
 	GetFoodStoresByStationNames(ctx context.Context, stations []string) ([]StationFoodStore, error)
+	// Find a food store given its `id`
 	GetFoodStoreByID(ctx context.Context, id string) (StationFoodStore, error)
+	// Removes all food stores; Only used in testing
 	Cleanup(ctx context.Context) error
 }
 
+// Implementation of StationFoodService
 type StationFoodServiceImpl struct {
 	db backend.NoSQLDatabase
 }
 
+// Creates and returns a new StationFoodService object
 func NewStationFoodServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*StationFoodServiceImpl, error) {
 	return &StationFoodServiceImpl{db: db}, nil
 }

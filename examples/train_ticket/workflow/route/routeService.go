@@ -12,12 +12,19 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// RouteService manages all the routes in the application
 type RouteService interface {
+	// Get a route based on the `start` point and `end` point
 	GetRouteByStartAndEnd(ctx context.Context, start string, end string) (Route, error)
+	// Gets all routes
 	GetAllRoutes(ctx context.Context) ([]Route, error)
+	// Get a route by ID
 	GetRouteById(ctx context.Context, id string) (Route, error)
+	// Get multiple routes based on ids
 	GetRouteByIds(ctx context.Context, ids []string) ([]Route, error)
+	// Delete a route by `id`
 	DeleteRoute(ctx context.Context, id string) error
+	// Create a new route or modify an existing route based on provided `info` for the route
 	CreateAndModify(ctx context.Context, info RouteInfo) (Route, error)
 }
 

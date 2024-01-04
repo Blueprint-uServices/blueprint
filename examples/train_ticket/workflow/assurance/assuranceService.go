@@ -10,21 +10,32 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// AssuranceService manages assurances provided to customers for trips
 type AssuranceService interface {
+	// Find an assurance by ID of the assurance
 	FindAssuranceById(ctx context.Context, id string) (Assurance, error)
+	// Find an assurance by Order ID
 	FindAssuranceByOrderId(ctx context.Context, orderId string) (Assurance, error)
+	// Creates a new Assurance
 	Create(ctx context.Context, typeindex int64, orderId string) (Assurance, error)
+	// Deletes the assurance with ID `id`
 	DeleteById(ctx context.Context, id string) error
+	// Delete the assurance associated with order that has id `orderId`
 	DeleteByOrderId(ctx context.Context, orderId string) error
+	// Modify an existing an assurance with provided Assurance `a`
 	Modify(ctx context.Context, a Assurance) (Assurance, error)
+	// Return all assurances
 	GetAllAssurances(ctx context.Context) ([]Assurance, error)
+	// Return all types of assurances
 	GetAllAssuranceTypes(ctx context.Context) ([]AssuranceType, error)
 }
 
+// Implementation of an AssuranceService
 type AssuranceServiceImpl struct {
 	db backend.NoSQLDatabase
 }
 
+// Constructs an AssuranceService object
 func NewAssuranceServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*AssuranceServiceImpl, error) {
 	return &AssuranceServiceImpl{db: db}, nil
 }
