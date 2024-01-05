@@ -87,7 +87,7 @@ func AddNodeTo[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName stri
 	}, opts)
 
 	// The namespace also instantiates the modifier
-	spec.AddProperty(namespaceName, prop_CHILDREN, childName)
+	spec.AddProperty(namespaceName, prop_CHILDREN, ptrNext)
 }
 
 // Used in conjunction with [AddNodeTo].  InstantiateNamespace derives a new child namespace
@@ -120,7 +120,6 @@ func InstantiateNamespace(parentNamespace wiring.Namespace, namespaceNode IRName
 func instantiateNamespaceNodes(namespace wiring.Namespace) error {
 	namespaceName := namespace.Name()
 	var nodeNames []string
-
 	if err := namespace.GetProperties(namespaceName, prop_CHILDREN, &nodeNames); err != nil {
 		return namespace.Error("InstantiateNamespace failed due to %v", err.Error())
 	}
