@@ -41,8 +41,11 @@ func (node *Process) GenerateArtifacts(workspaceDir string) error {
 		return err
 	}
 
-	all_nodes := []ir.IRNode{node.metricProvider}
-	all_nodes = append(all_nodes, node.Nodes...)
+	/*
+		all_nodes := []ir.IRNode{node.metricProvider}
+		all_nodes = append(all_nodes, node.Nodes...)
+	*/
+	all_nodes := node.Nodes
 
 	// Add relevant nodes to the workspace
 	for _, node := range all_nodes {
@@ -103,9 +106,6 @@ func (node *Process) GenerateArtifacts(workspaceDir string) error {
 
 	// For now, instantiate all contained nodes
 	for _, node := range all_nodes {
-		if node == nil {
-			slog.Error("Node is nil during instantiation")
-		}
 		namespaceBuilder.Instantiate(node.Name())
 	}
 

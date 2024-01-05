@@ -40,11 +40,12 @@ func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) 
 			return nil, err
 		}
 		proc := newGolangProcessNode(procName)
-		err = namespace.Get(metric_coll, &proc.metricProvider)
+
+		procNamespace, err := namespaceutil.InstantiateNamespace(namespace, &GolangProcessNamespace{proc})
+		err = procNamespace.Get(metric_coll, &proc.metricProvider)
 		if err != nil {
 			return nil, err
 		}
-		_, err = namespaceutil.InstantiateNamespace(namespace, &GolangProcessNamespace{proc})
 		return proc, err
 	})
 
