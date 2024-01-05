@@ -2,12 +2,9 @@ package backend
 
 import (
 	"context"
-	"time"
+	"errors"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	"go.opentelemetry.io/otel/metric"
-	metricsdk "go.opentelemetry.io/otel/sdk/metric"
 	"golang.org/x/exp/slog"
 )
 
@@ -19,32 +16,18 @@ type MetricCollector interface {
 
 var metric_collector MetricCollector
 
-type stdoutMetricCollector struct {
-	mp *metricsdk.MeterProvider
+type errorMetricCollector struct{}
+
+func (e *errorMetricCollector) GetMetricProvider(ctx context.Context) (metric.MeterProvider, error) {
+	return nil, errors.New("Error Metric Collector doesn't implement a metric provider")
 }
 
-func (s *stdoutMetricCollector) GetMetricProvider(ctx context.Context) (metric.MeterProvider, error) {
-	return s.mp, nil
-}
-
-func newstdoutMetricCollector(ctx context.Context) (*stdoutMetricCollector, error) {
-	exp, err := stdoutmetric.New()
-	if err != nil {
-		return nil, err
-	}
-
-	mp := metricsdk.NewMeterProvider(
-		metricsdk.WithReader(metricsdk.NewPeriodicReader(exp,
-			// Default is 1m. Set to 3s for demonstrative purposes.
-			metricsdk.WithInterval(3*time.Second))),
-	)
-
-	otel.SetMeterProvider(mp)
-	return &stdoutMetricCollector{mp}, nil
+func newErrorMetricCollector(ctx context.Context) (*errorMetricCollector, error) {
+	return &errorMetricCollector{}, nil
 }
 
 func init() {
-	coll, err := newstdoutMetricCollector(context.Background())
+	coll, err := newErrorMetricCollector(context.Background())
 	if err != nil {
 		slog.Error(err.Error())
 	}
