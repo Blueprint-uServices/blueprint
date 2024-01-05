@@ -13,6 +13,9 @@ use (
 	./examples/dsb_sn/tests
 	./examples/dsb_sn/wiring
 	./examples/dsb_sn/workflow
+	./examples/train_ticket/tests
+	./examples/train_ticket/wiring
+	./examples/train_ticket/workflow
 	./plugins
 	./runtime
 	./test/wiring
