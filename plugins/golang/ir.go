@@ -363,6 +363,11 @@ type (
 		Instantiate(name string)
 
 		/*
+			Specify priority nodes that should be built before any other nodes are built
+		*/
+		PriorityInstantiate(name string)
+
+		/*
 			Gets the ModuleBuilder that contains this NamespaceBuilder
 		*/
 		Module() ModuleBuilder

@@ -32,17 +32,18 @@ The typical usage of a [ir.NamespaceBuilder] is to:
 */
 type NamespaceBuilderImpl struct {
 	ir.VisitTrackerImpl
-	module         golang.ModuleBuilder // The module containing this file
-	Package        golang.PackageInfo
-	Name           string            // IR node name
-	FileName       string            // The short name of the file
-	FilePath       string            // The fully qualified path to the file
-	FuncName       string            // The name of the function to generate
-	Imports        *Imports          // Import declarations in the file; map of shortname to full package import name
-	Declarations   map[string]string // The DI declarations
-	Required       map[string]string
-	Optional       map[string]string
-	Instantiations map[string]struct{}
+	module                 golang.ModuleBuilder // The module containing this file
+	Package                golang.PackageInfo
+	Name                   string            // IR node name
+	FileName               string            // The short name of the file
+	FilePath               string            // The fully qualified path to the file
+	FuncName               string            // The name of the function to generate
+	Imports                *Imports          // Import declarations in the file; map of shortname to full package import name
+	Declarations           map[string]string // The DI declarations
+	Required               map[string]string
+	Optional               map[string]string
+	Instantiations         map[string]struct{}
+	PriorityInstantiations map[string]struct{}
 }
 
 /*
@@ -55,17 +56,18 @@ func NewNamespaceBuilder(module golang.ModuleBuilder, name, fileName, packagePat
 	}
 
 	n := &NamespaceBuilderImpl{
-		module:         module,
-		Name:           name,
-		Package:        pkg,
-		FileName:       fileName,
-		FilePath:       filepath.Join(pkg.Path, fileName),
-		FuncName:       funcName,
-		Imports:        NewImports(pkg.Path),
-		Declarations:   make(map[string]string),
-		Required:       make(map[string]string),
-		Optional:       make(map[string]string),
-		Instantiations: make(map[string]struct{}),
+		module:                 module,
+		Name:                   name,
+		Package:                pkg,
+		FileName:               fileName,
+		FilePath:               filepath.Join(pkg.Path, fileName),
+		FuncName:               funcName,
+		Imports:                NewImports(pkg.Path),
+		Declarations:           make(map[string]string),
+		Required:               make(map[string]string),
+		Optional:               make(map[string]string),
+		Instantiations:         make(map[string]struct{}),
+		PriorityInstantiations: make(map[string]struct{}),
 	}
 
 	// Add the runtime module as a dependency, in case it hasn't already
@@ -112,6 +114,10 @@ func (n *NamespaceBuilderImpl) OptionalArg(name, description string) {
 
 func (n *NamespaceBuilderImpl) Instantiate(name string) {
 	n.Instantiations[name] = struct{}{}
+}
+
+func (n *NamespaceBuilderImpl) PriorityInstantiate(name string) {
+	n.PriorityInstantiations[name] = struct{}{}
 }
 
 func (n *NamespaceBuilderImpl) Declare(name, buildFuncSrc string) error {
@@ -219,6 +225,7 @@ package {{.Package.ShortName}}
 func {{ .FuncName }}(name string) *golang.NamespaceBuilder {
 	b := golang.NewNamespaceBuilder(name)
 	set_{{.Name}}_Args(b)
+	set_{{.Name}}_PriorityInstances(b)
 	set_{{.Name}}_Instances(b)
 	set_{{.Name}}_Definitions(b)
 	return b
@@ -247,6 +254,16 @@ func set_{{.Name}}_Args(b *golang.NamespaceBuilder) {
 	{{- range $defName, $description := .Optional }}
 	b.Optional("{{$defName}}", "{{$description}}")
 	{{- end }}
+}
+
+// When the {{.Name}} namespace is built it will first instantiate the following nodes before instantiating nodes listed in set_{{.Name}}_Instances:
+{{- range $defName, $_ := .PriorityInstantiations }}
+//	{{$defName}}
+{{- end}}
+func set_{{.Name}}_PriorityInstances(b *golang.NamespaceBuilder) {
+	{{- range $defName, $_ := .PriorityInstantiations }}
+	b.PriorityInstantiate("{{ $defName }}")
+	{{- end}}
 }
 
 // When the {{.Name}} namespace is built it will automatically instantiate

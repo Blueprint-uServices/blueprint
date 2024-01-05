@@ -61,3 +61,9 @@ func (ctr *Container) AddNode(name string, node ir.IRNode) error {
 	ctr.Nodes = append(ctr.Nodes, node)
 	return nil
 }
+
+// Implements [wiring.NamespaceHandler]
+func (ctr *Container) AddPriorityNode(name string, node ir.IRNode) error {
+	// Priority nodes aren't required at the moment for linux container namespaces
+	return nil
+}

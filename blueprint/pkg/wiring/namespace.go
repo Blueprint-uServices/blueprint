@@ -36,6 +36,9 @@ type Namespace interface {
 	// for name.
 	Get(name string, dst any) error
 
+	// The same as [Get] but ensures that all the nodes are generated before any node created using [Get]
+	PriorityGet(name string, dst any) error
+
 	// The same as [Get] but without creating a depending (an edge) into the current namespace.  Most
 	// plugins should use [Get] instead.
 	Instantiate(name string, dst any) error
@@ -126,6 +129,10 @@ type NamespaceHandler interface {
 	// After a node has been built in this namespace, AddNode will be called
 	// to enable the handler to save the built node.
 	AddNode(string, ir.IRNode) error
+
+	// After a priority node has been built in this namespace, AddPriorityNode will be
+	// called to enable the handler to save the built node.
+	AddPriorityNode(string, ir.IRNode) error
 }
 
 // Implements [Namespace]
@@ -135,12 +142,17 @@ func (namespace *namespaceimpl) Name() string {
 
 // Implements [Namespace]
 func (namespace *namespaceimpl) Instantiate(name string, dst any) error {
-	return namespace.get(name, false, dst)
+	return namespace.get(name, false, dst, false)
 }
 
 // Implements [Namespace]
 func (namespace *namespaceimpl) Get(name string, dst any) error {
-	return namespace.get(name, true, dst)
+	return namespace.get(name, true, dst, false)
+}
+
+// Implements [Namespace]
+func (namespace *namespaceimpl) PriorityGet(name string, dst any) error {
+	return namespace.get(name, true, dst, true)
 }
 
 func (namespace *namespaceimpl) lookupDef(name string) (*WiringDef, error) {
@@ -151,7 +163,7 @@ func (namespace *namespaceimpl) lookupDef(name string) (*WiringDef, error) {
 	return def, nil
 }
 
-func (namespace *namespaceimpl) get(name string, addEdge bool, dst any) error {
+func (namespace *namespaceimpl) get(name string, addEdge bool, dst any, isPriority bool) error {
 	// If it already exists, return it
 	if node, ok := namespace.Seen[name]; ok {
 		return copyResult(node, dst)
@@ -173,7 +185,7 @@ func (namespace *namespaceimpl) get(name string, addEdge bool, dst any) error {
 	if def.Name != name {
 		namespace.Info("Resolved %s to %s", name, def.Name)
 		var node ir.IRNode
-		err := namespace.get(def.Name, addEdge, &node)
+		err := namespace.get(def.Name, addEdge, &node, isPriority)
 		namespace.Seen[name] = node
 		if err != nil {
 			return err
@@ -189,7 +201,11 @@ func (namespace *namespaceimpl) get(name string, addEdge bool, dst any) error {
 		namespace.Info("Getting %s of type %s from parent namespace %s", name, reflect.TypeOf(def.NodeType).String(), namespace.ParentNamespace.Name())
 		var node ir.IRNode
 		if addEdge {
-			err = namespace.ParentNamespace.Get(name, &node)
+			if isPriority {
+				err = namespace.ParentNamespace.PriorityGet(name, &node)
+			} else {
+				err = namespace.ParentNamespace.Get(name, &node)
+			}
 		} else {
 			err = namespace.ParentNamespace.Instantiate(name, &node)
 		}
@@ -222,7 +238,11 @@ func (namespace *namespaceimpl) get(name string, addEdge bool, dst any) error {
 
 	if _, already_added := namespace.Added[node.Name()]; !already_added {
 		if !def.Options.ProxyNode {
-			namespace.Handler.AddNode(name, node)
+			if isPriority {
+				namespace.Handler.AddPriorityNode(name, node)
+			} else {
+				namespace.Handler.AddNode(name, node)
+			}
 		}
 		namespace.Added[node.Name()] = true
 	}

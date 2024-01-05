@@ -48,11 +48,12 @@ type Runnable interface {
 // Ultimately one of the Build methods should be
 // called to create and start the namespace.
 type NamespaceBuilder struct {
-	name        string
-	buildFuncs  map[string]BuildFunc
-	required    map[string]*argNode
-	optional    map[string]*argNode
-	instantiate map[string]struct{}
+	name                string
+	buildFuncs          map[string]BuildFunc
+	required            map[string]*argNode
+	optional            map[string]*argNode
+	instantiate         map[string]struct{}
+	priorityinstantiate map[string]struct{}
 
 	// The first error encountered while defining nodes on the builder.
 	// Errors encountered by [NamespaceBuilder] are cached here, and then
@@ -105,6 +106,7 @@ func NewNamespaceBuilder(name string) *NamespaceBuilder {
 	b.required = make(map[string]*argNode)
 	b.optional = make(map[string]*argNode)
 	b.instantiate = make(map[string]struct{})
+	b.priorityinstantiate = make(map[string]struct{})
 	b.flagsparsed = false
 
 	return b
@@ -157,6 +159,14 @@ func (b *NamespaceBuilder) Optional(name string, description string) {
 	}
 }
 
+// Indicates the name that should be built with priority before other nodes when the namespace is built.
+//
+// The typical usage of this is to ensure defaults like loggers and metricCollectors are built
+// before any of the service nodes are modified.
+func (b *NamespaceBuilder) PriorityInstantiate(name string) {
+	b.priorityinstantiate[name] = struct{}{}
+}
+
 // Indicates that name should be eagerly built when the namespace is built.
 //
 // The typical usage of this is to ensure that servers get started for
@@ -194,7 +204,15 @@ func (b *NamespaceBuilder) Build(ctx context.Context) (*Namespace, error) {
 	n.ctx, n.cancel = context.WithCancel(ctx)
 	n.wg = &sync.WaitGroup{}
 
-	// Instantiate nodes
+	// Instantiate Priority Nodes
+	for name := range b.priorityinstantiate {
+		var node any
+		if err := n.Get(name, &node); err != nil {
+			return nil, err
+		}
+	}
+
+	// Instantiate Normal nodes
 	for name := range b.instantiate {
 		var node any
 		if err := n.Get(name, &node); err != nil {

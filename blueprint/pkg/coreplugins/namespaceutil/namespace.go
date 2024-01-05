@@ -37,13 +37,14 @@ type IRNamespace interface {
 }
 
 var prop_CHILDREN = "Children"
+var priority_CHILDREN = "PriorityChildren"
 
 func addNodeImpl[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName string, childName string, isPriority bool) {
 	ptr := pointer.GetPointer(spec, childName)
 	if ptr == nil {
 		// Not a pointer, no special handling needed
 		if isPriority {
-			spec.AddPriorityProperty(namespaceName, prop_CHILDREN, childName)
+			spec.AddPriorityProperty(namespaceName, priority_CHILDREN, childName)
 		} else {
 			spec.AddProperty(namespaceName, prop_CHILDREN, childName)
 		}
@@ -87,7 +88,7 @@ func addNodeImpl[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName st
 
 	// The namespace also instantiates the modifier
 	if isPriority {
-		spec.AddPriorityProperty(namespaceName, prop_CHILDREN, childName)
+		spec.AddPriorityProperty(namespaceName, priority_CHILDREN, childName)
 	} else {
 		spec.AddProperty(namespaceName, prop_CHILDREN, childName)
 	}
@@ -138,6 +139,21 @@ func InstantiateNamespace(parentNamespace wiring.Namespace, namespaceNode IRName
 func instantiateNamespaceNodes(namespace wiring.Namespace) error {
 	namespaceName := namespace.Name()
 	var nodeNames []string
+	var priorityNodeNames []string
+
+	if err := namespace.GetProperties(namespaceName, priority_CHILDREN, &priorityNodeNames); err != nil {
+		return namespace.Error("InstantiateNamespace failed due to %v", err.Error())
+	}
+	namespace.Info("Deferred instantiation of children [%v]", strings.Join(priorityNodeNames, ", "))
+
+	for _, childName := range priorityNodeNames {
+		// Instantiate the child
+		var child ir.IRNode
+		if err := namespace.PriorityGet(childName, &child); err != nil {
+			return err
+		}
+	}
+
 	if err := namespace.GetProperties(namespaceName, prop_CHILDREN, &nodeNames); err != nil {
 		return namespace.Error("InstantiateNamespace failed due to %v", err.Error())
 	}

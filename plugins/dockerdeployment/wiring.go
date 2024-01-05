@@ -51,3 +51,9 @@ func (deployment *Deployment) AddNode(name string, node ir.IRNode) error {
 	deployment.Nodes = append(deployment.Nodes, node)
 	return nil
 }
+
+// Implements [wiring.NamespaceHandler]
+func (deployment *Deployment) AddPriorityNode(name string, node ir.IRNode) error {
+	// Deployment namespace doesn't need priority nodes
+	return nil
+}

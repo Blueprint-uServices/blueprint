@@ -58,3 +58,9 @@ func (pool *ClientPool) AddNode(name string, node ir.IRNode) error {
 	pool.Nodes = append(pool.Nodes, node)
 	return nil
 }
+
+// Implements [wiring.NamespaceHandler]
+func (pool *ClientPool) AddPriorityNode(name string, node ir.IRNode) error {
+	// Clientpools don't need priority nodes
+	return nil
+}

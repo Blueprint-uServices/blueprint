@@ -105,3 +105,9 @@ func (proc *GolangProcessNamespace) AddNode(name string, node ir.IRNode) error {
 	proc.Nodes = append(proc.Nodes, node)
 	return nil
 }
+
+// Implements [wiring.NamespaceHandler]
+func (proc *GolangProcessNamespace) AddPriorityNode(name string, node ir.IRNode) error {
+	proc.PriorityNodes = append(proc.PriorityNodes, node)
+	return nil
+}

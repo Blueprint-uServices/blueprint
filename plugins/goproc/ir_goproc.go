@@ -28,12 +28,12 @@ type Process struct {
 	filesystemDeployer /* Can be deployed as a basic go process; implemented in deploy.go */
 	linuxDeployer      /* Can be deployed to linux; implemented in deploylinux.go */
 
-	InstanceName   string
-	ProcName       string
-	ModuleName     string
-	Nodes          []ir.IRNode
-	Edges          []ir.IRNode
-	MetricCollNode ir.IRNode
+	InstanceName  string
+	ProcName      string
+	ModuleName    string
+	Nodes         []ir.IRNode
+	Edges         []ir.IRNode
+	PriorityNodes []ir.IRNode
 }
 
 // A Golang Process Node can either be given the child nodes ahead of time, or they can be added using AddArtifactNode / AddCodeNode
