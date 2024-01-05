@@ -35,11 +35,10 @@ type WiringSpec interface {
 	Alias(name string, pointsto string)   // Defines an alias to another defined node; these can be recursive
 	GetAlias(alias string) (string, bool) // Gets the value of the specified alias, if it exists
 
-	SetProperty(name string, key string, value any)         // Sets a static property value in the wiring spec, replacing any existing value specified
-	AddProperty(name string, key string, value any)         // Adds a static property value in the wiring spec
-	GetProperty(name string, key string, dst any) error     // Gets a static property value from the wiring spec
-	GetProperties(name string, key string, dst any) error   // Gets all static property values from the wiring spec
-	AddPriorityProperty(name string, key string, value any) // Adds a static property value at the head of the queue in the working spec
+	SetProperty(name string, key string, value any)       // Sets a static property value in the wiring spec, replacing any existing value specified
+	AddProperty(name string, key string, value any)       // Adds a static property value in the wiring spec
+	GetProperty(name string, key string, dst any) error   // Gets a static property value from the wiring spec
+	GetProperties(name string, key string, dst any) error // Gets all static property values from the wiring spec
 
 	String() string // Returns a string representation of everything that has been defined
 
@@ -209,14 +208,6 @@ func (spec *wiringSpecImpl) SetProperty(name string, propKey string, propValue a
 func (spec *wiringSpecImpl) AddProperty(name string, propKey string, propValue any) {
 	def := spec.getDef(name, true)
 	def.Properties[propKey] = append(def.Properties[propKey], propValue)
-}
-
-// Adds a static value to the wiring spec, pre-pending it to any existing values for the specified key
-func (spec *wiringSpecImpl) AddPriorityProperty(name string, propKey string, propValue any) {
-	def := spec.getDef(name, true)
-	oldVals := def.Properties[propKey]
-	def.Properties[propKey] = []any{propValue}
-	def.Properties[propKey] = append(def.Properties[propKey], oldVals...)
 }
 
 // Primarily for use by plugins to get configuration values

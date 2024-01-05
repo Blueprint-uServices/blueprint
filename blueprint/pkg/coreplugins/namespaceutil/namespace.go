@@ -37,17 +37,17 @@ type IRNamespace interface {
 }
 
 var prop_CHILDREN = "Children"
-var priority_CHILDREN = "PriorityChildren"
 
-func addNodeImpl[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName string, childName string, isPriority bool) {
+// If a Blueprint plugin derives a namespace (e.g. a Process namespace that contains Golang nodes)
+// then the plugin can use this method.
+// When namespace gets instantiated, it will build child.  If child is a pointer, then
+// the pointer is also modified, so that when child is instantiated, it is done so within namespace.
+// The type parameter NamespaceNodeType is the namespace node type, e.g. Process
+func AddNodeTo[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName string, childName string) {
 	ptr := pointer.GetPointer(spec, childName)
 	if ptr == nil {
 		// Not a pointer, no special handling needed
-		if isPriority {
-			spec.AddPriorityProperty(namespaceName, priority_CHILDREN, childName)
-		} else {
-			spec.AddProperty(namespaceName, prop_CHILDREN, childName)
-		}
+		spec.AddProperty(namespaceName, prop_CHILDREN, childName)
 		return
 	}
 
@@ -87,26 +87,7 @@ func addNodeImpl[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName st
 	}, opts)
 
 	// The namespace also instantiates the modifier
-	if isPriority {
-		spec.AddPriorityProperty(namespaceName, priority_CHILDREN, childName)
-	} else {
-		spec.AddProperty(namespaceName, prop_CHILDREN, childName)
-	}
-}
-
-// If a Blueprint plugin derives a namespace (e.g. a Process namespace that contains Golang nodes)
-// then the plugin can use this method.
-// When namespace gets instantiated, it will build child.  If child is a pointer, then
-// the pointer is also modified, so that when child is instantiated, it is done so within namespace.
-// The type parameter NamespaceNodeType is the namespace node type, e.g. Process
-func AddNodeTo[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName string, childName string) {
-	addNodeImpl[NamespaceNodeType](spec, namespaceName, childName, false)
-}
-
-// Same as AddNodeTo but instead of adding a node at the end of the list of children in the namespace, the child
-// is added at the start of the list of children in the namespace
-func AddPriorityNodeTo[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName string, childName string) {
-	addNodeImpl[NamespaceNodeType](spec, namespaceName, childName, true)
+	spec.AddProperty(namespaceName, prop_CHILDREN, childName)
 }
 
 // Used in conjunction with [AddNodeTo].  InstantiateNamespace derives a new child namespace
@@ -139,20 +120,6 @@ func InstantiateNamespace(parentNamespace wiring.Namespace, namespaceNode IRName
 func instantiateNamespaceNodes(namespace wiring.Namespace) error {
 	namespaceName := namespace.Name()
 	var nodeNames []string
-	var priorityNodeNames []string
-
-	if err := namespace.GetProperties(namespaceName, priority_CHILDREN, &priorityNodeNames); err != nil {
-		return namespace.Error("InstantiateNamespace failed due to %v", err.Error())
-	}
-	namespace.Info("Deferred instantiation of children [%v]", strings.Join(priorityNodeNames, ", "))
-
-	for _, childName := range priorityNodeNames {
-		// Instantiate the child
-		var child ir.IRNode
-		if err := namespace.PriorityGet(childName, &child); err != nil {
-			return err
-		}
-	}
 
 	if err := namespace.GetProperties(namespaceName, prop_CHILDREN, &nodeNames); err != nil {
 		return namespace.Error("InstantiateNamespace failed due to %v", err.Error())

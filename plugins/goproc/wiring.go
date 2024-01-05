@@ -36,11 +36,14 @@ func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) 
 	spec.Define(procName, &Process{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		var metric_coll string
 		err := spec.GetProperty(procName, "metricCollector", &metric_coll)
-		namespaceutil.AddPriorityNodeTo[Process](spec, procName, metric_coll)
 		if err != nil {
 			return nil, err
 		}
 		proc := newGolangProcessNode(procName)
+		err = namespace.Get(metric_coll, &proc.metricProvider)
+		if err != nil {
+			return nil, err
+		}
 		_, err = namespaceutil.InstantiateNamespace(namespace, &GolangProcessNamespace{proc})
 		return proc, err
 	})
@@ -103,11 +106,5 @@ func (proc *GolangProcessNamespace) AddEdge(name string, edge ir.IRNode) error {
 // Implements [wiring.NamespaceHandler]
 func (proc *GolangProcessNamespace) AddNode(name string, node ir.IRNode) error {
 	proc.Nodes = append(proc.Nodes, node)
-	return nil
-}
-
-// Implements [wiring.NamespaceHandler]
-func (proc *GolangProcessNamespace) AddPriorityNode(name string, node ir.IRNode) error {
-	proc.PriorityNodes = append(proc.PriorityNodes, node)
 	return nil
 }
