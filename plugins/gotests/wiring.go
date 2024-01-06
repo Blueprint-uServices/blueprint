@@ -106,9 +106,3 @@ func (lib *gotests) AddNode(name string, node ir.IRNode) error {
 	lib.Nodes = append(lib.Nodes, node)
 	return nil
 }
-
-// Implements [wiring.NamespaceHandler]
-func (lib *gotests) AddPriorityNode(name string, node ir.IRNode) error {
-	// gotests don't need priority nodes at the moment
-	return nil
-}
