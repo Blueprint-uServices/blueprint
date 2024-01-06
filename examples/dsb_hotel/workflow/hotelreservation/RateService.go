@@ -8,10 +8,13 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// RateService implements Rate Service from the hotel reservation application
 type RateService interface {
+	// GetRates return the rates for the desired hotels (`hotelIDs`) for the provided dates (`inDate`, `outDate`)
 	GetRates(ctx context.Context, hotelIDs []string, inDate string, outDate string) ([]RatePlan, error)
 }
 
+// Implementation of RateService
 type RateServiceImpl struct {
 	rateCache backend.Cache
 	rateDB    backend.NoSQLDatabase
@@ -114,6 +117,7 @@ func initRateDB(ctx context.Context, db backend.NoSQLDatabase) error {
 	return nil
 }
 
+// Creates and Returns a new RateService object
 func NewRateServiceImpl(ctx context.Context, rateCache backend.Cache, rateDB backend.NoSQLDatabase) (RateService, error) {
 	err := initRateDB(ctx, rateDB)
 	if err != nil {

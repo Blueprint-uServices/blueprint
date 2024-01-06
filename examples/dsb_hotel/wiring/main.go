@@ -1,6 +1,9 @@
-// Package main provides the HotelReservation application from the DeathStarBench suite.
+// Package main provides an application for compiling a number of different
+// wiring specs for the Hotel Reservation application from the DeathStarBench suite.
 //
-// Run with go run examples/dsb_hotel/wiring/main.go
+// To display options and usage, invoke:
+//
+//	go run main.go -h
 package main
 
 import (

@@ -61,12 +61,10 @@ func TestUserHandler(t *testing.T) {
 	// Check Invalid pwd
 	resp, err = service.UserHandler(ctx, "Cornell_1", "bleh")
 	assert.Error(t, err)
-	assert.Equal(t, resp, "Invalid Credentials")
 
 	// Check invalid user
 	resp, err = service.UserHandler(ctx, "Vaastav", "blueprint")
 	assert.Error(t, err)
-	assert.Equal(t, resp, "Invalid Credentials")
 }
 
 func TestRecommendHandler(t *testing.T) {

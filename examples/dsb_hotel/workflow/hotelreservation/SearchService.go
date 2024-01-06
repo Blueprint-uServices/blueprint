@@ -4,15 +4,19 @@ import (
 	"context"
 )
 
+// SearchService implements the Search service from hotel reservation
 type SearchService interface {
+	// Returns the list of available hotels based on a given location for the desired date range
 	Nearby(ctx context.Context, lat float64, lon float64, inDate string, outDate string) ([]string, error)
 }
 
+// Implementation of the Search Service
 type SearchServiceImpl struct {
 	geoService  GeoService
 	rateService RateService
 }
 
+// Creates and Returns a new SearchService object
 func NewSearchServiceImpl(ctx context.Context, geoService GeoService, rateService RateService) (SearchService, error) {
 	return &SearchServiceImpl{geoService: geoService, rateService: rateService}, nil
 }

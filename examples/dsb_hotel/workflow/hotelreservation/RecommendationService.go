@@ -10,10 +10,13 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// RecommendationService implements Recommendation Service from the hotel reservation application
 type RecommendationService interface {
+	// Returns the recommended hotels based on the desired location (`lat`, `lon`) and the metric (`require`) for ranking recommendations
 	GetRecommendations(ctx context.Context, require string, lat float64, lon float64) ([]string, error)
 }
 
+// Implements RecommendationService
 type RecommendationServiceImpl struct {
 	recommendDB backend.NoSQLDatabase
 	hotels      map[string]Hotel
@@ -88,6 +91,7 @@ func initRecommendationDB(ctx context.Context, db backend.NoSQLDatabase) error {
 	return nil
 }
 
+// Creates and Returns a new RecommendationService object
 func NewRecommendationServiceImpl(ctx context.Context, recommendDB backend.NoSQLDatabase) (RecommendationService, error) {
 	service := &RecommendationServiceImpl{recommendDB: recommendDB, hotels: make(map[string]Hotel)}
 	err := initRecommendationDB(ctx, recommendDB)
