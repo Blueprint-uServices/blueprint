@@ -4,7 +4,9 @@
 // i)  the requests returns without an error
 // ii) the number of failed tries has reached the maximum number of failures.
 // Usage:
-//  AddRetries(spec, "my_service", 10)
+//  import "gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
+//  retries.AddRetries(spec, "my_service", 10) // Only adds retries
+//  retries.AddRetriesWithTimeouts(spec, "my_service", 10, "1s") // Adds retries and timeouts
 package retries
 
 import (
@@ -13,6 +15,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/timeouts"
 	"golang.org/x/exp/slog"
 )
 
@@ -41,4 +44,23 @@ func AddRetries(spec wiring.WiringSpec, serviceName string, max_retries int64) {
 
 		return newRetrierClient(clientWrapper, wrapped, max_retries)
 	})
+}
+
+// Add retrier + timeout functionality to all clients of the specified service.
+// Uses a [blueprint.WiringSpec]
+// Modifies the given service in the following ways:
+// (i)  all clients to that service have a user-specified `timeout` for each request.
+// (ii) all clients to that service retry at most `max_retries` number of times on error.
+//
+// Ordering of functionality depicted via example call-chain:
+// Before:
+//   workflow -> plugin grpc
+// After:
+//   workflow -> retrier -> timeout -> plugin grpc
+//
+// Usage:
+//   AddRetriesWithTimeouts(spec, "my_service", 10, "1s")
+func AddRetriesWithTimeouts(spec wiring.WiringSpec, serviceName string, max_retries int64, timeout string) {
+	AddRetries(spec, serviceName, max_retries)
+	timeouts.Add(spec, serviceName, timeout)
 }
