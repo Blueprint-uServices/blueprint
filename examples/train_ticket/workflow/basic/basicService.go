@@ -3,6 +3,8 @@ package basic
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"sync"
 
 	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/common"
@@ -32,7 +34,7 @@ func NewBasicServiceImpl(ctx context.Context, trainService train.TrainService, s
 func (b *BasicServiceImpl) QueryForTravel(ctx context.Context, info common.Travel) (common.TravelResult, error) {
 	var res common.TravelResult
 	var wg sync.WaitGroup
-	wg.Add(4)
+	wg.Add(5)
 	var trainType train.TrainType
 	var startstationID, endstationID string
 	var route route.Route
@@ -75,6 +77,34 @@ func (b *BasicServiceImpl) QueryForTravel(ctx context.Context, info common.Trave
 	if err5 != nil {
 		return res, err5
 	}
+
+	// Check if that stations are on the obtained route
+
+	startIndex := -1
+	endIndex := -1
+	for idx, station := range route.Stations {
+		if station == startstationID {
+			startIndex = idx
+		} else if station == endstationID {
+			endIndex = idx
+		}
+	}
+
+	if startIndex == -1 || endIndex == -1 {
+		return res, errors.New("Selected start and/or end stations are not available on this route")
+	}
+
+	res.Prices = make(map[string]string)
+	distance := route.Distances[endIndex] - route.Distances[startIndex]
+	basicRate := float64(distance) * pc.BasicPriceRate
+	comfortRate := float64(distance) * pc.FirstClassPriceRate
+	res.Prices["economyClass"] = fmt.Sprintf("%v", basicRate)
+	res.Prices["comfortClass"] = fmt.Sprintf("%v", comfortRate)
+
+	res.TType = trainType
+	res.Route = route
+	res.Percent = 1.0
+	res.Status = true
 
 	return res, nil
 }
