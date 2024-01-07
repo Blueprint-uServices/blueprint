@@ -41,14 +41,8 @@ func (node *Process) GenerateArtifacts(workspaceDir string) error {
 		return err
 	}
 
-	/*
-		all_nodes := []ir.IRNode{node.metricProvider}
-		all_nodes = append(all_nodes, node.Nodes...)
-	*/
-	all_nodes := node.Nodes
-
 	// Add relevant nodes to the workspace
-	for _, node := range all_nodes {
+	for _, node := range node.Nodes {
 		if n, valid := node.(golang.ProvidesModule); valid {
 			if err := n.AddToWorkspace(workspace); err != nil {
 				return err
@@ -64,7 +58,7 @@ func (node *Process) GenerateArtifacts(workspaceDir string) error {
 	}
 
 	// Add and/or generate interfaces
-	for _, node := range all_nodes {
+	for _, node := range node.Nodes {
 		if n, valid := node.(golang.ProvidesInterface); valid {
 			if err := n.AddInterfaces(module); err != nil {
 				return err
@@ -73,7 +67,7 @@ func (node *Process) GenerateArtifacts(workspaceDir string) error {
 	}
 
 	// Generate constructors and function declarations
-	for _, node := range all_nodes {
+	for _, node := range node.Nodes {
 		if n, valid := node.(golang.GeneratesFuncs); valid {
 			if err := n.GenerateFuncs(module); err != nil {
 				return err
@@ -91,7 +85,7 @@ func (node *Process) GenerateArtifacts(workspaceDir string) error {
 	}
 
 	// Add constructor invocations
-	for _, node := range all_nodes {
+	for _, node := range node.Nodes {
 		if n, valid := node.(golang.Instantiable); valid {
 			if err := n.AddInstantiation(namespaceBuilder); err != nil {
 				return err
@@ -105,7 +99,7 @@ func (node *Process) GenerateArtifacts(workspaceDir string) error {
 	}
 
 	// For now, instantiate all contained nodes
-	for _, node := range all_nodes {
+	for _, node := range node.Nodes {
 		namespaceBuilder.Instantiate(node.Name())
 	}
 
@@ -121,7 +115,7 @@ func (node *Process) GenerateArtifacts(workspaceDir string) error {
 	err = goprocgen.GenerateMain(
 		node.Name(),
 		node.Edges,
-		all_nodes, // For now just instantiate all contained nodes
+		node.Nodes, // For now just instantiate all contained nodes
 		module,
 		constructorName,
 	)

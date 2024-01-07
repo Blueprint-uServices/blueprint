@@ -9,6 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"golang.org/x/exp/slices"
 	"golang.org/x/exp/slog"
 )
 
@@ -111,6 +112,11 @@ func (n *NamespaceBuilderImpl) OptionalArg(name, description string) {
 }
 
 func (n *NamespaceBuilderImpl) Instantiate(name string) {
+	// Check for and avoid duplicates
+	exists := slices.Contains[[]string, string](n.Instantiations, name)
+	if exists {
+		return
+	}
 	n.Instantiations = append(n.Instantiations, name)
 }
 
