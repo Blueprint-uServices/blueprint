@@ -140,7 +140,7 @@ func (p *PriceServiceImpl) FindByRouteIDsAndTrainTypes(ctx context.Context, rtsA
 		routeid := pieces[0]
 		trainType := pieces[1]
 		pc, err := p.FindByRouteIDAndTrainType(ctx, routeid, trainType)
-		// Ignore error
+		// Don't Ignore error
 		if err == nil {
 			res[rt] = pc
 		}
