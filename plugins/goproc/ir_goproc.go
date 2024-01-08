@@ -34,6 +34,7 @@ type Process struct {
 	Nodes          []ir.IRNode
 	Edges          []ir.IRNode
 	metricProvider ir.IRNode
+	logger         ir.IRNode
 }
 
 // A Golang Process Node can either be given the child nodes ahead of time, or they can be added using AddArtifactNode / AddCodeNode

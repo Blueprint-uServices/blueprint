@@ -51,3 +51,8 @@ func (l *SLogger) Logf(ctx context.Context, format string, args ...any) (context
 	slog.Log(ctx, slog.LevelInfo.Level(), msg)
 	return ctx, nil
 }
+
+// Returns a new logger object
+func NewSLogger(ctx context.Context) (*SLogger, error) {
+	return &SLogger{}, nil
+}
