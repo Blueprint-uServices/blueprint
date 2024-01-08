@@ -54,5 +54,7 @@ func (l *SLogger) Logf(ctx context.Context, format string, args ...any) (context
 
 // Returns a new logger object
 func NewSLogger(ctx context.Context) (*SLogger, error) {
-	return &SLogger{}, nil
+	l := &SLogger{}
+	backend.SetDefaultLogger(l)
+	return l, nil
 }
