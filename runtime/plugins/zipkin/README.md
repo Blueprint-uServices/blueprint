@@ -16,7 +16,7 @@ Package zipkin implements a tracer \[backend.Tracer\] client interface for the z
 
 
 <a name="ZipkinTracer"></a>
-## type ZipkinTracer
+## type [ZipkinTracer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/zipkin/trace.go#L14-L16>)
 
 ZipkinTracer implements the runtime backend instance that implements the backend/trace.Tracer interface. REQUIRED: A functional backend running the zipkin collector.
 
@@ -27,7 +27,7 @@ type ZipkinTracer struct {
 ```
 
 <a name="NewZipkinTracer"></a>
-### func NewZipkinTracer
+### func [NewZipkinTracer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/zipkin/trace.go#L20>)
 
 ```go
 func NewZipkinTracer(ctx context.Context, addr string) (*ZipkinTracer, error)
@@ -36,7 +36,7 @@ func NewZipkinTracer(ctx context.Context, addr string) (*ZipkinTracer, error)
 Returns a new instance of ZipkinTracer. Configures opentelemetry to export zipkin traces to the zipkin collector hosted at address \`addr\`.
 
 <a name="ZipkinTracer.GetTracerProvider"></a>
-### func \(\*ZipkinTracer\) GetTracerProvider
+### func \(\*ZipkinTracer\) [GetTracerProvider](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/zipkin/trace.go#L33>)
 
 ```go
 func (t *ZipkinTracer) GetTracerProvider(ctx context.Context) (trace.TracerProvider, error)

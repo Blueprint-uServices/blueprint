@@ -24,7 +24,7 @@ The plugin extends the service interface with a \`Health\` method that returns a
 
 
 <a name="AddHealthCheckAPI"></a>
-## func AddHealthCheckAPI
+## func [AddHealthCheckAPI](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/healthchecker/wiring.go#L36>)
 
 ```go
 func AddHealthCheckAPI(spec wiring.WiringSpec, serviceName string)
@@ -55,7 +55,7 @@ type ServiceAHealth interface {
 ```
 
 <a name="HealthCheckerServerWrapper"></a>
-## type HealthCheckerServerWrapper
+## type [HealthCheckerServerWrapper](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/healthchecker/ir.go#L15-L24>)
 
 Blueprint IR node representing a HealthChecker
 
@@ -72,7 +72,7 @@ type HealthCheckerServerWrapper struct {
 ```
 
 <a name="HealthCheckerServerWrapper.AddInstantiation"></a>
-### func \(\*HealthCheckerServerWrapper\) AddInstantiation
+### func \(\*HealthCheckerServerWrapper\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/healthchecker/ir.go#L99>)
 
 ```go
 func (node *HealthCheckerServerWrapper) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -81,7 +81,7 @@ func (node *HealthCheckerServerWrapper) AddInstantiation(builder golang.Namespac
 
 
 <a name="HealthCheckerServerWrapper.AddInterfaces"></a>
-### func \(\*HealthCheckerServerWrapper\) AddInterfaces
+### func \(\*HealthCheckerServerWrapper\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/healthchecker/ir.go#L36>)
 
 ```go
 func (node *HealthCheckerServerWrapper) AddInterfaces(builder golang.ModuleBuilder) error
@@ -90,7 +90,7 @@ func (node *HealthCheckerServerWrapper) AddInterfaces(builder golang.ModuleBuild
 
 
 <a name="HealthCheckerServerWrapper.GenerateFuncs"></a>
-### func \(\*HealthCheckerServerWrapper\) GenerateFuncs
+### func \(\*HealthCheckerServerWrapper\) [GenerateFuncs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/healthchecker/ir.go#L83>)
 
 ```go
 func (node *HealthCheckerServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) error
@@ -99,7 +99,7 @@ func (node *HealthCheckerServerWrapper) GenerateFuncs(builder golang.ModuleBuild
 
 
 <a name="HealthCheckerServerWrapper.GetInterface"></a>
-### func \(\*HealthCheckerServerWrapper\) GetInterface
+### func \(\*HealthCheckerServerWrapper\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/healthchecker/ir.go#L79>)
 
 ```go
 func (node *HealthCheckerServerWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -108,7 +108,7 @@ func (node *HealthCheckerServerWrapper) GetInterface(ctx ir.BuildContext) (servi
 
 
 <a name="HealthCheckerServerWrapper.ImplementsGolangNode"></a>
-### func \(\*HealthCheckerServerWrapper\) ImplementsGolangNode
+### func \(\*HealthCheckerServerWrapper\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/healthchecker/ir.go#L26>)
 
 ```go
 func (node *HealthCheckerServerWrapper) ImplementsGolangNode()
@@ -117,7 +117,7 @@ func (node *HealthCheckerServerWrapper) ImplementsGolangNode()
 
 
 <a name="HealthCheckerServerWrapper.Name"></a>
-### func \(\*HealthCheckerServerWrapper\) Name
+### func \(\*HealthCheckerServerWrapper\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/healthchecker/ir.go#L28>)
 
 ```go
 func (node *HealthCheckerServerWrapper) Name() string
@@ -126,7 +126,7 @@ func (node *HealthCheckerServerWrapper) Name() string
 
 
 <a name="HealthCheckerServerWrapper.String"></a>
-### func \(\*HealthCheckerServerWrapper\) String
+### func \(\*HealthCheckerServerWrapper\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/healthchecker/ir.go#L32>)
 
 ```go
 func (node *HealthCheckerServerWrapper) String() string

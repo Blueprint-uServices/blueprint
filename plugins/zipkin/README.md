@@ -36,7 +36,7 @@ The applications must use a backend.Tracer \(runtime/core/backend\) as the inter
 
 
 <a name="Collector"></a>
-## func Collector
+## func [Collector](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/wiring.go#L20>)
 
 ```go
 func Collector(spec wiring.WiringSpec, collectorName string) string
@@ -47,7 +47,7 @@ Generates the IRNodes for a zipkin docker container named \`collectorName\` that
 The returned collectorName must be used as an argument to the opentelemetry.InstrumentUsingCustomCollector\(spec, serviceName, \`collectorName\`\).
 
 <a name="ZipkinCollectorClient"></a>
-## type ZipkinCollectorClient
+## type [ZipkinCollectorClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector_client.go#L17-L26>)
 
 Blueprint IR node representing a client to the zipkin container
 
@@ -65,7 +65,7 @@ type ZipkinCollectorClient struct {
 ```
 
 <a name="ZipkinCollectorClient.AddInstantiation"></a>
-### func \(\*ZipkinCollectorClient\) AddInstantiation
+### func \(\*ZipkinCollectorClient\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector_client.go#L66>)
 
 ```go
 func (node *ZipkinCollectorClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -74,7 +74,7 @@ func (node *ZipkinCollectorClient) AddInstantiation(builder golang.NamespaceBuil
 
 
 <a name="ZipkinCollectorClient.AddInterfaces"></a>
-### func \(\*ZipkinCollectorClient\) AddInterfaces
+### func \(\*ZipkinCollectorClient\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector_client.go#L81>)
 
 ```go
 func (node *ZipkinCollectorClient) AddInterfaces(builder golang.WorkspaceBuilder) error
@@ -83,7 +83,7 @@ func (node *ZipkinCollectorClient) AddInterfaces(builder golang.WorkspaceBuilder
 
 
 <a name="ZipkinCollectorClient.AddToWorkspace"></a>
-### func \(\*ZipkinCollectorClient\) AddToWorkspace
+### func \(\*ZipkinCollectorClient\) [AddToWorkspace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector_client.go#L85>)
 
 ```go
 func (node *ZipkinCollectorClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
@@ -92,7 +92,7 @@ func (node *ZipkinCollectorClient) AddToWorkspace(builder golang.WorkspaceBuilde
 
 
 <a name="ZipkinCollectorClient.GetInterface"></a>
-### func \(\*ZipkinCollectorClient\) GetInterface
+### func \(\*ZipkinCollectorClient\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector_client.go#L77>)
 
 ```go
 func (node *ZipkinCollectorClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -101,7 +101,7 @@ func (node *ZipkinCollectorClient) GetInterface(ctx ir.BuildContext) (service.Se
 
 
 <a name="ZipkinCollectorClient.ImplementsGolangNode"></a>
-### func \(\*ZipkinCollectorClient\) ImplementsGolangNode
+### func \(\*ZipkinCollectorClient\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector_client.go#L89>)
 
 ```go
 func (node *ZipkinCollectorClient) ImplementsGolangNode()
@@ -110,7 +110,7 @@ func (node *ZipkinCollectorClient) ImplementsGolangNode()
 
 
 <a name="ZipkinCollectorClient.ImplementsOTCollectorClient"></a>
-### func \(\*ZipkinCollectorClient\) ImplementsOTCollectorClient
+### func \(\*ZipkinCollectorClient\) [ImplementsOTCollectorClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector_client.go#L91>)
 
 ```go
 func (node *ZipkinCollectorClient) ImplementsOTCollectorClient()
@@ -119,7 +119,7 @@ func (node *ZipkinCollectorClient) ImplementsOTCollectorClient()
 
 
 <a name="ZipkinCollectorClient.Name"></a>
-### func \(\*ZipkinCollectorClient\) Name
+### func \(\*ZipkinCollectorClient\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector_client.go#L39>)
 
 ```go
 func (node *ZipkinCollectorClient) Name() string
@@ -128,7 +128,7 @@ func (node *ZipkinCollectorClient) Name() string
 
 
 <a name="ZipkinCollectorClient.String"></a>
-### func \(\*ZipkinCollectorClient\) String
+### func \(\*ZipkinCollectorClient\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector_client.go#L43>)
 
 ```go
 func (node *ZipkinCollectorClient) String() string
@@ -137,7 +137,7 @@ func (node *ZipkinCollectorClient) String() string
 
 
 <a name="ZipkinCollectorContainer"></a>
-## type ZipkinCollectorContainer
+## type [ZipkinCollectorContainer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector.go#L13-L19>)
 
 Blueprint IR node that represents the Zipkin container
 
@@ -152,7 +152,7 @@ type ZipkinCollectorContainer struct {
 ```
 
 <a name="ZipkinCollectorContainer.AddContainerArtifacts"></a>
-### func \(\*ZipkinCollectorContainer\) AddContainerArtifacts
+### func \(\*ZipkinCollectorContainer\) [AddContainerArtifacts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector.go#L76>)
 
 ```go
 func (node *ZipkinCollectorContainer) AddContainerArtifacts(targer docker.ContainerWorkspace) error
@@ -161,7 +161,7 @@ func (node *ZipkinCollectorContainer) AddContainerArtifacts(targer docker.Contai
 
 
 <a name="ZipkinCollectorContainer.AddContainerInstance"></a>
-### func \(\*ZipkinCollectorContainer\) AddContainerInstance
+### func \(\*ZipkinCollectorContainer\) [AddContainerInstance](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector.go#L80>)
 
 ```go
 func (node *ZipkinCollectorContainer) AddContainerInstance(target docker.ContainerWorkspace) error
@@ -170,7 +170,7 @@ func (node *ZipkinCollectorContainer) AddContainerInstance(target docker.Contain
 
 
 <a name="ZipkinCollectorContainer.GetInterface"></a>
-### func \(\*ZipkinCollectorContainer\) GetInterface
+### func \(\*ZipkinCollectorContainer\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector.go#L71>)
 
 ```go
 func (node *ZipkinCollectorContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -179,7 +179,7 @@ func (node *ZipkinCollectorContainer) GetInterface(ctx ir.BuildContext) (service
 
 
 <a name="ZipkinCollectorContainer.Name"></a>
-### func \(\*ZipkinCollectorContainer\) Name
+### func \(\*ZipkinCollectorContainer\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector.go#L63>)
 
 ```go
 func (node *ZipkinCollectorContainer) Name() string
@@ -188,7 +188,7 @@ func (node *ZipkinCollectorContainer) Name() string
 
 
 <a name="ZipkinCollectorContainer.String"></a>
-### func \(\*ZipkinCollectorContainer\) String
+### func \(\*ZipkinCollectorContainer\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector.go#L67>)
 
 ```go
 func (node *ZipkinCollectorContainer) String() string
@@ -197,7 +197,7 @@ func (node *ZipkinCollectorContainer) String() string
 
 
 <a name="ZipkinInterface"></a>
-## type ZipkinInterface
+## type [ZipkinInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector.go#L22-L25>)
 
 Zipkin interface exposed to the application.
 
@@ -209,7 +209,7 @@ type ZipkinInterface struct {
 ```
 
 <a name="ZipkinInterface.GetMethods"></a>
-### func \(\*ZipkinInterface\) GetMethods
+### func \(\*ZipkinInterface\) [GetMethods](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector.go#L31>)
 
 ```go
 func (j *ZipkinInterface) GetMethods() []service.Method
@@ -218,7 +218,7 @@ func (j *ZipkinInterface) GetMethods() []service.Method
 
 
 <a name="ZipkinInterface.GetName"></a>
-### func \(\*ZipkinInterface\) GetName
+### func \(\*ZipkinInterface\) [GetName](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/zipkin/ir_collector.go#L27>)
 
 ```go
 func (j *ZipkinInterface) GetName() string

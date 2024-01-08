@@ -10,12 +10,11 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/slogger"
 
 - [type SLogger](<#SLogger>)
   - [func NewSLogger\(ctx context.Context\) \(\*SLogger, error\)](<#NewSLogger>)
-  - [func \(l \*SLogger\) Debug\(ctx context.Context, msg string, args ...any\) \(context.Context, error\)](<#SLogger.Debug>)
-  - [func \(l \*SLogger\) Error\(ctx context.Context, msg string, args ...any\) \(context.Context, error\)](<#SLogger.Error>)
-  - [func \(l \*SLogger\) Info\(ctx context.Context, msg string, args ...any\) \(context.Context, error\)](<#SLogger.Info>)
-  - [func \(l \*SLogger\) LogWithAttrs\(ctx context.Context, priority backend.Priority, msg string, attrs ...backend.Attribute\) \(context.Context, error\)](<#SLogger.LogWithAttrs>)
-  - [func \(l \*SLogger\) Logf\(ctx context.Context, format string, args ...any\) \(context.Context, error\)](<#SLogger.Logf>)
-  - [func \(l \*SLogger\) Warn\(ctx context.Context, msg string, args ...any\) \(context.Context, error\)](<#SLogger.Warn>)
+  - [func \(l \*SLogger\) Debug\(ctx context.Context, format string, args ...any\) \(context.Context, error\)](<#SLogger.Debug>)
+  - [func \(l \*SLogger\) Error\(ctx context.Context, format string, args ...any\) \(context.Context, error\)](<#SLogger.Error>)
+  - [func \(l \*SLogger\) Info\(ctx context.Context, format string, args ...any\) \(context.Context, error\)](<#SLogger.Info>)
+  - [func \(l \*SLogger\) Logf\(ctx context.Context, opts backend.LogOptions, format string, args ...any\) \(context.Context, error\)](<#SLogger.Logf>)
+  - [func \(l \*SLogger\) Warn\(ctx context.Context, format string, args ...any\) \(context.Context, error\)](<#SLogger.Warn>)
 
 
 <a name="SLogger"></a>
@@ -28,7 +27,7 @@ type SLogger struct{}
 ```
 
 <a name="NewSLogger"></a>
-### func [NewSLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L56>)
+### func [NewSLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L46>)
 
 ```go
 func NewSLogger(ctx context.Context) (*SLogger, error)
@@ -37,55 +36,46 @@ func NewSLogger(ctx context.Context) (*SLogger, error)
 Returns a new logger object
 
 <a name="SLogger.Debug"></a>
-### func \(\*SLogger\) [Debug](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L25>)
+### func \(\*SLogger\) [Debug](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L15>)
 
 ```go
-func (l *SLogger) Debug(ctx context.Context, msg string, args ...any) (context.Context, error)
+func (l *SLogger) Debug(ctx context.Context, format string, args ...any) (context.Context, error)
 ```
 
 Implements backend.Logger
 
 <a name="SLogger.Error"></a>
-### func \(\*SLogger\) [Error](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L43>)
+### func \(\*SLogger\) [Error](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L33>)
 
 ```go
-func (l *SLogger) Error(ctx context.Context, msg string, args ...any) (context.Context, error)
+func (l *SLogger) Error(ctx context.Context, format string, args ...any) (context.Context, error)
 ```
 
 Implements backend.Logger
 
 <a name="SLogger.Info"></a>
-### func \(\*SLogger\) [Info](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L31>)
+### func \(\*SLogger\) [Info](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L21>)
 
 ```go
-func (l *SLogger) Info(ctx context.Context, msg string, args ...any) (context.Context, error)
-```
-
-Implements backend.Logger
-
-<a name="SLogger.LogWithAttrs"></a>
-### func \(\*SLogger\) [LogWithAttrs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L15>)
-
-```go
-func (l *SLogger) LogWithAttrs(ctx context.Context, priority backend.Priority, msg string, attrs ...backend.Attribute) (context.Context, error)
+func (l *SLogger) Info(ctx context.Context, format string, args ...any) (context.Context, error)
 ```
 
 Implements backend.Logger
 
 <a name="SLogger.Logf"></a>
-### func \(\*SLogger\) [Logf](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L49>)
+### func \(\*SLogger\) [Logf](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L39>)
 
 ```go
-func (l *SLogger) Logf(ctx context.Context, format string, args ...any) (context.Context, error)
+func (l *SLogger) Logf(ctx context.Context, opts backend.LogOptions, format string, args ...any) (context.Context, error)
 ```
 
 Implements backend.Logger
 
 <a name="SLogger.Warn"></a>
-### func \(\*SLogger\) [Warn](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L37>)
+### func \(\*SLogger\) [Warn](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L27>)
 
 ```go
-func (l *SLogger) Warn(ctx context.Context, msg string, args ...any) (context.Context, error)
+func (l *SLogger) Warn(ctx context.Context, format string, args ...any) (context.Context, error)
 ```
 
 Implements backend.Logger

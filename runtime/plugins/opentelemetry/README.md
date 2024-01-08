@@ -8,13 +8,45 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/opentelemetry"
 
 ## Index
 
+- [type StdoutMetricCollector](<#StdoutMetricCollector>)
+  - [func NewStdoutMetricCollector\(ctx context.Context\) \(\*StdoutMetricCollector, error\)](<#NewStdoutMetricCollector>)
+  - [func \(s \*StdoutMetricCollector\) GetMetricProvider\(ctx context.Context\) \(metric.MeterProvider, error\)](<#StdoutMetricCollector.GetMetricProvider>)
 - [type StdoutTracer](<#StdoutTracer>)
   - [func NewStdoutTracer\(ctx context.Context, addr string\) \(\*StdoutTracer, error\)](<#NewStdoutTracer>)
   - [func \(t \*StdoutTracer\) GetTracerProvider\(ctx context.Context\) \(trace.TracerProvider, error\)](<#StdoutTracer.GetTracerProvider>)
 
 
+<a name="StdoutMetricCollector"></a>
+## type [StdoutMetricCollector](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/opentelemetry/metric.go#L14-L16>)
+
+
+
+```go
+type StdoutMetricCollector struct {
+    // contains filtered or unexported fields
+}
+```
+
+<a name="NewStdoutMetricCollector"></a>
+### func [NewStdoutMetricCollector](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/opentelemetry/metric.go#L22>)
+
+```go
+func NewStdoutMetricCollector(ctx context.Context) (*StdoutMetricCollector, error)
+```
+
+
+
+<a name="StdoutMetricCollector.GetMetricProvider"></a>
+### func \(\*StdoutMetricCollector\) [GetMetricProvider](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/opentelemetry/metric.go#L18>)
+
+```go
+func (s *StdoutMetricCollector) GetMetricProvider(ctx context.Context) (metric.MeterProvider, error)
+```
+
+
+
 <a name="StdoutTracer"></a>
-## type StdoutTracer
+## type [StdoutTracer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/opentelemetry/trace.go#L11-L13>)
 
 
 
@@ -25,7 +57,7 @@ type StdoutTracer struct {
 ```
 
 <a name="NewStdoutTracer"></a>
-### func NewStdoutTracer
+### func [NewStdoutTracer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/opentelemetry/trace.go#L15>)
 
 ```go
 func NewStdoutTracer(ctx context.Context, addr string) (*StdoutTracer, error)
@@ -34,7 +66,7 @@ func NewStdoutTracer(ctx context.Context, addr string) (*StdoutTracer, error)
 
 
 <a name="StdoutTracer.GetTracerProvider"></a>
-### func \(\*StdoutTracer\) GetTracerProvider
+### func \(\*StdoutTracer\) [GetTracerProvider](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/opentelemetry/trace.go#L28>)
 
 ```go
 func (t *StdoutTracer) GetTracerProvider(ctx context.Context) (trace.TracerProvider, error)

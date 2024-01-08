@@ -44,7 +44,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb/query"
 
 
 <a name="CmpType"></a>
-## type CmpType
+## type [CmpType](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L41>)
 
 
 
@@ -65,7 +65,7 @@ const (
 ```
 
 <a name="Filter"></a>
-## type Filter
+## type [Filter](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L17-L20>)
 
 
 
@@ -77,7 +77,7 @@ type Filter interface {
 ```
 
 <a name="All"></a>
-### func All
+### func [All](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L180>)
 
 ```go
 func All(filters ...Filter) Filter
@@ -86,7 +86,7 @@ func All(filters ...Filter) Filter
 
 
 <a name="And"></a>
-### func And
+### func [And](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L137>)
 
 ```go
 func And(filters ...Filter) Filter
@@ -95,7 +95,7 @@ func And(filters ...Filter) Filter
 
 
 <a name="Broadcast"></a>
-### func Broadcast
+### func [Broadcast](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L115>)
 
 ```go
 func Broadcast(next Filter) Filter
@@ -104,7 +104,7 @@ func Broadcast(next Filter) Filter
 
 
 <a name="CmpFloat"></a>
-### func CmpFloat
+### func [CmpFloat](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L133>)
 
 ```go
 func CmpFloat(value float64, cmp CmpType) Filter
@@ -113,7 +113,7 @@ func CmpFloat(value float64, cmp CmpType) Filter
 
 
 <a name="CmpInt"></a>
-### func CmpInt
+### func [CmpInt](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L129>)
 
 ```go
 func CmpInt(value int64, cmp CmpType) Filter
@@ -122,7 +122,7 @@ func CmpInt(value int64, cmp CmpType) Filter
 
 
 <a name="ElemMatch"></a>
-### func ElemMatch
+### func [ElemMatch](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L184>)
 
 ```go
 func ElemMatch(queries ...Filter) Filter
@@ -131,7 +131,7 @@ func ElemMatch(queries ...Filter) Filter
 
 
 <a name="Equals"></a>
-### func Equals
+### func [Equals](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L119>)
 
 ```go
 func Equals(value any) Filter
@@ -140,7 +140,7 @@ func Equals(value any) Filter
 
 
 <a name="ExactFieldMatch"></a>
-### func ExactFieldMatch
+### func [ExactFieldMatch](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L167>)
 
 ```go
 func ExactFieldMatch(fieldsSeen ...string) Filter
@@ -149,7 +149,7 @@ func ExactFieldMatch(fieldsSeen ...string) Filter
 
 
 <a name="Exists"></a>
-### func Exists
+### func [Exists](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L163>)
 
 ```go
 func Exists() Filter
@@ -158,7 +158,7 @@ func Exists() Filter
 
 
 <a name="Index"></a>
-### func Index
+### func [Index](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L111>)
 
 ```go
 func Index(i int, next Filter) Filter
@@ -167,7 +167,7 @@ func Index(i int, next Filter) Filter
 
 
 <a name="Lookup"></a>
-### func Lookup
+### func [Lookup](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L92>)
 
 ```go
 func Lookup(selector string, next Filter) Filter
@@ -176,7 +176,7 @@ func Lookup(selector string, next Filter) Filter
 
 
 <a name="Not"></a>
-### func Not
+### func [Not](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L159>)
 
 ```go
 func Not(filter Filter) Filter
@@ -185,7 +185,7 @@ func Not(filter Filter) Filter
 
 
 <a name="Or"></a>
-### func Or
+### func [Or](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L148>)
 
 ```go
 func Or(filters ...Filter) Filter
@@ -194,7 +194,7 @@ func Or(filters ...Filter) Filter
 
 
 <a name="ParseFilter"></a>
-### func ParseFilter
+### func [ParseFilter](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/parsefilter.go#L15>)
 
 ```go
 func ParseFilter(filter bson.D) (Filter, error)
@@ -203,7 +203,7 @@ func ParseFilter(filter bson.D) (Filter, error)
 
 
 <a name="Regex"></a>
-### func Regex
+### func [Regex](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L175>)
 
 ```go
 func Regex(regex_string string) (Filter, error)
@@ -212,7 +212,7 @@ func Regex(regex_string string) (Filter, error)
 
 
 <a name="Select"></a>
-### func Select
+### func [Select](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/filter.go#L107>)
 
 ```go
 func Select(fieldName string, next Filter) Filter
@@ -221,7 +221,7 @@ func Select(fieldName string, next Filter) Filter
 
 
 <a name="Update"></a>
-## type Update
+## type [Update](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/update.go#L14-L17>)
 
 
 
@@ -233,7 +233,7 @@ type Update interface {
 ```
 
 <a name="AddToSet"></a>
-### func AddToSet
+### func [AddToSet](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/update.go#L82>)
 
 ```go
 func AddToSet(value any) (Update, error)
@@ -242,7 +242,7 @@ func AddToSet(value any) (Update, error)
 
 
 <a name="BroadcastUpdate"></a>
-### func BroadcastUpdate
+### func [BroadcastUpdate](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/update.go#L162>)
 
 ```go
 func BroadcastUpdate(update Update) Update
@@ -251,7 +251,7 @@ func BroadcastUpdate(update Update) Update
 
 
 <a name="IncInt"></a>
-### func IncInt
+### func [IncInt](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/update.go#L99>)
 
 ```go
 func IncInt(amount int64) Update
@@ -260,7 +260,7 @@ func IncInt(amount int64) Update
 
 
 <a name="ParseUpdate"></a>
-### func ParseUpdate
+### func [ParseUpdate](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/parseupdate.go#L11>)
 
 ```go
 func ParseUpdate(update bson.D) (Update, error)
@@ -269,7 +269,7 @@ func ParseUpdate(update bson.D) (Update, error)
 
 
 <a name="PullMatches"></a>
-### func PullMatches
+### func [PullMatches](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/update.go#L87>)
 
 ```go
 func PullMatches(filter Filter) (Update, error)
@@ -278,7 +278,7 @@ func PullMatches(filter Filter) (Update, error)
 
 
 <a name="PushValue"></a>
-### func PushValue
+### func [PushValue](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/update.go#L77>)
 
 ```go
 func PushValue(value any) (Update, error)
@@ -287,7 +287,7 @@ func PushValue(value any) (Update, error)
 
 
 <a name="SetValue"></a>
-### func SetValue
+### func [SetValue](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/update.go#L72>)
 
 ```go
 func SetValue(value any) (Update, error)
@@ -296,7 +296,7 @@ func SetValue(value any) (Update, error)
 
 
 <a name="UnsetElement"></a>
-### func UnsetElement
+### func [UnsetElement](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/update.go#L95>)
 
 ```go
 func UnsetElement(index int) Update
@@ -305,7 +305,7 @@ func UnsetElement(index int) Update
 
 
 <a name="UnsetField"></a>
-### func UnsetField
+### func [UnsetField](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/update.go#L91>)
 
 ```go
 func UnsetField(fieldName string) Update
@@ -314,7 +314,7 @@ func UnsetField(fieldName string) Update
 
 
 <a name="UnsetPath"></a>
-### func UnsetPath
+### func [UnsetPath](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/update.go#L126>)
 
 ```go
 func UnsetPath(selector string) Update
@@ -323,7 +323,7 @@ func UnsetPath(selector string) Update
 
 
 <a name="UpdateAll"></a>
-### func UpdateAll
+### func [UpdateAll](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/update.go#L149>)
 
 ```go
 func UpdateAll(updates []Update) Update
@@ -332,7 +332,7 @@ func UpdateAll(updates []Update) Update
 
 
 <a name="UpdateField"></a>
-### func UpdateField
+### func [UpdateField](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/update.go#L103>)
 
 ```go
 func UpdateField(fieldName string, update Update, createIfAbsent bool) Update
@@ -341,7 +341,7 @@ func UpdateField(fieldName string, update Update, createIfAbsent bool) Update
 
 
 <a name="UpdateIndex"></a>
-### func UpdateIndex
+### func [UpdateIndex](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/update.go#L107>)
 
 ```go
 func UpdateIndex(index int, update Update, createIfAbsent bool) Update
@@ -350,7 +350,7 @@ func UpdateIndex(index int, update Update, createIfAbsent bool) Update
 
 
 <a name="UpdatePath"></a>
-### func UpdatePath
+### func [UpdatePath](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/query/update.go#L111>)
 
 ```go
 func UpdatePath(selector string, update Update) Update
