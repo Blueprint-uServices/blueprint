@@ -21,7 +21,7 @@ Package redis implements a key\-value \[backend.Cache\] client interface to a va
 
 
 <a name="RedisCache"></a>
-## type RedisCache
+## type [RedisCache](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/redis/cache.go#L12-L14>)
 
 A redis client wrapper that implements the \[backend.Cache\] interface
 
@@ -32,7 +32,7 @@ type RedisCache struct {
 ```
 
 <a name="NewRedisCacheClient"></a>
-### func NewRedisCacheClient
+### func [NewRedisCacheClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/redis/cache.go#L17>)
 
 ```go
 func NewRedisCacheClient(ctx context.Context, addr string) (*RedisCache, error)
@@ -41,7 +41,7 @@ func NewRedisCacheClient(ctx context.Context, addr string) (*RedisCache, error)
 Instantiates a new redis client to a memcached instance running at \`serverAddress\`
 
 <a name="RedisCache.Delete"></a>
-### func \(\*RedisCache\) Delete
+### func \(\*RedisCache\) [Delete](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/redis/cache.go#L56>)
 
 ```go
 func (r *RedisCache) Delete(ctx context.Context, key string) error
@@ -50,7 +50,7 @@ func (r *RedisCache) Delete(ctx context.Context, key string) error
 Implements the backend.Cache interface
 
 <a name="RedisCache.Get"></a>
-### func \(\*RedisCache\) Get
+### func \(\*RedisCache\) [Get](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/redis/cache.go#L38>)
 
 ```go
 func (r *RedisCache) Get(ctx context.Context, key string, value interface{}) (bool, error)
@@ -59,7 +59,7 @@ func (r *RedisCache) Get(ctx context.Context, key string, value interface{}) (bo
 Implements the backend.Cache interface
 
 <a name="RedisCache.Incr"></a>
-### func \(\*RedisCache\) Incr
+### func \(\*RedisCache\) [Incr](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/redis/cache.go#L51>)
 
 ```go
 func (r *RedisCache) Incr(ctx context.Context, key string) (int64, error)
@@ -68,7 +68,7 @@ func (r *RedisCache) Incr(ctx context.Context, key string) (int64, error)
 Implements the backend.Cache interface
 
 <a name="RedisCache.Mget"></a>
-### func \(\*RedisCache\) Mget
+### func \(\*RedisCache\) [Mget](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/redis/cache.go#L61>)
 
 ```go
 func (r *RedisCache) Mget(ctx context.Context, keys []string, values []interface{}) error
@@ -77,7 +77,7 @@ func (r *RedisCache) Mget(ctx context.Context, keys []string, values []interface
 Implements the backend.Cache interface
 
 <a name="RedisCache.Mset"></a>
-### func \(\*RedisCache\) Mset
+### func \(\*RedisCache\) [Mset](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/redis/cache.go#L76>)
 
 ```go
 func (r *RedisCache) Mset(ctx context.Context, keys []string, values []interface{}) error
@@ -86,7 +86,7 @@ func (r *RedisCache) Mset(ctx context.Context, keys []string, values []interface
 Implements the backend.Cache interface
 
 <a name="RedisCache.Put"></a>
-### func \(\*RedisCache\) Put
+### func \(\*RedisCache\) [Put](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/redis/cache.go#L28>)
 
 ```go
 func (r *RedisCache) Put(ctx context.Context, key string, value interface{}) error

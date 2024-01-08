@@ -37,7 +37,7 @@ The applications must use a backend.RelationalDB \(runtime/core/backend\) as the
 
 
 <a name="Container"></a>
-## func Container
+## func [Container](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/wiring.go#L22>)
 
 ```go
 func Container(spec wiring.WiringSpec, dbName string) string
@@ -46,7 +46,7 @@ func Container(spec wiring.WiringSpec, dbName string) string
 Container generate the IRNodes for a mysql server docker container that uses the latest mysql/mysql image and the clients needed by the generated application to communicate with the server.
 
 <a name="MySQLDBContainer"></a>
-## type MySQLDBContainer
+## type [MySQLDBContainer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L14-L23>)
 
 Blueprint IR Node that represents the server side docker container
 
@@ -63,7 +63,7 @@ type MySQLDBContainer struct {
 ```
 
 <a name="MySQLDBContainer.AddContainerArtifacts"></a>
-### func \(\*MySQLDBContainer\) AddContainerArtifacts
+### func \(\*MySQLDBContainer\) [AddContainerArtifacts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L84>)
 
 ```go
 func (m *MySQLDBContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error
@@ -72,7 +72,7 @@ func (m *MySQLDBContainer) AddContainerArtifacts(target docker.ContainerWorkspac
 
 
 <a name="MySQLDBContainer.AddContainerInstance"></a>
-### func \(\*MySQLDBContainer\) AddContainerInstance
+### func \(\*MySQLDBContainer\) [AddContainerInstance](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L88>)
 
 ```go
 func (m *MySQLDBContainer) AddContainerInstance(target docker.ContainerWorkspace) error
@@ -81,7 +81,7 @@ func (m *MySQLDBContainer) AddContainerInstance(target docker.ContainerWorkspace
 
 
 <a name="MySQLDBContainer.GenerateArtifacts"></a>
-### func \(\*MySQLDBContainer\) GenerateArtifacts
+### func \(\*MySQLDBContainer\) [GenerateArtifacts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L80>)
 
 ```go
 func (m *MySQLDBContainer) GenerateArtifacts(outdir string) error
@@ -90,7 +90,7 @@ func (m *MySQLDBContainer) GenerateArtifacts(outdir string) error
 
 
 <a name="MySQLDBContainer.GetInterface"></a>
-### func \(\*MySQLDBContainer\) GetInterface
+### func \(\*MySQLDBContainer\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L75>)
 
 ```go
 func (m *MySQLDBContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -99,7 +99,7 @@ func (m *MySQLDBContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInt
 
 
 <a name="MySQLDBContainer.Name"></a>
-### func \(\*MySQLDBContainer\) Name
+### func \(\*MySQLDBContainer\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L71>)
 
 ```go
 func (m *MySQLDBContainer) Name() string
@@ -108,7 +108,7 @@ func (m *MySQLDBContainer) Name() string
 
 
 <a name="MySQLDBContainer.String"></a>
-### func \(\*MySQLDBContainer\) String
+### func \(\*MySQLDBContainer\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L67>)
 
 ```go
 func (m *MySQLDBContainer) String() string
@@ -117,7 +117,7 @@ func (m *MySQLDBContainer) String() string
 
 
 <a name="MySQLDBGoClient"></a>
-## type MySQLDBGoClient
+## type [MySQLDBGoClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_client.go#L18-L28>)
 
 Blueprint IR Node that represents the generated client for the mysql container
 
@@ -136,7 +136,7 @@ type MySQLDBGoClient struct {
 ```
 
 <a name="MySQLDBGoClient.AddInstantiation"></a>
-### func \(\*MySQLDBGoClient\) AddInstantiation
+### func \(\*MySQLDBGoClient\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_client.go#L84>)
 
 ```go
 func (m *MySQLDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -145,7 +145,7 @@ func (m *MySQLDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) erro
 
 
 <a name="MySQLDBGoClient.AddInterfaces"></a>
-### func \(\*MySQLDBGoClient\) AddInterfaces
+### func \(\*MySQLDBGoClient\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_client.go#L80>)
 
 ```go
 func (n *MySQLDBGoClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -154,7 +154,7 @@ func (n *MySQLDBGoClient) AddInterfaces(builder golang.ModuleBuilder) error
 
 
 <a name="MySQLDBGoClient.AddToWorkspace"></a>
-### func \(\*MySQLDBGoClient\) AddToWorkspace
+### func \(\*MySQLDBGoClient\) [AddToWorkspace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_client.go#L76>)
 
 ```go
 func (m *MySQLDBGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
@@ -163,7 +163,7 @@ func (m *MySQLDBGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
 
 
 <a name="MySQLDBGoClient.GetInterface"></a>
-### func \(\*MySQLDBGoClient\) GetInterface
+### func \(\*MySQLDBGoClient\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_client.go#L72>)
 
 ```go
 func (m *MySQLDBGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -172,7 +172,7 @@ func (m *MySQLDBGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInte
 
 
 <a name="MySQLDBGoClient.ImplementsGolangNode"></a>
-### func \(\*MySQLDBGoClient\) ImplementsGolangNode
+### func \(\*MySQLDBGoClient\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_client.go#L94>)
 
 ```go
 func (node *MySQLDBGoClient) ImplementsGolangNode()
@@ -181,7 +181,7 @@ func (node *MySQLDBGoClient) ImplementsGolangNode()
 
 
 <a name="MySQLDBGoClient.ImplementsGolangService"></a>
-### func \(\*MySQLDBGoClient\) ImplementsGolangService
+### func \(\*MySQLDBGoClient\) [ImplementsGolangService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_client.go#L95>)
 
 ```go
 func (node *MySQLDBGoClient) ImplementsGolangService()
@@ -190,7 +190,7 @@ func (node *MySQLDBGoClient) ImplementsGolangService()
 
 
 <a name="MySQLDBGoClient.Name"></a>
-### func \(\*MySQLDBGoClient\) Name
+### func \(\*MySQLDBGoClient\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_client.go#L48>)
 
 ```go
 func (m *MySQLDBGoClient) Name() string
@@ -199,7 +199,7 @@ func (m *MySQLDBGoClient) Name() string
 
 
 <a name="MySQLDBGoClient.String"></a>
-### func \(\*MySQLDBGoClient\) String
+### func \(\*MySQLDBGoClient\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_client.go#L44>)
 
 ```go
 func (m *MySQLDBGoClient) String() string
@@ -208,7 +208,7 @@ func (m *MySQLDBGoClient) String() string
 
 
 <a name="MySQLInterface"></a>
-## type MySQLInterface
+## type [MySQLInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L26-L29>)
 
 MySQL interface exposed by the docker container.
 
@@ -220,7 +220,7 @@ type MySQLInterface struct {
 ```
 
 <a name="MySQLInterface.GetMethods"></a>
-### func \(\*MySQLInterface\) GetMethods
+### func \(\*MySQLInterface\) [GetMethods](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L35>)
 
 ```go
 func (m *MySQLInterface) GetMethods() []service.Method
@@ -229,7 +229,7 @@ func (m *MySQLInterface) GetMethods() []service.Method
 
 
 <a name="MySQLInterface.GetName"></a>
-### func \(\*MySQLInterface\) GetName
+### func \(\*MySQLInterface\) [GetName](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L31>)
 
 ```go
 func (m *MySQLInterface) GetName() string

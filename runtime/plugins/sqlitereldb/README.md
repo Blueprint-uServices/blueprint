@@ -22,7 +22,7 @@ If you are directly running go code \(e.g. not from a docker container\), the go
 
 
 <a name="SqliteRelDB"></a>
-## type SqliteRelDB
+## type [SqliteRelDB](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/sqlitereldb/reldb.go#L19-L21>)
 
 An in\-memory relational DB that uses the go\-sqlite3 package
 
@@ -33,7 +33,7 @@ type SqliteRelDB struct {
 ```
 
 <a name="NewSqliteRelDB"></a>
-### func NewSqliteRelDB
+### func [NewSqliteRelDB](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/sqlitereldb/reldb.go#L24>)
 
 ```go
 func NewSqliteRelDB(ctx context.Context) (*SqliteRelDB, error)
@@ -42,7 +42,7 @@ func NewSqliteRelDB(ctx context.Context) (*SqliteRelDB, error)
 Instantiates a new [SqliteRelDB](<#SqliteRelDB>) instance that stores query data in\-memory
 
 <a name="SqliteRelDB.Exec"></a>
-### func \(\*SqliteRelDB\) Exec
+### func \(\*SqliteRelDB\) [Exec](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/sqlitereldb/reldb.go#L33>)
 
 ```go
 func (s *SqliteRelDB) Exec(ctx context.Context, query string, args ...any) (sql.Result, error)
@@ -51,7 +51,7 @@ func (s *SqliteRelDB) Exec(ctx context.Context, query string, args ...any) (sql.
 Exec implements backend.RelationalDB.
 
 <a name="SqliteRelDB.Get"></a>
-### func \(\*SqliteRelDB\) Get
+### func \(\*SqliteRelDB\) [Get](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/sqlitereldb/reldb.go#L43>)
 
 ```go
 func (s *SqliteRelDB) Get(ctx context.Context, dst interface{}, query string, args ...any) error
@@ -60,7 +60,7 @@ func (s *SqliteRelDB) Get(ctx context.Context, dst interface{}, query string, ar
 Get implements backend.RelationalDB.
 
 <a name="SqliteRelDB.Prepare"></a>
-### func \(\*SqliteRelDB\) Prepare
+### func \(\*SqliteRelDB\) [Prepare](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/sqlitereldb/reldb.go#L48>)
 
 ```go
 func (s *SqliteRelDB) Prepare(ctx context.Context, query string) (*sql.Stmt, error)
@@ -69,7 +69,7 @@ func (s *SqliteRelDB) Prepare(ctx context.Context, query string) (*sql.Stmt, err
 Prepare implements backend.RelationalDB.
 
 <a name="SqliteRelDB.Query"></a>
-### func \(\*SqliteRelDB\) Query
+### func \(\*SqliteRelDB\) [Query](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/sqlitereldb/reldb.go#L38>)
 
 ```go
 func (s *SqliteRelDB) Query(ctx context.Context, query string, args ...any) (*sql.Rows, error)
@@ -78,7 +78,7 @@ func (s *SqliteRelDB) Query(ctx context.Context, query string, args ...any) (*sq
 Query implements backend.RelationalDB.
 
 <a name="SqliteRelDB.Select"></a>
-### func \(\*SqliteRelDB\) Select
+### func \(\*SqliteRelDB\) [Select](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/sqlitereldb/reldb.go#L53>)
 
 ```go
 func (s *SqliteRelDB) Select(ctx context.Context, dst interface{}, query string, args ...any) error

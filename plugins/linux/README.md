@@ -18,7 +18,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
 
 
 <a name="EnvVar"></a>
-## func EnvVar
+## func [EnvVar](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linux/util.go#L9>)
 
 ```go
 func EnvVar(name string) string
@@ -27,7 +27,7 @@ func EnvVar(name string) string
 
 
 <a name="FuncName"></a>
-## func FuncName
+## func [FuncName](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linux/util.go#L13>)
 
 ```go
 func FuncName(name string) string
@@ -36,7 +36,7 @@ func FuncName(name string) string
 
 
 <a name="InstantiableProcess"></a>
-## type InstantiableProcess
+## type [InstantiableProcess](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linux/ir.go#L33-L35>)
 
 For process nodes that can be instantiated.
 
@@ -51,7 +51,7 @@ type InstantiableProcess interface {
 ```
 
 <a name="Process"></a>
-## type Process
+## type [Process](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linux/ir.go#L10-L13>)
 
 The base IRNode interface for linux processes
 
@@ -63,7 +63,7 @@ type Process interface {
 ```
 
 <a name="ProcessWorkspace"></a>
-## type ProcessWorkspace
+## type [ProcessWorkspace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linux/ir.go#L50-L113>)
 
 A process workspace has commands for adding artifacts to the workspace and
 
@@ -143,7 +143,7 @@ type ProcessWorkspace interface {
 ```
 
 <a name="ProcessWorkspaceInfo"></a>
-## type ProcessWorkspaceInfo
+## type [ProcessWorkspaceInfo](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linux/ir.go#L115-L118>)
 
 Builders used by the above code and artifact generation interfaces
 
@@ -155,7 +155,7 @@ type ProcessWorkspaceInfo struct {
 ```
 
 <a name="ProvidesProcessArtifacts"></a>
-## type ProvidesProcessArtifacts
+## type [ProvidesProcessArtifacts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linux/ir.go#L25-L27>)
 
 For process nodes that want to provide code or other artifacts for their process.
 

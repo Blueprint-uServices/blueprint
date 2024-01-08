@@ -15,7 +15,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/dockergen"
 
 
 <a name="Dockerfile"></a>
-## type Dockerfile
+## type [Dockerfile](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/dockergen/dockerfile_.go#L11-L17>)
 
 
 
@@ -30,7 +30,7 @@ type Dockerfile struct {
 ```
 
 <a name="NewDockerfile"></a>
-### func NewDockerfile
+### func [NewDockerfile](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/dockergen/dockerfile_.go#L19>)
 
 ```go
 func NewDockerfile(workspaceName, workspaceDir string) *Dockerfile
@@ -39,7 +39,7 @@ func NewDockerfile(workspaceName, workspaceDir string) *Dockerfile
 
 
 <a name="Dockerfile.AddCustomCommands"></a>
-### func \(\*Dockerfile\) AddCustomCommands
+### func \(\*Dockerfile\) [AddCustomCommands](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/dockergen/dockerfile_.go#L29>)
 
 ```go
 func (d *Dockerfile) AddCustomCommands(procName string, commands string)
@@ -48,7 +48,7 @@ func (d *Dockerfile) AddCustomCommands(procName string, commands string)
 
 
 <a name="Dockerfile.Generate"></a>
-### func \(\*Dockerfile\) Generate
+### func \(\*Dockerfile\) [Generate](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/dockergen/dockerfile_.go#L33>)
 
 ```go
 func (d *Dockerfile) Generate(procDirs map[string]string) error

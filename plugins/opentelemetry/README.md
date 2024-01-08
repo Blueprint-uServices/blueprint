@@ -37,7 +37,7 @@ The applications must use a backend.Tracer \(runtime/core/backend\) as the inter
 
 
 <a name="InstrumentUsingCustomCollector"></a>
-## func InstrumentUsingCustomCollector
+## func [InstrumentUsingCustomCollector](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/wiring.go#L23>)
 
 ```go
 func InstrumentUsingCustomCollector(spec wiring.WiringSpec, serviceName string, collectorName string)
@@ -48,7 +48,7 @@ Instruments \`serviceName\` with OpenTelemetry. This can only be done if \`servi
 This call will configure the generated clients on server and client side to use the exporter provided by the custom collector indicated by the \`collectorName\`. The \`collectorName\` must be declared in the wiring spec.
 
 <a name="OpenTelemetryClientWrapper"></a>
-## type OpenTelemetryClientWrapper
+## type [OpenTelemetryClientWrapper](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_client.go#L17-L25>)
 
 Blueprint IR Node that wraps the client\-side of a service to generate ot compatible logs
 
@@ -66,7 +66,7 @@ type OpenTelemetryClientWrapper struct {
 ```
 
 <a name="OpenTelemetryClientWrapper.AddInstantiation"></a>
-### func \(\*OpenTelemetryClientWrapper\) AddInstantiation
+### func \(\*OpenTelemetryClientWrapper\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_client.go#L97>)
 
 ```go
 func (node *OpenTelemetryClientWrapper) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -75,7 +75,7 @@ func (node *OpenTelemetryClientWrapper) AddInstantiation(builder golang.Namespac
 Part of code generation compilation pass; provides instantiation snippet
 
 <a name="OpenTelemetryClientWrapper.AddInterfaces"></a>
-### func \(\*OpenTelemetryClientWrapper\) AddInterfaces
+### func \(\*OpenTelemetryClientWrapper\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_client.go#L67>)
 
 ```go
 func (node *OpenTelemetryClientWrapper) AddInterfaces(builder golang.ModuleBuilder) error
@@ -84,7 +84,7 @@ func (node *OpenTelemetryClientWrapper) AddInterfaces(builder golang.ModuleBuild
 Part of code generation compilation pass; creates the interface definition code for the wrapper, and any new generated structs that are exposed and can be used by other IRNodes
 
 <a name="OpenTelemetryClientWrapper.GenerateFuncs"></a>
-### func \(\*OpenTelemetryClientWrapper\) GenerateFuncs
+### func \(\*OpenTelemetryClientWrapper\) [GenerateFuncs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_client.go#L72>)
 
 ```go
 func (node *OpenTelemetryClientWrapper) GenerateFuncs(builder golang.ModuleBuilder) error
@@ -93,7 +93,7 @@ func (node *OpenTelemetryClientWrapper) GenerateFuncs(builder golang.ModuleBuild
 Part of code generation compilation pass; provides implementation of interfaces from GenerateInterfaces
 
 <a name="OpenTelemetryClientWrapper.GetInterface"></a>
-### func \(\*OpenTelemetryClientWrapper\) GetInterface
+### func \(\*OpenTelemetryClientWrapper\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_client.go#L61>)
 
 ```go
 func (node *OpenTelemetryClientWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -102,7 +102,7 @@ func (node *OpenTelemetryClientWrapper) GetInterface(ctx ir.BuildContext) (servi
 
 
 <a name="OpenTelemetryClientWrapper.ImplementsGolangNode"></a>
-### func \(\*OpenTelemetryClientWrapper\) ImplementsGolangNode
+### func \(\*OpenTelemetryClientWrapper\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_client.go#L128>)
 
 ```go
 func (node *OpenTelemetryClientWrapper) ImplementsGolangNode()
@@ -111,7 +111,7 @@ func (node *OpenTelemetryClientWrapper) ImplementsGolangNode()
 
 
 <a name="OpenTelemetryClientWrapper.ImplementsGolangService"></a>
-### func \(\*OpenTelemetryClientWrapper\) ImplementsGolangService
+### func \(\*OpenTelemetryClientWrapper\) [ImplementsGolangService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_client.go#L129>)
 
 ```go
 func (node *OpenTelemetryClientWrapper) ImplementsGolangService()
@@ -120,7 +120,7 @@ func (node *OpenTelemetryClientWrapper) ImplementsGolangService()
 
 
 <a name="OpenTelemetryClientWrapper.Name"></a>
-### func \(\*OpenTelemetryClientWrapper\) Name
+### func \(\*OpenTelemetryClientWrapper\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_client.go#L36>)
 
 ```go
 func (node *OpenTelemetryClientWrapper) Name() string
@@ -129,7 +129,7 @@ func (node *OpenTelemetryClientWrapper) Name() string
 
 
 <a name="OpenTelemetryClientWrapper.String"></a>
-### func \(\*OpenTelemetryClientWrapper\) String
+### func \(\*OpenTelemetryClientWrapper\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_client.go#L40>)
 
 ```go
 func (node *OpenTelemetryClientWrapper) String() string
@@ -138,7 +138,7 @@ func (node *OpenTelemetryClientWrapper) String() string
 
 
 <a name="OpenTelemetryCollectorInterface"></a>
-## type OpenTelemetryCollectorInterface
+## type [OpenTelemetryCollectorInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_collector_client.go#L9-L13>)
 
 Interface that indicates if an IRNode implements the OTCollector interface All custom collector clients \*\*must\*\* implement this interface
 
@@ -151,7 +151,7 @@ type OpenTelemetryCollectorInterface interface {
 ```
 
 <a name="OpenTelemetryServerWrapper"></a>
-## type OpenTelemetryServerWrapper
+## type [OpenTelemetryServerWrapper](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_server.go#L18-L27>)
 
 Blueprint IR Node that wraps the server\-side of a service to generate ot compatible logs
 
@@ -170,7 +170,7 @@ type OpenTelemetryServerWrapper struct {
 ```
 
 <a name="OpenTelemetryServerWrapper.AddInstantiation"></a>
-### func \(\*OpenTelemetryServerWrapper\) AddInstantiation
+### func \(\*OpenTelemetryServerWrapper\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_server.go#L127>)
 
 ```go
 func (node *OpenTelemetryServerWrapper) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -179,7 +179,7 @@ func (node *OpenTelemetryServerWrapper) AddInstantiation(builder golang.Namespac
 Part of code generation compilation pass; provides instantiation snippet
 
 <a name="OpenTelemetryServerWrapper.AddInterfaces"></a>
-### func \(\*OpenTelemetryServerWrapper\) AddInterfaces
+### func \(\*OpenTelemetryServerWrapper\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_server.go#L82>)
 
 ```go
 func (node *OpenTelemetryServerWrapper) AddInterfaces(builder golang.ModuleBuilder) error
@@ -188,7 +188,7 @@ func (node *OpenTelemetryServerWrapper) AddInterfaces(builder golang.ModuleBuild
 Part of code generation compilation pass; creates the interface definition code for the wrapper, and any new generated structs that are exposed and can be used by other IRNodes
 
 <a name="OpenTelemetryServerWrapper.GenerateFuncs"></a>
-### func \(\*OpenTelemetryServerWrapper\) GenerateFuncs
+### func \(\*OpenTelemetryServerWrapper\) [GenerateFuncs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_server.go#L102>)
 
 ```go
 func (node *OpenTelemetryServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) error
@@ -197,7 +197,7 @@ func (node *OpenTelemetryServerWrapper) GenerateFuncs(builder golang.ModuleBuild
 Part of code generation compilation pass; provides implementation of interfaces from GenerateInterfaces
 
 <a name="OpenTelemetryServerWrapper.GetInterface"></a>
-### func \(\*OpenTelemetryServerWrapper\) GetInterface
+### func \(\*OpenTelemetryServerWrapper\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_server.go#L73>)
 
 ```go
 func (node *OpenTelemetryServerWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -206,7 +206,7 @@ func (node *OpenTelemetryServerWrapper) GetInterface(ctx ir.BuildContext) (servi
 
 
 <a name="OpenTelemetryServerWrapper.ImplementsGolangNode"></a>
-### func \(\*OpenTelemetryServerWrapper\) ImplementsGolangNode
+### func \(\*OpenTelemetryServerWrapper\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_server.go#L77>)
 
 ```go
 func (node *OpenTelemetryServerWrapper) ImplementsGolangNode()
@@ -215,7 +215,7 @@ func (node *OpenTelemetryServerWrapper) ImplementsGolangNode()
 
 
 <a name="OpenTelemetryServerWrapper.ImplementsGolangService"></a>
-### func \(\*OpenTelemetryServerWrapper\) ImplementsGolangService
+### func \(\*OpenTelemetryServerWrapper\) [ImplementsGolangService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_server.go#L78>)
 
 ```go
 func (node *OpenTelemetryServerWrapper) ImplementsGolangService()
@@ -224,7 +224,7 @@ func (node *OpenTelemetryServerWrapper) ImplementsGolangService()
 
 
 <a name="OpenTelemetryServerWrapper.Name"></a>
-### func \(\*OpenTelemetryServerWrapper\) Name
+### func \(\*OpenTelemetryServerWrapper\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_server.go#L48>)
 
 ```go
 func (node *OpenTelemetryServerWrapper) Name() string
@@ -233,7 +233,7 @@ func (node *OpenTelemetryServerWrapper) Name() string
 
 
 <a name="OpenTelemetryServerWrapper.String"></a>
-### func \(\*OpenTelemetryServerWrapper\) String
+### func \(\*OpenTelemetryServerWrapper\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_server.go#L52>)
 
 ```go
 func (node *OpenTelemetryServerWrapper) String() string

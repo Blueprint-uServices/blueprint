@@ -32,7 +32,7 @@ Package mongodb implements a cleint interface to a mongodb server that supports 
 
 
 <a name="MongoCollection"></a>
-## type MongoCollection
+## type [MongoCollection](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L21-L23>)
 
 Implements the \[backend.NoSQLCollection\] interface as a client\-wrapper to a mongodb server
 
@@ -43,7 +43,7 @@ type MongoCollection struct {
 ```
 
 <a name="MongoCollection.DeleteMany"></a>
-### func \(\*MongoCollection\) DeleteMany
+### func \(\*MongoCollection\) [DeleteMany](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L58>)
 
 ```go
 func (mc *MongoCollection) DeleteMany(ctx context.Context, filter bson.D) error
@@ -52,7 +52,7 @@ func (mc *MongoCollection) DeleteMany(ctx context.Context, filter bson.D) error
 Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.DeleteOne"></a>
-### func \(\*MongoCollection\) DeleteOne
+### func \(\*MongoCollection\) [DeleteOne](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L49>)
 
 ```go
 func (mc *MongoCollection) DeleteOne(ctx context.Context, filter bson.D) error
@@ -61,7 +61,7 @@ func (mc *MongoCollection) DeleteOne(ctx context.Context, filter bson.D) error
 Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.FindMany"></a>
-### func \(\*MongoCollection\) FindMany
+### func \(\*MongoCollection\) [FindMany](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L105>)
 
 ```go
 func (mc *MongoCollection) FindMany(ctx context.Context, filter bson.D, projection ...bson.D) (backend.NoSQLCursor, error)
@@ -70,7 +70,7 @@ func (mc *MongoCollection) FindMany(ctx context.Context, filter bson.D, projecti
 Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.FindOne"></a>
-### func \(\*MongoCollection\) FindOne
+### func \(\*MongoCollection\) [FindOne](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L78>)
 
 ```go
 func (mc *MongoCollection) FindOne(ctx context.Context, filter bson.D, projection ...bson.D) (backend.NoSQLCursor, error)
@@ -79,7 +79,7 @@ func (mc *MongoCollection) FindOne(ctx context.Context, filter bson.D, projectio
 Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.InsertMany"></a>
-### func \(\*MongoCollection\) InsertMany
+### func \(\*MongoCollection\) [InsertMany](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L71>)
 
 ```go
 func (mc *MongoCollection) InsertMany(ctx context.Context, documents []interface{}) error
@@ -88,7 +88,7 @@ func (mc *MongoCollection) InsertMany(ctx context.Context, documents []interface
 Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.InsertOne"></a>
-### func \(\*MongoCollection\) InsertOne
+### func \(\*MongoCollection\) [InsertOne](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L64>)
 
 ```go
 func (mc *MongoCollection) InsertOne(ctx context.Context, document interface{}) error
@@ -97,7 +97,7 @@ func (mc *MongoCollection) InsertOne(ctx context.Context, document interface{}) 
 Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.ReplaceMany"></a>
-### func \(\*MongoCollection\) ReplaceMany
+### func \(\*MongoCollection\) [ReplaceMany](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L183>)
 
 ```go
 func (mc *MongoCollection) ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) (int, error)
@@ -106,7 +106,7 @@ func (mc *MongoCollection) ReplaceMany(ctx context.Context, filter bson.D, repla
 Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.ReplaceOne"></a>
-### func \(\*MongoCollection\) ReplaceOne
+### func \(\*MongoCollection\) [ReplaceOne](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L173>)
 
 ```go
 func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error)
@@ -115,7 +115,7 @@ func (mc *MongoCollection) ReplaceOne(ctx context.Context, filter bson.D, replac
 Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.UpdateMany"></a>
-### func \(\*MongoCollection\) UpdateMany
+### func \(\*MongoCollection\) [UpdateMany](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L145>)
 
 ```go
 func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error)
@@ -124,7 +124,7 @@ func (mc *MongoCollection) UpdateMany(ctx context.Context, filter bson.D, update
 Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.UpdateOne"></a>
-### func \(\*MongoCollection\) UpdateOne
+### func \(\*MongoCollection\) [UpdateOne](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L135>)
 
 ```go
 func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) (int, error)
@@ -133,7 +133,7 @@ func (mc *MongoCollection) UpdateOne(ctx context.Context, filter bson.D, update 
 Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.Upsert"></a>
-### func \(\*MongoCollection\) Upsert
+### func \(\*MongoCollection\) [Upsert](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L155>)
 
 ```go
 func (mc *MongoCollection) Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error)
@@ -142,7 +142,7 @@ func (mc *MongoCollection) Upsert(ctx context.Context, filter bson.D, document i
 Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCollection.UpsertID"></a>
-### func \(\*MongoCollection\) UpsertID
+### func \(\*MongoCollection\) [UpsertID](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L167>)
 
 ```go
 func (mc *MongoCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error)
@@ -151,7 +151,7 @@ func (mc *MongoCollection) UpsertID(ctx context.Context, id primitive.ObjectID, 
 Implements the \[backend.NoSQLCollection\] interface
 
 <a name="MongoCursor"></a>
-## type MongoCursor
+## type [MongoCursor](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L188-L190>)
 
 Implements the \[backend.NoSQLCursor\] interface as a client\-wrapper to the Cursor returned by a mongodb server
 
@@ -162,7 +162,7 @@ type MongoCursor struct {
 ```
 
 <a name="MongoCursor.All"></a>
-### func \(\*MongoCursor\) All
+### func \(\*MongoCursor\) [All](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L210>)
 
 ```go
 func (mr *MongoCursor) All(ctx context.Context, objs interface{}) error
@@ -171,7 +171,7 @@ func (mr *MongoCursor) All(ctx context.Context, objs interface{}) error
 Implements the \[backend.NoSQLCursor\] interface
 
 <a name="MongoCursor.One"></a>
-### func \(\*MongoCursor\) One
+### func \(\*MongoCursor\) [One](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L193>)
 
 ```go
 func (mr *MongoCursor) One(ctx context.Context, obj interface{}) (bool, error)
@@ -180,7 +180,7 @@ func (mr *MongoCursor) One(ctx context.Context, obj interface{}) (bool, error)
 Implements the \[backend.NoSQLCursor\] interface
 
 <a name="MongoDB"></a>
-## type MongoDB
+## type [MongoDB](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L16-L18>)
 
 Implements the \[backend.NoSQLDatabase\] interface as a client\-wrapper to a mongodb server.
 
@@ -191,7 +191,7 @@ type MongoDB struct {
 ```
 
 <a name="NewMongoDB"></a>
-### func NewMongoDB
+### func [NewMongoDB](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L27>)
 
 ```go
 func NewMongoDB(ctx context.Context, addr string) (*MongoDB, error)
@@ -200,7 +200,7 @@ func NewMongoDB(ctx context.Context, addr string) (*MongoDB, error)
 Instantiates a new MongoDB client\-wrapper instance which connects to a mongodb server running at \`addr\`. REQUIRED: A mongodb server should be running at \`addr\`
 
 <a name="MongoDB.GetCollection"></a>
-### func \(\*MongoDB\) GetCollection
+### func \(\*MongoDB\) [GetCollection](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/mongodb/nosqldb.go#L40>)
 
 ```go
 func (md *MongoDB) GetCollection(ctx context.Context, db_name string, collectionName string) (backend.NoSQLCollection, error)

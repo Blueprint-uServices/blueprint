@@ -16,7 +16,7 @@ Package jaeger implements a tracer \[backend.Tracer\] client interface for the j
 
 
 <a name="JaegerTracer"></a>
-## type JaegerTracer
+## type [JaegerTracer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/jaeger/trace.go#L14-L16>)
 
 JaegerTracer implements the runtime backend instance that implements the backend/trace.Tracer interface. REQUIRED: A functional backend running the jaeger collector.
 
@@ -27,7 +27,7 @@ type JaegerTracer struct {
 ```
 
 <a name="NewJaegerTracer"></a>
-### func NewJaegerTracer
+### func [NewJaegerTracer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/jaeger/trace.go#L20>)
 
 ```go
 func NewJaegerTracer(ctx context.Context, addr string) (*JaegerTracer, error)
@@ -36,7 +36,7 @@ func NewJaegerTracer(ctx context.Context, addr string) (*JaegerTracer, error)
 Returns a new instance of JaegerTracer. Configures opentelemetry to export jaeger traces to the jaeger collector hosted at address \`addr\`.
 
 <a name="JaegerTracer.GetTracerProvider"></a>
-### func \(\*JaegerTracer\) GetTracerProvider
+### func \(\*JaegerTracer\) [GetTracerProvider](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/jaeger/trace.go#L33>)
 
 ```go
 func (t *JaegerTracer) GetTracerProvider(ctx context.Context) (trace.TracerProvider, error)

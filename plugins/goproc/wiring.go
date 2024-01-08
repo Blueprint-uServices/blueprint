@@ -32,10 +32,19 @@ func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) 
 	metric_collector := defineStdoutMetricCollector(spec, procName)
 	SetMetricCollector(spec, procName, metric_collector)
 
+	// Install default logger
+	logger := defineStdoutLogger(spec, procName)
+	SetLogger(spec, procName, logger)
+
 	// The process node is simply a namespace that accepts [golang.Node] nodes
 	spec.Define(procName, &Process{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		var metric_coll string
 		err := spec.GetProperty(procName, "metricCollector", &metric_coll)
+		if err != nil {
+			return nil, err
+		}
+		var logger_name string
+		err = spec.GetProperty(procName, "logger", &logger_name)
 		if err != nil {
 			return nil, err
 		}
@@ -46,6 +55,10 @@ func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) 
 			return nil, err
 		}
 		err = procNamespace.Get(metric_coll, &proc.metricProvider)
+		if err != nil {
+			return nil, err
+		}
+		err = procNamespace.Get(logger_name, &proc.logger)
 		if err != nil {
 			return nil, err
 		}
@@ -81,6 +94,11 @@ func SetMetricCollector(spec wiring.WiringSpec, procName string, metricCollNodeN
 	spec.SetProperty(procName, "metricCollector", metricCollNodeName)
 }
 
+// Override the default logger for this process
+func SetLogger(spec wiring.WiringSpec, procName string, loggerNodeName string) {
+	spec.SetProperty(procName, "logger", loggerNodeName)
+}
+
 // Defines the default metric collector
 func defineStdoutMetricCollector(spec wiring.WiringSpec, processName string) string {
 	collector := processName + ".stdoutmetriccollector"
@@ -88,6 +106,15 @@ func defineStdoutMetricCollector(spec wiring.WiringSpec, processName string) str
 		return newStdOutMetricCollector(collector)
 	})
 	return collector
+}
+
+// Defines the default logger
+func defineStdoutLogger(spec wiring.WiringSpec, processName string) string {
+	logger := processName + ".logger"
+	spec.Define(logger, &stdoutLogger{}, func(ns wiring.Namespace) (ir.IRNode, error) {
+		return newStdoutLogger(logger)
+	})
+	return logger
 }
 
 // A [wiring.NamespaceHandler] used to build [Process] IRNodes

@@ -23,7 +23,7 @@ Package xtrace provides a client\-wrapper implementation of the \[backend.XTrace
 
 
 <a name="XTracerImpl"></a>
-## type XTracerImpl
+## type [XTracerImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L14-L16>)
 
 Implementation of the \[backend.XTracer\] interface
 
@@ -34,7 +34,7 @@ type XTracerImpl struct {
 ```
 
 <a name="NewXTracerImpl"></a>
-### func NewXTracerImpl
+### func [NewXTracerImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L20>)
 
 ```go
 func NewXTracerImpl(ctx context.Context, addr string) (*XTracerImpl, error)
@@ -43,7 +43,7 @@ func NewXTracerImpl(ctx context.Context, addr string) (*XTracerImpl, error)
 Returns a new instance of [XTracerImpl](<#XTracerImpl>) that connects to a xtrace server running at \`addr\`. REQUIRED: An xtrace server must be running at \`addr\`
 
 <a name="XTracerImpl.Get"></a>
-### func \(\*XTracerImpl\) Get
+### func \(\*XTracerImpl\) [Get](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L59>)
 
 ```go
 func (xt *XTracerImpl) Get(ctx context.Context) (tracingplane.BaggageContext, error)
@@ -52,7 +52,7 @@ func (xt *XTracerImpl) Get(ctx context.Context) (tracingplane.BaggageContext, er
 Implements the \[backend.XTracer\] interface
 
 <a name="XTracerImpl.IsTracing"></a>
-### func \(\*XTracerImpl\) IsTracing
+### func \(\*XTracerImpl\) [IsTracing](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L64>)
 
 ```go
 func (xt *XTracerImpl) IsTracing(ctx context.Context) (bool, error)
@@ -61,7 +61,7 @@ func (xt *XTracerImpl) IsTracing(ctx context.Context) (bool, error)
 Implements the \[backend.XTracer\] interface
 
 <a name="XTracerImpl.Log"></a>
-### func \(\*XTracerImpl\) Log
+### func \(\*XTracerImpl\) [Log](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L29>)
 
 ```go
 func (xt *XTracerImpl) Log(ctx context.Context, msg string) (context.Context, error)
@@ -70,7 +70,7 @@ func (xt *XTracerImpl) Log(ctx context.Context, msg string) (context.Context, er
 Implements the \[backend.XTracer\] interface
 
 <a name="XTracerImpl.LogWithTags"></a>
-### func \(\*XTracerImpl\) LogWithTags
+### func \(\*XTracerImpl\) [LogWithTags](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L34>)
 
 ```go
 func (xt *XTracerImpl) LogWithTags(ctx context.Context, msg string, tags ...string) (context.Context, error)
@@ -79,7 +79,7 @@ func (xt *XTracerImpl) LogWithTags(ctx context.Context, msg string, tags ...stri
 Implements the \[backend.XTracer\] interface
 
 <a name="XTracerImpl.Merge"></a>
-### func \(\*XTracerImpl\) Merge
+### func \(\*XTracerImpl\) [Merge](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L49>)
 
 ```go
 func (xt *XTracerImpl) Merge(ctx context.Context, other tracingplane.BaggageContext) (context.Context, error)
@@ -88,7 +88,7 @@ func (xt *XTracerImpl) Merge(ctx context.Context, other tracingplane.BaggageCont
 Implements the \[backend.XTracer\] interface
 
 <a name="XTracerImpl.Set"></a>
-### func \(\*XTracerImpl\) Set
+### func \(\*XTracerImpl\) [Set](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L54>)
 
 ```go
 func (xt *XTracerImpl) Set(ctx context.Context, baggage tracingplane.BaggageContext) (context.Context, error)
@@ -97,7 +97,7 @@ func (xt *XTracerImpl) Set(ctx context.Context, baggage tracingplane.BaggageCont
 Implements the \[backend.XTracer\] interface
 
 <a name="XTracerImpl.StartTask"></a>
-### func \(\*XTracerImpl\) StartTask
+### func \(\*XTracerImpl\) [StartTask](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L39>)
 
 ```go
 func (xt *XTracerImpl) StartTask(ctx context.Context, tags ...string) (context.Context, error)
@@ -106,7 +106,7 @@ func (xt *XTracerImpl) StartTask(ctx context.Context, tags ...string) (context.C
 Implements the \[backend.XTracer\] interface
 
 <a name="XTracerImpl.StopTask"></a>
-### func \(\*XTracerImpl\) StopTask
+### func \(\*XTracerImpl\) [StopTask](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L44>)
 
 ```go
 func (xt *XTracerImpl) StopTask(ctx context.Context) (context.Context, error)

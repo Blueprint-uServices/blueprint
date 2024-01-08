@@ -19,11 +19,20 @@ func NewMyService(ctx context.Context, db backend.NoSQLDB) (MyService, error) {.
 - [func CopyResult\(src any, dst any\) error](<#CopyResult>)
 - [func GetPointerValue\(val any\) \(any, error\)](<#GetPointerValue>)
 - [func GetSpanContext\(encoded\_string string\) \(trace.SpanContextConfig, error\)](<#GetSpanContext>)
+- [func Meter\(ctx context.Context, name string, opts ...metric.MeterOption\) \(metric.Meter, error\)](<#Meter>)
+- [func SetDefaultLogger\(l Logger\)](<#SetDefaultLogger>)
+- [func SetDefaultMetricCollector\(m MetricCollector\)](<#SetDefaultMetricCollector>)
 - [func SetZero\(dst any\) error](<#SetZero>)
 - [type Cache](<#Cache>)
+- [type LogOptions](<#LogOptions>)
+- [type Logger](<#Logger>)
+  - [func GetLogger\(\) Logger](<#GetLogger>)
+- [type MetricCollector](<#MetricCollector>)
 - [type NoSQLCollection](<#NoSQLCollection>)
 - [type NoSQLCursor](<#NoSQLCursor>)
 - [type NoSQLDatabase](<#NoSQLDatabase>)
+- [type Priority](<#Priority>)
+  - [func \(p Priority\) String\(\) string](<#Priority.String>)
 - [type Queue](<#Queue>)
 - [type RelationalDB](<#RelationalDB>)
 - [type Tracer](<#Tracer>)
@@ -31,7 +40,7 @@ func NewMyService(ctx context.Context, db backend.NoSQLDB) (MyService, error) {.
 
 
 <a name="CopyResult"></a>
-## func CopyResult
+## func [CopyResult](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/reflect.go#L21>)
 
 ```go
 func CopyResult(src any, dst any) error
@@ -42,7 +51,7 @@ Lots of APIs want to copy results into interfaces. This is a helper method to do
 src can be anything; dst must be a pointer to the same type as src
 
 <a name="GetPointerValue"></a>
-## func GetPointerValue
+## func [GetPointerValue](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/reflect.go#L8>)
 
 ```go
 func GetPointerValue(val any) (any, error)
@@ -51,7 +60,7 @@ func GetPointerValue(val any) (any, error)
 
 
 <a name="GetSpanContext"></a>
-## func GetSpanContext
+## func [GetSpanContext](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/trace.go#L34>)
 
 ```go
 func GetSpanContext(encoded_string string) (trace.SpanContextConfig, error)
@@ -59,8 +68,39 @@ func GetSpanContext(encoded_string string) (trace.SpanContextConfig, error)
 
 Utility function to convert an encoded string into a Span Context
 
+<a name="Meter"></a>
+## func [Meter](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/metric.go#L51>)
+
+```go
+func Meter(ctx context.Context, name string, opts ...metric.MeterOption) (metric.Meter, error)
+```
+
+Meter returns a new metric.Meter with a provided name and configuration
+
+A Meter should be scoped at most to a single package. We recommend a meter being scoped to a single service. The name needs to be unique so it does not collide with other names used by an application, nor other applications.
+
+If the name is empty, then an implementation defined default name will be used instead.
+
+<a name="SetDefaultLogger"></a>
+## func [SetDefaultLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/log.go#L79>)
+
+```go
+func SetDefaultLogger(l Logger)
+```
+
+Set's the default logger to be used by the Blueprint application. NOTE: This should not be called in the workflow code. This is called from the various logger plugins.
+
+<a name="SetDefaultMetricCollector"></a>
+## func [SetDefaultMetricCollector](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/metric.go#L39>)
+
+```go
+func SetDefaultMetricCollector(m MetricCollector)
+```
+
+Sets the default metric collector to be used by BLueprint applications. This should be called from the constructor of a Metric Collector
+
 <a name="SetZero"></a>
-## func SetZero
+## func [SetZero](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/reflect.go#L54>)
 
 ```go
 func SetZero(dst any) error
@@ -69,7 +109,7 @@ func SetZero(dst any) error
 Sets the zero value of a pointer
 
 <a name="Cache"></a>
-## type Cache
+## type [Cache](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/cache.go#L6-L37>)
 
 Represents a key\-value cache.
 
@@ -108,8 +148,61 @@ type Cache interface {
 }
 ```
 
+<a name="LogOptions"></a>
+## type [LogOptions](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/log.go#L23-L25>)
+
+
+
+```go
+type LogOptions struct {
+    Level Priority
+}
+```
+
+<a name="Logger"></a>
+## type [Logger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/log.go#L28-L40>)
+
+Represents a logger that can be used by the logger plugin
+
+```go
+type Logger interface {
+    // Logf creates a new log record at `INFO` level with `fmt.Sprintf(format, args...)` as the log message. Same interface as fmt.Printf or log.Printf.
+    // Returns a context that may-be updated by the logger with some logger specific state. If no state is set, then the passed-in context is returned as is.
+    Logf(ctx context.Context, opts LogOptions, format string, args ...any) (context.Context, error)
+    // Debug creates a new log record at `DEBUG` level with `fmt.Sprintf(format, args...)` as the log message. Convenience wrapper around Logf
+    Debug(ctx context.Context, format string, args ...any) (context.Context, error)
+    // Info creates a new log record at `INFO` level with `fmt.Sprintf(format, args...)` as the log message.
+    Info(ctx context.Context, format string, args ...any) (context.Context, error)
+    // Warn creates a new log record at `WARN` level with `fmt.Sprintf(format, args...)` as the log message.
+    Warn(ctx context.Context, format string, args ...any) (context.Context, error)
+    // Error creates a new log record at `ERROR` level with `fmt.Sprintf(format, args...)` as the log message.
+    Error(ctx context.Context, format string, args ...any) (context.Context, error)
+}
+```
+
+<a name="GetLogger"></a>
+### func [GetLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/log.go#L84>)
+
+```go
+func GetLogger() Logger
+```
+
+Returns the default logger
+
+<a name="MetricCollector"></a>
+## type [MetricCollector](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/metric.go#L12-L15>)
+
+Represents a metric collector that can be used by the metric/opentelemetry plugin
+
+```go
+type MetricCollector interface {
+    // Returns a go.opentelemetry.io/otel/metric/MeterProvider
+    GetMetricProvider(ctx context.Context) (metric.MeterProvider, error)
+}
+```
+
 <a name="NoSQLCollection"></a>
-## type NoSQLCollection
+## type [NoSQLCollection](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/nosqldb.go#L31-L119>)
 
 
 
@@ -206,7 +299,7 @@ type NoSQLCollection interface {
 ```
 
 <a name="NoSQLCursor"></a>
-## type NoSQLCursor
+## type [NoSQLCursor](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/nosqldb.go#L18-L29>)
 
 
 
@@ -226,7 +319,7 @@ type NoSQLCursor interface {
 ```
 
 <a name="NoSQLDatabase"></a>
-## type NoSQLDatabase
+## type [NoSQLDatabase](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/nosqldb.go#L10-L16>)
 
 
 
@@ -240,8 +333,37 @@ type NoSQLDatabase interface {
 }
 ```
 
+<a name="Priority"></a>
+## type [Priority](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/log.go#L9>)
+
+The Priority Level at which the message will be recorded
+
+```go
+type Priority int
+```
+
+<a name="DEBUG"></a>
+
+```go
+const (
+    DEBUG Priority = iota
+    INFO
+    WARN
+    ERROR
+)
+```
+
+<a name="Priority.String"></a>
+### func \(Priority\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/log.go#L19>)
+
+```go
+func (p Priority) String() string
+```
+
+String representation for Priority enum
+
 <a name="Queue"></a>
-## type Queue
+## type [Queue](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/queue.go#L8-L29>)
 
 A Queue backend is used for pushing and popping elements.
 
@@ -271,7 +393,7 @@ type Queue interface {
 ```
 
 <a name="RelationalDB"></a>
-## type RelationalDB
+## type [RelationalDB](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/reldb.go#L13-L42>)
 
 A Relational database backend is used for storing and querying structured data using SQL queries.
 
@@ -311,7 +433,7 @@ type RelationalDB interface {
 ```
 
 <a name="Tracer"></a>
-## type Tracer
+## type [Tracer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/trace.go#L12-L16>)
 
 Represents a tracer that can be used by the tracer/opentelemetry plugin
 
@@ -324,7 +446,7 @@ type Tracer interface {
 ```
 
 <a name="XTracer"></a>
-## type XTracer
+## type [XTracer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/core/backend/xtrace.go#L10-L27>)
 
 Represents the XTrace tracer interface exposed to applications and used by the xtrace plugin.
 

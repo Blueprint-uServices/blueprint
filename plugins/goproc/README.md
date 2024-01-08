@@ -13,6 +13,8 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 - [func CreateProcess\(spec wiring.WiringSpec, procName string, children ...string\) string](<#CreateProcess>)
 - [func Deploy\(spec wiring.WiringSpec, serviceName string\) string](<#Deploy>)
 - [func RegisterAsDefaultBuilder\(\)](<#RegisterAsDefaultBuilder>)
+- [func SetLogger\(spec wiring.WiringSpec, procName string, loggerNodeName string\)](<#SetLogger>)
+- [func SetMetricCollector\(spec wiring.WiringSpec, procName string, metricCollNodeName string\)](<#SetMetricCollector>)
 - [type GolangProcessNamespace](<#GolangProcessNamespace>)
   - [func \(proc \*GolangProcessNamespace\) Accepts\(nodeType any\) bool](<#GolangProcessNamespace.Accepts>)
   - [func \(proc \*GolangProcessNamespace\) AddEdge\(name string, edge ir.IRNode\) error](<#GolangProcessNamespace.AddEdge>)
@@ -27,7 +29,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 
 
 <a name="AddToProcess"></a>
-## func AddToProcess
+## func [AddToProcess](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/wiring.go#L11>)
 
 ```go
 func AddToProcess(spec wiring.WiringSpec, procName, childName string)
@@ -36,7 +38,7 @@ func AddToProcess(spec wiring.WiringSpec, procName, childName string)
 Adds a child node to an existing process
 
 <a name="CreateClientProcess"></a>
-## func CreateClientProcess
+## func [CreateClientProcess](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/wiring.go#L73>)
 
 ```go
 func CreateClientProcess(spec wiring.WiringSpec, procName string, children ...string) string
@@ -45,7 +47,7 @@ func CreateClientProcess(spec wiring.WiringSpec, procName string, children ...st
 Creates a process that contains clients to the specified children. This is for convenience in serving as a starting point to write a custom client
 
 <a name="CreateProcess"></a>
-## func CreateProcess
+## func [CreateProcess](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/wiring.go#L25>)
 
 ```go
 func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) string
@@ -54,7 +56,7 @@ func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) 
 Creates a process with a given name, and adds the provided nodes as children. This method is only needed when creating processes with more than one child node; otherwise it is easier to use [Deploy](<#Deploy>)
 
 <a name="Deploy"></a>
-## func Deploy
+## func [Deploy](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/wiring.go#L16>)
 
 ```go
 func Deploy(spec wiring.WiringSpec, serviceName string) string
@@ -63,7 +65,7 @@ func Deploy(spec wiring.WiringSpec, serviceName string) string
 Wraps serviceName with a modifier that deploys the service inside a Golang process
 
 <a name="RegisterAsDefaultBuilder"></a>
-## func RegisterAsDefaultBuilder
+## func [RegisterAsDefaultBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/defaults.go#L9>)
 
 ```go
 func RegisterAsDefaultBuilder()
@@ -71,8 +73,26 @@ func RegisterAsDefaultBuilder()
 
 
 
+<a name="SetLogger"></a>
+## func [SetLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/wiring.go#L98>)
+
+```go
+func SetLogger(spec wiring.WiringSpec, procName string, loggerNodeName string)
+```
+
+Override the default logger for this process
+
+<a name="SetMetricCollector"></a>
+## func [SetMetricCollector](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/wiring.go#L93>)
+
+```go
+func SetMetricCollector(spec wiring.WiringSpec, procName string, metricCollNodeName string)
+```
+
+Override the default metric collector for this process
+
 <a name="GolangProcessNamespace"></a>
-## type GolangProcessNamespace
+## type [GolangProcessNamespace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/wiring.go#L121-L123>)
 
 A \[wiring.NamespaceHandler\] used to build [Process](<#Process>) IRNodes
 
@@ -83,7 +103,7 @@ type GolangProcessNamespace struct {
 ```
 
 <a name="GolangProcessNamespace.Accepts"></a>
-### func \(\*GolangProcessNamespace\) Accepts
+### func \(\*GolangProcessNamespace\) [Accepts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/wiring.go#L126>)
 
 ```go
 func (proc *GolangProcessNamespace) Accepts(nodeType any) bool
@@ -92,7 +112,7 @@ func (proc *GolangProcessNamespace) Accepts(nodeType any) bool
 Implements \[wiring.NamespaceHandler\]
 
 <a name="GolangProcessNamespace.AddEdge"></a>
-### func \(\*GolangProcessNamespace\) AddEdge
+### func \(\*GolangProcessNamespace\) [AddEdge](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/wiring.go#L132>)
 
 ```go
 func (proc *GolangProcessNamespace) AddEdge(name string, edge ir.IRNode) error
@@ -101,7 +121,7 @@ func (proc *GolangProcessNamespace) AddEdge(name string, edge ir.IRNode) error
 Implements \[wiring.NamespaceHandler\]
 
 <a name="GolangProcessNamespace.AddNode"></a>
-### func \(\*GolangProcessNamespace\) AddNode
+### func \(\*GolangProcessNamespace\) [AddNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/wiring.go#L138>)
 
 ```go
 func (proc *GolangProcessNamespace) AddNode(name string, node ir.IRNode) error
@@ -110,7 +130,7 @@ func (proc *GolangProcessNamespace) AddNode(name string, node ir.IRNode) error
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Process"></a>
-## type Process
+## type [Process](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/ir_goproc.go#L26-L38>)
 
 An IRNode representing a golang process. This is Blueprint's main implementation of Golang processes
 
@@ -126,7 +146,7 @@ type Process struct {
 ```
 
 <a name="Process.AddProcessArtifacts"></a>
-### func \(\*Process\) AddProcessArtifacts
+### func \(\*Process\) [AddProcessArtifacts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/deploy_linux_.go#L28>)
 
 ```go
 func (node *Process) AddProcessArtifacts(builder linux.ProcessWorkspace) error
@@ -135,7 +155,7 @@ func (node *Process) AddProcessArtifacts(builder linux.ProcessWorkspace) error
 Implements linux.ProvidesProcessArtifacts
 
 <a name="Process.AddProcessInstance"></a>
-### func \(\*Process\) AddProcessInstance
+### func \(\*Process\) [AddProcessInstance](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/deploy_linux_.go#L55>)
 
 ```go
 func (node *Process) AddProcessInstance(builder linux.ProcessWorkspace) error
@@ -144,7 +164,7 @@ func (node *Process) AddProcessInstance(builder linux.ProcessWorkspace) error
 Implements linux.InstantiableProcess
 
 <a name="Process.GenerateArtifacts"></a>
-### func \(\*Process\) GenerateArtifacts
+### func \(\*Process\) [GenerateArtifacts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/deploy.go#L37>)
 
 ```go
 func (node *Process) GenerateArtifacts(workspaceDir string) error
@@ -159,7 +179,7 @@ This will collect and package all of the code for the contained Golang nodes and
 The output code will be runnable on the local filesystem, assuming the user has configured the appropriate environment
 
 <a name="Process.ImplementsLinuxProcess"></a>
-### func \(\*Process\) ImplementsLinuxProcess
+### func \(\*Process\) [ImplementsLinuxProcess](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/deploy_linux_.go#L77>)
 
 ```go
 func (node *Process) ImplementsLinuxProcess()
@@ -168,7 +188,7 @@ func (node *Process) ImplementsLinuxProcess()
 
 
 <a name="Process.Name"></a>
-### func \(\*Process\) Name
+### func \(\*Process\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/ir_goproc.go#L51>)
 
 ```go
 func (proc *Process) Name() string
@@ -177,7 +197,7 @@ func (proc *Process) Name() string
 Implements ir.IRNode
 
 <a name="Process.String"></a>
-### func \(\*Process\) String
+### func \(\*Process\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/ir_goproc.go#L56>)
 
 ```go
 func (proc *Process) String() string

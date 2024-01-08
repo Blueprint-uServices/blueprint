@@ -21,7 +21,7 @@ Package simplecache implements a key\-value \[backend.Cache\] using a golang map
 
 
 <a name="SimpleCache"></a>
-## type SimpleCache
+## type [SimpleCache](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplecache/cache.go#L13-L17>)
 
 A simple map\-based cache that implements the \[backend.Cache\] interface
 
@@ -34,7 +34,7 @@ type SimpleCache struct {
 ```
 
 <a name="NewSimpleCache"></a>
-### func NewSimpleCache
+### func [NewSimpleCache](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplecache/cache.go#L20>)
 
 ```go
 func NewSimpleCache(ctx context.Context) (*SimpleCache, error)
@@ -43,7 +43,7 @@ func NewSimpleCache(ctx context.Context) (*SimpleCache, error)
 Instantiates a map\-based [SimpleCache](<#SimpleCache>)
 
 <a name="SimpleCache.Delete"></a>
-### func \(\*SimpleCache\) Delete
+### func \(\*SimpleCache\) [Delete](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplecache/cache.go#L68>)
 
 ```go
 func (cache *SimpleCache) Delete(ctx context.Context, key string) error
@@ -52,7 +52,7 @@ func (cache *SimpleCache) Delete(ctx context.Context, key string) error
 
 
 <a name="SimpleCache.Get"></a>
-### func \(\*SimpleCache\) Get
+### func \(\*SimpleCache\) [Get](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplecache/cache.go#L33>)
 
 ```go
 func (cache *SimpleCache) Get(ctx context.Context, key string, val interface{}) (bool, error)
@@ -61,7 +61,7 @@ func (cache *SimpleCache) Get(ctx context.Context, key string, val interface{}) 
 
 
 <a name="SimpleCache.Incr"></a>
-### func \(\*SimpleCache\) Incr
+### func \(\*SimpleCache\) [Incr](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplecache/cache.go#L75>)
 
 ```go
 func (cache *SimpleCache) Incr(ctx context.Context, key string) (int64, error)
@@ -70,7 +70,7 @@ func (cache *SimpleCache) Incr(ctx context.Context, key string) (int64, error)
 
 
 <a name="SimpleCache.Mget"></a>
-### func \(\*SimpleCache\) Mget
+### func \(\*SimpleCache\) [Mget](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplecache/cache.go#L54>)
 
 ```go
 func (cache *SimpleCache) Mget(ctx context.Context, keys []string, values []interface{}) error
@@ -79,7 +79,7 @@ func (cache *SimpleCache) Mget(ctx context.Context, keys []string, values []inte
 
 
 <a name="SimpleCache.Mset"></a>
-### func \(\*SimpleCache\) Mset
+### func \(\*SimpleCache\) [Mset](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplecache/cache.go#L40>)
 
 ```go
 func (cache *SimpleCache) Mset(ctx context.Context, keys []string, values []interface{}) error
@@ -88,7 +88,7 @@ func (cache *SimpleCache) Mset(ctx context.Context, keys []string, values []inte
 
 
 <a name="SimpleCache.Put"></a>
-### func \(\*SimpleCache\) Put
+### func \(\*SimpleCache\) [Put](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplecache/cache.go#L26>)
 
 ```go
 func (cache *SimpleCache) Put(ctx context.Context, key string, value interface{}) error

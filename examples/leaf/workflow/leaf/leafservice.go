@@ -36,6 +36,7 @@ type LeafServiceImpl struct {
 	Cache      backend.Cache
 	Collection backend.NoSQLCollection
 	Counter    metric.Int64Counter
+	logger     backend.Logger
 }
 
 func NewLeafServiceImpl(ctx ctxx.Context, cache backend.Cache, db backend.NoSQLDatabase) (*LeafServiceImpl, error) {
@@ -51,18 +52,19 @@ func NewLeafServiceImpl(ctx ctxx.Context, cache backend.Cache, db backend.NoSQLD
 	if err != nil {
 		return nil, err
 	}
-	return &LeafServiceImpl{Cache: cache, Collection: collection, Counter: counter}, nil
+	logger := backend.GetLogger()
+	return &LeafServiceImpl{Cache: cache, Collection: collection, Counter: counter, logger: logger}, nil
 }
 
 func (l *LeafServiceImpl) HelloNothing(ctx ctxx.Context) error {
 	l.Counter.Add(ctx, 1)
-	fmt.Println("hello nothing!")
+	ctx, _ = l.logger.Info(ctx, "hello nothing!")
 	return nil
 }
 
 func (l *LeafServiceImpl) HelloInt(ctx ctxx.Context, a int64) (int64, error) {
 	l.Counter.Add(ctx, 1)
-	fmt.Println("hello")
+	ctx, _ = l.logger.Info(ctx, "hello")
 	l.Cache.Put(ctx, "helloint", a)
 	var b int64
 	l.Cache.Get(ctx, "helloint", &b)

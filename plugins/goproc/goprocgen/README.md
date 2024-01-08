@@ -12,7 +12,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/goproc/goprocgen"
 
 
 <a name="GenerateMain"></a>
-## func GenerateMain
+## func [GenerateMain](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/goproc/goprocgen/main.go.go#L18-L23>)
 
 ```go
 func GenerateMain(name string, argNodes []ir.IRNode, nodesToInstantiate []ir.IRNode, module golang.ModuleBuilder, namespaceConstructor string) error

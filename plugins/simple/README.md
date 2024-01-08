@@ -30,7 +30,7 @@ For a more fully\-fledged microservice application, these simple backends are a 
 
 
 <a name="Cache"></a>
-## func Cache
+## func [Cache](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/simple/wiring.go#L38>)
 
 ```go
 func Cache(spec wiring.WiringSpec, name string) string
@@ -39,7 +39,7 @@ func Cache(spec wiring.WiringSpec, name string) string
 Defines an in\-memory \[backend.Cache\] instance with the specified name. In the compiled application, uses the \[simplecache.SimpleCache\] implementation from the Blueprint runtime package
 
 <a name="NoSQLDB"></a>
-## func NoSQLDB
+## func [NoSQLDB](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/simple/wiring.go#L19>)
 
 ```go
 func NoSQLDB(spec wiring.WiringSpec, name string) string
@@ -48,7 +48,7 @@ func NoSQLDB(spec wiring.WiringSpec, name string) string
 Defines an in\-memory \[backend.NoSQLDatabase\] instance with the specified name. In the compiled application, uses the \[simplenosqldb.SimpleNoSQLDB\] implementation from the Blueprint runtime package The SimpleNoSQLDB has limited support for query and update operations.
 
 <a name="Queue"></a>
-## func Queue
+## func [Queue](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/simple/wiring.go#L32>)
 
 ```go
 func Queue(spec wiring.WiringSpec, name string) string
@@ -57,7 +57,7 @@ func Queue(spec wiring.WiringSpec, name string) string
 Defines an in\-memory \[backend.Queue\] instance with the specified name. In the compiled application, uses the \[simplequeue.SimpleQueue\] implementation from the Blueprint runtime package
 
 <a name="RelationalDB"></a>
-## func RelationalDB
+## func [RelationalDB](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/simple/wiring.go#L26>)
 
 ```go
 func RelationalDB(spec wiring.WiringSpec, name string) string
@@ -66,7 +66,7 @@ func RelationalDB(spec wiring.WiringSpec, name string) string
 Defines an in\-memory \[backend.RelationalDB\] instance with the specified name. In the compiled application, uses the \[sqlitereldb.SqliteRelDB\] implementation from the Blueprint runtime package The compiled application might fail to run if gcc is not installed and CGO\_ENABLED is not set.
 
 <a name="SimpleBackend"></a>
-## type SimpleBackend
+## type [SimpleBackend](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/simple/ir.go#L21-L34>)
 
 The SimpleBackend IR node represents a service or backend implementation that is wholly defined in Blueprint's runtime module. Examples include SimpleCache, SimpleNoSQLDB, etc.
 
@@ -90,7 +90,7 @@ type SimpleBackend struct {
 ```
 
 <a name="SimpleBackend.AddInstantiation"></a>
-### func \(\*SimpleBackend\) AddInstantiation
+### func \(\*SimpleBackend\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/simple/ir.go#L86>)
 
 ```go
 func (node *SimpleBackend) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -99,7 +99,7 @@ func (node *SimpleBackend) AddInstantiation(builder golang.NamespaceBuilder) err
 
 
 <a name="SimpleBackend.AddInterfaces"></a>
-### func \(\*SimpleBackend\) AddInterfaces
+### func \(\*SimpleBackend\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/simple/ir.go#L82>)
 
 ```go
 func (node *SimpleBackend) AddInterfaces(builder golang.ModuleBuilder) error
@@ -108,7 +108,7 @@ func (node *SimpleBackend) AddInterfaces(builder golang.ModuleBuilder) error
 
 
 <a name="SimpleBackend.AddToWorkspace"></a>
-### func \(\*SimpleBackend\) AddToWorkspace
+### func \(\*SimpleBackend\) [AddToWorkspace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/simple/ir.go#L76>)
 
 ```go
 func (node *SimpleBackend) AddToWorkspace(builder golang.WorkspaceBuilder) error
@@ -117,7 +117,7 @@ func (node *SimpleBackend) AddToWorkspace(builder golang.WorkspaceBuilder) error
 
 
 <a name="SimpleBackend.GetInterface"></a>
-### func \(\*SimpleBackend\) GetInterface
+### func \(\*SimpleBackend\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/simple/ir.go#L72>)
 
 ```go
 func (node *SimpleBackend) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -126,7 +126,7 @@ func (node *SimpleBackend) GetInterface(ctx ir.BuildContext) (service.ServiceInt
 
 
 <a name="SimpleBackend.ImplementsGolangNode"></a>
-### func \(\*SimpleBackend\) ImplementsGolangNode
+### func \(\*SimpleBackend\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/simple/ir.go#L100>)
 
 ```go
 func (node *SimpleBackend) ImplementsGolangNode()
@@ -135,7 +135,7 @@ func (node *SimpleBackend) ImplementsGolangNode()
 
 
 <a name="SimpleBackend.ImplementsGolangService"></a>
-### func \(\*SimpleBackend\) ImplementsGolangService
+### func \(\*SimpleBackend\) [ImplementsGolangService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/simple/ir.go#L101>)
 
 ```go
 func (node *SimpleBackend) ImplementsGolangService()
@@ -144,7 +144,7 @@ func (node *SimpleBackend) ImplementsGolangService()
 
 
 <a name="SimpleBackend.Name"></a>
-### func \(\*SimpleBackend\) Name
+### func \(\*SimpleBackend\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/simple/ir.go#L68>)
 
 ```go
 func (node *SimpleBackend) Name() string
@@ -153,7 +153,7 @@ func (node *SimpleBackend) Name() string
 
 
 <a name="SimpleBackend.String"></a>
-### func \(\*SimpleBackend\) String
+### func \(\*SimpleBackend\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/simple/ir.go#L96>)
 
 ```go
 func (node *SimpleBackend) String() string

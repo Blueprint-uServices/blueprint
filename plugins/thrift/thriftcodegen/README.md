@@ -29,7 +29,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/thrift/thriftcodegen"
 
 
 <a name="CompileThriftFile"></a>
-## func CompileThriftFile
+## func [CompileThriftFile](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L78>)
 
 ```go
 func CompileThriftFile(thriftFileName string) error
@@ -38,7 +38,7 @@ func CompileThriftFile(thriftFileName string) error
 
 
 <a name="GenerateClient"></a>
-## func GenerateClient
+## func [GenerateClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/clientgen.go#L17>)
 
 ```go
 func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error
@@ -49,7 +49,7 @@ This function is used by the Thrift plugin to generate the client\-side caller o
 It is assumed that outputPackage is the same as the one where the .thrift is generated to
 
 <a name="GenerateServerHandler"></a>
-## func GenerateServerHandler
+## func [GenerateServerHandler](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/servergen.go#L17>)
 
 ```go
 func GenerateServerHandler(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error
@@ -60,7 +60,7 @@ This function is used by the Thrift plugin to generate the server\-side Thrift s
 It is assumed that outputPackage is the same as the one where the .thrift is generated to
 
 <a name="GenerateThrift"></a>
-## func GenerateThrift
+## func [GenerateThrift](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L20>)
 
 ```go
 func GenerateThrift(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error
@@ -69,7 +69,7 @@ func GenerateThrift(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 Generates the .thrift file for the provided service interface, then compiles it using \`thrift\`. See the plugin README for the required thrift package dependencies.
 
 <a name="ThriftBuilder"></a>
-## type ThriftBuilder
+## type [ThriftBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L124-L134>)
 
 
 
@@ -88,7 +88,7 @@ type ThriftBuilder struct {
 ```
 
 <a name="NewThriftBuilder"></a>
-### func NewThriftBuilder
+### func [NewThriftBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L136>)
 
 ```go
 func NewThriftBuilder(code *goparser.ParsedModuleSet) *ThriftBuilder
@@ -97,7 +97,7 @@ func NewThriftBuilder(code *goparser.ParsedModuleSet) *ThriftBuilder
 
 
 <a name="ThriftBuilder.AddService"></a>
-### func \(\*ThriftBuilder\) AddService
+### func \(\*ThriftBuilder\) [AddService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L220>)
 
 ```go
 func (b *ThriftBuilder) AddService(iface *gocode.ServiceInterface) error
@@ -106,7 +106,7 @@ func (b *ThriftBuilder) AddService(iface *gocode.ServiceInterface) error
 Adds a service declaration for the provided golang service interface.
 
 <a name="ThriftBuilder.GenerateMarshallingCode"></a>
-### func \(\*ThriftBuilder\) GenerateMarshallingCode
+### func \(\*ThriftBuilder\) [GenerateMarshallingCode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/marshallgen.go#L20>)
 
 ```go
 func (b *ThriftBuilder) GenerateMarshallingCode(outputFilePath string) error
@@ -117,7 +117,7 @@ Generates marshalling functions that convert between Go objects and Thrift struc
 This extends the code in thriftgen.go and is called from thriftgen.go
 
 <a name="ThriftBuilder.GetOrAddMessage"></a>
-### func \(\*ThriftBuilder\) GetOrAddMessage
+### func \(\*ThriftBuilder\) [GetOrAddMessage](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L240>)
 
 ```go
 func (b *ThriftBuilder) GetOrAddMessage(t *gocode.UserType) (*ThriftStructDecl, error)
@@ -126,7 +126,7 @@ func (b *ThriftBuilder) GetOrAddMessage(t *gocode.UserType) (*ThriftStructDecl, 
 
 
 <a name="ThriftBuilder.WriteThriftFile"></a>
-### func \(\*ThriftBuilder\) WriteThriftFile
+### func \(\*ThriftBuilder\) [WriteThriftFile](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L163>)
 
 ```go
 func (b *ThriftBuilder) WriteThriftFile(outputFilePath string) error
@@ -135,7 +135,7 @@ func (b *ThriftBuilder) WriteThriftFile(outputFilePath string) error
 
 
 <a name="ThriftField"></a>
-## type ThriftField
+## type [ThriftField](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L96-L102>)
 
 A basic structural representation of the Thrift messages and services
 
@@ -150,7 +150,7 @@ type ThriftField struct {
 ```
 
 <a name="ThriftField.Marshall"></a>
-### func \(\*ThriftField\) Marshall
+### func \(\*ThriftField\) [Marshall](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/marshallgen.go#L127>)
 
 ```go
 func (f *ThriftField) Marshall(imports *gogen.Imports, obj string, pkg string) (string, error)
@@ -159,7 +159,7 @@ func (f *ThriftField) Marshall(imports *gogen.Imports, obj string, pkg string) (
 
 
 <a name="ThriftField.Unmarshall"></a>
-### func \(\*ThriftField\) Unmarshall
+### func \(\*ThriftField\) [Unmarshall](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/marshallgen.go#L182>)
 
 ```go
 func (f *ThriftField) Unmarshall(imports *gogen.Imports, obj string, pkg string) (string, error)
@@ -168,7 +168,7 @@ func (f *ThriftField) Unmarshall(imports *gogen.Imports, obj string, pkg string)
 
 
 <a name="ThriftMethodDecl"></a>
-## type ThriftMethodDecl
+## type [ThriftMethodDecl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L111-L116>)
 
 
 
@@ -182,7 +182,7 @@ type ThriftMethodDecl struct {
 ```
 
 <a name="ThriftMethodDecl.MarshallRequest"></a>
-### func \(\*ThriftMethodDecl\) MarshallRequest
+### func \(\*ThriftMethodDecl\) [MarshallRequest](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/marshallgen.go#L103>)
 
 ```go
 func (m *ThriftMethodDecl) MarshallRequest(imports *gogen.Imports, pkg string) (string, error)
@@ -191,7 +191,7 @@ func (m *ThriftMethodDecl) MarshallRequest(imports *gogen.Imports, pkg string) (
 
 
 <a name="ThriftMethodDecl.MarshallResponse"></a>
-### func \(\*ThriftMethodDecl\) MarshallResponse
+### func \(\*ThriftMethodDecl\) [MarshallResponse](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/marshallgen.go#L115>)
 
 ```go
 func (m *ThriftMethodDecl) MarshallResponse(imports *gogen.Imports, pkg string) (string, error)
@@ -200,7 +200,7 @@ func (m *ThriftMethodDecl) MarshallResponse(imports *gogen.Imports, pkg string) 
 
 
 <a name="ThriftServiceDecl"></a>
-## type ThriftServiceDecl
+## type [ThriftServiceDecl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L118-L122>)
 
 
 
@@ -213,7 +213,7 @@ type ThriftServiceDecl struct {
 ```
 
 <a name="ThriftStructDecl"></a>
-## type ThriftStructDecl
+## type [ThriftStructDecl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L104-L109>)
 
 
 
