@@ -12,43 +12,33 @@ import (
 type SLogger struct{}
 
 // Implements backend.Logger
-func (l *SLogger) LogWithAttrs(ctx context.Context, priority backend.Priority, msg string, attrs ...backend.Attribute) (context.Context, error) {
-	var args []slog.Attr
-	for _, attr := range attrs {
-		args = append(args, slog.Attr{Key: attr.Key, Value: slog.AnyValue(attr.Value)})
-	}
-	slog.LogAttrs(ctx, slog.Level(priority), msg, args...)
+func (l *SLogger) Debug(ctx context.Context, format string, args ...any) (context.Context, error) {
+	slog.DebugContext(ctx, fmt.Sprintf(format, args...))
 	return ctx, nil
 }
 
 // Implements backend.Logger
-func (l *SLogger) Debug(ctx context.Context, msg string, args ...any) (context.Context, error) {
-	slog.DebugContext(ctx, msg, args...)
+func (l *SLogger) Info(ctx context.Context, format string, args ...any) (context.Context, error) {
+	slog.InfoContext(ctx, fmt.Sprintf(format, args...))
 	return ctx, nil
 }
 
 // Implements backend.Logger
-func (l *SLogger) Info(ctx context.Context, msg string, args ...any) (context.Context, error) {
-	slog.InfoContext(ctx, msg, args...)
+func (l *SLogger) Warn(ctx context.Context, format string, args ...any) (context.Context, error) {
+	slog.WarnContext(ctx, fmt.Sprintf(format, args...))
 	return ctx, nil
 }
 
 // Implements backend.Logger
-func (l *SLogger) Warn(ctx context.Context, msg string, args ...any) (context.Context, error) {
-	slog.WarnContext(ctx, msg, args...)
+func (l *SLogger) Error(ctx context.Context, format string, args ...any) (context.Context, error) {
+	slog.ErrorContext(ctx, fmt.Sprintf(format, args...))
 	return ctx, nil
 }
 
 // Implements backend.Logger
-func (l *SLogger) Error(ctx context.Context, msg string, args ...any) (context.Context, error) {
-	slog.ErrorContext(ctx, msg, args...)
-	return ctx, nil
-}
-
-// Implements backend.Logger
-func (l *SLogger) Logf(ctx context.Context, format string, args ...any) (context.Context, error) {
+func (l *SLogger) Logf(ctx context.Context, opts backend.LogOptions, format string, args ...any) (context.Context, error) {
 	msg := fmt.Sprintf(format, args...)
-	slog.Log(ctx, slog.LevelInfo.Level(), msg)
+	slog.Log(ctx, slog.Level(opts.Level), msg)
 	return ctx, nil
 }
 
