@@ -6,6 +6,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
+	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
@@ -36,7 +37,9 @@ func makeHTTPSpec(spec wiring.WiringSpec) ([]string, error) {
 
 func applyHTTPDefaults(spec wiring.WiringSpec, serviceName string, collectorName string) string {
 	procName := fmt.Sprintf("%s_process", serviceName)
+	ctrName := fmt.Sprintf("%s_container", serviceName)
 	opentelemetry.InstrumentUsingCustomCollector(spec, serviceName, collectorName)
 	http.Deploy(spec, serviceName)
-	return goproc.CreateProcess(spec, procName, serviceName)
+	goproc.CreateProcess(spec, procName, serviceName)
+	return linuxcontainer.CreateContainer(spec, ctrName, procName)
 }

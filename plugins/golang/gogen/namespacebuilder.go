@@ -9,6 +9,7 @@ import (
 	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"golang.org/x/exp/slices"
 	"golang.org/x/exp/slog"
 )
 
@@ -42,7 +43,7 @@ type NamespaceBuilderImpl struct {
 	Declarations   map[string]string // The DI declarations
 	Required       map[string]string
 	Optional       map[string]string
-	Instantiations map[string]struct{}
+	Instantiations []string
 }
 
 /*
@@ -65,7 +66,7 @@ func NewNamespaceBuilder(module golang.ModuleBuilder, name, fileName, packagePat
 		Declarations:   make(map[string]string),
 		Required:       make(map[string]string),
 		Optional:       make(map[string]string),
-		Instantiations: make(map[string]struct{}),
+		Instantiations: []string{},
 	}
 
 	// Add the runtime module as a dependency, in case it hasn't already
@@ -111,7 +112,12 @@ func (n *NamespaceBuilderImpl) OptionalArg(name, description string) {
 }
 
 func (n *NamespaceBuilderImpl) Instantiate(name string) {
-	n.Instantiations[name] = struct{}{}
+	// Check for and avoid duplicates
+	exists := slices.Contains[[]string, string](n.Instantiations, name)
+	if exists {
+		return
+	}
+	n.Instantiations = append(n.Instantiations, name)
 }
 
 func (n *NamespaceBuilderImpl) Declare(name, buildFuncSrc string) error {
@@ -251,11 +257,11 @@ func set_{{.Name}}_Args(b *golang.NamespaceBuilder) {
 
 // When the {{.Name}} namespace is built it will automatically instantiate
 // the following nodes:
-{{- range $defName, $_ := .Instantiations }}
+{{- range $_, $defName := .Instantiations }}
 //   {{$defName}}
 {{- end }}
 func set_{{.Name}}_Instances(b *golang.NamespaceBuilder) {
-	{{- range $defName, $_ := .Instantiations }}
+	{{- range $_, $defName := .Instantiations }}
 	b.Instantiate("{{ $defName }}")
 	{{- end }}
 }

@@ -28,10 +28,27 @@ func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) 
 		AddToProcess(spec, procName, childName)
 	}
 
+	// Install default metric collector
+	metric_collector := defineStdoutMetricCollector(spec, procName)
+	SetMetricCollector(spec, procName, metric_collector)
+
 	// The process node is simply a namespace that accepts [golang.Node] nodes
 	spec.Define(procName, &Process{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
+		var metric_coll string
+		err := spec.GetProperty(procName, "metricCollector", &metric_coll)
+		if err != nil {
+			return nil, err
+		}
 		proc := newGolangProcessNode(procName)
-		_, err := namespaceutil.InstantiateNamespace(namespace, &GolangProcessNamespace{proc})
+
+		procNamespace, err := namespaceutil.InstantiateNamespace(namespace, &GolangProcessNamespace{proc})
+		if err != nil {
+			return nil, err
+		}
+		err = procNamespace.Get(metric_coll, &proc.metricProvider)
+		if err != nil {
+			return nil, err
+		}
 		return proc, err
 	})
 
@@ -57,6 +74,20 @@ func CreateClientProcess(spec wiring.WiringSpec, procName string, children ...st
 	})
 
 	return procName
+}
+
+// Override the default metric collector for this process
+func SetMetricCollector(spec wiring.WiringSpec, procName string, metricCollNodeName string) {
+	spec.SetProperty(procName, "metricCollector", metricCollNodeName)
+}
+
+// Defines the default metric collector
+func defineStdoutMetricCollector(spec wiring.WiringSpec, processName string) string {
+	collector := processName + ".stdoutmetriccollector"
+	spec.Define(collector, &stdoutMetricCollector{}, func(ns wiring.Namespace) (ir.IRNode, error) {
+		return newStdOutMetricCollector(collector)
+	})
+	return collector
 }
 
 // A [wiring.NamespaceHandler] used to build [Process] IRNodes

@@ -52,7 +52,7 @@ type NamespaceBuilder struct {
 	buildFuncs  map[string]BuildFunc
 	required    map[string]*argNode
 	optional    map[string]*argNode
-	instantiate map[string]struct{}
+	instantiate []string
 
 	// The first error encountered while defining nodes on the builder.
 	// Errors encountered by [NamespaceBuilder] are cached here, and then
@@ -104,7 +104,7 @@ func NewNamespaceBuilder(name string) *NamespaceBuilder {
 	b.buildFuncs = make(map[string]BuildFunc)
 	b.required = make(map[string]*argNode)
 	b.optional = make(map[string]*argNode)
-	b.instantiate = make(map[string]struct{})
+	b.instantiate = []string{}
 	b.flagsparsed = false
 
 	return b
@@ -162,7 +162,7 @@ func (b *NamespaceBuilder) Optional(name string, description string) {
 // The typical usage of this is to ensure that servers get started for
 // namespaces that run servers.
 func (b *NamespaceBuilder) Instantiate(name string) {
-	b.instantiate[name] = struct{}{}
+	b.instantiate = append(b.instantiate, name)
 }
 
 // Builds and returns the namespace.  This will:
@@ -194,8 +194,8 @@ func (b *NamespaceBuilder) Build(ctx context.Context) (*Namespace, error) {
 	n.ctx, n.cancel = context.WithCancel(ctx)
 	n.wg = &sync.WaitGroup{}
 
-	// Instantiate nodes
-	for name := range b.instantiate {
+	// Instantiate Normal nodes
+	for _, name := range b.instantiate {
 		var node any
 		if err := n.Get(name, &node); err != nil {
 			return nil, err
@@ -243,7 +243,7 @@ func (b *NamespaceBuilder) BuildWithParent(parent *Namespace) (*Namespace, error
 	n.wg = &sync.WaitGroup{}
 
 	// Instantiate nodes
-	for name := range b.instantiate {
+	for _, name := range b.instantiate {
 		var node any
 		if err := n.Get(name, &node); err != nil {
 			return nil, err
