@@ -14,11 +14,13 @@ type NonLeafService interface {
 type NonLeafServiceImpl struct {
 	NonLeafService
 	leafService LeafService
+	logger      backend.Logger
 }
 
 func NewNonLeafServiceImpl(ctx context.Context, leafService LeafService) (NonLeafService, error) {
 	nonleaf := &NonLeafServiceImpl{}
 	nonleaf.leafService = leafService
+	nonleaf.logger = backend.GetLogger()
 	return nonleaf, nil
 }
 
@@ -56,11 +58,11 @@ func (nl *NonLeafServiceImpl) Hello(ctx context.Context, a int64) (int64, error)
 		return a, err
 	}
 
-	ctx, _ = backend.GetLogger().Info(ctx, ra)
-	ctx, _ = backend.GetLogger().Info(ctx, fmt.Sprintf("%v", rb))
-	ctx, _ = backend.GetLogger().Info(ctx, fmt.Sprintf("%v", rc))
-	ctx, _ = backend.GetLogger().Info(ctx, fmt.Sprintf("%v", rd))
-	ctx, _ = backend.GetLogger().Info(ctx, fmt.Sprintf("%v", re))
+	ctx, _ = nl.logger.Info(ctx, "ra: %s", ra)
+	ctx, _ = nl.logger.Info(ctx, "rb: %v", rb)
+	ctx, _ = nl.logger.Info(ctx, "rc: %d", rc)
+	ctx, _ = nl.logger.Info(ctx, "rd: %d", rd)
+	ctx, _ = nl.logger.Info(ctx, "re: %v", re)
 
 	return a, nil
 }
