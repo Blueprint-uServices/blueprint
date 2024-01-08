@@ -2,8 +2,7 @@ package backend
 
 import (
 	"context"
-
-	"golang.org/x/exp/slog"
+	"log"
 )
 
 // The Priority Level at which the message will be recorded
@@ -29,35 +28,59 @@ type Attribute struct {
 
 // Represents a logger that can be used by the logger plugin
 type Logger interface {
-	// Log creates a new log record at the desired `priority` level with `msg` as the log message and `attr` as list of optional key-value pairs for logging messages.
+	// LogWithAttrs creates a new log record at the desired `priority` level with `msg` as the log message and `attr` as list of optional key-value pairs for logging messages.
 	// Returns a context that may-be updated by the logger with some logger specific state. If no state is set, then the passed-in context is returned as is.
-	Log(ctx context.Context, priority Priority, msg string, attr ...Attribute) (context.Context, error)
+	LogWithAttrs(ctx context.Context, priority Priority, msg string, attr ...Attribute) (context.Context, error)
+	// Debug creates a new log record at `DEBUG` level with `msg` as the log message and `args` as key-value pairs. Same interface as slog's Debug.
+	Debug(ctx context.Context, msg string, args ...any) (context.Context, error)
+	// Info creates a new log record at `INFO` level with `msg` as the log message and `args` as key-value pairs. Same interface as slog's Info.
+	Info(ctx context.Context, msg string, args ...any) (context.Context, error)
+	// Warn creates a new log record at `WARN` level with `msg` as the log message and `args` as key-value pairs. Same interface as slog's Warn.
+	Warn(ctx context.Context, msg string, args ...any) (context.Context, error)
+	// Error creates a new log record at `ERROR` level with `msg` as the log message and `args` as key-value pairs. Same interface as slog's Error.
+	Error(ctx context.Context, msg string, args ...any) (context.Context, error)
+	// Logf creates a new log record at `INFO` level with the log message constructed from format and args. Same interface as fmt.Printf or log.Printf.
+	Logf(ctx context.Context, format string, args ...any) (context.Context, error)
 }
 
 var logger Logger
 
-// Blueprint's default logger that uses the slog package
-type defaultLogger struct{}
+// Blueprint's error out logger. This should never be used.
+type errorOutLogger struct{}
 
-func (l *defaultLogger) Log(ctx context.Context, priority Priority, msg string, attrs ...Attribute) (context.Context, error) {
-	var args []any
-	for _, attr := range attrs {
-		args = append(args, attr.Key)
-		args = append(args, attr.Value)
-	}
-	switch priority {
-	case DEBUG:
-		slog.Debug(msg, args...)
-		break
-	case INFO:
-		slog.Info(msg, args...)
-		break
-	case WARN:
-		slog.Warn(msg, args...)
-		break
-	case ERROR:
-		slog.Error(msg, args...)
-	}
+func (l *errorOutLogger) LogWithAttrs(ctx context.Context, priority Priority, msg string, attr ...Attribute) (context.Context, error) {
+	log.Fatal("ERROR: Use of errorOutLogger detected")
+	// Unreachable
+	return ctx, nil
+}
+
+func (l *errorOutLogger) Debug(ctx context.Context, msg string, args ...any) (context.Context, error) {
+	log.Fatal("ERROR: Use of errorOutLogger detected")
+	// Unreachable
+	return ctx, nil
+}
+
+func (l *errorOutLogger) Info(ctx context.Context, msg string, args ...any) (context.Context, error) {
+	log.Fatal("ERROR: Use of errorOutLogger detected")
+	// Unreachable
+	return ctx, nil
+}
+
+func (l *errorOutLogger) Warn(ctx context.Context, msg string, args ...any) (context.Context, error) {
+	log.Fatal("ERROR: Use of errorOutLogger detected")
+	// Unreachable
+	return ctx, nil
+}
+
+func (l *errorOutLogger) Error(ctx context.Context, msg string, args ...any) (context.Context, error) {
+	log.Fatal("ERROR: Use of errorOutLogger detected")
+	// Unreachable
+	return ctx, nil
+}
+
+func (l *errorOutLogger) Logf(ctx context.Context, format string, args ...any) (context.Context, error) {
+	log.Fatal("ERROR: Use of errorOutLogger detected")
+	// Unreachable
 	return ctx, nil
 }
 
@@ -67,12 +90,11 @@ func SetDefaultLogger(l Logger) {
 	logger = l
 }
 
-// Log function exposed to Blueprint workflow applications.
-// Wraps around the currently set default logger's Logger API calls.
-func Log(ctx context.Context, priority Priority, msg string, attrs ...Attribute) (context.Context, error) {
-	return logger.Log(ctx, priority, msg, attrs...)
+// Returns the default logger
+func GetLogger() Logger {
+	return logger
 }
 
 func init() {
-	logger = &defaultLogger{}
+	logger = &errorOutLogger{}
 }
