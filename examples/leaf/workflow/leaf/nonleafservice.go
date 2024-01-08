@@ -56,11 +56,11 @@ func (nl *NonLeafServiceImpl) Hello(ctx context.Context, a int64) (int64, error)
 		return a, err
 	}
 
-	ctx, _ = backend.Log(ctx, backend.INFO, ra)
-	ctx, _ = backend.Log(ctx, backend.INFO, fmt.Sprintf("%v", rb))
-	ctx, _ = backend.Log(ctx, backend.INFO, fmt.Sprintf("%v", rc))
-	ctx, _ = backend.Log(ctx, backend.INFO, fmt.Sprintf("%v", rd))
-	ctx, _ = backend.Log(ctx, backend.INFO, fmt.Sprintf("%v", re))
+	ctx, _ = backend.GetLogger().Info(ctx, ra)
+	ctx, _ = backend.GetLogger().Info(ctx, fmt.Sprintf("%v", rb))
+	ctx, _ = backend.GetLogger().Info(ctx, fmt.Sprintf("%v", rc))
+	ctx, _ = backend.GetLogger().Info(ctx, fmt.Sprintf("%v", rd))
+	ctx, _ = backend.GetLogger().Info(ctx, fmt.Sprintf("%v", re))
 
 	return a, nil
 }

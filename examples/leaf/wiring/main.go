@@ -23,9 +23,5 @@ func main() {
 		specs.HTTP,
 		specs.TimeoutDemo,
 		specs.TimeoutRetriesDemo,
-		specs.Logging,
-		specs.XtraceLogging,
-		specs.OTtraceLogging,
-		specs.GoVec,
 	)
 }
