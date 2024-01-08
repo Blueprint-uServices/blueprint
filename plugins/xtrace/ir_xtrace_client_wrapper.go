@@ -67,7 +67,6 @@ func (node *XtraceClientWrapper) genInterface(ctx ir.BuildContext) (*gocode.Serv
 	}
 	i := gocode.CopyServiceInterface(fmt.Sprintf("%v_XTraceClientWrapperInterface", iface.BaseName), module_ctx.Info().Name+"/"+node.outputPackage, iface)
 	for name, method := range i.Methods {
-		slog.Info(fmt.Sprintf("%v", method))
 		method.Arguments = method.Arguments[:len(method.Arguments)-1]
 		method.Returns = method.Returns[:len(method.Returns)-1]
 		i.Methods[name] = method
