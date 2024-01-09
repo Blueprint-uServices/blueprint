@@ -23,5 +23,6 @@ func main() {
 		specs.HTTP,
 		specs.TimeoutDemo,
 		specs.TimeoutRetriesDemo,
+		specs.Xtrace_Logger,
 	)
 }

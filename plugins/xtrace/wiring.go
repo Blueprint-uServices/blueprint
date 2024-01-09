@@ -111,3 +111,23 @@ func DefineXTraceServerContainer(spec wiring.WiringSpec, serverName string) stri
 	// Return the pointer; anybody who wants to access the X-Trace server should do so through the pointer
 	return serverName
 }
+
+// Generates the IRNode for a process-level xtrace logger for process `processName`.
+// Note: Requires that the XTraceServerContainer has been defined for it to correctly compile
+// Note: Any service in the process must also be instrumented with `Instrument` to get log statements associated with a given xtrace task.
+// Usage:
+//   DefineXTraceLogger(spec, "my_process")
+func DefineXTraceLogger(spec wiring.WiringSpec, processName string) string {
+	logger := processName + "_xtrace_logger"
+	xtrace_server := "xtrace_server"
+	xtrace_addr := xtrace_server + ".addr"
+	spec.Define(logger, &XTraceLogger{}, func(ns wiring.Namespace) (ir.IRNode, error) {
+		addr, err := address.Dial[*XTraceServerContainer](ns, xtrace_addr)
+		if err != nil {
+			return nil, err
+		}
+
+		return newXTraceLogger(logger, addr.Dial)
+	})
+	return logger
+}

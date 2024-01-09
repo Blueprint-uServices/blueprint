@@ -18,7 +18,7 @@ type XTracerImpl struct {
 // Returns a new instance of [XTracerImpl] that connects to a xtrace server running at `addr`.
 // REQUIRED: An xtrace server must be running at `addr`
 func NewXTracerImpl(ctx context.Context, addr string) (*XTracerImpl, error) {
-	err := client.Connect(addr)
+	err := connectClient(addr)
 	if err != nil {
 		return nil, err
 	}
