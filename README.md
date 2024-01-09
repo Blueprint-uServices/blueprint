@@ -16,10 +16,11 @@ To get started compiling and running your first Blueprint application, see the �
 
 ## Resources
 
-📘[User Manual](docs/manual) - the main source of Blueprint documentation\
+📘[User Manual](docs/manual)
+
 📚[Applications](examples) - off-the-shelf applications that come packaged with Blueprint\
-📝[Wiring Spec Plugins](plugins) - plugins that come packaged with Blueprint that can be used in wiring specs
-📓[Workflow Spec Backends](runtime/core) - backend interfaces that can be used in workflow specs\
+📝[Wiring Spec Plugins](plugins) - plugins that come packaged with Blueprint that can be used in wiring specs to modify applications\
+📓[Workflow Spec Backends](runtime/core) - backend interfaces that can be used in workflow specs when developing applications
 
 ### API Documentation on go.dev
 
