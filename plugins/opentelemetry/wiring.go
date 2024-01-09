@@ -73,3 +73,13 @@ func Instrument(spec wiring.WiringSpec, serviceName string, collectorName string
 	})
 
 }
+
+// Generates the IRNode for a process-level ot logger for process `processName` to be used in tandem with an OT Tracer.
+// Note: Logs are added as `ot.Events` to the current span. If no current span is being recorded, then no events will be generated. Use `Instrument` to ensure that all services in a process are instrumented with OpenTelemetry and are creating active spans.
+func DefineOTTraceLogger(spec wiring.WiringSpec, processName string) string {
+	logger := processName + "_ottrace_logger"
+	spec.Define(logger, &OTTraceLogger{}, func(ns wiring.Namespace) (ir.IRNode, error) {
+		return newOTTraceLogger(logger)
+	})
+	return logger
+}
