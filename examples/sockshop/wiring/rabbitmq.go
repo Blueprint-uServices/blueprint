@@ -1,4 +1,4 @@
-package wiring
+package main
 
 import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"

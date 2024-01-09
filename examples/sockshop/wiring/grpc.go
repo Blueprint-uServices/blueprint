@@ -1,4 +1,4 @@
-package wiring
+package main
 
 import (
 	"strings"
