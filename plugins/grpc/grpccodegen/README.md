@@ -3,7 +3,7 @@
 # grpccodegen
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/grpc/grpccodegen"
+import "github.com/Blueprint-uServices/blueprint/plugins/grpc/grpccodegen"
 ```
 
 ## Index

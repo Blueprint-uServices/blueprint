@@ -3,7 +3,7 @@
 # goprocgen
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/goproc/goprocgen"
+import "github.com/Blueprint-uServices/blueprint/plugins/goproc/goprocgen"
 ```
 
 ## Index

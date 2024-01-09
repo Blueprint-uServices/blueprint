@@ -7,10 +7,10 @@
 package jaeger
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/address"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/pointer"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
 )
 
 // Generates the IRNodes for a jaeger docker container named `collectorName` that uses the latest jaeger:all-in-one container

@@ -1,16 +1,16 @@
 package specs
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/gotests"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/memcached"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/thrift"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
+	"github.com/Blueprint-uServices/blueprint/plugins/goproc"
+	"github.com/Blueprint-uServices/blueprint/plugins/gotests"
+	"github.com/Blueprint-uServices/blueprint/plugins/http"
+	"github.com/Blueprint-uServices/blueprint/plugins/linuxcontainer"
+	"github.com/Blueprint-uServices/blueprint/plugins/memcached"
+	"github.com/Blueprint-uServices/blueprint/plugins/mongodb"
+	"github.com/Blueprint-uServices/blueprint/plugins/thrift"
+	"github.com/Blueprint-uServices/blueprint/plugins/wiringcmd"
+	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
 )
 
 // A wiring spec that deploys each service into its own Docker container and using thrift to communicate between services.

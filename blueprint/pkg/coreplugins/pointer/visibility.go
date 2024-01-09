@@ -1,9 +1,9 @@
 package pointer
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
 )
 
 // Metadata used to enforce reachability constraints for nodes (primarily services)

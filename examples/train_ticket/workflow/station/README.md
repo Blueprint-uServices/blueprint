@@ -3,7 +3,7 @@
 # station
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/station"
+import "github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/station"
 ```
 
 package station implements ts\-station\-service from the original TrainTicket application

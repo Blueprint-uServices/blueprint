@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/payment"
+	"github.com/Blueprint-uServices/blueprint/runtime/core/registry"
+	"github.com/Blueprint-uServices/blueprint/runtime/plugins/simplenosqldb"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/payment"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 )
 
 var paymentServiceRegistry = registry.NewServiceRegistry[payment.PaymentService]("payment_service")

@@ -3,7 +3,7 @@
 # golang
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+import "github.com/Blueprint-uServices/blueprint/plugins/golang"
 ```
 
 ## Index

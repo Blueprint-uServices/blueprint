@@ -3,7 +3,7 @@
 # backend
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/backend"
+import "github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/backend"
 ```
 
 Package backend provides IR node interfaces for common backend components.

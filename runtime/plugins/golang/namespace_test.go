@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Blueprint-uServices/blueprint/runtime/plugins/golang"
 	"github.com/stretchr/testify/assert"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/golang"
 )
 
 func TestEmptyNamespace(t *testing.T) {

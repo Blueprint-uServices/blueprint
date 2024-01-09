@@ -3,7 +3,7 @@
 # jaeger
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/jaeger"
+import "github.com/Blueprint-uServices/blueprint/runtime/plugins/jaeger"
 ```
 
 Package jaeger implements a tracer \[backend.Tracer\] client interface for the jaeger tracer.

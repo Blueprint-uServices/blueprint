@@ -3,7 +3,7 @@
 # user
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/user"
+import "github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/user"
 ```
 
 Package user implements the SockShop user microservice.

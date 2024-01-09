@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/service"
 )
 
 /*

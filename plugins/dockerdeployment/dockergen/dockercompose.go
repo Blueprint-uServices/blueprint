@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/address"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/plugins/linux"
 	"golang.org/x/exp/slog"
 )
 

@@ -3,7 +3,7 @@
 # workflow
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+import "github.com/Blueprint-uServices/blueprint/plugins/workflow"
 ```
 
 ## Index

@@ -3,7 +3,7 @@
 # queuemaster
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/queuemaster"
+import "github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/queuemaster"
 ```
 
 Package queuemaster implements the queue\-master SockShop service, responsible for pulling and "processing" shipments from the shipment queue.

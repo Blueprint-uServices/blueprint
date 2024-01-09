@@ -26,10 +26,10 @@
 package gotests
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/namespaceutil"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/namespaceutil"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang"
 )
 
 var prop_SERVICESTOTEST = "Services"

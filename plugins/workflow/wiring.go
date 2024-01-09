@@ -4,11 +4,11 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/pointer"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
 	"golang.org/x/exp/slog"
 )
 

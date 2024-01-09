@@ -3,11 +3,11 @@
 package specs
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/gotests"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
+	"github.com/Blueprint-uServices/blueprint/plugins/gotests"
+	"github.com/Blueprint-uServices/blueprint/plugins/simple"
+	"github.com/Blueprint-uServices/blueprint/plugins/wiringcmd"
+	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
 )
 
 // A simple wiring spec that compiles all services to a single process and therefore directly invoke each other.

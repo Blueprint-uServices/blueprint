@@ -8,9 +8,9 @@
 package simple
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/pointer"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
 )
 
 // Defines an in-memory [backend.NoSQLDatabase] instance with the specified name.

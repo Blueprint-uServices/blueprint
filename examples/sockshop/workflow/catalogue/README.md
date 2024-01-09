@@ -3,7 +3,7 @@
 # catalogue
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/catalogue"
+import "github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/catalogue"
 ```
 
 Package catalogue implements the SockShop catalogue microservice

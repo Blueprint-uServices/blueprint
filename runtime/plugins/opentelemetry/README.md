@@ -3,7 +3,7 @@
 # opentelemetry
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/opentelemetry"
+import "github.com/Blueprint-uServices/blueprint/runtime/plugins/opentelemetry"
 ```
 
 ## Index

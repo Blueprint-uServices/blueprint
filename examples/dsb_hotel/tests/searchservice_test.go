@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/Blueprint-uServices/blueprint/examples/dsb_hotel/workflow/hotelreservation"
+	"github.com/Blueprint-uServices/blueprint/runtime/core/registry"
 	"github.com/stretchr/testify/assert"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/dsb_hotel/workflow/hotelreservation"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 )
 
 var searchServiceRegistry = registry.NewServiceRegistry[hotelreservation.SearchService]("search_service")

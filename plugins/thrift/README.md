@@ -3,7 +3,7 @@
 # thrift
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/thrift"
+import "github.com/Blueprint-uServices/blueprint/plugins/thrift"
 ```
 
 Package thrift implements a Blueprint plugin that enables any Golang service to be deployed using a Thrift server.
@@ -11,7 +11,7 @@ Package thrift implements a Blueprint plugin that enables any Golang service to 
 To use the plugin in a Blueprint wiring spec, import this package and use the [Deploy](<#Deploy>) method, i.e.
 
 ```
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/thrift"
+import "github.com/Blueprint-uServices/blueprint/plugins/thrift"
 thrift.Deploy(spec, "my_service")
 ```
 

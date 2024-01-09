@@ -3,7 +3,7 @@
 # mongodb
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/mongodb"
+import "github.com/Blueprint-uServices/blueprint/runtime/plugins/mongodb"
 ```
 
 Package mongodb implements a cleint interface to a mongodb server that supports MongoDB's query and update API.

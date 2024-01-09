@@ -3,7 +3,7 @@
 # specs
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/wiring/specs"
+import "github.com/Blueprint-uServices/blueprint/examples/sockshop/wiring/specs"
 ```
 
 Package specs provides various different wiring specs for the SockShop application. These specs are used when running wiring/main.go.

@@ -3,7 +3,7 @@
 # frontend
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/frontend"
+import "github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/frontend"
 ```
 
 Package frontend implements the SockShop frontend service, typically deployed via HTTP

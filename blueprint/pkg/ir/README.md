@@ -3,7 +3,7 @@
 # ir
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+import "github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
 ```
 
 Package ir provides the basic interfaces for Blueprint's Internal Representation \(IR\) and for subsequently generating application artifacts such as code and container images.

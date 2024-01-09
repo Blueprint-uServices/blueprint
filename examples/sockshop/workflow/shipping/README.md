@@ -3,7 +3,7 @@
 # shipping
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/shipping"
+import "github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/shipping"
 ```
 
 Package shipping implements the SockShop shipping microservice.

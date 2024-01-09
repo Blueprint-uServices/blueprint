@@ -3,7 +3,7 @@
 # hotelreservation
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/dsb_hotel/workflow/hotelreservation"
+import "github.com/Blueprint-uServices/blueprint/examples/dsb_hotel/workflow/hotelreservation"
 ```
 
 Package hotelreservation implements the workflow specification of the Hotel Reservation application

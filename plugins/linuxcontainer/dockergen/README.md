@@ -3,7 +3,7 @@
 # dockergen
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/dockergen"
+import "github.com/Blueprint-uServices/blueprint/plugins/linuxcontainer/dockergen"
 ```
 
 ## Index

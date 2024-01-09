@@ -3,7 +3,7 @@
 # latency
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/latency"
+import "github.com/Blueprint-uServices/blueprint/plugins/latency"
 ```
 
 Package latencyinjector provides a Blueprint modifier for the server side of service calls.
@@ -11,7 +11,7 @@ Package latencyinjector provides a Blueprint modifier for the server side of ser
 The plugin configures the server side to inject a user\-defined amount of latency. Currently latency is injected for all requests and only a pre\-defined duration is supported with no variance/noise added. The plugin will generate a wrapper class that will sleep for a fixed amount of time \(the specified latency to be injected\) before invoking the handler for handling the request. Example Usage to add 100ms latency to each request:
 
 ```
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/latency"
+import "github.com/Blueprint-uServices/blueprint/plugins/latency"
 latency.AddFixed(spec, "my_service", "100ms")
 ```
 

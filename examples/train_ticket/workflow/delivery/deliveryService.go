@@ -5,7 +5,7 @@ import (
 	"context"
 	"fmt"
 
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
+	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
 	"golang.org/x/exp/slog"
 )
 

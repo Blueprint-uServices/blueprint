@@ -3,7 +3,7 @@
 # simplenosqldb
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
+import "github.com/Blueprint-uServices/blueprint/runtime/plugins/simplenosqldb"
 ```
 
 Package simplenosqldb implements an in\-memory NoSQLDB that supports a subset of MongoDB's query and update API.

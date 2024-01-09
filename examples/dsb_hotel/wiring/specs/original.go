@@ -3,18 +3,18 @@ package specs
 import (
 	"fmt"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/gotests"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/jaeger"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/memcached"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
+	"github.com/Blueprint-uServices/blueprint/plugins/goproc"
+	"github.com/Blueprint-uServices/blueprint/plugins/gotests"
+	"github.com/Blueprint-uServices/blueprint/plugins/grpc"
+	"github.com/Blueprint-uServices/blueprint/plugins/http"
+	"github.com/Blueprint-uServices/blueprint/plugins/jaeger"
+	"github.com/Blueprint-uServices/blueprint/plugins/linuxcontainer"
+	"github.com/Blueprint-uServices/blueprint/plugins/memcached"
+	"github.com/Blueprint-uServices/blueprint/plugins/mongodb"
+	"github.com/Blueprint-uServices/blueprint/plugins/opentelemetry"
+	"github.com/Blueprint-uServices/blueprint/plugins/wiringcmd"
+	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
 )
 
 // Wiring spec that represents the original configuration of the HotelReservation application.

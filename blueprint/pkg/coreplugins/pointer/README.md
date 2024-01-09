@@ -3,7 +3,7 @@
 # pointer
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
+import "github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/pointer"
 ```
 
 Package pointer provides the core functionality for wrapping clients and servers with modifier nodes such as tracing, RPC, and many more.

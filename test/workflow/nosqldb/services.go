@@ -3,8 +3,8 @@ package workflow
 import (
 	ctxx "context"
 
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
-	"gitlab.mpi-sws.org/cld/blueprint/test/workflow/workflow"
+	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+	"github.com/Blueprint-uServices/blueprint/test/workflow/workflow"
 )
 
 /*

@@ -3,7 +3,7 @@
 # codegen
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/gotests/codegen"
+import "github.com/Blueprint-uServices/blueprint/plugins/gotests/codegen"
 ```
 
 Package codegen implements the gotest plugin's code generation logic.

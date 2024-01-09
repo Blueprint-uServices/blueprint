@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/ioutil"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang"
 	cp "github.com/otiai10/copy"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/ioutil"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 	"golang.org/x/mod/modfile"
 )

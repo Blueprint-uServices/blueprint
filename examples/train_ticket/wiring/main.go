@@ -6,9 +6,9 @@
 package main
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/wiring/specs"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"github.com/Blueprint-uServices/blueprint/examples/train_ticket/wiring/specs"
+	"github.com/Blueprint-uServices/blueprint/plugins/wiringcmd"
+	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
 )
 
 func main() {

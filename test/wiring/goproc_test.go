@@ -3,9 +3,9 @@ package wiring
 import (
 	"testing"
 
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"github.com/Blueprint-uServices/blueprint/plugins/goproc"
+	"github.com/Blueprint-uServices/blueprint/plugins/grpc"
+	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
 
 	"github.com/stretchr/testify/assert"
 )

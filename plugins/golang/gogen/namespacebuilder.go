@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
 	"golang.org/x/exp/slices"
 	"golang.org/x/exp/slog"
 )
@@ -76,7 +76,7 @@ func NewNamespaceBuilder(module golang.ModuleBuilder, name, fileName, packagePat
 	}
 
 	n.Imports.AddPackages(
-		"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/golang",
+		"github.com/Blueprint-uServices/blueprint/runtime/plugins/golang",
 	)
 
 	return n, nil

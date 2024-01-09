@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"sync"
 
+	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
 	"github.com/bradfitz/gomemcache/memcache"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
 
 // A memcached client wrapper that implements the [backend.Cache] interface

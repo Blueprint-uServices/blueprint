@@ -7,7 +7,7 @@ import (
 	"errors"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
+	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

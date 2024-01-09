@@ -1,20 +1,20 @@
 package specs
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/gotests"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/mysql"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/opentelemetry"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/rabbitmq"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/zipkin"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
+	"github.com/Blueprint-uServices/blueprint/plugins/clientpool"
+	"github.com/Blueprint-uServices/blueprint/plugins/goproc"
+	"github.com/Blueprint-uServices/blueprint/plugins/gotests"
+	"github.com/Blueprint-uServices/blueprint/plugins/grpc"
+	"github.com/Blueprint-uServices/blueprint/plugins/linuxcontainer"
+	"github.com/Blueprint-uServices/blueprint/plugins/mongodb"
+	"github.com/Blueprint-uServices/blueprint/plugins/mysql"
+	"github.com/Blueprint-uServices/blueprint/plugins/opentelemetry"
+	"github.com/Blueprint-uServices/blueprint/plugins/rabbitmq"
+	"github.com/Blueprint-uServices/blueprint/plugins/retries"
+	"github.com/Blueprint-uServices/blueprint/plugins/wiringcmd"
+	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
+	"github.com/Blueprint-uServices/blueprint/plugins/zipkin"
 )
 
 // A wiring spec that deploys each service into its own Docker container and using gRPC to communicate between services.

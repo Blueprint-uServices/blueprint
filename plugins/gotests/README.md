@@ -3,7 +3,7 @@
 # gotests
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/gotests"
+import "github.com/Blueprint-uServices/blueprint/plugins/gotests"
 ```
 
 Package gotests provides a Blueprint plugin for automatically converting black\-box workflow spec unit tests into tests that can run against a compiled Blueprint system.

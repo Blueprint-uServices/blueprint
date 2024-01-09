@@ -14,8 +14,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang/gogen"
 	"golang.org/x/exp/slog"
 )
 

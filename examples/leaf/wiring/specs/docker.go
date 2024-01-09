@@ -3,16 +3,16 @@ package specs
 import (
 	"fmt"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/healthchecker"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/simple"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
+	"github.com/Blueprint-uServices/blueprint/plugins/clientpool"
+	"github.com/Blueprint-uServices/blueprint/plugins/goproc"
+	"github.com/Blueprint-uServices/blueprint/plugins/grpc"
+	"github.com/Blueprint-uServices/blueprint/plugins/healthchecker"
+	"github.com/Blueprint-uServices/blueprint/plugins/linuxcontainer"
+	"github.com/Blueprint-uServices/blueprint/plugins/mongodb"
+	"github.com/Blueprint-uServices/blueprint/plugins/simple"
+	"github.com/Blueprint-uServices/blueprint/plugins/wiringcmd"
+	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
 )
 
 var Docker = wiringcmd.SpecOption{

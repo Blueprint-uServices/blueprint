@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
 	"golang.org/x/exp/slog"
 )
 

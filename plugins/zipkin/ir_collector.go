@@ -1,12 +1,12 @@
 package zipkin
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/address"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/service"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/plugins/docker"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang/goparser"
+	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
 )
 
 // Blueprint IR node that represents the Zipkin container

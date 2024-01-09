@@ -3,11 +3,11 @@ package wiring
 import (
 	"testing"
 
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/grpc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"github.com/Blueprint-uServices/blueprint/plugins/clientpool"
+	"github.com/Blueprint-uServices/blueprint/plugins/goproc"
+	"github.com/Blueprint-uServices/blueprint/plugins/grpc"
+	"github.com/Blueprint-uServices/blueprint/plugins/retries"
+	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
 )
 
 func TestBasicClientPool(t *testing.T) {

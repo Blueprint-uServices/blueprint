@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Blueprint-uServices/blueprint/examples/dsb_sn/workflow/socialnetwork"
+	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+	"github.com/Blueprint-uServices/blueprint/runtime/core/registry"
+	"github.com/Blueprint-uServices/blueprint/runtime/plugins/simplecache"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/dsb_sn/workflow/socialnetwork"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplecache"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

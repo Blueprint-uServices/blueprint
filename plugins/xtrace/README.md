@@ -3,7 +3,7 @@
 # xtrace
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/xtrace"
+import "github.com/Blueprint-uServices/blueprint/plugins/xtrace"
 ```
 
 Package xtrace provides two plugins: \(i\) a plugin to generate and include an xtrace instance in a Blueprint application. \(ii\) provides a modifier plugin to wrap the service with an XTrace wrapper to generate XTrace compatible traces/logs.

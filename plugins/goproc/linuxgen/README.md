@@ -3,7 +3,7 @@
 # linuxgen
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/goproc/linuxgen"
+import "github.com/Blueprint-uServices/blueprint/plugins/goproc/linuxgen"
 ```
 
 ## Index

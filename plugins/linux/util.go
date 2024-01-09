@@ -3,7 +3,7 @@ package linux
 import (
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
 )
 
 func EnvVar(name string) string {

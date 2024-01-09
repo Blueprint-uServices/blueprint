@@ -5,7 +5,7 @@
 // The plugin will generate a wrapper class that will sleep for a fixed amount of time (the specified latency to be injected)
 // before invoking the handler for handling the request.
 // Example Usage to add 100ms latency to each request:
-//    import "gitlab.mpi-sws.org/cld/blueprint/plugins/latency"
+//    import "github.com/Blueprint-uServices/blueprint/plugins/latency"
 //    latency.AddFixed(spec, "my_service", "100ms")
 //
 // TODO: Allow latency to be injected selectively to a subset of requests based using
@@ -18,11 +18,11 @@
 package latency
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/pointer"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
 

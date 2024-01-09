@@ -3,7 +3,7 @@
 # payment
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/payment"
+import "github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/payment"
 ```
 
 Package payment implements the SockShop payment microservice.

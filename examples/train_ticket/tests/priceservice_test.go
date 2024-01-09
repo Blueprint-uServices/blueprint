@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/price"
+	"github.com/Blueprint-uServices/blueprint/runtime/core/registry"
+	"github.com/Blueprint-uServices/blueprint/runtime/plugins/simplenosqldb"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/price"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 )
 
 var priceServiceRegistry = registry.NewServiceRegistry[price.PriceService]("price_service")

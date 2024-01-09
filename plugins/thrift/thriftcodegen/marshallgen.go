@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang/gogen"
 )
 
 type marshallArgs struct {

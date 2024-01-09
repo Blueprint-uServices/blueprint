@@ -3,7 +3,7 @@
 # redis
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/redis"
+import "github.com/Blueprint-uServices/blueprint/plugins/redis"
 ```
 
 Package redis provides the Blueprint wiring and IR implementations of a redis plugin that provides a Cache interface implementation via a pre\-built redis container image.

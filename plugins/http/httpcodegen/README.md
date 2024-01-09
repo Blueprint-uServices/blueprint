@@ -3,7 +3,7 @@
 # httpcodegen
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/http/httpcodegen"
+import "github.com/Blueprint-uServices/blueprint/plugins/http/httpcodegen"
 ```
 
 ## Index

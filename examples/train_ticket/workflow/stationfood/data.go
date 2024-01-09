@@ -1,7 +1,7 @@
 package stationfood
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/food"
+	"github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/food"
 )
 
 type StationFoodStore struct {

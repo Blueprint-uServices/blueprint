@@ -3,12 +3,12 @@ package simple
 import (
 	"fmt"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/service"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang/goparser"
+	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
 	"golang.org/x/exp/slog"
 )
 

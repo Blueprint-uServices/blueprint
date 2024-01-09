@@ -32,9 +32,9 @@ package pointer
 import (
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/address"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
 )
 
 // A PointerDef provides methods for plugins to add client or server side modifiers

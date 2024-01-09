@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/shipping"
+	"github.com/Blueprint-uServices/blueprint/runtime/plugins/simplenosqldb"
+	"github.com/Blueprint-uServices/blueprint/runtime/plugins/simplequeue"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/shipping"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplequeue"
 )
 
 // Unit tests that don't use gotests plugin

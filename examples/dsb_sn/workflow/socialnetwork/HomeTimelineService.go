@@ -4,7 +4,7 @@ import (
 	"context"
 	"strconv"
 
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
+	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
 )
 
 // The HomeTimelineService Interface

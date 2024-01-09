@@ -3,7 +3,7 @@
 # dockerdeployment
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment"
+import "github.com/Blueprint-uServices/blueprint/plugins/dockerdeployment"
 ```
 
 ## Index

@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang/gogen"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang/goparser"
 	"golang.org/x/exp/slog"
 )
 

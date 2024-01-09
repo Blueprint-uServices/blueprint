@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/ioutil"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/dockerdeployment/dockergen"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/ioutil"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/address"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/plugins/docker"
+	"github.com/Blueprint-uServices/blueprint/plugins/dockerdeployment/dockergen"
 	"golang.org/x/exp/slog"
 )
 

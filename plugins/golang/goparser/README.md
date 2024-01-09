@@ -3,7 +3,7 @@
 # goparser
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/goparser"
+import "github.com/Blueprint-uServices/blueprint/plugins/golang/goparser"
 ```
 
 ## Index

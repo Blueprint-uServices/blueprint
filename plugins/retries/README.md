@@ -3,7 +3,7 @@
 # retries
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
+import "github.com/Blueprint-uServices/blueprint/plugins/retries"
 ```
 
 Package retries provides a Blueprint modifier for the client side of service calls.
@@ -11,7 +11,7 @@ Package retries provides a Blueprint modifier for the client side of service cal
 The plugin wraps clients with a retrier using that retries a request until one of the two conditions is met: i\) the requests returns without an error ii\) the number of failed tries has reached the maximum number of failures. Usage:
 
 ```
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/retries"
+import "github.com/Blueprint-uServices/blueprint/plugins/retries"
 retries.AddRetries(spec, "my_service", 10) // Only adds retries
 retries.AddRetriesWithTimeouts(spec, "my_service", 10, "1s") // Adds retries and timeouts
 ```

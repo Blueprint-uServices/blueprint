@@ -2,7 +2,7 @@
 //
 // To use the plugin in a Blueprint wiring spec, import this package and use the [Deploy] method, i.e.
 //
-//	import "gitlab.mpi-sws.org/cld/blueprint/plugins/thrift"
+//	import "github.com/Blueprint-uServices/blueprint/plugins/thrift"
 //	thrift.Deploy(spec, "my_service")
 //
 // See the documentation for [Deploy] for more information about its behavior.
@@ -16,12 +16,12 @@
 package thrift
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/pointer"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/address"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/pointer"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
+	"github.com/Blueprint-uServices/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
 

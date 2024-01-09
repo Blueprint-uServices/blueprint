@@ -3,7 +3,7 @@
 # mysql
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/mysql"
+import "github.com/Blueprint-uServices/blueprint/plugins/mysql"
 ```
 
 Package mysql provides a plugin to generate and include a mysql instance in a Blueprint application.

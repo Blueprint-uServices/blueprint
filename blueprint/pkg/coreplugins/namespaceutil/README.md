@@ -3,7 +3,7 @@
 # namespaceutil
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/namespaceutil"
+import "github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/namespaceutil"
 ```
 
 Package namespaceutil provides helper functionality for IRNodes that implement namespaces.

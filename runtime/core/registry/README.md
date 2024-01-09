@@ -3,7 +3,7 @@
 # registry
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
+import "github.com/Blueprint-uServices/blueprint/runtime/core/registry"
 ```
 
 Package registry provides a struct for registering different service constructors for use at runtime.

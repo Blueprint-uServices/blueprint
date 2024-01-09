@@ -7,9 +7,9 @@
 package main
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/examples/dsb_hotel/wiring/specs"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"github.com/Blueprint-uServices/blueprint/examples/dsb_hotel/wiring/specs"
+	"github.com/Blueprint-uServices/blueprint/plugins/wiringcmd"
+	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
 )
 
 func main() {

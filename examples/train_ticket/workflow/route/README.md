@@ -3,7 +3,7 @@
 # route
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/route"
+import "github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/route"
 ```
 
 package route implements ts\-route\-service from the original train ticket application

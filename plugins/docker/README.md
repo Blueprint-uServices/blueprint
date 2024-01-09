@@ -3,7 +3,7 @@
 # docker
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
+import "github.com/Blueprint-uServices/blueprint/plugins/docker"
 ```
 
 ## Index

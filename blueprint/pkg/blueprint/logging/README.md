@@ -3,7 +3,7 @@
 # logging
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/logging"
+import "github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/logging"
 ```
 
 Package logging implements a custom slog logger for Blueprint.

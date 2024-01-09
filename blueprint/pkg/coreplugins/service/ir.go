@@ -1,6 +1,6 @@
 package service
 
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+import "github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
 
 /*
 Interface for IRNodes that are Call-Response Services

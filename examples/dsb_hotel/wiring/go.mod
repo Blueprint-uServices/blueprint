@@ -1,7 +1,7 @@
-module gitlab.mpi-sws.org/cld/blueprint/examples/dsb_hotel/wiring
+module github.com/Blueprint-uServices/blueprint/examples/dsb_hotel/wiring
 
 go 1.20
 
-require gitlab.mpi-sws.org/cld/blueprint/blueprint v0.0.0
+require github.com/Blueprint-uServices/blueprint/blueprint v0.0.0
 
-replace gitlab.mpi-sws.org/cld/blueprint/blueprint => ../../../blueprint
+replace github.com/Blueprint-uServices/blueprint/blueprint => ../../../blueprint

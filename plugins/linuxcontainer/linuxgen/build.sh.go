@@ -3,7 +3,7 @@ package linuxgen
 import (
 	"path/filepath"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
 )
 
 /*

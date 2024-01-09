@@ -5,11 +5,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/logging"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
+	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/logging"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
 )
 
 var compilerLogging = flag.Bool("blueprint_verbose", false, "Enables verbose Blueprint compiler logging")

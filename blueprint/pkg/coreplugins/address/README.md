@@ -3,7 +3,7 @@
 # address
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
+import "github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/address"
 ```
 
 Package address provides IR nodes to represent addressing, particularly between clients and servers.

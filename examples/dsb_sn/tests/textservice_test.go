@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/Blueprint-uServices/blueprint/examples/dsb_sn/workflow/socialnetwork"
+	"github.com/Blueprint-uServices/blueprint/runtime/core/registry"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/dsb_sn/workflow/socialnetwork"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

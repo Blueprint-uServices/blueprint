@@ -3,7 +3,7 @@
 # consignprice
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/consignprice"
+import "github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/consignprice"
 ```
 
 Package consignprice implements ts\-consignprice\-service from the original train ticket application

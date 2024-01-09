@@ -3,7 +3,7 @@
 # thriftcodegen
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/thrift/thriftcodegen"
+import "github.com/Blueprint-uServices/blueprint/plugins/thrift/thriftcodegen"
 ```
 
 ## Index

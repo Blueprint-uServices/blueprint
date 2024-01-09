@@ -3,7 +3,7 @@
 # linux
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
+import "github.com/Blueprint-uServices/blueprint/plugins/linux"
 ```
 
 ## Index

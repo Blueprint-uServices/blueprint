@@ -1,3 +1,3 @@
-module gitlab.mpi-sws.org/cld/blueprint/test/workflow
+module github.com/Blueprint-uServices/blueprint/test/workflow
 
 go 1.20

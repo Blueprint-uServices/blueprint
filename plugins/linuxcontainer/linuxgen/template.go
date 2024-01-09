@@ -6,7 +6,7 @@ import (
 	"strings"
 	"text/template"
 
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/linux"
+	"github.com/Blueprint-uServices/blueprint/plugins/linux"
 )
 
 /*

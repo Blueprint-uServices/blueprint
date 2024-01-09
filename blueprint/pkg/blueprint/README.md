@@ -3,7 +3,7 @@
 # blueprint
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+import "github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
 ```
 
 Package blueprint provides some common utility methods for logging, io, errors and string manipulation.

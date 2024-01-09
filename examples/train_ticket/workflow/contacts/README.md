@@ -3,7 +3,7 @@
 # contacts
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/contacts"
+import "github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/contacts"
 ```
 
 ## Index

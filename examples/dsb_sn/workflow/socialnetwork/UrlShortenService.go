@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
+	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
 )
 
 // The UrlShortenService interface

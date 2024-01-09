@@ -3,7 +3,7 @@
 # zipkin
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/zipkin"
+import "github.com/Blueprint-uServices/blueprint/runtime/plugins/zipkin"
 ```
 
 Package zipkin implements a tracer \[backend.Tracer\] client interface for the zipkin tracer.

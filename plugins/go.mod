@@ -1,4 +1,4 @@
-module gitlab.mpi-sws.org/cld/blueprint/plugins
+module github.com/Blueprint-uServices/blueprint/plugins
 
 go 1.20
 
@@ -12,6 +12,6 @@ require (
 require golang.org/x/sys v0.14.0 // indirect
 
 require (
-	gitlab.mpi-sws.org/cld/blueprint/blueprint v0.0.0
+	github.com/Blueprint-uServices/blueprint/blueprint v0.0.0
 	golang.org/x/tools v0.15.0
 )

@@ -3,7 +3,7 @@
 # mysql
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/mysql"
+import "github.com/Blueprint-uServices/blueprint/runtime/plugins/mysql"
 ```
 
 Package mysql provides a client\-wrapper implementation of the \[backend.RelationalDB\] interface for a mysql server.
