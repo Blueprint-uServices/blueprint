@@ -1,29 +1,37 @@
 # Blueprint
 
-Blueprint is:
- * A collection of microservice benchmark applications
- * A library that simplifies developing new microservice applications
- * A tool for easily reconfiguring the frameworks, infrastructure, and deployment of a microservice application
- * A platform for prototyping new microservice infrastructure and integrating it with existing applications
+Blueprint is an extensible compiler for microservice applications, along with a collection of off-the-shelf microservice benchmark applications.
 
-Blueprint is particularly aimed at **prototyping and experimentation** use cases.  It is intended for use by anybody, but particularly researchers and practitioners wanting to experiment with microservice applications.
+Using Blueprint, you can:
+ * Run a number of off-the-shelf microservice applications and use them for your benchmarking, prototyping, and research experimentation.
+ * Change and reconfigure those off-the-shelf applications, so that they use different frameworks, infrastructure, and deployment choices.
+ * Easily develop your own microservice applications and leverage Blueprint's built-in features that decouple your application's logic from (Blueprint-generated) boilerplate.
+ * Prototype and develop your own microservice *infrastructure*, and integrate and evaluate your infrastructure with all of the existing applications.
 
-Blueprint actually is:
- * An extensible compiler for microservice applications
+Blueprint is particularly aimed at **prototyping and experimentation** use cases.  It is intended for use by anybody, but particularly researchers and practitioners wanting to experiment with microservice applications.  Its central goal is to reduce the amount of effort involved when changing and re-compiling the infrastructure choices of a microservice application.  
 
-Its central goal is to reduce the amount of effort involved when changing and re-compiling the infrastructure choices of a microservice application.  
+### Documentation & User Manual
 
-See [Getting Started](docs/gettingstarted.md) to get started with Blueprint.
+To get started compiling and running your first Blueprint application, see the [📖Getting Started](docs/manual/gettingstarted.md) page of the User Manual.
+
+[📘User Manual](docs/manual)
+
+[🚀API Documentation on go.dev](https://pkg.go.dev/github.com/blueprint-uservices/blueprint)
+
+
 
 ### Publications
 
-[Blueprint: A Toolchain for Highly-Reconfigurable Microservices](https://blueprint-uservices.github.io/assets/pdf/anand2023blueprint.pdf)\
+If you anticipate making use of Blueprint for your research project, we recommend familiarizing yourself with the SOSP 2023 publication below, which outlines and demonstrates some motivating use cases for Blueprint.
+
+📄[Blueprint: A Toolchain for Highly-Reconfigurable Microservices](https://blueprint-uservices.github.io/assets/pdf/anand2023blueprint.pdf)\
 Vaastav Anand, Deepak Garg, Antoine Kaufmann, Jonathan Mace\
 *29th ACM Symposium on Operating Systems Principles (SOSP '23)*
 
-### Mailing List
+### Mailing List & Slack
 
-Join the [blueprint-uservices Slack](https://blueprint-uservices.slack.com/) and/or the [Blueprint-uServices Google Group](https://groups.google.com/g/blueprint-uservices) to contact us.
+ * Slack: [blueprint-uservices](https://blueprint-uservices.slack.com/)
+ * Google Group (mailing list): [blueprint-uservices](https://groups.google.com/g/blueprint-uservices)
 
 ### Contributors
 
