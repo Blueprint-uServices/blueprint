@@ -47,6 +47,85 @@ Instruments \`serviceName\` with OpenTelemetry. This can only be done if \`servi
 
 This call will configure the generated clients on server and client side to use the exporter provided by the custom collector indicated by the \`collectorName\`. The \`collectorName\` must be declared in the wiring spec.
 
+<a name="OTTraceLogger"></a>
+## type [OTTraceLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L16-L23>)
+
+Blueprint IR Node that represents a process\-level OT trace logger
+
+```go
+type OTTraceLogger struct {
+    golang.Node
+    golang.Instantiable
+
+    LoggerName  string
+    Iface       *goparser.ParsedInterface
+    Constructor *gocode.Constructor
+}
+```
+
+<a name="OTTraceLogger.AddInstantiation"></a>
+### func \(\*OTTraceLogger\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L72>)
+
+```go
+func (node *OTTraceLogger) AddInstantiation(builder golang.NamespaceBuilder) error
+```
+
+
+
+<a name="OTTraceLogger.AddInterfaces"></a>
+### func \(\*OTTraceLogger\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L64>)
+
+```go
+func (node *OTTraceLogger) AddInterfaces(builder golang.ModuleBuilder) error
+```
+
+
+
+<a name="OTTraceLogger.AddToWorkspace"></a>
+### func \(\*OTTraceLogger\) [AddToWorkspace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L60>)
+
+```go
+func (node *OTTraceLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error
+```
+
+
+
+<a name="OTTraceLogger.GetInterface"></a>
+### func \(\*OTTraceLogger\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L68>)
+
+```go
+func (node *OTTraceLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
+```
+
+
+
+<a name="OTTraceLogger.ImplementsGolangNode"></a>
+### func \(\*OTTraceLogger\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L82>)
+
+```go
+func (node *OTTraceLogger) ImplementsGolangNode()
+```
+
+
+
+<a name="OTTraceLogger.Name"></a>
+### func \(\*OTTraceLogger\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L52>)
+
+```go
+func (node *OTTraceLogger) Name() string
+```
+
+
+
+<a name="OTTraceLogger.String"></a>
+### func \(\*OTTraceLogger\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L56>)
+
+```go
+func (node *OTTraceLogger) String() string
+```
+
+
+
 <a name="OpenTelemetryClientWrapper"></a>
 ## type [OpenTelemetryClientWrapper](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_client.go#L17-L25>)
 
