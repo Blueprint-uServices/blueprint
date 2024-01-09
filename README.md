@@ -10,17 +10,33 @@ Using Blueprint, you can:
 
 Blueprint is particularly aimed at **prototyping and experimentation** use cases.  It is intended for use by anybody, but particularly researchers and practitioners wanting to experiment with microservice applications.  Its central goal is to reduce the amount of effort involved when changing and re-compiling the infrastructure choices of a microservice application.  
 
+*** 
 ## Documentation & User Manual
 
-To get started compiling and running your first Blueprint application, see the [📖Getting Started](docs/manual/gettingstarted.md) page of the User Manual.
+To get started compiling and running your first Blueprint application, see the 📖[Getting Started](docs/manual/gettingstarted.md) page of the User Manual.
 
 📘[User Manual](docs/manual)
 
 🚀[API Documentation on go.dev](https://pkg.go.dev/github.com/blueprint-uservices/blueprint)
 
+## Applications
+
+📚[Applications](examples)\
+A number of off-the-shelf applications come packaged with Blueprint.  These can be found in the `examples` directory.
+
+## Wiring Plugins
 
 
-## Publications
+📓Workflow Spec\
+📝Wiring Spec\
+🔧Compiling\
+🏁Compiled Application
+
+***
+
+## Project
+
+### Publications
 
 If you anticipate making use of Blueprint for your research project, we recommend familiarizing yourself with the SOSP 2023 publication below, which outlines and demonstrates some motivating use cases for Blueprint.
 
@@ -28,19 +44,22 @@ If you anticipate making use of Blueprint for your research project, we recommen
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Vaastav Anand, Deepak Garg, Antoine Kaufmann, Jonathan Mace\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*29th ACM Symposium on Operating Systems Principles (SOSP '23)*
 
-## Mailing List & Slack
+### Mailing List & Slack
 
  * Slack: [blueprint-uservices](https://blueprint-uservices.slack.com/)
  * Google Group (mailing list): [blueprint-uservices](https://groups.google.com/g/blueprint-uservices)
 
-## Contributors
+### Contributors
 
 We are a team of researchers:
  * [Vaastav Anand](https://vaastavanand.com/), PhD student at the Max Planck Institute for Software Systems (MPI-SWS)
  * [Jonathan Mace](https://www.microsoft.com/en-us/research/people/jonathanmace/), Researcher at Microsoft Research and Adjunct Faculty at the Max Planck Institute for Software Systems (MPI-SWS)
 
+If you are interested in contributing, please contact us on Slack!
 
-## Resources
+***
+
+### Resources
 
  * [https://blueprint-uservices.github.io/](https://blueprint-uservices.github.io/) - the main project website, containing high-level project content
  * [Blueprint GitHub Repository](https://github.com/blueprint-uservices/blueprint) - the Blueprint GitHub repository
