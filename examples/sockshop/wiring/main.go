@@ -1,5 +1,6 @@
-// Package main provides an application for compiling a number of different
-// wiring specs for the SockShop application.
+// An application for compiling the SockShop application.
+// Provides a number of different wiring specs for compiling
+// the application in different configurations.
 //
 // To display options and usage, invoke:
 //
@@ -7,6 +8,7 @@
 package main
 
 import (
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/wiring/specs"
 	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
@@ -19,9 +21,9 @@ func main() {
 	name := "SockShop"
 	wiringcmd.MakeAndExecute(
 		name,
-		Basic,
-		GRPC,
-		Docker,
-		DockerRabbit,
+		specs.Basic,
+		specs.GRPC,
+		specs.Docker,
+		specs.DockerRabbit,
 	)
 }

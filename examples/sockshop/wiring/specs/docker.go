@@ -1,4 +1,4 @@
-package main
+package specs
 
 import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
@@ -10,26 +10,29 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
 	"github.com/blueprint-uservices/blueprint/plugins/mysql"
 	"github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
-	"github.com/blueprint-uservices/blueprint/plugins/rabbitmq"
 	"github.com/blueprint-uservices/blueprint/plugins/retries"
+	"github.com/blueprint-uservices/blueprint/plugins/simple"
 	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 	"github.com/blueprint-uservices/blueprint/plugins/zipkin"
 )
 
 // A wiring spec that deploys each service into its own Docker container and using gRPC to communicate between services.
-// All RPC calls are retried up to 3 times.  RPC clients use a client pool with 10 clients.
+//
+// All RPC calls are retried up to 3 times.
+// RPC clients use a client pool with 10 clients.
 // All services are instrumented with OpenTelemetry and traces are exported to Zipkin
+//
 // The user, cart, shipping, and orders services using separate MongoDB instances to store their data.
 // The catalogue service uses MySQL to store catalogue data.
-// The shipping service and queue master service run within the same process (TODO: separate processes)
-var DockerRabbit = wiringcmd.SpecOption{
-	Name:        "rabbit",
-	Description: "Deploys each service in a separate container with gRPC, and uses mongodb as NoSQL database backends and rabbitmq as the queue backend.",
-	Build:       makeDockerRabbitSpec,
+// The shipping service and queue master service run within the same process.
+var Docker = wiringcmd.SpecOption{
+	Name:        "docker",
+	Description: "Deploys each service in a separate container with gRPC, and uses mongodb as NoSQL database backends.",
+	Build:       makeDockerSpec,
 }
 
-func makeDockerRabbitSpec(spec wiring.WiringSpec) ([]string, error) {
+func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	// Define the trace collector, which will be used by all services
 	trace_collector := zipkin.Collector(spec, "zipkin")
 
@@ -60,13 +63,15 @@ func makeDockerRabbitSpec(spec wiring.WiringSpec) ([]string, error) {
 	cart_service := workflow.Service(spec, "cart_service", "CartService", cart_db)
 	applyDockerDefaults(cart_service)
 
-	shipqueue := rabbitmq.Container(spec, "shipping_queue", "shippingq")
+	shipqueue := simple.Queue(spec, "shipping_queue")
 	shipdb := mongodb.Container(spec, "shipping_db")
 	shipping_service := workflow.Service(spec, "shipping_service", "ShippingService", shipqueue, shipdb)
 	applyDockerDefaults(shipping_service)
 
+	// Deploy queue master to the same process as the shipping proc
+	// TODO: after distributed queue is supported, move to separate containers
 	queue_master := workflow.Service(spec, "queue_master", "QueueMaster", shipqueue, shipping_service)
-	applyDockerDefaults(queue_master)
+	goproc.AddToProcess(spec, "shipping_proc", queue_master)
 
 	order_db := mongodb.Container(spec, "order_db")
 	order_service := workflow.Service(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)

@@ -1,4 +1,7 @@
-package main
+// Package specs implements wiring specs for the SockShop application.
+//
+// The wiring spec can be specified using the -w option when running wiring/main.go
+package specs
 
 import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
