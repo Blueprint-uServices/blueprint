@@ -11,26 +11,27 @@ Using Blueprint, you can:
 Blueprint is particularly aimed at **prototyping and experimentation** use cases.  It is intended for use by anybody, but particularly researchers and practitioners wanting to experiment with microservice applications.  Its central goal is to reduce the amount of effort involved when changing and re-compiling the infrastructure choices of a microservice application.  
 
 *** 
+# Resources
+
 ## Documentation & User Manual
 
 To get started compiling and running your first Blueprint application, see the 📖[Getting Started](docs/manual/gettingstarted.md) page of the User Manual.
 
 📘[User Manual](docs/manual)
 
-🚀[API Documentation on go.dev](https://pkg.go.dev/github.com/blueprint-uservices/blueprint)
-
 ## Applications
 
-📚[Applications](examples)\
-A number of off-the-shelf applications come packaged with Blueprint.  These can be found in the `examples` directory.
+📚[Applications](examples) - off-the-shelf applications that come packaged with Blueprint
 
-## Wiring Plugins
+📓[Workflow Spec Backends](runtime/core) - backend interfaces that can be used in workflow specs
 
+📝[Wiring Spec Plugins](plugins) - plugins that come packaged with Blueprint that can be used in wiring specs
 
-📓Workflow Spec\
-📝Wiring Spec\
-🔧Compiling\
-🏁Compiled Application
+## API Documentation on go.dev
+
+🚀[Blueprint Compiler](https://pkg.go.dev/github.com/blueprint-uservices/blueprint/blueprint)
+🚀[Blueprint Plugins](https://pkg.go.dev/github.com/blueprint-uservices/blueprint/plugins)
+🚀[Blueprint Runtime Components](https://pkg.go.dev/github.com/blueprint-uservices/blueprint/runtime)
 
 ***
 
@@ -56,17 +57,3 @@ We are a team of researchers:
  * [Jonathan Mace](https://www.microsoft.com/en-us/research/people/jonathanmace/), Researcher at Microsoft Research and Adjunct Faculty at the Max Planck Institute for Software Systems (MPI-SWS)
 
 If you are interested in contributing, please contact us on Slack!
-
-***
-
-### Resources
-
- * [https://blueprint-uservices.github.io/](https://blueprint-uservices.github.io/) - the main project website, containing high-level project content
- * [Blueprint GitHub Repository](https://github.com/blueprint-uservices/blueprint) - the Blueprint GitHub repository
- * [Blueprint GitHub Repository Documentation](https://github.com/blueprint-uservices/blueprint/tree/main/docs) - documentation within the Blueprint GitHub repository.  You are currently reading this.
- * [Blueprint Applications](../examples) - applications implemented for Blueprint.  Currently these are simply hosted in [../examples](examples) but in future they will be migrated to separate repositories.
- * API Documentation on go.dev (*Note: this will not be available until the Blueprint github repository is publicly visible*)
-   * [Blueprint Compiler](https://pkg.go.dev/github.com/blueprint-uservices/blueprint/blueprint)
-   * [Blueprint Plugins](https://pkg.go.dev/github.com/blueprint-uservices/blueprint/plugins)
-   * [Blueprint Runtime Components](https://pkg.go.dev/github.com/blueprint-uservices/blueprint/runtime)
-
