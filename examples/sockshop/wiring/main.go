@@ -7,7 +7,6 @@
 package main
 
 import (
-	"github.com/blueprint-uservices/blueprint/examples/sockshop/wiring/specs"
 	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
@@ -20,9 +19,9 @@ func main() {
 	name := "SockShop"
 	wiringcmd.MakeAndExecute(
 		name,
-		specs.Basic,
-		specs.GRPC,
-		specs.Docker,
-		specs.DockerRabbit,
+		Basic,
+		GRPC,
+		Docker,
+		DockerRabbit,
 	)
 }
