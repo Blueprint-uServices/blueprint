@@ -10,6 +10,13 @@ Package xtrace provides a client\-wrapper implementation of the \[backend.XTrace
 
 ## Index
 
+- [type XTraceLogger](<#XTraceLogger>)
+  - [func NewXTraceLogger\(ctx context.Context, addr string\) \(\*XTraceLogger, error\)](<#NewXTraceLogger>)
+  - [func \(l \*XTraceLogger\) Debug\(ctx context.Context, format string, args ...any\) \(context.Context, error\)](<#XTraceLogger.Debug>)
+  - [func \(l \*XTraceLogger\) Error\(ctx context.Context, format string, args ...any\) \(context.Context, error\)](<#XTraceLogger.Error>)
+  - [func \(l \*XTraceLogger\) Info\(ctx context.Context, format string, args ...any\) \(context.Context, error\)](<#XTraceLogger.Info>)
+  - [func \(l \*XTraceLogger\) Logf\(ctx context.Context, opts backend.LogOptions, format string, args ...any\) \(context.Context, error\)](<#XTraceLogger.Logf>)
+  - [func \(l \*XTraceLogger\) Warn\(ctx context.Context, format string, args ...any\) \(context.Context, error\)](<#XTraceLogger.Warn>)
 - [type XTracerImpl](<#XTracerImpl>)
   - [func NewXTracerImpl\(ctx context.Context, addr string\) \(\*XTracerImpl, error\)](<#NewXTracerImpl>)
   - [func \(xt \*XTracerImpl\) Get\(ctx context.Context\) \(tracingplane.BaggageContext, error\)](<#XTracerImpl.Get>)
@@ -21,6 +28,71 @@ Package xtrace provides a client\-wrapper implementation of the \[backend.XTrace
   - [func \(xt \*XTracerImpl\) StartTask\(ctx context.Context, tags ...string\) \(context.Context, error\)](<#XTracerImpl.StartTask>)
   - [func \(xt \*XTracerImpl\) StopTask\(ctx context.Context\) \(context.Context, error\)](<#XTracerImpl.StopTask>)
 
+
+<a name="XTraceLogger"></a>
+## type [XTraceLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/log.go#L13-L15>)
+
+Implementation of the \[backend.Logger\] interface Note: This logger should only be used in conjunction with the XTracerImpl tracer. Using this logger without using the XTracerImpl tracer would result in no\-op logging behavior.
+
+```go
+type XTraceLogger struct {
+    backend.Logger
+}
+```
+
+<a name="NewXTraceLogger"></a>
+### func [NewXTraceLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/log.go#L32>)
+
+```go
+func NewXTraceLogger(ctx context.Context, addr string) (*XTraceLogger, error)
+```
+
+Returns a new instance of [XTracerImpl](<#XTracerImpl>) that connects to a xtrace server running at \`addr\`. REQUIRED: An xtrace server must be running at \`addr\`
+
+<a name="XTraceLogger.Debug"></a>
+### func \(\*XTraceLogger\) [Debug](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/log.go#L53>)
+
+```go
+func (l *XTraceLogger) Debug(ctx context.Context, format string, args ...any) (context.Context, error)
+```
+
+Implements backend.Logger
+
+<a name="XTraceLogger.Error"></a>
+### func \(\*XTraceLogger\) [Error](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/log.go#L71>)
+
+```go
+func (l *XTraceLogger) Error(ctx context.Context, format string, args ...any) (context.Context, error)
+```
+
+Implements backend.Logger
+
+<a name="XTraceLogger.Info"></a>
+### func \(\*XTraceLogger\) [Info](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/log.go#L43>)
+
+```go
+func (l *XTraceLogger) Info(ctx context.Context, format string, args ...any) (context.Context, error)
+```
+
+Implements backend.Logger
+
+<a name="XTraceLogger.Logf"></a>
+### func \(\*XTraceLogger\) [Logf](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/log.go#L80>)
+
+```go
+func (l *XTraceLogger) Logf(ctx context.Context, opts backend.LogOptions, format string, args ...any) (context.Context, error)
+```
+
+Implements backend.Logger
+
+<a name="XTraceLogger.Warn"></a>
+### func \(\*XTraceLogger\) [Warn](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/xtrace/log.go#L62>)
+
+```go
+func (l *XTraceLogger) Warn(ctx context.Context, format string, args ...any) (context.Context, error)
+```
+
+Implements backend.Logger
 
 <a name="XTracerImpl"></a>
 ## type [XTracerImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L14-L16>)

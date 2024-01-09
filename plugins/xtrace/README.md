@@ -14,6 +14,7 @@ The applications must use a backend.XTracer \(runtime/core/backend\) as the inte
 
 ## Index
 
+- [func DefineXTraceLogger\(spec wiring.WiringSpec, processName string\) string](<#DefineXTraceLogger>)
 - [func DefineXTraceServerContainer\(spec wiring.WiringSpec, serverName string\) string](<#DefineXTraceServerContainer>)
 - [func Instrument\(spec wiring.WiringSpec, serviceName string\)](<#Instrument>)
 - [type XTraceClient](<#XTraceClient>)
@@ -27,6 +28,14 @@ The applications must use a backend.XTracer \(runtime/core/backend\) as the inte
 - [type XTraceInterface](<#XTraceInterface>)
   - [func \(xt \*XTraceInterface\) GetMethods\(\) \[\]service.Method](<#XTraceInterface.GetMethods>)
   - [func \(xt \*XTraceInterface\) GetName\(\) string](<#XTraceInterface.GetName>)
+- [type XTraceLogger](<#XTraceLogger>)
+  - [func \(node \*XTraceLogger\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#XTraceLogger.AddInstantiation>)
+  - [func \(node \*XTraceLogger\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#XTraceLogger.AddInterfaces>)
+  - [func \(node \*XTraceLogger\) AddToWorkspace\(builder golang.WorkspaceBuilder\) error](<#XTraceLogger.AddToWorkspace>)
+  - [func \(node \*XTraceLogger\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#XTraceLogger.GetInterface>)
+  - [func \(node \*XTraceLogger\) ImplementsGolangNode\(\)](<#XTraceLogger.ImplementsGolangNode>)
+  - [func \(node \*XTraceLogger\) Name\(\) string](<#XTraceLogger.Name>)
+  - [func \(node \*XTraceLogger\) String\(\) string](<#XTraceLogger.String>)
 - [type XTraceServerContainer](<#XTraceServerContainer>)
   - [func \(node \*XTraceServerContainer\) AddContainerArtifacts\(target docker.ContainerWorkspace\) error](<#XTraceServerContainer.AddContainerArtifacts>)
   - [func \(node \*XTraceServerContainer\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#XTraceServerContainer.AddContainerInstance>)
@@ -52,6 +61,19 @@ The applications must use a backend.XTracer \(runtime/core/backend\) as the inte
   - [func \(node \*XtraceServerWrapper\) Name\(\) string](<#XtraceServerWrapper.Name>)
   - [func \(node \*XtraceServerWrapper\) String\(\) string](<#XtraceServerWrapper.String>)
 
+
+<a name="DefineXTraceLogger"></a>
+## func [DefineXTraceLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/wiring.go#L120>)
+
+```go
+func DefineXTraceLogger(spec wiring.WiringSpec, processName string) string
+```
+
+Generates the IRNode for a process\-level xtrace logger for process \`processName\`. Note: Requires that the XTraceServerContainer has been defined for it to correctly compile Note: Any service in the process must also be instrumented with \`Instrument\` to get log statements associated with a given xtrace task. Usage:
+
+```
+DefineXTraceLogger(spec, "my_process")
+```
 
 <a name="DefineXTraceServerContainer"></a>
 ## func [DefineXTraceServerContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/wiring.go#L74>)
@@ -185,6 +207,87 @@ func (xt *XTraceInterface) GetMethods() []service.Method
 
 ```go
 func (xt *XTraceInterface) GetName() string
+```
+
+
+
+<a name="XTraceLogger"></a>
+## type [XTraceLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L17-L26>)
+
+Blueprint IR Node that represents a process\-level xtrace logger
+
+```go
+type XTraceLogger struct {
+    golang.Node
+    golang.Instantiable
+
+    ServerDialAddr *address.DialConfig
+
+    LoggerName  string
+    Iface       *goparser.ParsedInterface
+    Constructor *gocode.Constructor
+}
+```
+
+<a name="XTraceLogger.AddInstantiation"></a>
+### func \(\*XTraceLogger\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L76>)
+
+```go
+func (node *XTraceLogger) AddInstantiation(builder golang.NamespaceBuilder) error
+```
+
+
+
+<a name="XTraceLogger.AddInterfaces"></a>
+### func \(\*XTraceLogger\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L68>)
+
+```go
+func (node *XTraceLogger) AddInterfaces(builder golang.ModuleBuilder) error
+```
+
+
+
+<a name="XTraceLogger.AddToWorkspace"></a>
+### func \(\*XTraceLogger\) [AddToWorkspace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L64>)
+
+```go
+func (node *XTraceLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error
+```
+
+
+
+<a name="XTraceLogger.GetInterface"></a>
+### func \(\*XTraceLogger\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L72>)
+
+```go
+func (node *XTraceLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
+```
+
+
+
+<a name="XTraceLogger.ImplementsGolangNode"></a>
+### func \(\*XTraceLogger\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L86>)
+
+```go
+func (node *XTraceLogger) ImplementsGolangNode()
+```
+
+
+
+<a name="XTraceLogger.Name"></a>
+### func \(\*XTraceLogger\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L56>)
+
+```go
+func (node *XTraceLogger) Name() string
+```
+
+
+
+<a name="XTraceLogger.String"></a>
+### func \(\*XTraceLogger\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L60>)
+
+```go
+func (node *XTraceLogger) String() string
 ```
 
 
