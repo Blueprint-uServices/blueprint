@@ -30,7 +30,7 @@ The starting point for a Blueprint application is the [NewWiringSpec](<#NewWirin
 
 
 <a name="BuildApplicationIR"></a>
-## func BuildApplicationIR
+## func [BuildApplicationIR](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/application.go#L19>)
 
 ```go
 func BuildApplicationIR(spec WiringSpec, name string, nodesToInstantiate ...string) (*ir.ApplicationNode, error)
@@ -43,7 +43,7 @@ Callers should typically provide nodesToInstantiate to specify which nodes shoul
 If nodesToInstantiate is empty, all nodes will be instantiated, but this might not result in an application with the desired topology. Hence the recommended approach is to explicitly specify which nodes to instantiate.
 
 <a name="BuildFunc"></a>
-## type BuildFunc
+## type [BuildFunc](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L24>)
 
 Creates an IR node within the provided namespace or within a new child namespace. Other named IR nodes can be fetched from the provided Namespace by invoking \[Namespace.Get\] or other [Namespace](<#Namespace>) methods.
 
@@ -52,7 +52,7 @@ type BuildFunc func(Namespace) (ir.IRNode, error)
 ```
 
 <a name="DeferOpts"></a>
-## type DeferOpts
+## type [DeferOpts](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/namespace.go#L81-L84>)
 
 Options for deferred functions provided with \[Namespace.Defer\]
 
@@ -64,7 +64,7 @@ type DeferOpts struct {
 ```
 
 <a name="Namespace"></a>
-## type Namespace
+## type [Namespace](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/namespace.go#L26-L78>)
 
 Namespace is a dependency injection container used by Blueprint plugins during Blueprint's IR construction process. Namespaces instantiate and store IRNodes. A root Blueprint application is itself a Namespace.
 
@@ -131,7 +131,7 @@ type Namespace interface {
 ```
 
 <a name="NamespaceHandler"></a>
-## type NamespaceHandler
+## type [NamespaceHandler](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/namespace.go#L114-L129>)
 
 NamespaceHandler is an interface intended for use by any Blueprint plugin that wants to provide a custom namespace.
 
@@ -155,7 +155,7 @@ type NamespaceHandler interface {
 ```
 
 <a name="WiringDef"></a>
-## type WiringDef
+## type [WiringDef](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L65-L71>)
 
 
 
@@ -170,7 +170,7 @@ type WiringDef struct {
 ```
 
 <a name="WiringDef.AddProperty"></a>
-### func \(\*WiringDef\) AddProperty
+### func \(\*WiringDef\) [AddProperty](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L90>)
 
 ```go
 func (def *WiringDef) AddProperty(key string, value any)
@@ -179,7 +179,7 @@ func (def *WiringDef) AddProperty(key string, value any)
 
 
 <a name="WiringDef.GetProperties"></a>
-### func \(\*WiringDef\) GetProperties
+### func \(\*WiringDef\) [GetProperties](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L103>)
 
 ```go
 func (def *WiringDef) GetProperties(key string, dst any) error
@@ -188,7 +188,7 @@ func (def *WiringDef) GetProperties(key string, dst any) error
 
 
 <a name="WiringDef.GetProperty"></a>
-### func \(\*WiringDef\) GetProperty
+### func \(\*WiringDef\) [GetProperty](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L94>)
 
 ```go
 func (def *WiringDef) GetProperty(key string, dst any) error
@@ -197,7 +197,7 @@ func (def *WiringDef) GetProperty(key string, dst any) error
 
 
 <a name="WiringDef.String"></a>
-### func \(\*WiringDef\) String
+### func \(\*WiringDef\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L107>)
 
 ```go
 func (def *WiringDef) String() string
@@ -206,7 +206,7 @@ func (def *WiringDef) String() string
 
 
 <a name="WiringError"></a>
-## type WiringError
+## type [WiringError](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L246-L248>)
 
 
 
@@ -217,7 +217,7 @@ type WiringError struct {
 ```
 
 <a name="WiringError.Error"></a>
-### func \(WiringError\) Error
+### func \(WiringError\) [Error](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L250>)
 
 ```go
 func (e WiringError) Error() string
@@ -226,7 +226,7 @@ func (e WiringError) Error() string
 
 
 <a name="WiringOpts"></a>
-## type WiringOpts
+## type [WiringOpts](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L53-L63>)
 
 Additional options that can be specified when defining a WiringSpec node.
 
@@ -245,7 +245,7 @@ type WiringOpts struct {
 ```
 
 <a name="WiringSpec"></a>
-## type WiringSpec
+## type [WiringSpec](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L26-L50>)
 
 
 
@@ -278,7 +278,7 @@ type WiringSpec interface {
 ```
 
 <a name="NewWiringSpec"></a>
-### func NewWiringSpec
+### func [NewWiringSpec](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L81>)
 
 ```go
 func NewWiringSpec(name string) WiringSpec

@@ -20,7 +20,7 @@ import "github.com/blueprint-uservices/blueprint/plugins/dockerdeployment/docker
 
 
 <a name="ExecuteTemplate"></a>
-## func [ExecuteTemplate](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/dockerdeployment/dockergen/template.go#L17>)
+## func [ExecuteTemplate](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/dockergen/template.go#L17>)
 
 ```go
 func ExecuteTemplate(name string, body string, args any) (string, error)
@@ -29,7 +29,7 @@ func ExecuteTemplate(name string, body string, args any) (string, error)
 
 
 <a name="ExecuteTemplateToFile"></a>
-## func [ExecuteTemplateToFile](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/dockerdeployment/dockergen/template.go#L21>)
+## func [ExecuteTemplateToFile](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/dockergen/template.go#L21>)
 
 ```go
 func ExecuteTemplateToFile(name string, body string, args any, filename string) error
@@ -38,7 +38,7 @@ func ExecuteTemplateToFile(name string, body string, args any, filename string) 
 
 
 <a name="DockerComposeFile"></a>
-## type [DockerComposeFile](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/dockerdeployment/dockergen/dockercompose.go#L18-L26>)
+## type [DockerComposeFile](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/dockergen/dockercompose.go#L18-L26>)
 
 
 
@@ -54,7 +54,7 @@ type DockerComposeFile struct {
 ```
 
 <a name="NewDockerComposeFile"></a>
-### func [NewDockerComposeFile](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/dockerdeployment/dockergen/dockercompose.go#L37>)
+### func [NewDockerComposeFile](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/dockergen/dockercompose.go#L37>)
 
 ```go
 func NewDockerComposeFile(workspaceName, workspaceDir, fileName string) *DockerComposeFile
@@ -63,7 +63,7 @@ func NewDockerComposeFile(workspaceName, workspaceDir, fileName string) *DockerC
 
 
 <a name="DockerComposeFile.AddBuildInstance"></a>
-### func \(\*DockerComposeFile\) [AddBuildInstance](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/dockerdeployment/dockergen/dockercompose.go#L61>)
+### func \(\*DockerComposeFile\) [AddBuildInstance](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/dockergen/dockercompose.go#L61>)
 
 ```go
 func (d *DockerComposeFile) AddBuildInstance(instanceName string, containerTemplateName string, args ...ir.IRNode) error
@@ -72,7 +72,7 @@ func (d *DockerComposeFile) AddBuildInstance(instanceName string, containerTempl
 
 
 <a name="DockerComposeFile.AddEnvVar"></a>
-### func \(\*DockerComposeFile\) [AddEnvVar](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/dockerdeployment/dockergen/dockercompose.go#L65>)
+### func \(\*DockerComposeFile\) [AddEnvVar](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/dockergen/dockercompose.go#L65>)
 
 ```go
 func (d *DockerComposeFile) AddEnvVar(instanceName string, key string, val string) error
@@ -81,7 +81,7 @@ func (d *DockerComposeFile) AddEnvVar(instanceName string, key string, val strin
 
 
 <a name="DockerComposeFile.AddImageInstance"></a>
-### func \(\*DockerComposeFile\) [AddImageInstance](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/dockerdeployment/dockergen/dockercompose.go#L57>)
+### func \(\*DockerComposeFile\) [AddImageInstance](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/dockergen/dockercompose.go#L57>)
 
 ```go
 func (d *DockerComposeFile) AddImageInstance(instanceName string, image string, args ...ir.IRNode) error
@@ -90,7 +90,7 @@ func (d *DockerComposeFile) AddImageInstance(instanceName string, image string, 
 
 
 <a name="DockerComposeFile.Generate"></a>
-### func \(\*DockerComposeFile\) [Generate](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/dockerdeployment/dockergen/dockercompose.go#L49>)
+### func \(\*DockerComposeFile\) [Generate](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/dockergen/dockercompose.go#L49>)
 
 ```go
 func (d *DockerComposeFile) Generate() error
@@ -99,7 +99,7 @@ func (d *DockerComposeFile) Generate() error
 
 
 <a name="DockerComposeFile.ResolveLocalDials"></a>
-### func \(\*DockerComposeFile\) [ResolveLocalDials](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/dockerdeployment/dockergen/dockercompose.go#L135>)
+### func \(\*DockerComposeFile\) [ResolveLocalDials](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/dockergen/dockercompose.go#L135>)
 
 ```go
 func (d *DockerComposeFile) ResolveLocalDials() error

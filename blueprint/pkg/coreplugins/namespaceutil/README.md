@@ -26,7 +26,7 @@ This package also takes care of adding modifiers to pointers to build the server
 
 
 <a name="AddNodeTo"></a>
-## func AddNodeTo
+## func [AddNodeTo](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/namespaceutil/namespace.go#L46>)
 
 ```go
 func AddNodeTo[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName string, childName string)
@@ -35,7 +35,7 @@ func AddNodeTo[NamespaceNodeType any](spec wiring.WiringSpec, namespaceName stri
 If a Blueprint plugin derives a namespace \(e.g. a Process namespace that contains Golang nodes\) then the plugin can use this method. When namespace gets instantiated, it will build child. If child is a pointer, then the pointer is also modified, so that when child is instantiated, it is done so within namespace. The type parameter NamespaceNodeType is the namespace node type, e.g. Process
 
 <a name="InstantiateNamespace"></a>
-## func InstantiateNamespace
+## func [InstantiateNamespace](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/namespaceutil/namespace.go#L103>)
 
 ```go
 func InstantiateNamespace(parentNamespace wiring.Namespace, namespaceNode IRNamespace) (wiring.Namespace, error)
@@ -48,7 +48,7 @@ The node argument is an \[ir.IRNode\] that also implements the \[wiring.Namespac
 Returns the child namespace. If the child namespace has already been created, this method will return an error
 
 <a name="IRNamespace"></a>
-## type IRNamespace
+## type [IRNamespace](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/namespaceutil/namespace.go#L34-L37>)
 
 An IRNode that also implements the \[wiring.NamespaceHandler\] interface, so that it can be directly used with the convenience methods defined in the \[pointer\] package.
 

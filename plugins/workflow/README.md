@@ -19,7 +19,7 @@ import "github.com/blueprint-uservices/blueprint/plugins/workflow"
 
 
 <a name="Init"></a>
-## func [Init](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/workflow/wiring.go#L29>)
+## func [Init](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L29>)
 
 ```go
 func Init(srcModulePaths ...string)
@@ -34,7 +34,7 @@ The provided paths should be to the root of a go module \(containing a go.mod fi
 This can be called more than once, which will concatenate all provided srcModulePaths
 
 <a name="Reset"></a>
-## func [Reset](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/workflow/wiring.go#L42>)
+## func [Reset](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L42>)
 
 ```go
 func Reset()
@@ -43,7 +43,7 @@ func Reset()
 
 
 <a name="Service"></a>
-## func [Service](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/workflow/wiring.go#L81>)
+## func [Service](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L81>)
 
 ```go
 func Service(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string
@@ -58,7 +58,7 @@ This adds a service to the application, using a definition that was provided in 
 This call creates several definitions within the wiring spec. In particular, \`serviceName\` is defined as a pointer to the actual service, and can thus be modified and
 
 <a name="WorkflowSpec"></a>
-## type [WorkflowSpec](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/workflow/workflowspec.go#L25-L27>)
+## type [WorkflowSpec](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/workflowspec.go#L25-L27>)
 
 Representation of a workflow spec.
 
@@ -77,7 +77,7 @@ type WorkflowSpec struct {
 ```
 
 <a name="GetSpec"></a>
-### func [GetSpec](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/workflow/wiring.go#L47>)
+### func [GetSpec](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L47>)
 
 ```go
 func GetSpec() (*WorkflowSpec, error)
@@ -86,7 +86,7 @@ func GetSpec() (*WorkflowSpec, error)
 Static initialization of the workflow spec
 
 <a name="NewWorkflowSpec"></a>
-### func [NewWorkflowSpec](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/workflow/workflowspec.go#L39>)
+### func [NewWorkflowSpec](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/workflowspec.go#L39>)
 
 ```go
 func NewWorkflowSpec(srcModuleDirs ...string) (*WorkflowSpec, error)
@@ -97,7 +97,7 @@ Parses the specified module directories and loads workflow specs from there.
 This will return an error if \*any\* of the provided srcModuleDirs are not valid Go modules
 
 <a name="WorkflowSpec.Get"></a>
-### func \(\*WorkflowSpec\) [Get](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/workflow/workflowspec.go#L55>)
+### func \(\*WorkflowSpec\) [Get](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/workflowspec.go#L55>)
 
 ```go
 func (spec *WorkflowSpec) Get(name string) (*WorkflowSpecService, error)
@@ -108,7 +108,7 @@ Looks up the named service in the workflow spec. When a wiring spec instantiates
 Returns the service and a constructor
 
 <a name="WorkflowSpecService"></a>
-## type [WorkflowSpecService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/workflow/workflowspec.go#L29-L32>)
+## type [WorkflowSpecService](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/workflowspec.go#L29-L32>)
 
 
 

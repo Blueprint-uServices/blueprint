@@ -35,7 +35,7 @@ const (
 ```
 
 <a name="Contact"></a>
-## type [Contact](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/contacts/data.go#L11-L18>)
+## type [Contact](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/contacts/data.go#L11-L18>)
 
 
 
@@ -51,7 +51,7 @@ type Contact struct {
 ```
 
 <a name="ContactsService"></a>
-## type [ContactsService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L12-L25>)
+## type [ContactsService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L12-L25>)
 
 Contacts Service manages contacts for users
 
@@ -73,7 +73,7 @@ type ContactsService interface {
 ```
 
 <a name="ContactsServiceImpl"></a>
-## type [ContactsServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L27-L29>)
+## type [ContactsServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L27-L29>)
 
 
 
@@ -84,7 +84,7 @@ type ContactsServiceImpl struct {
 ```
 
 <a name="NewContactsServiceImpl"></a>
-### func [NewContactsServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L31>)
+### func [NewContactsServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L31>)
 
 ```go
 func NewContactsServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*ContactsServiceImpl, error)
@@ -93,7 +93,7 @@ func NewContactsServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*Con
 
 
 <a name="ContactsServiceImpl.CreateContacts"></a>
-### func \(\*ContactsServiceImpl\) [CreateContacts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L74>)
+### func \(\*ContactsServiceImpl\) [CreateContacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L74>)
 
 ```go
 func (c *ContactsServiceImpl) CreateContacts(ctx context.Context, contact Contact) error
@@ -102,7 +102,7 @@ func (c *ContactsServiceImpl) CreateContacts(ctx context.Context, contact Contac
 
 
 <a name="ContactsServiceImpl.Delete"></a>
-### func \(\*ContactsServiceImpl\) [Delete](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L95>)
+### func \(\*ContactsServiceImpl\) [Delete](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L95>)
 
 ```go
 func (c *ContactsServiceImpl) Delete(ctx context.Context, contact Contact) error
@@ -111,7 +111,7 @@ func (c *ContactsServiceImpl) Delete(ctx context.Context, contact Contact) error
 
 
 <a name="ContactsServiceImpl.FindContactsByAccountId"></a>
-### func \(\*ContactsServiceImpl\) [FindContactsByAccountId](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L56>)
+### func \(\*ContactsServiceImpl\) [FindContactsByAccountId](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L56>)
 
 ```go
 func (c *ContactsServiceImpl) FindContactsByAccountId(ctx context.Context, id string) ([]Contact, error)
@@ -120,7 +120,7 @@ func (c *ContactsServiceImpl) FindContactsByAccountId(ctx context.Context, id st
 
 
 <a name="ContactsServiceImpl.FindContactsById"></a>
-### func \(\*ContactsServiceImpl\) [FindContactsById](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L35>)
+### func \(\*ContactsServiceImpl\) [FindContactsById](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L35>)
 
 ```go
 func (c *ContactsServiceImpl) FindContactsById(ctx context.Context, id string) (Contact, error)
@@ -129,7 +129,7 @@ func (c *ContactsServiceImpl) FindContactsById(ctx context.Context, id string) (
 
 
 <a name="ContactsServiceImpl.GetAllContacts"></a>
-### func \(\*ContactsServiceImpl\) [GetAllContacts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L104>)
+### func \(\*ContactsServiceImpl\) [GetAllContacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L104>)
 
 ```go
 func (c *ContactsServiceImpl) GetAllContacts(ctx context.Context) ([]Contact, error)
@@ -138,7 +138,7 @@ func (c *ContactsServiceImpl) GetAllContacts(ctx context.Context) ([]Contact, er
 
 
 <a name="ContactsServiceImpl.Modify"></a>
-### func \(\*ContactsServiceImpl\) [Modify](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L121>)
+### func \(\*ContactsServiceImpl\) [Modify](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/contacts/contactsService.go#L121>)
 
 ```go
 func (c *ContactsServiceImpl) Modify(ctx context.Context, contact Contact) (bool, error)

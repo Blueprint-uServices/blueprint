@@ -50,7 +50,7 @@ import "github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
 
 
 <a name="ExecuteTemplate"></a>
-## func [ExecuteTemplate](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/template.go#L20>)
+## func [ExecuteTemplate](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/template.go#L20>)
 
 ```go
 func ExecuteTemplate(name string, body string, args any) (string, error)
@@ -59,7 +59,7 @@ func ExecuteTemplate(name string, body string, args any) (string, error)
 
 
 <a name="ExecuteTemplateToFile"></a>
-## func [ExecuteTemplateToFile](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/template.go#L34>)
+## func [ExecuteTemplateToFile](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/template.go#L34>)
 
 ```go
 func ExecuteTemplateToFile(name string, body string, args any, filename string) error
@@ -68,7 +68,7 @@ func ExecuteTemplateToFile(name string, body string, args any, filename string) 
 
 
 <a name="Imports"></a>
-## type [Imports](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/imports.go#L23-L29>)
+## type [Imports](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/imports.go#L23-L29>)
 
 A helper struct for managing imports in generated golang files.
 
@@ -85,7 +85,7 @@ type Imports struct {
 ```
 
 <a name="NewImports"></a>
-### func [NewImports](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/imports.go#L35>)
+### func [NewImports](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/imports.go#L35>)
 
 ```go
 func NewImports(packageName string) *Imports
@@ -94,7 +94,7 @@ func NewImports(packageName string) *Imports
 Creates a new ImportedPackages struct, treating the provided fully\-qualified packageName as the "current" package
 
 <a name="Imports.AddPackage"></a>
-### func \(\*Imports\) [AddPackage](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/imports.go#L45>)
+### func \(\*Imports\) [AddPackage](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/imports.go#L45>)
 
 ```go
 func (imports *Imports) AddPackage(pkg string) string
@@ -103,7 +103,7 @@ func (imports *Imports) AddPackage(pkg string) string
 
 
 <a name="Imports.AddPackages"></a>
-### func \(\*Imports\) [AddPackages](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/imports.go#L74>)
+### func \(\*Imports\) [AddPackages](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/imports.go#L74>)
 
 ```go
 func (imports *Imports) AddPackages(pkgs ...string)
@@ -112,7 +112,7 @@ func (imports *Imports) AddPackages(pkgs ...string)
 
 
 <a name="Imports.AddType"></a>
-### func \(\*Imports\) [AddType](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/imports.go#L80>)
+### func \(\*Imports\) [AddType](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/imports.go#L80>)
 
 ```go
 func (imports *Imports) AddType(typeName gocode.TypeName)
@@ -121,7 +121,7 @@ func (imports *Imports) AddType(typeName gocode.TypeName)
 
 
 <a name="Imports.NameOf"></a>
-### func \(\*Imports\) [NameOf](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/imports.go#L137>)
+### func \(\*Imports\) [NameOf](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/imports.go#L137>)
 
 ```go
 func (imports *Imports) NameOf(typeName gocode.TypeName) string
@@ -130,7 +130,7 @@ func (imports *Imports) NameOf(typeName gocode.TypeName) string
 
 
 <a name="Imports.Qualify"></a>
-### func \(\*Imports\) [Qualify](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/imports.go#L127>)
+### func \(\*Imports\) [Qualify](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/imports.go#L127>)
 
 ```go
 func (imports *Imports) Qualify(pkg string, name string) string
@@ -139,7 +139,7 @@ func (imports *Imports) Qualify(pkg string, name string) string
 
 
 <a name="Imports.String"></a>
-### func \(\*Imports\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/imports.go#L114>)
+### func \(\*Imports\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/imports.go#L114>)
 
 ```go
 func (imports *Imports) String() string
@@ -148,7 +148,7 @@ func (imports *Imports) String() string
 
 
 <a name="ModuleBuilderImpl"></a>
-## type [ModuleBuilderImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L20-L25>)
+## type [ModuleBuilderImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L20-L25>)
 
 Implements the ModuleBuilder interface defined in golang/ir.go
 
@@ -165,7 +165,7 @@ type ModuleBuilderImpl struct {
 ```
 
 <a name="NewModuleBuilder"></a>
-### func [NewModuleBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L33>)
+### func [NewModuleBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L33>)
 
 ```go
 func NewModuleBuilder(workspace *WorkspaceBuilderImpl, moduleName string) (*ModuleBuilderImpl, error)
@@ -176,7 +176,7 @@ This method is used by plugins if they want to generate their own Go module from
 After dependencies and code have been added to the module, plugins must call Generate on the Generated Module to finish building it.
 
 <a name="ModuleBuilderImpl.Build"></a>
-### func \(\*ModuleBuilderImpl\) [Build](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L88>)
+### func \(\*ModuleBuilderImpl\) [Build](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L88>)
 
 ```go
 func (module *ModuleBuilderImpl) Build(nodes []ir.IRNode) error
@@ -185,7 +185,7 @@ func (module *ModuleBuilderImpl) Build(nodes []ir.IRNode) error
 
 
 <a name="ModuleBuilderImpl.CreatePackage"></a>
-### func \(\*ModuleBuilderImpl\) [CreatePackage](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L54>)
+### func \(\*ModuleBuilderImpl\) [CreatePackage](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L54>)
 
 ```go
 func (module *ModuleBuilderImpl) CreatePackage(packageName string) (golang.PackageInfo, error)
@@ -194,7 +194,7 @@ func (module *ModuleBuilderImpl) CreatePackage(packageName string) (golang.Packa
 
 
 <a name="ModuleBuilderImpl.ImplementsBuildContext"></a>
-### func \(\*ModuleBuilderImpl\) [ImplementsBuildContext](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L108>)
+### func \(\*ModuleBuilderImpl\) [ImplementsBuildContext](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L108>)
 
 ```go
 func (module *ModuleBuilderImpl) ImplementsBuildContext()
@@ -203,7 +203,7 @@ func (module *ModuleBuilderImpl) ImplementsBuildContext()
 
 
 <a name="ModuleBuilderImpl.Info"></a>
-### func \(\*ModuleBuilderImpl\) [Info](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L46>)
+### func \(\*ModuleBuilderImpl\) [Info](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L46>)
 
 ```go
 func (module *ModuleBuilderImpl) Info() golang.ModuleInfo
@@ -212,7 +212,7 @@ func (module *ModuleBuilderImpl) Info() golang.ModuleInfo
 
 
 <a name="ModuleBuilderImpl.Workspace"></a>
-### func \(\*ModuleBuilderImpl\) [Workspace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L84>)
+### func \(\*ModuleBuilderImpl\) [Workspace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L84>)
 
 ```go
 func (module *ModuleBuilderImpl) Workspace() golang.WorkspaceBuilder
@@ -221,7 +221,7 @@ func (module *ModuleBuilderImpl) Workspace() golang.WorkspaceBuilder
 
 
 <a name="NamespaceBuilderImpl"></a>
-## type [NamespaceBuilderImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L34-L47>)
+## type [NamespaceBuilderImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L34-L47>)
 
 Implements the \[ir.NamespaceBuilder\] interface defined in gogen/ir.go
 
@@ -258,7 +258,7 @@ type NamespaceBuilderImpl struct {
 ```
 
 <a name="NewNamespaceBuilder"></a>
-### func [NewNamespaceBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L52>)
+### func [NewNamespaceBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L52>)
 
 ```go
 func NewNamespaceBuilder(module golang.ModuleBuilder, name, fileName, packagePath, funcName string) (*NamespaceBuilderImpl, error)
@@ -267,7 +267,7 @@ func NewNamespaceBuilder(module golang.ModuleBuilder, name, fileName, packagePat
 Create a new NamespaceBuilder
 
 <a name="NamespaceBuilderImpl.Build"></a>
-### func \(\*NamespaceBuilderImpl\) [Build](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L284>)
+### func \(\*NamespaceBuilderImpl\) [Build](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L284>)
 
 ```go
 func (code *NamespaceBuilderImpl) Build() error
@@ -276,7 +276,7 @@ func (code *NamespaceBuilderImpl) Build() error
 Generates the file within its module
 
 <a name="NamespaceBuilderImpl.Declare"></a>
-### func \(\*NamespaceBuilderImpl\) [Declare](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L123>)
+### func \(\*NamespaceBuilderImpl\) [Declare](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L123>)
 
 ```go
 func (n *NamespaceBuilderImpl) Declare(name, buildFuncSrc string) error
@@ -285,7 +285,7 @@ func (n *NamespaceBuilderImpl) Declare(name, buildFuncSrc string) error
 
 
 <a name="NamespaceBuilderImpl.DeclareConstructor"></a>
-### func \(\*NamespaceBuilderImpl\) [DeclareConstructor](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L159>)
+### func \(\*NamespaceBuilderImpl\) [DeclareConstructor](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L159>)
 
 ```go
 func (namespace *NamespaceBuilderImpl) DeclareConstructor(name string, constructor *gocode.Constructor, args []ir.IRNode) error
@@ -294,7 +294,7 @@ func (namespace *NamespaceBuilderImpl) DeclareConstructor(name string, construct
 
 
 <a name="NamespaceBuilderImpl.ImplementsBuildContext"></a>
-### func \(\*NamespaceBuilderImpl\) [ImplementsBuildContext](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L289>)
+### func \(\*NamespaceBuilderImpl\) [ImplementsBuildContext](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L289>)
 
 ```go
 func (code *NamespaceBuilderImpl) ImplementsBuildContext()
@@ -303,7 +303,7 @@ func (code *NamespaceBuilderImpl) ImplementsBuildContext()
 
 
 <a name="NamespaceBuilderImpl.Import"></a>
-### func \(\*NamespaceBuilderImpl\) [Import](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L94>)
+### func \(\*NamespaceBuilderImpl\) [Import](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L94>)
 
 ```go
 func (n *NamespaceBuilderImpl) Import(packageName string) string
@@ -312,7 +312,7 @@ func (n *NamespaceBuilderImpl) Import(packageName string) string
 
 
 <a name="NamespaceBuilderImpl.ImportType"></a>
-### func \(\*NamespaceBuilderImpl\) [ImportType](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L98>)
+### func \(\*NamespaceBuilderImpl\) [ImportType](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L98>)
 
 ```go
 func (n *NamespaceBuilderImpl) ImportType(typeName gocode.TypeName) string
@@ -321,7 +321,7 @@ func (n *NamespaceBuilderImpl) ImportType(typeName gocode.TypeName) string
 
 
 <a name="NamespaceBuilderImpl.Info"></a>
-### func \(\*NamespaceBuilderImpl\) [Info](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L85>)
+### func \(\*NamespaceBuilderImpl\) [Info](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L85>)
 
 ```go
 func (n *NamespaceBuilderImpl) Info() golang.NamespaceInfo
@@ -330,7 +330,7 @@ func (n *NamespaceBuilderImpl) Info() golang.NamespaceInfo
 
 
 <a name="NamespaceBuilderImpl.Instantiate"></a>
-### func \(\*NamespaceBuilderImpl\) [Instantiate](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L114>)
+### func \(\*NamespaceBuilderImpl\) [Instantiate](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L114>)
 
 ```go
 func (n *NamespaceBuilderImpl) Instantiate(name string)
@@ -339,7 +339,7 @@ func (n *NamespaceBuilderImpl) Instantiate(name string)
 
 
 <a name="NamespaceBuilderImpl.Module"></a>
-### func \(\*NamespaceBuilderImpl\) [Module](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L102>)
+### func \(\*NamespaceBuilderImpl\) [Module](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L102>)
 
 ```go
 func (n *NamespaceBuilderImpl) Module() golang.ModuleBuilder
@@ -348,7 +348,7 @@ func (n *NamespaceBuilderImpl) Module() golang.ModuleBuilder
 
 
 <a name="NamespaceBuilderImpl.OptionalArg"></a>
-### func \(\*NamespaceBuilderImpl\) [OptionalArg](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L110>)
+### func \(\*NamespaceBuilderImpl\) [OptionalArg](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L110>)
 
 ```go
 func (n *NamespaceBuilderImpl) OptionalArg(name, description string)
@@ -357,7 +357,7 @@ func (n *NamespaceBuilderImpl) OptionalArg(name, description string)
 
 
 <a name="NamespaceBuilderImpl.RequiredArg"></a>
-### func \(\*NamespaceBuilderImpl\) [RequiredArg](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L106>)
+### func \(\*NamespaceBuilderImpl\) [RequiredArg](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L106>)
 
 ```go
 func (n *NamespaceBuilderImpl) RequiredArg(name, description string)
@@ -366,7 +366,7 @@ func (n *NamespaceBuilderImpl) RequiredArg(name, description string)
 
 
 <a name="WorkspaceBuilderImpl"></a>
-## type [WorkspaceBuilderImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L26-L32>)
+## type [WorkspaceBuilderImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L26-L32>)
 
 Implements the WorkspaceBuilder interface defined in golang/ir.go
 
@@ -383,7 +383,7 @@ type WorkspaceBuilderImpl struct {
 ```
 
 <a name="NewWorkspaceBuilder"></a>
-### func [NewWorkspaceBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L39>)
+### func [NewWorkspaceBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L39>)
 
 ```go
 func NewWorkspaceBuilder(workspaceDir string) (*WorkspaceBuilderImpl, error)
@@ -394,7 +394,7 @@ Creates a new WorkspaceBuilder at the specified output dir.
 Will return an error if the workspacedir already exists
 
 <a name="WorkspaceBuilderImpl.AddLocalModule"></a>
-### func \(\*WorkspaceBuilderImpl\) [AddLocalModule](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L90>)
+### func \(\*WorkspaceBuilderImpl\) [AddLocalModule](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L90>)
 
 ```go
 func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSrcPath string) (string, error)
@@ -403,7 +403,7 @@ func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSr
 
 
 <a name="WorkspaceBuilderImpl.AddLocalModuleRelative"></a>
-### func \(\*WorkspaceBuilderImpl\) [AddLocalModuleRelative](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L146>)
+### func \(\*WorkspaceBuilderImpl\) [AddLocalModuleRelative](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L146>)
 
 ```go
 func (workspace *WorkspaceBuilderImpl) AddLocalModuleRelative(shortName string, relativeModuleSrcPath string) (string, error)
@@ -414,7 +414,7 @@ This method is used by plugins if they want to copy a locally\-defined module in
 The specified relativeModuleSrcPath must point to a valid Go module with a go.mod file, relative to the calling file's location.
 
 <a name="WorkspaceBuilderImpl.CreateModule"></a>
-### func \(\*WorkspaceBuilderImpl\) [CreateModule](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L54>)
+### func \(\*WorkspaceBuilderImpl\) [CreateModule](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L54>)
 
 ```go
 func (workspace *WorkspaceBuilderImpl) CreateModule(moduleName string, moduleVersion string) (string, error)
@@ -423,7 +423,7 @@ func (workspace *WorkspaceBuilderImpl) CreateModule(moduleName string, moduleVer
 
 
 <a name="WorkspaceBuilderImpl.Finish"></a>
-### func \(\*WorkspaceBuilderImpl\) [Finish](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L185>)
+### func \(\*WorkspaceBuilderImpl\) [Finish](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L185>)
 
 ```go
 func (workspace *WorkspaceBuilderImpl) Finish() error
@@ -437,7 +437,7 @@ The method will do the following:
 - updates the go.mod files of all contained modules with 'replace' directives for any required modules that exist in the workspace
 
 <a name="WorkspaceBuilderImpl.GetLocalModule"></a>
-### func \(\*WorkspaceBuilderImpl\) [GetLocalModule](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L135>)
+### func \(\*WorkspaceBuilderImpl\) [GetLocalModule](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L135>)
 
 ```go
 func (workspace *WorkspaceBuilderImpl) GetLocalModule(modulePath string) (string, bool)
@@ -446,7 +446,7 @@ func (workspace *WorkspaceBuilderImpl) GetLocalModule(modulePath string) (string
 
 
 <a name="WorkspaceBuilderImpl.ImplementsBuildContext"></a>
-### func \(\*WorkspaceBuilderImpl\) [ImplementsBuildContext](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L272>)
+### func \(\*WorkspaceBuilderImpl\) [ImplementsBuildContext](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L272>)
 
 ```go
 func (workspace *WorkspaceBuilderImpl) ImplementsBuildContext()
@@ -455,7 +455,7 @@ func (workspace *WorkspaceBuilderImpl) ImplementsBuildContext()
 
 
 <a name="WorkspaceBuilderImpl.Info"></a>
-### func \(\*WorkspaceBuilderImpl\) [Info](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L48>)
+### func \(\*WorkspaceBuilderImpl\) [Info](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L48>)
 
 ```go
 func (workspace *WorkspaceBuilderImpl) Info() golang.WorkspaceInfo

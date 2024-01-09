@@ -28,7 +28,7 @@ The UserService thus uses three collections for the above information. To get th
 
 
 <a name="Address"></a>
-## type Address
+## type [Address](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/user/userservice.go#L82-L89>)
 
 A street address
 
@@ -44,7 +44,7 @@ type Address struct {
 ```
 
 <a name="Card"></a>
-## type Card
+## type [Card](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/user/userservice.go#L92-L97>)
 
 A credit card
 
@@ -58,7 +58,7 @@ type Card struct {
 ```
 
 <a name="User"></a>
-## type User
+## type [User](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/user/userservice.go#L69-L79>)
 
 A user with an account. Accounts are optional for ordering.
 
@@ -77,7 +77,7 @@ type User struct {
 ```
 
 <a name="UserService"></a>
-## type UserService
+## type [UserService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/user/userservice.go#L34-L66>)
 
 UserService stores information about user accounts. Having a user account is optional, and not required for placing orders. UserService also stores addresses and credit card details used in orders that aren't associated with a user account.
 
@@ -118,7 +118,7 @@ type UserService interface {
 ```
 
 <a name="NewUserServiceImpl"></a>
-### func NewUserServiceImpl
+### func [NewUserServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/user/userservice.go#L113>)
 
 ```go
 func NewUserServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (UserService, error)

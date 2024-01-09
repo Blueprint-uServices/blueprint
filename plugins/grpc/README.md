@@ -27,7 +27,7 @@ To use this plugin requires the protocol buffers and grpc compilers are installe
 
 
 <a name="Deploy"></a>
-## func [Deploy](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/wiring.go#L46>)
+## func [Deploy](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/wiring.go#L46>)
 
 ```go
 func Deploy(spec wiring.WiringSpec, serviceName string)

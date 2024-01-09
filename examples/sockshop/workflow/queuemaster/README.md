@@ -15,7 +15,7 @@ Package queuemaster implements the queue\-master SockShop service, responsible f
 
 
 <a name="QueueMaster"></a>
-## type QueueMaster
+## type [QueueMaster](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/queuemaster/queuemaster.go#L20-L25>)
 
 QueueMaster implements the SockShop queue\-master microservice.
 
@@ -31,7 +31,7 @@ type QueueMaster interface {
 ```
 
 <a name="NewQueueMaster"></a>
-### func NewQueueMaster
+### func [NewQueueMaster](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/queuemaster/queuemaster.go#L30>)
 
 ```go
 func NewQueueMaster(ctx context.Context, queue backend.Queue, shipping shipping.ShippingService) (QueueMaster, error)

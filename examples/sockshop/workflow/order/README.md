@@ -18,7 +18,7 @@ The service calls other services to collect information and then submits the ord
 
 
 <a name="Order"></a>
-## type Order
+## type [Order](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/order/orderservice.go#L39-L49>)
 
 A successfully placed order
 
@@ -37,7 +37,7 @@ type Order struct {
 ```
 
 <a name="OrderService"></a>
-## type OrderService
+## type [OrderService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/order/orderservice.go#L27-L36>)
 
 The service calls other services to collect information and then submits the order to the shipping service
 
@@ -55,7 +55,7 @@ type OrderService interface {
 ```
 
 <a name="NewOrderService"></a>
-### func NewOrderService
+### func [NewOrderService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/order/orderservice.go#L55>)
 
 ```go
 func NewOrderService(ctx context.Context, userService user.UserService, cartService cart.CartService, payments payment.PaymentService, shipping shipping.ShippingService, orderDB backend.NoSQLDatabase) (OrderService, error)

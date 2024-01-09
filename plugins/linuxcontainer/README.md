@@ -26,7 +26,7 @@ import "github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 
 
 <a name="AddProcessToContainer"></a>
-## func [AddProcessToContainer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L11>)
+## func [AddProcessToContainer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L11>)
 
 ```go
 func AddProcessToContainer(spec wiring.WiringSpec, containerName, childName string)
@@ -35,7 +35,7 @@ func AddProcessToContainer(spec wiring.WiringSpec, containerName, childName stri
 Adds a process to an existing container
 
 <a name="CreateContainer"></a>
-## func [CreateContainer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L26>)
+## func [CreateContainer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L26>)
 
 ```go
 func CreateContainer(spec wiring.WiringSpec, containerName string, children ...string) string
@@ -44,7 +44,7 @@ func CreateContainer(spec wiring.WiringSpec, containerName string, children ...s
 Adds a container that will explicitly instantiate all of the named child processes The container will also implicitly instantiate any of the dependencies of the children
 
 <a name="Deploy"></a>
-## func [Deploy](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L16>)
+## func [Deploy](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L16>)
 
 ```go
 func Deploy(spec wiring.WiringSpec, serviceName string) string
@@ -53,7 +53,7 @@ func Deploy(spec wiring.WiringSpec, serviceName string) string
 Wraps serviceName with a modifier that deploys the service inside a container
 
 <a name="RegisterAsDefaultBuilder"></a>
-## func [RegisterAsDefaultBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/defaults.go#L14>)
+## func [RegisterAsDefaultBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/defaults.go#L14>)
 
 ```go
 func RegisterAsDefaultBuilder()
@@ -62,7 +62,7 @@ func RegisterAsDefaultBuilder()
 to trigger module initialization and register builders
 
 <a name="Container"></a>
-## type [Container](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/ir.go#L13-L24>)
+## type [Container](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/ir.go#L13-L24>)
 
 
 
@@ -79,7 +79,7 @@ type Container struct {
 ```
 
 <a name="Container.Accepts"></a>
-### func \(\*Container\) [Accepts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L48>)
+### func \(\*Container\) [Accepts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L48>)
 
 ```go
 func (ctr *Container) Accepts(nodeType any) bool
@@ -88,7 +88,7 @@ func (ctr *Container) Accepts(nodeType any) bool
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Container.AddContainerArtifacts"></a>
-### func \(\*Container\) [AddContainerArtifacts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/deploy_docker.go#L54>)
+### func \(\*Container\) [AddContainerArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/deploy_docker.go#L54>)
 
 ```go
 func (node *Container) AddContainerArtifacts(target docker.ContainerWorkspace) error
@@ -97,7 +97,7 @@ func (node *Container) AddContainerArtifacts(target docker.ContainerWorkspace) e
 Implements dockerDeployer docker.ProvidesContainerImage
 
 <a name="Container.AddContainerInstance"></a>
-### func \(\*Container\) [AddContainerInstance](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/deploy_docker.go#L80>)
+### func \(\*Container\) [AddContainerInstance](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/deploy_docker.go#L80>)
 
 ```go
 func (node *Container) AddContainerInstance(target docker.ContainerWorkspace) error
@@ -106,7 +106,7 @@ func (node *Container) AddContainerInstance(target docker.ContainerWorkspace) er
 Implements dockerDeployer docker.ProvidesContainerInstance
 
 <a name="Container.AddEdge"></a>
-### func \(\*Container\) [AddEdge](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L54>)
+### func \(\*Container\) [AddEdge](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L54>)
 
 ```go
 func (ctr *Container) AddEdge(name string, edge ir.IRNode) error
@@ -115,7 +115,7 @@ func (ctr *Container) AddEdge(name string, edge ir.IRNode) error
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Container.AddNode"></a>
-### func \(\*Container\) [AddNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L60>)
+### func \(\*Container\) [AddNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L60>)
 
 ```go
 func (ctr *Container) AddNode(name string, node ir.IRNode) error
@@ -124,7 +124,7 @@ func (ctr *Container) AddNode(name string, node ir.IRNode) error
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Container.GenerateArtifacts"></a>
-### func \(\*Container\) [GenerateArtifacts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/deploy.go#L69>)
+### func \(\*Container\) [GenerateArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/deploy.go#L69>)
 
 ```go
 func (node *Container) GenerateArtifacts(dir string) error
@@ -139,7 +139,7 @@ Collects process artifacts into a directory on the local filesystem and generate
 The output processes will be runnable in the local environment.
 
 <a name="Container.ImplementsDockerContainer"></a>
-### func \(\*Container\) [ImplementsDockerContainer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/deploy_docker.go#L126>)
+### func \(\*Container\) [ImplementsDockerContainer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/deploy_docker.go#L126>)
 
 ```go
 func (node *Container) ImplementsDockerContainer()
@@ -148,7 +148,7 @@ func (node *Container) ImplementsDockerContainer()
 
 
 <a name="Container.Name"></a>
-### func \(\*Container\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/ir.go#L35>)
+### func \(\*Container\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/ir.go#L35>)
 
 ```go
 func (ctr *Container) Name() string
@@ -157,7 +157,7 @@ func (ctr *Container) Name() string
 Implements ir.IRNode
 
 <a name="Container.String"></a>
-### func \(\*Container\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/ir.go#L40>)
+### func \(\*Container\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/ir.go#L40>)
 
 ```go
 func (ctr *Container) String() string
@@ -166,7 +166,7 @@ func (ctr *Container) String() string
 Implements ir.IRNode
 
 <a name="LinuxContainerNamespace"></a>
-## type [LinuxContainerNamespace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L43-L45>)
+## type [LinuxContainerNamespace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L43-L45>)
 
 A \[wiring.NamespaceHandler\] used to build golang process nodes
 

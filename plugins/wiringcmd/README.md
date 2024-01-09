@@ -24,7 +24,7 @@ It is a helper package for building wiring spec command line programs. The Bluep
 
 
 <a name="MakeAndExecute"></a>
-## func [MakeAndExecute](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L43>)
+## func [MakeAndExecute](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L43>)
 
 ```go
 func MakeAndExecute(name string, specs ...SpecOption)
@@ -33,7 +33,7 @@ func MakeAndExecute(name string, specs ...SpecOption)
 
 
 <a name="CmdBuilder"></a>
-## type [CmdBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L31-L41>)
+## type [CmdBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L31-L41>)
 
 A helper struct when a Blueprint application supports multiple different wiring specs. Makes it easy to choose which spec to compile. See the Blueprint example applications for usage
 
@@ -52,7 +52,7 @@ type CmdBuilder struct {
 ```
 
 <a name="NewCmdBuilder"></a>
-### func [NewCmdBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L59>)
+### func [NewCmdBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L59>)
 
 ```go
 func NewCmdBuilder(applicationName string) *CmdBuilder
@@ -61,7 +61,7 @@ func NewCmdBuilder(applicationName string) *CmdBuilder
 
 
 <a name="CmdBuilder.Add"></a>
-### func \(\*CmdBuilder\) [Add](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L66>)
+### func \(\*CmdBuilder\) [Add](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L66>)
 
 ```go
 func (b *CmdBuilder) Add(specs ...SpecOption)
@@ -70,7 +70,7 @@ func (b *CmdBuilder) Add(specs ...SpecOption)
 
 
 <a name="CmdBuilder.Build"></a>
-### func \(\*CmdBuilder\) [Build](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L116>)
+### func \(\*CmdBuilder\) [Build](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L116>)
 
 ```go
 func (b *CmdBuilder) Build() error
@@ -79,7 +79,7 @@ func (b *CmdBuilder) Build() error
 
 
 <a name="CmdBuilder.List"></a>
-### func \(\*CmdBuilder\) [List](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L108>)
+### func \(\*CmdBuilder\) [List](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L108>)
 
 ```go
 func (builder *CmdBuilder) List() string
@@ -88,7 +88,7 @@ func (builder *CmdBuilder) List() string
 Returns a list of configured wiring specs
 
 <a name="CmdBuilder.ParseArgs"></a>
-### func \(\*CmdBuilder\) [ParseArgs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L72>)
+### func \(\*CmdBuilder\) [ParseArgs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L72>)
 
 ```go
 func (b *CmdBuilder) ParseArgs()
@@ -97,7 +97,7 @@ func (b *CmdBuilder) ParseArgs()
 
 
 <a name="CmdBuilder.ValidateArgs"></a>
-### func \(\*CmdBuilder\) [ValidateArgs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L84>)
+### func \(\*CmdBuilder\) [ValidateArgs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L84>)
 
 ```go
 func (b *CmdBuilder) ValidateArgs() error
@@ -106,7 +106,7 @@ func (b *CmdBuilder) ValidateArgs() error
 
 
 <a name="SpecOption"></a>
-## type [SpecOption](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L22-L26>)
+## type [SpecOption](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L22-L26>)
 
 
 

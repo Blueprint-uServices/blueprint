@@ -18,7 +18,7 @@ All the shipping microservice does is push the shipment to a queue. The queue\-m
 
 
 <a name="Shipment"></a>
-## type Shipment
+## type [Shipment](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/shipping/shippingservice.go#L32-L36>)
 
 Represents a shipment for an order
 
@@ -31,7 +31,7 @@ type Shipment struct {
 ```
 
 <a name="ShippingService"></a>
-## type ShippingService
+## type [ShippingService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/shipping/shippingservice.go#L17-L29>)
 
 ShippingService implements the SockShop shipping microservice
 
@@ -52,7 +52,7 @@ type ShippingService interface {
 ```
 
 <a name="NewShippingService"></a>
-### func NewShippingService
+### func [NewShippingService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/shipping/shippingservice.go#L39>)
 
 ```go
 func NewShippingService(ctx context.Context, queue backend.Queue, db backend.NoSQLDatabase) (ShippingService, error)

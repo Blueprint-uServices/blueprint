@@ -26,7 +26,7 @@ import "github.com/blueprint-uservices/blueprint/plugins/golang"
 
 
 <a name="AddRuntimeModule"></a>
-## func [AddRuntimeModule](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/helpers.go#L45>)
+## func [AddRuntimeModule](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/helpers.go#L45>)
 
 ```go
 func AddRuntimeModule(workspace WorkspaceBuilder) error
@@ -35,7 +35,7 @@ func AddRuntimeModule(workspace WorkspaceBuilder) error
 
 
 <a name="GetGoInterface"></a>
-## func [GetGoInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/helpers.go#L19>)
+## func [GetGoInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/helpers.go#L19>)
 
 ```go
 func GetGoInterface(ctx ir.BuildContext, node ir.IRNode) (*gocode.ServiceInterface, error)
@@ -46,7 +46,7 @@ Helper method that does typecasting on builder and service.
 Assumes builder is a golang module builder, and service is a golang module; if so, gets the golang service interface for the service. If not, returns an error.
 
 <a name="GeneratesFuncs"></a>
-## type [GeneratesFuncs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/ir.go#L124-L130>)
+## type [GeneratesFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L124-L130>)
 
 Some IRNodes generate implementations of service interfaces. This interface should be used to do so. This is
 
@@ -72,7 +72,7 @@ type GeneratesFuncs interface {
 ```
 
 <a name="Instantiable"></a>
-## type [Instantiable](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/ir.go#L76-L82>)
+## type [Instantiable](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L76-L82>)
 
 This is an interface for IRNodes that can be used by plugins that want to be able to instantiate things in
 
@@ -101,7 +101,7 @@ type Instantiable interface {
 ```
 
 <a name="ModuleBuilder"></a>
-## type [ModuleBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/ir.go#L237-L257>)
+## type [ModuleBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L237-L257>)
 
 ModuleBuilder is used by IRNodes for plugins that want to generate Golang code and collect it into a module.
 
@@ -142,7 +142,7 @@ type ModuleBuilder interface {
 ```
 
 <a name="ModuleInfo"></a>
-## type [ModuleInfo](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/ir.go#L211-L215>)
+## type [ModuleInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L211-L215>)
 
 APIs used by the above IR nodes when they are generating code.
 
@@ -157,7 +157,7 @@ type ModuleInfo struct {
 ```
 
 <a name="NamespaceBuilder"></a>
-## type [NamespaceBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/ir.go#L307-L369>)
+## type [NamespaceBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L307-L369>)
 
 NamespaceBuilder is used by IRNodes that implement the Instantiable interface. The NamespaceBuilder provides
 
@@ -269,7 +269,7 @@ type NamespaceBuilder interface {
 ```
 
 <a name="NamespaceInfo"></a>
-## type [NamespaceInfo](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/ir.go#L259-L264>)
+## type [NamespaceInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L259-L264>)
 
 APIs used by the above IR nodes when they are generating code.
 
@@ -285,7 +285,7 @@ type NamespaceInfo struct {
 ```
 
 <a name="Node"></a>
-## type [Node](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/ir.go#L32-L35>)
+## type [Node](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L32-L35>)
 
 golang.Node is the base IRNode interface that should be implemented by any IRNode that
 
@@ -301,7 +301,7 @@ type Node interface {
 ```
 
 <a name="PackageInfo"></a>
-## type [PackageInfo](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/ir.go#L217-L222>)
+## type [PackageInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L217-L222>)
 
 APIs used by the above IR nodes when they are generating code.
 
@@ -317,7 +317,7 @@ type PackageInfo struct {
 ```
 
 <a name="ProvidesInterface"></a>
-## type [ProvidesInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/ir.go#L99-L111>)
+## type [ProvidesInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L99-L111>)
 
 Service nodes need to include interface definitions that callers of the code depend on. The most basic
 
@@ -353,7 +353,7 @@ type ProvidesInterface interface {
 ```
 
 <a name="ProvidesModule"></a>
-## type [ProvidesModule](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/ir.go#L140-L146>)
+## type [ProvidesModule](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L140-L146>)
 
 This is an interface for IRNodes for plugins that want to include standalone modules in the output workspace.
 
@@ -376,7 +376,7 @@ type ProvidesModule interface {
 ```
 
 <a name="Service"></a>
-## type [Service](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/ir.go#L49-L55>)
+## type [Service](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L49-L55>)
 
 golang.Service is a golang.Node that exposes an interface that can be directly invoked
 
@@ -403,7 +403,7 @@ type Service interface {
 ```
 
 <a name="WorkspaceBuilder"></a>
-## type [WorkspaceBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/ir.go#L166-L209>)
+## type [WorkspaceBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L166-L209>)
 
 WorkspaceBuilder is used by plugins if they want to collect and combine Golang code and modules.
 
@@ -461,7 +461,7 @@ type WorkspaceBuilder interface {
 ```
 
 <a name="WorkspaceInfo"></a>
-## type [WorkspaceInfo](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/golang/ir.go#L155-L157>)
+## type [WorkspaceInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L155-L157>)
 
 APIs used by the above IR nodes when they are generating code.
 

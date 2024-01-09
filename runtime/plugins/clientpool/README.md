@@ -22,7 +22,7 @@ ClientPools do not need to be used directly by application workflow specs. Inste
 
 
 <a name="ClientPool"></a>
-## type [ClientPool](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/clientpool/clientpool.go#L16-L23>)
+## type [ClientPool](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/clientpool/clientpool.go#L16-L23>)
 
 A ClientPool that contains up to Capacity clients. Clients are acquired with Pop and returned with Push.
 
@@ -33,7 +33,7 @@ type ClientPool[T any] struct {
 ```
 
 <a name="NewClientPool"></a>
-### func [NewClientPool](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/clientpool/clientpool.go#L30>)
+### func [NewClientPool](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/clientpool/clientpool.go#L30>)
 
 ```go
 func NewClientPool[T any](capacity int, build func() (T, error)) *ClientPool[T]
@@ -44,7 +44,7 @@ Instantiates a [ClientPool](<#ClientPool>) that will have up to maxClients clien
 Callers acquire a client instance by calling [ClientPool.Pop](<#ClientPool.Pop>), and when they are finished with a client, return it to the pool by calling [ClientPool.Push](<#ClientPool.Push>)
 
 <a name="ClientPool[T].Available"></a>
-### func \(\*ClientPool\[T\]\) [Available](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/clientpool/clientpool.go#L99>)
+### func \(\*ClientPool\[T\]\) [Available](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/clientpool/clientpool.go#L99>)
 
 ```go
 func (pool *ClientPool[T]) Available() int
@@ -53,7 +53,7 @@ func (pool *ClientPool[T]) Available() int
 Returns the current number of available clients in the client pool
 
 <a name="ClientPool[T].Capacity"></a>
-### func \(\*ClientPool\[T\]\) [Capacity](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/clientpool/clientpool.go#L89>)
+### func \(\*ClientPool\[T\]\) [Capacity](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/clientpool/clientpool.go#L89>)
 
 ```go
 func (pool *ClientPool[T]) Capacity() int
@@ -62,7 +62,7 @@ func (pool *ClientPool[T]) Capacity() int
 Returns the capacity of the client pool
 
 <a name="ClientPool[T].Pop"></a>
-### func \(\*ClientPool\[T\]\) [Pop](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/clientpool/clientpool.go#L46>)
+### func \(\*ClientPool\[T\]\) [Pop](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/clientpool/clientpool.go#L46>)
 
 ```go
 func (pool *ClientPool[T]) Pop(ctx context.Context) (client T, err error)
@@ -73,7 +73,7 @@ Acquires a client from the pool, blocking if all clients are currently in use.
 When a caller has finished using a client, it \*must\* call [ClientPool.Push](<#ClientPool.Push>) to return the client to the pool.
 
 <a name="ClientPool[T].Push"></a>
-### func \(\*ClientPool\[T\]\) [Push](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/clientpool/clientpool.go#L83>)
+### func \(\*ClientPool\[T\]\) [Push](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/clientpool/clientpool.go#L83>)
 
 ```go
 func (pool *ClientPool[T]) Push(client T)
@@ -82,7 +82,7 @@ func (pool *ClientPool[T]) Push(client T)
 Returns a client to the pool.
 
 <a name="ClientPool[T].Size"></a>
-### func \(\*ClientPool\[T\]\) [Size](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/clientpool/clientpool.go#L94>)
+### func \(\*ClientPool\[T\]\) [Size](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/clientpool/clientpool.go#L94>)
 
 ```go
 func (pool *ClientPool[T]) Size() int

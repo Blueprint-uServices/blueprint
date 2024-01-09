@@ -31,7 +31,7 @@ retries.AddRetriesWithTimeouts(spec, "my_service", 10, "1s") // Adds retries and
 
 
 <a name="AddRetries"></a>
-## func [AddRetries](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/wiring.go#L27>)
+## func [AddRetries](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L27>)
 
 ```go
 func AddRetries(spec wiring.WiringSpec, serviceName string, max_retries int64)
@@ -44,7 +44,7 @@ AddRetries(spec, "my_service", 10)
 ```
 
 <a name="AddRetriesWithTimeouts"></a>
-## func [AddRetriesWithTimeouts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/wiring.go#L63>)
+## func [AddRetriesWithTimeouts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L63>)
 
 ```go
 func AddRetriesWithTimeouts(spec wiring.WiringSpec, serviceName string, max_retries int64, timeout string)
@@ -71,7 +71,7 @@ AddRetriesWithTimeouts(spec, "my_service", 10, "1s")
 ```
 
 <a name="RetrierClient"></a>
-## type [RetrierClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L15-L25>)
+## type [RetrierClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L15-L25>)
 
 Blueprint IR node representing a Retrier
 
@@ -90,7 +90,7 @@ type RetrierClient struct {
 ```
 
 <a name="RetrierClient.AddInstantiation"></a>
-### func \(\*RetrierClient\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L73>)
+### func \(\*RetrierClient\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L73>)
 
 ```go
 func (node *RetrierClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -99,7 +99,7 @@ func (node *RetrierClient) AddInstantiation(builder golang.NamespaceBuilder) err
 
 
 <a name="RetrierClient.AddInterfaces"></a>
-### func \(\*RetrierClient\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L52>)
+### func \(\*RetrierClient\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L52>)
 
 ```go
 func (node *RetrierClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -108,7 +108,7 @@ func (node *RetrierClient) AddInterfaces(builder golang.ModuleBuilder) error
 
 
 <a name="RetrierClient.GenerateFuncs"></a>
-### func \(\*RetrierClient\) [GenerateFuncs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L60>)
+### func \(\*RetrierClient\) [GenerateFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L60>)
 
 ```go
 func (node *RetrierClient) GenerateFuncs(builder golang.ModuleBuilder) error
@@ -117,7 +117,7 @@ func (node *RetrierClient) GenerateFuncs(builder golang.ModuleBuilder) error
 
 
 <a name="RetrierClient.GetInterface"></a>
-### func \(\*RetrierClient\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L56>)
+### func \(\*RetrierClient\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L56>)
 
 ```go
 func (node *RetrierClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -126,7 +126,7 @@ func (node *RetrierClient) GetInterface(ctx ir.BuildContext) (service.ServiceInt
 
 
 <a name="RetrierClient.ImplementsGolangNode"></a>
-### func \(\*RetrierClient\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L27>)
+### func \(\*RetrierClient\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L27>)
 
 ```go
 func (node *RetrierClient) ImplementsGolangNode()
@@ -135,7 +135,7 @@ func (node *RetrierClient) ImplementsGolangNode()
 
 
 <a name="RetrierClient.Name"></a>
-### func \(\*RetrierClient\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L29>)
+### func \(\*RetrierClient\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L29>)
 
 ```go
 func (node *RetrierClient) Name() string
@@ -144,7 +144,7 @@ func (node *RetrierClient) Name() string
 
 
 <a name="RetrierClient.String"></a>
-### func \(\*RetrierClient\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/retries/ir.go#L33>)
+### func \(\*RetrierClient\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L33>)
 
 ```go
 func (node *RetrierClient) String() string

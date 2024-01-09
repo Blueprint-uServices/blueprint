@@ -13,7 +13,7 @@ import "github.com/blueprint-uservices/blueprint/plugins/http/httpcodegen"
 
 
 <a name="GenerateClient"></a>
-## func [GenerateClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/httpcodegen/clientgen.go#L14>)
+## func [GenerateClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/httpcodegen/clientgen.go#L14>)
 
 ```go
 func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error
@@ -22,7 +22,7 @@ func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 This function is used by the HTTP plugin to generate the client\-side HTTP service
 
 <a name="GenerateServerHandler"></a>
-## func [GenerateServerHandler](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/httpcodegen/servergen.go#L16>)
+## func [GenerateServerHandler](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/httpcodegen/servergen.go#L16>)
 
 ```go
 func GenerateServerHandler(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error

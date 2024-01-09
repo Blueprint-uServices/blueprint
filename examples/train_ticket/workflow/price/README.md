@@ -24,7 +24,7 @@ Package price provides an implementation of the PriceService PriceService uses a
 
 
 <a name="PriceConfig"></a>
-## type [PriceConfig](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/price/data.go#L3-L9>)
+## type [PriceConfig](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/price/data.go#L3-L9>)
 
 
 
@@ -39,7 +39,7 @@ type PriceConfig struct {
 ```
 
 <a name="PriceService"></a>
-## type [PriceService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L14-L22>)
+## type [PriceService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L14-L22>)
 
 
 
@@ -56,7 +56,7 @@ type PriceService interface {
 ```
 
 <a name="PriceServiceImpl"></a>
-## type [PriceServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L24-L26>)
+## type [PriceServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L24-L26>)
 
 
 
@@ -67,7 +67,7 @@ type PriceServiceImpl struct {
 ```
 
 <a name="NewPriceServiceImpl"></a>
-### func [NewPriceServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L28>)
+### func [NewPriceServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L28>)
 
 ```go
 func NewPriceServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*PriceServiceImpl, error)
@@ -76,7 +76,7 @@ func NewPriceServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*PriceS
 
 
 <a name="PriceServiceImpl.CreateNewPriceConfig"></a>
-### func \(\*PriceServiceImpl\) [CreateNewPriceConfig](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L88>)
+### func \(\*PriceServiceImpl\) [CreateNewPriceConfig](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L88>)
 
 ```go
 func (p *PriceServiceImpl) CreateNewPriceConfig(ctx context.Context, pc PriceConfig) error
@@ -85,7 +85,7 @@ func (p *PriceServiceImpl) CreateNewPriceConfig(ctx context.Context, pc PriceCon
 
 
 <a name="PriceServiceImpl.DeletePriceConfig"></a>
-### func \(\*PriceServiceImpl\) [DeletePriceConfig](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L70>)
+### func \(\*PriceServiceImpl\) [DeletePriceConfig](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L70>)
 
 ```go
 func (p *PriceServiceImpl) DeletePriceConfig(ctx context.Context, id string) error
@@ -94,7 +94,7 @@ func (p *PriceServiceImpl) DeletePriceConfig(ctx context.Context, id string) err
 
 
 <a name="PriceServiceImpl.FindByID"></a>
-### func \(\*PriceServiceImpl\) [FindByID](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L32>)
+### func \(\*PriceServiceImpl\) [FindByID](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L32>)
 
 ```go
 func (p *PriceServiceImpl) FindByID(ctx context.Context, id string) (PriceConfig, error)
@@ -103,7 +103,7 @@ func (p *PriceServiceImpl) FindByID(ctx context.Context, id string) (PriceConfig
 
 
 <a name="PriceServiceImpl.FindByRouteIDAndTrainType"></a>
-### func \(\*PriceServiceImpl\) [FindByRouteIDAndTrainType](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L110>)
+### func \(\*PriceServiceImpl\) [FindByRouteIDAndTrainType](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L110>)
 
 ```go
 func (p *PriceServiceImpl) FindByRouteIDAndTrainType(ctx context.Context, routeID string, trainType string) (PriceConfig, error)
@@ -112,7 +112,7 @@ func (p *PriceServiceImpl) FindByRouteIDAndTrainType(ctx context.Context, routeI
 
 
 <a name="PriceServiceImpl.FindByRouteIDsAndTrainTypes"></a>
-### func \(\*PriceServiceImpl\) [FindByRouteIDsAndTrainTypes](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L135>)
+### func \(\*PriceServiceImpl\) [FindByRouteIDsAndTrainTypes](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L135>)
 
 ```go
 func (p *PriceServiceImpl) FindByRouteIDsAndTrainTypes(ctx context.Context, rtsAndTypes []string) (map[string]PriceConfig, error)
@@ -121,7 +121,7 @@ func (p *PriceServiceImpl) FindByRouteIDsAndTrainTypes(ctx context.Context, rtsA
 
 
 <a name="PriceServiceImpl.GetAllPriceConfig"></a>
-### func \(\*PriceServiceImpl\) [GetAllPriceConfig](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L53>)
+### func \(\*PriceServiceImpl\) [GetAllPriceConfig](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L53>)
 
 ```go
 func (p *PriceServiceImpl) GetAllPriceConfig(ctx context.Context) ([]PriceConfig, error)
@@ -130,7 +130,7 @@ func (p *PriceServiceImpl) GetAllPriceConfig(ctx context.Context) ([]PriceConfig
 
 
 <a name="PriceServiceImpl.UpdatePriceConfig"></a>
-### func \(\*PriceServiceImpl\) [UpdatePriceConfig](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L79>)
+### func \(\*PriceServiceImpl\) [UpdatePriceConfig](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/price/priceService.go#L79>)
 
 ```go
 func (p *PriceServiceImpl) UpdatePriceConfig(ctx context.Context, pc PriceConfig) (bool, error)

@@ -21,7 +21,7 @@ A blueprint\_clients.go file is generated for any package where a [registry.Serv
 
 
 <a name="ClientBuilder"></a>
-## type [ClientBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/gotests/codegen/blueprint_clients.go.go#L23-L30>)
+## type [ClientBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/gotests/codegen/blueprint_clients.go.go#L23-L30>)
 
 Used by the gotests plugin to generate the blueprint\_clients.go file
 
@@ -37,7 +37,7 @@ type ClientBuilder struct {
 ```
 
 <a name="NewClientBuilder"></a>
-### func [NewClientBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/gotests/codegen/blueprint_clients.go.go#L47>)
+### func [NewClientBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/gotests/codegen/blueprint_clients.go.go#L47>)
 
 ```go
 func NewClientBuilder(packageName, packageShortName, namespaceConstructor, namespacePackage, namespaceName, outputDir string) *ClientBuilder
@@ -53,7 +53,7 @@ Create a new builder to generate a blueprint\_clients.go file.
 - namespaceName can be any name
 
 <a name="ClientBuilder.AddClient"></a>
-### func \(\*ClientBuilder\) [AddClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/gotests/codegen/blueprint_clients.go.go#L67>)
+### func \(\*ClientBuilder\) [AddClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/gotests/codegen/blueprint_clients.go.go#L67>)
 
 ```go
 func (b *ClientBuilder) AddClient(registryVar, clientName, nodeToInstantiate string, clientType gocode.TypeName)
@@ -67,7 +67,7 @@ Add a client registration to the generated blueprint\_clients.go file
 - clientType is the service interface being created.
 
 <a name="ClientBuilder.Build"></a>
-### func \(\*ClientBuilder\) [Build](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/gotests/codegen/blueprint_clients.go.go#L78>)
+### func \(\*ClientBuilder\) [Build](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/gotests/codegen/blueprint_clients.go.go#L78>)
 
 ```go
 func (b *ClientBuilder) Build() error

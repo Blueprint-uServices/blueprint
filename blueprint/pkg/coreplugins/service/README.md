@@ -15,7 +15,7 @@ import "github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/servi
 
 
 <a name="Method"></a>
-## type Method
+## type [Method](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/service/service.go#L11-L15>)
 
 
 
@@ -28,7 +28,7 @@ type Method interface {
 ```
 
 <a name="ServiceInterface"></a>
-## type ServiceInterface
+## type [ServiceInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/service/service.go#L6-L9>)
 
 
 
@@ -40,7 +40,7 @@ type ServiceInterface interface {
 ```
 
 <a name="ServiceNode"></a>
-## type ServiceNode
+## type [ServiceNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/service/ir.go#L12-L16>)
 
 Any IR node that represents a callable service should implement this interface.
 
@@ -53,7 +53,7 @@ type ServiceNode interface {
 ```
 
 <a name="Variable"></a>
-## type Variable
+## type [Variable](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/service/service.go#L17-L20>)
 
 
 

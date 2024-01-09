@@ -17,7 +17,7 @@ import "github.com/blueprint-uservices/blueprint/runtime/plugins/opentelemetry"
 
 
 <a name="StdoutMetricCollector"></a>
-## type [StdoutMetricCollector](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/opentelemetry/metric.go#L14-L16>)
+## type [StdoutMetricCollector](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/opentelemetry/metric.go#L14-L16>)
 
 
 
@@ -28,7 +28,7 @@ type StdoutMetricCollector struct {
 ```
 
 <a name="NewStdoutMetricCollector"></a>
-### func [NewStdoutMetricCollector](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/opentelemetry/metric.go#L22>)
+### func [NewStdoutMetricCollector](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/opentelemetry/metric.go#L22>)
 
 ```go
 func NewStdoutMetricCollector(ctx context.Context) (*StdoutMetricCollector, error)
@@ -37,7 +37,7 @@ func NewStdoutMetricCollector(ctx context.Context) (*StdoutMetricCollector, erro
 
 
 <a name="StdoutMetricCollector.GetMetricProvider"></a>
-### func \(\*StdoutMetricCollector\) [GetMetricProvider](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/opentelemetry/metric.go#L18>)
+### func \(\*StdoutMetricCollector\) [GetMetricProvider](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/opentelemetry/metric.go#L18>)
 
 ```go
 func (s *StdoutMetricCollector) GetMetricProvider(ctx context.Context) (metric.MeterProvider, error)
@@ -46,7 +46,7 @@ func (s *StdoutMetricCollector) GetMetricProvider(ctx context.Context) (metric.M
 
 
 <a name="StdoutTracer"></a>
-## type [StdoutTracer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/opentelemetry/trace.go#L11-L13>)
+## type [StdoutTracer](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/opentelemetry/trace.go#L11-L13>)
 
 
 
@@ -57,7 +57,7 @@ type StdoutTracer struct {
 ```
 
 <a name="NewStdoutTracer"></a>
-### func [NewStdoutTracer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/opentelemetry/trace.go#L15>)
+### func [NewStdoutTracer](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/opentelemetry/trace.go#L15>)
 
 ```go
 func NewStdoutTracer(ctx context.Context, addr string) (*StdoutTracer, error)
@@ -66,7 +66,7 @@ func NewStdoutTracer(ctx context.Context, addr string) (*StdoutTracer, error)
 
 
 <a name="StdoutTracer.GetTracerProvider"></a>
-### func \(\*StdoutTracer\) [GetTracerProvider](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/opentelemetry/trace.go#L28>)
+### func \(\*StdoutTracer\) [GetTracerProvider](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/opentelemetry/trace.go#L28>)
 
 ```go
 func (t *StdoutTracer) GetTracerProvider(ctx context.Context) (trace.TracerProvider, error)

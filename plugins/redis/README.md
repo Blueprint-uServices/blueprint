@@ -39,7 +39,7 @@ PrebuiltContainer(spec, "fooCache")
 
 
 <a name="Container"></a>
-## func [Container](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/wiring.go#L19>)
+## func [Container](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/wiring.go#L19>)
 
 ```go
 func Container(spec wiring.WiringSpec, cacheName string) string
@@ -48,7 +48,7 @@ func Container(spec wiring.WiringSpec, cacheName string) string
 Adds a redis container to the application that defines a cache called \`cacheName\` which uses the pre\-built redis process container
 
 <a name="RedisContainer"></a>
-## type [RedisContainer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_redis_container.go#L14-L21>)
+## type [RedisContainer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_redis_container.go#L14-L21>)
 
 Blueprint IR Node that represents a redis container
 
@@ -64,7 +64,7 @@ type RedisContainer struct {
 ```
 
 <a name="RedisContainer.AddContainerArtifacts"></a>
-### func \(\*RedisContainer\) [AddContainerArtifacts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_redis_container.go#L81>)
+### func \(\*RedisContainer\) [AddContainerArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_redis_container.go#L81>)
 
 ```go
 func (node *RedisContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error
@@ -73,7 +73,7 @@ func (node *RedisContainer) AddContainerArtifacts(target docker.ContainerWorkspa
 
 
 <a name="RedisContainer.AddContainerInstance"></a>
-### func \(\*RedisContainer\) [AddContainerInstance](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_redis_container.go#L85>)
+### func \(\*RedisContainer\) [AddContainerInstance](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_redis_container.go#L85>)
 
 ```go
 func (node *RedisContainer) AddContainerInstance(target docker.ContainerWorkspace) error
@@ -82,7 +82,7 @@ func (node *RedisContainer) AddContainerInstance(target docker.ContainerWorkspac
 
 
 <a name="RedisContainer.GenerateArtifacts"></a>
-### func \(\*RedisContainer\) [GenerateArtifacts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_redis_container.go#L77>)
+### func \(\*RedisContainer\) [GenerateArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_redis_container.go#L77>)
 
 ```go
 func (r *RedisContainer) GenerateArtifacts(outputDir string) error
@@ -91,7 +91,7 @@ func (r *RedisContainer) GenerateArtifacts(outputDir string) error
 
 
 <a name="RedisContainer.GetInterface"></a>
-### func \(\*RedisContainer\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_redis_container.go#L72>)
+### func \(\*RedisContainer\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_redis_container.go#L72>)
 
 ```go
 func (node *RedisContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -100,7 +100,7 @@ func (node *RedisContainer) GetInterface(ctx ir.BuildContext) (service.ServiceIn
 
 
 <a name="RedisContainer.Name"></a>
-### func \(\*RedisContainer\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_redis_container.go#L68>)
+### func \(\*RedisContainer\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_redis_container.go#L68>)
 
 ```go
 func (r *RedisContainer) Name() string
@@ -109,7 +109,7 @@ func (r *RedisContainer) Name() string
 
 
 <a name="RedisContainer.String"></a>
-### func \(\*RedisContainer\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_redis_container.go#L64>)
+### func \(\*RedisContainer\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_redis_container.go#L64>)
 
 ```go
 func (r *RedisContainer) String() string
@@ -118,7 +118,7 @@ func (r *RedisContainer) String() string
 
 
 <a name="RedisGoClient"></a>
-## type [RedisGoClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_client.go#L18-L26>)
+## type [RedisGoClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_client.go#L18-L26>)
 
 Blueprint IR Node that represents a client to a redis container
 
@@ -135,7 +135,7 @@ type RedisGoClient struct {
 ```
 
 <a name="RedisGoClient.AddInstantiation"></a>
-### func \(\*RedisGoClient\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_client.go#L79>)
+### func \(\*RedisGoClient\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_client.go#L79>)
 
 ```go
 func (n *RedisGoClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -144,7 +144,7 @@ func (n *RedisGoClient) AddInstantiation(builder golang.NamespaceBuilder) error
 
 
 <a name="RedisGoClient.AddInterfaces"></a>
-### func \(\*RedisGoClient\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_client.go#L75>)
+### func \(\*RedisGoClient\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_client.go#L75>)
 
 ```go
 func (n *RedisGoClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -153,7 +153,7 @@ func (n *RedisGoClient) AddInterfaces(builder golang.ModuleBuilder) error
 
 
 <a name="RedisGoClient.AddToWorkspace"></a>
-### func \(\*RedisGoClient\) [AddToWorkspace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_client.go#L71>)
+### func \(\*RedisGoClient\) [AddToWorkspace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_client.go#L71>)
 
 ```go
 func (n *RedisGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
@@ -162,7 +162,7 @@ func (n *RedisGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
 
 
 <a name="RedisGoClient.GetInterface"></a>
-### func \(\*RedisGoClient\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_client.go#L67>)
+### func \(\*RedisGoClient\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_client.go#L67>)
 
 ```go
 func (n *RedisGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -171,7 +171,7 @@ func (n *RedisGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterf
 
 
 <a name="RedisGoClient.ImplementsGolangNode"></a>
-### func \(\*RedisGoClient\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_client.go#L89>)
+### func \(\*RedisGoClient\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_client.go#L89>)
 
 ```go
 func (node *RedisGoClient) ImplementsGolangNode()
@@ -180,7 +180,7 @@ func (node *RedisGoClient) ImplementsGolangNode()
 
 
 <a name="RedisGoClient.ImplementsGolangService"></a>
-### func \(\*RedisGoClient\) [ImplementsGolangService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_client.go#L90>)
+### func \(\*RedisGoClient\) [ImplementsGolangService](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_client.go#L90>)
 
 ```go
 func (node *RedisGoClient) ImplementsGolangService()
@@ -189,7 +189,7 @@ func (node *RedisGoClient) ImplementsGolangService()
 
 
 <a name="RedisGoClient.Name"></a>
-### func \(\*RedisGoClient\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_client.go#L43>)
+### func \(\*RedisGoClient\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_client.go#L43>)
 
 ```go
 func (n *RedisGoClient) Name() string
@@ -198,7 +198,7 @@ func (n *RedisGoClient) Name() string
 
 
 <a name="RedisGoClient.String"></a>
-### func \(\*RedisGoClient\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_client.go#L39>)
+### func \(\*RedisGoClient\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_client.go#L39>)
 
 ```go
 func (n *RedisGoClient) String() string
@@ -207,7 +207,7 @@ func (n *RedisGoClient) String() string
 
 
 <a name="RedisInterface"></a>
-## type [RedisInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_redis_container.go#L25-L28>)
+## type [RedisInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_redis_container.go#L25-L28>)
 
 Redis interface exposed to other services. This interface can not be modified further.
 
@@ -219,7 +219,7 @@ type RedisInterface struct {
 ```
 
 <a name="RedisInterface.GetMethods"></a>
-### func \(\*RedisInterface\) [GetMethods](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_redis_container.go#L34>)
+### func \(\*RedisInterface\) [GetMethods](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_redis_container.go#L34>)
 
 ```go
 func (r *RedisInterface) GetMethods() []service.Method
@@ -228,7 +228,7 @@ func (r *RedisInterface) GetMethods() []service.Method
 
 
 <a name="RedisInterface.GetName"></a>
-### func \(\*RedisInterface\) [GetName](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/redis/ir_redis_container.go#L30>)
+### func \(\*RedisInterface\) [GetName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/redis/ir_redis_container.go#L30>)
 
 ```go
 func (r *RedisInterface) GetName() string

@@ -22,7 +22,7 @@ The custom logger adds additional callsite information to logging statements, to
 
 
 <a name="DisableCompilerLogging"></a>
-## func DisableCompilerLogging
+## func [DisableCompilerLogging](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/blueprint/logging/logging.go#L132>)
 
 ```go
 func DisableCompilerLogging()
@@ -31,7 +31,7 @@ func DisableCompilerLogging()
 Disables logging by the compiler; useful when running tests to suppress verbose output.
 
 <a name="EnableCompilerLogging"></a>
-## func EnableCompilerLogging
+## func [EnableCompilerLogging](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/blueprint/logging/logging.go#L125>)
 
 ```go
 func EnableCompilerLogging()
@@ -40,7 +40,7 @@ func EnableCompilerLogging()
 Compiler logging is enabled by default; this method is useful for tests to disable and enable logging in order to suppress output.
 
 <a name="Callsite"></a>
-## type Callsite
+## type [Callsite](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/blueprint/logging/logging.go#L231-L236>)
 
 Used to tie logging statements and errors back to the wiring file line that caused the error
 
@@ -54,7 +54,7 @@ type Callsite struct {
 ```
 
 <a name="Callsite.String"></a>
-### func \(Callsite\) String
+### func \(Callsite\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/blueprint/logging/logging.go#L243>)
 
 ```go
 func (cs Callsite) String() string
@@ -63,7 +63,7 @@ func (cs Callsite) String() string
 
 
 <a name="Callstack"></a>
-## type Callstack
+## type [Callstack](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/blueprint/logging/logging.go#L239-L241>)
 
 Used to tie logging statements and errors back to the wiring file line that caused the error
 
@@ -74,7 +74,7 @@ type Callstack struct {
 ```
 
 <a name="GetCallstack"></a>
-### func GetCallstack
+### func [GetCallstack](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/blueprint/logging/logging.go#L258>)
 
 ```go
 func GetCallstack() *Callstack
@@ -83,7 +83,7 @@ func GetCallstack() *Callstack
 Gets the current callstack including file information. Blueprint's wiring spec uses this so that logging statements and error messages can be attributed back to the appropriate wiring spec line.
 
 <a name="Callstack.String"></a>
-### func \(\*Callstack\) String
+### func \(\*Callstack\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/blueprint/logging/logging.go#L247>)
 
 ```go
 func (stack *Callstack) String() string

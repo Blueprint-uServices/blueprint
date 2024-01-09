@@ -31,7 +31,7 @@ timeouts.Add(spec, "my_service", "1s")
 
 
 <a name="Add"></a>
-## func [Add](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/timeouts/wiring.go#L27>)
+## func [Add](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/timeouts/wiring.go#L27>)
 
 ```go
 func Add(spec wiring.WiringSpec, serviceName string, timeout string)
@@ -48,7 +48,7 @@ Add(spec, "my_service", "1s")
 ```
 
 <a name="TimeoutClient"></a>
-## type [TimeoutClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/timeouts/ir.go#L15-L25>)
+## type [TimeoutClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/timeouts/ir.go#L15-L25>)
 
 Blueprint IR node representing a Timeout node
 
@@ -67,7 +67,7 @@ type TimeoutClient struct {
 ```
 
 <a name="TimeoutClient.AddInstantiation"></a>
-### func \(\*TimeoutClient\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/timeouts/ir.go#L82>)
+### func \(\*TimeoutClient\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/timeouts/ir.go#L82>)
 
 ```go
 func (node *TimeoutClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -76,7 +76,7 @@ func (node *TimeoutClient) AddInstantiation(builder golang.NamespaceBuilder) err
 Implements golang.Instantiable
 
 <a name="TimeoutClient.AddInterfaces"></a>
-### func \(\*TimeoutClient\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/timeouts/ir.go#L58>)
+### func \(\*TimeoutClient\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/timeouts/ir.go#L58>)
 
 ```go
 func (node *TimeoutClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -85,7 +85,7 @@ func (node *TimeoutClient) AddInterfaces(builder golang.ModuleBuilder) error
 Implements golang.Service
 
 <a name="TimeoutClient.GenerateFuncs"></a>
-### func \(\*TimeoutClient\) [GenerateFuncs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/timeouts/ir.go#L68>)
+### func \(\*TimeoutClient\) [GenerateFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/timeouts/ir.go#L68>)
 
 ```go
 func (node *TimeoutClient) GenerateFuncs(builder golang.ModuleBuilder) error
@@ -94,7 +94,7 @@ func (node *TimeoutClient) GenerateFuncs(builder golang.ModuleBuilder) error
 Implements golang.GeneratesFuncs
 
 <a name="TimeoutClient.GetInterface"></a>
-### func \(\*TimeoutClient\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/timeouts/ir.go#L63>)
+### func \(\*TimeoutClient\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/timeouts/ir.go#L63>)
 
 ```go
 func (node *TimeoutClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -103,7 +103,7 @@ func (node *TimeoutClient) GetInterface(ctx ir.BuildContext) (service.ServiceInt
 Implements golang.Service
 
 <a name="TimeoutClient.ImplementsGolangNode"></a>
-### func \(\*TimeoutClient\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/timeouts/ir.go#L42>)
+### func \(\*TimeoutClient\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/timeouts/ir.go#L42>)
 
 ```go
 func (node *TimeoutClient) ImplementsGolangNode()
@@ -112,7 +112,7 @@ func (node *TimeoutClient) ImplementsGolangNode()
 Implements ir.IRNode
 
 <a name="TimeoutClient.ImplementsGolangService"></a>
-### func \(\*TimeoutClient\) [ImplementsGolangService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/timeouts/ir.go#L45>)
+### func \(\*TimeoutClient\) [ImplementsGolangService](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/timeouts/ir.go#L45>)
 
 ```go
 func (node *TimeoutClient) ImplementsGolangService()
@@ -121,7 +121,7 @@ func (node *TimeoutClient) ImplementsGolangService()
 Implements golang.Service
 
 <a name="TimeoutClient.Name"></a>
-### func \(\*TimeoutClient\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/timeouts/ir.go#L48>)
+### func \(\*TimeoutClient\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/timeouts/ir.go#L48>)
 
 ```go
 func (node *TimeoutClient) Name() string
@@ -130,7 +130,7 @@ func (node *TimeoutClient) Name() string
 Implements ir.IRNode
 
 <a name="TimeoutClient.String"></a>
-### func \(\*TimeoutClient\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/timeouts/ir.go#L53>)
+### func \(\*TimeoutClient\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/timeouts/ir.go#L53>)
 
 ```go
 func (node *TimeoutClient) String() string

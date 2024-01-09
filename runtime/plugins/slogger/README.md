@@ -18,7 +18,7 @@ import "github.com/blueprint-uservices/blueprint/runtime/plugins/slogger"
 
 
 <a name="SLogger"></a>
-## type [SLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L12>)
+## type [SLogger](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/slogger/log.go#L12>)
 
 SLogger implements the backend.Logger interface by wrapping calls to golang's slog package.
 
@@ -27,7 +27,7 @@ type SLogger struct{}
 ```
 
 <a name="NewSLogger"></a>
-### func [NewSLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L46>)
+### func [NewSLogger](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/slogger/log.go#L46>)
 
 ```go
 func NewSLogger(ctx context.Context) (*SLogger, error)
@@ -36,7 +36,7 @@ func NewSLogger(ctx context.Context) (*SLogger, error)
 Returns a new logger object
 
 <a name="SLogger.Debug"></a>
-### func \(\*SLogger\) [Debug](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L15>)
+### func \(\*SLogger\) [Debug](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/slogger/log.go#L15>)
 
 ```go
 func (l *SLogger) Debug(ctx context.Context, format string, args ...any) (context.Context, error)
@@ -45,7 +45,7 @@ func (l *SLogger) Debug(ctx context.Context, format string, args ...any) (contex
 Implements backend.Logger
 
 <a name="SLogger.Error"></a>
-### func \(\*SLogger\) [Error](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L33>)
+### func \(\*SLogger\) [Error](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/slogger/log.go#L33>)
 
 ```go
 func (l *SLogger) Error(ctx context.Context, format string, args ...any) (context.Context, error)
@@ -54,7 +54,7 @@ func (l *SLogger) Error(ctx context.Context, format string, args ...any) (contex
 Implements backend.Logger
 
 <a name="SLogger.Info"></a>
-### func \(\*SLogger\) [Info](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L21>)
+### func \(\*SLogger\) [Info](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/slogger/log.go#L21>)
 
 ```go
 func (l *SLogger) Info(ctx context.Context, format string, args ...any) (context.Context, error)
@@ -63,7 +63,7 @@ func (l *SLogger) Info(ctx context.Context, format string, args ...any) (context
 Implements backend.Logger
 
 <a name="SLogger.Logf"></a>
-### func \(\*SLogger\) [Logf](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L39>)
+### func \(\*SLogger\) [Logf](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/slogger/log.go#L39>)
 
 ```go
 func (l *SLogger) Logf(ctx context.Context, opts backend.LogOptions, format string, args ...any) (context.Context, error)
@@ -72,7 +72,7 @@ func (l *SLogger) Logf(ctx context.Context, opts backend.LogOptions, format stri
 Implements backend.Logger
 
 <a name="SLogger.Warn"></a>
-### func \(\*SLogger\) [Warn](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/slogger/log.go#L27>)
+### func \(\*SLogger\) [Warn](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/slogger/log.go#L27>)
 
 ```go
 func (l *SLogger) Warn(ctx context.Context, format string, args ...any) (context.Context, error)
