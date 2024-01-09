@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	"go.opentelemetry.io/otel/metric"

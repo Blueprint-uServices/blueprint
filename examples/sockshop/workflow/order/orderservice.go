@@ -10,11 +10,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/cart"
-	"github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/payment"
-	"github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/shipping"
-	"github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/user"
-	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/cart"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/payment"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/shipping"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/user"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 )

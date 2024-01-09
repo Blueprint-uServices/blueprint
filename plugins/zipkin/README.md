@@ -3,7 +3,7 @@
 # zipkin
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/zipkin"
+import "github.com/blueprint-uservices/blueprint/plugins/zipkin"
 ```
 
 Package zipkin provides a plugin to generate and include a zipkin collector instance in a Blueprint application.

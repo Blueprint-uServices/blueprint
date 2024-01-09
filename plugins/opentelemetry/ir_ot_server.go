@@ -5,12 +5,12 @@ import (
 	"path/filepath"
 	"reflect"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/service"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/gogen"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/plugins/golang"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
 	"golang.org/x/exp/slog"
 )
 
@@ -185,7 +185,7 @@ func generateServerHandler(builder golang.ModuleBuilder, wrapped *gocode.Service
 		Name: wrapped.BaseName,
 	}
 
-	server.Imports.AddPackages("context", "go.opentelemetry.io/otel/trace", "github.com/Blueprint-uServices/blueprint/runtime/core/backend")
+	server.Imports.AddPackages("context", "go.opentelemetry.io/otel/trace", "github.com/blueprint-uservices/blueprint/runtime/core/backend")
 
 	slog.Info(fmt.Sprintf("Generating %v/%v", server.Package.PackageName, "env.sh"))
 	outputFile := filepath.Join(server.Package.Path, "env.sh")

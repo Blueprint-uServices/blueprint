@@ -3,14 +3,14 @@
 # codegen
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/gotests/codegen"
+import "github.com/blueprint-uservices/blueprint/plugins/gotests/codegen"
 ```
 
 Package codegen implements the gotest plugin's code generation logic.
 
 Generates the blueprint\_clients.go file that gets added to test packages. This is used internally by the gotest package.
 
-A blueprint\_clients.go file is generated for any package where a [registry.ServiceRegistry](<https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/core/registry>) is used. The file adds a static initialization block that registers an instance of the 'real' application client.
+A blueprint\_clients.go file is generated for any package where a [registry.ServiceRegistry](<https://github.com/blueprint-uservices/blueprint/tree/main/runtime/core/registry>) is used. The file adds a static initialization block that registers an instance of the 'real' application client.
 
 ## Index
 

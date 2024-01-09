@@ -3,7 +3,7 @@
 # gocode
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
+import "github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
 ```
 
 ## Index

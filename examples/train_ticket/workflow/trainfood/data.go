@@ -1,6 +1,6 @@
 package trainfood
 
-import "github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/food"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/food"
 
 type TrainFood struct {
 	ID     string

@@ -3,7 +3,7 @@
 # simplequeue
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/runtime/plugins/simplequeue"
+import "github.com/blueprint-uservices/blueprint/runtime/plugins/simplequeue"
 ```
 
 Package simplequeue implements an simple in\-memory \[backend.Queue\] that internally uses a golang channel of capacity 10 for passing items from producer to consumer.

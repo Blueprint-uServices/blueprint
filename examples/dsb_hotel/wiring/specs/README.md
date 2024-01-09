@@ -3,7 +3,7 @@
 # specs
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/examples/dsb_hotel/wiring/specs"
+import "github.com/blueprint-uservices/blueprint/examples/dsb_hotel/wiring/specs"
 ```
 
 ## Index

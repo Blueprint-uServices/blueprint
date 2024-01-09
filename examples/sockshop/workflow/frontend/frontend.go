@@ -5,10 +5,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/cart"
-	"github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/catalogue"
-	"github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/order"
-	"github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/user"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/cart"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/catalogue"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/order"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/user"
 	"github.com/google/uuid"
 )
 

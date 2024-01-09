@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/ioutil"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/address"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/plugins/docker"
-	"github.com/Blueprint-uServices/blueprint/plugins/dockerdeployment/dockergen"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/ioutil"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/address"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/plugins/docker"
+	"github.com/blueprint-uservices/blueprint/plugins/dockerdeployment/dockergen"
 	"golang.org/x/exp/slog"
 )
 

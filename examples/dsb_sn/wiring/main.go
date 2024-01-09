@@ -7,9 +7,9 @@
 package main
 
 import (
-	"github.com/Blueprint-uServices/blueprint/examples/dsb_sn/wiring/specs"
-	"github.com/Blueprint-uServices/blueprint/plugins/wiringcmd"
-	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/examples/dsb_sn/wiring/specs"
+	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
 func main() {

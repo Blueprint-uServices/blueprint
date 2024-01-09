@@ -4,7 +4,7 @@ package xtrace
 import (
 	"context"
 
-	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"github.com/tracingplane/tracingplane-go/tracingplane"
 	"gitlab.mpi-sws.org/cld/tracing/tracing-framework-go/localbaggage"
 	"gitlab.mpi-sws.org/cld/tracing/tracing-framework-go/xtrace/client"

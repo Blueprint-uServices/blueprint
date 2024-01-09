@@ -3,7 +3,7 @@
 # redis
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/runtime/plugins/redis"
+import "github.com/blueprint-uservices/blueprint/runtime/plugins/redis"
 ```
 
 Package redis implements a key\-value \[backend.Cache\] client interface to a vanilla redis implementation.

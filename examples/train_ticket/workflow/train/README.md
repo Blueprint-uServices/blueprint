@@ -3,7 +3,7 @@
 # train
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/train"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/train"
 ```
 
 package train implements ts\-train\-service from the original TrainTicket application

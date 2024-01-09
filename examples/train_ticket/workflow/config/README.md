@@ -3,7 +3,7 @@
 # config
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/config"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/config"
 ```
 
 package config implements ts\-config\-service from the train ticket application

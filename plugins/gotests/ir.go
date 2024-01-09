@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/gogen"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/goparser"
-	"github.com/Blueprint-uServices/blueprint/plugins/gotests/codegen"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/plugins/golang"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
+	"github.com/blueprint-uservices/blueprint/plugins/gotests/codegen"
 	"golang.org/x/exp/slog"
 )
 

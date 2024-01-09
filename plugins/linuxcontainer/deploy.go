@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/ioutil"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/plugins/linux"
-	"github.com/Blueprint-uServices/blueprint/plugins/linuxcontainer/linuxgen"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/ioutil"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/plugins/linux"
+	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer/linuxgen"
 	"golang.org/x/exp/slog"
 )
 

@@ -3,7 +3,7 @@
 # simple
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/simple"
+import "github.com/blueprint-uservices/blueprint/plugins/simple"
 ```
 
 Package simple provides basic in\-memory implementations of various Blueprint backends including Cache, Queue, NoSQLDB, and RelationalDB.

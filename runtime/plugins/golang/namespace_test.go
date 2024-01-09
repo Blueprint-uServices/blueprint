@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Blueprint-uServices/blueprint/runtime/plugins/golang"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/golang"
 	"github.com/stretchr/testify/assert"
 )
 

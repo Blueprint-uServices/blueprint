@@ -10,12 +10,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/logging"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
-	"github.com/Blueprint-uServices/blueprint/plugins/dockerdeployment"
-	"github.com/Blueprint-uServices/blueprint/plugins/goproc"
-	"github.com/Blueprint-uServices/blueprint/plugins/linuxcontainer"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/logging"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/dockerdeployment"
+	"github.com/blueprint-uservices/blueprint/plugins/goproc"
+	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"golang.org/x/exp/slog"
 )
 

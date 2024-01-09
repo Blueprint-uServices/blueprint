@@ -3,7 +3,7 @@
 # payment
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/payment"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/payment"
 ```
 
 package payment implements ts\-payment\-service from the original train ticket application

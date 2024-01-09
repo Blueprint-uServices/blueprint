@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/food"
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/food"
 	"github.com/stretchr/testify/require"
 )
 

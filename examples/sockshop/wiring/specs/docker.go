@@ -1,20 +1,20 @@
 package specs
 
 import (
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
-	"github.com/Blueprint-uServices/blueprint/plugins/clientpool"
-	"github.com/Blueprint-uServices/blueprint/plugins/goproc"
-	"github.com/Blueprint-uServices/blueprint/plugins/gotests"
-	"github.com/Blueprint-uServices/blueprint/plugins/grpc"
-	"github.com/Blueprint-uServices/blueprint/plugins/linuxcontainer"
-	"github.com/Blueprint-uServices/blueprint/plugins/mongodb"
-	"github.com/Blueprint-uServices/blueprint/plugins/mysql"
-	"github.com/Blueprint-uServices/blueprint/plugins/opentelemetry"
-	"github.com/Blueprint-uServices/blueprint/plugins/retries"
-	"github.com/Blueprint-uServices/blueprint/plugins/simple"
-	"github.com/Blueprint-uServices/blueprint/plugins/wiringcmd"
-	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
-	"github.com/Blueprint-uServices/blueprint/plugins/zipkin"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/clientpool"
+	"github.com/blueprint-uservices/blueprint/plugins/goproc"
+	"github.com/blueprint-uservices/blueprint/plugins/gotests"
+	"github.com/blueprint-uservices/blueprint/plugins/grpc"
+	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
+	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
+	"github.com/blueprint-uservices/blueprint/plugins/mysql"
+	"github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
+	"github.com/blueprint-uservices/blueprint/plugins/retries"
+	"github.com/blueprint-uservices/blueprint/plugins/simple"
+	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/zipkin"
 )
 
 // A wiring spec that deploys each service into its own Docker container and using gRPC to communicate between services.

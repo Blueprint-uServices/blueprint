@@ -8,8 +8,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/shipping"
-	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/shipping"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"golang.org/x/exp/slog"
 )
 

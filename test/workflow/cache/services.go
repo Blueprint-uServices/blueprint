@@ -3,8 +3,8 @@ package workflow
 import (
 	ctxx "context"
 
-	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
-	"github.com/Blueprint-uServices/blueprint/test/workflow/workflow"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/test/workflow/workflow"
 )
 
 /*

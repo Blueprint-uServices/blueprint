@@ -3,7 +3,7 @@
 # service
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/service"
+import "github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 ```
 
 ## Index

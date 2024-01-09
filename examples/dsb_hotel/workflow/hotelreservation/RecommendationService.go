@@ -5,7 +5,7 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"github.com/hailocab/go-geoindex"
 	"go.mongodb.org/mongo-driver/bson"
 )

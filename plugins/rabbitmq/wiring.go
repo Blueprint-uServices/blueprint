@@ -7,11 +7,11 @@
 package rabbitmq
 
 import (
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/address"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/pointer"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/address"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/pointer"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 )
 
 // Container generate the IRNodes for a mysql server docker container that uses the latest mysql/mysql image

@@ -3,7 +3,7 @@
 # news
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/news"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/news"
 ```
 
 package news implements the ts\-news\-service from the TrainTicket application

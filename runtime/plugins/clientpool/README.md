@@ -3,7 +3,7 @@
 # clientpool
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/runtime/plugins/clientpool"
+import "github.com/blueprint-uservices/blueprint/runtime/plugins/clientpool"
 ```
 
 Package clientpool implements the runtime components of Blueprint's ClientPool plugin.

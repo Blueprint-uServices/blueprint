@@ -3,7 +3,7 @@
 # delivery
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/delivery"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/delivery"
 ```
 
 Package delivery implements ts\-delivery service from the original train ticket application

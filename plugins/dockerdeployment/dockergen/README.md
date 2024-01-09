@@ -3,7 +3,7 @@
 # dockergen
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/dockerdeployment/dockergen"
+import "github.com/blueprint-uservices/blueprint/plugins/dockerdeployment/dockergen"
 ```
 
 ## Index

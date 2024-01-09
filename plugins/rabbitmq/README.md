@@ -3,7 +3,7 @@
 # rabbitmq
 
 ```go
-import "github.com/Blueprint-uServices/blueprintplugins/rabbitmq"
+import "github.com/blueprint-uservices/blueprintplugins/rabbitmq"
 ```
 
 Package rabbitmq provides a plugin to generate and include a rabbitmq instance in a Blueprint application.

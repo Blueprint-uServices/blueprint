@@ -1,12 +1,12 @@
 package jaeger
 
 import (
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/address"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/service"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/plugins/docker"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/goparser"
-	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/address"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/plugins/docker"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
 // Blueprint IR node that represents the Jaeger container

@@ -3,7 +3,7 @@
 # price
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/price"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/price"
 ```
 
 Package price provides an implementation of the PriceService PriceService uses a backend.NoSQLDatabase to store price config data

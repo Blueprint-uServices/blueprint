@@ -3,7 +3,7 @@
 # backend
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+import "github.com/blueprint-uservices/blueprint/runtime/core/backend"
 ```
 
 Package backend provides the interfaces for common backends like caches, queues, databases, etc. that are often used by application workflow specs.

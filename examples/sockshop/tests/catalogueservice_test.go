@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/catalogue"
-	"github.com/Blueprint-uServices/blueprint/runtime/core/registry"
-	"github.com/Blueprint-uServices/blueprint/runtime/plugins/sqlitereldb"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/catalogue"
+	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/sqlitereldb"
 	"github.com/stretchr/testify/require"
 )
 

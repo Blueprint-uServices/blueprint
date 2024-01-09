@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/shipping"
-	"github.com/Blueprint-uServices/blueprint/runtime/plugins/simplenosqldb"
-	"github.com/Blueprint-uServices/blueprint/runtime/plugins/simplequeue"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/shipping"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/simplenosqldb"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/simplequeue"
 	"github.com/stretchr/testify/require"
 )
 

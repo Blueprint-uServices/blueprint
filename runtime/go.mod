@@ -1,4 +1,4 @@
-module github.com/Blueprint-uServices/blueprint/runtime
+module github.com/blueprint-uservices/blueprint/runtime
 
 go 1.20
 

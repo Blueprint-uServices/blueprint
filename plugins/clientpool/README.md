@@ -3,7 +3,7 @@
 # clientpool
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/clientpool"
+import "github.com/blueprint-uservices/blueprint/plugins/clientpool"
 ```
 
 Package clientpool provides a Blueprint modifier for the client side of service calls.

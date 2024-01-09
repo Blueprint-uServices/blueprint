@@ -1,7 +1,7 @@
 package dockerdeployment
 
 import (
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 )
 
 /* A deployment is a collection of containers */

@@ -3,7 +3,7 @@
 # timeouts
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/timeouts"
+import "github.com/blueprint-uservices/blueprint/plugins/timeouts"
 ```
 
 Package timeouts provides a Blueprint modifier for the client side of service calls.

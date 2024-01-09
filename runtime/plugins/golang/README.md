@@ -3,7 +3,7 @@
 # golang
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/runtime/plugins/golang"
+import "github.com/blueprint-uservices/blueprint/runtime/plugins/golang"
 ```
 
 Package golang implements the golang namespace used by Blueprint applications at runtime to instantiate golang nodes.

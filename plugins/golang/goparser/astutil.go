@@ -5,7 +5,7 @@ import (
 	"go/ast"
 	"strings"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/stringutil"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/stringutil"
 )
 
 // Returns a string representation of an expr and its internals

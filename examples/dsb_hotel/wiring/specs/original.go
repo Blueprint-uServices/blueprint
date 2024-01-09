@@ -3,18 +3,18 @@ package specs
 import (
 	"fmt"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
-	"github.com/Blueprint-uServices/blueprint/plugins/goproc"
-	"github.com/Blueprint-uServices/blueprint/plugins/gotests"
-	"github.com/Blueprint-uServices/blueprint/plugins/grpc"
-	"github.com/Blueprint-uServices/blueprint/plugins/http"
-	"github.com/Blueprint-uServices/blueprint/plugins/jaeger"
-	"github.com/Blueprint-uServices/blueprint/plugins/linuxcontainer"
-	"github.com/Blueprint-uServices/blueprint/plugins/memcached"
-	"github.com/Blueprint-uServices/blueprint/plugins/mongodb"
-	"github.com/Blueprint-uServices/blueprint/plugins/opentelemetry"
-	"github.com/Blueprint-uServices/blueprint/plugins/wiringcmd"
-	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/goproc"
+	"github.com/blueprint-uservices/blueprint/plugins/gotests"
+	"github.com/blueprint-uservices/blueprint/plugins/grpc"
+	"github.com/blueprint-uservices/blueprint/plugins/http"
+	"github.com/blueprint-uservices/blueprint/plugins/jaeger"
+	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
+	"github.com/blueprint-uservices/blueprint/plugins/memcached"
+	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
+	"github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
+	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
 // Wiring spec that represents the original configuration of the HotelReservation application.

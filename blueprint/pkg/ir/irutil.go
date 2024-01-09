@@ -4,7 +4,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/stringutil"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/stringutil"
 )
 
 // Returns name with only alphanumeric characters and all other

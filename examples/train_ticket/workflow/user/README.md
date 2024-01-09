@@ -3,7 +3,7 @@
 # user
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/user"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/user"
 ```
 
 Package user provides an implementation of the UserService UserService uses a backend.NoSQLDatabase to store user data

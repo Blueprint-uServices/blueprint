@@ -3,7 +3,7 @@
 # memcached
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/runtime/plugins/memcached"
+import "github.com/blueprint-uservices/blueprint/runtime/plugins/memcached"
 ```
 
 Package memcached implements a key\-value \[backend.Cache\] client interface to a vanilla memcached implementation.

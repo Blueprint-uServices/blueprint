@@ -3,7 +3,7 @@
 # goproc
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/goproc"
+import "github.com/blueprint-uservices/blueprint/plugins/goproc"
 ```
 
 ## Index

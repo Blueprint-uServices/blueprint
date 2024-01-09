@@ -8,8 +8,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
 )
 
 /*

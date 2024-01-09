@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/goparser"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
 	"golang.org/x/exp/slog"
 )
 

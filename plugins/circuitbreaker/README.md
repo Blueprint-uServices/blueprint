@@ -3,7 +3,7 @@
 # circuitbreaker
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/circuitbreaker"
+import "github.com/blueprint-uservices/blueprint/plugins/circuitbreaker"
 ```
 
 Package circuitbreaker provides a Blueprint modifier for the client side of service calls.

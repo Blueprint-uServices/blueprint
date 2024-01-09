@@ -1,7 +1,7 @@
-module github.com/Blueprint-uServices/blueprint/examples/dsb_hotel/wiring
+module github.com/blueprint-uservices/blueprint/examples/dsb_hotel/wiring
 
 go 1.20
 
-require github.com/Blueprint-uServices/blueprint/blueprint v0.0.0
+require github.com/blueprint-uservices/blueprint/blueprint v0.0.0
 
-replace github.com/Blueprint-uServices/blueprint/blueprint => ../../../blueprint
+replace github.com/blueprint-uservices/blueprint/blueprint => ../../../blueprint

@@ -3,7 +3,7 @@
 # wiring
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/examples/sockshop/wiring"
+import "github.com/blueprint-uservices/blueprint/examples/sockshop/wiring"
 ```
 
 Package main provides an application for compiling a number of different wiring specs for the SockShop application.

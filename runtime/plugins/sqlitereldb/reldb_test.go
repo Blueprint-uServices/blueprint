@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Blueprint-uServices/blueprint/runtime/plugins/sqlitereldb"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/sqlitereldb"
 	"github.com/stretchr/testify/require"
 )
 

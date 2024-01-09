@@ -10,9 +10,9 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
 	"golang.org/x/exp/slices"
 	"golang.org/x/mod/modfile"
 )

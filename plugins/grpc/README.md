@@ -3,7 +3,7 @@
 # grpc
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/grpc"
+import "github.com/blueprint-uservices/blueprint/plugins/grpc"
 ```
 
 Package grpc implements a Blueprint plugin that enables any Golang service to be deployed using a gRPC server.
@@ -11,7 +11,7 @@ Package grpc implements a Blueprint plugin that enables any Golang service to be
 To use the plugin in a Blueprint wiring spec, import this package and use the [Deploy](<#Deploy>) method, ie.
 
 ```
-import "github.com/Blueprint-uServices/blueprint/plugins/grpc"
+import "github.com/blueprint-uservices/blueprint/plugins/grpc"
 grpc.Deploy(spec, "my_service")
 ```
 

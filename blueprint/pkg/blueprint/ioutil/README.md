@@ -3,7 +3,7 @@
 # ioutil
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/ioutil"
+import "github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/ioutil"
 ```
 
 Package ioutil implements filesystem related utility methods primarily for use by plugins that produce artifacts onto the local filesystem.

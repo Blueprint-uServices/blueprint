@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 )
 
 // The SocialGraphService interface

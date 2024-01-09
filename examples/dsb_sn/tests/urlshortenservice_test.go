@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Blueprint-uServices/blueprint/examples/dsb_sn/workflow/socialnetwork"
-	"github.com/Blueprint-uServices/blueprint/runtime/core/registry"
-	"github.com/Blueprint-uServices/blueprint/runtime/plugins/simplenosqldb"
+	"github.com/blueprint-uservices/blueprint/examples/dsb_sn/workflow/socialnetwork"
+	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/simplenosqldb"
 	"github.com/stretchr/testify/require"
 )
 

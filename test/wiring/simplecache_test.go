@@ -3,8 +3,8 @@ package wiring
 import (
 	"testing"
 
-	"github.com/Blueprint-uServices/blueprint/plugins/simple"
-	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/simple"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
 func TestSimpleCache(t *testing.T) {

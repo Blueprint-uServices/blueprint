@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
-	"github.com/Blueprint-uServices/blueprint/runtime/plugins/mongodb"
-	"github.com/Blueprint-uServices/blueprint/runtime/plugins/simplenosqldb"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/mongodb"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/simplenosqldb"
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

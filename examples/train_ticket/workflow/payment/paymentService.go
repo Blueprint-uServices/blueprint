@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 )

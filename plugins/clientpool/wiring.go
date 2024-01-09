@@ -4,10 +4,10 @@
 package clientpool
 
 import (
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/pointer"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/pointer"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/golang"
 	"golang.org/x/exp/slog"
 )
 

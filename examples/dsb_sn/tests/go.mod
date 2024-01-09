@@ -1,14 +1,14 @@
-module github.com/Blueprint-uServices/blueprint/examples/dsb_sn/tests
+module github.com/blueprint-uservices/blueprint/examples/dsb_sn/tests
 
 go 1.20
 
-require github.com/Blueprint-uServices/blueprint/runtime v0.0.0
+require github.com/blueprint-uservices/blueprint/runtime v0.0.0
 
-replace github.com/Blueprint-uServices/blueprint/runtime => ../../../runtime
+replace github.com/blueprint-uservices/blueprint/runtime => ../../../runtime
 
 require (
 	github.com/stretchr/testify v1.8.4
-	github.com/Blueprint-uServices/blueprint/examples/dsb_sn/workflow v0.0.0
+	github.com/blueprint-uservices/blueprint/examples/dsb_sn/workflow v0.0.0
 	go.mongodb.org/mongo-driver v1.13.0
 )
 
@@ -35,4 +35,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/Blueprint-uServices/blueprint/examples/dsb_sn/workflow => ../workflow
+replace github.com/blueprint-uservices/blueprint/examples/dsb_sn/workflow => ../workflow

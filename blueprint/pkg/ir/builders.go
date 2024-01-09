@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/ioutil"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/ioutil"
 	"golang.org/x/exp/slog"
 )
 

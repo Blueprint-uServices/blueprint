@@ -1,10 +1,10 @@
 package goproc
 
 import (
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/plugins/docker"
-	"github.com/Blueprint-uServices/blueprint/plugins/goproc/linuxgen"
-	"github.com/Blueprint-uServices/blueprint/plugins/linux"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/plugins/docker"
+	"github.com/blueprint-uservices/blueprint/plugins/goproc/linuxgen"
+	"github.com/blueprint-uservices/blueprint/plugins/linux"
 )
 
 // This file name ends with an underscore because Go has magic filenames that won't compile

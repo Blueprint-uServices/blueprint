@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Blueprint-uServices/blueprint/runtime/plugins/clientpool"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/clientpool"
 	"github.com/stretchr/testify/require"
 )
 

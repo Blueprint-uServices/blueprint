@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 )
 
 type NonLeafService interface {

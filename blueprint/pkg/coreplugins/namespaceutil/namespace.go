@@ -24,9 +24,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/pointer"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/pointer"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 )
 
 // An IRNode that also implements the [wiring.NamespaceHandler] interface,

@@ -7,7 +7,7 @@ package simplequeue
 import (
 	"context"
 
-	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 )
 
 // A simple chan-based queue that implements the [backend.Queue] interface

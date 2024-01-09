@@ -3,7 +3,7 @@
 # rabbitmq
 
 ```go
-import "github.com/Blueprint-uServices/blueprintruntime/plugins/rabbitmq"
+import "github.com/blueprint-uservices/blueprintruntime/plugins/rabbitmq"
 ```
 
 Package rabbitmq provides a client\-wrapper implementation of the \[backend.Queue\] interface for a rabbitmq server.

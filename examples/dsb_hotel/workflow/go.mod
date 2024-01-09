@@ -1,4 +1,4 @@
-module github.com/Blueprint-uServices/blueprint/examples/dsb_hotel/workflow
+module github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workflow
 
 go 1.20
 

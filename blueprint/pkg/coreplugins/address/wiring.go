@@ -1,9 +1,9 @@
 package address
 
 import (
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/stringutil"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/stringutil"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 )
 
 // Additional optional options for use when defining an address

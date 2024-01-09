@@ -3,7 +3,7 @@
 # xtrace
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/runtime/plugins/xtrace"
+import "github.com/blueprint-uservices/blueprint/runtime/plugins/xtrace"
 ```
 
 Package xtrace provides a client\-wrapper implementation of the \[backend.XTracer\] interface to a xtrace server.

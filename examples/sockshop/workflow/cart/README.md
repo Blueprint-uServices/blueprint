@@ -3,7 +3,7 @@
 # cart
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/cart"
+import "github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/cart"
 ```
 
 Package cart implements the SockShop cart microservice.

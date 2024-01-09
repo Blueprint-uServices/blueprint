@@ -3,7 +3,7 @@
 # wiring
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
+import "github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 ```
 
 Package wiring provides the entry point for a Blueprint application to create and configure a wiring spec; that wiring spec can enriched and extended by plugins; ultimately it is used by applications to generate concrete application instances.

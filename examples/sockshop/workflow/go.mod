@@ -1,11 +1,11 @@
-module github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow
+module github.com/blueprint-uservices/blueprint/examples/sockshop/workflow
 
 go 1.20
 
 require (
 	github.com/google/uuid v1.4.0
 	github.com/stretchr/testify v1.8.4
-	github.com/Blueprint-uServices/blueprint/runtime v0.0.0
+	github.com/blueprint-uservices/blueprint/runtime v0.0.0
 	go.mongodb.org/mongo-driver v1.12.1
 	golang.org/x/exp v0.0.0-20230728194245-b0cb94b80691
 )
@@ -22,4 +22,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/Blueprint-uServices/blueprint/runtime => ../../../runtime
+replace github.com/blueprint-uservices/blueprint/runtime => ../../../runtime

@@ -3,7 +3,7 @@
 # memcached
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/memcached"
+import "github.com/blueprint-uservices/blueprint/plugins/memcached"
 ```
 
 Package memcached provides the Blueprint wiring and IR implementations of a memcached plugin that provides a Cache interface implementation via a pre\-built memcached container image.

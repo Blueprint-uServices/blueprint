@@ -3,9 +3,9 @@ package linuxcontainer
 import (
 	"fmt"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/address"
-	"github.com/Blueprint-uServices/blueprint/plugins/docker"
-	"github.com/Blueprint-uServices/blueprint/plugins/linuxcontainer/dockergen"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/address"
+	"github.com/blueprint-uservices/blueprint/plugins/docker"
+	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer/dockergen"
 	"golang.org/x/exp/slog"
 )
 

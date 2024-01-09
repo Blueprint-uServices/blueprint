@@ -3,13 +3,13 @@
 # http
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/http"
+import "github.com/blueprint-uservices/blueprint/plugins/http"
 ```
 
 To use the plugin in a Blueprint wiring spec, import this package and use the [Deploy](<#Deploy>) method, i.e.
 
 ```
-import "github.com/Blueprint-uServices/blueprint/plugins/http"
+import "github.com/blueprint-uservices/blueprint/plugins/http"
 http.Deploy(spec, "my_service")
 ```
 

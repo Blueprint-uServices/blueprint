@@ -36,9 +36,9 @@ var ignore = make(map[string]struct{})
 
 func init() {
 	funcNames := []string{
-		"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring.(*namespaceimpl).Info",
-		"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring.(*namespaceimpl).Warn",
-		"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring.(*namespaceimpl).Error",
+		"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring.(*namespaceimpl).Info",
+		"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring.(*namespaceimpl).Warn",
+		"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring.(*namespaceimpl).Error",
 		"golang.org/x/exp/slog.Info",
 		"golang.org/x/exp/slog.(*Logger).log",
 	}

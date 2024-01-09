@@ -3,7 +3,7 @@
 # stringutil
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/stringutil"
+import "github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/stringutil"
 ```
 
 Package stringutil implements utility methods for common string manipulations used by Blueprint plugins.

@@ -3,7 +3,7 @@
 # linuxgen
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/linuxcontainer/linuxgen"
+import "github.com/blueprint-uservices/blueprint/plugins/linuxcontainer/linuxgen"
 ```
 
 ## Index

@@ -3,7 +3,7 @@
 # mongodb
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/mongodb"
+import "github.com/blueprint-uservices/blueprint/plugins/mongodb"
 ```
 
 Package mongodb provides a plugin to generate and include a mongodb instance in a Blueprint application.

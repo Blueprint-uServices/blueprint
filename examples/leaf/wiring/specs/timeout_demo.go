@@ -3,17 +3,17 @@ package specs
 import (
 	"fmt"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
-	"github.com/Blueprint-uServices/blueprint/plugins/goproc"
-	"github.com/Blueprint-uServices/blueprint/plugins/http"
-	"github.com/Blueprint-uServices/blueprint/plugins/latency"
-	"github.com/Blueprint-uServices/blueprint/plugins/linuxcontainer"
-	"github.com/Blueprint-uServices/blueprint/plugins/mongodb"
-	"github.com/Blueprint-uServices/blueprint/plugins/retries"
-	"github.com/Blueprint-uServices/blueprint/plugins/simple"
-	"github.com/Blueprint-uServices/blueprint/plugins/timeouts"
-	"github.com/Blueprint-uServices/blueprint/plugins/wiringcmd"
-	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/goproc"
+	"github.com/blueprint-uservices/blueprint/plugins/http"
+	"github.com/blueprint-uservices/blueprint/plugins/latency"
+	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
+	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
+	"github.com/blueprint-uservices/blueprint/plugins/retries"
+	"github.com/blueprint-uservices/blueprint/plugins/simple"
+	"github.com/blueprint-uservices/blueprint/plugins/timeouts"
+	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
 // A wiring spec that demonstrates how to add timeouts to a blueprint application.

@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 )
 
 // The UserMentionService interface

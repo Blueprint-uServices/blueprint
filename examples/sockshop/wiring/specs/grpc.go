@@ -3,14 +3,14 @@ package specs
 import (
 	"strings"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
-	"github.com/Blueprint-uServices/blueprint/plugins/clientpool"
-	"github.com/Blueprint-uServices/blueprint/plugins/goproc"
-	"github.com/Blueprint-uServices/blueprint/plugins/gotests"
-	"github.com/Blueprint-uServices/blueprint/plugins/grpc"
-	"github.com/Blueprint-uServices/blueprint/plugins/simple"
-	"github.com/Blueprint-uServices/blueprint/plugins/wiringcmd"
-	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/clientpool"
+	"github.com/blueprint-uservices/blueprint/plugins/goproc"
+	"github.com/blueprint-uservices/blueprint/plugins/gotests"
+	"github.com/blueprint-uservices/blueprint/plugins/grpc"
+	"github.com/blueprint-uservices/blueprint/plugins/simple"
+	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
 // A wiring spec that deploys each service to a separate process, with services communicating over GRPC.

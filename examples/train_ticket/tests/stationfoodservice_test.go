@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/stationfood"
-	"github.com/Blueprint-uServices/blueprint/runtime/core/registry"
-	"github.com/Blueprint-uServices/blueprint/runtime/plugins/simplenosqldb"
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/stationfood"
+	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/simplenosqldb"
 	"github.com/stretchr/testify/require"
 )
 

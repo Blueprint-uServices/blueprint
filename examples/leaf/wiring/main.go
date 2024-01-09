@@ -5,9 +5,9 @@
 package main
 
 import (
-	"github.com/Blueprint-uServices/blueprint/examples/leaf/wiring/specs"
-	"github.com/Blueprint-uServices/blueprint/plugins/wiringcmd"
-	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/examples/leaf/wiring/specs"
+	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
 func main() {

@@ -3,7 +3,7 @@
 # slogger
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/runtime/plugins/slogger"
+import "github.com/blueprint-uservices/blueprint/runtime/plugins/slogger"
 ```
 
 ## Index

@@ -5,9 +5,9 @@ import (
 	"go/ast"
 	"strings"
 
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/goparser"
-	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 	"golang.org/x/exp/slog"
 )
 

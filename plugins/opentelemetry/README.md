@@ -3,7 +3,7 @@
 # opentelemetry
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/opentelemetry"
+import "github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
 ```
 
 Package opentelemetry provides two plugins: \(i\) a plugin to generate and include an opentelemetry collector instance in a Blueprint application \(ii\) provides a modifier plugin to wrap the service with an OpenTelemetry wrapper to generate OT compatible traces/logs.

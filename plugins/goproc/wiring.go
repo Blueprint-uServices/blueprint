@@ -1,10 +1,10 @@
 package goproc
 
 import (
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/namespaceutil"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/namespaceutil"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/golang"
 )
 
 // Adds a child node to an existing process

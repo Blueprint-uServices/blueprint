@@ -21,4 +21,4 @@ python scripts/gen_docs.py
 
 ### Updating Website docs
 
-To update the documentation on the website, please follow the instructions [here](https://github.com/Blueprint-uServices/Blueprint-uServices.github.io/tree/main#updating-documentation).
+To update the documentation on the website, please follow the instructions [here](https://github.com/blueprint-uservices/Blueprint-uServices.github.io/tree/main#updating-documentation).

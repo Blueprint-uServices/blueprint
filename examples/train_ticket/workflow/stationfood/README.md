@@ -3,7 +3,7 @@
 # stationfood
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/examples/train_ticket/workflow/stationfood"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/stationfood"
 ```
 
 package stationfood implements ts\-station\-food\-service from the original Train Ticket application

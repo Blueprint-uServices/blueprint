@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/logging"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
-	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/logging"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 	"github.com/stretchr/testify/require"
 )
 

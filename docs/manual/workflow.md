@@ -92,7 +92,7 @@ Some services want to persist data in backends, such as in a database, or make u
 Several backends are defined in Blueprint's `runtime` module.  To make use of them, use the following import:
 
 ```
-import "github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+import "github.com/blueprint-uservices/blueprint/runtime/core/backend"
 ```
 
 We can update the MultiEchoer to use a [`backend.Cache`](../../runtime/core/backend/cache.go) and attempt to lookup cached entries.
@@ -139,7 +139,7 @@ Backends do not impose any additional rules.  Like services, they must be passed
 The [runtime/core](../../runtime/core) package provides the interfaces for a number of commonplace backends.
 
 ```
-import "github.com/Blueprint-uServices/blueprint/runtime/core/backend"
+import "github.com/blueprint-uservices/blueprint/runtime/core/backend"
 ```
 
 * `backend.Cache` an interface for key-value caches; implementations for use in Wiring Specs include [simplecache](../../plugins/simple) and [memcached](../../plugins/memcached)

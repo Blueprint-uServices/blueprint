@@ -3,7 +3,7 @@
 # docker
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/docker"
+import "github.com/blueprint-uservices/blueprint/plugins/docker"
 ```
 
 ## Index

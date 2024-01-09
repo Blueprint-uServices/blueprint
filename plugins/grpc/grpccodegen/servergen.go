@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/Blueprint-uServices/blueprint/plugins/golang"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/gogen"
+	"github.com/blueprint-uservices/blueprint/plugins/golang"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
 	"golang.org/x/exp/slog"
 )
 

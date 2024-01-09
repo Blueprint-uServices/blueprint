@@ -3,7 +3,7 @@
 # query
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/runtime/plugins/simplenosqldb/query"
+import "github.com/blueprint-uservices/blueprint/runtime/plugins/simplenosqldb/query"
 ```
 
 ## Index

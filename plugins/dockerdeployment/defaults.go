@@ -1,9 +1,9 @@
 package dockerdeployment
 
 import (
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint/ioutil"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/plugins/docker"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/ioutil"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/plugins/docker"
 )
 
 // to trigger module initialization and register builders

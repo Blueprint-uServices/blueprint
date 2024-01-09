@@ -7,15 +7,15 @@
 // is used.  The file adds a static initialization block that registers an instance
 // of the 'real' application client.
 //
-// [registry.ServiceRegistry]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/core/registry
+// [registry.ServiceRegistry]: https://github.com/blueprint-uservices/blueprint/tree/main/runtime/core/registry
 package codegen
 
 import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/gocode"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang/gogen"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
 	"golang.org/x/exp/slog"
 )
 

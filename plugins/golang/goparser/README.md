@@ -3,7 +3,7 @@
 # goparser
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/golang/goparser"
+import "github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
 ```
 
 ## Index

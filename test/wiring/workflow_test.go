@@ -3,7 +3,7 @@ package wiring
 import (
 	"testing"
 
-	"github.com/Blueprint-uServices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 	"golang.org/x/exp/slog"
 
 	"github.com/stretchr/testify/assert"

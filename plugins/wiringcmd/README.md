@@ -3,7 +3,7 @@
 # wiringcmd
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/wiringcmd"
+import "github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 ```
 
 Package wiringcmd doesn't provide any blueprint IR or wiring spec extensions.

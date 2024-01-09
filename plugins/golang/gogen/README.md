@@ -3,7 +3,7 @@
 # gogen
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/golang/gogen"
+import "github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
 ```
 
 ## Index

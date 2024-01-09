@@ -3,7 +3,7 @@
 # order
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/order"
+import "github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/order"
 ```
 
 Package order implements the SockShop orders microservice.

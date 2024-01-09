@@ -3,7 +3,7 @@
 # jaeger
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/jaeger"
+import "github.com/blueprint-uservices/blueprint/plugins/jaeger"
 ```
 
 Package jaeger provides a plugin to generate and include a jaeger collector instance in a Blueprint application.

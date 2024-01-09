@@ -3,7 +3,7 @@
 # sqlitereldb
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/runtime/plugins/sqlitereldb"
+import "github.com/blueprint-uservices/blueprint/runtime/plugins/sqlitereldb"
 ```
 
 Package sqlitereldb implements a \[backend.RelationalDB\] using the in\-memory Golang SQLite package [github.com/mattn/go\\\-sqlite3](<https://pkg.go.dev/github.com/mattn/go-sqlite3/>).

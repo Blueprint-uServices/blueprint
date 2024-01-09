@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow/payment"
-	"github.com/Blueprint-uServices/blueprint/runtime/core/registry"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/payment"
+	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
 	"github.com/stretchr/testify/assert"
 )
 

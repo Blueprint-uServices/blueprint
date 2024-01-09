@@ -4,18 +4,18 @@
 // i)  the requests returns without an error
 // ii) the number of failed tries has reached the maximum number of failures.
 // Usage:
-//  import "github.com/Blueprint-uServices/blueprint/plugins/retries"
+//  import "github.com/blueprint-uservices/blueprint/plugins/retries"
 //  retries.AddRetries(spec, "my_service", 10) // Only adds retries
 //  retries.AddRetriesWithTimeouts(spec, "my_service", 10, "1s") // Adds retries and timeouts
 package retries
 
 import (
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/blueprint"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/coreplugins/pointer"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/ir"
-	"github.com/Blueprint-uServices/blueprint/blueprint/pkg/wiring"
-	"github.com/Blueprint-uServices/blueprint/plugins/golang"
-	"github.com/Blueprint-uServices/blueprint/plugins/timeouts"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/pointer"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/golang"
+	"github.com/blueprint-uservices/blueprint/plugins/timeouts"
 	"golang.org/x/exp/slog"
 )
 

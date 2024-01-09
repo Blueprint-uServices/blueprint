@@ -3,7 +3,7 @@
 # healthchecker
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/healthchecker"
+import "github.com/blueprint-uservices/blueprint/plugins/healthchecker"
 ```
 
 Package healthchecker provides a Blueprint modifier for the server side of a service.

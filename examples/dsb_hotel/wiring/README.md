@@ -3,7 +3,7 @@
 # wiring
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/examples/dsb_hotel/wiring"
+import "github.com/blueprint-uservices/blueprint/examples/dsb_hotel/wiring"
 ```
 
 Package main provides an application for compiling a number of different wiring specs for the Hotel Reservation application from the DeathStarBench suite.

@@ -1,15 +1,15 @@
-module github.com/Blueprint-uServices/blueprint/examples/sockshop/tests
+module github.com/blueprint-uservices/blueprint/examples/sockshop/tests
 
 go 1.20
 
-require github.com/Blueprint-uServices/blueprint/runtime v0.0.0
+require github.com/blueprint-uservices/blueprint/runtime v0.0.0
 
-replace github.com/Blueprint-uServices/blueprint/runtime => ../../../runtime
+replace github.com/blueprint-uservices/blueprint/runtime => ../../../runtime
 
 require (
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.4
-	github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow v0.0.0
+	github.com/blueprint-uservices/blueprint/examples/sockshop/workflow v0.0.0
 )
 
 require (
@@ -28,4 +28,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/Blueprint-uServices/blueprint/examples/sockshop/workflow => ../workflow
+replace github.com/blueprint-uservices/blueprint/examples/sockshop/workflow => ../workflow

@@ -3,7 +3,7 @@
 # linuxcontainer
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/plugins/linuxcontainer"
+import "github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 ```
 
 ## Index

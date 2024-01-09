@@ -1,7 +1,7 @@
 package opentelemetry
 
 import (
-	"github.com/Blueprint-uServices/blueprint/plugins/golang"
+	"github.com/blueprint-uservices/blueprint/plugins/golang"
 )
 
 // Interface that indicates if an IRNode implements the OTCollector interface

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/Blueprint-uServices/blueprint/plugins/linuxcontainer/linuxgen"
+	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer/linuxgen"
 	"golang.org/x/exp/slog"
 )
 

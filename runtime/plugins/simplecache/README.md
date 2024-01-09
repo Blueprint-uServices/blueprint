@@ -3,7 +3,7 @@
 # simplecache
 
 ```go
-import "github.com/Blueprint-uServices/blueprint/runtime/plugins/simplecache"
+import "github.com/blueprint-uservices/blueprint/runtime/plugins/simplecache"
 ```
 
 Package simplecache implements a key\-value \[backend.Cache\] using a golang map.

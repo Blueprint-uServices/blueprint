@@ -1,1 +1,1 @@
-module github.com/Blueprint-uServices/blueprint/examples/train_ticket/wiring
+module github.com/blueprint-uservices/blueprint/examples/train_ticket/wiring
