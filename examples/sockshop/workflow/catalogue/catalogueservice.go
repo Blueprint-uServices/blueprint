@@ -5,9 +5,9 @@ import (
 	"context"
 	"strings"
 
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
 
 type (

@@ -7,10 +7,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/mongodb"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/simplenosqldb"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/mongodb"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

@@ -1,4 +1,4 @@
-module gitlab.mpi-sws.org/cld/blueprint/examples/dsb_hotel/workflow
+module github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workflow
 
 go 1.20
 

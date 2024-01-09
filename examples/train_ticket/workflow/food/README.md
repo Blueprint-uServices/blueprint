@@ -3,7 +3,7 @@
 # food
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/food"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/food"
 ```
 
 ## Index
@@ -13,7 +13,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/food"
 
 
 <a name="Food"></a>
-## type [Food](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/food/data.go#L3-L6>)
+## type [Food](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/food/data.go#L3-L6>)
 
 
 
@@ -25,7 +25,7 @@ type Food struct {
 ```
 
 <a name="FoodOrder"></a>
-## type [FoodOrder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/food/data.go#L8-L16>)
+## type [FoodOrder](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/food/data.go#L8-L16>)
 
 
 

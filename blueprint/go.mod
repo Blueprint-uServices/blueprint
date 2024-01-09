@@ -1,4 +1,4 @@
-module gitlab.mpi-sws.org/cld/blueprint/blueprint
+module github.com/blueprint-uservices/blueprint/blueprint
 
 go 1.20
 

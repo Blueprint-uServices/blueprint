@@ -1,1 +1,1 @@
-module gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/wiring
+module github.com/blueprint-uservices/blueprint/examples/train_ticket/wiring

@@ -5,11 +5,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/cart"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/catalogue"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/order"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/user"
 	"github.com/google/uuid"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/cart"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/catalogue"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/order"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/user"
 )
 
 type (

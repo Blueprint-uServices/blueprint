@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/assurance"
+	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/simplenosqldb"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/assurance"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 )
 
 var assuranceServiceRegistry = registry.NewServiceRegistry[assurance.AssuranceService]("assurance_service")

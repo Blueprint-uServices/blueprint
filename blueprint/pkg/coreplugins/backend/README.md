@@ -3,7 +3,7 @@
 # backend
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/backend"
+import "github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/backend"
 ```
 
 Package backend provides IR node interfaces for common backend components.
@@ -17,7 +17,7 @@ Package backend provides IR node interfaces for common backend components.
 
 
 <a name="Cache"></a>
-## type Cache
+## type [Cache](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/backend/ir.go#L10-L13>)
 
 
 
@@ -29,7 +29,7 @@ type Cache interface {
 ```
 
 <a name="NoSQLDB"></a>
-## type NoSQLDB
+## type [NoSQLDB](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/backend/ir.go#L15-L18>)
 
 
 
@@ -41,7 +41,7 @@ type NoSQLDB interface {
 ```
 
 <a name="Queue"></a>
-## type Queue
+## type [Queue](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/backend/ir.go#L20-L23>)
 
 
 
@@ -53,7 +53,7 @@ type Queue interface {
 ```
 
 <a name="RelDB"></a>
-## type RelDB
+## type [RelDB](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/backend/ir.go#L25-L28>)
 
 
 

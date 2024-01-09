@@ -3,7 +3,7 @@
 # grpccodegen
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/grpc/grpccodegen"
+import "github.com/blueprint-uservices/blueprint/plugins/grpc/grpccodegen"
 ```
 
 ## Index
@@ -27,7 +27,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/grpc/grpccodegen"
 
 
 <a name="CompileProtoFile"></a>
-## func [CompileProtoFile](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L86>)
+## func [CompileProtoFile](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L86>)
 
 ```go
 func CompileProtoFile(protoFileName string) error
@@ -36,7 +36,7 @@ func CompileProtoFile(protoFileName string) error
 
 
 <a name="GenerateClient"></a>
-## func [GenerateClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/clientgen.go#L18>)
+## func [GenerateClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/clientgen.go#L18>)
 
 ```go
 func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error
@@ -47,7 +47,7 @@ This function is used by the GRPC plugin to generate the client\-side caller of 
 It is assumed that outputPackage is the same as the one where the .proto is generated to
 
 <a name="GenerateGRPCProto"></a>
-## func [GenerateGRPCProto](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L23>)
+## func [GenerateGRPCProto](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L23>)
 
 ```go
 func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error
@@ -58,7 +58,7 @@ Generates the GRPC .proto file for the provided service interface, then compiles
 See the plugin README for the required GRPC and protocol buffers package dependencies.
 
 <a name="GenerateServerHandler"></a>
-## func [GenerateServerHandler](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/servergen.go#L18>)
+## func [GenerateServerHandler](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/servergen.go#L18>)
 
 ```go
 func GenerateServerHandler(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error
@@ -69,7 +69,7 @@ This function is used by the GRPC plugin to generate the server\-side GRPC servi
 It is assumed that outputPackage is the same as the one where the .proto is generated to
 
 <a name="GRPCField"></a>
-## type [GRPCField](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L105-L111>)
+## type [GRPCField](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L105-L111>)
 
 A basic structural representation of the GRPC messages and services
 
@@ -84,7 +84,7 @@ type GRPCField struct {
 ```
 
 <a name="GRPCField.Marshall"></a>
-### func \(\*GRPCField\) [Marshall](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/marshallgen.go#L118>)
+### func \(\*GRPCField\) [Marshall](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/marshallgen.go#L118>)
 
 ```go
 func (f *GRPCField) Marshall(imports *gogen.Imports, obj string) (string, error)
@@ -93,7 +93,7 @@ func (f *GRPCField) Marshall(imports *gogen.Imports, obj string) (string, error)
 
 
 <a name="GRPCField.Unmarshall"></a>
-### func \(\*GRPCField\) [Unmarshall](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/marshallgen.go#L173>)
+### func \(\*GRPCField\) [Unmarshall](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/marshallgen.go#L173>)
 
 ```go
 func (f *GRPCField) Unmarshall(imports *gogen.Imports, obj string) (string, error)
@@ -102,7 +102,7 @@ func (f *GRPCField) Unmarshall(imports *gogen.Imports, obj string) (string, erro
 
 
 <a name="GRPCMessageDecl"></a>
-## type [GRPCMessageDecl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L113-L118>)
+## type [GRPCMessageDecl](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L113-L118>)
 
 A basic structural representation of the GRPC messages and services
 
@@ -116,7 +116,7 @@ type GRPCMessageDecl struct {
 ```
 
 <a name="GRPCMethodDecl"></a>
-## type [GRPCMethodDecl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L120-L125>)
+## type [GRPCMethodDecl](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L120-L125>)
 
 A basic structural representation of the GRPC messages and services
 
@@ -130,7 +130,7 @@ type GRPCMethodDecl struct {
 ```
 
 <a name="GRPCProtoBuilder"></a>
-## type [GRPCProtoBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L133-L142>)
+## type [GRPCProtoBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L133-L142>)
 
 A basic structural representation of the GRPC messages and services
 
@@ -148,7 +148,7 @@ type GRPCProtoBuilder struct {
 ```
 
 <a name="NewProtoBuilder"></a>
-### func [NewProtoBuilder](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L145>)
+### func [NewProtoBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L145>)
 
 ```go
 func NewProtoBuilder(code *goparser.ParsedModuleSet, name string) *GRPCProtoBuilder
@@ -157,7 +157,7 @@ func NewProtoBuilder(code *goparser.ParsedModuleSet, name string) *GRPCProtoBuil
 
 
 <a name="GRPCProtoBuilder.AddService"></a>
-### func \(\*GRPCProtoBuilder\) [AddService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L252>)
+### func \(\*GRPCProtoBuilder\) [AddService](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L252>)
 
 ```go
 func (b *GRPCProtoBuilder) AddService(iface *gocode.ServiceInterface) error
@@ -170,7 +170,7 @@ Adds a service declaration for the provided golang service interface.
 For arguments and return values on methods in the interface, corresponding GRPC message objects are needed. The ProtoBuilder will consult the parsed code to find the definitions of arguments and return values.
 
 <a name="GRPCProtoBuilder.GenerateMarshallingCode"></a>
-### func \(\*GRPCProtoBuilder\) [GenerateMarshallingCode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/marshallgen.go#L94>)
+### func \(\*GRPCProtoBuilder\) [GenerateMarshallingCode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/marshallgen.go#L94>)
 
 ```go
 func (b *GRPCProtoBuilder) GenerateMarshallingCode(outputFilePath string) error
@@ -179,7 +179,7 @@ func (b *GRPCProtoBuilder) GenerateMarshallingCode(outputFilePath string) error
 
 
 <a name="GRPCProtoBuilder.GetOrAddMessage"></a>
-### func \(\*GRPCProtoBuilder\) [GetOrAddMessage](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L272>)
+### func \(\*GRPCProtoBuilder\) [GetOrAddMessage](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L272>)
 
 ```go
 func (b *GRPCProtoBuilder) GetOrAddMessage(t *gocode.UserType) (*GRPCMessageDecl, error)
@@ -188,7 +188,7 @@ func (b *GRPCProtoBuilder) GetOrAddMessage(t *gocode.UserType) (*GRPCMessageDecl
 
 
 <a name="GRPCProtoBuilder.WriteProtoFile"></a>
-### func \(\*GRPCProtoBuilder\) [WriteProtoFile](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L176>)
+### func \(\*GRPCProtoBuilder\) [WriteProtoFile](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L176>)
 
 ```go
 func (b *GRPCProtoBuilder) WriteProtoFile(outputFilePath string) error
@@ -197,7 +197,7 @@ func (b *GRPCProtoBuilder) WriteProtoFile(outputFilePath string) error
 
 
 <a name="GRPCServiceDecl"></a>
-## type [GRPCServiceDecl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L127-L131>)
+## type [GRPCServiceDecl](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L127-L131>)
 
 A basic structural representation of the GRPC messages and services
 

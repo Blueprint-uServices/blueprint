@@ -85,7 +85,7 @@ If you wish to write your own client application, you can import the `build/gote
 ```
 import "context"
 import "blueprint/testclients/clients"
-import "gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/frontend"
+import "github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/frontend"
 
 func getSockshopFrontendClient(ctx context.Context) (frontend.Frontend, error) {
     builder := clients.NewClientLibrary("myclient")

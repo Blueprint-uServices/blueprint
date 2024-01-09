@@ -3,7 +3,7 @@
 # latency
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/latency"
+import "github.com/blueprint-uservices/blueprint/plugins/latency"
 ```
 
 Package latencyinjector provides a Blueprint modifier for the server side of service calls.
@@ -11,7 +11,7 @@ Package latencyinjector provides a Blueprint modifier for the server side of ser
 The plugin configures the server side to inject a user\-defined amount of latency. Currently latency is injected for all requests and only a pre\-defined duration is supported with no variance/noise added. The plugin will generate a wrapper class that will sleep for a fixed amount of time \(the specified latency to be injected\) before invoking the handler for handling the request. Example Usage to add 100ms latency to each request:
 
 ```
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/latency"
+import "github.com/blueprint-uservices/blueprint/plugins/latency"
 latency.AddFixed(spec, "my_service", "100ms")
 ```
 
@@ -34,7 +34,7 @@ If you need the above feature\(s\) consider submitting a PR, raising a feature r
 
 
 <a name="AddFixed"></a>
-## func [AddFixed](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/latency/wiring.go#L35>)
+## func [AddFixed](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/latency/wiring.go#L35>)
 
 ```go
 func AddFixed(spec wiring.WiringSpec, serviceName string, latency string)
@@ -47,7 +47,7 @@ AddFixed(spec, "my_service", "100ms")
 ```
 
 <a name="LatencyInjectorWrapper"></a>
-## type [LatencyInjectorWrapper](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/latency/ir.go#L15-L24>)
+## type [LatencyInjectorWrapper](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/latency/ir.go#L15-L24>)
 
 Blueprint IR Node representing a server side latency injector
 
@@ -66,7 +66,7 @@ type LatencyInjectorWrapper struct {
 ```
 
 <a name="LatencyInjectorWrapper.AddInstantiation"></a>
-### func \(\*LatencyInjectorWrapper\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/latency/ir.go#L81>)
+### func \(\*LatencyInjectorWrapper\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/latency/ir.go#L81>)
 
 ```go
 func (node *LatencyInjectorWrapper) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -75,7 +75,7 @@ func (node *LatencyInjectorWrapper) AddInstantiation(builder golang.NamespaceBui
 Implements golang.Instantiable
 
 <a name="LatencyInjectorWrapper.AddInterfaces"></a>
-### func \(\*LatencyInjectorWrapper\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/latency/ir.go#L57>)
+### func \(\*LatencyInjectorWrapper\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/latency/ir.go#L57>)
 
 ```go
 func (node *LatencyInjectorWrapper) AddInterfaces(builder golang.ModuleBuilder) error
@@ -84,7 +84,7 @@ func (node *LatencyInjectorWrapper) AddInterfaces(builder golang.ModuleBuilder) 
 Implements \[golang.Service\]
 
 <a name="LatencyInjectorWrapper.GenerateFuncs"></a>
-### func \(\*LatencyInjectorWrapper\) [GenerateFuncs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/latency/ir.go#L67>)
+### func \(\*LatencyInjectorWrapper\) [GenerateFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/latency/ir.go#L67>)
 
 ```go
 func (node *LatencyInjectorWrapper) GenerateFuncs(builder golang.ModuleBuilder) error
@@ -93,7 +93,7 @@ func (node *LatencyInjectorWrapper) GenerateFuncs(builder golang.ModuleBuilder) 
 Implements \[golang.GeneratesFuncs\]
 
 <a name="LatencyInjectorWrapper.GetInterface"></a>
-### func \(\*LatencyInjectorWrapper\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/latency/ir.go#L62>)
+### func \(\*LatencyInjectorWrapper\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/latency/ir.go#L62>)
 
 ```go
 func (node *LatencyInjectorWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -102,7 +102,7 @@ func (node *LatencyInjectorWrapper) GetInterface(ctx ir.BuildContext) (service.S
 Implements \[golang.Service\]
 
 <a name="LatencyInjectorWrapper.ImplementsGolangNode"></a>
-### func \(\*LatencyInjectorWrapper\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/latency/ir.go#L41>)
+### func \(\*LatencyInjectorWrapper\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/latency/ir.go#L41>)
 
 ```go
 func (node *LatencyInjectorWrapper) ImplementsGolangNode()
@@ -111,7 +111,7 @@ func (node *LatencyInjectorWrapper) ImplementsGolangNode()
 Implements \[ir.IRNode\]
 
 <a name="LatencyInjectorWrapper.ImplementsGolangService"></a>
-### func \(\*LatencyInjectorWrapper\) [ImplementsGolangService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/latency/ir.go#L44>)
+### func \(\*LatencyInjectorWrapper\) [ImplementsGolangService](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/latency/ir.go#L44>)
 
 ```go
 func (node *LatencyInjectorWrapper) ImplementsGolangService()
@@ -120,7 +120,7 @@ func (node *LatencyInjectorWrapper) ImplementsGolangService()
 Implements \[golang.Service\]
 
 <a name="LatencyInjectorWrapper.Name"></a>
-### func \(\*LatencyInjectorWrapper\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/latency/ir.go#L47>)
+### func \(\*LatencyInjectorWrapper\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/latency/ir.go#L47>)
 
 ```go
 func (node *LatencyInjectorWrapper) Name() string
@@ -129,7 +129,7 @@ func (node *LatencyInjectorWrapper) Name() string
 Implements \[ir.IRNode\]
 
 <a name="LatencyInjectorWrapper.String"></a>
-### func \(\*LatencyInjectorWrapper\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/latency/ir.go#L52>)
+### func \(\*LatencyInjectorWrapper\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/latency/ir.go#L52>)
 
 ```go
 func (node *LatencyInjectorWrapper) String() string

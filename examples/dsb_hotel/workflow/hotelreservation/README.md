@@ -3,7 +3,7 @@
 # hotelreservation
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/dsb_hotel/workflow/hotelreservation"
+import "github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workflow/hotelreservation"
 ```
 
 Package hotelreservation implements the workflow specification of the Hotel Reservation application
@@ -75,7 +75,7 @@ const (
 ```
 
 <a name="Address"></a>
-## type [Address](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L72-L81>)
+## type [Address](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L72-L81>)
 
 
 
@@ -93,7 +93,7 @@ type Address struct {
 ```
 
 <a name="FrontEndService"></a>
-## type [FrontEndService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/FrontEndService.go#L9-L18>)
+## type [FrontEndService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/FrontEndService.go#L9-L18>)
 
 FrontEndService implements the front end server from the hotel reservation application
 
@@ -111,7 +111,7 @@ type FrontEndService interface {
 ```
 
 <a name="NewFrontEndServiceImpl"></a>
-### func [NewFrontEndServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/FrontEndService.go#L30>)
+### func [NewFrontEndServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/FrontEndService.go#L30>)
 
 ```go
 func NewFrontEndServiceImpl(ctx context.Context, searchService SearchService, profileService ProfileService, recommendationService RecommendationService, userService UserService, reservationService ReservationService) (FrontEndService, error)
@@ -120,7 +120,7 @@ func NewFrontEndServiceImpl(ctx context.Context, searchService SearchService, pr
 Creates and Returns a new FrontEndService object
 
 <a name="FrontEndServiceImpl"></a>
-## type [FrontEndServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/FrontEndService.go#L21-L27>)
+## type [FrontEndServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/FrontEndService.go#L21-L27>)
 
 Implementation of the FrontEndService
 
@@ -131,7 +131,7 @@ type FrontEndServiceImpl struct {
 ```
 
 <a name="FrontEndServiceImpl.RecommendHandler"></a>
-### func \(\*FrontEndServiceImpl\) [RecommendHandler](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/FrontEndService.go#L53>)
+### func \(\*FrontEndServiceImpl\) [RecommendHandler](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/FrontEndService.go#L53>)
 
 ```go
 func (f *FrontEndServiceImpl) RecommendHandler(ctx context.Context, lat float64, lon float64, require string, locale string) ([]HotelProfile, error)
@@ -140,7 +140,7 @@ func (f *FrontEndServiceImpl) RecommendHandler(ctx context.Context, lat float64,
 
 
 <a name="FrontEndServiceImpl.ReservationHandler"></a>
-### func \(\*FrontEndServiceImpl\) [ReservationHandler](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/FrontEndService.go#L82>)
+### func \(\*FrontEndServiceImpl\) [ReservationHandler](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/FrontEndService.go#L82>)
 
 ```go
 func (f *FrontEndServiceImpl) ReservationHandler(ctx context.Context, inDate string, outDate string, hotelId string, customerName string, username string, password string, roomNumber int64) (string, error)
@@ -149,7 +149,7 @@ func (f *FrontEndServiceImpl) ReservationHandler(ctx context.Context, inDate str
 
 
 <a name="FrontEndServiceImpl.SearchHandler"></a>
-### func \(\*FrontEndServiceImpl\) [SearchHandler](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/FrontEndService.go#L34>)
+### func \(\*FrontEndServiceImpl\) [SearchHandler](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/FrontEndService.go#L34>)
 
 ```go
 func (f *FrontEndServiceImpl) SearchHandler(ctx context.Context, customerName string, inDate string, outDate string, lat float64, lon float64, locale string) ([]HotelProfile, error)
@@ -158,7 +158,7 @@ func (f *FrontEndServiceImpl) SearchHandler(ctx context.Context, customerName st
 
 
 <a name="FrontEndServiceImpl.UserHandler"></a>
-### func \(\*FrontEndServiceImpl\) [UserHandler](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/FrontEndService.go#L71>)
+### func \(\*FrontEndServiceImpl\) [UserHandler](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/FrontEndService.go#L71>)
 
 ```go
 func (f *FrontEndServiceImpl) UserHandler(ctx context.Context, username string, password string) (string, error)
@@ -167,7 +167,7 @@ func (f *FrontEndServiceImpl) UserHandler(ctx context.Context, username string, 
 
 
 <a name="GeoService"></a>
-## type [GeoService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/GeoService.go#L13-L16>)
+## type [GeoService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/GeoService.go#L13-L16>)
 
 GeoService implements the GeoService from HotelReservation
 
@@ -179,7 +179,7 @@ type GeoService interface {
 ```
 
 <a name="NewGeoServiceImpl"></a>
-### func [NewGeoServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/GeoService.go#L74>)
+### func [NewGeoServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/GeoService.go#L74>)
 
 ```go
 func NewGeoServiceImpl(ctx context.Context, geoDB backend.NoSQLDatabase) (GeoService, error)
@@ -188,7 +188,7 @@ func NewGeoServiceImpl(ctx context.Context, geoDB backend.NoSQLDatabase) (GeoSer
 Creates and returns a new GeoService object
 
 <a name="GeoServiceImpl"></a>
-## type [GeoServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/GeoService.go#L19-L22>)
+## type [GeoServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/GeoService.go#L19-L22>)
 
 Implementation of GeoService
 
@@ -199,7 +199,7 @@ type GeoServiceImpl struct {
 ```
 
 <a name="GeoServiceImpl.Nearby"></a>
-### func \(\*GeoServiceImpl\) [Nearby](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/GeoService.go#L114>)
+### func \(\*GeoServiceImpl\) [Nearby](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/GeoService.go#L114>)
 
 ```go
 func (g *GeoServiceImpl) Nearby(ctx context.Context, lat float64, lon float64) ([]string, error)
@@ -208,7 +208,7 @@ func (g *GeoServiceImpl) Nearby(ctx context.Context, lat float64, lon float64) (
 
 
 <a name="Hotel"></a>
-## type [Hotel](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L62-L68>)
+## type [Hotel](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L62-L68>)
 
 
 
@@ -223,7 +223,7 @@ type Hotel struct {
 ```
 
 <a name="HotelNumber"></a>
-## type [HotelNumber](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L55-L58>)
+## type [HotelNumber](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L55-L58>)
 
 
 
@@ -235,7 +235,7 @@ type HotelNumber struct {
 ```
 
 <a name="HotelProfile"></a>
-## type [HotelProfile](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L85-L91>)
+## type [HotelProfile](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L85-L91>)
 
 
 
@@ -250,7 +250,7 @@ type HotelProfile struct {
 ```
 
 <a name="Point"></a>
-## type [Point](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L4-L8>)
+## type [Point](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L4-L8>)
 
 
 
@@ -263,7 +263,7 @@ type Point struct {
 ```
 
 <a name="Point.Id"></a>
-### func \(Point\) [Id](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L12>)
+### func \(Point\) [Id](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L12>)
 
 ```go
 func (p Point) Id() string
@@ -272,7 +272,7 @@ func (p Point) Id() string
 
 
 <a name="Point.Lat"></a>
-### func \(Point\) [Lat](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L14>)
+### func \(Point\) [Lat](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L14>)
 
 ```go
 func (p Point) Lat() float64
@@ -281,7 +281,7 @@ func (p Point) Lat() float64
 
 
 <a name="Point.Lon"></a>
-### func \(Point\) [Lon](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L16>)
+### func \(Point\) [Lon](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L16>)
 
 ```go
 func (p Point) Lon() float64
@@ -290,7 +290,7 @@ func (p Point) Lon() float64
 
 
 <a name="ProfileService"></a>
-## type [ProfileService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ProfileService.go#L12-L15>)
+## type [ProfileService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ProfileService.go#L12-L15>)
 
 ProfileService implements Profile Service from the hotel reservation application
 
@@ -302,7 +302,7 @@ type ProfileService interface {
 ```
 
 <a name="NewProfileServiceImpl"></a>
-### func [NewProfileServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ProfileService.go#L165>)
+### func [NewProfileServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ProfileService.go#L165>)
 
 ```go
 func NewProfileServiceImpl(ctx context.Context, profileCache backend.Cache, profileDB backend.NoSQLDatabase) (ProfileService, error)
@@ -311,7 +311,7 @@ func NewProfileServiceImpl(ctx context.Context, profileCache backend.Cache, prof
 Creates and Returns a new Profile Service object
 
 <a name="ProfileServiceImpl"></a>
-## type [ProfileServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ProfileService.go#L18-L21>)
+## type [ProfileServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ProfileService.go#L18-L21>)
 
 Implementation of Profile Service
 
@@ -322,7 +322,7 @@ type ProfileServiceImpl struct {
 ```
 
 <a name="ProfileServiceImpl.GetProfiles"></a>
-### func \(\*ProfileServiceImpl\) [GetProfiles](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ProfileService.go#L173>)
+### func \(\*ProfileServiceImpl\) [GetProfiles](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ProfileService.go#L173>)
 
 ```go
 func (p *ProfileServiceImpl) GetProfiles(ctx context.Context, hotelIds []string, locale string) ([]HotelProfile, error)
@@ -331,7 +331,7 @@ func (p *ProfileServiceImpl) GetProfiles(ctx context.Context, hotelIds []string,
 
 
 <a name="RatePlan"></a>
-## type [RatePlan](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L35-L41>)
+## type [RatePlan](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L35-L41>)
 
 
 
@@ -346,7 +346,7 @@ type RatePlan struct {
 ```
 
 <a name="RateService"></a>
-## type [RateService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RateService.go#L12-L15>)
+## type [RateService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RateService.go#L12-L15>)
 
 RateService implements Rate Service from the hotel reservation application
 
@@ -358,7 +358,7 @@ type RateService interface {
 ```
 
 <a name="NewRateServiceImpl"></a>
-### func [NewRateServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RateService.go#L121>)
+### func [NewRateServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RateService.go#L121>)
 
 ```go
 func NewRateServiceImpl(ctx context.Context, rateCache backend.Cache, rateDB backend.NoSQLDatabase) (RateService, error)
@@ -367,7 +367,7 @@ func NewRateServiceImpl(ctx context.Context, rateCache backend.Cache, rateDB bac
 Creates and Returns a new RateService object
 
 <a name="RateServiceImpl"></a>
-## type [RateServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RateService.go#L18-L21>)
+## type [RateServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RateService.go#L18-L21>)
 
 Implementation of RateService
 
@@ -378,7 +378,7 @@ type RateServiceImpl struct {
 ```
 
 <a name="RateServiceImpl.GetRates"></a>
-### func \(\*RateServiceImpl\) [GetRates](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RateService.go#L129>)
+### func \(\*RateServiceImpl\) [GetRates](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RateService.go#L129>)
 
 ```go
 func (r *RateServiceImpl) GetRates(ctx context.Context, hotelIDs []string, inDate string, outDate string) ([]RatePlan, error)
@@ -387,7 +387,7 @@ func (r *RateServiceImpl) GetRates(ctx context.Context, hotelIDs []string, inDat
 
 
 <a name="RecommendationService"></a>
-## type [RecommendationService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RecommendationService.go#L14-L17>)
+## type [RecommendationService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RecommendationService.go#L14-L17>)
 
 RecommendationService implements Recommendation Service from the hotel reservation application
 
@@ -399,7 +399,7 @@ type RecommendationService interface {
 ```
 
 <a name="NewRecommendationServiceImpl"></a>
-### func [NewRecommendationServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RecommendationService.go#L95>)
+### func [NewRecommendationServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RecommendationService.go#L95>)
 
 ```go
 func NewRecommendationServiceImpl(ctx context.Context, recommendDB backend.NoSQLDatabase) (RecommendationService, error)
@@ -408,7 +408,7 @@ func NewRecommendationServiceImpl(ctx context.Context, recommendDB backend.NoSQL
 Creates and Returns a new RecommendationService object
 
 <a name="RecommendationServiceImpl"></a>
-## type [RecommendationServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RecommendationService.go#L20-L23>)
+## type [RecommendationServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RecommendationService.go#L20-L23>)
 
 Implements RecommendationService
 
@@ -419,7 +419,7 @@ type RecommendationServiceImpl struct {
 ```
 
 <a name="RecommendationServiceImpl.GetRecommendations"></a>
-### func \(\*RecommendationServiceImpl\) [GetRecommendations](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RecommendationService.go#L128>)
+### func \(\*RecommendationServiceImpl\) [GetRecommendations](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RecommendationService.go#L128>)
 
 ```go
 func (r *RecommendationServiceImpl) GetRecommendations(ctx context.Context, require string, lat float64, lon float64) ([]string, error)
@@ -428,7 +428,7 @@ func (r *RecommendationServiceImpl) GetRecommendations(ctx context.Context, requ
 
 
 <a name="RecommendationServiceImpl.LoadRecommendations"></a>
-### func \(\*RecommendationServiceImpl\) [LoadRecommendations](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RecommendationService.go#L108>)
+### func \(\*RecommendationServiceImpl\) [LoadRecommendations](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/RecommendationService.go#L108>)
 
 ```go
 func (r *RecommendationServiceImpl) LoadRecommendations(ctx context.Context) error
@@ -437,7 +437,7 @@ func (r *RecommendationServiceImpl) LoadRecommendations(ctx context.Context) err
 
 
 <a name="Reservation"></a>
-## type [Reservation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L45-L51>)
+## type [Reservation](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L45-L51>)
 
 
 
@@ -452,7 +452,7 @@ type Reservation struct {
 ```
 
 <a name="ReservationService"></a>
-## type [ReservationService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ReservationService.go#L13-L18>)
+## type [ReservationService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ReservationService.go#L13-L18>)
 
 ReservationService implements ReservationService from hotel reservation application
 
@@ -466,7 +466,7 @@ type ReservationService interface {
 ```
 
 <a name="NewReservationServiceImpl"></a>
-### func [NewReservationServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ReservationService.go#L87>)
+### func [NewReservationServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ReservationService.go#L87>)
 
 ```go
 func NewReservationServiceImpl(ctx context.Context, reserveCache backend.Cache, reserveDB backend.NoSQLDatabase) (ReservationService, error)
@@ -475,7 +475,7 @@ func NewReservationServiceImpl(ctx context.Context, reserveCache backend.Cache, 
 
 
 <a name="ReservationServiceImpl"></a>
-## type [ReservationServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ReservationService.go#L20-L25>)
+## type [ReservationServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ReservationService.go#L20-L25>)
 
 
 
@@ -488,7 +488,7 @@ type ReservationServiceImpl struct {
 ```
 
 <a name="ReservationServiceImpl.CheckAvailability"></a>
-### func \(\*ReservationServiceImpl\) [CheckAvailability](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ReservationService.go#L186>)
+### func \(\*ReservationServiceImpl\) [CheckAvailability](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ReservationService.go#L186>)
 
 ```go
 func (r *ReservationServiceImpl) CheckAvailability(ctx context.Context, customerName string, hotelIds []string, inDate string, outDate string, roomNumber int64) ([]string, error)
@@ -497,7 +497,7 @@ func (r *ReservationServiceImpl) CheckAvailability(ctx context.Context, customer
 
 
 <a name="ReservationServiceImpl.MakeReservation"></a>
-### func \(\*ReservationServiceImpl\) [MakeReservation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ReservationService.go#L96>)
+### func \(\*ReservationServiceImpl\) [MakeReservation](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/ReservationService.go#L96>)
 
 ```go
 func (r *ReservationServiceImpl) MakeReservation(ctx context.Context, customerName string, hotelIds []string, inDate string, outDate string, roomNumber int64) ([]string, error)
@@ -506,7 +506,7 @@ func (r *ReservationServiceImpl) MakeReservation(ctx context.Context, customerNa
 
 
 <a name="RoomType"></a>
-## type [RoomType](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L25-L31>)
+## type [RoomType](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L25-L31>)
 
 
 
@@ -521,7 +521,7 @@ type RoomType struct {
 ```
 
 <a name="SearchService"></a>
-## type [SearchService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/SearchService.go#L8-L11>)
+## type [SearchService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/SearchService.go#L8-L11>)
 
 SearchService implements the Search service from hotel reservation
 
@@ -533,7 +533,7 @@ type SearchService interface {
 ```
 
 <a name="NewSearchServiceImpl"></a>
-### func [NewSearchServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/SearchService.go#L20>)
+### func [NewSearchServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/SearchService.go#L20>)
 
 ```go
 func NewSearchServiceImpl(ctx context.Context, geoService GeoService, rateService RateService) (SearchService, error)
@@ -542,7 +542,7 @@ func NewSearchServiceImpl(ctx context.Context, geoService GeoService, rateServic
 Creates and Returns a new SearchService object
 
 <a name="SearchServiceImpl"></a>
-## type [SearchServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/SearchService.go#L14-L17>)
+## type [SearchServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/SearchService.go#L14-L17>)
 
 Implementation of the Search Service
 
@@ -553,7 +553,7 @@ type SearchServiceImpl struct {
 ```
 
 <a name="SearchServiceImpl.Nearby"></a>
-### func \(\*SearchServiceImpl\) [Nearby](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/SearchService.go#L24>)
+### func \(\*SearchServiceImpl\) [Nearby](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/SearchService.go#L24>)
 
 ```go
 func (s *SearchServiceImpl) Nearby(ctx context.Context, lat float64, lon float64, inDate string, outDate string) ([]string, error)
@@ -562,7 +562,7 @@ func (s *SearchServiceImpl) Nearby(ctx context.Context, lat float64, lon float64
 
 
 <a name="User"></a>
-## type [User](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L18-L21>)
+## type [User](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/DataModels.go#L18-L21>)
 
 
 
@@ -574,7 +574,7 @@ type User struct {
 ```
 
 <a name="UserService"></a>
-## type [UserService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/UserService.go#L14-L18>)
+## type [UserService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/UserService.go#L14-L18>)
 
 UserService manages the registered users for the application
 
@@ -587,7 +587,7 @@ type UserService interface {
 ```
 
 <a name="NewUserServiceImpl"></a>
-### func [NewUserServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/UserService.go#L50>)
+### func [NewUserServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/UserService.go#L50>)
 
 ```go
 func NewUserServiceImpl(ctx context.Context, userDB backend.NoSQLDatabase) (UserService, error)
@@ -596,7 +596,7 @@ func NewUserServiceImpl(ctx context.Context, userDB backend.NoSQLDatabase) (User
 Creates and returns a new UserService object
 
 <a name="UserServiceImpl"></a>
-## type [UserServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/UserService.go#L21-L24>)
+## type [UserServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/UserService.go#L21-L24>)
 
 Implementation of the UserService
 
@@ -607,7 +607,7 @@ type UserServiceImpl struct {
 ```
 
 <a name="UserServiceImpl.CheckUser"></a>
-### func \(\*UserServiceImpl\) [CheckUser](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/UserService.go#L83>)
+### func \(\*UserServiceImpl\) [CheckUser](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/UserService.go#L83>)
 
 ```go
 func (u *UserServiceImpl) CheckUser(ctx context.Context, username string, password string) (bool, error)
@@ -616,7 +616,7 @@ func (u *UserServiceImpl) CheckUser(ctx context.Context, username string, passwo
 
 
 <a name="UserServiceImpl.LoadUsers"></a>
-### func \(\*UserServiceImpl\) [LoadUsers](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/UserService.go#L63>)
+### func \(\*UserServiceImpl\) [LoadUsers](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/dsb_hotel/workflow/hotelreservation/UserService.go#L63>)
 
 ```go
 func (u *UserServiceImpl) LoadUsers(ctx context.Context) error

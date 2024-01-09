@@ -1,10 +1,10 @@
-module gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/wiring
+module github.com/blueprint-uservices/blueprint/examples/sockshop/wiring
 
 go 1.20
 
-require gitlab.mpi-sws.org/cld/blueprint/blueprint v0.0.0
+require github.com/blueprint-uservices/blueprint/blueprint v0.0.0
 
-require gitlab.mpi-sws.org/cld/blueprint/plugins v0.0.0
+require github.com/blueprint-uservices/blueprint/plugins v0.0.0
 
 require (
 	github.com/otiai10/copy v1.11.0 // indirect
@@ -14,6 +14,6 @@ require (
 	golang.org/x/tools v0.15.0 // indirect
 )
 
-replace gitlab.mpi-sws.org/cld/blueprint/blueprint => ../../../blueprint
+replace github.com/blueprint-uservices/blueprint/blueprint => ../../../blueprint
 
-replace gitlab.mpi-sws.org/cld/blueprint/plugins => ../../../plugins
+replace github.com/blueprint-uservices/blueprint/plugins => ../../../plugins

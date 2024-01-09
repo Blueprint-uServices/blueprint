@@ -3,7 +3,7 @@
 # memcached
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/memcached"
+import "github.com/blueprint-uservices/blueprint/runtime/plugins/memcached"
 ```
 
 Package memcached implements a key\-value \[backend.Cache\] client interface to a vanilla memcached implementation.
@@ -21,7 +21,7 @@ Package memcached implements a key\-value \[backend.Cache\] client interface to 
 
 
 <a name="Memcached"></a>
-## type [Memcached](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/memcached/cache.go#L14-L17>)
+## type [Memcached](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/memcached/cache.go#L14-L17>)
 
 A memcached client wrapper that implements the \[backend.Cache\] interface
 
@@ -33,7 +33,7 @@ type Memcached struct {
 ```
 
 <a name="NewMemcachedClient"></a>
-### func [NewMemcachedClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/memcached/cache.go#L20>)
+### func [NewMemcachedClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/memcached/cache.go#L20>)
 
 ```go
 func NewMemcachedClient(ctx context.Context, serverAddress string) (*Memcached, error)
@@ -42,7 +42,7 @@ func NewMemcachedClient(ctx context.Context, serverAddress string) (*Memcached, 
 Instantiates a new memcached client to a memcached instance running at \`serverAddress\`
 
 <a name="Memcached.Delete"></a>
-### func \(\*Memcached\) [Delete](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/memcached/cache.go#L56>)
+### func \(\*Memcached\) [Delete](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/memcached/cache.go#L56>)
 
 ```go
 func (m *Memcached) Delete(ctx context.Context, key string) error
@@ -51,7 +51,7 @@ func (m *Memcached) Delete(ctx context.Context, key string) error
 Implements the backend.Cache interface
 
 <a name="Memcached.Get"></a>
-### func \(\*Memcached\) [Get](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/memcached/cache.go#L38>)
+### func \(\*Memcached\) [Get](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/memcached/cache.go#L38>)
 
 ```go
 func (m *Memcached) Get(ctx context.Context, key string, value interface{}) (bool, error)
@@ -60,7 +60,7 @@ func (m *Memcached) Get(ctx context.Context, key string, value interface{}) (boo
 Implements the backend.Cache interface
 
 <a name="Memcached.Incr"></a>
-### func \(\*Memcached\) [Incr](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/memcached/cache.go#L50>)
+### func \(\*Memcached\) [Incr](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/memcached/cache.go#L50>)
 
 ```go
 func (m *Memcached) Incr(ctx context.Context, key string) (int64, error)
@@ -69,7 +69,7 @@ func (m *Memcached) Incr(ctx context.Context, key string) (int64, error)
 Implements the backend.Cache interface
 
 <a name="Memcached.Mget"></a>
-### func \(\*Memcached\) [Mget](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/memcached/cache.go#L61>)
+### func \(\*Memcached\) [Mget](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/memcached/cache.go#L61>)
 
 ```go
 func (m *Memcached) Mget(ctx context.Context, keys []string, values []interface{}) error
@@ -78,7 +78,7 @@ func (m *Memcached) Mget(ctx context.Context, keys []string, values []interface{
 Implements the backend.Cache interface
 
 <a name="Memcached.Mset"></a>
-### func \(\*Memcached\) [Mset](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/memcached/cache.go#L78>)
+### func \(\*Memcached\) [Mset](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/memcached/cache.go#L78>)
 
 ```go
 func (m *Memcached) Mset(ctx context.Context, keys []string, values []interface{}) error
@@ -87,7 +87,7 @@ func (m *Memcached) Mset(ctx context.Context, keys []string, values []interface{
 Implements the backend.Cache interface
 
 <a name="Memcached.Put"></a>
-### func \(\*Memcached\) [Put](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/memcached/cache.go#L29>)
+### func \(\*Memcached\) [Put](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/memcached/cache.go#L29>)
 
 ```go
 func (m *Memcached) Put(ctx context.Context, key string, value interface{}) error

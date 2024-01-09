@@ -3,7 +3,7 @@
 # blueprint
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+import "github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 ```
 
 Package blueprint provides some common utility methods for logging, io, errors and string manipulation.
@@ -25,7 +25,7 @@ const (
 ```
 
 <a name="Errorf"></a>
-## func Errorf
+## func [Errorf](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/blueprint/errors.go#L30>)
 
 ```go
 func Errorf(format string, a ...any) error

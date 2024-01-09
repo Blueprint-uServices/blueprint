@@ -3,7 +3,7 @@
 # station
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/station"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/station"
 ```
 
 package station implements ts\-station\-service from the original TrainTicket application
@@ -25,7 +25,7 @@ package station implements ts\-station\-service from the original TrainTicket ap
 
 
 <a name="Station"></a>
-## type [Station](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/station/data.go#L3-L7>)
+## type [Station](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/station/data.go#L3-L7>)
 
 
 
@@ -38,7 +38,7 @@ type Station struct {
 ```
 
 <a name="StationService"></a>
-## type [StationService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L13-L30>)
+## type [StationService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L13-L30>)
 
 StationService manages all stations
 
@@ -64,7 +64,7 @@ type StationService interface {
 ```
 
 <a name="StationServiceImpl"></a>
-## type [StationServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L33-L35>)
+## type [StationServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L33-L35>)
 
 Implementation of the StationService
 
@@ -75,7 +75,7 @@ type StationServiceImpl struct {
 ```
 
 <a name="NewStationServiceImpl"></a>
-### func [NewStationServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L38>)
+### func [NewStationServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L38>)
 
 ```go
 func NewStationServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*StationServiceImpl, error)
@@ -84,7 +84,7 @@ func NewStationServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*Stat
 Returns a new StationService object
 
 <a name="StationServiceImpl.CreateStation"></a>
-### func \(\*StationServiceImpl\) [CreateStation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L42>)
+### func \(\*StationServiceImpl\) [CreateStation](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L42>)
 
 ```go
 func (s *StationServiceImpl) CreateStation(ctx context.Context, station Station) error
@@ -93,7 +93,7 @@ func (s *StationServiceImpl) CreateStation(ctx context.Context, station Station)
 
 
 <a name="StationServiceImpl.DeleteStation"></a>
-### func \(\*StationServiceImpl\) [DeleteStation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L88>)
+### func \(\*StationServiceImpl\) [DeleteStation](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L88>)
 
 ```go
 func (s *StationServiceImpl) DeleteStation(ctx context.Context, id string) error
@@ -102,7 +102,7 @@ func (s *StationServiceImpl) DeleteStation(ctx context.Context, id string) error
 
 
 <a name="StationServiceImpl.Exists"></a>
-### func \(\*StationServiceImpl\) [Exists](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L64>)
+### func \(\*StationServiceImpl\) [Exists](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L64>)
 
 ```go
 func (s *StationServiceImpl) Exists(ctx context.Context, name string) (bool, error)
@@ -111,7 +111,7 @@ func (s *StationServiceImpl) Exists(ctx context.Context, name string) (bool, err
 
 
 <a name="StationServiceImpl.FindByID"></a>
-### func \(\*StationServiceImpl\) [FindByID](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L131>)
+### func \(\*StationServiceImpl\) [FindByID](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L131>)
 
 ```go
 func (s *StationServiceImpl) FindByID(ctx context.Context, id string) (Station, error)
@@ -120,7 +120,7 @@ func (s *StationServiceImpl) FindByID(ctx context.Context, id string) (Station, 
 
 
 <a name="StationServiceImpl.FindByIDs"></a>
-### func \(\*StationServiceImpl\) [FindByIDs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L152>)
+### func \(\*StationServiceImpl\) [FindByIDs](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L152>)
 
 ```go
 func (s *StationServiceImpl) FindByIDs(ctx context.Context, ids []string) ([]Station, error)
@@ -129,7 +129,7 @@ func (s *StationServiceImpl) FindByIDs(ctx context.Context, ids []string) ([]Sta
 
 
 <a name="StationServiceImpl.FindID"></a>
-### func \(\*StationServiceImpl\) [FindID](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L97>)
+### func \(\*StationServiceImpl\) [FindID](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L97>)
 
 ```go
 func (s *StationServiceImpl) FindID(ctx context.Context, name string) (string, error)
@@ -138,7 +138,7 @@ func (s *StationServiceImpl) FindID(ctx context.Context, name string) (string, e
 
 
 <a name="StationServiceImpl.FindIDs"></a>
-### func \(\*StationServiceImpl\) [FindIDs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L118>)
+### func \(\*StationServiceImpl\) [FindIDs](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L118>)
 
 ```go
 func (s *StationServiceImpl) FindIDs(ctx context.Context, names []string) ([]string, error)
@@ -147,7 +147,7 @@ func (s *StationServiceImpl) FindIDs(ctx context.Context, names []string) ([]str
 
 
 <a name="StationServiceImpl.UpdateStation"></a>
-### func \(\*StationServiceImpl\) [UpdateStation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L79>)
+### func \(\*StationServiceImpl\) [UpdateStation](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/station/stationService.go#L79>)
 
 ```go
 func (s *StationServiceImpl) UpdateStation(ctx context.Context, station Station) (bool, error)

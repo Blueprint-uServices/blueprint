@@ -1,12 +1,12 @@
-module gitlab.mpi-sws.org/cld/blueprint/examples/dsb_sn/workflow
+module github.com/blueprint-uservices/blueprint/examples/dsb_sn/workflow
 
 go 1.20
 
-replace gitlab.mpi-sws.org/cld/blueprint/runtime => ../../../runtime
+replace github.com/blueprint-uservices/blueprint/runtime => ../../../runtime
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	gitlab.mpi-sws.org/cld/blueprint/runtime v0.0.0-00010101000000-000000000000
+	github.com/blueprint-uservices/blueprint/runtime v0.0.0-00010101000000-000000000000
 	go.mongodb.org/mongo-driver v1.13.0
 )
 

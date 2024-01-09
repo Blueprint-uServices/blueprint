@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/user"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/simplenosqldb"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/user"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

@@ -5,8 +5,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"github.com/google/uuid"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/blueprint-uservices/blueprint/examples/dsb_sn/workflow/socialnetwork"
+	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/dsb_sn/workflow/socialnetwork"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

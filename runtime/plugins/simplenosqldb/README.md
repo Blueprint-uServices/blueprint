@@ -3,7 +3,7 @@
 # simplenosqldb
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
+import "github.com/blueprint-uservices/blueprint/runtime/plugins/simplenosqldb"
 ```
 
 Package simplenosqldb implements an in\-memory NoSQLDB that supports a subset of MongoDB's query and update API.
@@ -36,7 +36,7 @@ Only a small set of common basic filter and update operators are supported, but 
 
 
 <a name="SetVerbose"></a>
-## func [SetVerbose](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L156>)
+## func [SetVerbose](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L156>)
 
 ```go
 func SetVerbose(enabled bool) bool
@@ -45,7 +45,7 @@ func SetVerbose(enabled bool) bool
 Enable or disable verbose logging; used for testing
 
 <a name="SimpleCollection"></a>
-## type [SimpleCollection](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L31-L33>)
+## type [SimpleCollection](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L31-L33>)
 
 Simple implementations of the NoSQLDB Interfaces from runtime/core/backend
 
@@ -56,7 +56,7 @@ type SimpleCollection struct {
 ```
 
 <a name="SimpleCollection.DeleteMany"></a>
-### func \(\*SimpleCollection\) [DeleteMany](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L200>)
+### func \(\*SimpleCollection\) [DeleteMany](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L200>)
 
 ```go
 func (db *SimpleCollection) DeleteMany(ctx context.Context, filter bson.D) error
@@ -65,7 +65,7 @@ func (db *SimpleCollection) DeleteMany(ctx context.Context, filter bson.D) error
 
 
 <a name="SimpleCollection.DeleteOne"></a>
-### func \(\*SimpleCollection\) [DeleteOne](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L186>)
+### func \(\*SimpleCollection\) [DeleteOne](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L186>)
 
 ```go
 func (db *SimpleCollection) DeleteOne(ctx context.Context, filter bson.D) error
@@ -74,7 +74,7 @@ func (db *SimpleCollection) DeleteOne(ctx context.Context, filter bson.D) error
 
 
 <a name="SimpleCollection.FindMany"></a>
-### func \(\*SimpleCollection\) [FindMany](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L162>)
+### func \(\*SimpleCollection\) [FindMany](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L162>)
 
 ```go
 func (db *SimpleCollection) FindMany(ctx context.Context, filter bson.D, projection ...bson.D) (backend.NoSQLCursor, error)
@@ -83,7 +83,7 @@ func (db *SimpleCollection) FindMany(ctx context.Context, filter bson.D, project
 
 
 <a name="SimpleCollection.FindOne"></a>
-### func \(\*SimpleCollection\) [FindOne](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L132>)
+### func \(\*SimpleCollection\) [FindOne](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L132>)
 
 ```go
 func (db *SimpleCollection) FindOne(ctx context.Context, filter bson.D, projection ...bson.D) (backend.NoSQLCursor, error)
@@ -92,7 +92,7 @@ func (db *SimpleCollection) FindOne(ctx context.Context, filter bson.D, projecti
 
 
 <a name="SimpleCollection.InsertMany"></a>
-### func \(\*SimpleCollection\) [InsertMany](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L122>)
+### func \(\*SimpleCollection\) [InsertMany](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L122>)
 
 ```go
 func (db *SimpleCollection) InsertMany(ctx context.Context, documents []interface{}) error
@@ -101,7 +101,7 @@ func (db *SimpleCollection) InsertMany(ctx context.Context, documents []interfac
 
 
 <a name="SimpleCollection.InsertOne"></a>
-### func \(\*SimpleCollection\) [InsertOne](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L98>)
+### func \(\*SimpleCollection\) [InsertOne](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L98>)
 
 ```go
 func (db *SimpleCollection) InsertOne(ctx context.Context, document interface{}) error
@@ -110,7 +110,7 @@ func (db *SimpleCollection) InsertOne(ctx context.Context, document interface{})
 
 
 <a name="SimpleCollection.ReplaceMany"></a>
-### func \(\*SimpleCollection\) [ReplaceMany](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L321>)
+### func \(\*SimpleCollection\) [ReplaceMany](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L321>)
 
 ```go
 func (db *SimpleCollection) ReplaceMany(ctx context.Context, filter bson.D, replacements ...interface{}) (int, error)
@@ -119,7 +119,7 @@ func (db *SimpleCollection) ReplaceMany(ctx context.Context, filter bson.D, repl
 
 
 <a name="SimpleCollection.ReplaceOne"></a>
-### func \(\*SimpleCollection\) [ReplaceOne](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L307>)
+### func \(\*SimpleCollection\) [ReplaceOne](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L307>)
 
 ```go
 func (db *SimpleCollection) ReplaceOne(ctx context.Context, filter bson.D, replacement interface{}) (int, error)
@@ -128,7 +128,7 @@ func (db *SimpleCollection) ReplaceOne(ctx context.Context, filter bson.D, repla
 
 
 <a name="SimpleCollection.String"></a>
-### func \(\*SimpleCollection\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L357>)
+### func \(\*SimpleCollection\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L357>)
 
 ```go
 func (db *SimpleCollection) String() string
@@ -137,7 +137,7 @@ func (db *SimpleCollection) String() string
 
 
 <a name="SimpleCollection.UpdateMany"></a>
-### func \(\*SimpleCollection\) [UpdateMany](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L252>)
+### func \(\*SimpleCollection\) [UpdateMany](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L252>)
 
 ```go
 func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, update bson.D) (int, error)
@@ -146,7 +146,7 @@ func (db *SimpleCollection) UpdateMany(ctx context.Context, filter bson.D, updat
 
 
 <a name="SimpleCollection.UpdateOne"></a>
-### func \(\*SimpleCollection\) [UpdateOne](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L223>)
+### func \(\*SimpleCollection\) [UpdateOne](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L223>)
 
 ```go
 func (db *SimpleCollection) UpdateOne(ctx context.Context, filter bson.D, update bson.D) (int, error)
@@ -155,7 +155,7 @@ func (db *SimpleCollection) UpdateOne(ctx context.Context, filter bson.D, update
 
 
 <a name="SimpleCollection.Upsert"></a>
-### func \(\*SimpleCollection\) [Upsert](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L290>)
+### func \(\*SimpleCollection\) [Upsert](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L290>)
 
 ```go
 func (db *SimpleCollection) Upsert(ctx context.Context, filter bson.D, document interface{}) (bool, error)
@@ -164,7 +164,7 @@ func (db *SimpleCollection) Upsert(ctx context.Context, filter bson.D, document 
 
 
 <a name="SimpleCollection.UpsertID"></a>
-### func \(\*SimpleCollection\) [UpsertID](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L298>)
+### func \(\*SimpleCollection\) [UpsertID](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L298>)
 
 ```go
 func (db *SimpleCollection) UpsertID(ctx context.Context, id primitive.ObjectID, document interface{}) (bool, error)
@@ -173,7 +173,7 @@ func (db *SimpleCollection) UpsertID(ctx context.Context, id primitive.ObjectID,
 
 
 <a name="SimpleCursor"></a>
-## type [SimpleCursor](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L35-L37>)
+## type [SimpleCursor](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L35-L37>)
 
 Simple implementations of the NoSQLDB Interfaces from runtime/core/backend
 
@@ -184,7 +184,7 @@ type SimpleCursor struct {
 ```
 
 <a name="SimpleCursor.All"></a>
-### func \(\*SimpleCursor\) [All](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L94>)
+### func \(\*SimpleCursor\) [All](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L94>)
 
 ```go
 func (c *SimpleCursor) All(ctx context.Context, obj interface{}) error
@@ -193,7 +193,7 @@ func (c *SimpleCursor) All(ctx context.Context, obj interface{}) error
 
 
 <a name="SimpleCursor.One"></a>
-### func \(\*SimpleCursor\) [One](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L63>)
+### func \(\*SimpleCursor\) [One](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L63>)
 
 ```go
 func (c *SimpleCursor) One(ctx context.Context, obj interface{}) (bool, error)
@@ -202,7 +202,7 @@ func (c *SimpleCursor) One(ctx context.Context, obj interface{}) (bool, error)
 
 
 <a name="SimpleNoSQLDB"></a>
-## type [SimpleNoSQLDB](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L27-L29>)
+## type [SimpleNoSQLDB](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L27-L29>)
 
 Implements the \[backend.NoSQLDatabase\] interface for a subset of MongoDB's query and update operators.
 
@@ -215,7 +215,7 @@ type SimpleNoSQLDB struct {
 ```
 
 <a name="NewSimpleNoSQLDB"></a>
-### func [NewSimpleNoSQLDB](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L41>)
+### func [NewSimpleNoSQLDB](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L41>)
 
 ```go
 func NewSimpleNoSQLDB(ctx context.Context) (*SimpleNoSQLDB, error)
@@ -224,7 +224,7 @@ func NewSimpleNoSQLDB(ctx context.Context) (*SimpleNoSQLDB, error)
 Instantiate a new in\-memory NoSQLDB
 
 <a name="SimpleNoSQLDB.GetCollection"></a>
-### func \(\*SimpleNoSQLDB\) [GetCollection](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L47>)
+### func \(\*SimpleNoSQLDB\) [GetCollection](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplenosqldb/nosqldb.go#L47>)
 
 ```go
 func (impl *SimpleNoSQLDB) GetCollection(ctx context.Context, db_name string, collection_name string) (backend.NoSQLCollection, error)

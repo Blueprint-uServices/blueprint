@@ -3,7 +3,7 @@
 # circuitbreaker
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/circuitbreaker"
+import "github.com/blueprint-uservices/blueprint/plugins/circuitbreaker"
 ```
 
 Package circuitbreaker provides a Blueprint modifier for the client side of service calls.
@@ -24,7 +24,7 @@ The plugin wraps clients with a circuitbreaker that blocks any new requests from
 
 
 <a name="AddCircuitBreaker"></a>
-## func [AddCircuitBreaker](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/circuitbreaker/wiring.go#L22>)
+## func [AddCircuitBreaker](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/circuitbreaker/wiring.go#L22>)
 
 ```go
 func AddCircuitBreaker(spec wiring.WiringSpec, serviceName string, min_reqs int64, failure_rate float64, interval string)
@@ -37,7 +37,7 @@ AddCircuitBreaker(spec, "serviceA", 1000, 0.1, "1s")
 ```
 
 <a name="CircuitBreakerClient"></a>
-## type [CircuitBreakerClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/circuitbreaker/ir.go#L15-L27>)
+## type [CircuitBreakerClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/circuitbreaker/ir.go#L15-L27>)
 
 Blueprint IR node representing a CircuitBreaker
 
@@ -58,7 +58,7 @@ type CircuitBreakerClient struct {
 ```
 
 <a name="CircuitBreakerClient.AddInstantiation"></a>
-### func \(\*CircuitBreakerClient\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/circuitbreaker/ir.go#L77>)
+### func \(\*CircuitBreakerClient\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/circuitbreaker/ir.go#L77>)
 
 ```go
 func (node *CircuitBreakerClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -67,7 +67,7 @@ func (node *CircuitBreakerClient) AddInstantiation(builder golang.NamespaceBuild
 
 
 <a name="CircuitBreakerClient.AddInterfaces"></a>
-### func \(\*CircuitBreakerClient\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/circuitbreaker/ir.go#L56>)
+### func \(\*CircuitBreakerClient\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/circuitbreaker/ir.go#L56>)
 
 ```go
 func (node *CircuitBreakerClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -76,7 +76,7 @@ func (node *CircuitBreakerClient) AddInterfaces(builder golang.ModuleBuilder) er
 
 
 <a name="CircuitBreakerClient.GenerateFuncs"></a>
-### func \(\*CircuitBreakerClient\) [GenerateFuncs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/circuitbreaker/ir.go#L64>)
+### func \(\*CircuitBreakerClient\) [GenerateFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/circuitbreaker/ir.go#L64>)
 
 ```go
 func (node *CircuitBreakerClient) GenerateFuncs(builder golang.ModuleBuilder) error
@@ -85,7 +85,7 @@ func (node *CircuitBreakerClient) GenerateFuncs(builder golang.ModuleBuilder) er
 
 
 <a name="CircuitBreakerClient.GetInterface"></a>
-### func \(\*CircuitBreakerClient\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/circuitbreaker/ir.go#L60>)
+### func \(\*CircuitBreakerClient\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/circuitbreaker/ir.go#L60>)
 
 ```go
 func (node *CircuitBreakerClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -94,7 +94,7 @@ func (node *CircuitBreakerClient) GetInterface(ctx ir.BuildContext) (service.Ser
 
 
 <a name="CircuitBreakerClient.ImplementsGolangNode"></a>
-### func \(\*CircuitBreakerClient\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/circuitbreaker/ir.go#L29>)
+### func \(\*CircuitBreakerClient\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/circuitbreaker/ir.go#L29>)
 
 ```go
 func (node *CircuitBreakerClient) ImplementsGolangNode()
@@ -103,7 +103,7 @@ func (node *CircuitBreakerClient) ImplementsGolangNode()
 
 
 <a name="CircuitBreakerClient.Name"></a>
-### func \(\*CircuitBreakerClient\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/circuitbreaker/ir.go#L31>)
+### func \(\*CircuitBreakerClient\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/circuitbreaker/ir.go#L31>)
 
 ```go
 func (node *CircuitBreakerClient) Name() string
@@ -112,7 +112,7 @@ func (node *CircuitBreakerClient) Name() string
 
 
 <a name="CircuitBreakerClient.String"></a>
-### func \(\*CircuitBreakerClient\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/circuitbreaker/ir.go#L35>)
+### func \(\*CircuitBreakerClient\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/circuitbreaker/ir.go#L35>)
 
 ```go
 func (node *CircuitBreakerClient) String() string

@@ -3,7 +3,7 @@ package wiring
 import (
 	"fmt"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 )
 
 // Builds the IR of an application using the definitions of the provided spec.  Returns

@@ -16,7 +16,7 @@ import (
 	"strings"
 	"sync"
 
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slog"
 )

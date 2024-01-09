@@ -1,9 +1,9 @@
 package dockerdeployment
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/ioutil"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/docker"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/ioutil"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/plugins/docker"
 )
 
 // to trigger module initialization and register builders

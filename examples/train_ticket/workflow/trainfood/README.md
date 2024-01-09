@@ -3,7 +3,7 @@
 # trainfood
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/trainfood"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/trainfood"
 ```
 
 package trainfood implements ts\-train\-food\-service from the original train ticket application
@@ -21,7 +21,7 @@ package trainfood implements ts\-train\-food\-service from the original train ti
 
 
 <a name="TrainFood"></a>
-## type [TrainFood](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/trainfood/data.go#L5-L9>)
+## type [TrainFood](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/trainfood/data.go#L5-L9>)
 
 
 
@@ -34,7 +34,7 @@ type TrainFood struct {
 ```
 
 <a name="TrainFoodService"></a>
-## type [TrainFoodService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/trainfood/trainFoodService.go#L14-L23>)
+## type [TrainFoodService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/trainfood/trainFoodService.go#L14-L23>)
 
 TrainFoodService manages food items in Trains
 
@@ -52,7 +52,7 @@ type TrainFoodService interface {
 ```
 
 <a name="TrainFoodServiceImpl"></a>
-## type [TrainFoodServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/trainfood/trainFoodService.go#L26-L28>)
+## type [TrainFoodServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/trainfood/trainFoodService.go#L26-L28>)
 
 Implementation of TrainFoodService
 
@@ -63,7 +63,7 @@ type TrainFoodServiceImpl struct {
 ```
 
 <a name="NewTrainFoodServiceImpl"></a>
-### func [NewTrainFoodServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/trainfood/trainFoodService.go#L31>)
+### func [NewTrainFoodServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/trainfood/trainFoodService.go#L31>)
 
 ```go
 func NewTrainFoodServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*TrainFoodServiceImpl, error)
@@ -72,7 +72,7 @@ func NewTrainFoodServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*Tr
 Creates a NewTrainFoodService
 
 <a name="TrainFoodServiceImpl.Cleanup"></a>
-### func \(\*TrainFoodServiceImpl\) [Cleanup](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/trainfood/trainFoodService.go#L100>)
+### func \(\*TrainFoodServiceImpl\) [Cleanup](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/trainfood/trainFoodService.go#L100>)
 
 ```go
 func (t *TrainFoodServiceImpl) Cleanup(ctx context.Context) error
@@ -81,7 +81,7 @@ func (t *TrainFoodServiceImpl) Cleanup(ctx context.Context) error
 
 
 <a name="TrainFoodServiceImpl.CreateTrainFood"></a>
-### func \(\*TrainFoodServiceImpl\) [CreateTrainFood](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/trainfood/trainFoodService.go#L72>)
+### func \(\*TrainFoodServiceImpl\) [CreateTrainFood](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/trainfood/trainFoodService.go#L72>)
 
 ```go
 func (t *TrainFoodServiceImpl) CreateTrainFood(ctx context.Context, tf TrainFood) (TrainFood, error)
@@ -90,7 +90,7 @@ func (t *TrainFoodServiceImpl) CreateTrainFood(ctx context.Context, tf TrainFood
 
 
 <a name="TrainFoodServiceImpl.ListTrainFood"></a>
-### func \(\*TrainFoodServiceImpl\) [ListTrainFood](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/trainfood/trainFoodService.go#L35>)
+### func \(\*TrainFoodServiceImpl\) [ListTrainFood](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/trainfood/trainFoodService.go#L35>)
 
 ```go
 func (t *TrainFoodServiceImpl) ListTrainFood(ctx context.Context) ([]TrainFood, error)
@@ -99,7 +99,7 @@ func (t *TrainFoodServiceImpl) ListTrainFood(ctx context.Context) ([]TrainFood, 
 
 
 <a name="TrainFoodServiceImpl.ListTrainFoodByTripID"></a>
-### func \(\*TrainFoodServiceImpl\) [ListTrainFoodByTripID](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/trainfood/trainFoodService.go#L52>)
+### func \(\*TrainFoodServiceImpl\) [ListTrainFoodByTripID](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/trainfood/trainFoodService.go#L52>)
 
 ```go
 func (t *TrainFoodServiceImpl) ListTrainFoodByTripID(ctx context.Context, tripid string) ([]food.Food, error)

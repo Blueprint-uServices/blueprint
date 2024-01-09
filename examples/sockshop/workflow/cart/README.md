@@ -3,7 +3,7 @@
 # cart
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/cart"
+import "github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/cart"
 ```
 
 Package cart implements the SockShop cart microservice.
@@ -16,7 +16,7 @@ Package cart implements the SockShop cart microservice.
 
 
 <a name="CartService"></a>
-## type CartService
+## type [CartService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/cart/cartservice.go#L13-L39>)
 
 The CartService interface
 
@@ -51,7 +51,7 @@ type CartService interface {
 ```
 
 <a name="NewCartService"></a>
-### func NewCartService
+### func [NewCartService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/cart/cartservice.go#L62>)
 
 ```go
 func NewCartService(ctx context.Context, db backend.NoSQLDatabase) (CartService, error)
@@ -60,7 +60,7 @@ func NewCartService(ctx context.Context, db backend.NoSQLDatabase) (CartService,
 Creates a [CartService](<#CartService>) instance that persists cart data in the provided db
 
 <a name="Item"></a>
-## type Item
+## type [Item](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/cart/cartservice.go#L49-L53>)
 
 A cart item is just an item ID and a quantity. The catalogue service is responsible for managing the actual items.
 

@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	jwt "github.com/dgrijalva/jwt-go"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

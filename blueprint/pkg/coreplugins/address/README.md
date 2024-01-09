@@ -3,7 +3,7 @@
 # address
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/address"
+import "github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/address"
 ```
 
 Package address provides IR nodes to represent addressing, particularly between clients and servers.
@@ -43,7 +43,7 @@ To implement addressing, several concerns are addressed:
 
 
 <a name="AssignPorts"></a>
-## func AssignPorts
+## func [AssignPorts](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/portassignment.go#L28>)
 
 ```go
 func AssignPorts(hostname string, nodes []ir.IRNode) error
@@ -60,7 +60,7 @@ Ports will be assigned either ascending from port 2000, or ascending from a node
 After calling this method, any provided [BindConfig](<#BindConfig>) IR nodes will have their hostname and port set.
 
 <a name="Bind"></a>
-## func Bind
+## func [Bind](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/wiring.go#L93>)
 
 ```go
 func Bind[ServerType ir.IRNode](namespace wiring.Namespace, addressName string, serverNode ServerType, dst **BindConfig) error
@@ -75,7 +75,7 @@ This is a convenience method for use when only the bind address is needed. It is
 In addition to setting the [BindConfig](<#BindConfig>) node in dst, this call sets the destination of the address to be serverNode
 
 <a name="CheckPorts"></a>
-## func CheckPorts
+## func [CheckPorts](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/portassignment.go#L83>)
 
 ```go
 func CheckPorts(nodes []ir.IRNode) error
@@ -84,7 +84,7 @@ func CheckPorts(nodes []ir.IRNode) error
 Returns an error if there are [BindConfig](<#BindConfig>) nodes in the provided list that haven't been allocated a port.
 
 <a name="Define"></a>
-## func Define
+## func [Define](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/wiring.go#L30>)
 
 ```go
 func Define[ServerType ir.IRNode](spec wiring.WiringSpec, addressName string, pointsTo string, opts ...AddressOpts)
@@ -99,7 +99,7 @@ The type parameter ServerType should correspond to the node type of pointsTo.
 By default the address is reachable application wide. [AddressOpts](<#AddressOpts>) can be optionally provided to further configure the address.
 
 <a name="ResetPorts"></a>
-## func ResetPorts
+## func [ResetPorts](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/portassignment.go#L100>)
 
 ```go
 func ResetPorts(nodes []ir.IRNode)
@@ -110,7 +110,7 @@ Clears the hostname and port from any [BindConfig](<#BindConfig>) node.
 This is used by namespace nodes when performing address translation, e.g. between ports within a container vs. external to a container.
 
 <a name="Address"></a>
-## type Address
+## type [Address](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/ir.go#L77-L82>)
 
 The main implementation of the [Node](<#Node>) interface.
 
@@ -126,7 +126,7 @@ type Address[ServerType ir.IRNode] struct {
 ```
 
 <a name="Dial"></a>
-### func Dial
+### func [Dial](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/wiring.go#L69>)
 
 ```go
 func Dial[ServerType ir.IRNode](namespace wiring.Namespace, addressName string) (*Address[ServerType], error)
@@ -139,7 +139,7 @@ This method is intended for use by other Blueprint plugins within their own Buil
 This is a convenience method for use when only the dial address is needed. It is equivalent to getting addressName directly from namespace and then reading then \[Address.Dial\] field.
 
 <a name="Address[ServerType].GetDestination"></a>
-### func \(\*Address\[ServerType\]\) GetDestination
+### func \(\*Address\[ServerType\]\) [GetDestination](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/ir.go#L93>)
 
 ```go
 func (addr *Address[ServerType]) GetDestination() ir.IRNode
@@ -148,7 +148,7 @@ func (addr *Address[ServerType]) GetDestination() ir.IRNode
 
 
 <a name="Address[ServerType].ImplementsAddressNode"></a>
-### func \(\*Address\[ServerType\]\) ImplementsAddressNode
+### func \(\*Address\[ServerType\]\) [ImplementsAddressNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/ir.go#L109>)
 
 ```go
 func (addr *Address[ServerType]) ImplementsAddressNode()
@@ -157,7 +157,7 @@ func (addr *Address[ServerType]) ImplementsAddressNode()
 
 
 <a name="Address[ServerType].ImplementsIRMetadata"></a>
-### func \(\*Address\[ServerType\]\) ImplementsIRMetadata
+### func \(\*Address\[ServerType\]\) [ImplementsIRMetadata](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/ir.go#L110>)
 
 ```go
 func (addr *Address[ServerType]) ImplementsIRMetadata()
@@ -166,7 +166,7 @@ func (addr *Address[ServerType]) ImplementsIRMetadata()
 
 
 <a name="Address[ServerType].Name"></a>
-### func \(\*Address\[ServerType\]\) Name
+### func \(\*Address\[ServerType\]\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/ir.go#L85>)
 
 ```go
 func (addr *Address[ServerType]) Name() string
@@ -175,7 +175,7 @@ func (addr *Address[ServerType]) Name() string
 
 
 <a name="Address[ServerType].SetDestination"></a>
-### func \(\*Address\[ServerType\]\) SetDestination
+### func \(\*Address\[ServerType\]\) [SetDestination](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/ir.go#L100>)
 
 ```go
 func (addr *Address[ServerType]) SetDestination(node ir.IRNode) error
@@ -184,7 +184,7 @@ func (addr *Address[ServerType]) SetDestination(node ir.IRNode) error
 
 
 <a name="Address[ServerType].String"></a>
-### func \(\*Address\[ServerType\]\) String
+### func \(\*Address\[ServerType\]\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/ir.go#L89>)
 
 ```go
 func (addr *Address[ServerType]) String() string
@@ -193,7 +193,7 @@ func (addr *Address[ServerType]) String() string
 
 
 <a name="AddressDef"></a>
-## type AddressDef
+## type [AddressDef](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/wiring.go#L117-L121>)
 
 
 
@@ -206,7 +206,7 @@ type AddressDef struct {
 ```
 
 <a name="GetAddress"></a>
-### func GetAddress
+### func [GetAddress](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/wiring.go#L134>)
 
 ```go
 func GetAddress(spec wiring.WiringSpec, name string) *AddressDef
@@ -215,7 +215,7 @@ func GetAddress(spec wiring.WiringSpec, name string) *AddressDef
 Gets the AddressDef metadata for an address that was defined using [Define](<#Define>)
 
 <a name="AddressOpts"></a>
-## type AddressOpts
+## type [AddressOpts](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/wiring.go#L10-L16>)
 
 Additional optional options for use when defining an address
 
@@ -230,7 +230,7 @@ type AddressOpts struct {
 ```
 
 <a name="BindConfig"></a>
-## type BindConfig
+## type [BindConfig](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/ir.go#L59-L62>)
 
 IR config node representing an address that a server should bind to.
 
@@ -242,7 +242,7 @@ type BindConfig struct {
 ```
 
 <a name="BindConfig.ImplementsBindConfig"></a>
-### func \(\*BindConfig\) ImplementsBindConfig
+### func \(\*BindConfig\) [ImplementsBindConfig](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/ir.go#L133>)
 
 ```go
 func (conf *BindConfig) ImplementsBindConfig()
@@ -251,7 +251,7 @@ func (conf *BindConfig) ImplementsBindConfig()
 
 
 <a name="DialConfig"></a>
-## type DialConfig
+## type [DialConfig](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/ir.go#L65-L67>)
 
 IR config node representing an address that a client should dial.
 
@@ -262,7 +262,7 @@ type DialConfig struct {
 ```
 
 <a name="DialConfig.ImplementsDialConfig"></a>
-### func \(\*DialConfig\) ImplementsDialConfig
+### func \(\*DialConfig\) [ImplementsDialConfig](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/ir.go#L134>)
 
 ```go
 func (conf *DialConfig) ImplementsDialConfig()
@@ -271,7 +271,7 @@ func (conf *DialConfig) ImplementsDialConfig()
 
 
 <a name="Node"></a>
-## type Node
+## type [Node](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/address/ir.go#L37-L48>)
 
 IR metadata node representing an address.
 

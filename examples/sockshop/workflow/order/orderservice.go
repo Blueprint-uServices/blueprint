@@ -10,12 +10,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/cart"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/payment"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/shipping"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/user"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"github.com/google/uuid"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/cart"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/payment"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/shipping"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/user"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

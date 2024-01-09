@@ -3,13 +3,13 @@
 # http
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/http"
+import "github.com/blueprint-uservices/blueprint/plugins/http"
 ```
 
 To use the plugin in a Blueprint wiring spec, import this package and use the [Deploy](<#Deploy>) method, i.e.
 
 ```
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/http"
+import "github.com/blueprint-uservices/blueprint/plugins/http"
 http.Deploy(spec, "my_service")
 ```
 
@@ -35,7 +35,7 @@ The plugin implements a server\-side handler and client\-side library that calls
 
 
 <a name="Deploy"></a>
-## func [Deploy](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/wiring.go#L36>)
+## func [Deploy](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/wiring.go#L36>)
 
 ```go
 func Deploy(spec wiring.WiringSpec, serviceName string)
@@ -48,7 +48,7 @@ Like many other modifiers, HTTP modifier the service at the golang level, by gen
 Deploying a service with HTTP increases the visibility of the service within the application. By default, any other service running in any other container or namespace can now contact this service.
 
 <a name="GolangHttpClient"></a>
-## type [GolangHttpClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/ir_http_client.go#L16-L26>)
+## type [GolangHttpClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/ir_http_client.go#L16-L26>)
 
 IRNode representing a client to a Golang server. This node does not introduce any new runtime interfaces or types that can be used by other IRNodes.
 
@@ -66,7 +66,7 @@ type GolangHttpClient struct {
 ```
 
 <a name="GolangHttpClient.AddInstantiation"></a>
-### func \(\*GolangHttpClient\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/ir_http_client.go#L79>)
+### func \(\*GolangHttpClient\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/ir_http_client.go#L79>)
 
 ```go
 func (node *GolangHttpClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -75,7 +75,7 @@ func (node *GolangHttpClient) AddInstantiation(builder golang.NamespaceBuilder) 
 
 
 <a name="GolangHttpClient.AddInterfaces"></a>
-### func \(\*GolangHttpClient\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/ir_http_client.go#L62>)
+### func \(\*GolangHttpClient\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/ir_http_client.go#L62>)
 
 ```go
 func (node *GolangHttpClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -84,7 +84,7 @@ func (node *GolangHttpClient) AddInterfaces(builder golang.ModuleBuilder) error
 Just makes sure that the interface exposed by the server is included in the built module
 
 <a name="GolangHttpClient.GenerateFuncs"></a>
-### func \(\*GolangHttpClient\) [GenerateFuncs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/ir_http_client.go#L66>)
+### func \(\*GolangHttpClient\) [GenerateFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/ir_http_client.go#L66>)
 
 ```go
 func (node *GolangHttpClient) GenerateFuncs(builder golang.ModuleBuilder) error
@@ -93,7 +93,7 @@ func (node *GolangHttpClient) GenerateFuncs(builder golang.ModuleBuilder) error
 
 
 <a name="GolangHttpClient.GetInterface"></a>
-### func \(\*GolangHttpClient\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/ir_http_client.go#L45>)
+### func \(\*GolangHttpClient\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/ir_http_client.go#L45>)
 
 ```go
 func (node *GolangHttpClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -102,7 +102,7 @@ func (node *GolangHttpClient) GetInterface(ctx ir.BuildContext) (service.Service
 
 
 <a name="GolangHttpClient.ImplementsGolangNode"></a>
-### func \(\*GolangHttpClient\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/ir_http_client.go#L104>)
+### func \(\*GolangHttpClient\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/ir_http_client.go#L104>)
 
 ```go
 func (node *GolangHttpClient) ImplementsGolangNode()
@@ -111,7 +111,7 @@ func (node *GolangHttpClient) ImplementsGolangNode()
 
 
 <a name="GolangHttpClient.ImplementsGolangService"></a>
-### func \(\*GolangHttpClient\) [ImplementsGolangService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/ir_http_client.go#L105>)
+### func \(\*GolangHttpClient\) [ImplementsGolangService](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/ir_http_client.go#L105>)
 
 ```go
 func (node *GolangHttpClient) ImplementsGolangService()
@@ -120,7 +120,7 @@ func (node *GolangHttpClient) ImplementsGolangService()
 
 
 <a name="GolangHttpClient.Name"></a>
-### func \(\*GolangHttpClient\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/ir_http_client.go#L41>)
+### func \(\*GolangHttpClient\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/ir_http_client.go#L41>)
 
 ```go
 func (n *GolangHttpClient) Name() string
@@ -129,7 +129,7 @@ func (n *GolangHttpClient) Name() string
 
 
 <a name="GolangHttpClient.String"></a>
-### func \(\*GolangHttpClient\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/ir_http_client.go#L37>)
+### func \(\*GolangHttpClient\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/ir_http_client.go#L37>)
 
 ```go
 func (n *GolangHttpClient) String() string
@@ -138,7 +138,7 @@ func (n *GolangHttpClient) String() string
 
 
 <a name="HttpInterface"></a>
-## type [HttpInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/ir_http_server.go#L31-L34>)
+## type [HttpInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/ir_http_server.go#L31-L34>)
 
 Represents a service that is exposed over HTTP
 
@@ -150,7 +150,7 @@ type HttpInterface struct {
 ```
 
 <a name="HttpInterface.GetMethods"></a>
-### func \(\*HttpInterface\) [GetMethods](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/ir_http_server.go#L40>)
+### func \(\*HttpInterface\) [GetMethods](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/ir_http_server.go#L40>)
 
 ```go
 func (i *HttpInterface) GetMethods() []service.Method
@@ -159,7 +159,7 @@ func (i *HttpInterface) GetMethods() []service.Method
 
 
 <a name="HttpInterface.GetName"></a>
-### func \(\*HttpInterface\) [GetName](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/http/ir_http_server.go#L36>)
+### func \(\*HttpInterface\) [GetName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/http/ir_http_server.go#L36>)
 
 ```go
 func (i *HttpInterface) GetName() string

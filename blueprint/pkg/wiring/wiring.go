@@ -13,9 +13,9 @@ import (
 	"reflect"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/logging"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/logging"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/stringutil"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 )
 
 // Creates an IR node within the provided namespace or within a new child namespace.

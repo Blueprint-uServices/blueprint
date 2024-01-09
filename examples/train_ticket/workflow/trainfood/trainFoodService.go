@@ -5,8 +5,8 @@ import (
 	"context"
 	"errors"
 
-	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/food"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/food"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

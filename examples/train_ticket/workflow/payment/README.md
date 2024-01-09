@@ -3,7 +3,7 @@
 # payment
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/payment"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/payment"
 ```
 
 package payment implements ts\-payment\-service from the original train ticket application
@@ -23,7 +23,7 @@ package payment implements ts\-payment\-service from the original train ticket a
 
 
 <a name="Money"></a>
-## type [Money](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/payment/data.go#L10-L14>)
+## type [Money](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/payment/data.go#L10-L14>)
 
 
 
@@ -36,7 +36,7 @@ type Money struct {
 ```
 
 <a name="Payment"></a>
-## type [Payment](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/payment/data.go#L3-L8>)
+## type [Payment](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/payment/data.go#L3-L8>)
 
 
 
@@ -50,7 +50,7 @@ type Payment struct {
 ```
 
 <a name="PaymentService"></a>
-## type [PaymentService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L14-L25>)
+## type [PaymentService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L14-L25>)
 
 PaymentService manages payments in the application
 
@@ -70,7 +70,7 @@ type PaymentService interface {
 ```
 
 <a name="PaymentServiceImpl"></a>
-## type [PaymentServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L28-L31>)
+## type [PaymentServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L28-L31>)
 
 Implementation of PaymentService
 
@@ -81,7 +81,7 @@ type PaymentServiceImpl struct {
 ```
 
 <a name="NewPaymentServiceImpl"></a>
-### func [NewPaymentServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L34>)
+### func [NewPaymentServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L34>)
 
 ```go
 func NewPaymentServiceImpl(ctx context.Context, payDB backend.NoSQLDatabase, moneyDB backend.NoSQLDatabase) (*PaymentServiceImpl, error)
@@ -90,7 +90,7 @@ func NewPaymentServiceImpl(ctx context.Context, payDB backend.NoSQLDatabase, mon
 Creates a new PaymentService object
 
 <a name="PaymentServiceImpl.AddMoney"></a>
-### func \(\*PaymentServiceImpl\) [AddMoney](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L87>)
+### func \(\*PaymentServiceImpl\) [AddMoney](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L87>)
 
 ```go
 func (p *PaymentServiceImpl) AddMoney(ctx context.Context, payment Payment) error
@@ -99,7 +99,7 @@ func (p *PaymentServiceImpl) AddMoney(ctx context.Context, payment Payment) erro
 
 
 <a name="PaymentServiceImpl.Cleanup"></a>
-### func \(\*PaymentServiceImpl\) [Cleanup](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L100>)
+### func \(\*PaymentServiceImpl\) [Cleanup](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L100>)
 
 ```go
 func (p *PaymentServiceImpl) Cleanup(ctx context.Context) error
@@ -108,7 +108,7 @@ func (p *PaymentServiceImpl) Cleanup(ctx context.Context) error
 
 
 <a name="PaymentServiceImpl.InitPayment"></a>
-### func \(\*PaymentServiceImpl\) [InitPayment](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L38>)
+### func \(\*PaymentServiceImpl\) [InitPayment](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L38>)
 
 ```go
 func (p *PaymentServiceImpl) InitPayment(ctx context.Context, payment Payment) error
@@ -117,7 +117,7 @@ func (p *PaymentServiceImpl) InitPayment(ctx context.Context, payment Payment) e
 
 
 <a name="PaymentServiceImpl.Pay"></a>
-### func \(\*PaymentServiceImpl\) [Pay](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L72>)
+### func \(\*PaymentServiceImpl\) [Pay](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L72>)
 
 ```go
 func (p *PaymentServiceImpl) Pay(ctx context.Context, payment Payment) error
@@ -126,7 +126,7 @@ func (p *PaymentServiceImpl) Pay(ctx context.Context, payment Payment) error
 
 
 <a name="PaymentServiceImpl.Query"></a>
-### func \(\*PaymentServiceImpl\) [Query](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L58>)
+### func \(\*PaymentServiceImpl\) [Query](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/payment/paymentService.go#L58>)
 
 ```go
 func (p *PaymentServiceImpl) Query(ctx context.Context) ([]Payment, error)

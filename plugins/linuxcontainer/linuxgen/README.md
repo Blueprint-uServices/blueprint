@@ -3,7 +3,7 @@
 # linuxgen
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/linuxgen"
+import "github.com/blueprint-uservices/blueprint/plugins/linuxcontainer/linuxgen"
 ```
 
 ## Index
@@ -23,7 +23,7 @@ import "gitlab.mpi-sws.org/cld/blueprint/plugins/linuxcontainer/linuxgen"
 
 
 <a name="ExecuteTemplate"></a>
-## func [ExecuteTemplate](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/linuxgen/template.go#L17>)
+## func [ExecuteTemplate](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/linuxgen/template.go#L17>)
 
 ```go
 func ExecuteTemplate(name string, body string, args any) (string, error)
@@ -32,7 +32,7 @@ func ExecuteTemplate(name string, body string, args any) (string, error)
 
 
 <a name="ExecuteTemplateToFile"></a>
-## func [ExecuteTemplateToFile](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/linuxgen/template.go#L21>)
+## func [ExecuteTemplateToFile](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/linuxgen/template.go#L21>)
 
 ```go
 func ExecuteTemplateToFile(name string, body string, args any, filename string) error
@@ -41,7 +41,7 @@ func ExecuteTemplateToFile(name string, body string, args any, filename string) 
 
 
 <a name="GenerateRunFunc"></a>
-## func [GenerateRunFunc](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/linuxgen/runfunc.go#L21>)
+## func [GenerateRunFunc](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/linuxgen/runfunc.go#L21>)
 
 ```go
 func GenerateRunFunc(name string, runfunc string, deps ...ir.IRNode) (string, error)
@@ -50,7 +50,7 @@ func GenerateRunFunc(name string, runfunc string, deps ...ir.IRNode) (string, er
 
 
 <a name="BuildScript"></a>
-## type [BuildScript](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/linuxgen/build.sh.go#L22-L27>)
+## type [BuildScript](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/linuxgen/build.sh.go#L22-L27>)
 
 
 
@@ -64,7 +64,7 @@ type BuildScript struct {
 ```
 
 <a name="NewBuildScript"></a>
-### func [NewBuildScript](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/linuxgen/build.sh.go#L33>)
+### func [NewBuildScript](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/linuxgen/build.sh.go#L33>)
 
 ```go
 func NewBuildScript(workspaceDir, fileName string) *BuildScript
@@ -73,7 +73,7 @@ func NewBuildScript(workspaceDir, fileName string) *BuildScript
 Creates a new build.sh that will invoke multiple build scripts of processes in subdirectories of the workspace
 
 <a name="BuildScript.Add"></a>
-### func \(\*BuildScript\) [Add](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/linuxgen/build.sh.go#L50>)
+### func \(\*BuildScript\) [Add](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/linuxgen/build.sh.go#L50>)
 
 ```go
 func (d *BuildScript) Add(filePath string) error
@@ -86,7 +86,7 @@ filePath should be a fully qualified path to a build script that resides within 
 Returns an error if the script resides outside of the workspace
 
 <a name="BuildScript.GenerateBuildScript"></a>
-### func \(\*BuildScript\) [GenerateBuildScript](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/linuxgen/build.sh.go#L71>)
+### func \(\*BuildScript\) [GenerateBuildScript](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/linuxgen/build.sh.go#L71>)
 
 ```go
 func (d *BuildScript) GenerateBuildScript() error
@@ -95,7 +95,7 @@ func (d *BuildScript) GenerateBuildScript() error
 
 
 <a name="RunScript"></a>
-## type [RunScript](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/linuxgen/run.sh.go#L16-L24>)
+## type [RunScript](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/linuxgen/run.sh.go#L16-L24>)
 
 
 
@@ -112,7 +112,7 @@ type RunScript struct {
 ```
 
 <a name="NewRunScript"></a>
-### func [NewRunScript](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/linuxgen/run.sh.go#L30>)
+### func [NewRunScript](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/linuxgen/run.sh.go#L30>)
 
 ```go
 func NewRunScript(workspaceName, workspaceDir, fileName string) *RunScript
@@ -121,7 +121,7 @@ func NewRunScript(workspaceName, workspaceDir, fileName string) *RunScript
 Creates a new run.sh that will check environment variables are set and invokes the run scripts of the processes within the workspace
 
 <a name="RunScript.Add"></a>
-### func \(\*RunScript\) [Add](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/linuxgen/run.sh.go#L54>)
+### func \(\*RunScript\) [Add](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/linuxgen/run.sh.go#L54>)
 
 ```go
 func (run *RunScript) Add(procName, runfunc string, deps ...ir.IRNode)
@@ -130,7 +130,7 @@ func (run *RunScript) Add(procName, runfunc string, deps ...ir.IRNode)
 
 
 <a name="RunScript.GenerateRunScript"></a>
-### func \(\*RunScript\) [GenerateRunScript](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/linuxgen/run.sh.go#L64>)
+### func \(\*RunScript\) [GenerateRunScript](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/linuxgen/run.sh.go#L64>)
 
 ```go
 func (run *RunScript) GenerateRunScript() error
@@ -139,7 +139,7 @@ func (run *RunScript) GenerateRunScript() error
 
 
 <a name="RunScript.Require"></a>
-### func \(\*RunScript\) [Require](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/linuxcontainer/linuxgen/run.sh.go#L50>)
+### func \(\*RunScript\) [Require](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/linuxgen/run.sh.go#L50>)
 
 ```go
 func (run *RunScript) Require(node ir.IRNode)

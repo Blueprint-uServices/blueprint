@@ -5,8 +5,8 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 )
 
 // Implements a Queue that uses the rabbitmq package

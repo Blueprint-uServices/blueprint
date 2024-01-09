@@ -3,7 +3,7 @@
 # route
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/route"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/route"
 ```
 
 package route implements ts\-route\-service from the original train ticket application
@@ -24,7 +24,7 @@ package route implements ts\-route\-service from the original train ticket appli
 
 
 <a name="Route"></a>
-## type [Route](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/route/data.go#L3-L9>)
+## type [Route](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/route/data.go#L3-L9>)
 
 
 
@@ -39,7 +39,7 @@ type Route struct {
 ```
 
 <a name="RouteInfo"></a>
-## type [RouteInfo](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/route/data.go#L11-L17>)
+## type [RouteInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/route/data.go#L11-L17>)
 
 
 
@@ -54,7 +54,7 @@ type RouteInfo struct {
 ```
 
 <a name="RouteService"></a>
-## type [RouteService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L16-L29>)
+## type [RouteService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L16-L29>)
 
 RouteService manages all the routes in the application
 
@@ -76,7 +76,7 @@ type RouteService interface {
 ```
 
 <a name="RouteServiceImpl"></a>
-## type [RouteServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L31-L33>)
+## type [RouteServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L31-L33>)
 
 
 
@@ -87,7 +87,7 @@ type RouteServiceImpl struct {
 ```
 
 <a name="NewRouteServiceImpl"></a>
-### func [NewRouteServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L35>)
+### func [NewRouteServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L35>)
 
 ```go
 func NewRouteServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*RouteServiceImpl, error)
@@ -96,7 +96,7 @@ func NewRouteServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*RouteS
 
 
 <a name="RouteServiceImpl.CreateAndModify"></a>
-### func \(\*RouteServiceImpl\) [CreateAndModify](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L122>)
+### func \(\*RouteServiceImpl\) [CreateAndModify](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L122>)
 
 ```go
 func (r *RouteServiceImpl) CreateAndModify(ctx context.Context, info RouteInfo) (Route, error)
@@ -105,7 +105,7 @@ func (r *RouteServiceImpl) CreateAndModify(ctx context.Context, info RouteInfo) 
 
 
 <a name="RouteServiceImpl.DeleteRoute"></a>
-### func \(\*RouteServiceImpl\) [DeleteRoute](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L39>)
+### func \(\*RouteServiceImpl\) [DeleteRoute](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L39>)
 
 ```go
 func (r *RouteServiceImpl) DeleteRoute(ctx context.Context, id string) error
@@ -114,7 +114,7 @@ func (r *RouteServiceImpl) DeleteRoute(ctx context.Context, id string) error
 
 
 <a name="RouteServiceImpl.GetAllRoutes"></a>
-### func \(\*RouteServiceImpl\) [GetAllRoutes](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L47>)
+### func \(\*RouteServiceImpl\) [GetAllRoutes](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L47>)
 
 ```go
 func (r *RouteServiceImpl) GetAllRoutes(ctx context.Context) ([]Route, error)
@@ -123,7 +123,7 @@ func (r *RouteServiceImpl) GetAllRoutes(ctx context.Context) ([]Route, error)
 
 
 <a name="RouteServiceImpl.GetRouteById"></a>
-### func \(\*RouteServiceImpl\) [GetRouteById](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L65>)
+### func \(\*RouteServiceImpl\) [GetRouteById](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L65>)
 
 ```go
 func (r *RouteServiceImpl) GetRouteById(ctx context.Context, id string) (Route, error)
@@ -132,7 +132,7 @@ func (r *RouteServiceImpl) GetRouteById(ctx context.Context, id string) (Route, 
 
 
 <a name="RouteServiceImpl.GetRouteByIds"></a>
-### func \(\*RouteServiceImpl\) [GetRouteByIds](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L85>)
+### func \(\*RouteServiceImpl\) [GetRouteByIds](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L85>)
 
 ```go
 func (r *RouteServiceImpl) GetRouteByIds(ctx context.Context, ids []string) ([]Route, error)
@@ -141,7 +141,7 @@ func (r *RouteServiceImpl) GetRouteByIds(ctx context.Context, ids []string) ([]R
 
 
 <a name="RouteServiceImpl.GetRouteByStartAndEnd"></a>
-### func \(\*RouteServiceImpl\) [GetRouteByStartAndEnd](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L98>)
+### func \(\*RouteServiceImpl\) [GetRouteByStartAndEnd](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/route/routeService.go#L98>)
 
 ```go
 func (r *RouteServiceImpl) GetRouteByStartAndEnd(ctx context.Context, start string, end string) (Route, error)

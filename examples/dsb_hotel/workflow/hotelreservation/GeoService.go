@@ -4,8 +4,8 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	geoindex "github.com/hailocab/go-geoindex"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

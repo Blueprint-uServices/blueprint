@@ -1,6 +1,6 @@
 package linuxgen
 
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
+import "github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
 
 /*
 If the goproc is being deployed to Docker, we can provide some custom

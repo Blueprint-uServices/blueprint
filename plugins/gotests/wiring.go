@@ -20,16 +20,16 @@
 //
 // See [Workflow Tests] for more information on writing workflow tests.
 //
-// [Workflow Tests]: https://github.com/Blueprint-uServices/blueprint/tree/main/docs/manual/workflow_tests.md
-// [registry.ServiceRegistry]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/core/registry
-// [workflow.Init]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/workflow
+// [Workflow Tests]: https://github.com/blueprint-uservices/blueprint/tree/main/docs/manual/workflow_tests.md
+// [registry.ServiceRegistry]: https://github.com/blueprint-uservices/blueprint/tree/main/runtime/core/registry
+// [workflow.Init]: https://github.com/blueprint-uservices/blueprint/tree/main/plugins/workflow
 package gotests
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/namespaceutil"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/namespaceutil"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/golang"
 )
 
 var prop_SERVICESTOTEST = "Services"
@@ -49,8 +49,8 @@ var prop_SERVICESTOTEST = "Services"
 //
 // For more information about tests see [Workflow Tests].
 //
-// [Workflow Tests]: https://github.com/Blueprint-uServices/blueprint/tree/main/docs/manual/workflow_tests.md
-// [registry.ServiceRegistry]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/core/registry
+// [Workflow Tests]: https://github.com/blueprint-uservices/blueprint/tree/main/docs/manual/workflow_tests.md
+// [registry.ServiceRegistry]: https://github.com/blueprint-uservices/blueprint/tree/main/runtime/core/registry
 func Test(spec wiring.WiringSpec, servicesToTest ...string) string {
 
 	name := "gotests"

@@ -3,7 +3,7 @@
 # mongodb
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
+import "github.com/blueprint-uservices/blueprint/plugins/mongodb"
 ```
 
 Package mongodb provides a plugin to generate and include a mongodb instance in a Blueprint application.
@@ -37,7 +37,7 @@ The applications must use a backend.NoSQLDatabase \(runtime/core/backend\) as th
 
 
 <a name="Container"></a>
-## func [Container](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/wiring.go#L21>)
+## func [Container](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/wiring.go#L21>)
 
 ```go
 func Container(spec wiring.WiringSpec, dbName string) string
@@ -48,7 +48,7 @@ Container generates the IRNodes for a mongodb server docker container that uses 
 The generated container has the name \`dbName\`.
 
 <a name="MongoDBContainer"></a>
-## type [MongoDBContainer](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L14-L21>)
+## type [MongoDBContainer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L14-L21>)
 
 Blueprint IR Node that represents the server side docker container
 
@@ -64,7 +64,7 @@ type MongoDBContainer struct {
 ```
 
 <a name="MongoDBContainer.AddContainerArtifacts"></a>
-### func \(\*MongoDBContainer\) [AddContainerArtifacts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L80>)
+### func \(\*MongoDBContainer\) [AddContainerArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L80>)
 
 ```go
 func (node *MongoDBContainer) AddContainerArtifacts(targer docker.ContainerWorkspace) error
@@ -73,7 +73,7 @@ func (node *MongoDBContainer) AddContainerArtifacts(targer docker.ContainerWorks
 
 
 <a name="MongoDBContainer.AddContainerInstance"></a>
-### func \(\*MongoDBContainer\) [AddContainerInstance](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L84>)
+### func \(\*MongoDBContainer\) [AddContainerInstance](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L84>)
 
 ```go
 func (node *MongoDBContainer) AddContainerInstance(target docker.ContainerWorkspace) error
@@ -82,7 +82,7 @@ func (node *MongoDBContainer) AddContainerInstance(target docker.ContainerWorksp
 
 
 <a name="MongoDBContainer.GenerateArtifacts"></a>
-### func \(\*MongoDBContainer\) [GenerateArtifacts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L76>)
+### func \(\*MongoDBContainer\) [GenerateArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L76>)
 
 ```go
 func (m *MongoDBContainer) GenerateArtifacts(outdir string) error
@@ -91,7 +91,7 @@ func (m *MongoDBContainer) GenerateArtifacts(outdir string) error
 
 
 <a name="MongoDBContainer.GetInterface"></a>
-### func \(\*MongoDBContainer\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L71>)
+### func \(\*MongoDBContainer\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L71>)
 
 ```go
 func (m *MongoDBContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -100,7 +100,7 @@ func (m *MongoDBContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInt
 
 
 <a name="MongoDBContainer.Name"></a>
-### func \(\*MongoDBContainer\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L67>)
+### func \(\*MongoDBContainer\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L67>)
 
 ```go
 func (m *MongoDBContainer) Name() string
@@ -109,7 +109,7 @@ func (m *MongoDBContainer) Name() string
 
 
 <a name="MongoDBContainer.String"></a>
-### func \(\*MongoDBContainer\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L63>)
+### func \(\*MongoDBContainer\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L63>)
 
 ```go
 func (m *MongoDBContainer) String() string
@@ -118,7 +118,7 @@ func (m *MongoDBContainer) String() string
 
 
 <a name="MongoDBGoClient"></a>
-## type [MongoDBGoClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_client.go#L18-L25>)
+## type [MongoDBGoClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_client.go#L18-L25>)
 
 Blueprint IR Node that represents the generated client for the mongodb container
 
@@ -134,7 +134,7 @@ type MongoDBGoClient struct {
 ```
 
 <a name="MongoDBGoClient.AddInstantiation"></a>
-### func \(\*MongoDBGoClient\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_client.go#L78>)
+### func \(\*MongoDBGoClient\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_client.go#L78>)
 
 ```go
 func (n *MongoDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -143,7 +143,7 @@ func (n *MongoDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) erro
 
 
 <a name="MongoDBGoClient.AddInterfaces"></a>
-### func \(\*MongoDBGoClient\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_client.go#L74>)
+### func \(\*MongoDBGoClient\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_client.go#L74>)
 
 ```go
 func (n *MongoDBGoClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -152,7 +152,7 @@ func (n *MongoDBGoClient) AddInterfaces(builder golang.ModuleBuilder) error
 
 
 <a name="MongoDBGoClient.AddToWorkspace"></a>
-### func \(\*MongoDBGoClient\) [AddToWorkspace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_client.go#L70>)
+### func \(\*MongoDBGoClient\) [AddToWorkspace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_client.go#L70>)
 
 ```go
 func (n *MongoDBGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
@@ -161,7 +161,7 @@ func (n *MongoDBGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
 
 
 <a name="MongoDBGoClient.GetInterface"></a>
-### func \(\*MongoDBGoClient\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_client.go#L66>)
+### func \(\*MongoDBGoClient\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_client.go#L66>)
 
 ```go
 func (n *MongoDBGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -170,7 +170,7 @@ func (n *MongoDBGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInte
 
 
 <a name="MongoDBGoClient.ImplementsGolangNode"></a>
-### func \(\*MongoDBGoClient\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_client.go#L88>)
+### func \(\*MongoDBGoClient\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_client.go#L88>)
 
 ```go
 func (node *MongoDBGoClient) ImplementsGolangNode()
@@ -179,7 +179,7 @@ func (node *MongoDBGoClient) ImplementsGolangNode()
 
 
 <a name="MongoDBGoClient.ImplementsGolangService"></a>
-### func \(\*MongoDBGoClient\) [ImplementsGolangService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_client.go#L89>)
+### func \(\*MongoDBGoClient\) [ImplementsGolangService](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_client.go#L89>)
 
 ```go
 func (node *MongoDBGoClient) ImplementsGolangService()
@@ -188,7 +188,7 @@ func (node *MongoDBGoClient) ImplementsGolangService()
 
 
 <a name="MongoDBGoClient.Name"></a>
-### func \(\*MongoDBGoClient\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_client.go#L42>)
+### func \(\*MongoDBGoClient\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_client.go#L42>)
 
 ```go
 func (m *MongoDBGoClient) Name() string
@@ -197,7 +197,7 @@ func (m *MongoDBGoClient) Name() string
 
 
 <a name="MongoDBGoClient.String"></a>
-### func \(\*MongoDBGoClient\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_client.go#L38>)
+### func \(\*MongoDBGoClient\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_client.go#L38>)
 
 ```go
 func (m *MongoDBGoClient) String() string
@@ -206,7 +206,7 @@ func (m *MongoDBGoClient) String() string
 
 
 <a name="MongoInterface"></a>
-## type [MongoInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L24-L27>)
+## type [MongoInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L24-L27>)
 
 MongoDB interface exposed by the docker container.
 
@@ -218,7 +218,7 @@ type MongoInterface struct {
 ```
 
 <a name="MongoInterface.GetMethods"></a>
-### func \(\*MongoInterface\) [GetMethods](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L33>)
+### func \(\*MongoInterface\) [GetMethods](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L33>)
 
 ```go
 func (m *MongoInterface) GetMethods() []service.Method
@@ -227,7 +227,7 @@ func (m *MongoInterface) GetMethods() []service.Method
 
 
 <a name="MongoInterface.GetName"></a>
-### func \(\*MongoInterface\) [GetName](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L29>)
+### func \(\*MongoInterface\) [GetName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mongodb/ir_mongo_container.go#L29>)
 
 ```go
 func (m *MongoInterface) GetName() string

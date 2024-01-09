@@ -5,12 +5,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/stringutil"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/plugins/golang"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
 	"golang.org/x/exp/slog"
 )
 
@@ -154,8 +154,8 @@ func (pool *ClientPool) getTemplateArgs(module golang.ModuleBuilder) (*templateA
 
 	args.Imports.AddPackages(
 		"context", "fmt",
-		"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/clientpool",
-		"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/golang",
+		"github.com/blueprint-uservices/blueprint/runtime/plugins/clientpool",
+		"github.com/blueprint-uservices/blueprint/runtime/plugins/golang",
 	)
 	return args, nil
 }

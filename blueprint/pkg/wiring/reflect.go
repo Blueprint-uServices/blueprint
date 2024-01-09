@@ -3,7 +3,7 @@ package wiring
 import (
 	"reflect"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 )
 
 func getPointerValue(val any) (any, error) {

@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/order"
+	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/simplenosqldb"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/order"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 )
 
 // Tests acquire an OrderService instance using a service registry.

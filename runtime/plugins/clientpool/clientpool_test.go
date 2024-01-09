@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/clientpool"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/clientpool"
 )
 
 type element struct {

@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/sqlitereldb"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/sqlitereldb"
 )
 
 func TestRelDB(t *testing.T) {

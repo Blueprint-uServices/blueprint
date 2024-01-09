@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/payment"
+	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
 	"github.com/stretchr/testify/assert"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/payment"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 )
 
 // Tests acquire a PaymentService instance using a service registry.

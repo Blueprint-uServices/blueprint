@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/blueprint-uservices/blueprint/examples/dsb_sn/workflow/socialnetwork"
+	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/dsb_sn/workflow/socialnetwork"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 )
 
 var uniqueIdServiceRegistry = registry.NewServiceRegistry[socialnetwork.UniqueIdService]("uniqueId_service")

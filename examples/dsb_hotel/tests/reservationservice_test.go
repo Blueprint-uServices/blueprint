@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workflow/hotelreservation"
+	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/simplecache"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/simplenosqldb"
 	"github.com/stretchr/testify/assert"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/dsb_hotel/workflow/hotelreservation"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplecache"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplenosqldb"
 )
 
 var reservationServiceRegistry = registry.NewServiceRegistry[hotelreservation.ReservationService]("reservation_service")

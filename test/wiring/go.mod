@@ -1,3 +1,3 @@
-module gitlab.mpi-sws.org/cld/blueprint/test/wiring
+module github.com/blueprint-uservices/blueprint/test/wiring
 
 go 1.20

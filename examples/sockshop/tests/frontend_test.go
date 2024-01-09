@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/cart"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/catalogue"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/frontend"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/user"
+	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/cart"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/catalogue"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/frontend"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/sockshop/workflow/user"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
 	"golang.org/x/exp/slices"
 )
 

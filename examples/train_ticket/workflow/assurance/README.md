@@ -3,7 +3,7 @@
 # assurance
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/assurance"
+import "github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/assurance"
 ```
 
 Package assurance implements the ts\-assurance service from the original TrainTicket application
@@ -41,7 +41,7 @@ var TRAFFIC_ACCIDENT = AssuranceType{1, "Traffic Accident Assurance", 3.0}
 ```
 
 <a name="Assurance"></a>
-## type [Assurance](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/assurance/data.go#L25-L29>)
+## type [Assurance](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/assurance/data.go#L25-L29>)
 
 
 
@@ -54,7 +54,7 @@ type Assurance struct {
 ```
 
 <a name="AssuranceService"></a>
-## type [AssuranceService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L14-L31>)
+## type [AssuranceService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L14-L31>)
 
 AssuranceService manages assurances provided to customers for trips
 
@@ -80,7 +80,7 @@ type AssuranceService interface {
 ```
 
 <a name="AssuranceServiceImpl"></a>
-## type [AssuranceServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L34-L36>)
+## type [AssuranceServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L34-L36>)
 
 Implementation of an AssuranceService
 
@@ -91,7 +91,7 @@ type AssuranceServiceImpl struct {
 ```
 
 <a name="NewAssuranceServiceImpl"></a>
-### func [NewAssuranceServiceImpl](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L39>)
+### func [NewAssuranceServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L39>)
 
 ```go
 func NewAssuranceServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*AssuranceServiceImpl, error)
@@ -100,7 +100,7 @@ func NewAssuranceServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*As
 Constructs an AssuranceService object
 
 <a name="AssuranceServiceImpl.Create"></a>
-### func \(\*AssuranceServiceImpl\) [Create](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L141>)
+### func \(\*AssuranceServiceImpl\) [Create](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L141>)
 
 ```go
 func (a *AssuranceServiceImpl) Create(ctx context.Context, typeindex int64, orderid string) (Assurance, error)
@@ -109,7 +109,7 @@ func (a *AssuranceServiceImpl) Create(ctx context.Context, typeindex int64, orde
 
 
 <a name="AssuranceServiceImpl.DeleteById"></a>
-### func \(\*AssuranceServiceImpl\) [DeleteById](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L103>)
+### func \(\*AssuranceServiceImpl\) [DeleteById](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L103>)
 
 ```go
 func (a *AssuranceServiceImpl) DeleteById(ctx context.Context, id string) error
@@ -118,7 +118,7 @@ func (a *AssuranceServiceImpl) DeleteById(ctx context.Context, id string) error
 
 
 <a name="AssuranceServiceImpl.DeleteByOrderId"></a>
-### func \(\*AssuranceServiceImpl\) [DeleteByOrderId](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L112>)
+### func \(\*AssuranceServiceImpl\) [DeleteByOrderId](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L112>)
 
 ```go
 func (a *AssuranceServiceImpl) DeleteByOrderId(ctx context.Context, order_id string) error
@@ -127,7 +127,7 @@ func (a *AssuranceServiceImpl) DeleteByOrderId(ctx context.Context, order_id str
 
 
 <a name="AssuranceServiceImpl.FindAssuranceById"></a>
-### func \(\*AssuranceServiceImpl\) [FindAssuranceById](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L61>)
+### func \(\*AssuranceServiceImpl\) [FindAssuranceById](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L61>)
 
 ```go
 func (a *AssuranceServiceImpl) FindAssuranceById(ctx context.Context, id string) (Assurance, error)
@@ -136,7 +136,7 @@ func (a *AssuranceServiceImpl) FindAssuranceById(ctx context.Context, id string)
 
 
 <a name="AssuranceServiceImpl.FindAssuranceByOrderId"></a>
-### func \(\*AssuranceServiceImpl\) [FindAssuranceByOrderId](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L82>)
+### func \(\*AssuranceServiceImpl\) [FindAssuranceByOrderId](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L82>)
 
 ```go
 func (a *AssuranceServiceImpl) FindAssuranceByOrderId(ctx context.Context, order_id string) (Assurance, error)
@@ -145,7 +145,7 @@ func (a *AssuranceServiceImpl) FindAssuranceByOrderId(ctx context.Context, order
 
 
 <a name="AssuranceServiceImpl.GetAllAssuranceTypes"></a>
-### func \(\*AssuranceServiceImpl\) [GetAllAssuranceTypes](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L43>)
+### func \(\*AssuranceServiceImpl\) [GetAllAssuranceTypes](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L43>)
 
 ```go
 func (a *AssuranceServiceImpl) GetAllAssuranceTypes(ctx context.Context) ([]AssuranceType, error)
@@ -154,7 +154,7 @@ func (a *AssuranceServiceImpl) GetAllAssuranceTypes(ctx context.Context) ([]Assu
 
 
 <a name="AssuranceServiceImpl.GetAllAssurances"></a>
-### func \(\*AssuranceServiceImpl\) [GetAllAssurances](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L47>)
+### func \(\*AssuranceServiceImpl\) [GetAllAssurances](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L47>)
 
 ```go
 func (a *AssuranceServiceImpl) GetAllAssurances(ctx context.Context) ([]Assurance, error)
@@ -163,7 +163,7 @@ func (a *AssuranceServiceImpl) GetAllAssurances(ctx context.Context) ([]Assuranc
 
 
 <a name="AssuranceServiceImpl.Modify"></a>
-### func \(\*AssuranceServiceImpl\) [Modify](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L121>)
+### func \(\*AssuranceServiceImpl\) [Modify](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/assurance/assuranceService.go#L121>)
 
 ```go
 func (a *AssuranceServiceImpl) Modify(ctx context.Context, assurance Assurance) (Assurance, error)
@@ -172,7 +172,7 @@ func (a *AssuranceServiceImpl) Modify(ctx context.Context, assurance Assurance) 
 
 
 <a name="AssuranceType"></a>
-## type [AssuranceType](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/examples/train_ticket/workflow/assurance/data.go#L9-L13>)
+## type [AssuranceType](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/assurance/data.go#L9-L13>)
 
 
 

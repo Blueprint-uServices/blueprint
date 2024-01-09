@@ -29,7 +29,7 @@ For services that use backends such as `backend.Cache` there are corresponding s
 import (
     "context"
     "testing"
-    "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplecache"
+    "github.com/blueprint-uservices/blueprint/runtime/plugins/simplecache"
 )
 
 // A test for the MultiEchoerService
@@ -65,7 +65,7 @@ package tests
 
 import (
     "testing"
-    "gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
+    "github.com/blueprint-uservices/blueprint/runtime/core/registry"
 )
 
 var echoRegistry = registry.NewServiceRegistry[echo.EchoService]("echo")
@@ -93,8 +93,8 @@ package tests
 
 import (
     "testing"
-    "gitlab.mpi-sws.org/cld/blueprint/runtime/core/registry"
-    "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplecache"
+    "github.com/blueprint-uservices/blueprint/runtime/core/registry"
+    "github.com/blueprint-uservices/blueprint/runtime/plugins/simplecache"
 )
 
 var multiEchoerRegistry = registry.NewServiceRegistry[echo.MultiEchoerService]("multi_echoer")

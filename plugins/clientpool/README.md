@@ -3,7 +3,7 @@
 # clientpool
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/clientpool"
+import "github.com/blueprint-uservices/blueprint/plugins/clientpool"
 ```
 
 Package clientpool provides a Blueprint modifier for the client side of service calls.
@@ -27,7 +27,7 @@ The plugin wraps clients with a ClientPool that can create N instances of client
 
 
 <a name="Create"></a>
-## func [Create](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/clientpool/wiring.go#L15>)
+## func [Create](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/clientpool/wiring.go#L15>)
 
 ```go
 func Create(spec wiring.WiringSpec, serviceName string, numClients int)
@@ -36,7 +36,7 @@ func Create(spec wiring.WiringSpec, serviceName string, numClients int)
 Wraps the client side of serviceName with a client pool with n client instances
 
 <a name="ClientPool"></a>
-## type [ClientPool](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/clientpool/ir.go#L18-L27>)
+## type [ClientPool](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/clientpool/ir.go#L18-L27>)
 
 Blueprint IR node representing a ClientPool that uses \[N\] instances of \[Client\]
 
@@ -54,7 +54,7 @@ type ClientPool struct {
 ```
 
 <a name="ClientPool.Accepts"></a>
-### func \(\*ClientPool\) [Accepts](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/clientpool/wiring.go#L45>)
+### func \(\*ClientPool\) [Accepts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/clientpool/wiring.go#L45>)
 
 ```go
 func (pool *ClientPool) Accepts(nodeType any) bool
@@ -63,7 +63,7 @@ func (pool *ClientPool) Accepts(nodeType any) bool
 Implements \[wiring.NamespaceHandler\]
 
 <a name="ClientPool.AddEdge"></a>
-### func \(\*ClientPool\) [AddEdge](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/clientpool/wiring.go#L51>)
+### func \(\*ClientPool\) [AddEdge](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/clientpool/wiring.go#L51>)
 
 ```go
 func (pool *ClientPool) AddEdge(name string, edge ir.IRNode) error
@@ -72,7 +72,7 @@ func (pool *ClientPool) AddEdge(name string, edge ir.IRNode) error
 Implements \[wiring.NamespaceHandler\]
 
 <a name="ClientPool.AddInstantiation"></a>
-### func \(\*ClientPool\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/clientpool/ir.go#L116>)
+### func \(\*ClientPool\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/clientpool/ir.go#L116>)
 
 ```go
 func (pool *ClientPool) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -81,7 +81,7 @@ func (pool *ClientPool) AddInstantiation(builder golang.NamespaceBuilder) error
 Implements golang.Service golang.Instantiable
 
 <a name="ClientPool.AddInterfaces"></a>
-### func \(\*ClientPool\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/clientpool/ir.go#L54>)
+### func \(\*ClientPool\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/clientpool/ir.go#L54>)
 
 ```go
 func (pool *ClientPool) AddInterfaces(module golang.ModuleBuilder) error
@@ -90,7 +90,7 @@ func (pool *ClientPool) AddInterfaces(module golang.ModuleBuilder) error
 Implements golang.Service golang.ProvidesInterface
 
 <a name="ClientPool.AddNode"></a>
-### func \(\*ClientPool\) [AddNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/clientpool/wiring.go#L57>)
+### func \(\*ClientPool\) [AddNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/clientpool/wiring.go#L57>)
 
 ```go
 func (pool *ClientPool) AddNode(name string, node ir.IRNode) error
@@ -99,7 +99,7 @@ func (pool *ClientPool) AddNode(name string, node ir.IRNode) error
 Implements \[wiring.NamespaceHandler\]
 
 <a name="ClientPool.GenerateFuncs"></a>
-### func \(\*ClientPool\) [GenerateFuncs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/clientpool/ir.go#L67>)
+### func \(\*ClientPool\) [GenerateFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/clientpool/ir.go#L67>)
 
 ```go
 func (pool *ClientPool) GenerateFuncs(module golang.ModuleBuilder) error
@@ -108,7 +108,7 @@ func (pool *ClientPool) GenerateFuncs(module golang.ModuleBuilder) error
 Implements golang.GeneratesFuncs
 
 <a name="ClientPool.GetInterface"></a>
-### func \(\*ClientPool\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/clientpool/ir.go#L48>)
+### func \(\*ClientPool\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/clientpool/ir.go#L48>)
 
 ```go
 func (pool *ClientPool) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -117,7 +117,7 @@ func (pool *ClientPool) GetInterface(ctx ir.BuildContext) (service.ServiceInterf
 Implements golang.Service service.ServiceNode
 
 <a name="ClientPool.Name"></a>
-### func \(\*ClientPool\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/clientpool/ir.go#L30>)
+### func \(\*ClientPool\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/clientpool/ir.go#L30>)
 
 ```go
 func (pool *ClientPool) Name() string
@@ -126,7 +126,7 @@ func (pool *ClientPool) Name() string
 Implements ir.IRNode
 
 <a name="ClientPool.String"></a>
-### func \(\*ClientPool\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/clientpool/ir.go#L35>)
+### func \(\*ClientPool\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/clientpool/ir.go#L35>)
 
 ```go
 func (pool *ClientPool) String() string
@@ -135,7 +135,7 @@ func (pool *ClientPool) String() string
 Implements ir.IRNode
 
 <a name="ClientPoolNamespace"></a>
-## type [ClientPoolNamespace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/clientpool/wiring.go#L40-L42>)
+## type [ClientPoolNamespace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/clientpool/wiring.go#L40-L42>)
 
 A \[wiring.NamespaceHandler\] used to build [ClientPool](<#ClientPool>) IRNodes
 

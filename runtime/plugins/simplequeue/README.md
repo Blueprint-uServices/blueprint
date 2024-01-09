@@ -3,7 +3,7 @@
 # simplequeue
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/simplequeue"
+import "github.com/blueprint-uservices/blueprint/runtime/plugins/simplequeue"
 ```
 
 Package simplequeue implements an simple in\-memory \[backend.Queue\] that internally uses a golang channel of capacity 10 for passing items from producer to consumer.
@@ -19,7 +19,7 @@ Calls to \[backend.Queue.Push\] will block once the queue capacity reaches 10.
 
 
 <a name="SimpleQueue"></a>
-## type [SimpleQueue](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplequeue/queue.go#L14-L16>)
+## type [SimpleQueue](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplequeue/queue.go#L14-L16>)
 
 A simple chan\-based queue that implements the \[backend.Queue\] interface
 
@@ -30,7 +30,7 @@ type SimpleQueue struct {
 ```
 
 <a name="NewSimpleQueue"></a>
-### func [NewSimpleQueue](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplequeue/queue.go#L21>)
+### func [NewSimpleQueue](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplequeue/queue.go#L21>)
 
 ```go
 func NewSimpleQueue(ctx context.Context) (q *SimpleQueue, err error)
@@ -41,7 +41,7 @@ Instantiates a \[backend.Queue\] that internally uses a golang channel of capaci
 Calls to \[q.Push\] will block once the queue capacity reaches 10.
 
 <a name="SimpleQueue.Pop"></a>
-### func \(\*SimpleQueue\) [Pop](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplequeue/queue.go#L33>)
+### func \(\*SimpleQueue\) [Pop](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplequeue/queue.go#L33>)
 
 ```go
 func (q *SimpleQueue) Pop(ctx context.Context, dst interface{}) (bool, error)
@@ -50,7 +50,7 @@ func (q *SimpleQueue) Pop(ctx context.Context, dst interface{}) (bool, error)
 Pop implements backend.Queue.
 
 <a name="SimpleQueue.Push"></a>
-### func \(\*SimpleQueue\) [Push](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/simplequeue/queue.go#L50>)
+### func \(\*SimpleQueue\) [Push](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/simplequeue/queue.go#L50>)
 
 ```go
 func (q *SimpleQueue) Push(ctx context.Context, item interface{}) (bool, error)
