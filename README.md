@@ -10,34 +10,24 @@ Using Blueprint, you can:
 
 Blueprint is particularly aimed at **prototyping and experimentation** use cases.  It is intended for use by anybody, but particularly researchers and practitioners wanting to experiment with microservice applications.  Its central goal is to reduce the amount of effort involved when changing and re-compiling the infrastructure choices of a microservice application.  
 
-*** 
-# Resources
-
-## Documentation & User Manual
+## Getting Started
 
 To get started compiling and running your first Blueprint application, see the 📖[Getting Started](docs/manual/gettingstarted.md) page of the User Manual.
 
-📘[User Manual](docs/manual)
+## Resources
 
-## Applications
-
-📚[Applications](examples) - off-the-shelf applications that come packaged with Blueprint
-
-📓[Workflow Spec Backends](runtime/core) - backend interfaces that can be used in workflow specs
-
+📘[User Manual](docs/manual) - the main source of Blueprint documentation\
+📚[Applications](examples) - off-the-shelf applications that come packaged with Blueprint\
 📝[Wiring Spec Plugins](plugins) - plugins that come packaged with Blueprint that can be used in wiring specs
+📓[Workflow Spec Backends](runtime/core) - backend interfaces that can be used in workflow specs\
 
-## API Documentation on go.dev
+### API Documentation on go.dev
 
-🚀[Blueprint Compiler](https://pkg.go.dev/github.com/blueprint-uservices/blueprint/blueprint)
-🚀[Blueprint Plugins](https://pkg.go.dev/github.com/blueprint-uservices/blueprint/plugins)
+🚀[Blueprint Compiler](https://pkg.go.dev/github.com/blueprint-uservices/blueprint/blueprint)\
+🚀[Blueprint Plugins](https://pkg.go.dev/github.com/blueprint-uservices/blueprint/plugins)\
 🚀[Blueprint Runtime Components](https://pkg.go.dev/github.com/blueprint-uservices/blueprint/runtime)
 
-***
-
 ## Project
-
-### Publications
 
 If you anticipate making use of Blueprint for your research project, we recommend familiarizing yourself with the SOSP 2023 publication below, which outlines and demonstrates some motivating use cases for Blueprint.
 
