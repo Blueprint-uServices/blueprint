@@ -23,26 +23,29 @@
 // # Running Artifacts
 //
 // If the dockercompose deployment is not further combined by other plugins, then the entry point to running
-// your application will be using docker-compose.
+// your application will be using docker-compose.  You can build or run the deployment with:
 //
-// After building an application, you can run docker-compose build and docker-compose up to build and start
-// the application respectively.  You will probably need to set a number of environment variables for this
-// to work, to decide which ports you want to expose locally.  Docker will complain about these environment
-// variables not being set, if they are absent.  You can write these to a .env file or set them
+//	docker-compose build
+//	docker-compose up
+//
+// Although the plugin automatically assigns and sets hostnames and ports for containers, you will still
+// need to set some environment variables for ports to expose on the local host.  If you try to build or run
+// the docker-compose file when these are absent, Docker will complain about their absence.  You can write
+// these to a .env file or set them in your local environment.
+//
+// For a concrete guide on running a generated docker-compose file, see the [SockShop Getting Started]
+// documentation.
 //
 // # Internals
 //
 // Internally, the plugin makes use of interfaces defined in the [docker] plugin.  It can combine any
 // Container IRNodes including ones that use off-the-shelf container images, and ones that generate their
-// own container image (Dockerfile) onto the local filesystem.
+// own container image (Dockerfile) onto the local filesystem.  Internally the plugin assigns hostnames
+// to container instances and sets environment variables so that services call to the correct hostnames
+// and ports.
 //
 // [docker]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/docker
-
-// The plugin allows using both off-the-shelf container images, and container images that have been
-// auto-generated onto the local file system.  The plugin generates a docker-compose file that instantiates
-// images, and sets environment variables and ports.
-//
-// in your local environment.
+// [SockShop Getting Started]: https://github.com/Blueprint-uServices/blueprint/tree/main/examples/sockshop
 package dockercompose
 
 import (
