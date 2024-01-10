@@ -1,3 +1,4 @@
+// Package linux extends Blueprint IR by providing interfaces used by other Blueprint plugins for deploying nodes as linux processes.
 package linux
 
 import (

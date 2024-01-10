@@ -1,3 +1,4 @@
+// Package dockerdeployment deploys a set of docker containers as a docker-compose file.
 package dockerdeployment
 
 import (

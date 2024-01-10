@@ -1,15 +1,4 @@
-package golang
-
-import (
-	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
-	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
-)
-
-/*
-The golang plugin extends Blueprint's IR as follows:
-
-It defines the following IR interfaces:
+/* Package golang plugin extends Blueprint's IR by defining the following IR interfaces:
 
   - golang.Node is the base interface for any node that lives within a golang process
   - golang.Service is a golang node that has methods that can be directly called by other golang nodes
@@ -24,6 +13,14 @@ use these interfaces.
   - golang.GeneratesFuncs is for golang nodes that generate function implementations
   - golang.ProvidesModule is for golang nodes that generate or otherwise provide the full source code of modules
 */
+package golang
+
+import (
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
+)
+
 type (
 	/*
 		golang.Node is the base IRNode interface that should be implemented by any IRNode that

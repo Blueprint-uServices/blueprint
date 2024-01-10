@@ -6,6 +6,8 @@
 import "github.com/blueprint-uservices/blueprint/plugins/linux"
 ```
 
+Package linux extends Blueprint IR by providing interfaces used by other Blueprint plugins for deploying nodes as linux processes.
+
 ## Index
 
 - [func EnvVar\(name string\) string](<#EnvVar>)
@@ -36,7 +38,7 @@ func FuncName(name string) string
 
 
 <a name="InstantiableProcess"></a>
-## type [InstantiableProcess](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L33-L35>)
+## type [InstantiableProcess](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L34-L36>)
 
 For process nodes that can be instantiated.
 
@@ -51,7 +53,7 @@ type InstantiableProcess interface {
 ```
 
 <a name="Process"></a>
-## type [Process](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L10-L13>)
+## type [Process](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L11-L14>)
 
 The base IRNode interface for linux processes
 
@@ -63,7 +65,7 @@ type Process interface {
 ```
 
 <a name="ProcessWorkspace"></a>
-## type [ProcessWorkspace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L50-L113>)
+## type [ProcessWorkspace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L51-L114>)
 
 A process workspace has commands for adding artifacts to the workspace and
 
@@ -143,7 +145,7 @@ type ProcessWorkspace interface {
 ```
 
 <a name="ProcessWorkspaceInfo"></a>
-## type [ProcessWorkspaceInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L115-L118>)
+## type [ProcessWorkspaceInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L116-L119>)
 
 Builders used by the above code and artifact generation interfaces
 
@@ -155,7 +157,7 @@ type ProcessWorkspaceInfo struct {
 ```
 
 <a name="ProvidesProcessArtifacts"></a>
-## type [ProvidesProcessArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L25-L27>)
+## type [ProvidesProcessArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L26-L28>)
 
 For process nodes that want to provide code or other artifacts for their process.
 

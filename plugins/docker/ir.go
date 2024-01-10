@@ -1,3 +1,4 @@
+// Package docker extends the IR by providing interfaces that can be used by other plugins to implement container generation using docker.
 package docker
 
 import (
