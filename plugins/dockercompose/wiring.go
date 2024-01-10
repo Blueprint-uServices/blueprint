@@ -1,4 +1,5 @@
-package dockerdeployment
+// Package dockercompose is a plugin that enables de
+package dockercompose
 
 import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/namespaceutil"
