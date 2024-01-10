@@ -19,11 +19,11 @@
 // Blueprint will combine any container instances that exist in the wiring spec but aren't explicitly added to
 // a container deployment, and create a default docker-compose deployment with the name "docker".
 //
-//     dockercompose.RegisterAsDefaultBuilder()
+//	dockercompose.RegisterAsDefaultBuilder()
 //
 // Calling the above is optional.  If your wiring spec uses the [cmdbuilder] then dockercompose is already
 // registered as the default container workspace builder.
-
+//
 // # Artifacts Generated
 //
 // During compilation, the plugin generates a docker-compose file that instantiates images for the specified
@@ -59,7 +59,6 @@
 //
 // [docker]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/docker
 // [SockShop Getting Started]: https://github.com/Blueprint-uServices/blueprint/tree/main/examples/sockshop
-//
 // [linuxcontainer]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/linuxcontainer
 // [goproc]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc
 package dockercompose
