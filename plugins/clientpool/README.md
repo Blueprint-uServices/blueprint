@@ -6,11 +6,11 @@
 import "github.com/blueprint-uservices/blueprint/plugins/clientpool"
 ```
 
-Package clientpool is a plugin for adding a client pool to the client side of service calls.
+Package clientpool is a plugin that wraps the client side of a service to use a pool of N clients, disallowing callers from making more than N concurrent oustanding calls each to the service.
 
-By default, Blueprint instantiate one client to a service and there is no concurrency control or rate limiting of calls using that client.
+By default, Blueprint instantiates one client to a service and there is no concurrency control or rate limiting of calls using that client.
 
-When applied, the clientpool plugin instantiates N instances of clients to a service, and each client instance can only be used by one caller at a time, effectively rate\-limiting to N outstanding calls at a time.
+When applied, the clientpool plugin instantiates N instances of clients to a service, and callers have exclusive access to a client when making a call. This effectively limits a caller to only making N outstanding calls at a time, with any extra calls blocking until a client becomes available. By contrast, the default Blueprint behavior is to use only one client, but to share that client and allow an unlimited number of concurrent calls.
 
 To use the clientpool plugin in your wiring spec, simply apply it to an application\-level service instance:
 
@@ -38,13 +38,21 @@ During compilation, the clientpool plugin will generate a client\-side wrapper c
 
 
 <a name="Create"></a>
-## func [Create](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/clientpool/wiring.go#L34>)
+## func [Create](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/clientpool/wiring.go#L44>)
 
 ```go
 func Create(spec wiring.WiringSpec, serviceName string, numClients int)
 ```
 
-Modifies the client\-side of an application\-level service so that all calls to serviceName are made using a pool of numClients clients. At runtime, clients to serviceName will only be able to have up to numClients concurrent calls outstanding before subsequent calls block.
+Create can be used by wiring specs to apply the clientpool plugin to the client side of a service.
+
+This will modify the client\-side of serviceName so that all calls are made using a pool of numClients clients.
+
+At runtime, clients to serviceName will only be able to have up to numClients concurrent calls outstanding, before subsequent calls block.
+
+serviceName must be an application\-level service instance, e.g. clientpool must be applied to the service before deploying the service over RPC or to a process.
+
+After calling [Create](<#Create>) you can continue to apply application\-level modifiers to serviceName.
 
 <a name="ClientPool"></a>
 ## type [ClientPool](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/clientpool/ir.go#L18-L27>)
@@ -65,7 +73,7 @@ type ClientPool struct {
 ```
 
 <a name="ClientPool.Accepts"></a>
-### func \(\*ClientPool\) [Accepts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/clientpool/wiring.go#L64>)
+### func \(\*ClientPool\) [Accepts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/clientpool/wiring.go#L74>)
 
 ```go
 func (pool *ClientPool) Accepts(nodeType any) bool
@@ -74,7 +82,7 @@ func (pool *ClientPool) Accepts(nodeType any) bool
 Implements \[wiring.NamespaceHandler\]
 
 <a name="ClientPool.AddEdge"></a>
-### func \(\*ClientPool\) [AddEdge](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/clientpool/wiring.go#L70>)
+### func \(\*ClientPool\) [AddEdge](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/clientpool/wiring.go#L80>)
 
 ```go
 func (pool *ClientPool) AddEdge(name string, edge ir.IRNode) error
@@ -101,7 +109,7 @@ func (pool *ClientPool) AddInterfaces(module golang.ModuleBuilder) error
 Implements golang.Service golang.ProvidesInterface
 
 <a name="ClientPool.AddNode"></a>
-### func \(\*ClientPool\) [AddNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/clientpool/wiring.go#L76>)
+### func \(\*ClientPool\) [AddNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/clientpool/wiring.go#L86>)
 
 ```go
 func (pool *ClientPool) AddNode(name string, node ir.IRNode) error
