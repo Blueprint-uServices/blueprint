@@ -37,7 +37,7 @@ The applications must use a backend.Queue \(runtime/core/backend\) as the interf
 
 
 <a name="Container"></a>
-## func [Container](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/wiring.go#L19>)
+## func [Container](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/wiring.go#L19>)
 
 ```go
 func Container(spec wiring.WiringSpec, name string, queue_name string) string
@@ -46,7 +46,7 @@ func Container(spec wiring.WiringSpec, name string, queue_name string) string
 Container generate the IRNodes for a mysql server docker container that uses the latest mysql/mysql image and the clients needed by the generated application to communicate with the server.
 
 <a name="RabbitmqContainer"></a>
-## type [RabbitmqContainer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L14-L21>)
+## type [RabbitmqContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L14-L21>)
 
 Blueprint IR Node that represents the server side docker container
 
@@ -62,7 +62,7 @@ type RabbitmqContainer struct {
 ```
 
 <a name="RabbitmqContainer.AddContainerArtifacts"></a>
-### func \(\*RabbitmqContainer\) [AddContainerArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L81>)
+### func \(\*RabbitmqContainer\) [AddContainerArtifacts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L81>)
 
 ```go
 func (n *RabbitmqContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error
@@ -71,7 +71,7 @@ func (n *RabbitmqContainer) AddContainerArtifacts(target docker.ContainerWorkspa
 
 
 <a name="RabbitmqContainer.AddContainerInstance"></a>
-### func \(\*RabbitmqContainer\) [AddContainerInstance](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L85>)
+### func \(\*RabbitmqContainer\) [AddContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L85>)
 
 ```go
 func (n *RabbitmqContainer) AddContainerInstance(target docker.ContainerWorkspace) error
@@ -80,7 +80,7 @@ func (n *RabbitmqContainer) AddContainerInstance(target docker.ContainerWorkspac
 
 
 <a name="RabbitmqContainer.GenerateArtifacts"></a>
-### func \(\*RabbitmqContainer\) [GenerateArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L77>)
+### func \(\*RabbitmqContainer\) [GenerateArtifacts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L77>)
 
 ```go
 func (n *RabbitmqContainer) GenerateArtifacts(outdir string) error
@@ -89,7 +89,7 @@ func (n *RabbitmqContainer) GenerateArtifacts(outdir string) error
 
 
 <a name="RabbitmqContainer.GetInterface"></a>
-### func \(\*RabbitmqContainer\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L72>)
+### func \(\*RabbitmqContainer\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L72>)
 
 ```go
 func (n *RabbitmqContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -98,7 +98,7 @@ func (n *RabbitmqContainer) GetInterface(ctx ir.BuildContext) (service.ServiceIn
 
 
 <a name="RabbitmqContainer.Name"></a>
-### func \(\*RabbitmqContainer\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L68>)
+### func \(\*RabbitmqContainer\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L68>)
 
 ```go
 func (n *RabbitmqContainer) Name() string
@@ -107,7 +107,7 @@ func (n *RabbitmqContainer) Name() string
 
 
 <a name="RabbitmqContainer.String"></a>
-### func \(\*RabbitmqContainer\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L64>)
+### func \(\*RabbitmqContainer\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L64>)
 
 ```go
 func (n *RabbitmqContainer) String() string
@@ -116,7 +116,7 @@ func (n *RabbitmqContainer) String() string
 
 
 <a name="RabbitmqGoClient"></a>
-## type [RabbitmqGoClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L18-L26>)
+## type [RabbitmqGoClient](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L18-L26>)
 
 Blueprint IR Node that represents the generated client for the rabbitmq container
 
@@ -133,7 +133,7 @@ type RabbitmqGoClient struct {
 ```
 
 <a name="RabbitmqGoClient.AddInstantiation"></a>
-### func \(\*RabbitmqGoClient\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L79>)
+### func \(\*RabbitmqGoClient\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L79>)
 
 ```go
 func (n *RabbitmqGoClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -142,7 +142,7 @@ func (n *RabbitmqGoClient) AddInstantiation(builder golang.NamespaceBuilder) err
 
 
 <a name="RabbitmqGoClient.AddInterfaces"></a>
-### func \(\*RabbitmqGoClient\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L75>)
+### func \(\*RabbitmqGoClient\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L75>)
 
 ```go
 func (n *RabbitmqGoClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -151,7 +151,7 @@ func (n *RabbitmqGoClient) AddInterfaces(builder golang.ModuleBuilder) error
 
 
 <a name="RabbitmqGoClient.AddToWorkspace"></a>
-### func \(\*RabbitmqGoClient\) [AddToWorkspace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L71>)
+### func \(\*RabbitmqGoClient\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L71>)
 
 ```go
 func (n *RabbitmqGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
@@ -160,7 +160,7 @@ func (n *RabbitmqGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
 
 
 <a name="RabbitmqGoClient.GetInterface"></a>
-### func \(\*RabbitmqGoClient\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L67>)
+### func \(\*RabbitmqGoClient\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L67>)
 
 ```go
 func (n *RabbitmqGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -169,7 +169,7 @@ func (n *RabbitmqGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInt
 
 
 <a name="RabbitmqGoClient.ImplementsGolangNode"></a>
-### func \(\*RabbitmqGoClient\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L88>)
+### func \(\*RabbitmqGoClient\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L88>)
 
 ```go
 func (n *RabbitmqGoClient) ImplementsGolangNode()
@@ -178,7 +178,7 @@ func (n *RabbitmqGoClient) ImplementsGolangNode()
 
 
 <a name="RabbitmqGoClient.ImplementsGolangService"></a>
-### func \(\*RabbitmqGoClient\) [ImplementsGolangService](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L89>)
+### func \(\*RabbitmqGoClient\) [ImplementsGolangService](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L89>)
 
 ```go
 func (n *RabbitmqGoClient) ImplementsGolangService()
@@ -187,7 +187,7 @@ func (n *RabbitmqGoClient) ImplementsGolangService()
 
 
 <a name="RabbitmqGoClient.Name"></a>
-### func \(\*RabbitmqGoClient\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L44>)
+### func \(\*RabbitmqGoClient\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L44>)
 
 ```go
 func (n *RabbitmqGoClient) Name() string
@@ -196,7 +196,7 @@ func (n *RabbitmqGoClient) Name() string
 
 
 <a name="RabbitmqGoClient.String"></a>
-### func \(\*RabbitmqGoClient\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L40>)
+### func \(\*RabbitmqGoClient\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_client.go#L40>)
 
 ```go
 func (n *RabbitmqGoClient) String() string
@@ -205,7 +205,7 @@ func (n *RabbitmqGoClient) String() string
 
 
 <a name="RabbitmqInterface"></a>
-## type [RabbitmqInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L24-L27>)
+## type [RabbitmqInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L24-L27>)
 
 RabbitMQ interface exposed by the docker container.
 
@@ -217,7 +217,7 @@ type RabbitmqInterface struct {
 ```
 
 <a name="RabbitmqInterface.GetMethods"></a>
-### func \(\*RabbitmqInterface\) [GetMethods](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L33>)
+### func \(\*RabbitmqInterface\) [GetMethods](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L33>)
 
 ```go
 func (r *RabbitmqInterface) GetMethods() []service.Method
@@ -226,7 +226,7 @@ func (r *RabbitmqInterface) GetMethods() []service.Method
 
 
 <a name="RabbitmqInterface.GetName"></a>
-### func \(\*RabbitmqInterface\) [GetName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L29>)
+### func \(\*RabbitmqInterface\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/rabbitmq/ir_container.go#L29>)
 
 ```go
 func (r *RabbitmqInterface) GetName() string

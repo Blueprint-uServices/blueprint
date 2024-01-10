@@ -40,7 +40,7 @@ The method \[InstantiateDst\] is used by other Blueprint plugins that wish to ex
 
 
 <a name="RequireUniqueness"></a>
-## func [RequireUniqueness](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/visibility.go#L35>)
+## func [RequireUniqueness](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/visibility.go#L35>)
 
 ```go
 func RequireUniqueness(spec wiring.WiringSpec, alias string, visibility any)
@@ -55,7 +55,7 @@ This is independent of whether it can be addressed by any node within that granu
 The name argument should be an alias that this call will redefine.
 
 <a name="ModifierOpts"></a>
-## type [ModifierOpts](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L79-L82>)
+## type [ModifierOpts](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L79-L82>)
 
 Additional options that can be specified when adding a modifier to a pointer. If not specified, defaults are used.
 
@@ -67,7 +67,7 @@ type ModifierOpts struct {
 ```
 
 <a name="PointerDef"></a>
-## type [PointerDef](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L44-L56>)
+## type [PointerDef](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L44-L56>)
 
 A PointerDef provides methods for plugins to add client or server side modifiers to a pointer.
 
@@ -80,7 +80,7 @@ type PointerDef struct {
 ```
 
 <a name="CreatePointer"></a>
-### func [CreatePointer](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L101>)
+### func [CreatePointer](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L101>)
 
 ```go
 func CreatePointer[SrcNodeType any](spec wiring.WiringSpec, name string, dst string, options ...PointerOpts) *PointerDef
@@ -93,7 +93,7 @@ Any plugin that defines client and server nodes should typically declare a point
 Additional pointer options can be specified by providing optional PointerOpts.
 
 <a name="GetPointer"></a>
-### func [GetPointer](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L144>)
+### func [GetPointer](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L144>)
 
 ```go
 func GetPointer(spec wiring.WiringSpec, name string) *PointerDef
@@ -102,7 +102,7 @@ func GetPointer(spec wiring.WiringSpec, name string) *PointerDef
 Gets the PointerDef metadata for a pointer name that was defined using [CreatePointer](<#CreatePointer>)
 
 <a name="PointerDef.AddAddrModifier"></a>
-### func \(\*PointerDef\) [AddAddrModifier](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L201>)
+### func \(\*PointerDef\) [AddAddrModifier](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L201>)
 
 ```go
 func (ptr *PointerDef) AddAddrModifier(spec wiring.WiringSpec, addrName string) string
@@ -115,7 +115,7 @@ It immediately instantiates the address, and returns it. It defers instantiation
 The return value of AddAddrModifier is the name of the \_previous\_ server side modifier. This can be used within the BuildFunc of the destination \(PointsTo\) of addrName
 
 <a name="PointerDef.AddDstModifier"></a>
-### func \(\*PointerDef\) [AddDstModifier](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L179>)
+### func \(\*PointerDef\) [AddDstModifier](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L179>)
 
 ```go
 func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName string, options ...ModifierOpts) string
@@ -130,7 +130,7 @@ A pointer can have multiple modifiers applied to it. They will be applied in the
 The return value of AddDstModifier is the name of the \_previous\_ server side modifier. This can be used within the BuildFunc of modifierName.
 
 <a name="PointerDef.AddSrcModifier"></a>
-### func \(\*PointerDef\) [AddSrcModifier](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L160>)
+### func \(\*PointerDef\) [AddSrcModifier](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L160>)
 
 ```go
 func (ptr *PointerDef) AddSrcModifier(spec wiring.WiringSpec, modifierName string) string
@@ -145,7 +145,7 @@ A pointer can have multiple modifiers applied to it. They will be applied in the
 The return value of AddSrcModifier is the name of the \_next\_ client side modifier. This can be used within the BuildFunc of modifierName.
 
 <a name="PointerDef.InstantiateDst"></a>
-### func \(\*PointerDef\) [InstantiateDst](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L221>)
+### func \(\*PointerDef\) [InstantiateDst](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L221>)
 
 ```go
 func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) error
@@ -156,7 +156,7 @@ If any pointer modifiers are addresses, this will instantiate the server side of
 This is primarily used by namespace plugins.
 
 <a name="PointerDef.String"></a>
-### func \(PointerDef\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L58>)
+### func \(PointerDef\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L58>)
 
 ```go
 func (ptr PointerDef) String() string
@@ -165,7 +165,7 @@ func (ptr PointerDef) String() string
 
 
 <a name="PointerOpts"></a>
-## type [PointerOpts](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L70-L75>)
+## type [PointerOpts](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L70-L75>)
 
 Additional options that can be specified when creating a pointer. If not specified, defaults are used.
 

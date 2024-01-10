@@ -32,7 +32,7 @@ See [Workflow Tests](<https://github.com/blueprint-uservices/blueprint/tree/main
 
 
 <a name="Test"></a>
-## func [Test](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/gotests/wiring.go#L54>)
+## func [Test](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/gotests/wiring.go#L54>)
 
 ```go
 func Test(spec wiring.WiringSpec, servicesToTest ...string) string

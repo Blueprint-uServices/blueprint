@@ -25,7 +25,7 @@ const (
 ```
 
 <a name="Errorf"></a>
-## func [Errorf](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/blueprint/errors.go#L30>)
+## func [Errorf](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/blueprint/errors.go#L30>)
 
 ```go
 func Errorf(format string, a ...any) error

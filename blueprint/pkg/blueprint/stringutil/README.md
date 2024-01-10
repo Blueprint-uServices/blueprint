@@ -18,7 +18,7 @@ Package stringutil implements utility methods for common string manipulations us
 
 
 <a name="Capitalize"></a>
-## func [Capitalize](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/blueprint/stringutil/name.go#L11>)
+## func [Capitalize](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/blueprint/stringutil/name.go#L11>)
 
 ```go
 func Capitalize(s string) string
@@ -27,7 +27,7 @@ func Capitalize(s string) string
 Returns s with the first letter converted to uppercase.
 
 <a name="CleanName"></a>
-## func [CleanName](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/blueprint/stringutil/name.go#L24>)
+## func [CleanName](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/blueprint/stringutil/name.go#L24>)
 
 ```go
 func CleanName(name string) string
@@ -38,7 +38,7 @@ Returns name with only alphanumeric characters and all other symbols converted t
 CleanName is primarily used by plugins to convert user\-defined service names into names that are valid as e.g. environment variables, command line arguments, etc.
 
 <a name="Indent"></a>
-## func [Indent](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/blueprint/stringutil/indent.go#L12>)
+## func [Indent](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/blueprint/stringutil/indent.go#L12>)
 
 ```go
 func Indent(str string, amount int) string
@@ -47,7 +47,7 @@ func Indent(str string, amount int) string
 Indents str by the specified amount by prepending whitespace \(space characters\) at the beginning of every line. str can be a multi\-line string; whitespace will be prepended to every line.
 
 <a name="Reindent"></a>
-## func [Reindent](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/blueprint/stringutil/indent.go#L23>)
+## func [Reindent](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/blueprint/stringutil/indent.go#L23>)
 
 ```go
 func Reindent(str string, amount int) string
@@ -56,7 +56,7 @@ func Reindent(str string, amount int) string
 Indents str by the specified amount by adding or removing whitespace \(space characters\) at the beginning of every line. If str is already indented by some amount, then this method will add or remove whitespace so that the result is indented by amount total whitespace.
 
 <a name="ReplaceSuffix"></a>
-## func [ReplaceSuffix](<https://github.com/Blueprint-uServices/blueprint/blob/main/blueprint/pkg/blueprint/stringutil/name.go#L39>)
+## func [ReplaceSuffix](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/blueprint/stringutil/name.go#L39>)
 
 ```go
 func ReplaceSuffix(s string, suffix string, replacement string) string

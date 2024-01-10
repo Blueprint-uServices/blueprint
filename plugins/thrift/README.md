@@ -30,7 +30,7 @@ To use this plugin, the thrift compiler and version\-matching go bindings are re
 
 
 <a name="Deploy"></a>
-## func [Deploy](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/thrift/wiring.go#L41>)
+## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/wiring.go#L41>)
 
 ```go
 func Deploy(spec wiring.WiringSpec, serviceName string)
@@ -45,7 +45,7 @@ Like many other modifiers, Thrift modifies the service at the golang level, by g
 Deploying a service with Thrift increases the visibility of the service within the application. By default, any other service running in any other container or namespace can now contact this service.
 
 <a name="ThriftInterface"></a>
-## type [ThriftInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/thrift/ir_thrift_server.go#L30-L33>)
+## type [ThriftInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/ir_thrift_server.go#L30-L33>)
 
 
 
@@ -57,7 +57,7 @@ type ThriftInterface struct {
 ```
 
 <a name="ThriftInterface.GetMethods"></a>
-### func \(\*ThriftInterface\) [GetMethods](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/thrift/ir_thrift_server.go#L39>)
+### func \(\*ThriftInterface\) [GetMethods](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/ir_thrift_server.go#L39>)
 
 ```go
 func (thrift *ThriftInterface) GetMethods() []service.Method
@@ -66,7 +66,7 @@ func (thrift *ThriftInterface) GetMethods() []service.Method
 
 
 <a name="ThriftInterface.GetName"></a>
-### func \(\*ThriftInterface\) [GetName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/thrift/ir_thrift_server.go#L35>)
+### func \(\*ThriftInterface\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/ir_thrift_server.go#L35>)
 
 ```go
 func (thrift *ThriftInterface) GetName() string

@@ -14,7 +14,7 @@ import "github.com/blueprint-uservices/blueprint/plugins/goproc/linuxgen"
 
 
 <a name="GenerateBinaryRunFunc"></a>
-## func [GenerateBinaryRunFunc](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/linuxgen/goproc_runfunc.go#L23>)
+## func [GenerateBinaryRunFunc](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/linuxgen/goproc_runfunc.go#L23>)
 
 ```go
 func GenerateBinaryRunFunc(procName string, args ...ir.IRNode) (string, error)
@@ -23,7 +23,7 @@ func GenerateBinaryRunFunc(procName string, args ...ir.IRNode) (string, error)
 Generates command\-line function to run a goproc that has been built to a binary using \`go build\`
 
 <a name="GenerateDockerfileBuildCommands"></a>
-## func [GenerateDockerfileBuildCommands](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/linuxgen/dockerfile_buildcommands.go#L9>)
+## func [GenerateDockerfileBuildCommands](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/linuxgen/dockerfile_buildcommands.go#L9>)
 
 ```go
 func GenerateDockerfileBuildCommands(goProcName string) (string, error)
@@ -32,7 +32,7 @@ func GenerateDockerfileBuildCommands(goProcName string) (string, error)
 If the goproc is being deployed to Docker, we can provide some custom build commands to add to the Dockerfile
 
 <a name="GenerateRunFunc"></a>
-## func [GenerateRunFunc](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/linuxgen/goproc_runfunc.go#L11>)
+## func [GenerateRunFunc](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/linuxgen/goproc_runfunc.go#L11>)
 
 ```go
 func GenerateRunFunc(procName string, args ...ir.IRNode) (string, error)

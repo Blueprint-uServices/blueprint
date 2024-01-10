@@ -27,7 +27,7 @@ var ErrInvalidPaymentAmount = errors.New("invalid payment amount")
 ```
 
 <a name="Authorisation"></a>
-## type [Authorisation](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/payment/paymentservice.go#L20-L23>)
+## type [Authorisation](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/sockshop/workflow/payment/paymentservice.go#L20-L23>)
 
 
 
@@ -39,7 +39,7 @@ type Authorisation struct {
 ```
 
 <a name="PaymentService"></a>
-## type [PaymentService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/payment/paymentservice.go#L16-L18>)
+## type [PaymentService](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/sockshop/workflow/payment/paymentservice.go#L16-L18>)
 
 PaymentService provides payment services
 
@@ -50,7 +50,7 @@ type PaymentService interface {
 ```
 
 <a name="NewPaymentService"></a>
-### func [NewPaymentService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/payment/paymentservice.go#L27>)
+### func [NewPaymentService](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/sockshop/workflow/payment/paymentservice.go#L27>)
 
 ```go
 func NewPaymentService(ctx context.Context, declineOverAmount string) (PaymentService, error)

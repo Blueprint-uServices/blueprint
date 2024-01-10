@@ -20,7 +20,7 @@ Package mysql provides a client\-wrapper implementation of the \[backend.Relatio
 
 
 <a name="MySqlDB"></a>
-## type [MySqlDB](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/mysql/reldb.go#L14-L17>)
+## type [MySqlDB](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/mysql/reldb.go#L14-L17>)
 
 Implements a RelationalDB that uses the mysql package
 
@@ -31,7 +31,7 @@ type MySqlDB struct {
 ```
 
 <a name="NewMySqlDB"></a>
-### func [NewMySqlDB](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/mysql/reldb.go#L20>)
+### func [NewMySqlDB](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/mysql/reldb.go#L20>)
 
 ```go
 func NewMySqlDB(ctx context.Context, addr string, name string, username string, password string) (*MySqlDB, error)
@@ -40,7 +40,7 @@ func NewMySqlDB(ctx context.Context, addr string, name string, username string, 
 Instantiates a new [MySqlDB](<#MySqlDB>) instance that stores query data in a MySqlDB instance
 
 <a name="MySqlDB.Exec"></a>
-### func \(\*MySqlDB\) [Exec](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/mysql/reldb.go#L46>)
+### func \(\*MySqlDB\) [Exec](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/mysql/reldb.go#L46>)
 
 ```go
 func (s *MySqlDB) Exec(ctx context.Context, query string, args ...any) (sql.Result, error)
@@ -49,7 +49,7 @@ func (s *MySqlDB) Exec(ctx context.Context, query string, args ...any) (sql.Resu
 Exec implements backend.RelationalDB
 
 <a name="MySqlDB.Get"></a>
-### func \(\*MySqlDB\) [Get](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/mysql/reldb.go#L66>)
+### func \(\*MySqlDB\) [Get](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/mysql/reldb.go#L66>)
 
 ```go
 func (s *MySqlDB) Get(ctx context.Context, dst interface{}, query string, args ...any) error
@@ -58,7 +58,7 @@ func (s *MySqlDB) Get(ctx context.Context, dst interface{}, query string, args .
 Get implements backend.RelationalDB
 
 <a name="MySqlDB.Prepare"></a>
-### func \(\*MySqlDB\) [Prepare](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/mysql/reldb.go#L56>)
+### func \(\*MySqlDB\) [Prepare](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/mysql/reldb.go#L56>)
 
 ```go
 func (s *MySqlDB) Prepare(ctx context.Context, query string) (*sql.Stmt, error)
@@ -67,7 +67,7 @@ func (s *MySqlDB) Prepare(ctx context.Context, query string) (*sql.Stmt, error)
 Prepare implements backend.RelationalDB
 
 <a name="MySqlDB.Query"></a>
-### func \(\*MySqlDB\) [Query](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/mysql/reldb.go#L51>)
+### func \(\*MySqlDB\) [Query](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/mysql/reldb.go#L51>)
 
 ```go
 func (s *MySqlDB) Query(ctx context.Context, query string, args ...any) (*sql.Rows, error)
@@ -76,7 +76,7 @@ func (s *MySqlDB) Query(ctx context.Context, query string, args ...any) (*sql.Ro
 Query implements backend.RelationalDB
 
 <a name="MySqlDB.Select"></a>
-### func \(\*MySqlDB\) [Select](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/mysql/reldb.go#L61>)
+### func \(\*MySqlDB\) [Select](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/mysql/reldb.go#L61>)
 
 ```go
 func (s *MySqlDB) Select(ctx context.Context, dst interface{}, query string, args ...any) error

@@ -17,7 +17,7 @@ import "github.com/blueprint-uservices/blueprint/plugins/docker"
 
 
 <a name="Container"></a>
-## type [Container](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/docker/ir.go#L11-L14>)
+## type [Container](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L11-L14>)
 
 The base IRNode interface for docker containers
 
@@ -29,7 +29,7 @@ type Container interface {
 ```
 
 <a name="ContainerWorkspace"></a>
-## type [ContainerWorkspace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/docker/ir.go#L51-L115>)
+## type [ContainerWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L51-L115>)
 
 Builders used by the above code and artifact generation interfaces
 
@@ -102,7 +102,7 @@ type ContainerWorkspace interface {
 ```
 
 <a name="ContainerWorkspaceInfo"></a>
-## type [ContainerWorkspaceInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/docker/ir.go#L39-L42>)
+## type [ContainerWorkspaceInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L39-L42>)
 
 Builders used by the above code and artifact generation interfaces
 
@@ -114,7 +114,7 @@ type ContainerWorkspaceInfo struct {
 ```
 
 <a name="ProcessWorkspace"></a>
-## type [ProcessWorkspace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/docker/ir.go#L130-L166>)
+## type [ProcessWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L130-L166>)
 
 Docker also specializes the build process for linux containers.
 
@@ -171,7 +171,7 @@ type ProcessWorkspace interface {
 ```
 
 <a name="ProvidesContainerImage"></a>
-## type [ProvidesContainerImage](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/docker/ir.go#L26-L28>)
+## type [ProvidesContainerImage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L26-L28>)
 
 For container nodes that want to provide code or other
 
@@ -187,7 +187,7 @@ type ProvidesContainerImage interface {
 ```
 
 <a name="ProvidesContainerInstance"></a>
-## type [ProvidesContainerInstance](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/docker/ir.go#L30-L32>)
+## type [ProvidesContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L30-L32>)
 
 Code and artifact generation interfaces that IRNodes can implement to provide docker images
 

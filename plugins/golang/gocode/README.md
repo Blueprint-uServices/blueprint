@@ -94,7 +94,7 @@ import "github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
 
 
 <a name="IsBasicType"></a>
-## func [IsBasicType](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L61>)
+## func [IsBasicType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L61>)
 
 ```go
 func IsBasicType(name string) bool
@@ -103,7 +103,7 @@ func IsBasicType(name string) bool
 
 
 <a name="IsBuiltinPackage"></a>
-## func [IsBuiltinPackage](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L55>)
+## func [IsBuiltinPackage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L55>)
 
 ```go
 func IsBuiltinPackage(packageName string) bool
@@ -112,7 +112,7 @@ func IsBuiltinPackage(packageName string) bool
 
 
 <a name="AnyType"></a>
-## type [AnyType](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L160-L162>)
+## type [AnyType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L160-L162>)
 
 The 'any' type which is just interface\{\}
 
@@ -123,7 +123,7 @@ type AnyType struct {
 ```
 
 <a name="AnyType.Equals"></a>
-### func \(\*AnyType\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L387>)
+### func \(\*AnyType\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L387>)
 
 ```go
 func (t *AnyType) Equals(other TypeName) bool
@@ -132,7 +132,7 @@ func (t *AnyType) Equals(other TypeName) bool
 
 
 <a name="AnyType.IsTypeName"></a>
-### func \(\*AnyType\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L273>)
+### func \(\*AnyType\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L273>)
 
 ```go
 func (t *AnyType) IsTypeName()
@@ -141,7 +141,7 @@ func (t *AnyType) IsTypeName()
 
 
 <a name="AnyType.String"></a>
-### func \(\*AnyType\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L244>)
+### func \(\*AnyType\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L244>)
 
 ```go
 func (t *AnyType) String() string
@@ -150,7 +150,7 @@ func (t *AnyType) String() string
 
 
 <a name="BasicType"></a>
-## type [BasicType](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L75-L78>)
+## type [BasicType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L75-L78>)
 
 Primitive types that don't need import statements
 
@@ -162,7 +162,7 @@ type BasicType struct {
 ```
 
 <a name="BasicType.Equals"></a>
-### func \(\*BasicType\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L280>)
+### func \(\*BasicType\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L280>)
 
 ```go
 func (t *BasicType) Equals(other TypeName) bool
@@ -171,7 +171,7 @@ func (t *BasicType) Equals(other TypeName) bool
 
 
 <a name="BasicType.IsTypeName"></a>
-### func \(\*BasicType\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L264>)
+### func \(\*BasicType\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L264>)
 
 ```go
 func (t *BasicType) IsTypeName()
@@ -180,7 +180,7 @@ func (t *BasicType) IsTypeName()
 
 
 <a name="BasicType.String"></a>
-### func \(\*BasicType\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L204>)
+### func \(\*BasicType\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L204>)
 
 ```go
 func (t *BasicType) String() string
@@ -189,7 +189,7 @@ func (t *BasicType) String() string
 
 
 <a name="Chan"></a>
-## type [Chan](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L126-L129>)
+## type [Chan](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L126-L129>)
 
 Bidirectional Channel, e.g. chan string, chan \*MyType
 
@@ -201,7 +201,7 @@ type Chan struct {
 ```
 
 <a name="Chan.Equals"></a>
-### func \(\*Chan\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L346>)
+### func \(\*Chan\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L346>)
 
 ```go
 func (t *Chan) Equals(other TypeName) bool
@@ -210,7 +210,7 @@ func (t *Chan) Equals(other TypeName) bool
 
 
 <a name="Chan.IsTypeName"></a>
-### func \(\*Chan\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L270>)
+### func \(\*Chan\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L270>)
 
 ```go
 func (t *Chan) IsTypeName()
@@ -219,7 +219,7 @@ func (t *Chan) IsTypeName()
 
 
 <a name="Chan.String"></a>
-### func \(\*Chan\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L228>)
+### func \(\*Chan\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L228>)
 
 ```go
 func (t *Chan) String() string
@@ -228,7 +228,7 @@ func (t *Chan) String() string
 
 
 <a name="Constructor"></a>
-## type [Constructor](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L32-L35>)
+## type [Constructor](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L32-L35>)
 
 
 
@@ -240,7 +240,7 @@ type Constructor struct {
 ```
 
 <a name="Ellipsis"></a>
-## type [Ellipsis](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L101-L104>)
+## type [Ellipsis](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L101-L104>)
 
 Ellipsis type used in function arguments, e.g. ...string
 
@@ -252,7 +252,7 @@ type Ellipsis struct {
 ```
 
 <a name="Ellipsis.Equals"></a>
-### func \(\*Ellipsis\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L313>)
+### func \(\*Ellipsis\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L313>)
 
 ```go
 func (t *Ellipsis) Equals(other TypeName) bool
@@ -261,7 +261,7 @@ func (t *Ellipsis) Equals(other TypeName) bool
 
 
 <a name="Ellipsis.IsTypeName"></a>
-### func \(\*Ellipsis\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L267>)
+### func \(\*Ellipsis\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L267>)
 
 ```go
 func (t *Ellipsis) IsTypeName()
@@ -270,7 +270,7 @@ func (t *Ellipsis) IsTypeName()
 
 
 <a name="Ellipsis.String"></a>
-### func \(\*Ellipsis\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L216>)
+### func \(\*Ellipsis\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L216>)
 
 ```go
 func (t *Ellipsis) String() string
@@ -279,7 +279,7 @@ func (t *Ellipsis) String() string
 
 
 <a name="Func"></a>
-## type [Func](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L25-L30>)
+## type [Func](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L25-L30>)
 
 
 
@@ -293,7 +293,7 @@ type Func struct {
 ```
 
 <a name="Func.AddArgument"></a>
-### func \(\*Func\) [AddArgument](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L90>)
+### func \(\*Func\) [AddArgument](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L90>)
 
 ```go
 func (f *Func) AddArgument(variable Variable)
@@ -302,7 +302,7 @@ func (f *Func) AddArgument(variable Variable)
 
 
 <a name="Func.AddRetVar"></a>
-### func \(\*Func\) [AddRetVar](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L94>)
+### func \(\*Func\) [AddRetVar](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L94>)
 
 ```go
 func (f *Func) AddRetVar(variable Variable)
@@ -311,7 +311,7 @@ func (f *Func) AddRetVar(variable Variable)
 
 
 <a name="Func.Equals"></a>
-### func \(Func\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L121>)
+### func \(Func\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L121>)
 
 ```go
 func (f Func) Equals(g Func) bool
@@ -320,7 +320,7 @@ func (f Func) Equals(g Func) bool
 
 
 <a name="Func.GetArguments"></a>
-### func \(\*Func\) [GetArguments](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L74>)
+### func \(\*Func\) [GetArguments](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L74>)
 
 ```go
 func (f *Func) GetArguments() []service.Variable
@@ -329,7 +329,7 @@ func (f *Func) GetArguments() []service.Variable
 
 
 <a name="Func.GetName"></a>
-### func \(\*Func\) [GetName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L70>)
+### func \(\*Func\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L70>)
 
 ```go
 func (f *Func) GetName() string
@@ -338,7 +338,7 @@ func (f *Func) GetName() string
 
 
 <a name="Func.GetReturns"></a>
-### func \(\*Func\) [GetReturns](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L82>)
+### func \(\*Func\) [GetReturns](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L82>)
 
 ```go
 func (f *Func) GetReturns() []service.Variable
@@ -347,7 +347,7 @@ func (f *Func) GetReturns() []service.Variable
 
 
 <a name="Func.String"></a>
-### func \(Func\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L133>)
+### func \(Func\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L133>)
 
 ```go
 func (f Func) String() string
@@ -356,7 +356,7 @@ func (f Func) String() string
 
 
 <a name="FuncType"></a>
-## type [FuncType](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L170-L172>)
+## type [FuncType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L170-L172>)
 
 A function signature. For now Blueprint doesn't support
 
@@ -373,7 +373,7 @@ type FuncType struct {
 ```
 
 <a name="FuncType.Equals"></a>
-### func \(\*FuncType\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L395>)
+### func \(\*FuncType\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L395>)
 
 ```go
 func (t *FuncType) Equals(other TypeName) bool
@@ -382,7 +382,7 @@ func (t *FuncType) Equals(other TypeName) bool
 
 
 <a name="FuncType.IsTypeName"></a>
-### func \(\*FuncType\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L275>)
+### func \(\*FuncType\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L275>)
 
 ```go
 func (t *FuncType) IsTypeName()
@@ -391,7 +391,7 @@ func (t *FuncType) IsTypeName()
 
 
 <a name="FuncType.String"></a>
-### func \(\*FuncType\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L248>)
+### func \(\*FuncType\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L248>)
 
 ```go
 func (t *FuncType) String() string
@@ -400,7 +400,7 @@ func (t *FuncType) String() string
 
 
 <a name="GenericType"></a>
-## type [GenericType](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L186-L190>)
+## type [GenericType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L186-L190>)
 
 A struct with generics. For now blueprint doesn't support generics in service declarations
 
@@ -413,7 +413,7 @@ type GenericType struct {
 ```
 
 <a name="GenericType.Equals"></a>
-### func \(\*GenericType\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L411>)
+### func \(\*GenericType\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L411>)
 
 ```go
 func (t *GenericType) Equals(other TypeName) bool
@@ -422,7 +422,7 @@ func (t *GenericType) Equals(other TypeName) bool
 
 
 <a name="GenericType.IsTypeName"></a>
-### func \(\*GenericType\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L277>)
+### func \(\*GenericType\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L277>)
 
 ```go
 func (t *GenericType) IsTypeName()
@@ -431,7 +431,7 @@ func (t *GenericType) IsTypeName()
 
 
 <a name="GenericType.String"></a>
-### func \(\*GenericType\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L256>)
+### func \(\*GenericType\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L256>)
 
 ```go
 func (t *GenericType) String() string
@@ -440,7 +440,7 @@ func (t *GenericType) String() string
 
 
 <a name="GenericTypeParam"></a>
-## type [GenericTypeParam](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L193-L196>)
+## type [GenericTypeParam](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L193-L196>)
 
 The type parameter of a generic struct or func
 
@@ -452,7 +452,7 @@ type GenericTypeParam struct {
 ```
 
 <a name="GenericTypeParam.Equals"></a>
-### func \(\*GenericTypeParam\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L422>)
+### func \(\*GenericTypeParam\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L422>)
 
 ```go
 func (t *GenericTypeParam) Equals(other TypeName) bool
@@ -461,7 +461,7 @@ func (t *GenericTypeParam) Equals(other TypeName) bool
 
 
 <a name="GenericTypeParam.IsTypeName"></a>
-### func \(\*GenericTypeParam\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L278>)
+### func \(\*GenericTypeParam\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L278>)
 
 ```go
 func (t *GenericTypeParam) IsTypeName()
@@ -470,7 +470,7 @@ func (t *GenericTypeParam) IsTypeName()
 
 
 <a name="GenericTypeParam.String"></a>
-### func \(\*GenericTypeParam\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L260>)
+### func \(\*GenericTypeParam\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L260>)
 
 ```go
 func (t *GenericTypeParam) String() string
@@ -479,7 +479,7 @@ func (t *GenericTypeParam) String() string
 
 
 <a name="InterfaceType"></a>
-## type [InterfaceType](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L153-L155>)
+## type [InterfaceType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L153-L155>)
 
 An interface of any kind. For now Blueprint doesn't support
 
@@ -496,7 +496,7 @@ type InterfaceType struct {
 ```
 
 <a name="InterfaceType.Equals"></a>
-### func \(\*InterfaceType\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L379>)
+### func \(\*InterfaceType\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L379>)
 
 ```go
 func (t *InterfaceType) Equals(other TypeName) bool
@@ -505,7 +505,7 @@ func (t *InterfaceType) Equals(other TypeName) bool
 
 
 <a name="InterfaceType.IsTypeName"></a>
-### func \(\*InterfaceType\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L274>)
+### func \(\*InterfaceType\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L274>)
 
 ```go
 func (t *InterfaceType) IsTypeName()
@@ -514,7 +514,7 @@ func (t *InterfaceType) IsTypeName()
 
 
 <a name="InterfaceType.String"></a>
-### func \(\*InterfaceType\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L240>)
+### func \(\*InterfaceType\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L240>)
 
 ```go
 func (t *InterfaceType) String() string
@@ -523,7 +523,7 @@ func (t *InterfaceType) String() string
 
 
 <a name="Map"></a>
-## type [Map](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L117-L121>)
+## type [Map](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L117-L121>)
 
 Map type, e.g. map\[string\]context.Context
 
@@ -536,7 +536,7 @@ type Map struct {
 ```
 
 <a name="Map.Equals"></a>
-### func \(\*Map\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L335>)
+### func \(\*Map\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L335>)
 
 ```go
 func (t *Map) Equals(other TypeName) bool
@@ -545,7 +545,7 @@ func (t *Map) Equals(other TypeName) bool
 
 
 <a name="Map.IsTypeName"></a>
-### func \(\*Map\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L269>)
+### func \(\*Map\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L269>)
 
 ```go
 func (t *Map) IsTypeName()
@@ -554,7 +554,7 @@ func (t *Map) IsTypeName()
 
 
 <a name="Map.String"></a>
-### func \(\*Map\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L224>)
+### func \(\*Map\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L224>)
 
 ```go
 func (m *Map) String() string
@@ -563,7 +563,7 @@ func (m *Map) String() string
 
 
 <a name="Pointer"></a>
-## type [Pointer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L109-L112>)
+## type [Pointer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L109-L112>)
 
 Pointer to a type, e.g. \*string, \*MyType, \*context.Context
 
@@ -575,7 +575,7 @@ type Pointer struct {
 ```
 
 <a name="Pointer.Equals"></a>
-### func \(\*Pointer\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L324>)
+### func \(\*Pointer\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L324>)
 
 ```go
 func (t *Pointer) Equals(other TypeName) bool
@@ -584,7 +584,7 @@ func (t *Pointer) Equals(other TypeName) bool
 
 
 <a name="Pointer.IsTypeName"></a>
-### func \(\*Pointer\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L268>)
+### func \(\*Pointer\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L268>)
 
 ```go
 func (t *Pointer) IsTypeName()
@@ -593,7 +593,7 @@ func (t *Pointer) IsTypeName()
 
 
 <a name="Pointer.String"></a>
-### func \(\*Pointer\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L220>)
+### func \(\*Pointer\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L220>)
 
 ```go
 func (t *Pointer) String() string
@@ -602,7 +602,7 @@ func (t *Pointer) String() string
 
 
 <a name="ReceiveChan"></a>
-## type [ReceiveChan](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L134-L137>)
+## type [ReceiveChan](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L134-L137>)
 
 Receive\-only Channel, e.g. \<\-chan string, \<\-chan \*MyType
 
@@ -614,7 +614,7 @@ type ReceiveChan struct {
 ```
 
 <a name="ReceiveChan.Equals"></a>
-### func \(\*ReceiveChan\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L357>)
+### func \(\*ReceiveChan\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L357>)
 
 ```go
 func (t *ReceiveChan) Equals(other TypeName) bool
@@ -623,7 +623,7 @@ func (t *ReceiveChan) Equals(other TypeName) bool
 
 
 <a name="ReceiveChan.IsTypeName"></a>
-### func \(\*ReceiveChan\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L271>)
+### func \(\*ReceiveChan\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L271>)
 
 ```go
 func (t *ReceiveChan) IsTypeName()
@@ -632,7 +632,7 @@ func (t *ReceiveChan) IsTypeName()
 
 
 <a name="ReceiveChan.String"></a>
-### func \(\*ReceiveChan\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L232>)
+### func \(\*ReceiveChan\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L232>)
 
 ```go
 func (t *ReceiveChan) String() string
@@ -641,7 +641,7 @@ func (t *ReceiveChan) String() string
 
 
 <a name="SendChan"></a>
-## type [SendChan](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L142-L145>)
+## type [SendChan](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L142-L145>)
 
 Send\-only Channel, e.g. chan\<\- string, chan\<\- \*MyType
 
@@ -653,7 +653,7 @@ type SendChan struct {
 ```
 
 <a name="SendChan.Equals"></a>
-### func \(\*SendChan\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L368>)
+### func \(\*SendChan\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L368>)
 
 ```go
 func (t *SendChan) Equals(other TypeName) bool
@@ -662,7 +662,7 @@ func (t *SendChan) Equals(other TypeName) bool
 
 
 <a name="SendChan.IsTypeName"></a>
-### func \(\*SendChan\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L272>)
+### func \(\*SendChan\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L272>)
 
 ```go
 func (t *SendChan) IsTypeName()
@@ -671,7 +671,7 @@ func (t *SendChan) IsTypeName()
 
 
 <a name="SendChan.String"></a>
-### func \(\*SendChan\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L236>)
+### func \(\*SendChan\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L236>)
 
 ```go
 func (t *SendChan) String() string
@@ -680,7 +680,7 @@ func (t *SendChan) String() string
 
 
 <a name="ServiceInterface"></a>
-## type [ServiceInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L38-L42>)
+## type [ServiceInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L38-L42>)
 
 Implements service.ServiceInterface
 
@@ -693,7 +693,7 @@ type ServiceInterface struct {
 ```
 
 <a name="CopyServiceInterface"></a>
-### func [CopyServiceInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L61>)
+### func [CopyServiceInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L61>)
 
 ```go
 func CopyServiceInterface(name string, pkg string, s *ServiceInterface) *ServiceInterface
@@ -702,7 +702,7 @@ func CopyServiceInterface(name string, pkg string, s *ServiceInterface) *Service
 
 
 <a name="ServiceInterface.AddMethod"></a>
-### func \(\*ServiceInterface\) [AddMethod](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L57>)
+### func \(\*ServiceInterface\) [AddMethod](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L57>)
 
 ```go
 func (s *ServiceInterface) AddMethod(f Func)
@@ -711,7 +711,7 @@ func (s *ServiceInterface) AddMethod(f Func)
 
 
 <a name="ServiceInterface.Contains"></a>
-### func \(\*ServiceInterface\) [Contains](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L158>)
+### func \(\*ServiceInterface\) [Contains](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L158>)
 
 ```go
 func (i *ServiceInterface) Contains(j *ServiceInterface) bool
@@ -720,7 +720,7 @@ func (i *ServiceInterface) Contains(j *ServiceInterface) bool
 Reports whether all of the methods in j exist on interface i
 
 <a name="ServiceInterface.GetMethods"></a>
-### func \(\*ServiceInterface\) [GetMethods](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L49>)
+### func \(\*ServiceInterface\) [GetMethods](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L49>)
 
 ```go
 func (s *ServiceInterface) GetMethods() []service.Method
@@ -729,7 +729,7 @@ func (s *ServiceInterface) GetMethods() []service.Method
 
 
 <a name="ServiceInterface.GetName"></a>
-### func \(\*ServiceInterface\) [GetName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L45>)
+### func \(\*ServiceInterface\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L45>)
 
 ```go
 func (s *ServiceInterface) GetName() string
@@ -738,7 +738,7 @@ func (s *ServiceInterface) GetName() string
 
 
 <a name="ServiceInterface.String"></a>
-### func \(\*ServiceInterface\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L153>)
+### func \(\*ServiceInterface\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L153>)
 
 ```go
 func (i *ServiceInterface) String() string
@@ -747,7 +747,7 @@ func (i *ServiceInterface) String() string
 
 
 <a name="Slice"></a>
-## type [Slice](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L93-L96>)
+## type [Slice](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L93-L96>)
 
 A slice or fixed\-size array, e.g. \[\]byte
 
@@ -759,7 +759,7 @@ type Slice struct {
 ```
 
 <a name="Slice.Equals"></a>
-### func \(\*Slice\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L302>)
+### func \(\*Slice\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L302>)
 
 ```go
 func (t *Slice) Equals(other TypeName) bool
@@ -768,7 +768,7 @@ func (t *Slice) Equals(other TypeName) bool
 
 
 <a name="Slice.IsTypeName"></a>
-### func \(\*Slice\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L266>)
+### func \(\*Slice\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L266>)
 
 ```go
 func (t *Slice) IsTypeName()
@@ -777,7 +777,7 @@ func (t *Slice) IsTypeName()
 
 
 <a name="Slice.String"></a>
-### func \(\*Slice\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L212>)
+### func \(\*Slice\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L212>)
 
 ```go
 func (t *Slice) String() string
@@ -786,7 +786,7 @@ func (t *Slice) String() string
 
 
 <a name="StructType"></a>
-## type [StructType](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L179-L181>)
+## type [StructType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L179-L181>)
 
 An inline struct of any kind. For now Blueprint doesn't
 
@@ -802,7 +802,7 @@ type StructType struct {
 ```
 
 <a name="StructType.Equals"></a>
-### func \(\*StructType\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L403>)
+### func \(\*StructType\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L403>)
 
 ```go
 func (t *StructType) Equals(other TypeName) bool
@@ -811,7 +811,7 @@ func (t *StructType) Equals(other TypeName) bool
 
 
 <a name="StructType.IsTypeName"></a>
-### func \(\*StructType\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L276>)
+### func \(\*StructType\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L276>)
 
 ```go
 func (t *StructType) IsTypeName()
@@ -820,7 +820,7 @@ func (t *StructType) IsTypeName()
 
 
 <a name="StructType.String"></a>
-### func \(\*StructType\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L252>)
+### func \(\*StructType\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L252>)
 
 ```go
 func (t *StructType) String() string
@@ -829,7 +829,7 @@ func (t *StructType) String() string
 
 
 <a name="TypeName"></a>
-## type [TypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L12-L16>)
+## type [TypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L12-L16>)
 
 A type name is the fully qualified name of a type that you use when declaring a variable, including possible imports and go.mod requires
 
@@ -842,7 +842,7 @@ type TypeName interface {
 ```
 
 <a name="UserType"></a>
-## type [UserType](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L84-L88>)
+## type [UserType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L84-L88>)
 
 A type that is declared in a module, thus requiring an import statement and a
 
@@ -859,7 +859,7 @@ type UserType struct {
 ```
 
 <a name="UserType.Equals"></a>
-### func \(\*UserType\) [Equals](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L291>)
+### func \(\*UserType\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L291>)
 
 ```go
 func (t *UserType) Equals(other TypeName) bool
@@ -868,7 +868,7 @@ func (t *UserType) Equals(other TypeName) bool
 
 
 <a name="UserType.IsTypeName"></a>
-### func \(\*UserType\) [IsTypeName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L265>)
+### func \(\*UserType\) [IsTypeName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L265>)
 
 ```go
 func (t *UserType) IsTypeName()
@@ -877,7 +877,7 @@ func (t *UserType) IsTypeName()
 
 
 <a name="UserType.String"></a>
-### func \(\*UserType\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/typename.go#L208>)
+### func \(\*UserType\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/typename.go#L208>)
 
 ```go
 func (t *UserType) String() string
@@ -886,7 +886,7 @@ func (t *UserType) String() string
 
 
 <a name="Variable"></a>
-## type [Variable](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L19-L23>)
+## type [Variable](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L19-L23>)
 
 
 
@@ -899,7 +899,7 @@ type Variable struct {
 ```
 
 <a name="Variable.GetName"></a>
-### func \(\*Variable\) [GetName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L98>)
+### func \(\*Variable\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L98>)
 
 ```go
 func (v *Variable) GetName() string
@@ -908,7 +908,7 @@ func (v *Variable) GetName() string
 
 
 <a name="Variable.GetType"></a>
-### func \(\*Variable\) [GetType](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L102>)
+### func \(\*Variable\) [GetType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L102>)
 
 ```go
 func (v *Variable) GetType() string
@@ -917,7 +917,7 @@ func (v *Variable) GetType() string
 
 
 <a name="Variable.String"></a>
-### func \(\*Variable\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gocode/service.go#L125>)
+### func \(\*Variable\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L125>)
 
 ```go
 func (v *Variable) String() string
