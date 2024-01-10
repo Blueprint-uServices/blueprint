@@ -1,3 +1,25 @@
+// Package docker does not provide any functionality or expose methods for wiring specs to use.
+//
+// This package merely defines several interfaces for use by other plugins, related to generating
+// docker images.
+//
+// The noteworthy interfaces are as follows:
+//   - [Container] is an interface for IRNodes that represent containers.  If an IRNode implements
+//     this interface then it will ultimately be instantiated in a namespace that supports containers,
+//     such as a docker-compose file or a Kubernetes pod.
+//   - If the container IRNode wants to generate or define a custom Docker image (e.g. using a Dockerfile),
+//     then the IRNode should implement the [ProvidesContainerImage] interface.
+//   - If the container IRNode wants to instantiate a Docker image (be it a pre-defined image, or a custom
+//     image defined using [ProvidesContainerImage]), then the IRNode should implement the
+//     [ProvidesContainerInstance] interface.
+//
+// Consult the following plugins for examples:
+//   - Many backend plugins such as the memcached plugin provide prebuilt containers for the backends
+//   - The linuxcontainer plugin generates custom Dockerfile images
+//   - The dockerdeployment plugin implements a Container namespace that collects together Container nodes
+//     and generates a docker-compose file
+//   - The kubernetes plugin implements a Container namespace that collects together Container nodes and
+//     generates YAML manifests
 package docker
 
 import (
@@ -5,9 +27,9 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/linux"
 )
 
-/*
-The base IRNode interface for docker containers
-*/
+// An IRNode interface that represents containers.  If an IRNode implements this interface
+// then it enables that IRNode to be instantiated within container namespaces such as docker-compose
+// files and Kubernetes pods.
 type Container interface {
 	ir.IRNode
 	ImplementsDockerContainer()
@@ -18,24 +40,24 @@ Code and artifact generation interfaces that IRNodes
 can implement to provide docker images
 */
 type (
-	/*
-		For container nodes that want to provide code or other
-		artifacts for their container.  Methods on the `builder` argument
-		are used for collecting the artifacts
-	*/
+	// An optional interface for Container IRNodes to implement if the node needs
+	// to generate custom container images (e.g. using a Dockerfile).
+	// [target] provides methods for doing so.
 	ProvidesContainerImage interface {
 		AddContainerArtifacts(target ContainerWorkspace) error
 	}
 
+	// An optional interface for Container IRNodes to implement if the node
+	// wants to declare an instance of a container.  The container instance
+	// can be of a pre-existing image or of a locally-defined image that
+	// was declared with [ProvidesContainerImage].
 	ProvidesContainerInstance interface {
 		AddContainerInstance(target ContainerWorkspace) error
 	}
 )
 
-/*
-Builders used by the above code and artifact generation interfaces
-*/
 type (
+	// Metadata about the local build environment used during the compilation process
 	ContainerWorkspaceInfo struct {
 		Path   string // fully-qualified path on the filesystem to the workspace
 		Target string // the type of workspace being built
@@ -48,9 +70,17 @@ type (
 		An example concrete container workspace is a docker-compose file
 	*/
 
+	// A workspace during the Blueprint compilation process that collects together
+	// container images and instances.
+	//
+	// A [ContainerWorkspace] instance will be provided to Container IRNodes that implement
+	// either the [ProvidesContainerImage] or [ProvidesContainerInstance] interfaces.
+	// The container IRNodes can invoke methods on this workspace in order to add their
+	// artifacts to the build output.
 	ContainerWorkspace interface {
 		ir.BuildContext
 
+		// Provides metadata about the workspace
 		Info() ContainerWorkspaceInfo
 
 		/*
@@ -59,6 +89,9 @@ type (
 
 			Returns a fully qualified path on the local filesystem where artifacts will be
 			collected.
+
+			The caller is responsible for then depositing artifacts in this directory
+			(e.g. generating its Dockerfile there)
 		*/
 		CreateImageDir(imageName string) (string, error)
 

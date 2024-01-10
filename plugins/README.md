@@ -1,6 +1,6 @@
 # Plugins
 
-This module contains a range of plugins that implement most of Blueprint's features and functionality.
+Much of Blueprint's features and functionality are implemented by plugins contained in this module.
 
 Each plugin resides in its own subdirectory and provides its own documentation.
 
