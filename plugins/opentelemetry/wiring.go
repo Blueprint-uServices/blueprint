@@ -1,11 +1,14 @@
-// Package opentelemetry provides two plugins:
+// Package opentelemetry provides three plugins:
 // (i)  a plugin to generate and include an opentelemetry collector instance in a Blueprint application
-// (ii) provides a modifier plugin to wrap the service with an OpenTelemetry wrapper to generate OT compatible traces/logs.
+// (ii) a plugin to wrap the service with an OpenTelemetry wrapper to generate OT compatible traces.
+// (iii) a plugin to install an opentelemetry logger for a go process. The logger adds all the logs as events to the current active span.
 //
 // The package provides an in-memory trace exporter implementation and a go-client for generating traces on both the server and client side.
 // The generated clients handle context propagation correctly on both the server and client sides.
 //
-// The applications must use a backend.Tracer (runtime/core/backend) as the interface in the workflow.
+// Example usage (for complete instrumentation):
+//
+//
 package opentelemetry
 
 import (
