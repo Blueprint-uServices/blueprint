@@ -9,7 +9,7 @@ This User Manual is a work in progress.
  1. Applications: the Workflow Spec
     1. [📓Workflow Spec](workflow.md)
     1. [📓Testing an Application](workflow_tests.md)
-    1. [📓Example Applications]()
+    1. [📓Example Applications](../../examples/)
  1. Configuring Applications: the Wiring Spec
     1. [📝Wiring Spec](wiring.md)
     1. [📝Supported Plugins](plugins.md)
