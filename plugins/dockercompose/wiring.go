@@ -15,6 +15,11 @@
 // To deploy an application-level service in a container, make sure you first deploy the service to a process
 // (with the [goproc] plugin) and to a container image (with the [linuxcontainer] plugin)
 //
+// # Default Builder
+//
+// Instead of explicitly combining container instances into a deployment, the dockercompose plugin can be
+// configured as the default builder instead.
+//
 // The dockercompose plugin can be configured as the default builder for container instances; at compile time,
 // Blueprint will combine any container instances that exist in the wiring spec but aren't explicitly added to
 // a container deployment, and create a default docker-compose deployment with the name "docker".
@@ -23,6 +28,9 @@
 //
 // Calling the above is optional.  If your wiring spec uses the [cmdbuilder] then dockercompose is already
 // registered as the default container workspace builder.
+//
+// If your wiring spec manually creates container deployments, then the default builder will not have any effect.
+// It only takes effect if there are 1 or more container instances that haven't been put into a deployment.
 //
 // # Artifacts Generated
 //

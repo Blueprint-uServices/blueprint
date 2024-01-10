@@ -24,6 +24,10 @@ dockercompose.AddContainerToDeployment(spec, "my_deployment", "my_container_3")
 
 To deploy an application\-level service in a container, make sure you first deploy the service to a process \(with the [goproc](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc>) plugin\) and to a container image \(with the [linuxcontainer](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/linuxcontainer>) plugin\)
 
+### Default Builder
+
+Instead of explicitly combining container instances into a deployment, the dockercompose plugin can be configured as the default builder instead.
+
 The dockercompose plugin can be configured as the default builder for container instances; at compile time, Blueprint will combine any container instances that exist in the wiring spec but aren't explicitly added to a container deployment, and create a default docker\-compose deployment with the name "docker".
 
 ```
@@ -31,6 +35,8 @@ dockercompose.RegisterAsDefaultBuilder()
 ```
 
 Calling the above is optional. If your wiring spec uses the \[cmdbuilder\] then dockercompose is already registered as the default container workspace builder.
+
+If your wiring spec manually creates container deployments, then the default builder will not have any effect. It only takes effect if there are 1 or more container instances that haven't been put into a deployment.
 
 ### Artifacts Generated
 
@@ -70,7 +76,7 @@ Internally, the plugin makes use of interfaces defined in the [docker](<https://
 
 
 <a name="AddContainerToDeployment"></a>
-## func [AddContainerToDeployment](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L75>)
+## func [AddContainerToDeployment](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L83>)
 
 ```go
 func AddContainerToDeployment(spec wiring.WiringSpec, deploymentName, containerName string)
@@ -79,7 +85,7 @@ func AddContainerToDeployment(spec wiring.WiringSpec, deploymentName, containerN
 Adds containerName to the existing container deployment deploymentName, which was previously created using [NewDeployment](<#NewDeployment>)
 
 <a name="NewDeployment"></a>
-## func [NewDeployment](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L87>)
+## func [NewDeployment](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L95>)
 
 ```go
 func NewDeployment(spec wiring.WiringSpec, deploymentName string, containers ...string) string
@@ -121,7 +127,7 @@ type Deployment struct {
 ```
 
 <a name="Deployment.Accepts"></a>
-### func \(\*Deployment\) [Accepts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L108>)
+### func \(\*Deployment\) [Accepts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L116>)
 
 ```go
 func (deployment *Deployment) Accepts(nodeType any) bool
@@ -130,7 +136,7 @@ func (deployment *Deployment) Accepts(nodeType any) bool
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Deployment.AddEdge"></a>
-### func \(\*Deployment\) [AddEdge](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L114>)
+### func \(\*Deployment\) [AddEdge](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L122>)
 
 ```go
 func (deployment *Deployment) AddEdge(name string, edge ir.IRNode) error
@@ -139,7 +145,7 @@ func (deployment *Deployment) AddEdge(name string, edge ir.IRNode) error
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Deployment.AddNode"></a>
-### func \(\*Deployment\) [AddNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L120>)
+### func \(\*Deployment\) [AddNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L128>)
 
 ```go
 func (deployment *Deployment) AddNode(name string, node ir.IRNode) error
