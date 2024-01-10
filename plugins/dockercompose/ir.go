@@ -1,4 +1,4 @@
-package dockerdeployment
+package dockercompose
 
 import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
