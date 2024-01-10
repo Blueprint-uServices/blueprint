@@ -1,7 +1,6 @@
-// Package docker does not provide any functionality or expose methods for wiring specs to use.
-//
-// This package merely defines several interfaces for use by other plugins, related to generating
-// docker images.
+// Package docker defines compiler interfaces for use by plugins that generate and instantiate Docker images.
+// The package does not provide any wiring spec functionality and is not directly used by Blueprint applications;
+// only by other Blueprint plugins.
 //
 // The noteworthy interfaces are as follows:
 //   - [Container] is an interface for IRNodes that represent containers.  If an IRNode implements
