@@ -30,16 +30,16 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	var allServices []string
 
 	// Define backends
-	user_cache := memcached.PrebuiltContainer(spec, "user_cache")
+	user_cache := memcached.Container(spec, "user_cache")
 	user_db := mongodb.Container(spec, "user_db")
-	post_cache := memcached.PrebuiltContainer(spec, "post_cache")
+	post_cache := memcached.Container(spec, "post_cache")
 	post_db := mongodb.Container(spec, "post_db")
-	social_cache := memcached.PrebuiltContainer(spec, "social_cache")
+	social_cache := memcached.Container(spec, "social_cache")
 	social_db := mongodb.Container(spec, "social_db")
 	urlshorten_db := mongodb.Container(spec, "urlshorten_db")
-	usertimeline_cache := memcached.PrebuiltContainer(spec, "usertimeline_cache")
+	usertimeline_cache := memcached.Container(spec, "usertimeline_cache")
 	usertimeline_db := mongodb.Container(spec, "usertimeline_db")
-	hometimeline_cache := memcached.PrebuiltContainer(spec, "hometimeline_cache")
+	hometimeline_cache := memcached.Container(spec, "hometimeline_cache")
 
 	// Add backends to services list so that their client libraries are used in the generated tests!
 	allServices = append(allServices, user_cache)

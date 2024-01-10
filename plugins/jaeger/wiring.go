@@ -16,8 +16,8 @@ import (
 // Generates the IRNodes for a jaeger docker container named `collectorName` that uses the latest jaeger:all-in-one container
 // and the clients needed by the generated application to communicate with the server.
 //
-// The returned collectorName must be used as an argument to the opentelemetry.InstrumentUsingCustomCollector(spec, serviceName, `collectorName`).
-func DefineJaegerCollector(spec wiring.WiringSpec, collectorName string) string {
+// The returned collectorName must be used as an argument to the opentelemetry.Instrument(spec, serviceName, `collectorName`).
+func Collector(spec wiring.WiringSpec, collectorName string) string {
 	// The nodes that we are defining
 	collectorAddr := collectorName + ".addr"
 	collectorCtr := collectorName + ".ctr"

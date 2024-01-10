@@ -12,7 +12,7 @@ Blueprint is particularly aimed at **prototyping and experimentation** use cases
 
 ## Getting Started
 
-To get started compiling and running your first Blueprint application, see the 📖[Getting Started](docs/manual/gettingstarted.md) page of the User Manual.
+See the 📖[Getting Started](docs/manual/gettingstarted.md) page of the User Manual to get started compiling and running your first Blueprint application.
 
 ## Resources
 
