@@ -1,4 +1,3 @@
-// Package linuxcontainer deploys one or more pre-defined linux processes to a linux container.
 package linuxcontainer
 
 import (

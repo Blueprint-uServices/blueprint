@@ -6,18 +6,6 @@
 import "github.com/blueprint-uservices/blueprint/plugins/golang"
 ```
 
-Package golang plugin extends Blueprint's IR by defining the following IR interfaces:
-
-- golang.Node is the base interface for any node that lives within a golang process
-- golang.Service is a golang node that has methods that can be directly called by other golang nodes
-
-To support golang code generation, the following IR interfaces are provided. The golang.Process depends on these interfaces for collecting and packaging code, however, usage of these interfaces is not intended to be private to just the golang.Process plugin. Other plugins are permitted to use these interfaces.
-
-- golang.Instantiable is for golang nodes that can generate instantiation source code snippets
-- golang.ProvidesInterface is for golang nodes that include interfaces or generate new ones
-- golang.GeneratesFuncs is for golang nodes that generate function implementations
-- golang.ProvidesModule is for golang nodes that generate or otherwise provide the full source code of modules
-
 ## Index
 
 - [func AddRuntimeModule\(workspace WorkspaceBuilder\) error](<#AddRuntimeModule>)
@@ -58,7 +46,7 @@ Helper method that does typecasting on builder and service.
 Assumes builder is a golang module builder, and service is a golang module; if so, gets the golang service interface for the service. If not, returns an error.
 
 <a name="GeneratesFuncs"></a>
-## type [GeneratesFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L121-L127>)
+## type [GeneratesFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L124-L130>)
 
 Some IRNodes generate implementations of service interfaces. This interface should be used to do so. This is
 
@@ -84,7 +72,7 @@ type GeneratesFuncs interface {
 ```
 
 <a name="Instantiable"></a>
-## type [Instantiable](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L73-L79>)
+## type [Instantiable](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L76-L82>)
 
 This is an interface for IRNodes that can be used by plugins that want to be able to instantiate things in
 
@@ -113,7 +101,7 @@ type Instantiable interface {
 ```
 
 <a name="ModuleBuilder"></a>
-## type [ModuleBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L234-L254>)
+## type [ModuleBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L237-L257>)
 
 ModuleBuilder is used by IRNodes for plugins that want to generate Golang code and collect it into a module.
 
@@ -154,7 +142,7 @@ type ModuleBuilder interface {
 ```
 
 <a name="ModuleInfo"></a>
-## type [ModuleInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L208-L212>)
+## type [ModuleInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L211-L215>)
 
 APIs used by the above IR nodes when they are generating code.
 
@@ -169,7 +157,7 @@ type ModuleInfo struct {
 ```
 
 <a name="NamespaceBuilder"></a>
-## type [NamespaceBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L304-L366>)
+## type [NamespaceBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L307-L369>)
 
 NamespaceBuilder is used by IRNodes that implement the Instantiable interface. The NamespaceBuilder provides
 
@@ -281,7 +269,7 @@ type NamespaceBuilder interface {
 ```
 
 <a name="NamespaceInfo"></a>
-## type [NamespaceInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L256-L261>)
+## type [NamespaceInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L259-L264>)
 
 APIs used by the above IR nodes when they are generating code.
 
@@ -297,7 +285,7 @@ type NamespaceInfo struct {
 ```
 
 <a name="Node"></a>
-## type [Node](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L29-L32>)
+## type [Node](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L32-L35>)
 
 golang.Node is the base IRNode interface that should be implemented by any IRNode that
 
@@ -313,7 +301,7 @@ type Node interface {
 ```
 
 <a name="PackageInfo"></a>
-## type [PackageInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L214-L219>)
+## type [PackageInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L217-L222>)
 
 APIs used by the above IR nodes when they are generating code.
 
@@ -329,7 +317,7 @@ type PackageInfo struct {
 ```
 
 <a name="ProvidesInterface"></a>
-## type [ProvidesInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L96-L108>)
+## type [ProvidesInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L99-L111>)
 
 Service nodes need to include interface definitions that callers of the code depend on. The most basic
 
@@ -365,7 +353,7 @@ type ProvidesInterface interface {
 ```
 
 <a name="ProvidesModule"></a>
-## type [ProvidesModule](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L137-L143>)
+## type [ProvidesModule](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L140-L146>)
 
 This is an interface for IRNodes for plugins that want to include standalone modules in the output workspace.
 
@@ -388,7 +376,7 @@ type ProvidesModule interface {
 ```
 
 <a name="Service"></a>
-## type [Service](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L46-L52>)
+## type [Service](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L49-L55>)
 
 golang.Service is a golang.Node that exposes an interface that can be directly invoked
 
@@ -415,7 +403,7 @@ type Service interface {
 ```
 
 <a name="WorkspaceBuilder"></a>
-## type [WorkspaceBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L163-L206>)
+## type [WorkspaceBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L166-L209>)
 
 WorkspaceBuilder is used by plugins if they want to collect and combine Golang code and modules.
 
@@ -473,7 +461,7 @@ type WorkspaceBuilder interface {
 ```
 
 <a name="WorkspaceInfo"></a>
-## type [WorkspaceInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L152-L154>)
+## type [WorkspaceInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/ir.go#L155-L157>)
 
 APIs used by the above IR nodes when they are generating code.
 

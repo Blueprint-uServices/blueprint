@@ -6,12 +6,6 @@
 import "github.com/blueprint-uservices/blueprint/plugins/goproc"
 ```
 
-Package goproc provides \`goproc.Process\`, a node that represents a runnable Golang process. It can contain any number of other golang.Node IRNodes. When it's compiled, the goproc.Process will generate a go module with a runnable main method that instantiates and initializes the contained go nodes. To achieve this, the golang.Process also collects module dependencies from its contained nodes.
-
-The \`GenerateArtifacts\` method generates the main method based on the process's contained nodes.
-
-Most of the heavy lifting of code generation is done by the following: \* gogen/workspacebuilder \* gogen/modulebuilder \* gogen/namespacebuilder
-
 ## Index
 
 - [func AddToProcess\(spec wiring.WiringSpec, procName, childName string\)](<#AddToProcess>)
@@ -136,7 +130,7 @@ func (proc *GolangProcessNamespace) AddNode(name string, node ir.IRNode) error
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Process"></a>
-## type [Process](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L24-L36>)
+## type [Process](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L26-L38>)
 
 An IRNode representing a golang process. This is Blueprint's main implementation of Golang processes
 
@@ -194,7 +188,7 @@ func (node *Process) ImplementsLinuxProcess()
 
 
 <a name="Process.Name"></a>
-### func \(\*Process\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L49>)
+### func \(\*Process\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L51>)
 
 ```go
 func (proc *Process) Name() string
@@ -203,7 +197,7 @@ func (proc *Process) Name() string
 Implements ir.IRNode
 
 <a name="Process.String"></a>
-### func \(\*Process\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L54>)
+### func \(\*Process\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L56>)
 
 ```go
 func (proc *Process) String() string

@@ -6,8 +6,6 @@
 import "github.com/blueprint-uservices/blueprint/plugins/dockerdeployment"
 ```
 
-Package dockerdeployment deploys a set of docker containers as a docker\-compose file.
-
 ## Index
 
 - [func AddContainerToDeployment\(spec wiring.WiringSpec, deploymentName, containerName string\)](<#AddContainerToDeployment>)
@@ -51,7 +49,7 @@ func RegisterAsDefaultBuilder()
 to trigger module initialization and register builders
 
 <a name="Deployment"></a>
-## type [Deployment](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/ir.go#L9-L16>)
+## type [Deployment](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/ir.go#L8-L15>)
 
 A deployment is a collection of containers
 
@@ -101,7 +99,7 @@ func (node *Deployment) GenerateArtifacts(dir string) error
 Implements ir.ArtifactGenerator
 
 <a name="Deployment.Name"></a>
-### func \(\*Deployment\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/ir.go#L19>)
+### func \(\*Deployment\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/ir.go#L18>)
 
 ```go
 func (node *Deployment) Name() string
@@ -110,7 +108,7 @@ func (node *Deployment) Name() string
 Implements IRNode
 
 <a name="Deployment.String"></a>
-### func \(\*Deployment\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/ir.go#L24>)
+### func \(\*Deployment\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/dockerdeployment/ir.go#L23>)
 
 ```go
 func (node *Deployment) String() string

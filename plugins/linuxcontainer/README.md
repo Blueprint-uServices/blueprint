@@ -6,8 +6,6 @@
 import "github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 ```
 
-Package linuxcontainer deploys one or more pre\-defined linux processes to a linux container.
-
 ## Index
 
 - [func AddProcessToContainer\(spec wiring.WiringSpec, containerName, childName string\)](<#AddProcessToContainer>)
@@ -28,7 +26,7 @@ Package linuxcontainer deploys one or more pre\-defined linux processes to a lin
 
 
 <a name="AddProcessToContainer"></a>
-## func [AddProcessToContainer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L12>)
+## func [AddProcessToContainer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L11>)
 
 ```go
 func AddProcessToContainer(spec wiring.WiringSpec, containerName, childName string)
@@ -37,7 +35,7 @@ func AddProcessToContainer(spec wiring.WiringSpec, containerName, childName stri
 Adds a process to an existing container
 
 <a name="CreateContainer"></a>
-## func [CreateContainer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L27>)
+## func [CreateContainer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L26>)
 
 ```go
 func CreateContainer(spec wiring.WiringSpec, containerName string, children ...string) string
@@ -46,7 +44,7 @@ func CreateContainer(spec wiring.WiringSpec, containerName string, children ...s
 Adds a container that will explicitly instantiate all of the named child processes The container will also implicitly instantiate any of the dependencies of the children
 
 <a name="Deploy"></a>
-## func [Deploy](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L17>)
+## func [Deploy](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L16>)
 
 ```go
 func Deploy(spec wiring.WiringSpec, serviceName string) string
@@ -81,7 +79,7 @@ type Container struct {
 ```
 
 <a name="Container.Accepts"></a>
-### func \(\*Container\) [Accepts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L49>)
+### func \(\*Container\) [Accepts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L48>)
 
 ```go
 func (ctr *Container) Accepts(nodeType any) bool
@@ -108,7 +106,7 @@ func (node *Container) AddContainerInstance(target docker.ContainerWorkspace) er
 Implements dockerDeployer docker.ProvidesContainerInstance
 
 <a name="Container.AddEdge"></a>
-### func \(\*Container\) [AddEdge](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L55>)
+### func \(\*Container\) [AddEdge](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L54>)
 
 ```go
 func (ctr *Container) AddEdge(name string, edge ir.IRNode) error
@@ -117,7 +115,7 @@ func (ctr *Container) AddEdge(name string, edge ir.IRNode) error
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Container.AddNode"></a>
-### func \(\*Container\) [AddNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L61>)
+### func \(\*Container\) [AddNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L60>)
 
 ```go
 func (ctr *Container) AddNode(name string, node ir.IRNode) error
@@ -168,7 +166,7 @@ func (ctr *Container) String() string
 Implements ir.IRNode
 
 <a name="LinuxContainerNamespace"></a>
-## type [LinuxContainerNamespace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L44-L46>)
+## type [LinuxContainerNamespace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L43-L45>)
 
 A \[wiring.NamespaceHandler\] used to build golang process nodes
 

@@ -1,4 +1,3 @@
-// Package workflow implements the wiring bindings for including services defined in workflow specification.
 package workflow
 
 import (

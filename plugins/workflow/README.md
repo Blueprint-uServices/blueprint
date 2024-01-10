@@ -6,8 +6,6 @@
 import "github.com/blueprint-uservices/blueprint/plugins/workflow"
 ```
 
-Package workflow implements the wiring bindings for including services defined in workflow specification.
-
 ## Index
 
 - [func Init\(srcModulePaths ...string\)](<#Init>)
@@ -21,7 +19,7 @@ Package workflow implements the wiring bindings for including services defined i
 
 
 <a name="Init"></a>
-## func [Init](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L30>)
+## func [Init](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L29>)
 
 ```go
 func Init(srcModulePaths ...string)
@@ -36,7 +34,7 @@ The provided paths should be to the root of a go module \(containing a go.mod fi
 This can be called more than once, which will concatenate all provided srcModulePaths
 
 <a name="Reset"></a>
-## func [Reset](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L43>)
+## func [Reset](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L42>)
 
 ```go
 func Reset()
@@ -45,7 +43,7 @@ func Reset()
 
 
 <a name="Service"></a>
-## func [Service](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L82>)
+## func [Service](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L81>)
 
 ```go
 func Service(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string
@@ -79,7 +77,7 @@ type WorkflowSpec struct {
 ```
 
 <a name="GetSpec"></a>
-### func [GetSpec](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L48>)
+### func [GetSpec](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L47>)
 
 ```go
 func GetSpec() (*WorkflowSpec, error)

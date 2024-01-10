@@ -1,4 +1,11 @@
-/* Package goproc provides `goproc.Process`, a node that represents a runnable Golang process.  It can contain any number of
+package goproc
+
+import (
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+)
+
+/*
+goproc.Process is a node that represents a runnable Golang process.  It can contain any number of
 other golang.Node IRNodes.  When it's compiled, the goproc.Process will generate a go module with
 a runnable main method that instantiates and initializes the contained go nodes.  To achieve this,
 the golang.Process also collects module dependencies from its contained nodes.
@@ -11,11 +18,6 @@ Most of the heavy lifting of code generation is done by the following:
 * gogen/namespacebuilder
 
 */
-package goproc
-
-import (
-	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
-)
 
 var generatedModulePrefix = "blueprint/goproc"
 
