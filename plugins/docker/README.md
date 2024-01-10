@@ -11,15 +11,15 @@ Package docker defines compiler interfaces for use by plugins that generate and 
 The noteworthy interfaces are as follows:
 
 - [Container](<#Container>) is an interface for IRNodes that represent containers. If an IRNode implements this interface then it will ultimately be instantiated in a namespace that supports containers, such as a docker\-compose file or a Kubernetes pod.
-- If the container IRNode wants to generate or define a custom Docker image \(e.g. using a Dockerfile\), then the IRNode should implement the [ProvidesContainerImage](<#ProvidesContainerImage>) interface.
-- If the container IRNode wants to instantiate a Docker image \(be it a pre\-defined image, or a custom image defined using [ProvidesContainerImage](<#ProvidesContainerImage>)\), then the IRNode should implement the [ProvidesContainerInstance](<#ProvidesContainerInstance>) interface.
+- If a container IRNode wants to generate or define a custom Docker image \(e.g. using a Dockerfile\), then the IRNode should implement the [ProvidesContainerImage](<#ProvidesContainerImage>) interface.
+- If a container IRNode wants to instantiate a Docker image \(be it a pre\-defined image, or a custom image defined using [ProvidesContainerImage](<#ProvidesContainerImage>)\), then the IRNode should implement the [ProvidesContainerInstance](<#ProvidesContainerInstance>) interface.
 
 Consult the following plugins for examples:
 
-- Many backend plugins such as the memcached plugin provide prebuilt containers for the backends
-- The linuxcontainer plugin generates custom Dockerfile images
-- The dockercompose plugin implements a Container namespace that collects together Container nodes and generates a docker\-compose file
-- The kubernetes plugin implements a Container namespace that collects together Container nodes and generates YAML manifests
+- Many backend plugins such as the [memcached](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/memcached>) plugin provide prebuilt containers for the backends
+- The [linuxcontainer](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/memclinuxcontainerached>) plugin generates custom Dockerfile images
+- The [dockercompose](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/dockercompose>) plugin implements a Container namespace that collects together Container nodes and generates a docker\-compose file
+- The [kubernetes](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/kubernetes>) plugin implements a Container namespace that collects together Container nodes and generates YAML manifests
 
 ## Index
 
@@ -32,7 +32,7 @@ Consult the following plugins for examples:
 
 
 <a name="Container"></a>
-## type [Container](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L32-L35>)
+## type [Container](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L37-L40>)
 
 An IRNode interface that represents containers. If an IRNode implements this interface then it enables that IRNode to be instantiated within container namespaces such as docker\-compose files and Kubernetes pods.
 
@@ -44,7 +44,7 @@ type Container interface {
 ```
 
 <a name="ContainerWorkspace"></a>
-## type [ContainerWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L79-L147>)
+## type [ContainerWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L84-L152>)
 
 A workspace during the Blueprint compilation process that collects together container images and instances.
 
@@ -123,7 +123,7 @@ type ContainerWorkspace interface {
 ```
 
 <a name="ContainerWorkspaceInfo"></a>
-## type [ContainerWorkspaceInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L60-L63>)
+## type [ContainerWorkspaceInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L65-L68>)
 
 Metadata about the local build environment used during the compilation process
 
@@ -135,7 +135,7 @@ type ContainerWorkspaceInfo struct {
 ```
 
 <a name="ProcessWorkspace"></a>
-## type [ProcessWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L162-L198>)
+## type [ProcessWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L167-L203>)
 
 Docker also specializes the build process for linux containers.
 
@@ -192,7 +192,7 @@ type ProcessWorkspace interface {
 ```
 
 <a name="ProvidesContainerImage"></a>
-## type [ProvidesContainerImage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L45-L47>)
+## type [ProvidesContainerImage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L50-L52>)
 
 An optional interface for Container IRNodes to implement if the node needs to generate custom container images \(e.g. using a Dockerfile\). \[target\] provides methods for doing so.
 
@@ -203,7 +203,7 @@ type ProvidesContainerImage interface {
 ```
 
 <a name="ProvidesContainerInstance"></a>
-## type [ProvidesContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L53-L55>)
+## type [ProvidesContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L58-L60>)
 
 An optional interface for Container IRNodes to implement if the node wants to declare an instance of a container. The container instance can be of a pre\-existing image or of a locally\-defined image that was declared with [ProvidesContainerImage](<#ProvidesContainerImage>).
 

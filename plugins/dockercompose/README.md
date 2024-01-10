@@ -26,17 +26,18 @@ To deploy an application\-level service in a container, make sure you first depl
 
 ### Default Builder
 
-Instead of explicitly combining container instances into a deployment, the dockercompose plugin can be configured as the default builder instead.
+Instead of explicitly combining container instances into a deployment, the dockercompose plugin can be configured as the default builder for container instances, by calling [RegisterAsDefaultBuilder](<#RegisterAsDefaultBuilder>) in your wiring spec.
 
-The dockercompose plugin can be configured as the default builder for container instances; at compile time, Blueprint will combine any container instances that exist in the wiring spec but aren't explicitly added to a container deployment, and create a default docker\-compose deployment with the name "docker".
+At compile time Blueprint will combine any container instances that exist in the wiring spec but aren't explicitly added to a container deployment, and create a default docker\-compose deployment with the name "docker".
 
 ```
 dockercompose.RegisterAsDefaultBuilder()
 ```
 
-Calling the above is optional. If your wiring spec uses the \[cmdbuilder\] then dockercompose is already registered as the default container workspace builder.
+Calling [RegisterAsDefaultBuilder](<#RegisterAsDefaultBuilder>) is optional and usually unnecessary:
 
-If your wiring spec manually creates container deployments, then the default builder will not have any effect. It only takes effect if there are 1 or more container instances that haven't been put into a deployment.
+- If your wiring spec uses Blueprint's \[cmdbuilder\] then dockercompose is already registered as the default container workspace builder.
+- The default builder only takes effect if there are 1 or more container instances that haven't been added to a container deployment. If your wiring spec manually creates container deployments using [NewDeployment](<#NewDeployment>) for all container instances, then the default builder will not have any effect.
 
 ### Artifacts Generated
 

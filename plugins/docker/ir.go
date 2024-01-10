@@ -6,19 +6,24 @@
 //   - [Container] is an interface for IRNodes that represent containers.  If an IRNode implements
 //     this interface then it will ultimately be instantiated in a namespace that supports containers,
 //     such as a docker-compose file or a Kubernetes pod.
-//   - If the container IRNode wants to generate or define a custom Docker image (e.g. using a Dockerfile),
+//   - If a container IRNode wants to generate or define a custom Docker image (e.g. using a Dockerfile),
 //     then the IRNode should implement the [ProvidesContainerImage] interface.
-//   - If the container IRNode wants to instantiate a Docker image (be it a pre-defined image, or a custom
+//   - If a container IRNode wants to instantiate a Docker image (be it a pre-defined image, or a custom
 //     image defined using [ProvidesContainerImage]), then the IRNode should implement the
 //     [ProvidesContainerInstance] interface.
 //
 // Consult the following plugins for examples:
-//   - Many backend plugins such as the memcached plugin provide prebuilt containers for the backends
-//   - The linuxcontainer plugin generates custom Dockerfile images
-//   - The dockercompose plugin implements a Container namespace that collects together Container nodes
+//   - Many backend plugins such as the [memcached] plugin provide prebuilt containers for the backends
+//   - The [linuxcontainer] plugin generates custom Dockerfile images
+//   - The [dockercompose] plugin implements a Container namespace that collects together Container nodes
 //     and generates a docker-compose file
-//   - The kubernetes plugin implements a Container namespace that collects together Container nodes and
+//   - The [kubernetes] plugin implements a Container namespace that collects together Container nodes and
 //     generates YAML manifests
+//
+// [memcached]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/memcached
+// [linuxcontainer]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/memclinuxcontainerached
+// [dockercompose]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/dockercompose
+// [kubernetes]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/kubernetes
 package docker
 
 import (
