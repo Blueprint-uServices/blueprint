@@ -10,12 +10,10 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-/*
-Helper method that does typecasting on builder and service.
-
-Assumes builder is a golang module builder, and service is a golang module; if so, gets the golang
-service interface for the service.  If not, returns an error.
-*/
+// A convenience function that can be called by other Blueprint plugins.
+//
+// If ctx is a [ModuleBuilder] and node is a [Service], this method returns the [*gocode.ServiceInterface]
+// of node.  If not, returns nil and an error.
 func GetGoInterface(ctx ir.BuildContext, node ir.IRNode) (*gocode.ServiceInterface, error) {
 	service, isService := node.(service.ServiceNode)
 	if !isService {
@@ -42,6 +40,10 @@ func GetGoInterface(ctx ir.BuildContext, node ir.IRNode) (*gocode.ServiceInterfa
 	}
 }
 
+// A convenience function that can be called by other Blueprint plugins.
+// Ensures that Blueprint's [runtime] module is copied to the output workspace.
+//
+// [runtime]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime
 func AddRuntimeModule(workspace WorkspaceBuilder) error {
 	if !workspace.Visited("runtime") {
 		slog.Info("Copying local module runtime to workspace")
