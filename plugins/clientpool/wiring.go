@@ -1,6 +1,23 @@
-// Package clientpool provides a Blueprint modifier for the client side of service calls.
+// Package clientpool is a plugin for adding a client pool to the client side of service calls.
 //
-// The plugin wraps clients with a ClientPool that can create N instances of clients to a service.
+// By default, Blueprint instantiate one client to a service and there is no concurrency control
+// or rate limiting of calls using that client.
+//
+// When applied, the clientpool plugin instantiates N instances of clients to a service, and
+// each client instance can only be used by one caller at a time, effectively rate-limiting to
+// N outstanding calls at a time.
+//
+// To use the clientpool plugin in your wiring spec, simply apply it to an application-level service instance:
+//
+//	clientpool.Create(spec, "my_service", 10)
+//
+// After applying the clientpool plugin to a service, you can continue to apply application-level
+// modifiers to the service.
+//
+// During compilation, the clientpool plugin will generate a client-side wrapper class.  The plugin
+// also utilizes some code in the [runtime/plugins/clientpool] package.
+//
+// [runtime/plugins/clientpool]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/plugins/clientpool
 package clientpool
 
 import (
@@ -11,7 +28,9 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-// Wraps the client side of serviceName with a client pool with n client instances
+// Modifies the client-side of an application-level service so that all calls to serviceName
+// are made using a pool of numClients clients.  At runtime, clients to serviceName will only
+// be able to have up to numClients concurrent calls outstanding before subsequent calls block.
 func Create(spec wiring.WiringSpec, serviceName string, numClients int) {
 	poolName := serviceName + ".clientpool"
 
@@ -28,7 +47,7 @@ func Create(spec wiring.WiringSpec, serviceName string, numClients int) {
 	// Define the client pool
 	spec.Define(poolName, &ClientPool{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		pool := &ClientPool{PoolName: poolName, N: numClients}
-		poolNamespace, err := namespace.DeriveNamespace(poolName, &ClientPoolNamespace{pool})
+		poolNamespace, err := namespace.DeriveNamespace(poolName, &clientPoolNamespace{pool})
 		if err != nil {
 			return nil, err
 		}
@@ -37,7 +56,7 @@ func Create(spec wiring.WiringSpec, serviceName string, numClients int) {
 }
 
 // A [wiring.NamespaceHandler] used to build [ClientPool] IRNodes
-type ClientPoolNamespace struct {
+type clientPoolNamespace struct {
 	*ClientPool
 }
 
