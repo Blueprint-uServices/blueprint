@@ -1,6 +1,7 @@
-// Package xtrace provides two plugins:
+// Package xtrace provides three plugins:
 // (i)  a plugin to generate and include an xtrace instance in a Blueprint application.
 // (ii) provides a modifier plugin to wrap the service with an XTrace wrapper to generate XTrace compatible traces/logs.
+// (iii) a plugin to define an xtrace-based logger for a process.
 //
 // The package provides a built-in xtrace container that provides the server-side implementation
 // and a go-client for connecting to the server.
@@ -20,10 +21,10 @@ import (
 
 var default_xtrace_server_name = "xtrace_server"
 
-// Instruments the service with an entry + exit point xtrace wrapper to generate xtrace compatible logs.
+// Instruments the client and server side of the service with name `serviceName` to add xtrace context propagation implementation.
 // Usage:
-//
-//	Instrument(spec, "serviceA")
+//  import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
+//	xtrace.Instrument(spec, "serviceA")
 func Instrument(spec wiring.WiringSpec, serviceName string) {
 	xtraceServer := DefineXTraceServerContainer(spec, default_xtrace_server_name)
 	clientWrapper := serviceName + ".client.xtrace"
@@ -67,10 +68,14 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 	})
 }
 
-// Generates the IRNodes for a xtrace docker container that uses the latest xtrace image
-// and the clients needed by the generated application to communicate with the server.
+// Adds an xtrace docker container that uses the latest xtrace image to the application
+// along with the default client needed by the generated application to communicate with the server.
 //
 // The generated container has the name `serviceName`.
+// Usage:
+//
+//  import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
+//  xtrace.DefineXTraceServerContainer(spec, "xtrace_server")
 func DefineXTraceServerContainer(spec wiring.WiringSpec, serverName string) string {
 	// The nodes that we are defining
 	xtraceAddr := serverName + ".addr"
@@ -112,11 +117,15 @@ func DefineXTraceServerContainer(spec wiring.WiringSpec, serverName string) stri
 	return serverName
 }
 
-// Generates the IRNode for a process-level xtrace logger for process `processName`.
+// Adds an xtrace-based logger to the process with name `processName`.
+// Returns the name of the logger instantiated.
 // Note: Requires that the XTraceServerContainer has been defined for it to correctly compile
 // Note: Any service in the process must also be instrumented with `Instrument` to get log statements associated with a given xtrace task.
 // Usage:
-//   DefineXTraceLogger(spec, "my_process")
+//   import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
+//   import "github.com/blueprint-uservices/blueprint/plugins/goproc"
+//   logger = xtrace.DefineXTraceLogger(spec, "my_process") // Define an xtrace-logger for the process `my_process`
+//   goproc.SetLogger(spec, "my_process", logger) // Set the default logger fo
 func DefineXTraceLogger(spec wiring.WiringSpec, processName string) string {
 	logger := processName + "_xtrace_logger"
 	xtrace_server := "xtrace_server"

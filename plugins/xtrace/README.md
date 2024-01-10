@@ -6,7 +6,7 @@
 import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
 ```
 
-Package xtrace provides two plugins: \(i\) a plugin to generate and include an xtrace instance in a Blueprint application. \(ii\) provides a modifier plugin to wrap the service with an XTrace wrapper to generate XTrace compatible traces/logs.
+Package xtrace provides three plugins: \(i\) a plugin to generate and include an xtrace instance in a Blueprint application. \(ii\) provides a modifier plugin to wrap the service with an XTrace wrapper to generate XTrace compatible traces/logs. \(iii\) a plugin to define an xtrace\-based logger for a process.
 
 The package provides a built\-in xtrace container that provides the server\-side implementation and a go\-client for connecting to the server.
 
@@ -63,40 +63,49 @@ The applications must use a backend.XTracer \(runtime/core/backend\) as the inte
 
 
 <a name="DefineXTraceLogger"></a>
-## func [DefineXTraceLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/wiring.go#L120>)
+## func [DefineXTraceLogger](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/wiring.go#L129>)
 
 ```go
 func DefineXTraceLogger(spec wiring.WiringSpec, processName string) string
 ```
 
-Generates the IRNode for a process\-level xtrace logger for process \`processName\`. Note: Requires that the XTraceServerContainer has been defined for it to correctly compile Note: Any service in the process must also be instrumented with \`Instrument\` to get log statements associated with a given xtrace task. Usage:
+Adds an xtrace\-based logger to the process with name \`processName\`. Returns the name of the logger instantiated. Note: Requires that the XTraceServerContainer has been defined for it to correctly compile Note: Any service in the process must also be instrumented with \`Instrument\` to get log statements associated with a given xtrace task. Usage:
 
 ```
-DefineXTraceLogger(spec, "my_process")
+import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
+import "github.com/blueprint-uservices/blueprint/plugins/goproc"
+logger = xtrace.DefineXTraceLogger(spec, "my_process") // Define an xtrace-logger for the process `my_process`
+goproc.SetLogger(spec, "my_process", logger) // Set the default logger fo
 ```
 
 <a name="DefineXTraceServerContainer"></a>
-## func [DefineXTraceServerContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/wiring.go#L74>)
+## func [DefineXTraceServerContainer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/wiring.go#L79>)
 
 ```go
 func DefineXTraceServerContainer(spec wiring.WiringSpec, serverName string) string
 ```
 
-Generates the IRNodes for a xtrace docker container that uses the latest xtrace image and the clients needed by the generated application to communicate with the server.
+Adds an xtrace docker container that uses the latest xtrace image to the application along with the default client needed by the generated application to communicate with the server.
 
-The generated container has the name \`serviceName\`.
+The generated container has the name \`serviceName\`. Usage:
+
+```
+import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
+xtrace.DefineXTraceServerContainer(spec, "xtrace_server")
+```
 
 <a name="Instrument"></a>
-## func [Instrument](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/wiring.go#L27>)
+## func [Instrument](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/wiring.go#L28>)
 
 ```go
 func Instrument(spec wiring.WiringSpec, serviceName string)
 ```
 
-Instruments the service with an entry \+ exit point xtrace wrapper to generate xtrace compatible logs. Usage:
+Instruments the client and server side of the service with name \`serviceName\` to add xtrace context propagation implementation. Usage:
 
 ```
-Instrument(spec, "serviceA")
+import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
+	xtrace.Instrument(spec, "serviceA")
 ```
 
 <a name="XTraceClient"></a>
@@ -212,7 +221,7 @@ func (xt *XTraceInterface) GetName() string
 
 
 <a name="XTraceLogger"></a>
-## type [XTraceLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L17-L26>)
+## type [XTraceLogger](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L17-L26>)
 
 Blueprint IR Node that represents a process\-level xtrace logger
 
@@ -230,7 +239,7 @@ type XTraceLogger struct {
 ```
 
 <a name="XTraceLogger.AddInstantiation"></a>
-### func \(\*XTraceLogger\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L76>)
+### func \(\*XTraceLogger\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L76>)
 
 ```go
 func (node *XTraceLogger) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -239,7 +248,7 @@ func (node *XTraceLogger) AddInstantiation(builder golang.NamespaceBuilder) erro
 
 
 <a name="XTraceLogger.AddInterfaces"></a>
-### func \(\*XTraceLogger\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L68>)
+### func \(\*XTraceLogger\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L68>)
 
 ```go
 func (node *XTraceLogger) AddInterfaces(builder golang.ModuleBuilder) error
@@ -248,7 +257,7 @@ func (node *XTraceLogger) AddInterfaces(builder golang.ModuleBuilder) error
 
 
 <a name="XTraceLogger.AddToWorkspace"></a>
-### func \(\*XTraceLogger\) [AddToWorkspace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L64>)
+### func \(\*XTraceLogger\) [AddToWorkspace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L64>)
 
 ```go
 func (node *XTraceLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error
@@ -257,7 +266,7 @@ func (node *XTraceLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error
 
 
 <a name="XTraceLogger.GetInterface"></a>
-### func \(\*XTraceLogger\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L72>)
+### func \(\*XTraceLogger\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L72>)
 
 ```go
 func (node *XTraceLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -266,7 +275,7 @@ func (node *XTraceLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInte
 
 
 <a name="XTraceLogger.ImplementsGolangNode"></a>
-### func \(\*XTraceLogger\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L86>)
+### func \(\*XTraceLogger\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L86>)
 
 ```go
 func (node *XTraceLogger) ImplementsGolangNode()
@@ -275,7 +284,7 @@ func (node *XTraceLogger) ImplementsGolangNode()
 
 
 <a name="XTraceLogger.Name"></a>
-### func \(\*XTraceLogger\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L56>)
+### func \(\*XTraceLogger\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L56>)
 
 ```go
 func (node *XTraceLogger) Name() string
@@ -284,7 +293,7 @@ func (node *XTraceLogger) Name() string
 
 
 <a name="XTraceLogger.String"></a>
-### func \(\*XTraceLogger\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L60>)
+### func \(\*XTraceLogger\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L60>)
 
 ```go
 func (node *XTraceLogger) String() string
