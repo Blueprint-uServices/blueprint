@@ -1,13 +1,11 @@
 // Package clientpool is a plugin that wraps the client side of a service to use a pool of N clients, disallowing
 // callers from making more than N concurrent oustanding calls each to the service.
 //
-// By default, Blueprint instantiates one client to a service and there is no concurrency control
-// or rate limiting of calls using that client.
-//
 // When applied, the clientpool plugin instantiates N instances of clients to a service, and callers have exclusive
-// access to a client when making a call.  This effectively limits a caller to only making N outstanding calls at
-// a time, with any extra calls blocking until a client becomes available.  By contrast, the default Blueprint behavior
-// is to use only one client, but to share that client and allow an unlimited number of concurrent calls.
+// access to a client when making a call.  This effectively limits the caller-side to only having N outstanding calls at
+// a time, with any extra calls blocking until a previous call completes and a client becomes available.
+// By contrast, the default Blueprint behavior is for all callers to share a single client that allows an unlimited
+// number of concurrent calls.
 //
 // To use the clientpool plugin in your wiring spec, simply apply it to an application-level service instance:
 //
@@ -30,7 +28,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-// Create can be used by wiring specs to apply the clientpool plugin to the client side of a service.
+// Create can be used by wiring specs to add a clientpool to the client side of a service.
 //
 // This will modify the client-side of serviceName so that all calls are made using a pool of numClients clients.
 //

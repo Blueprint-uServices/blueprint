@@ -44,7 +44,7 @@ During compilation, the clientpool plugin will generate a client\-side wrapper c
 func Create(spec wiring.WiringSpec, serviceName string, numClients int)
 ```
 
-Create can be used by wiring specs to apply the clientpool plugin to the client side of a service.
+Create can be used by wiring specs to add a clientpool to the client side of a service.
 
 This will modify the client\-side of serviceName so that all calls are made using a pool of numClients clients.
 
