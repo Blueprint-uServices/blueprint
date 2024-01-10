@@ -2,6 +2,7 @@ package workflow
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
@@ -70,6 +71,7 @@ func (spec *WorkflowSpec) Get(name string) (*WorkflowSpecService, error) {
 }
 
 func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*WorkflowSpecService, error) {
+	log.Println("Making service for struct: ", struc.String())
 	ifaces := spec.findInterfacesFor(struc)
 	if len(ifaces) == 0 {
 		return nil, blueprint.Errorf("unable to find service interfaces for %v", struc.Name)

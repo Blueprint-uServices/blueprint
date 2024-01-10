@@ -1,3 +1,8 @@
+// package govector provides runtime GoVector components to be used by the govector plugin.
+//
+// Package provides a GoVector logger that maintains vector clocks for a process and correctly propagates the vector clocks to other processes through its service-level instrumentation.
+//
+// More info on govector: https://github.com/DistributedClocks/GoVector
 package govector
 
 import (
@@ -17,13 +22,13 @@ type GoVecLogger struct {
 var logger *GoVecLogger
 
 // Returns a new object of type GoVecLogger
-func NewGoVecLogger(ctx context.Context, proc_name string) (*GoVecLogger, error) {
+func NewGoVecLogger(ctx context.Context, loggerName string) (*GoVecLogger, error) {
 	// TODO Export options from the config
 	if logger != nil {
 		return logger, nil
 	}
 	config := govec.GetDefaultConfig()
-	l := &GoVecLogger{govec.InitGoVector(proc_name, proc_name, config)}
+	l := &GoVecLogger{govec.InitGoVector(loggerName, loggerName, config)}
 	logger = l
 	backend.SetDefaultLogger(logger)
 	return logger, nil

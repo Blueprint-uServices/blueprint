@@ -12,6 +12,9 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
+// Wiring specification demonstrates how to instrument an application using GoVector to propagate vector clocks and to create logs with vector clocks.
+// The wiring spec uses govector logger as the custom logger for processes.
+// Each service is deployed in a separate process with services communicating using HTTP.
 var Govector = wiringcmd.SpecOption{
 	Name:        "govector",
 	Description: "Deploys each service in a separate process, communicating using HTTP. Wraps each service in GoVector vector clocks and sets the GoVectorLogger for each process.",

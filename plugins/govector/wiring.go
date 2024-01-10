@@ -1,8 +1,25 @@
-// Package GoVector adds support for instrumenting applications with GoVector logger.
-// GoVector logger maintains a vector clock for each process and implements the vector clock
-// transmission between multiple processes.
-// GoVector is a vector clock logging library developed for educational purposes.
+// Package govector provides two plugins:
+//
+// (i) a plugin to wrap the client and server side of a service with a GoVector wrapper to maintain and propagate vector clocks for each process.
+// A vector clock is a logical clock maintained by every process in a distributed system which can then be used to establish partial order between distributed operations. The plugin generates a log file for each process where the incremental vector timestamps are stored to track the propagation of requests.
+//
+// (ii) a plugin to install a GoVector logger for a given process. The log messages are appended with vector timestamps and placed in a log file in chronological order. Log files from all processes can be combined to visualize the full execution of a distributed system.
+//
+// GoVector is a vector clock logging library developed for educational purposes by researchers at UBC Systopia.
 // More information on GoVector: https://github.com/DistributedClocks/GoVector
+//
+// Example Usage (for full instrumentation):
+//
+// import "github.com/blueprint-uservices/blueprint/plugins/govector"
+//
+// for _, service := range serviceNames {
+//     govector.Instrument(spec, service) // Instrument the service to propagate vector clocks
+// }
+//
+// for _, proc := range procNames {
+//     logger := govector.DefineLogger(spec, proc) // Define a logger for the process
+//	   goproc.SetLogger(spec, proc, logger) // Set the logger for the process
+// }
 package govector
 
 import (
@@ -14,7 +31,8 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-// Instruments the service with an entry + exit point govector wrapper to generate govector logs.
+// Instruments the client and server side of a service with govector-instrumentation to initialize, maintain, and propagate vector clocks.
+// The instrumentation generates logging events appended with vector clock timestamps.
 // Ensures that the logs are sent to a GoVector logger defined with name `logger`
 func Instrument(spec wiring.WiringSpec, serviceName string) {
 	clientWrapper := serviceName + ".client.govec"
@@ -52,6 +70,5 @@ func DefineLogger(spec wiring.WiringSpec, loggerName string) string {
 	spec.Define(logger, &GoVecLoggerClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		return newGoVecLoggerClient(logger)
 	})
-	// TODO: Require uniqueness for each logger
 	return logger
 }

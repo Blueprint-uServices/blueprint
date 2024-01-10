@@ -123,7 +123,7 @@ func generateClientHandler(builder golang.ModuleBuilder, wrapped *gocode.Service
 		Imports:         gogen.NewImports(pkg.Name),
 	}
 
-	client.Imports.AddPackages("context", "github.com/blueprint-uservices/blueprint/runtime/plugins/govector")
+	client.Imports.AddPackages("context", "github.com/blueprint-uservices/blueprint/runtime/plugins/govector", "errors")
 
 	slog.Info(fmt.Sprintf("Generating %v/%v", client.Package.PackageName, impl.Name))
 	outputFile := filepath.Join(client.Package.Path, impl.Name+".go")
@@ -153,11 +153,16 @@ type {{.IfaceName}} interface {
 
 type {{.Name}} struct {
 	Client {{.ServerIfaceName}}
+	logger *govector.GoVecLogger
 }
 
 func New_{{.Name}}(ctx context.Context, client {{.ServerIfaceName}}) (*{{.Name}}, error) {
 	handler := &{{.Name}}{}
 	handler.Client = client
+	handler.logger = govector.GetLogger()
+	if handler.logger == nil {
+		return nil, errors.New("GoVector logger is not initialized")
+	}
 	return handler, nil
 }
 
@@ -166,9 +171,9 @@ func New_{{.Name}}(ctx context.Context, client {{.ServerIfaceName}}) (*{{.Name}}
 {{range $_, $f := .Impl.Methods}}
 func (handler *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
 	var govec_bytes, govec_ret []byte
-	govec_bytes, _ = govector.GetLogger().GetSendCtx(ctx, "Preparing to make request for function {{$f.Name}}")
+	govec_bytes, _ = handler.logger.GetSendCtx(ctx, "Preparing to make request for function {{$f.Name}}")
 	{{RetVars $f "govec_ret" "err"}} = handler.Client.{{$f.Name}}({{ArgVars $f "ctx"}}, govec_bytes)
-	govector.GetLogger().UnpackReceiveCtx(ctx, "Unpacking response from server", govec_ret)
+	handler.logger.UnpackReceiveCtx(ctx, "Unpacking response from server", govec_ret)
 	return
 }
 {{end}}
