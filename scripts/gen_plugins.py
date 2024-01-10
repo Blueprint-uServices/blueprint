@@ -1,3 +1,8 @@
+'''
+This script generates index files for all the available plugins for Blueprint's website.
+The generated index files are placed at https://github.com/Blueprint-uServices/Blueprint-uServices.github.io/tree/main/_documents
+which then get listed on the Blueprint's website at https://blueprint-uservices.github.io/plugins/.
+'''
 import os
 import sys
 from datetime import date
