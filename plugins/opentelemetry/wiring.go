@@ -1,10 +1,15 @@
 // Package opentelemetry provides three plugins:
-// (i)  a plugin to generate and include an opentelemetry collector instance in a Blueprint application
-// (ii) a plugin to wrap the service with an OpenTelemetry wrapper to generate OT compatible traces.
+// (i)  a plugin to generate and include an opentelemetry collector instance in a Blueprint application.
+// (ii) a plugin to wrap the service with an OpenTelemetry wrapper to generate OT compatible traces by starting and stopping client spans for remote calls between services and correctly propagating context between services.
 // (iii) a plugin to install an opentelemetry logger for a go process. The logger adds all the logs as events to the current active span.
+//
+// In order to generate complete end-to-end traces of the application, all services of the application need to be instrumented with OpenTelemetry.
+// If the plugin is only applied to a subset of services, the application will run, but the traces it produces won't be end-to-end and won't be useful.
 //
 // The package provides an in-memory trace exporter implementation and a go-client for generating traces on both the server and client side.
 // The generated clients handle context propagation correctly on both the server and client sides.
+//
+// The plugin does not support instrumenting clients for backends such as databases, caches, queues, etc. If needed, please consider submitting a PR or contacting the maintainers via google groups or on slack.
 //
 // Example usage (for complete instrumentation):
 //
@@ -12,14 +17,14 @@
 // import "github.com/blueprint-uservices/blueprint/plugins/jaeger"
 // import "github.com/blueprint-uservices/blueprint/plugins/goproc"
 //
-// jaegerCollector := jaeger.DefineJaegerCollector(spec, "jaeger_collector") // Define a custom opentelemetry collector
+// jaegerCollector := jaeger.Collector(spec, "jaeger_collector") // Define a custom opentelemetry collector
 //
 // for _, service := range serviceNames {
-//    opentelemetry.InstrumentUsingCustomCollector(spec, service, jaegerCollector) // Instrument a service with opentelemetry tracing
+//    opentelemetry.Instrument(spec, service, jaegerCollector) // Instrument a service with opentelemetry tracing
 // }
 //
 // for _, proc := range procNames {
-//    logger := opentelemetry.DefineOTTraceLogger(spec, proc) // Define an OTTrace logger for the desired process
+//    logger := opentelemetry.Logger(spec, proc) // Define an OTTrace logger for the desired process
 //    goproc.SetLogger(spec, proc, logger) // Set the default logger for the desired process
 // }
 package opentelemetry
@@ -91,8 +96,9 @@ func Instrument(spec wiring.WiringSpec, serviceName string, collectorName string
 }
 
 // Adds a process-level ot logger for process `processName` to be used in tandem with an OT Tracer.
-// Note: Logs are added as `ot.Events` to the current span. If no current span is being recorded, then no events will be generated. Use `InstrumentUsingCustomCollector` to ensure that all services in a process are instrumented with OpenTelemetry and are creating active spans.
-func DefineOTTraceLogger(spec wiring.WiringSpec, processName string) string {
+// Logs are added as `ot.Events` to the current span and will be added as events to the current span and won't appear in stdout.
+// If no current span is being recorded, then no events will be generated. Use `Instrument` to ensure that all services in a process are instrumented with OpenTelemetry and are creating active spans.
+func Logger(spec wiring.WiringSpec, processName string) string {
 	logger := processName + "_ottrace_logger"
 	spec.Define(logger, &OTTraceLogger{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		return newOTTraceLogger(logger)
