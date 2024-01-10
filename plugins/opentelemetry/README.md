@@ -6,11 +6,28 @@
 import "github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
 ```
 
-Package opentelemetry provides two plugins: \(i\) a plugin to generate and include an opentelemetry collector instance in a Blueprint application \(ii\) provides a modifier plugin to wrap the service with an OpenTelemetry wrapper to generate OT compatible traces/logs.
+Package opentelemetry provides three plugins: \(i\) a plugin to generate and include an opentelemetry collector instance in a Blueprint application \(ii\) a plugin to wrap the service with an OpenTelemetry wrapper to generate OT compatible traces. \(iii\) a plugin to install an opentelemetry logger for a go process. The logger adds all the logs as events to the current active span.
 
 The package provides an in\-memory trace exporter implementation and a go\-client for generating traces on both the server and client side. The generated clients handle context propagation correctly on both the server and client sides.
 
-The applications must use a backend.Tracer \(runtime/core/backend\) as the interface in the workflow.
+Example usage \(for complete instrumentation\):
+
+import "github.com/blueprint\-uservices/blueprint/plugins/opentelemetry" import "github.com/blueprint\-uservices/blueprint/plugins/jaeger" import "github.com/blueprint\-uservices/blueprint/plugins/goproc"
+
+jaegerCollector := jaeger.DefineJaegerCollector\(spec, "jaeger\_collector"\) // Define a custom opentelemetry collector
+
+```
+for _, service := range serviceNames {
+   opentelemetry.InstrumentUsingCustomCollector(spec, service, jaegerCollector) // Instrument a service with opentelemetry tracing
+}
+```
+
+```
+for _, proc := range procNames {
+   logger := opentelemetry.DefineOTTraceLogger(spec, proc) // Define an OTTrace logger for the desired process
+   goproc.SetLogger(spec, proc, logger) // Set the default logger for the desired process
+}
+```
 
 ## Index
 
@@ -48,7 +65,7 @@ Instruments \`serviceName\` with OpenTelemetry. This can only be done if \`servi
 This call will configure the generated clients on server and client side to use the exporter provided by the custom collector indicated by the \`collectorName\`. The \`collectorName\` must be declared in the wiring spec.
 
 <a name="OTTraceLogger"></a>
-## type [OTTraceLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L16-L23>)
+## type [OTTraceLogger](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L16-L23>)
 
 Blueprint IR Node that represents a process\-level OT trace logger
 
@@ -64,7 +81,7 @@ type OTTraceLogger struct {
 ```
 
 <a name="OTTraceLogger.AddInstantiation"></a>
-### func \(\*OTTraceLogger\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L72>)
+### func \(\*OTTraceLogger\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L72>)
 
 ```go
 func (node *OTTraceLogger) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -73,7 +90,7 @@ func (node *OTTraceLogger) AddInstantiation(builder golang.NamespaceBuilder) err
 
 
 <a name="OTTraceLogger.AddInterfaces"></a>
-### func \(\*OTTraceLogger\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L64>)
+### func \(\*OTTraceLogger\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L64>)
 
 ```go
 func (node *OTTraceLogger) AddInterfaces(builder golang.ModuleBuilder) error
@@ -82,7 +99,7 @@ func (node *OTTraceLogger) AddInterfaces(builder golang.ModuleBuilder) error
 
 
 <a name="OTTraceLogger.AddToWorkspace"></a>
-### func \(\*OTTraceLogger\) [AddToWorkspace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L60>)
+### func \(\*OTTraceLogger\) [AddToWorkspace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L60>)
 
 ```go
 func (node *OTTraceLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error
@@ -91,7 +108,7 @@ func (node *OTTraceLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error
 
 
 <a name="OTTraceLogger.GetInterface"></a>
-### func \(\*OTTraceLogger\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L68>)
+### func \(\*OTTraceLogger\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L68>)
 
 ```go
 func (node *OTTraceLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -100,7 +117,7 @@ func (node *OTTraceLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInt
 
 
 <a name="OTTraceLogger.ImplementsGolangNode"></a>
-### func \(\*OTTraceLogger\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L82>)
+### func \(\*OTTraceLogger\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L82>)
 
 ```go
 func (node *OTTraceLogger) ImplementsGolangNode()
@@ -109,7 +126,7 @@ func (node *OTTraceLogger) ImplementsGolangNode()
 
 
 <a name="OTTraceLogger.Name"></a>
-### func \(\*OTTraceLogger\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L52>)
+### func \(\*OTTraceLogger\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L52>)
 
 ```go
 func (node *OTTraceLogger) Name() string
@@ -118,7 +135,7 @@ func (node *OTTraceLogger) Name() string
 
 
 <a name="OTTraceLogger.String"></a>
-### func \(\*OTTraceLogger\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L56>)
+### func \(\*OTTraceLogger\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L56>)
 
 ```go
 func (node *OTTraceLogger) String() string

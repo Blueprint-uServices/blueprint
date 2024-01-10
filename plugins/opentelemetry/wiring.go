@@ -8,7 +8,20 @@
 //
 // Example usage (for complete instrumentation):
 //
+// import "github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
+// import "github.com/blueprint-uservices/blueprint/plugins/jaeger"
+// import "github.com/blueprint-uservices/blueprint/plugins/goproc"
 //
+// jaegerCollector := jaeger.DefineJaegerCollector(spec, "jaeger_collector") // Define a custom opentelemetry collector
+//
+// for _, service := range serviceNames {
+//    opentelemetry.InstrumentUsingCustomCollector(spec, service, jaegerCollector) // Instrument a service with opentelemetry tracing
+// }
+//
+// for _, proc := range procNames {
+//    logger := opentelemetry.DefineOTTraceLogger(spec, proc) // Define an OTTrace logger for the desired process
+//    goproc.SetLogger(spec, proc, logger) // Set the default logger for the desired process
+// }
 package opentelemetry
 
 import (
@@ -77,8 +90,8 @@ func Instrument(spec wiring.WiringSpec, serviceName string, collectorName string
 
 }
 
-// Generates the IRNode for a process-level ot logger for process `processName` to be used in tandem with an OT Tracer.
-// Note: Logs are added as `ot.Events` to the current span. If no current span is being recorded, then no events will be generated. Use `Instrument` to ensure that all services in a process are instrumented with OpenTelemetry and are creating active spans.
+// Adds a process-level ot logger for process `processName` to be used in tandem with an OT Tracer.
+// Note: Logs are added as `ot.Events` to the current span. If no current span is being recorded, then no events will be generated. Use `InstrumentUsingCustomCollector` to ensure that all services in a process are instrumented with OpenTelemetry and are creating active spans.
 func DefineOTTraceLogger(spec wiring.WiringSpec, processName string) string {
 	logger := processName + "_ottrace_logger"
 	spec.Define(logger, &OTTraceLogger{}, func(ns wiring.Namespace) (ir.IRNode, error) {

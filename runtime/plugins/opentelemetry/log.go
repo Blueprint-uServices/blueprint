@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -17,6 +17,7 @@ type OTTraceLogger struct {
 	backend.Logger
 }
 
+// Returns a new OTTraceLogger object
 func NewOTTraceLogger(ctx context.Context) (*OTTraceLogger, error) {
 	l := &OTTraceLogger{}
 	backend.SetDefaultLogger(l)
