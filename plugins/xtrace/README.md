@@ -10,7 +10,24 @@ Package xtrace provides three plugins: \(i\) a plugin to generate and include an
 
 The package provides a built\-in xtrace container that provides the server\-side implementation and a go\-client for connecting to the server.
 
-The applications must use a backend.XTracer \(runtime/core/backend\) as the interface in the workflow.
+Example Usage \(for complete xtrace instrumentation\):
+
+import "github.com/blueprint\-uservices/blueprint/plugins/xtrace"
+
+xtrace.DefineXTraceServerContainer\(spec, "xtrace\_server"\) // Defines and adds an xtrace server to the wiring spec
+
+```
+for _, service := range serviceNames {
+  xtrace.Instrument(spec, service) // Instrument service with xtrace instrumentation
+}
+```
+
+```
+for _, proc := range processNames {
+  logger = xtrace.DefineXTraceLogger(spec, proc) // Define an xtrace-logger for the process
+  goproc.SetLogger(spec, proc, logger) // Set the default logger for the process
+}
+```
 
 ## Index
 
@@ -63,7 +80,7 @@ The applications must use a backend.XTracer \(runtime/core/backend\) as the inte
 
 
 <a name="DefineXTraceLogger"></a>
-## func [DefineXTraceLogger](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/wiring.go#L129>)
+## func [DefineXTraceLogger](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/wiring.go#L142>)
 
 ```go
 func DefineXTraceLogger(spec wiring.WiringSpec, processName string) string
@@ -75,11 +92,11 @@ Adds an xtrace\-based logger to the process with name \`processName\`. Returns t
 import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
 import "github.com/blueprint-uservices/blueprint/plugins/goproc"
 logger = xtrace.DefineXTraceLogger(spec, "my_process") // Define an xtrace-logger for the process `my_process`
-goproc.SetLogger(spec, "my_process", logger) // Set the default logger fo
+goproc.SetLogger(spec, "my_process", logger) // Set the default logger for the process
 ```
 
 <a name="DefineXTraceServerContainer"></a>
-## func [DefineXTraceServerContainer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/wiring.go#L79>)
+## func [DefineXTraceServerContainer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/wiring.go#L92>)
 
 ```go
 func DefineXTraceServerContainer(spec wiring.WiringSpec, serverName string) string
@@ -95,13 +112,13 @@ xtrace.DefineXTraceServerContainer(spec, "xtrace_server")
 ```
 
 <a name="Instrument"></a>
-## func [Instrument](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/wiring.go#L28>)
+## func [Instrument](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/xtrace/wiring.go#L41>)
 
 ```go
 func Instrument(spec wiring.WiringSpec, serviceName string)
 ```
 
-Instruments the client and server side of the service with name \`serviceName\` to add xtrace context propagation implementation. Usage:
+Instruments the client and server side of the service with name \`serviceName\` to add xtrace context propagation. Usage:
 
 ```
 import "github.com/blueprint-uservices/blueprint/plugins/xtrace"

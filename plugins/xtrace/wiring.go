@@ -6,7 +6,20 @@
 // The package provides a built-in xtrace container that provides the server-side implementation
 // and a go-client for connecting to the server.
 //
-// The applications must use a backend.XTracer (runtime/core/backend) as the interface in the workflow.
+// Example Usage (for complete xtrace instrumentation):
+//
+// import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
+//
+// xtrace.DefineXTraceServerContainer(spec, "xtrace_server") // Defines and adds an xtrace server to the wiring spec
+//
+// for _, service := range serviceNames {
+//   xtrace.Instrument(spec, service) // Instrument service with xtrace instrumentation
+// }
+//
+// for _, proc := range processNames {
+//   logger = xtrace.DefineXTraceLogger(spec, proc) // Define an xtrace-logger for the process
+//   goproc.SetLogger(spec, proc, logger) // Set the default logger for the process
+// }
 package xtrace
 
 import (
@@ -21,7 +34,7 @@ import (
 
 var default_xtrace_server_name = "xtrace_server"
 
-// Instruments the client and server side of the service with name `serviceName` to add xtrace context propagation implementation.
+// Instruments the client and server side of the service with name `serviceName` to add xtrace context propagation.
 // Usage:
 //  import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
 //	xtrace.Instrument(spec, "serviceA")
@@ -125,7 +138,7 @@ func DefineXTraceServerContainer(spec wiring.WiringSpec, serverName string) stri
 //   import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
 //   import "github.com/blueprint-uservices/blueprint/plugins/goproc"
 //   logger = xtrace.DefineXTraceLogger(spec, "my_process") // Define an xtrace-logger for the process `my_process`
-//   goproc.SetLogger(spec, "my_process", logger) // Set the default logger fo
+//   goproc.SetLogger(spec, "my_process", logger) // Set the default logger for the process
 func DefineXTraceLogger(spec wiring.WiringSpec, processName string) string {
 	logger := processName + "_xtrace_logger"
 	xtrace_server := "xtrace_server"
