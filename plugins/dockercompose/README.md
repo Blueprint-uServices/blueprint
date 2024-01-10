@@ -22,6 +22,8 @@ You can add containers to existing deployments:
 dockercompose.AddContainerToDeployment(spec, "my_deployment", "my_container_3")
 ```
 
+To deploy an application\-level service in a container, make sure you first deploy the service to a process \(with the [goproc](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc>) plugin\) and to a container image \(with the [linuxcontainer](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/linuxcontainer>) plugin\)
+
 ### Artifacts Generated
 
 During compilation, the plugin generates a docker\-compose file that instantiates images for the specified containers. The plugin also sets environment variables and ports for the instances.
@@ -57,40 +59,49 @@ Internally, the plugin makes use of interfaces defined in the [docker](<https://
   - [func \(node \*Deployment\) GenerateArtifacts\(dir string\) error](<#Deployment.GenerateArtifacts>)
   - [func \(node \*Deployment\) Name\(\) string](<#Deployment.Name>)
   - [func \(node \*Deployment\) String\(\) string](<#Deployment.String>)
-- [type DeploymentNamespace](<#DeploymentNamespace>)
 
 
 <a name="AddContainerToDeployment"></a>
-## func [AddContainerToDeployment](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L59>)
+## func [AddContainerToDeployment](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L65>)
 
 ```go
 func AddContainerToDeployment(spec wiring.WiringSpec, deploymentName, containerName string)
 ```
 
-Adds a child node to an existing container deployment
+Adds containerName to the existing container deployment deploymentName, which was previously created using [NewDeployment](<#NewDeployment>)
 
 <a name="NewDeployment"></a>
-## func [NewDeployment](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L65>)
+## func [NewDeployment](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L77>)
 
 ```go
 func NewDeployment(spec wiring.WiringSpec, deploymentName string, containers ...string) string
 ```
 
-Adds a deployment that explicitly instantiates all of the containers provided. The deployment will also implicitly instantiate any of the dependencies of the containers
+Creates a new container deployment called \[deploymentName\] that will instantiate the container instances given in containers.
+
+Further container instances can be added to the deployment by calling [AddContainerToDeployment](<#AddContainerToDeployment>).
+
+During compilation, generates a docker\-compose file that instantiates the containers.
+
+Returns deploymentName.
 
 <a name="RegisterAsDefaultBuilder"></a>
-## func [RegisterAsDefaultBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/defaults.go#L10>)
+## func [RegisterAsDefaultBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/defaults.go#L18>)
 
 ```go
 func RegisterAsDefaultBuilder()
 ```
 
-to trigger module initialization and register builders
+RegisterAsDefaultBuilder should be invoked by a wiring spec if it wishes to use docker\-compose as the default way of combining container instances.
+
+If you are using the \[cmdbuilder\], then docker\-compose is automatically set as the default builder and you do not need to call this function again.
+
+Default builders are responsible for building any container instances that exist in a wiring spec but aren't explicitly added to a container deployment within that wiring spec. The Blueprint compiler groups these "floating" container instances into a default dockercompose deployment with the name "docker".
 
 <a name="Deployment"></a>
-## type [Deployment](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/ir.go#L8-L15>)
+## type [Deployment](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/ir.go#L9-L16>)
 
-A deployment is a collection of containers
+An IRNode representing a docker\-compose deployment, which is simply a collection of container instances.
 
 ```go
 type Deployment struct {
@@ -102,7 +113,7 @@ type Deployment struct {
 ```
 
 <a name="Deployment.Accepts"></a>
-### func \(\*Deployment\) [Accepts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L86>)
+### func \(\*Deployment\) [Accepts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L98>)
 
 ```go
 func (deployment *Deployment) Accepts(nodeType any) bool
@@ -111,7 +122,7 @@ func (deployment *Deployment) Accepts(nodeType any) bool
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Deployment.AddEdge"></a>
-### func \(\*Deployment\) [AddEdge](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L92>)
+### func \(\*Deployment\) [AddEdge](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L104>)
 
 ```go
 func (deployment *Deployment) AddEdge(name string, edge ir.IRNode) error
@@ -120,7 +131,7 @@ func (deployment *Deployment) AddEdge(name string, edge ir.IRNode) error
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Deployment.AddNode"></a>
-### func \(\*Deployment\) [AddNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L98>)
+### func \(\*Deployment\) [AddNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L110>)
 
 ```go
 func (deployment *Deployment) AddNode(name string, node ir.IRNode) error
@@ -138,7 +149,7 @@ func (node *Deployment) GenerateArtifacts(dir string) error
 Implements ir.ArtifactGenerator
 
 <a name="Deployment.Name"></a>
-### func \(\*Deployment\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/ir.go#L18>)
+### func \(\*Deployment\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/ir.go#L19>)
 
 ```go
 func (node *Deployment) Name() string
@@ -147,23 +158,12 @@ func (node *Deployment) Name() string
 Implements IRNode
 
 <a name="Deployment.String"></a>
-### func \(\*Deployment\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/ir.go#L23>)
+### func \(\*Deployment\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/ir.go#L24>)
 
 ```go
 func (node *Deployment) String() string
 ```
 
 Implements IRNode
-
-<a name="DeploymentNamespace"></a>
-## type [DeploymentNamespace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L81-L83>)
-
-A \[wiring.NamespaceHandler\] used to build container deployments
-
-```go
-type DeploymentNamespace struct {
-    *Deployment
-}
-```
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)

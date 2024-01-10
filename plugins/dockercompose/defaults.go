@@ -6,7 +6,15 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/docker"
 )
 
-// to trigger module initialization and register builders
+// RegisterAsDefaultBuilder should be invoked by a wiring spec if it wishes to use docker-compose as the default
+// way of combining container instances.
+//
+// If you are using the [cmdbuilder], then docker-compose is automatically set as the default builder and you
+// do not need to call this function again.
+//
+// Default builders are responsible for building any container instances that exist in a wiring spec but aren't
+// explicitly added to a container deployment within that wiring spec.  The Blueprint compiler groups these
+// "floating" container instances into a default dockercompose deployment with the name "docker".
 func RegisterAsDefaultBuilder() {
 	ir.RegisterDefaultNamespace[docker.Container]("containerdeployment", buildDefaultContainerWorkspace)
 }

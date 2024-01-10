@@ -12,6 +12,9 @@
 //
 //	dockercompose.AddContainerToDeployment(spec, "my_deployment", "my_container_3")
 //
+// To deploy an application-level service in a container, make sure you first deploy the service to a process
+// (with the [goproc] plugin) and to a container image (with the [linuxcontainer] plugin)
+//
 // # Artifacts Generated
 //
 // During compilation, the plugin generates a docker-compose file that instantiates images for the specified
@@ -45,6 +48,8 @@
 // and ports.
 //
 // [docker]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/docker
+// [linuxcontainer]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/linuxcontainer
+// [goproc]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc
 // [SockShop Getting Started]: https://github.com/Blueprint-uServices/blueprint/tree/main/examples/sockshop
 package dockercompose
 
@@ -55,13 +60,20 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/docker"
 )
 
-// Adds a child node to an existing container deployment
+// Adds containerName to the existing container deployment deploymentName, which was previously
+// created using [NewDeployment]
 func AddContainerToDeployment(spec wiring.WiringSpec, deploymentName, containerName string) {
 	namespaceutil.AddNodeTo[Deployment](spec, deploymentName, containerName)
 }
 
-// Adds a deployment that explicitly instantiates all of the containers provided.
-// The deployment will also implicitly instantiate any of the dependencies of the containers
+// Creates a new container deployment called [deploymentName] that will instantiate the container
+// instances given in containers.
+//
+// Further container instances can be added to the deployment by calling [AddContainerToDeployment].
+//
+// During compilation, generates a docker-compose file that instantiates the containers.
+//
+// Returns deploymentName.
 func NewDeployment(spec wiring.WiringSpec, deploymentName string, containers ...string) string {
 	// If any children were provided in this call, add them to the process via a property
 	for _, containerName := range containers {
@@ -70,7 +82,7 @@ func NewDeployment(spec wiring.WiringSpec, deploymentName string, containers ...
 
 	spec.Define(deploymentName, &Deployment{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		deployment := &Deployment{DeploymentName: deploymentName}
-		_, err := namespaceutil.InstantiateNamespace(namespace, &DeploymentNamespace{deployment})
+		_, err := namespaceutil.InstantiateNamespace(namespace, &deploymentNamespace{deployment})
 		return deployment, err
 	})
 
@@ -78,7 +90,7 @@ func NewDeployment(spec wiring.WiringSpec, deploymentName string, containers ...
 }
 
 // A [wiring.NamespaceHandler] used to build container deployments
-type DeploymentNamespace struct {
+type deploymentNamespace struct {
 	*Deployment
 }
 
