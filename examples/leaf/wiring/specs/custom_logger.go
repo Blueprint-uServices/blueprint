@@ -34,7 +34,7 @@ func makeCustomLoggerSpec(spec wiring.WiringSpec, logger_type string) ([]string,
 		var logger string
 		if logger_type == "xtrace" {
 			xtrace.Instrument(spec, service_name)
-			logger = xtrace.DefineXTraceLogger(spec, procName)
+			logger = xtrace.Logger(spec, procName)
 		}
 		cntrName := strings.ReplaceAll(service_name, "service", "container")
 		http.Deploy(spec, service_name)

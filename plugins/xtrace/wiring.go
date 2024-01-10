@@ -1,23 +1,26 @@
 // Package xtrace provides three plugins:
 // (i)  a plugin to generate and include an xtrace instance in a Blueprint application.
-// (ii) provides a modifier plugin to wrap the service with an XTrace wrapper to generate XTrace compatible traces/logs.
-// (iii) a plugin to define an xtrace-based logger for a process.
+// (ii) provides a modifier plugin to wrap the service with an XTrace wrapper to generate XTrace compatible traces/logs by correctly propagating baggage across service boundaries.
+// (iii) a plugin to define an xtrace-based logger for a process. Log events are added as reports to the currently active xtrace task, if one exists. If no such task exists, then no events are logged.
 //
 // The package provides a built-in xtrace container that provides the server-side implementation
 // and a go-client for connecting to the server.
+//
+// In order to generate complete end-to-end traces of the application, all services of the application need to be instrumented with XTrace.
+// If the plugin is only applied to a subset of services, the application will run, but the traces it produces won't be end-to-end and won't be useful.
 //
 // Example Usage (for complete xtrace instrumentation):
 //
 // import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
 //
-// xtrace.DefineXTraceServerContainer(spec, "xtrace_server") // Defines and adds an xtrace server to the wiring spec
+// xtrace.Container(spec, "xtrace_server") // Defines and adds an xtrace server to the wiring spec
 //
 // for _, service := range serviceNames {
 //   xtrace.Instrument(spec, service) // Instrument service with xtrace instrumentation
 // }
 //
 // for _, proc := range processNames {
-//   logger = xtrace.DefineXTraceLogger(spec, proc) // Define an xtrace-logger for the process
+//   logger = xtrace.Logger(spec, proc) // Define an xtrace-logger for the process
 //   goproc.SetLogger(spec, proc, logger) // Set the default logger for the process
 // }
 package xtrace
@@ -39,7 +42,7 @@ var default_xtrace_server_name = "xtrace_server"
 //  import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
 //	xtrace.Instrument(spec, "serviceA")
 func Instrument(spec wiring.WiringSpec, serviceName string) {
-	xtraceServer := DefineXTraceServerContainer(spec, default_xtrace_server_name)
+	xtraceServer := Container(spec, default_xtrace_server_name)
 	clientWrapper := serviceName + ".client.xtrace"
 	serverWrapper := serviceName + ".server.xtrace"
 
@@ -88,8 +91,8 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 // Usage:
 //
 //  import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
-//  xtrace.DefineXTraceServerContainer(spec, "xtrace_server")
-func DefineXTraceServerContainer(spec wiring.WiringSpec, serverName string) string {
+//  xtrace.Container(spec, "xtrace_server")
+func Container(spec wiring.WiringSpec, serverName string) string {
 	// The nodes that we are defining
 	xtraceAddr := serverName + ".addr"
 	xtraceClient := serverName + ".client"
@@ -132,14 +135,16 @@ func DefineXTraceServerContainer(spec wiring.WiringSpec, serverName string) stri
 
 // Adds an xtrace-based logger to the process with name `processName`.
 // Returns the name of the logger instantiated.
+// Logged events are added as reports to the currently active XTrace task, if available. If no such task exists, then no log events are generated.
+// Log messages are not printed to stdout as they are captured by the xtrace library and attached to the trace.
 // Note: Requires that the XTraceServerContainer has been defined for it to correctly compile
 // Note: Any service in the process must also be instrumented with `Instrument` to get log statements associated with a given xtrace task.
 // Usage:
 //   import "github.com/blueprint-uservices/blueprint/plugins/xtrace"
 //   import "github.com/blueprint-uservices/blueprint/plugins/goproc"
-//   logger = xtrace.DefineXTraceLogger(spec, "my_process") // Define an xtrace-logger for the process `my_process`
+//   logger = xtrace.Logger(spec, "my_process") // Define an xtrace-logger for the process `my_process`
 //   goproc.SetLogger(spec, "my_process", logger) // Set the default logger for the process
-func DefineXTraceLogger(spec wiring.WiringSpec, processName string) string {
+func Logger(spec wiring.WiringSpec, processName string) string {
 	logger := processName + "_xtrace_logger"
 	xtrace_server := "xtrace_server"
 	xtrace_addr := xtrace_server + ".addr"
