@@ -109,21 +109,13 @@ type Instantiable interface {
 ```
 
 <a name="ModuleBuilder"></a>
-## type [ModuleBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L230-L250>)
+## type [ModuleBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L229-L249>)
 
-ModuleBuilder is used by IRNodes for plugins that want to generate Golang code and collect it into a module.
+[ModuleBuilder](<#ModuleBuilder>) is used during Blueprint's compilation process by [Node](<#Node>) implementations that generate code. A [Node](<#Node>) must also implement the [ProvidesInterface](<#ProvidesInterface>) or [GeneratesFuncs](<#GeneratesFuncs>) interfaces if it wishes to make use of the [ModuleBuilder](<#ModuleBuilder>).
 
-```
-An IRNode must implement the RequiresPackages interface; then during compilation, `AddToModule`
-will be called, enabling the IRNode to add its dependencies and code to the output module using the
-methods on `ModuleBuilder`.
+[ModuleBuilder](<#ModuleBuilder>) enables plugins to create packages within a shared module. After creating a package, the plugin should then generate and place its code inside that package.
 
-After creating a module builder, plugins can directly create directories and copy files into
-the ModuleDir.  Any go dependencies should be added with the Require function.
-
-When finished building the module, plugins should call Finish to finish building the go.mod
-file
-```
+go mod tidy will be invoked later as part of the compilation. Packages that reside locally within the workspace will be resolved locally. Any remaining required packages will be automatically resolved.
 
 ```go
 type ModuleBuilder interface {
@@ -150,9 +142,9 @@ type ModuleBuilder interface {
 ```
 
 <a name="ModuleInfo"></a>
-## type [ModuleInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L204-L208>)
+## type [ModuleInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L206-L210>)
 
-
+Metadata about a golang module that resides within a golang workspace
 
 ```go
 type ModuleInfo struct {
@@ -163,96 +155,82 @@ type ModuleInfo struct {
 ```
 
 <a name="NamespaceBuilder"></a>
-## type [NamespaceBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L300-L362>)
+## type [NamespaceBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L277-L360>)
 
-NamespaceBuilder is used by IRNodes that implement the Instantiable interface. The NamespaceBuilder provides
+[NamespaceBuilder](<#NamespaceBuilder>) is used during Blueprint's compilation process by [Node](<#Node>) implementations that want to instantiate code. A [Node](<#Node>) must also implement the [Instantiable](<#Instantiable>) interface if it wishes to make use of the [NamespaceBuilder](<#NamespaceBuilder>).
 
-```
-the following methods that can be used by plugins to provide instantiation code:
+During compilation, the [NamespaceBuilder](<#NamespaceBuilder>) will accumulate instantiation code from [Node](<#Node>) instances that reside within the namespace. Some nodes might have dependencies on other nodes; these dependencies are handled automatically by the [NamespaceBuilder](<#NamespaceBuilder>). Some nodes might require arguments be passed in to the namespace \(e.g. command\-line arguments like addresses\); these are also checked by the [NamespaceBuilder](<#NamespaceBuilder>).
 
-  - `Import` declares that a particular package should be imported, as it will be used by the
-    instantiation code
+After all [Node](<#Node>) instances have added their declarations to the NamespaceBuilder, the NamespaceBuilder will generate a golang file with methods for instantiating the namespace. The namespace instantiation function will invoke the instantiation code for all relevant nodes, and makes use of additional helper classes defined in [runtime/plugins/golang](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/golang>).
 
-  - `Declare` provides a buildFunc as a string that will be inserted into the output file; buildFunc
-    is used at runtime to create the instance
-
-In the generated golang code, instances are declared and created using a simple dependency injection
-style.  The runtime dependency injection interface is defined in runtime/plugins/golang/di.go
-
-The basic requirement of an instantiable node is that it can provide a buildFunc definition that
-will be invoked at runtime to create the instance.  A buildFunc has method signature:
-
-	func(n *golang.Namespace) (any, error)
-
-The buildFunc will instantiate and return an instance or an error.  If the node needs to be
-able to call other instances, it can acquire the instances through the golang.Namespace's Get
-method.  For example, the following pseudocode for a tracing wrapper class would get the
-underlying handler then return the wrapper class:
-
-	func(n *golang.Namespace) (any, error) {
-		handler, err := n.Get("serviceA.handler")
-		if err != nil {
-			return nil, err
-		}
-
-		serviceA, isValid := handler.(ServiceA)
-		if !isValid {
-			return nil, blueprint.Errorf("serviceA.handler does not implement ServiceA interface")
-		}
-
-		return newServiceATracingWrapper(serviceA), nil
-	}
-
-The above code makes reference to names like `serviceA.handler`; rarely should these names
-be hard-coded, instead they would typically be provided by calling or inspecting the IR
-dependencies of this node.
-```
+The main NamespaceBuilder implementation is in [gogen/namespacebuilder.go](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go>)
 
 ```go
 type NamespaceBuilder interface {
     ir.BuildContext
 
-    /*
-    	Metadata info about the namespace being built
-    */
+    // Metadata info about the namespace being built
     Info() NamespaceInfo
 
-    /*
-    	Adds an import statement to the generated file; this is necessary for any types
-    	declared in other packages that are going to be used in a DI declaration.
-
-    	This method returns the type alias that should be used in the generated code.
-    	By default the type alias is just the package name, but if there are multiple
-    	different imports with the same package name, then aliases will be created
-    */
+    // Adds an import statement to the generated file; this is necessary for any types
+    // declared in other packages that are going to be used in a DI declaration.
+    //
+    // This method returns the type alias that should be used in the generated code.
+    // By default the type alias is just the package name, but if there are multiple
+    // different imports with the same package name, then aliases will be created
     Import(packageName string) string
 
-    /*
-    	If the provided type is a user type or a builtin type, adds an import statement
-    	similar to the `Import` method.
-
-    	Returns the name that should be used in code for the type.  For example, if it's
-    	a type from an imported package, then would return mypackage.Foo.
-    */
+    // If the provided type is a user type or a builtin type, adds an import statement
+    // similar to the `Import` method.
+    //
+    // Returns the name that should be used in code for the type.  For example, if it's
+    // a type from an imported package, then would return mypackage.Foo.
     ImportType(typeName gocode.TypeName) string
 
-    /*
-    	Provides the source code of a buildFunc that will be invoked at runtime by the
-    	generated code, to build the named instance
-    */
+    // Declares buildFuncSrc, the golang source code that should be invoked at runtime
+    // to instantiate instanceName.  Most plugins will probably want to use [DeclareConstructor]
+    // rather than [Declare].
+    //
+    // # buildFuncSrc
+    //
+    // buildFuncSrc should be a function with the following signature:
+    //
+    // 	func(n *golang.Namespace) (any, error)
+    //
+    // The first return value of the function should be the instance.  An error can be
+    // returned if anything went wrong when creating the instance.
+    //
+    // # golang.Namespace
+    //
+    // The golang.Namespace argument in the buildFunc method signature is defined in
+    // the [runtime/plugins/golang] package.  This argument enables buildFunc to
+    // get other nodes' instances by name, using the method Get.
+    //
+    // # Example
+    //
+    //     func(n *golang.Namespace) (any, error) {
+    // 	      var cart_db backend.NoSQLDatabase
+    //     	  if err := n.Get("cart_db", &cart_db); err != nil {
+    // 	    	  return nil, err
+    //     	  }
+    // 	      return cart.NewCartService(n.Context(), cart_db)
+    //     }
+    //
+    // [runtime/plugins/golang]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/plugins/golang
     Declare(instanceName string, buildFuncSrc string) error
 
-    /*
-    	This is like Declare, but instead of having to manually construct the source
-    	code, the NamespaceBuilder will automatically create the build func src code,
-    	invoking the specified constructor and passing the provided nodes as args
-    */
+    // [DeclareConstructor] is a simpler version of [Declare] that does not require the
+    // caller manually construct buildFunc source code.
+    //
+    // By invoking [DeclareConstructor], the caller specifies constructor, the func to use
+    // to build name.
+    //
+    // The [NamespaceBuilder] will generate code that instantiates each node in args,
+    // then passes those instances to constructor.
     DeclareConstructor(name string, constructor *gocode.Constructor, args []ir.IRNode) error
 
-    /*
-    	Specify nodes needed by this namespace that exist in a parent namespace
-    	and will be passed as runtime arguments
-    */
+    // Specify nodes needed by this namespace that exist in a parent namespace
+    // and will be passed as runtime arguments
     RequiredArg(name, description string)
 
     /*
@@ -277,7 +255,7 @@ type NamespaceBuilder interface {
 <a name="NamespaceInfo"></a>
 ## type [NamespaceInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L252-L257>)
 
-
+Metadata about a namespace code file being generated
 
 ```go
 type NamespaceInfo struct {
@@ -301,9 +279,9 @@ type Node interface {
 ```
 
 <a name="PackageInfo"></a>
-## type [PackageInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L210-L215>)
+## type [PackageInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L213-L218>)
 
-
+Metadata about a package within a golang module
 
 ```go
 type PackageInfo struct {
@@ -364,15 +342,11 @@ type Service interface {
 ```
 
 <a name="WorkspaceBuilder"></a>
-## type [WorkspaceBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L159-L202>)
+## type [WorkspaceBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L160-L203>)
 
-WorkspaceBuilder is used by plugins if they want to collect and combine Golang code and modules.
+[WorkspaceBuilder](<#WorkspaceBuilder>) is used during Blueprint's compilation process to enable [Node](<#Node>) implementations to generate or copy Golang code modules into the output workspace. A [Node](<#Node>) must also implement the [ProvidesModule](<#ProvidesModule>) interface if it wishes to make use of the [WorkspaceBuilder](<#WorkspaceBuilder>).
 
-```
-An IRNode must implement the ProvidesModule interface; then during compilation, `AddToWorkspace`
-will be called, enabling the IRNode to add its code and modules to the output workspace directory
-using the methods on `WorkspaceBuilder`.
-```
+The main use case for [WorkspaceBuilder](<#WorkspaceBuilder>) is to copy existing golang modules from the local filesystem into the output workspace. A specialized use case is for generating golang modules. However, although most plugins generate golang code, most would not need to be in control of generating an entire module, and would probably want to instead use the [ModuleBuilder](<#ModuleBuilder>) to contribute code to a shared module.
 
 ```go
 type WorkspaceBuilder interface {
