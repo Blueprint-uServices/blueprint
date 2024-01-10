@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/DistributedClocks/GoVector/govec"
-	"gitlab.mpi-sws.org/cld/blueprint/runtime/core/backend"
+	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 )
 
 // GoVecLogger implements the GoVector interface (including the backend.Logger) by using the GoVector Logger

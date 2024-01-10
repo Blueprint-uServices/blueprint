@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/plugins/golang"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
 	"golang.org/x/exp/slog"
 )
 
@@ -123,7 +123,7 @@ func generateClientHandler(builder golang.ModuleBuilder, wrapped *gocode.Service
 		Imports:         gogen.NewImports(pkg.Name),
 	}
 
-	client.Imports.AddPackages("context", "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/govector")
+	client.Imports.AddPackages("context", "github.com/blueprint-uservices/blueprint/runtime/plugins/govector")
 
 	slog.Info(fmt.Sprintf("Generating %v/%v", client.Package.PackageName, impl.Name))
 	outputFile := filepath.Join(client.Package.Path, impl.Name+".go")
