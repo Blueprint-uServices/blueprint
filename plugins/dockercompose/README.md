@@ -36,7 +36,7 @@ dockercompose.RegisterAsDefaultBuilder()
 
 Calling [RegisterAsDefaultBuilder](<#RegisterAsDefaultBuilder>) is optional and usually unnecessary:
 
-- If your wiring spec uses Blueprint's \[cmdbuilder\] then dockercompose is already registered as the default container workspace builder.
+- If your wiring spec uses Blueprint's [cmdbuilder](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/cmdbuilder>) then dockercompose is already registered as the default container workspace builder.
 - The default builder only takes effect if there are 1 or more container instances that haven't been added to a container deployment. If your wiring spec manually creates container deployments using [NewDeployment](<#NewDeployment>) for all container instances, then the default builder will not have any effect.
 
 ### Artifacts Generated
@@ -77,22 +77,22 @@ Internally, the plugin makes use of interfaces defined in the [docker](<https://
 
 
 <a name="AddContainerToDeployment"></a>
-## func [AddContainerToDeployment](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L83>)
+## func [AddContainerToDeployment](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L84>)
 
 ```go
 func AddContainerToDeployment(spec wiring.WiringSpec, deploymentName, containerName string)
 ```
 
-Adds containerName to the existing container deployment deploymentName, which was previously created using [NewDeployment](<#NewDeployment>)
+AddContainerToDeployment can be used by wiring specs to add a container instance to an existing container deployment.
 
 <a name="NewDeployment"></a>
-## func [NewDeployment](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L95>)
+## func [NewDeployment](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L96>)
 
 ```go
 func NewDeployment(spec wiring.WiringSpec, deploymentName string, containers ...string) string
 ```
 
-Creates a new container deployment called \[deploymentName\] that will instantiate the container instances given in containers.
+NewDeployment can be used by wiring specs to create a container deployment that instantiates a number of containers.
 
 Further container instances can be added to the deployment by calling [AddContainerToDeployment](<#AddContainerToDeployment>).
 
@@ -128,7 +128,7 @@ type Deployment struct {
 ```
 
 <a name="Deployment.Accepts"></a>
-### func \(\*Deployment\) [Accepts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L116>)
+### func \(\*Deployment\) [Accepts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L117>)
 
 ```go
 func (deployment *Deployment) Accepts(nodeType any) bool
@@ -137,7 +137,7 @@ func (deployment *Deployment) Accepts(nodeType any) bool
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Deployment.AddEdge"></a>
-### func \(\*Deployment\) [AddEdge](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L122>)
+### func \(\*Deployment\) [AddEdge](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L123>)
 
 ```go
 func (deployment *Deployment) AddEdge(name string, edge ir.IRNode) error
@@ -146,7 +146,7 @@ func (deployment *Deployment) AddEdge(name string, edge ir.IRNode) error
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Deployment.AddNode"></a>
-### func \(\*Deployment\) [AddNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L128>)
+### func \(\*Deployment\) [AddNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/wiring.go#L129>)
 
 ```go
 func (deployment *Deployment) AddNode(name string, node ir.IRNode) error

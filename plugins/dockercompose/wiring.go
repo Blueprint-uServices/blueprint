@@ -69,6 +69,7 @@
 // [SockShop Getting Started]: https://github.com/Blueprint-uServices/blueprint/tree/main/examples/sockshop
 // [linuxcontainer]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/linuxcontainer
 // [goproc]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc
+// [cmdbuilder]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/cmdbuilder
 package dockercompose
 
 import (
@@ -78,14 +79,14 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/docker"
 )
 
-// Adds containerName to the existing container deployment deploymentName, which was previously
-// created using [NewDeployment]
+// AddContainerToDeployment can be used by wiring specs to add a container instance to an existing
+// container deployment.
 func AddContainerToDeployment(spec wiring.WiringSpec, deploymentName, containerName string) {
 	namespaceutil.AddNodeTo[Deployment](spec, deploymentName, containerName)
 }
 
-// Creates a new container deployment called [deploymentName] that will instantiate the container
-// instances given in containers.
+// NewDeployment can be used by wiring specs to create a container deployment that instantiates
+// a number of containers.
 //
 // Further container instances can be added to the deployment by calling [AddContainerToDeployment].
 //
