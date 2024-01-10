@@ -15,13 +15,23 @@
 // To deploy an application-level service in a container, make sure you first deploy the service to a process
 // (with the [goproc] plugin) and to a container image (with the [linuxcontainer] plugin)
 //
+// The dockercompose plugin can be configured as the default builder for container instances; at compile time,
+// Blueprint will combine any container instances that exist in the wiring spec but aren't explicitly added to
+// a container deployment, and create a default docker-compose deployment with the name "docker".
+//
+//     dockercompose.RegisterAsDefaultBuilder()
+//
+// Calling the above is optional.  If your wiring spec uses the [cmdbuilder] then dockercompose is already
+// registered as the default container workspace builder.
+
 // # Artifacts Generated
 //
 // During compilation, the plugin generates a docker-compose file that instantiates images for the specified
 // containers.  The plugin also sets environment variables and ports for the instances.
 //
-// dockercompose is the default builder for container images: if your wiring spec defines containers but doesn't
-// further put them into a namespace, then by default Blueprint will generate a dockercompose file.
+// If your wiring spec only defines container instances, and dockercompose is registered as the default builder,
+// then Blueprint will automatically generate a docker-compose deployment called "docker" that instantiates all
+// of the container instances.
 //
 // # Running Artifacts
 //
@@ -48,9 +58,10 @@
 // and ports.
 //
 // [docker]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/docker
+// [SockShop Getting Started]: https://github.com/Blueprint-uServices/blueprint/tree/main/examples/sockshop
+//
 // [linuxcontainer]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/linuxcontainer
 // [goproc]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc
-// [SockShop Getting Started]: https://github.com/Blueprint-uServices/blueprint/tree/main/examples/sockshop
 package dockercompose
 
 import (
