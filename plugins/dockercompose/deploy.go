@@ -133,7 +133,7 @@ func (d *dockerComposeWorkspace) SetEnvironmentVariable(instanceName string, key
 	return d.DockerComposeFile.AddEnvVar(instanceName, key, val)
 }
 
-// Implements docker.ContainerWorkspace
+// Generates the docker-compose file
 func (d *dockerComposeWorkspace) Finish() error {
 	// Now that all images and instances have been declared, we can generate the docker-compose file
 	return d.DockerComposeFile.Generate()
