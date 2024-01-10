@@ -1,10 +1,9 @@
-// Package xtrace provides a client-wrapper implementation of the [backend.XTracer] interface to a xtrace server.
+// Package xtrace provides a client-wrapper implementation of the [XTracer] interface to a xtrace server.
 package xtrace
 
 import (
 	"context"
 
-	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"github.com/tracingplane/tracingplane-go/tracingplane"
 	"gitlab.mpi-sws.org/cld/tracing/tracing-framework-go/localbaggage"
 	"gitlab.mpi-sws.org/cld/tracing/tracing-framework-go/xtrace/client"
@@ -12,7 +11,7 @@ import (
 
 // Implementation of the [backend.XTracer] interface
 type XTracerImpl struct {
-	backend.XTracer
+	XTracer
 }
 
 // Returns a new instance of [XTracerImpl] that connects to a xtrace server running at `addr`.
