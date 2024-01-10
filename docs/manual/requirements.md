@@ -26,6 +26,6 @@ Plugins are expected to document their requirements.
 ### Plugin runtime requirements
 
 Some plugins do not have compilation-time requirements but do have runtime requirements.  These requirements are optional; they are only needed if the plugin is used.  Examples include:
- - [docker-compose plugin](../plugins/dockerdeployment/) requires that Docker is installed in order to run docker containers
+ - [docker-compose plugin](../plugins/dockercompose/) requires that Docker is installed in order to run docker containers
 
 Plugins are expected to document their requirements.

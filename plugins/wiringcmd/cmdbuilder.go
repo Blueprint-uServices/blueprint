@@ -13,7 +13,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/logging"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
-	"github.com/blueprint-uservices/blueprint/plugins/dockerdeployment"
+	"github.com/blueprint-uservices/blueprint/plugins/dockercompose"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"golang.org/x/exp/slog"
@@ -118,7 +118,7 @@ func (b *CmdBuilder) Build() error {
 	slog.Info("Initializing Blueprint compiler")
 	goproc.RegisterAsDefaultBuilder()
 	linuxcontainer.RegisterAsDefaultBuilder()
-	dockerdeployment.RegisterAsDefaultBuilder()
+	dockercompose.RegisterAsDefaultBuilder()
 
 	// Define the wiring spec
 	slog.Info(fmt.Sprintf("Building %v-%v to %v", b.Name, b.SpecName, b.OutputDir))

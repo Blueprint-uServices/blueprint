@@ -15,7 +15,7 @@
 // Consult the following plugins for examples:
 //   - Many backend plugins such as the memcached plugin provide prebuilt containers for the backends
 //   - The linuxcontainer plugin generates custom Dockerfile images
-//   - The dockerdeployment plugin implements a Container namespace that collects together Container nodes
+//   - The dockercompose plugin implements a Container namespace that collects together Container nodes
 //     and generates a docker-compose file
 //   - The kubernetes plugin implements a Container namespace that collects together Container nodes and
 //     generates YAML manifests

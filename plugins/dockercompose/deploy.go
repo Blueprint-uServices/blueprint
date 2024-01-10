@@ -1,4 +1,4 @@
-package dockerdeployment
+package dockercompose
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/address"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/docker"
-	"github.com/blueprint-uservices/blueprint/plugins/dockerdeployment/dockergen"
+	"github.com/blueprint-uservices/blueprint/plugins/dockercompose/dockergen"
 	"golang.org/x/exp/slog"
 )
 
