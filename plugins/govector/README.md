@@ -3,10 +3,33 @@
 # govector
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/plugins/govector"
+import "github.com/blueprint-uservices/blueprint/plugins/govector"
 ```
 
-Package GoVector adds support for instrumenting applications with GoVector logger. GoVector logger maintains a vector clock for each process and implements the vector clock transmission between multiple processes. GoVector is a vector clock logging library developed for educational purposes. More information on GoVector: https://github.com/DistributedClocks/GoVector
+Package govector provides two plugins:
+
+\(i\) a plugin to wrap the client and server side of a service with a GoVector wrapper to maintain and propagate vector clocks for each process. A vector clock is a logical clock maintained by every process in a distributed system which can then be used to establish partial order between distributed operations. The plugin generates a log file for each process where the incremental vector timestamps are stored to track the propagation of requests.
+
+\(ii\) a plugin to install a GoVector logger for a given process. The log messages are appended with vector timestamps and placed in a log file in chronological order. Log files from all processes can be combined to visualize the full execution of a distributed system.
+
+GoVector is a vector clock logging library developed for educational purposes by researchers at UBC Systopia. More information on GoVector: https://github.com/DistributedClocks/GoVector
+
+Example Usage \(for full instrumentation\):
+
+import "github.com/blueprint\-uservices/blueprint/plugins/govector"
+
+```
+for _, service := range serviceNames {
+    govector.Instrument(spec, service) // Instrument the service to propagate vector clocks
+}
+```
+
+```
+for _, proc := range procNames {
+    logger := govector.DefineLogger(spec, proc) // Define a logger for the process
+	   goproc.SetLogger(spec, proc, logger) // Set the logger for the process
+}
+```
 
 ## Index
 
@@ -41,7 +64,7 @@ Package GoVector adds support for instrumenting applications with GoVector logge
 
 
 <a name="DefineLogger"></a>
-## func [DefineLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/wiring.go#L50>)
+## func [DefineLogger](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/wiring.go#L68>)
 
 ```go
 func DefineLogger(spec wiring.WiringSpec, loggerName string) string
@@ -50,16 +73,16 @@ func DefineLogger(spec wiring.WiringSpec, loggerName string) string
 Defines a logger with name \`loggerName\`. The logger can then be used in process and service nodes.
 
 <a name="Instrument"></a>
-## func [Instrument](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/wiring.go#L19>)
+## func [Instrument](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/wiring.go#L37>)
 
 ```go
 func Instrument(spec wiring.WiringSpec, serviceName string)
 ```
 
-Instruments the service with an entry \+ exit point govector wrapper to generate govector logs. Ensures that the logs are sent to a GoVector logger defined with name \`logger\`
+Instruments the client and server side of a service with govector\-instrumentation to initialize, maintain, and propagate vector clocks. The instrumentation generates logging events appended with vector clock timestamps. Ensures that the logs are sent to a GoVector logger defined with name \`logger\`
 
 <a name="GoVecLoggerClient"></a>
-## type [GoVecLoggerClient](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_logger.go#L16-L25>)
+## type [GoVecLoggerClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_logger.go#L16-L25>)
 
 Blueprint IR Node that represents a GoVector logger instance
 
@@ -77,7 +100,7 @@ type GoVecLoggerClient struct {
 ```
 
 <a name="GoVecLoggerClient.AddInstantiation"></a>
-### func \(\*GoVecLoggerClient\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_logger.go#L65>)
+### func \(\*GoVecLoggerClient\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_logger.go#L65>)
 
 ```go
 func (node *GoVecLoggerClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -86,7 +109,7 @@ func (node *GoVecLoggerClient) AddInstantiation(builder golang.NamespaceBuilder)
 
 
 <a name="GoVecLoggerClient.AddInterfaces"></a>
-### func \(\*GoVecLoggerClient\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_logger.go#L79>)
+### func \(\*GoVecLoggerClient\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_logger.go#L79>)
 
 ```go
 func (node *GoVecLoggerClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -95,7 +118,7 @@ func (node *GoVecLoggerClient) AddInterfaces(builder golang.ModuleBuilder) error
 
 
 <a name="GoVecLoggerClient.AddToWorkspace"></a>
-### func \(\*GoVecLoggerClient\) [AddToWorkspace](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_logger.go#L75>)
+### func \(\*GoVecLoggerClient\) [AddToWorkspace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_logger.go#L75>)
 
 ```go
 func (node *GoVecLoggerClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
@@ -104,7 +127,7 @@ func (node *GoVecLoggerClient) AddToWorkspace(builder golang.WorkspaceBuilder) e
 
 
 <a name="GoVecLoggerClient.GetInterface"></a>
-### func \(\*GoVecLoggerClient\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_logger.go#L83>)
+### func \(\*GoVecLoggerClient\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_logger.go#L83>)
 
 ```go
 func (node *GoVecLoggerClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -113,7 +136,7 @@ func (node *GoVecLoggerClient) GetInterface(ctx ir.BuildContext) (service.Servic
 
 
 <a name="GoVecLoggerClient.ImplementsGolangNode"></a>
-### func \(\*GoVecLoggerClient\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_logger.go#L87>)
+### func \(\*GoVecLoggerClient\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_logger.go#L87>)
 
 ```go
 func (node *GoVecLoggerClient) ImplementsGolangNode()
@@ -122,7 +145,7 @@ func (node *GoVecLoggerClient) ImplementsGolangNode()
 
 
 <a name="GoVecLoggerClient.Name"></a>
-### func \(\*GoVecLoggerClient\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_logger.go#L39>)
+### func \(\*GoVecLoggerClient\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_logger.go#L39>)
 
 ```go
 func (node *GoVecLoggerClient) Name() string
@@ -131,7 +154,7 @@ func (node *GoVecLoggerClient) Name() string
 
 
 <a name="GoVecLoggerClient.String"></a>
-### func \(\*GoVecLoggerClient\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_logger.go#L43>)
+### func \(\*GoVecLoggerClient\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_logger.go#L43>)
 
 ```go
 func (node *GoVecLoggerClient) String() string
@@ -140,7 +163,7 @@ func (node *GoVecLoggerClient) String() string
 
 
 <a name="GovecClientWrapper"></a>
-## type [GovecClientWrapper](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L17-L26>)
+## type [GovecClientWrapper](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L17-L26>)
 
 Blueprint IR Node that wraps the client\-side of a service to generate govec logs
 
@@ -159,7 +182,7 @@ type GovecClientWrapper struct {
 ```
 
 <a name="GovecClientWrapper.AddInstantiation"></a>
-### func \(\*GovecClientWrapper\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L65>)
+### func \(\*GovecClientWrapper\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L65>)
 
 ```go
 func (node *GovecClientWrapper) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -168,7 +191,7 @@ func (node *GovecClientWrapper) AddInstantiation(builder golang.NamespaceBuilder
 
 
 <a name="GovecClientWrapper.AddInterfaces"></a>
-### func \(\*GovecClientWrapper\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L106>)
+### func \(\*GovecClientWrapper\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L106>)
 
 ```go
 func (node *GovecClientWrapper) AddInterfaces(builder golang.ModuleBuilder) error
@@ -177,7 +200,7 @@ func (node *GovecClientWrapper) AddInterfaces(builder golang.ModuleBuilder) erro
 
 
 <a name="GovecClientWrapper.GenerateFuncs"></a>
-### func \(\*GovecClientWrapper\) [GenerateFuncs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L88>)
+### func \(\*GovecClientWrapper\) [GenerateFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L88>)
 
 ```go
 func (node *GovecClientWrapper) GenerateFuncs(builder golang.ModuleBuilder) error
@@ -186,7 +209,7 @@ func (node *GovecClientWrapper) GenerateFuncs(builder golang.ModuleBuilder) erro
 
 
 <a name="GovecClientWrapper.GetInterface"></a>
-### func \(\*GovecClientWrapper\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L102>)
+### func \(\*GovecClientWrapper\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L102>)
 
 ```go
 func (node *GovecClientWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -195,7 +218,7 @@ func (node *GovecClientWrapper) GetInterface(ctx ir.BuildContext) (service.Servi
 
 
 <a name="GovecClientWrapper.ImplementsGolangNode"></a>
-### func \(\*GovecClientWrapper\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L36>)
+### func \(\*GovecClientWrapper\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L36>)
 
 ```go
 func (node *GovecClientWrapper) ImplementsGolangNode()
@@ -204,7 +227,7 @@ func (node *GovecClientWrapper) ImplementsGolangNode()
 
 
 <a name="GovecClientWrapper.ImplementsGolangService"></a>
-### func \(\*GovecClientWrapper\) [ImplementsGolangService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L37>)
+### func \(\*GovecClientWrapper\) [ImplementsGolangService](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L37>)
 
 ```go
 func (node *GovecClientWrapper) ImplementsGolangService()
@@ -213,7 +236,7 @@ func (node *GovecClientWrapper) ImplementsGolangService()
 
 
 <a name="GovecClientWrapper.Name"></a>
-### func \(\*GovecClientWrapper\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L28>)
+### func \(\*GovecClientWrapper\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L28>)
 
 ```go
 func (node *GovecClientWrapper) Name() string
@@ -222,7 +245,7 @@ func (node *GovecClientWrapper) Name() string
 
 
 <a name="GovecClientWrapper.String"></a>
-### func \(\*GovecClientWrapper\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L32>)
+### func \(\*GovecClientWrapper\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_clientwrapper.go#L32>)
 
 ```go
 func (node *GovecClientWrapper) String() string
@@ -231,7 +254,7 @@ func (node *GovecClientWrapper) String() string
 
 
 <a name="GovecServerWrapper"></a>
-## type [GovecServerWrapper](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L17-L25>)
+## type [GovecServerWrapper](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L17-L25>)
 
 Blueprint IR node that wraps the server\-side of a service to generate govec compatible logs
 
@@ -249,7 +272,7 @@ type GovecServerWrapper struct {
 ```
 
 <a name="GovecServerWrapper.AddInstantiation"></a>
-### func \(\*GovecServerWrapper\) [AddInstantiation](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L65>)
+### func \(\*GovecServerWrapper\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L65>)
 
 ```go
 func (node *GovecServerWrapper) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -258,7 +281,7 @@ func (node *GovecServerWrapper) AddInstantiation(builder golang.NamespaceBuilder
 
 
 <a name="GovecServerWrapper.AddInterfaces"></a>
-### func \(\*GovecServerWrapper\) [AddInterfaces](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L104>)
+### func \(\*GovecServerWrapper\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L104>)
 
 ```go
 func (node *GovecServerWrapper) AddInterfaces(builder golang.ModuleBuilder) error
@@ -267,7 +290,7 @@ func (node *GovecServerWrapper) AddInterfaces(builder golang.ModuleBuilder) erro
 
 
 <a name="GovecServerWrapper.GenerateFuncs"></a>
-### func \(\*GovecServerWrapper\) [GenerateFuncs](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L86>)
+### func \(\*GovecServerWrapper\) [GenerateFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L86>)
 
 ```go
 func (node *GovecServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) error
@@ -276,7 +299,7 @@ func (node *GovecServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) erro
 
 
 <a name="GovecServerWrapper.GetInterface"></a>
-### func \(\*GovecServerWrapper\) [GetInterface](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L100>)
+### func \(\*GovecServerWrapper\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L100>)
 
 ```go
 func (node *GovecServerWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -285,7 +308,7 @@ func (node *GovecServerWrapper) GetInterface(ctx ir.BuildContext) (service.Servi
 
 
 <a name="GovecServerWrapper.ImplementsGolangNode"></a>
-### func \(\*GovecServerWrapper\) [ImplementsGolangNode](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L35>)
+### func \(\*GovecServerWrapper\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L35>)
 
 ```go
 func (node *GovecServerWrapper) ImplementsGolangNode()
@@ -294,7 +317,7 @@ func (node *GovecServerWrapper) ImplementsGolangNode()
 
 
 <a name="GovecServerWrapper.ImplementsGolangService"></a>
-### func \(\*GovecServerWrapper\) [ImplementsGolangService](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L36>)
+### func \(\*GovecServerWrapper\) [ImplementsGolangService](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L36>)
 
 ```go
 func (node *GovecServerWrapper) ImplementsGolangService()
@@ -303,7 +326,7 @@ func (node *GovecServerWrapper) ImplementsGolangService()
 
 
 <a name="GovecServerWrapper.Name"></a>
-### func \(\*GovecServerWrapper\) [Name](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L27>)
+### func \(\*GovecServerWrapper\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L27>)
 
 ```go
 func (node *GovecServerWrapper) Name() string
@@ -312,7 +335,7 @@ func (node *GovecServerWrapper) Name() string
 
 
 <a name="GovecServerWrapper.String"></a>
-### func \(\*GovecServerWrapper\) [String](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L31>)
+### func \(\*GovecServerWrapper\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_serverwrapper.go#L31>)
 
 ```go
 func (node *GovecServerWrapper) String() string
