@@ -24,6 +24,10 @@ Any application\-level service modifiers \(e.g. tracing\) should be applied to t
 
 After deploying a service to gRPC, you will probably want to deploy the service in a process.
 
+### Example
+
+The SockShop [grpc wiring spec](<https://github.com/Blueprint-uServices/blueprint/tree/main/examples/sockshop/wiring/specs/grpc.go>) uses the grpc plugin.
+
 ### Configuration and Arguments
 
 The gRPC server requires an argument \`bind\_addr\` to know which interface and port to bind to. This is a host:port string, typically looking something like "0.0.0.0:12345"
@@ -44,7 +48,7 @@ To use this plugin requires the protocol buffers and grpc compilers are installe
 
 
 <a name="Deploy"></a>
-## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/grpc/wiring.go#L71>)
+## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/grpc/wiring.go#L76>)
 
 ```go
 func Deploy(spec wiring.WiringSpec, serviceName string)

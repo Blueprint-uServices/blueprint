@@ -17,6 +17,10 @@
 //
 // After deploying a service to gRPC, you will probably want to deploy the service in a process.
 //
+// # Example
+//
+// The SockShop [grpc wiring spec] uses the grpc plugin.
+//
 // # Configuration and Arguments
 //
 // The gRPC server requires an argument `bind_addr` to know which interface and port to bind to.
@@ -42,6 +46,7 @@
 // can be found on the [gRPC Quick Start].
 //
 // [grpccodegen]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/grpc/grpccodegen
+// [grpc wiring spec]: https://github.com/Blueprint-uServices/blueprint/tree/main/examples/sockshop/wiring/specs/grpc.go
 // [gRPC Quick Start]: https://grpc.io/docs/languages/go/quickstart/
 package grpc
 
