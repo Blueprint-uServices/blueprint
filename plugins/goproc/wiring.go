@@ -1,3 +1,49 @@
+// Package goproc is a plugin for instantiating golang application-level instances within a single golang process.
+//
+// # Wiring Spec Usage
+//
+// To use the goproc plugin in your wiring spec, you can declare a process, giving it a name and specifying which
+// golang instances to include.
+//
+//	goproc.CreateProcess(spec, "my_process", "user_service", "payment_service", "cart_service")
+//
+// If you are only deploying a single service within the process, you can use the shorter [Deploy]:
+//
+//	goproc.Deploy(spec, "user_service")
+//
+// When a service is added to a process, the goproc plugin also adds a modifier to the service.  Thus, any
+// application-level modifiers should be applied to the service *before* deploying it into a process.
+//
+// If you expect services to be reachable from outside the process, then make sure they have been deployed
+// using e.g. the gRPC plugin, prior to deploying the service in a process.
+//
+// # Default Builder
+//
+// The goproc plugin is the default builder for "floating" golang instances (ie, golang instances that haven't
+// been added to any process).
+//
+// # Artifacts Generated
+//
+// During compilation, the plugin creates a golang workspace and pulls in all module dependencies.  Within the
+// workspace, the plugin creates a module and instructs all golang instances to generate their code into that
+// module.  Finally, the plugin generates a main.go with a main method that instantiates the golang instances.
+//
+// # Running artifacts
+//
+// A generated goproc can be run by running the main.go from the workspace directory.
+//
+//	go run {{.procName}}/main.go -h
+//
+// The goproc may require additional command line arguments (e.g. bind or dial addresses) in order to run; if so,
+// running the goproc will report any missing variables.
+//
+// # Internals
+//
+// Internally, the goproc plugin makes use of interfaces defined in the [golang] plugin.  It can combine any
+// golang.Node IRNodes.  The plugin uses the WorkspaceBuilder, ModuleBuilder, and NamespaceBuilder defined by
+// the golang plugin to accumulate and generate code.
+//
+// [golang]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/golang
 package goproc
 
 import (
@@ -7,21 +53,31 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
 )
 
-// Adds a child node to an existing process
+// AddToProcess can be used by wiring specs to add a golang instance to an existing golang process.
 func AddToProcess(spec wiring.WiringSpec, procName, childName string) {
 	namespaceutil.AddNodeTo[Process](spec, procName, childName)
 }
 
-// Wraps serviceName with a modifier that deploys the service inside a Golang process
+// Deploy can be used by wiring specs to deploy a golang service in a golang process.
+//
+// Adds a modifier to the service that will create the golang process if not already created.
 func Deploy(spec wiring.WiringSpec, serviceName string) string {
 	procName := serviceName + "_proc"
 	CreateProcess(spec, procName, serviceName)
 	return serviceName
 }
 
-// Creates a process with a given name, and adds the provided nodes as children.  This method
-// is only needed when creating processes with more than one child node; otherwise it is easier
-// to use [Deploy]
+// CreateProcess can be used by wiring specs to define a process called procName and to deploy
+// the golang services children.  CreateProcess only needs to be used when more than one children
+// are being added to the process; otherwise it is more convenient to use [Deploy].
+//
+// Children can be subsequently added to procName by calling [AddToProcess]
+//
+// procName is configured with a logger that prints to stdout.  To change the logger,
+// call [SetLogger].
+//
+// procName is configured with a metric collector that prints to stdout.  To change the metric
+// collector, call [SetMetricCollector]
 func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) string {
 	// If any children were provided in this call, add them to the process via a property
 	for _, childName := range children {
@@ -50,7 +106,7 @@ func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) 
 		}
 		proc := newGolangProcessNode(procName)
 
-		procNamespace, err := namespaceutil.InstantiateNamespace(namespace, &GolangProcessNamespace{proc})
+		procNamespace, err := namespaceutil.InstantiateNamespace(namespace, &golangProcessNamespace{proc})
 		if err != nil {
 			return nil, err
 		}
@@ -68,12 +124,12 @@ func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) 
 	return procName
 }
 
-// Creates a process that contains clients to the specified children.  This is for convenience in
-// serving as a starting point to write a custom client
+// CreateClientProcess can be used by wiring specs to create a process that contains only clients
+// of the specified children.  This is for convenience in serving as a starting point to write a custom client
 func CreateClientProcess(spec wiring.WiringSpec, procName string, children ...string) string {
 	spec.Define(procName, &Process{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		proc := newGolangProcessNode(procName)
-		procNamespace, err := namespace.DeriveNamespace(procName, &GolangProcessNamespace{proc})
+		procNamespace, err := namespace.DeriveNamespace(procName, &golangProcessNamespace{proc})
 		if err != nil {
 			return nil, err
 		}
@@ -89,12 +145,20 @@ func CreateClientProcess(spec wiring.WiringSpec, procName string, children ...st
 	return procName
 }
 
-// Override the default metric collector for this process
+// SetMetricCollector can be used by wiring specs to change the metric collector used by the process.
+// This method should not need to be used directly.  Instead it is used by other plugins such as
+// [opentelemetry] to install custom metric collectors.
+//
+// [opentelemetry]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/opentelemetry
 func SetMetricCollector(spec wiring.WiringSpec, procName string, metricCollNodeName string) {
 	spec.SetProperty(procName, "metricCollector", metricCollNodeName)
 }
 
-// Override the default logger for this process
+// SetLogger can be used by wiring specs to change the logger used by the process.
+// This method should not need to be used directly.  Instead it is used by other plugins such as
+// [opentelemetry] to install custom loggers.
+//
+// [opentelemetry]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/opentelemetry
 func SetLogger(spec wiring.WiringSpec, procName string, loggerNodeName string) {
 	spec.SetProperty(procName, "logger", loggerNodeName)
 }
@@ -118,24 +182,24 @@ func defineStdoutLogger(spec wiring.WiringSpec, processName string) string {
 }
 
 // A [wiring.NamespaceHandler] used to build [Process] IRNodes
-type GolangProcessNamespace struct {
+type golangProcessNamespace struct {
 	*Process
 }
 
 // Implements [wiring.NamespaceHandler]
-func (proc *GolangProcessNamespace) Accepts(nodeType any) bool {
+func (proc *golangProcessNamespace) Accepts(nodeType any) bool {
 	_, isGolangNode := nodeType.(golang.Node)
 	return isGolangNode
 }
 
 // Implements [wiring.NamespaceHandler]
-func (proc *GolangProcessNamespace) AddEdge(name string, edge ir.IRNode) error {
+func (proc *golangProcessNamespace) AddEdge(name string, edge ir.IRNode) error {
 	proc.Edges = append(proc.Edges, edge)
 	return nil
 }
 
 // Implements [wiring.NamespaceHandler]
-func (proc *GolangProcessNamespace) AddNode(name string, node ir.IRNode) error {
+func (proc *golangProcessNamespace) AddNode(name string, node ir.IRNode) error {
 	proc.Nodes = append(proc.Nodes, node)
 	return nil
 }

@@ -52,12 +52,14 @@ func initBasics() {
 	}
 }
 
+// Reports whether packageName is a builtin (e.g. "os", "context")
 func IsBuiltinPackage(packageName string) bool {
 	initBuiltins()
 	_, ok := builtins[packageName]
 	return ok
 }
 
+// Reports whether name is a basic type (e.g. "bool", "string", "int32", "float32", "rune", etc.)
 func IsBasicType(name string) bool {
 	initBasics()
 	_, ok := basics[name]
