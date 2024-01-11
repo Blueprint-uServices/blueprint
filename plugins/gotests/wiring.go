@@ -1,6 +1,10 @@
 // Package gotests provides a Blueprint plugin for automatically converting black-box workflow spec unit tests into
 // tests that can run against a compiled Blueprint system.
 //
+// If you have developed a Blueprint application, then you have probably also written tests of your workflow services.
+// The gotests plugin lets you leverage those tests and automatically convert them into tests that can run against
+// the compiled applciation.
+//
 // In addition to the documentation here, the [Workflow Tests] page of the user manual has more information.
 //
 // # Wiring Spec Usage
@@ -117,8 +121,10 @@ import (
 
 var prop_SERVICESTOTEST = "Services"
 
-// Auto-generates tests for servicesToTest by converting existing black-box workflow unit tests.
-// After compilation, the output will contain a golang workspace called "tests" that will
+// [Test] can be used by wiring specs to convert existing black-box workflow tests into tests that use
+// generated service clients and can be run against the compiled Blueprint application.
+//
+// After compilation, the output will contain a golang workspace called "gotests" that will
 // include modified versions of the source tests.
 //
 // servicesToTest should be the names of golang services instantiated in the wiring spec.
