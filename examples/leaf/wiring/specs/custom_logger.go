@@ -31,16 +31,14 @@ func makeCustomLoggerSpec(spec wiring.WiringSpec, logger_type string) ([]string,
 	applyLoggerDefaults := func(service_name string) string {
 
 		procName := strings.ReplaceAll(service_name, "service", "process")
-		var logger string
 		if logger_type == "xtrace" {
 			xtrace.Instrument(spec, service_name)
-			logger = xtrace.Logger(spec, procName)
 		}
 		cntrName := strings.ReplaceAll(service_name, "service", "container")
 		http.Deploy(spec, service_name)
 		goproc.CreateProcess(spec, procName, service_name)
-		if logger != "" {
-			goproc.SetLogger(spec, procName, logger)
+		if logger_type == "xtrace" {
+			xtrace.Logger(spec, procName)
 		}
 		return linuxcontainer.CreateContainer(spec, cntrName, procName)
 	}
