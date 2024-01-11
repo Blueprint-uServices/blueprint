@@ -5,6 +5,6 @@
 // plugin then uses the builders defined here to accumulate the code declarations of those golang instances,
 // and to generate the main file for the process.//
 //
-// [golang]:https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/golang
-// [goproc]:https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc
+// [golang]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/golang
+// [goproc]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc
 package gogen
