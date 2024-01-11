@@ -13,24 +13,10 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-/*
-Implements the [ir.NamespaceBuilder] interface defined in gogen/ir.go
-
-[ir.NamespaceBuilder] is useful for any golang namespace node, such as the goproc plugin, that wants to be able
-to instantiate Golang IR nodes.
-
-The [ir.NamespaceBuilder] accumulates code from child nodes and stubs for instantiating the code.
-
-The [ir.NamespaceBuilder] can then be used to generate a source file that constructs the namespace.
-
-The typical usage of a [ir.NamespaceBuilder] is to:
-
- 1. Create a new [ir.NamespaceBuilder] with the [NewNamespaceBuilder] method
-
- 2. Collect code definitions from child nodes by calling `Instantiable.AddInstantiation` on those nodes
-
- 3. Generate the final output by calling `NamespaceBuilder.Finish`
-*/
+// Implements [golang.NamespaceBuilder].
+//
+// Creates a source file, {{FileName}}.go, containing a function, {{FuncName}}.
+// The body of {{FuncName}} instantiates all nodes of this namespace.
 type NamespaceBuilderImpl struct {
 	ir.VisitTrackerImpl
 	module         golang.ModuleBuilder // The module containing this file
@@ -46,9 +32,17 @@ type NamespaceBuilderImpl struct {
 	Instantiations []string
 }
 
-/*
-Create a new NamespaceBuilder
-*/
+// Creates a function called funcName within a file called fileName, within the provided module.  Returns a
+// [NamespaceBuilderImpl] that can be used to accumulate instantiation code.
+//
+// The typical usage of this is by plugins such as the [goproc] plugin that accumulate
+// golang nodes and generate code to run those nodes.
+//
+// After calling this method, the returned [NamespaceBuilderImpl] can be passed to golang nodes,
+// to accumulate the instantiation code for those nodes.
+//
+// After all instantiations have been accumulated, the caller should invoke [Build], which will actually
+// generate the file fileName, combining all provided node instantiation code snippets.
 func NewNamespaceBuilder(module golang.ModuleBuilder, name, fileName, packagePath, funcName string) (*NamespaceBuilderImpl, error) {
 	pkg, err := module.CreatePackage(packagePath)
 	if err != nil {
@@ -82,6 +76,7 @@ func NewNamespaceBuilder(module golang.ModuleBuilder, name, fileName, packagePat
 	return n, nil
 }
 
+// Implements [golang.NamespaceBuilder]
 func (n *NamespaceBuilderImpl) Info() golang.NamespaceInfo {
 	return golang.NamespaceInfo{
 		Package:  n.Package,
@@ -91,26 +86,32 @@ func (n *NamespaceBuilderImpl) Info() golang.NamespaceInfo {
 	}
 }
 
+// Implements [golang.NamespaceBuilder]
 func (n *NamespaceBuilderImpl) Import(packageName string) string {
 	return n.Imports.AddPackage(packageName)
 }
 
+// Implements [golang.NamespaceBuilder]
 func (n *NamespaceBuilderImpl) ImportType(typeName gocode.TypeName) string {
 	return n.Imports.NameOf(typeName)
 }
 
+// Implements [golang.NamespaceBuilder]
 func (n *NamespaceBuilderImpl) Module() golang.ModuleBuilder {
 	return n.module
 }
 
+// Implements [golang.NamespaceBuilder]
 func (n *NamespaceBuilderImpl) RequiredArg(name, description string) {
 	n.Required[name] = description
 }
 
+// Implements [golang.NamespaceBuilder]
 func (n *NamespaceBuilderImpl) OptionalArg(name, description string) {
 	n.Optional[name] = description
 }
 
+// Implements [golang.NamespaceBuilder]
 func (n *NamespaceBuilderImpl) Instantiate(name string) {
 	// Check for and avoid duplicates
 	exists := slices.Contains[[]string, string](n.Instantiations, name)
@@ -120,6 +121,7 @@ func (n *NamespaceBuilderImpl) Instantiate(name string) {
 	n.Instantiations = append(n.Instantiations, name)
 }
 
+// Implements [golang.NamespaceBuilder]
 func (n *NamespaceBuilderImpl) Declare(name, buildFuncSrc string) error {
 	if _, exists := n.Declarations[name]; exists {
 		return blueprint.Errorf("generated file %s encountered redeclaration of %s", n.FileName, name)
@@ -156,6 +158,7 @@ var buildFuncTemplate = `func(n *golang.Namespace) (any, error) {
 		return {{.Namespace.Imports.NameOf .Constructor}}(n.Context() {{- range $i, $arg := .Args}}, {{$arg}}{{end}})
 	}`
 
+// Implements [golang.NamespaceBuilder]
 func (namespace *NamespaceBuilderImpl) DeclareConstructor(name string, constructor *gocode.Constructor, args []ir.IRNode) error {
 	if len(constructor.Arguments) != len(args)+1 {
 		argNames := []string{}
@@ -278,9 +281,7 @@ func set_{{.Name}}_Definitions(b *golang.NamespaceBuilder) {
 }
 `
 
-/*
-Generates the file within its module
-*/
+// Build should be the last invocation, used to generate the namespace file.
 func (code *NamespaceBuilderImpl) Build() error {
 	slog.Info(fmt.Sprintf("Generating %v", filepath.Join(code.Package.PackageName, code.FileName)))
 	return ExecuteTemplateToFile("namespace_"+code.FuncName, diFuncTemplate, code, code.FilePath)

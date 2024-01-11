@@ -6,6 +6,10 @@
 import "github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
 ```
 
+Package goparser parses go modules and extracts module, package, struct, and interface information.
+
+It is used by Blueprint to parse workflow specs.
+
 ## Index
 
 - [func ExprStr\(e ast.Expr\) string](<#ExprStr>)
@@ -59,9 +63,9 @@ func ExprStr(e ast.Expr) string
 Returns a string representation of an expr and its internals Useful for debugging golang code parsers.
 
 <a name="ParsedField"></a>
-## type [ParsedField](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L119-L124>)
+## type [ParsedField](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L116-L121>)
 
-A set of modules on the local filesystem that contain workflow spec interfaces and implementations. It is allowed for a workflow spec implementation in one package to use the interface defined in another package. However, currently, it is not possible to use workflow spec nodes whose interface or implementation comes entirely from an external module \(ie. a module that exists only as a 'require' directive of a go.mod\)
+
 
 ```go
 type ParsedField struct {
@@ -73,7 +77,7 @@ type ParsedField struct {
 ```
 
 <a name="ParsedField.Parse"></a>
-### func \(\*ParsedField\) [Parse](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L364>)
+### func \(\*ParsedField\) [Parse](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L361>)
 
 ```go
 func (f *ParsedField) Parse() error
@@ -82,7 +86,7 @@ func (f *ParsedField) Parse() error
 
 
 <a name="ParsedField.String"></a>
-### func \(\*ParsedField\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L866>)
+### func \(\*ParsedField\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L863>)
 
 ```go
 func (f *ParsedField) String() string
@@ -91,9 +95,9 @@ func (f *ParsedField) String() string
 
 
 <a name="ParsedFile"></a>
-## type [ParsedFile](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L72-L80>)
+## type [ParsedFile](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L69-L77>)
 
-A set of modules on the local filesystem that contain workflow spec interfaces and implementations. It is allowed for a workflow spec implementation in one package to use the interface defined in another package. However, currently, it is not possible to use workflow spec nodes whose interface or implementation comes entirely from an external module \(ie. a module that exists only as a 'require' directive of a go.mod\)
+
 
 ```go
 type ParsedFile struct {
@@ -108,7 +112,7 @@ type ParsedFile struct {
 ```
 
 <a name="ParsedFile.LoadFuncs"></a>
-### func \(\*ParsedFile\) [LoadFuncs](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L677>)
+### func \(\*ParsedFile\) [LoadFuncs](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L674>)
 
 ```go
 func (f *ParsedFile) LoadFuncs() error
@@ -121,7 +125,7 @@ Loads the names of all funcs. If the func has a receiver type, then it is saved 
 This does not parse the arguments or returns of the func
 
 <a name="ParsedFile.LoadImports"></a>
-### func \(\*ParsedFile\) [LoadImports](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L508>)
+### func \(\*ParsedFile\) [LoadImports](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L505>)
 
 ```go
 func (f *ParsedFile) LoadImports() error
@@ -130,7 +134,7 @@ func (f *ParsedFile) LoadImports() error
 
 
 <a name="ParsedFile.LoadStructsAndInterfaces"></a>
-### func \(\*ParsedFile\) [LoadStructsAndInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L545>)
+### func \(\*ParsedFile\) [LoadStructsAndInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L542>)
 
 ```go
 func (f *ParsedFile) LoadStructsAndInterfaces() error
@@ -147,7 +151,7 @@ Does not:
 - look for function declarations
 
 <a name="ParsedFile.LoadVars"></a>
-### func \(\*ParsedFile\) [LoadVars](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L644>)
+### func \(\*ParsedFile\) [LoadVars](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L641>)
 
 ```go
 func (f *ParsedFile) LoadVars() error
@@ -158,7 +162,7 @@ Looks for:
 - vars declared
 
 <a name="ParsedFile.ResolveIdent"></a>
-### func \(\*ParsedFile\) [ResolveIdent](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L422>)
+### func \(\*ParsedFile\) [ResolveIdent](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L419>)
 
 ```go
 func (f *ParsedFile) ResolveIdent(name string, typeParams ...string) gocode.TypeName
@@ -173,7 +177,7 @@ An ident can be:
 - a generic type from a struct or func's type params
 
 <a name="ParsedFile.ResolveSelector"></a>
-### func \(\*ParsedFile\) [ResolveSelector](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L450>)
+### func \(\*ParsedFile\) [ResolveSelector](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L447>)
 
 ```go
 func (f *ParsedFile) ResolveSelector(packageShortName string, name string) gocode.TypeName
@@ -182,7 +186,7 @@ func (f *ParsedFile) ResolveSelector(packageShortName string, name string) gocod
 
 
 <a name="ParsedFile.ResolveType"></a>
-### func \(\*ParsedFile\) [ResolveType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L462>)
+### func \(\*ParsedFile\) [ResolveType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L459>)
 
 ```go
 func (f *ParsedFile) ResolveType(expr ast.Expr, typeParams ...string) gocode.TypeName
@@ -191,7 +195,7 @@ func (f *ParsedFile) ResolveType(expr ast.Expr, typeParams ...string) gocode.Typ
 If the expr is in the context of a generic struct or func, typeParams provides the additional named type params
 
 <a name="ParsedFile.String"></a>
-### func \(\*ParsedFile\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L812>)
+### func \(\*ParsedFile\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L809>)
 
 ```go
 func (f *ParsedFile) String() string
@@ -200,9 +204,9 @@ func (f *ParsedFile) String() string
 
 
 <a name="ParsedFunc"></a>
-## type [ParsedFunc](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L101-L105>)
+## type [ParsedFunc](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L98-L102>)
 
-A set of modules on the local filesystem that contain workflow spec interfaces and implementations. It is allowed for a workflow spec implementation in one package to use the interface defined in another package. However, currently, it is not possible to use workflow spec nodes whose interface or implementation comes entirely from an external module \(ie. a module that exists only as a 'require' directive of a go.mod\)
+
 
 ```go
 type ParsedFunc struct {
@@ -213,7 +217,7 @@ type ParsedFunc struct {
 ```
 
 <a name="ParsedFunc.AsConstructor"></a>
-### func \(\*ParsedFunc\) [AsConstructor](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L771>)
+### func \(\*ParsedFunc\) [AsConstructor](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L768>)
 
 ```go
 func (f *ParsedFunc) AsConstructor() *gocode.Constructor
@@ -222,7 +226,7 @@ func (f *ParsedFunc) AsConstructor() *gocode.Constructor
 
 
 <a name="ParsedFunc.Parse"></a>
-### func \(\*ParsedFunc\) [Parse](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L372>)
+### func \(\*ParsedFunc\) [Parse](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L369>)
 
 ```go
 func (f *ParsedFunc) Parse() error
@@ -231,7 +235,7 @@ func (f *ParsedFunc) Parse() error
 
 
 <a name="ParsedFunc.String"></a>
-### func \(\*ParsedFunc\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L847>)
+### func \(\*ParsedFunc\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L844>)
 
 ```go
 func (f *ParsedFunc) String() string
@@ -240,9 +244,9 @@ func (f *ParsedFunc) String() string
 
 
 <a name="ParsedImport"></a>
-## type [ParsedImport](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L114-L117>)
+## type [ParsedImport](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L111-L114>)
 
-A set of modules on the local filesystem that contain workflow spec interfaces and implementations. It is allowed for a workflow spec implementation in one package to use the interface defined in another package. However, currently, it is not possible to use workflow spec nodes whose interface or implementation comes entirely from an external module \(ie. a module that exists only as a 'require' directive of a go.mod\)
+
 
 ```go
 type ParsedImport struct {
@@ -252,9 +256,9 @@ type ParsedImport struct {
 ```
 
 <a name="ParsedInterface"></a>
-## type [ParsedInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L94-L99>)
+## type [ParsedInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L91-L96>)
 
-A set of modules on the local filesystem that contain workflow spec interfaces and implementations. It is allowed for a workflow spec implementation in one package to use the interface defined in another package. However, currently, it is not possible to use workflow spec nodes whose interface or implementation comes entirely from an external module \(ie. a module that exists only as a 'require' directive of a go.mod\)
+
 
 ```go
 type ParsedInterface struct {
@@ -266,7 +270,7 @@ type ParsedInterface struct {
 ```
 
 <a name="ParsedInterface.ServiceInterface"></a>
-### func \(\*ParsedInterface\) [ServiceInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L755>)
+### func \(\*ParsedInterface\) [ServiceInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L752>)
 
 ```go
 func (iface *ParsedInterface) ServiceInterface(ctx ir.BuildContext) *gocode.ServiceInterface
@@ -275,7 +279,7 @@ func (iface *ParsedInterface) ServiceInterface(ctx ir.BuildContext) *gocode.Serv
 
 
 <a name="ParsedInterface.String"></a>
-### func \(\*ParsedInterface\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L837>)
+### func \(\*ParsedInterface\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L834>)
 
 ```go
 func (i *ParsedInterface) String() string
@@ -284,7 +288,7 @@ func (i *ParsedInterface) String() string
 
 
 <a name="ParsedInterface.Type"></a>
-### func \(\*ParsedInterface\) [Type](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L741>)
+### func \(\*ParsedInterface\) [Type](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L738>)
 
 ```go
 func (iface *ParsedInterface) Type() *gocode.UserType
@@ -293,9 +297,9 @@ func (iface *ParsedInterface) Type() *gocode.UserType
 
 
 <a name="ParsedModule"></a>
-## type [ParsedModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L48-L55>)
+## type [ParsedModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L45-L52>)
 
-A set of modules on the local filesystem that contain workflow spec interfaces and implementations. It is allowed for a workflow spec implementation in one package to use the interface defined in another package. However, currently, it is not possible to use workflow spec nodes whose interface or implementation comes entirely from an external module \(ie. a module that exists only as a 'require' directive of a go.mod\)
+
 
 ```go
 type ParsedModule struct {
@@ -309,7 +313,7 @@ type ParsedModule struct {
 ```
 
 <a name="ParsedModule.Load"></a>
-### func \(\*ParsedModule\) [Load](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L217>)
+### func \(\*ParsedModule\) [Load](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L214>)
 
 ```go
 func (mod *ParsedModule) Load() error
@@ -318,7 +322,7 @@ func (mod *ParsedModule) Load() error
 
 
 <a name="ParsedModule.String"></a>
-### func \(\*ParsedModule\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L786>)
+### func \(\*ParsedModule\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L783>)
 
 ```go
 func (mod *ParsedModule) String() string
@@ -327,7 +331,7 @@ func (mod *ParsedModule) String() string
 
 
 <a name="ParsedModuleSet"></a>
-## type [ParsedModuleSet](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L33-L35>)
+## type [ParsedModuleSet](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L30-L32>)
 
 A set of modules on the local filesystem that contain workflow spec interfaces and implementations. It is allowed for a workflow spec implementation in one package to use the interface defined in another package. However, currently, it is not possible to use workflow spec nodes whose interface or implementation comes entirely from an external module \(ie. a module that exists only as a 'require' directive of a go.mod\)
 
@@ -338,7 +342,7 @@ type ParsedModuleSet struct {
 ```
 
 <a name="ParseModules"></a>
-### func [ParseModules](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L158>)
+### func [ParseModules](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L155>)
 
 ```go
 func ParseModules(srcDirs ...string) (*ParsedModuleSet, error)
@@ -347,7 +351,7 @@ func ParseModules(srcDirs ...string) (*ParsedModuleSet, error)
 Parse the specified module directories
 
 <a name="ParseWorkspace"></a>
-### func [ParseWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L139>)
+### func [ParseWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L136>)
 
 ```go
 func ParseWorkspace(workspaceDir string) (*ParsedModuleSet, error)
@@ -356,7 +360,7 @@ func ParseWorkspace(workspaceDir string) (*ParsedModuleSet, error)
 Parse all modules in the specified directory
 
 <a name="ParsedModuleSet.AddModule"></a>
-### func \(\*ParsedModuleSet\) [AddModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L188>)
+### func \(\*ParsedModuleSet\) [AddModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L185>)
 
 ```go
 func (set *ParsedModuleSet) AddModule(srcDir string) (*ParsedModule, error)
@@ -365,7 +369,7 @@ func (set *ParsedModuleSet) AddModule(srcDir string) (*ParsedModule, error)
 
 
 <a name="ParsedModuleSet.GetPackage"></a>
-### func \(\*ParsedModuleSet\) [GetPackage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L127>)
+### func \(\*ParsedModuleSet\) [GetPackage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L124>)
 
 ```go
 func (set *ParsedModuleSet) GetPackage(name string) *ParsedPackage
@@ -374,7 +378,7 @@ func (set *ParsedModuleSet) GetPackage(name string) *ParsedPackage
 
 
 <a name="ParsedModuleSet.String"></a>
-### func \(\*ParsedModuleSet\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L778>)
+### func \(\*ParsedModuleSet\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L775>)
 
 ```go
 func (set *ParsedModuleSet) String() string
@@ -383,9 +387,9 @@ func (set *ParsedModuleSet) String() string
 
 
 <a name="ParsedPackage"></a>
-## type [ParsedPackage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L57-L70>)
+## type [ParsedPackage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L54-L67>)
 
-A set of modules on the local filesystem that contain workflow spec interfaces and implementations. It is allowed for a workflow spec implementation in one package to use the interface defined in another package. However, currently, it is not possible to use workflow spec nodes whose interface or implementation comes entirely from an external module \(ie. a module that exists only as a 'require' directive of a go.mod\)
+
 
 ```go
 type ParsedPackage struct {
@@ -405,7 +409,7 @@ type ParsedPackage struct {
 ```
 
 <a name="ParsedPackage.Load"></a>
-### func \(\*ParsedPackage\) [Load](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L276>)
+### func \(\*ParsedPackage\) [Load](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L273>)
 
 ```go
 func (pkg *ParsedPackage) Load() error
@@ -414,7 +418,7 @@ func (pkg *ParsedPackage) Load() error
 
 
 <a name="ParsedPackage.Parse"></a>
-### func \(\*ParsedPackage\) [Parse](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L330>)
+### func \(\*ParsedPackage\) [Parse](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L327>)
 
 ```go
 func (pkg *ParsedPackage) Parse() error
@@ -423,7 +427,7 @@ func (pkg *ParsedPackage) Parse() error
 
 
 <a name="ParsedPackage.String"></a>
-### func \(\*ParsedPackage\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L798>)
+### func \(\*ParsedPackage\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L795>)
 
 ```go
 func (pkg *ParsedPackage) String() string
@@ -432,9 +436,9 @@ func (pkg *ParsedPackage) String() string
 
 
 <a name="ParsedStruct"></a>
-## type [ParsedStruct](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L82-L92>)
+## type [ParsedStruct](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L79-L89>)
 
-A set of modules on the local filesystem that contain workflow spec interfaces and implementations. It is allowed for a workflow spec implementation in one package to use the interface defined in another package. However, currently, it is not possible to use workflow spec nodes whose interface or implementation comes entirely from an external module \(ie. a module that exists only as a 'require' directive of a go.mod\)
+
 
 ```go
 type ParsedStruct struct {
@@ -451,7 +455,7 @@ type ParsedStruct struct {
 ```
 
 <a name="ParsedStruct.String"></a>
-### func \(\*ParsedStruct\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L827>)
+### func \(\*ParsedStruct\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L824>)
 
 ```go
 func (f *ParsedStruct) String() string
@@ -460,7 +464,7 @@ func (f *ParsedStruct) String() string
 
 
 <a name="ParsedStruct.Type"></a>
-### func \(\*ParsedStruct\) [Type](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L748>)
+### func \(\*ParsedStruct\) [Type](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L745>)
 
 ```go
 func (struc *ParsedStruct) Type() *gocode.UserType
@@ -469,7 +473,7 @@ func (struc *ParsedStruct) Type() *gocode.UserType
 
 
 <a name="ParsedVar"></a>
-## type [ParsedVar](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L108-L112>)
+## type [ParsedVar](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L105-L109>)
 
 Currently we save var statements but don't do anything with them
 

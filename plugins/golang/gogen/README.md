@@ -6,6 +6,12 @@
 import "github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
 ```
 
+Package gogen provides implementations of the builder interfaces defined by the \[golang\] plugin
+
+The builders are intended for use by plugins that define golang namespace nodes. For example, the \[goproc\] plugin defines a process node that collects together golang instance nodes. The \[goproc\] plugin then uses the builders defined here to accumulate the code declarations of those golang instances, and to generate the main file for the process.//
+
+\[golang\]:https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/golang \[goproc\]:https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc
+
 ## Index
 
 - [func ExecuteTemplate\(name string, body string, args any\) \(string, error\)](<#ExecuteTemplate>)
@@ -20,7 +26,6 @@ import "github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
   - [func \(imports \*Imports\) String\(\) string](<#Imports.String>)
 - [type ModuleBuilderImpl](<#ModuleBuilderImpl>)
   - [func NewModuleBuilder\(workspace \*WorkspaceBuilderImpl, moduleName string\) \(\*ModuleBuilderImpl, error\)](<#NewModuleBuilder>)
-  - [func \(module \*ModuleBuilderImpl\) Build\(nodes \[\]ir.IRNode\) error](<#ModuleBuilderImpl.Build>)
   - [func \(module \*ModuleBuilderImpl\) CreatePackage\(packageName string\) \(golang.PackageInfo, error\)](<#ModuleBuilderImpl.CreatePackage>)
   - [func \(module \*ModuleBuilderImpl\) ImplementsBuildContext\(\)](<#ModuleBuilderImpl.ImplementsBuildContext>)
   - [func \(module \*ModuleBuilderImpl\) Info\(\) golang.ModuleInfo](<#ModuleBuilderImpl.Info>)
@@ -68,7 +73,7 @@ func ExecuteTemplateToFile(name string, body string, args any, filename string) 
 
 
 <a name="Imports"></a>
-## type [Imports](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L23-L29>)
+## type [Imports](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L21-L27>)
 
 A helper struct for managing imports in generated golang files.
 
@@ -85,7 +90,7 @@ type Imports struct {
 ```
 
 <a name="NewImports"></a>
-### func [NewImports](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L35>)
+### func [NewImports](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L31>)
 
 ```go
 func NewImports(packageName string) *Imports
@@ -94,16 +99,16 @@ func NewImports(packageName string) *Imports
 Creates a new ImportedPackages struct, treating the provided fully\-qualified packageName as the "current" package
 
 <a name="Imports.AddPackage"></a>
-### func \(\*Imports\) [AddPackage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L45>)
+### func \(\*Imports\) [AddPackage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L43>)
 
 ```go
 func (imports *Imports) AddPackage(pkg string) string
 ```
 
-
+Imports the fully\-qualified package pkg. Returns the shortname of the package, to use when referring to names exported by pkg.
 
 <a name="Imports.AddPackages"></a>
-### func \(\*Imports\) [AddPackages](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L74>)
+### func \(\*Imports\) [AddPackages](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L72>)
 
 ```go
 func (imports *Imports) AddPackages(pkgs ...string)
@@ -112,31 +117,33 @@ func (imports *Imports) AddPackages(pkgs ...string)
 
 
 <a name="Imports.AddType"></a>
-### func \(\*Imports\) [AddType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L80>)
+### func \(\*Imports\) [AddType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L79>)
 
 ```go
 func (imports *Imports) AddType(typeName gocode.TypeName)
 ```
 
-
+Adds all necessary import statements to be able to use typeName
 
 <a name="Imports.NameOf"></a>
-### func \(\*Imports\) [NameOf](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L137>)
+### func \(\*Imports\) [NameOf](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L143>)
 
 ```go
 func (imports *Imports) NameOf(typeName gocode.TypeName) string
 ```
 
-
+Returns the qualified import name to use for typeName
 
 <a name="Imports.Qualify"></a>
-### func \(\*Imports\) [Qualify](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L127>)
+### func \(\*Imports\) [Qualify](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L132>)
 
 ```go
 func (imports *Imports) Qualify(pkg string, name string) string
 ```
 
+Given fully\-qualified package name pkg and exported member name, returns the short name used to reference that member.
 
+e.g. Qualify\("github.com/blueprint\-uservices/plugins/golang/gogen", "Imports"\) returns "gogen.Imports"
 
 <a name="Imports.String"></a>
 ### func \(\*Imports\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L114>)
@@ -145,14 +152,14 @@ func (imports *Imports) Qualify(pkg string, name string) string
 func (imports *Imports) String() string
 ```
 
-
+Returns the import statement needed to import all added packages and types
 
 <a name="ModuleBuilderImpl"></a>
-## type [ModuleBuilderImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L20-L25>)
+## type [ModuleBuilderImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L17-L22>)
 
-Implements the ModuleBuilder interface defined in golang/ir.go
+Implements \[golang.ModuleBuilder\].
 
-The ModuleBuilder is used by plugins that generate golang source files, and need a module to put that code into.
+Creates a module on the local filesystem with a user\-provided module name.
 
 ```go
 type ModuleBuilderImpl struct {
@@ -165,36 +172,29 @@ type ModuleBuilderImpl struct {
 ```
 
 <a name="NewModuleBuilder"></a>
-### func [NewModuleBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L33>)
+### func [NewModuleBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L34>)
 
 ```go
 func NewModuleBuilder(workspace *WorkspaceBuilderImpl, moduleName string) (*ModuleBuilderImpl, error)
 ```
 
-This method is used by plugins if they want to generate their own Go module from scratch.
+Creates a module within the provided workspace, and returns a [ModuleBuilderImpl](<#ModuleBuilderImpl>) that can be used to accumulate code in the created module.
 
-After dependencies and code have been added to the module, plugins must call Generate on the Generated Module to finish building it.
+The typical usage of this is by plugins such as the [goproc](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc>) plugin that accumulate golang nodes and generate code to run those nodes.
 
-<a name="ModuleBuilderImpl.Build"></a>
-### func \(\*ModuleBuilderImpl\) [Build](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L88>)
-
-```go
-func (module *ModuleBuilderImpl) Build(nodes []ir.IRNode) error
-```
-
-
+After calling this method, the returned ModuleBuilder can be passed to golang nodes, to accumulate the interfaces and funcs of those nodes.
 
 <a name="ModuleBuilderImpl.CreatePackage"></a>
-### func \(\*ModuleBuilderImpl\) [CreatePackage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L54>)
+### func \(\*ModuleBuilderImpl\) [CreatePackage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L57>)
 
 ```go
 func (module *ModuleBuilderImpl) CreatePackage(packageName string) (golang.PackageInfo, error)
 ```
 
-
+Implements \[golang.ModuleBuilder\]
 
 <a name="ModuleBuilderImpl.ImplementsBuildContext"></a>
-### func \(\*ModuleBuilderImpl\) [ImplementsBuildContext](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L108>)
+### func \(\*ModuleBuilderImpl\) [ImplementsBuildContext](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L92>)
 
 ```go
 func (module *ModuleBuilderImpl) ImplementsBuildContext()
@@ -203,41 +203,29 @@ func (module *ModuleBuilderImpl) ImplementsBuildContext()
 
 
 <a name="ModuleBuilderImpl.Info"></a>
-### func \(\*ModuleBuilderImpl\) [Info](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L46>)
+### func \(\*ModuleBuilderImpl\) [Info](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L48>)
 
 ```go
 func (module *ModuleBuilderImpl) Info() golang.ModuleInfo
 ```
 
-
+Implements \[golang.ModuleBuilder\]
 
 <a name="ModuleBuilderImpl.Workspace"></a>
-### func \(\*ModuleBuilderImpl\) [Workspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L84>)
+### func \(\*ModuleBuilderImpl\) [Workspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/modulebuilder.go#L88>)
 
 ```go
 func (module *ModuleBuilderImpl) Workspace() golang.WorkspaceBuilder
 ```
 
-
+Implements \[golang.ModuleBuilder\]
 
 <a name="NamespaceBuilderImpl"></a>
-## type [NamespaceBuilderImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L34-L47>)
+## type [NamespaceBuilderImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L20-L33>)
 
-Implements the \[ir.NamespaceBuilder\] interface defined in gogen/ir.go
+Implements \[golang.NamespaceBuilder\].
 
-\[ir.NamespaceBuilder\] is useful for any golang namespace node, such as the goproc plugin, that wants to be able to instantiate Golang IR nodes.
-
-The \[ir.NamespaceBuilder\] accumulates code from child nodes and stubs for instantiating the code.
-
-The \[ir.NamespaceBuilder\] can then be used to generate a source file that constructs the namespace.
-
-The typical usage of a \[ir.NamespaceBuilder\] is to:
-
-1. Create a new \[ir.NamespaceBuilder\] with the [NewNamespaceBuilder](<#NewNamespaceBuilder>) method
-
-2. Collect code definitions from child nodes by calling \`Instantiable.AddInstantiation\` on those nodes
-
-3. Generate the final output by calling \`NamespaceBuilder.Finish\`
+Creates a source file, \{\{FileName\}\}.go, containing a function, \{\{FuncName\}\}. The body of \{\{FuncName\}\} instantiates all nodes of this namespace.
 
 ```go
 type NamespaceBuilderImpl struct {
@@ -258,43 +246,49 @@ type NamespaceBuilderImpl struct {
 ```
 
 <a name="NewNamespaceBuilder"></a>
-### func [NewNamespaceBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L52>)
+### func [NewNamespaceBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L46>)
 
 ```go
 func NewNamespaceBuilder(module golang.ModuleBuilder, name, fileName, packagePath, funcName string) (*NamespaceBuilderImpl, error)
 ```
 
-Create a new NamespaceBuilder
+Creates a function called funcName within a file called fileName, within the provided module. Returns a [NamespaceBuilderImpl](<#NamespaceBuilderImpl>) that can be used to accumulate instantiation code.
+
+The typical usage of this is by plugins such as the \[goproc\] plugin that accumulate golang nodes and generate code to run those nodes.
+
+After calling this method, the returned [NamespaceBuilderImpl](<#NamespaceBuilderImpl>) can be passed to golang nodes, to accumulate the instantiation code for those nodes.
+
+After all instantiations have been accumulated, the caller should invoke \[Build\], which will actually generate the file fileName, combining all provided node instantiation code snippets.
 
 <a name="NamespaceBuilderImpl.Build"></a>
-### func \(\*NamespaceBuilderImpl\) [Build](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L284>)
+### func \(\*NamespaceBuilderImpl\) [Build](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L285>)
 
 ```go
 func (code *NamespaceBuilderImpl) Build() error
 ```
 
-Generates the file within its module
+Build should be the last invocation, used to generate the namespace file.
 
 <a name="NamespaceBuilderImpl.Declare"></a>
-### func \(\*NamespaceBuilderImpl\) [Declare](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L123>)
+### func \(\*NamespaceBuilderImpl\) [Declare](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L125>)
 
 ```go
 func (n *NamespaceBuilderImpl) Declare(name, buildFuncSrc string) error
 ```
 
-
+Implements \[golang.NamespaceBuilder\]
 
 <a name="NamespaceBuilderImpl.DeclareConstructor"></a>
-### func \(\*NamespaceBuilderImpl\) [DeclareConstructor](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L159>)
+### func \(\*NamespaceBuilderImpl\) [DeclareConstructor](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L162>)
 
 ```go
 func (namespace *NamespaceBuilderImpl) DeclareConstructor(name string, constructor *gocode.Constructor, args []ir.IRNode) error
 ```
 
-
+Implements \[golang.NamespaceBuilder\]
 
 <a name="NamespaceBuilderImpl.ImplementsBuildContext"></a>
-### func \(\*NamespaceBuilderImpl\) [ImplementsBuildContext](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L289>)
+### func \(\*NamespaceBuilderImpl\) [ImplementsBuildContext](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L290>)
 
 ```go
 func (code *NamespaceBuilderImpl) ImplementsBuildContext()
@@ -303,49 +297,49 @@ func (code *NamespaceBuilderImpl) ImplementsBuildContext()
 
 
 <a name="NamespaceBuilderImpl.Import"></a>
-### func \(\*NamespaceBuilderImpl\) [Import](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L94>)
+### func \(\*NamespaceBuilderImpl\) [Import](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L90>)
 
 ```go
 func (n *NamespaceBuilderImpl) Import(packageName string) string
 ```
 
-
+Implements \[golang.NamespaceBuilder\]
 
 <a name="NamespaceBuilderImpl.ImportType"></a>
-### func \(\*NamespaceBuilderImpl\) [ImportType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L98>)
+### func \(\*NamespaceBuilderImpl\) [ImportType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L95>)
 
 ```go
 func (n *NamespaceBuilderImpl) ImportType(typeName gocode.TypeName) string
 ```
 
-
+Implements \[golang.NamespaceBuilder\]
 
 <a name="NamespaceBuilderImpl.Info"></a>
-### func \(\*NamespaceBuilderImpl\) [Info](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L85>)
+### func \(\*NamespaceBuilderImpl\) [Info](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L80>)
 
 ```go
 func (n *NamespaceBuilderImpl) Info() golang.NamespaceInfo
 ```
 
-
+Implements \[golang.NamespaceBuilder\]
 
 <a name="NamespaceBuilderImpl.Instantiate"></a>
-### func \(\*NamespaceBuilderImpl\) [Instantiate](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L114>)
+### func \(\*NamespaceBuilderImpl\) [Instantiate](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L115>)
 
 ```go
 func (n *NamespaceBuilderImpl) Instantiate(name string)
 ```
 
-
+Implements \[golang.NamespaceBuilder\]
 
 <a name="NamespaceBuilderImpl.Module"></a>
-### func \(\*NamespaceBuilderImpl\) [Module](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L102>)
+### func \(\*NamespaceBuilderImpl\) [Module](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L100>)
 
 ```go
 func (n *NamespaceBuilderImpl) Module() golang.ModuleBuilder
 ```
 
-
+Implements \[golang.NamespaceBuilder\]
 
 <a name="NamespaceBuilderImpl.OptionalArg"></a>
 ### func \(\*NamespaceBuilderImpl\) [OptionalArg](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L110>)
@@ -354,23 +348,23 @@ func (n *NamespaceBuilderImpl) Module() golang.ModuleBuilder
 func (n *NamespaceBuilderImpl) OptionalArg(name, description string)
 ```
 
-
+Implements \[golang.NamespaceBuilder\]
 
 <a name="NamespaceBuilderImpl.RequiredArg"></a>
-### func \(\*NamespaceBuilderImpl\) [RequiredArg](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L106>)
+### func \(\*NamespaceBuilderImpl\) [RequiredArg](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go#L105>)
 
 ```go
 func (n *NamespaceBuilderImpl) RequiredArg(name, description string)
 ```
 
-
+Implements \[golang.NamespaceBuilder\]
 
 <a name="WorkspaceBuilderImpl"></a>
-## type [WorkspaceBuilderImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L26-L32>)
+## type [WorkspaceBuilderImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L24-L30>)
 
-Implements the WorkspaceBuilder interface defined in golang/ir.go
+Implements \[golang.WorkspaceBuilder\].
 
-The WorkspaceBuilder is used for accumulating local module directories into a golang workspace.
+Creates a golang workspace on the local filesystem
 
 ```go
 type WorkspaceBuilderImpl struct {
@@ -383,53 +377,59 @@ type WorkspaceBuilderImpl struct {
 ```
 
 <a name="NewWorkspaceBuilder"></a>
-### func [NewWorkspaceBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L39>)
+### func [NewWorkspaceBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L48>)
 
 ```go
 func NewWorkspaceBuilder(workspaceDir string) (*WorkspaceBuilderImpl, error)
 ```
 
-Creates a new WorkspaceBuilder at the specified output dir.
+Creates a golang workspace in the specified directory on the local filesystem.
 
-Will return an error if the workspacedir already exists
+Calls to \[CreateModule\] will create golang modules in subdirectories of the workspace. The builder will automatically create the necessary go.mod files of modules, and go.work file of the workspace.
+
+The typical usage of this is by plugins such as the \[goproc\] plugin that accumulate golang nodes and generate code to run those nodes.
+
+After calling this method, the returned WorkspaceBuilder can be passed to golang nodes, to accumulate modules.
+
+After all modules have been accumulated, the caller should invoke \[Finish\], which will write the go.work file, insert replace directives in go.mod files for sibling modules, and invoke go mod tidy to resolve external package dependencies.
+
+Returns an error if the directory already exists.
 
 <a name="WorkspaceBuilderImpl.AddLocalModule"></a>
-### func \(\*WorkspaceBuilderImpl\) [AddLocalModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L90>)
+### func \(\*WorkspaceBuilderImpl\) [AddLocalModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L102>)
 
 ```go
 func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSrcPath string) (string, error)
 ```
 
-
+Implements \[golang.WorkspaceBuilder\]
 
 <a name="WorkspaceBuilderImpl.AddLocalModuleRelative"></a>
-### func \(\*WorkspaceBuilderImpl\) [AddLocalModuleRelative](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L146>)
+### func \(\*WorkspaceBuilderImpl\) [AddLocalModuleRelative](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L154>)
 
 ```go
 func (workspace *WorkspaceBuilderImpl) AddLocalModuleRelative(shortName string, relativeModuleSrcPath string) (string, error)
 ```
 
-This method is used by plugins if they want to copy a locally\-defined module into the generated workspace.
-
-The specified relativeModuleSrcPath must point to a valid Go module with a go.mod file, relative to the calling file's location.
+Implements \[golang.WorkspaceBuilder\]
 
 <a name="WorkspaceBuilderImpl.CreateModule"></a>
-### func \(\*WorkspaceBuilderImpl\) [CreateModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L54>)
+### func \(\*WorkspaceBuilderImpl\) [CreateModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L65>)
 
 ```go
 func (workspace *WorkspaceBuilderImpl) CreateModule(moduleName string, moduleVersion string) (string, error)
 ```
 
-
+Implements \[golang.WorkspaceBuilder\]
 
 <a name="WorkspaceBuilderImpl.Finish"></a>
-### func \(\*WorkspaceBuilderImpl\) [Finish](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L185>)
+### func \(\*WorkspaceBuilderImpl\) [Finish](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L191>)
 
 ```go
 func (workspace *WorkspaceBuilderImpl) Finish() error
 ```
 
-This method should be used by plugins after all modules in a workspace have been combined.
+This method should be called by plugins after all modules in a workspace have been combined.
 
 The method will do the following:
 
@@ -437,16 +437,16 @@ The method will do the following:
 - updates the go.mod files of all contained modules with 'replace' directives for any required modules that exist in the workspace
 
 <a name="WorkspaceBuilderImpl.GetLocalModule"></a>
-### func \(\*WorkspaceBuilderImpl\) [GetLocalModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L135>)
+### func \(\*WorkspaceBuilderImpl\) [GetLocalModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L148>)
 
 ```go
 func (workspace *WorkspaceBuilderImpl) GetLocalModule(modulePath string) (string, bool)
 ```
 
-
+Implements \[golang.WorkspaceBuilder\]
 
 <a name="WorkspaceBuilderImpl.ImplementsBuildContext"></a>
-### func \(\*WorkspaceBuilderImpl\) [ImplementsBuildContext](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L272>)
+### func \(\*WorkspaceBuilderImpl\) [ImplementsBuildContext](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L276>)
 
 ```go
 func (workspace *WorkspaceBuilderImpl) ImplementsBuildContext()
@@ -455,12 +455,12 @@ func (workspace *WorkspaceBuilderImpl) ImplementsBuildContext()
 
 
 <a name="WorkspaceBuilderImpl.Info"></a>
-### func \(\*WorkspaceBuilderImpl\) [Info](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L48>)
+### func \(\*WorkspaceBuilderImpl\) [Info](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/workspacebuilder.go#L58>)
 
 ```go
 func (workspace *WorkspaceBuilderImpl) Info() golang.WorkspaceInfo
 ```
 
-
+Implements \[golang.WorkspaceBuilder\]
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)

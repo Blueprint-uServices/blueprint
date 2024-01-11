@@ -11,12 +11,9 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-/*
-Implements the ModuleBuilder interface defined in golang/ir.go
-
-The ModuleBuilder is used by plugins that generate golang source files, and need a module to put that
-code into.
-*/
+// Implements [golang.ModuleBuilder].
+//
+// Creates a module on the local filesystem with a user-provided module name.
 type ModuleBuilderImpl struct {
 	ir.VisitTrackerImpl
 	Name      string                // The FQ name of this module
@@ -24,12 +21,16 @@ type ModuleBuilderImpl struct {
 	ModuleDir string                // The directory containing this module
 }
 
-/*
-This method is used by plugins if they want to generate their own Go module from scratch.
-
-After dependencies and code have been added to the module, plugins must call Generate
-on the Generated Module to finish building it.
-*/
+// Creates a module within the provided workspace, and returns a [ModuleBuilderImpl] that
+// can be used to accumulate code in the created module.
+//
+// The typical usage of this is by plugins such as the [goproc] plugin that accumulate
+// golang nodes and generate code to run those nodes.
+//
+// After calling this method, the returned ModuleBuilder can be passed to golang nodes,
+// to accumulate the interfaces and funcs of those nodes.
+//
+// [goproc]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc
 func NewModuleBuilder(workspace *WorkspaceBuilderImpl, moduleName string) (*ModuleBuilderImpl, error) {
 	moduleDir, err := workspace.CreateModule(moduleName, "v0.0.0")
 	if err != nil {
@@ -43,6 +44,7 @@ func NewModuleBuilder(workspace *WorkspaceBuilderImpl, moduleName string) (*Modu
 	return module, nil
 }
 
+// Implements [golang.ModuleBuilder]
 func (module *ModuleBuilderImpl) Info() golang.ModuleInfo {
 	return golang.ModuleInfo{
 		Name:    module.Name,
@@ -51,6 +53,7 @@ func (module *ModuleBuilderImpl) Info() golang.ModuleInfo {
 	}
 }
 
+// Implements [golang.ModuleBuilder]
 func (module *ModuleBuilderImpl) CreatePackage(packageName string) (golang.PackageInfo, error) {
 	if packageName == "" {
 		packageName = "main"
@@ -81,28 +84,9 @@ func (module *ModuleBuilderImpl) CreatePackage(packageName string) (golang.Packa
 	}
 }
 
+// Implements [golang.ModuleBuilder]
 func (module *ModuleBuilderImpl) Workspace() golang.WorkspaceBuilder {
 	return module.workspace
-}
-
-func (module *ModuleBuilderImpl) Build(nodes []ir.IRNode) error {
-	for _, node := range nodes {
-		if n, valid := node.(golang.ProvidesInterface); valid {
-			err := n.AddInterfaces(module)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	for _, node := range nodes {
-		if n, valid := node.(golang.GeneratesFuncs); valid {
-			err := n.GenerateFuncs(module)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
 }
 
 func (module *ModuleBuilderImpl) ImplementsBuildContext() {}

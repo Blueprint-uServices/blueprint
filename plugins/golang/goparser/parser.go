@@ -1,3 +1,6 @@
+// Package goparser parses go modules and extracts module, package, struct, and interface information.
+//
+// It is used by Blueprint to parse workflow specs.
 package goparser
 
 import (
@@ -17,19 +20,13 @@ import (
 	"golang.org/x/mod/modfile"
 )
 
-/*
-Parses go modules and extracts module, package, struct, and interface info
-*/
-
-/*
-A set of modules on the local filesystem that contain workflow spec interfaces
-and implementations.  It is allowed for a workflow spec implementation in one
-package to use the interface defined in another package.  However, currently,
-it is not possible to use workflow spec nodes whose interface or implementation
-comes entirely from an external module (ie. a module that exists only as a
-'require' directive of a go.mod)
-*/
 type (
+	// A set of modules on the local filesystem that contain workflow spec interfaces
+	// and implementations.  It is allowed for a workflow spec implementation in one
+	// package to use the interface defined in another package.  However, currently,
+	// it is not possible to use workflow spec nodes whose interface or implementation
+	// comes entirely from an external module (ie. a module that exists only as a
+	// 'require' directive of a go.mod)
 	ParsedModuleSet struct {
 		Modules map[string]*ParsedModule // Map from FQ module name to module object
 	}

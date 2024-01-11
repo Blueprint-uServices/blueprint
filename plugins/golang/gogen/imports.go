@@ -9,17 +9,15 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-/*
-A helper struct for managing imports in generated golang files.
-
-Used by plugins like the GRPC plugin.
-
-The string representation of the Imports struct is
-the import declaration.
-
-The NameOf method provides the correctly qualified name for
-the specified userType
-*/
+// A helper struct for managing imports in generated golang files.
+//
+// Used by plugins like the GRPC plugin.
+//
+// The string representation of the Imports struct is
+// the import declaration.
+//
+// The NameOf method provides the correctly qualified name for
+// the specified userType
 type Imports struct {
 	localPackage string              // The name of the package where the importing is happening
 	packages     map[string]string   // Map from fully qualified package name to imported name
@@ -28,10 +26,8 @@ type Imports struct {
 	seen         map[string]struct{} // Map from imported name to fully qualified package name
 }
 
-/*
-Creates a new ImportedPackages struct, treating the provided
-fully-qualified packageName as the "current" package
-*/
+// Creates a new ImportedPackages struct, treating the provided
+// fully-qualified packageName as the "current" package
 func NewImports(packageName string) *Imports {
 	imports := &Imports{}
 	imports.localPackage = packageName
@@ -42,6 +38,8 @@ func NewImports(packageName string) *Imports {
 	return imports
 }
 
+// Imports the fully-qualified package pkg.  Returns the shortname of the package,
+// to use when referring to names exported by pkg.
 func (imports *Imports) AddPackage(pkg string) string {
 	if pkg == imports.localPackage {
 		return ""
@@ -77,6 +75,7 @@ func (imports *Imports) AddPackages(pkgs ...string) {
 	}
 }
 
+// Adds all necessary import statements to be able to use typeName
 func (imports *Imports) AddType(typeName gocode.TypeName) {
 	switch t := typeName.(type) {
 	case *gocode.UserType:
@@ -111,6 +110,7 @@ func (imports *Imports) AddType(typeName gocode.TypeName) {
 	}
 }
 
+// Returns the import statement needed to import all added packages and types
 func (imports *Imports) String() string {
 	var b strings.Builder
 	b.WriteString("import (\n")
@@ -124,6 +124,11 @@ func (imports *Imports) String() string {
 	return b.String()
 }
 
+// Given fully-qualified package name pkg and exported member name,
+// returns the short name used to reference that member.
+//
+// e.g. Qualify("github.com/blueprint-uservices/plugins/golang/gogen", "Imports")
+// returns "gogen.Imports"
 func (imports *Imports) Qualify(pkg string, name string) string {
 	if pkg == imports.localPackage {
 		return name
@@ -134,6 +139,7 @@ func (imports *Imports) Qualify(pkg string, name string) string {
 	return pkg + "." + name
 }
 
+// Returns the qualified import name to use for typeName
 func (imports *Imports) NameOf(typeName gocode.TypeName) string {
 	imports.AddType(typeName)
 	switch t := typeName.(type) {
