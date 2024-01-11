@@ -8,7 +8,7 @@ import "github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
 
 Package gogen provides implementations of the builder interfaces defined by the [golang](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/golang>) plugin
 
-The builders are intended for use by plugins that define golang namespace nodes. For example, the [goproc](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc>) plugin defines a process node that collects together golang instance nodes. The [goproc](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc>) plugin then uses the builders defined here to accumulate the code declarations of those golang instances, and to generate the main file for the process.//
+The builders are intended for use by plugins that define golang namespace nodes. For example, the [goproc](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc>) plugin defines a process node that collects together golang instance nodes. The [goproc](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc>) plugin then uses the builders defined here to accumulate the code declarations of those golang instances, and to generate the main file for the process.
 
 ## Index
 
@@ -53,22 +53,26 @@ The builders are intended for use by plugins that define golang namespace nodes.
 
 
 <a name="ExecuteTemplate"></a>
-## func [ExecuteTemplate](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/template.go#L20>)
+## func [ExecuteTemplate](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/template.go#L26>)
 
 ```go
 func ExecuteTemplate(name string, body string, args any) (string, error)
 ```
 
+A helper function for executing [text/template](<https://pkg.go.dev/text/template/>) templates to string.
 
+When executing the provided template body, the body can make use of a number of convenience functions. See [gogen/template.go](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/golang/gogen/template.go>) for details.
 
 <a name="ExecuteTemplateToFile"></a>
-## func [ExecuteTemplateToFile](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/template.go#L34>)
+## func [ExecuteTemplateToFile](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/template.go#L46>)
 
 ```go
 func ExecuteTemplateToFile(name string, body string, args any, filename string) error
 ```
 
+A helper function for executing [text/template](<https://pkg.go.dev/text/template/>) templates to file
 
+When executing the provided template body, the body can make use of a number of convenience functions. See [gogen/template.go](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/golang/gogen/template.go>) for details.
 
 <a name="Imports"></a>
 ## type [Imports](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gogen/imports.go#L21-L27>)
