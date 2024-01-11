@@ -1,3 +1,5 @@
+// Package gocode defines basic structs used by IRNodes to describe Golang types, variables,
+// funcs, constructors, and service interfaces.
 package gocode
 
 import (
@@ -6,14 +8,6 @@ import (
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 )
-
-/*
-Basic structs used by IR nodes to describe Golang service interfaces
-
-These structs implement the generic interfaces described in the core 'service' package
-
-TypeName is defined separately in typename.go
-*/
 
 type (
 	Variable struct {

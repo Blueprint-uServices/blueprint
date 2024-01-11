@@ -6,6 +6,8 @@
 import "github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
 ```
 
+Package gocode defines basic structs used by IRNodes to describe Golang types, variables, funcs, constructors, and service interfaces.
+
 ## Index
 
 - [func IsBasicType\(name string\) bool](<#IsBasicType>)
@@ -228,7 +230,7 @@ func (t *Chan) String() string
 
 
 <a name="Constructor"></a>
-## type [Constructor](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L32-L35>)
+## type [Constructor](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L26-L29>)
 
 
 
@@ -279,7 +281,7 @@ func (t *Ellipsis) String() string
 
 
 <a name="Func"></a>
-## type [Func](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L25-L30>)
+## type [Func](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L19-L24>)
 
 
 
@@ -293,7 +295,7 @@ type Func struct {
 ```
 
 <a name="Func.AddArgument"></a>
-### func \(\*Func\) [AddArgument](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L90>)
+### func \(\*Func\) [AddArgument](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L84>)
 
 ```go
 func (f *Func) AddArgument(variable Variable)
@@ -302,7 +304,7 @@ func (f *Func) AddArgument(variable Variable)
 
 
 <a name="Func.AddRetVar"></a>
-### func \(\*Func\) [AddRetVar](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L94>)
+### func \(\*Func\) [AddRetVar](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L88>)
 
 ```go
 func (f *Func) AddRetVar(variable Variable)
@@ -311,7 +313,7 @@ func (f *Func) AddRetVar(variable Variable)
 
 
 <a name="Func.Equals"></a>
-### func \(Func\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L121>)
+### func \(Func\) [Equals](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L115>)
 
 ```go
 func (f Func) Equals(g Func) bool
@@ -320,7 +322,7 @@ func (f Func) Equals(g Func) bool
 
 
 <a name="Func.GetArguments"></a>
-### func \(\*Func\) [GetArguments](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L74>)
+### func \(\*Func\) [GetArguments](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L68>)
 
 ```go
 func (f *Func) GetArguments() []service.Variable
@@ -329,7 +331,7 @@ func (f *Func) GetArguments() []service.Variable
 
 
 <a name="Func.GetName"></a>
-### func \(\*Func\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L70>)
+### func \(\*Func\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L64>)
 
 ```go
 func (f *Func) GetName() string
@@ -338,7 +340,7 @@ func (f *Func) GetName() string
 
 
 <a name="Func.GetReturns"></a>
-### func \(\*Func\) [GetReturns](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L82>)
+### func \(\*Func\) [GetReturns](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L76>)
 
 ```go
 func (f *Func) GetReturns() []service.Variable
@@ -347,7 +349,7 @@ func (f *Func) GetReturns() []service.Variable
 
 
 <a name="Func.String"></a>
-### func \(Func\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L133>)
+### func \(Func\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L127>)
 
 ```go
 func (f Func) String() string
@@ -680,7 +682,7 @@ func (t *SendChan) String() string
 
 
 <a name="ServiceInterface"></a>
-## type [ServiceInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L38-L42>)
+## type [ServiceInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L32-L36>)
 
 Implements service.ServiceInterface
 
@@ -693,7 +695,7 @@ type ServiceInterface struct {
 ```
 
 <a name="CopyServiceInterface"></a>
-### func [CopyServiceInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L61>)
+### func [CopyServiceInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L55>)
 
 ```go
 func CopyServiceInterface(name string, pkg string, s *ServiceInterface) *ServiceInterface
@@ -702,7 +704,7 @@ func CopyServiceInterface(name string, pkg string, s *ServiceInterface) *Service
 
 
 <a name="ServiceInterface.AddMethod"></a>
-### func \(\*ServiceInterface\) [AddMethod](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L57>)
+### func \(\*ServiceInterface\) [AddMethod](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L51>)
 
 ```go
 func (s *ServiceInterface) AddMethod(f Func)
@@ -711,7 +713,7 @@ func (s *ServiceInterface) AddMethod(f Func)
 
 
 <a name="ServiceInterface.Contains"></a>
-### func \(\*ServiceInterface\) [Contains](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L158>)
+### func \(\*ServiceInterface\) [Contains](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L152>)
 
 ```go
 func (i *ServiceInterface) Contains(j *ServiceInterface) bool
@@ -720,7 +722,7 @@ func (i *ServiceInterface) Contains(j *ServiceInterface) bool
 Reports whether all of the methods in j exist on interface i
 
 <a name="ServiceInterface.GetMethods"></a>
-### func \(\*ServiceInterface\) [GetMethods](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L49>)
+### func \(\*ServiceInterface\) [GetMethods](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L43>)
 
 ```go
 func (s *ServiceInterface) GetMethods() []service.Method
@@ -729,7 +731,7 @@ func (s *ServiceInterface) GetMethods() []service.Method
 
 
 <a name="ServiceInterface.GetName"></a>
-### func \(\*ServiceInterface\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L45>)
+### func \(\*ServiceInterface\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L39>)
 
 ```go
 func (s *ServiceInterface) GetName() string
@@ -738,7 +740,7 @@ func (s *ServiceInterface) GetName() string
 
 
 <a name="ServiceInterface.String"></a>
-### func \(\*ServiceInterface\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L153>)
+### func \(\*ServiceInterface\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L147>)
 
 ```go
 func (i *ServiceInterface) String() string
@@ -886,7 +888,7 @@ func (t *UserType) String() string
 
 
 <a name="Variable"></a>
-## type [Variable](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L19-L23>)
+## type [Variable](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L13-L17>)
 
 
 
@@ -899,7 +901,7 @@ type Variable struct {
 ```
 
 <a name="Variable.GetName"></a>
-### func \(\*Variable\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L98>)
+### func \(\*Variable\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L92>)
 
 ```go
 func (v *Variable) GetName() string
@@ -908,7 +910,7 @@ func (v *Variable) GetName() string
 
 
 <a name="Variable.GetType"></a>
-### func \(\*Variable\) [GetType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L102>)
+### func \(\*Variable\) [GetType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L96>)
 
 ```go
 func (v *Variable) GetType() string
@@ -917,7 +919,7 @@ func (v *Variable) GetType() string
 
 
 <a name="Variable.String"></a>
-### func \(\*Variable\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L125>)
+### func \(\*Variable\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/gocode/service.go#L119>)
 
 ```go
 func (v *Variable) String() string
