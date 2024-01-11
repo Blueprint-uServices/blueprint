@@ -81,7 +81,7 @@ func (msg *{{$struct.GRPCType.Name}}) unmarshall(obj *{{$imports.Qualify $t.Pack
 `
 
 type marshallArgs struct {
-	GRPCProtoBuilder
+	gRPCProtoBuilder
 	Imports *gogen.Imports
 }
 
@@ -91,7 +91,7 @@ Generates marshalling functions that convert between Go objects and GRPC message
 This extends the code in protogen.go and is called from protogen.go
 */
 
-func (b *GRPCProtoBuilder) GenerateMarshallingCode(outputFilePath string) error {
+func (b *gRPCProtoBuilder) GenerateMarshallingCode(outputFilePath string) error {
 	t, err := template.New("marshallGRPC").Parse(marshallFileTemplate)
 	if err != nil {
 		return err
@@ -103,10 +103,10 @@ func (b *GRPCProtoBuilder) GenerateMarshallingCode(outputFilePath string) error 
 	}
 
 	args := &marshallArgs{}
-	args.GRPCProtoBuilder = *b
+	args.gRPCProtoBuilder = *b
 	args.Imports = gogen.NewImports(args.PackageName)
 
-	for _, msg := range args.GRPCProtoBuilder.Messages {
+	for _, msg := range args.gRPCProtoBuilder.Messages {
 		for _, field := range msg.FieldList {
 			args.Imports.AddType(field.SrcType)
 		}
@@ -115,7 +115,7 @@ func (b *GRPCProtoBuilder) GenerateMarshallingCode(outputFilePath string) error 
 	return t.Execute(f, args)
 }
 
-func (f *GRPCField) Marshall(imports *gogen.Imports, obj string) (string, error) {
+func (f *gRPCField) Marshall(imports *gogen.Imports, obj string) (string, error) {
 	switch t := f.GRPCType.(type) {
 	case *gocode.UserType:
 		{
@@ -170,7 +170,7 @@ func (f *GRPCField) Marshall(imports *gogen.Imports, obj string) (string, error)
 	return "", nil
 }
 
-func (f *GRPCField) Unmarshall(imports *gogen.Imports, obj string) (string, error) {
+func (f *gRPCField) Unmarshall(imports *gogen.Imports, obj string) (string, error) {
 	switch t := f.GRPCType.(type) {
 	case *gocode.UserType:
 		{

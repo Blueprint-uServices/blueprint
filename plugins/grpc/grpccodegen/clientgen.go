@@ -10,11 +10,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-/*
-This function is used by the GRPC plugin to generate the client-side caller of the GRPC service.
-
-It is assumed that outputPackage is the same as the one where the .proto is generated to
-*/
+// Generates a gRPC client for the specified service
 func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error {
 	pkg, err := builder.CreatePackage(outputPackage)
 	if err != nil {

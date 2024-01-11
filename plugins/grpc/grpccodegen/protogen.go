@@ -33,7 +33,7 @@ func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInte
 	}
 
 	// Construct and validate the GRPC proto builder for the service
-	pb := NewProtoBuilder(modules, service.BaseName)
+	pb := newProtoBuilder(modules, service.BaseName)
 	splits := strings.Split(outputPackage, "/")
 	outputPackageName := splits[len(splits)-1]
 	pb.Module = builder.Info()
@@ -83,6 +83,7 @@ func rel(path string) string {
 	return s
 }
 
+// Runs protoc on the specified protoFileName
 func CompileProtoFile(protoFileName string) error {
 	proto_path, _ := filepath.Split(protoFileName)
 	cmd := exec.Command("protoc", protoFileName, "--go_out="+proto_path, "--go-grpc_out="+proto_path, "--proto_path="+proto_path)
@@ -102,7 +103,7 @@ func CompileProtoFile(protoFileName string) error {
 
 /* A basic structural representation of the GRPC messages and services */
 type (
-	GRPCField struct {
+	gRPCField struct {
 		SrcType   gocode.TypeName // The source type
 		ProtoType string          // The GRPC type in proto
 		GRPCType  gocode.TypeName // The GRPC type in golang
@@ -110,45 +111,45 @@ type (
 		Position  int
 	}
 
-	GRPCMessageDecl struct {
-		Builder   *GRPCProtoBuilder
+	gRPCMessageDecl struct {
+		Builder   *gRPCProtoBuilder
 		Name      string
 		GRPCType  *gocode.UserType // The GRPC-generated type for this message
-		FieldList []*GRPCField
+		FieldList []*gRPCField
 	}
 
-	GRPCMethodDecl struct {
-		Service  *GRPCServiceDecl
+	gRPCMethodDecl struct {
+		Service  *gRPCServiceDecl
 		Name     string
-		Request  *GRPCMessageDecl
-		Response *GRPCMessageDecl
+		Request  *gRPCMessageDecl
+		Response *gRPCMessageDecl
 	}
 
-	GRPCServiceDecl struct {
-		Builder *GRPCProtoBuilder
+	gRPCServiceDecl struct {
+		Builder *gRPCProtoBuilder
 		Name    string
-		Methods map[string]*GRPCMethodDecl
+		Methods map[string]*gRPCMethodDecl
 	}
 
-	GRPCProtoBuilder struct {
+	gRPCProtoBuilder struct {
 		Name        string
 		Code        *goparser.ParsedModuleSet
 		Package     string // Package shortname
 		Module      golang.ModuleInfo
 		PackageName string // Fully qualified package
-		Services    map[string]*GRPCServiceDecl
-		Messages    map[string]*GRPCMessageDecl
-		Structs     map[gocode.UserType]*GRPCMessageDecl // Mapping from golang struct to the corresponding message
+		Services    map[string]*gRPCServiceDecl
+		Messages    map[string]*gRPCMessageDecl
+		Structs     map[gocode.UserType]*gRPCMessageDecl // Mapping from golang struct to the corresponding message
 	}
 )
 
-func NewProtoBuilder(code *goparser.ParsedModuleSet, name string) *GRPCProtoBuilder {
-	b := &GRPCProtoBuilder{}
+func newProtoBuilder(code *goparser.ParsedModuleSet, name string) *gRPCProtoBuilder {
+	b := &gRPCProtoBuilder{}
 	b.Name = name
 	b.Code = code
-	b.Services = make(map[string]*GRPCServiceDecl)
-	b.Messages = make(map[string]*GRPCMessageDecl)
-	b.Structs = make(map[gocode.UserType]*GRPCMessageDecl)
+	b.Services = make(map[string]*gRPCServiceDecl)
+	b.Messages = make(map[string]*gRPCMessageDecl)
+	b.Structs = make(map[gocode.UserType]*gRPCMessageDecl)
 	return b
 }
 
@@ -173,7 +174,7 @@ service {{$service.Name}} {
 {{ end }}
 `
 
-func (b *GRPCProtoBuilder) WriteProtoFile(outputFilePath string) error {
+func (b *gRPCProtoBuilder) WriteProtoFile(outputFilePath string) error {
 	t, err := template.New("protofile").Parse(protoFileTemplate)
 	if err != nil {
 		return err
@@ -188,8 +189,8 @@ func (b *GRPCProtoBuilder) WriteProtoFile(outputFilePath string) error {
 
 }
 
-func (b *GRPCProtoBuilder) newMessage(name string) *GRPCMessageDecl {
-	s := &GRPCMessageDecl{}
+func (b *gRPCProtoBuilder) newMessage(name string) *gRPCMessageDecl {
+	s := &gRPCMessageDecl{}
 	s.Builder = b
 	s.Name = name
 	s.FieldList = nil
@@ -198,17 +199,17 @@ func (b *GRPCProtoBuilder) newMessage(name string) *GRPCMessageDecl {
 	return s
 }
 
-func (b *GRPCProtoBuilder) newService(name string) *GRPCServiceDecl {
-	s := &GRPCServiceDecl{}
+func (b *gRPCProtoBuilder) newService(name string) *gRPCServiceDecl {
+	s := &gRPCServiceDecl{}
 	s.Builder = b
 	s.Name = name
-	s.Methods = make(map[string]*GRPCMethodDecl)
+	s.Methods = make(map[string]*gRPCMethodDecl)
 	b.Services[name] = s
 	return s
 }
 
-func (b *GRPCServiceDecl) newMethod(name string) *GRPCMethodDecl {
-	m := &GRPCMethodDecl{}
+func (b *gRPCServiceDecl) newMethod(name string) *gRPCMethodDecl {
+	m := &gRPCMethodDecl{}
 	m.Service = b
 	m.Name = name
 	m.Request = b.Builder.newMessage(fmt.Sprintf("%s_%s_Request", b.Name, name))
@@ -217,8 +218,8 @@ func (b *GRPCServiceDecl) newMethod(name string) *GRPCMethodDecl {
 	return m
 }
 
-func (b *GRPCProtoBuilder) makeFieldList(vars []gocode.Variable) ([]*GRPCField, error) {
-	var fieldList []*GRPCField
+func (b *gRPCProtoBuilder) makeFieldList(vars []gocode.Variable) ([]*gRPCField, error) {
+	var fieldList []*gRPCField
 	for i, arg := range vars {
 		protoType, grpcType, err := b.getGRPCType(arg.Type)
 		if err != nil {
@@ -229,7 +230,7 @@ func (b *GRPCProtoBuilder) makeFieldList(vars []gocode.Variable) ([]*GRPCField, 
 		if name == "" {
 			name = fmt.Sprintf("ret%v", i)
 		}
-		fieldList = append(fieldList, &GRPCField{
+		fieldList = append(fieldList, &gRPCField{
 			SrcType:   arg.Type,
 			ProtoType: protoType,
 			GRPCType:  grpcType,
@@ -249,7 +250,7 @@ For arguments and return values on methods in the interface, corresponding GRPC 
 are needed.  The ProtoBuilder will consult the parsed code to find the definitions of arguments
 and return values.
 */
-func (b *GRPCProtoBuilder) AddService(iface *gocode.ServiceInterface) error {
+func (b *gRPCProtoBuilder) AddService(iface *gocode.ServiceInterface) error {
 	serviceDecl := b.newService(iface.Name) // TODO: (not implemented yet) possibility of name collisions
 	for _, method := range iface.Methods {
 		argList, err := b.makeFieldList(method.Arguments)
@@ -269,7 +270,7 @@ func (b *GRPCProtoBuilder) AddService(iface *gocode.ServiceInterface) error {
 	return nil
 }
 
-func (b *GRPCProtoBuilder) GetOrAddMessage(t *gocode.UserType) (*GRPCMessageDecl, error) {
+func (b *gRPCProtoBuilder) GetOrAddMessage(t *gocode.UserType) (*gRPCMessageDecl, error) {
 	// Message might already exist
 	if msgDecl, exists := b.Structs[*t]; exists {
 		return msgDecl, nil
@@ -307,7 +308,7 @@ func (b *GRPCProtoBuilder) GetOrAddMessage(t *gocode.UserType) (*GRPCMessageDecl
 			return nil, err
 		}
 
-		msg.FieldList = append(msg.FieldList, &GRPCField{
+		msg.FieldList = append(msg.FieldList, &gRPCField{
 			SrcType:   field.Type,
 			ProtoType: fieldProto,
 			GRPCType:  fieldGRPC,
@@ -364,7 +365,7 @@ func getMapKeyType(t gocode.TypeName) (string, gocode.TypeName, bool) {
 
 // Returns the name of the type for the .proto declaration and the corresponding golang type,
 // which may be different from the source type
-func (b *GRPCProtoBuilder) getGRPCType(t gocode.TypeName) (string, gocode.TypeName, error) {
+func (b *gRPCProtoBuilder) getGRPCType(t gocode.TypeName) (string, gocode.TypeName, error) {
 	switch arg := t.(type) {
 	case *gocode.UserType:
 		{
