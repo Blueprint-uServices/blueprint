@@ -44,7 +44,7 @@ type Container interface {
 ```
 
 <a name="ContainerWorkspace"></a>
-## type [ContainerWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L77-L125>)
+## type [ContainerWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L81-L129>)
 
 [ContainerWorkspace](<#ContainerWorkspace>) receives container images and instances from [Container](<#Container>) nodes during Blueprint's compilation process.
 
@@ -103,7 +103,7 @@ type ContainerWorkspace interface {
 ```
 
 <a name="ContainerWorkspaceInfo"></a>
-## type [ContainerWorkspaceInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L65-L68>)
+## type [ContainerWorkspaceInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L69-L72>)
 
 Metadata about the local build environment used during the compilation process
 
@@ -115,7 +115,7 @@ type ContainerWorkspaceInfo struct {
 ```
 
 <a name="ProcessWorkspace"></a>
-## type [ProcessWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L134-L167>)
+## type [ProcessWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L138-L171>)
 
 ProcessWorkspace enables \[linux.Process\] nodes to add custom Dockerfile commands when the process is being added to a Docker container. ProcessWorkspaces extends \[linux.ProcessWorkspace\] with the method \[ProcessWorkspace.AddDockerfileCommands\].
 
@@ -159,23 +159,27 @@ type ProcessWorkspace interface {
 ```
 
 <a name="ProvidesContainerImage"></a>
-## type [ProvidesContainerImage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L50-L52>)
+## type [ProvidesContainerImage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L50-L54>)
 
 An optional interface for Container IRNodes to implement if the node needs to generate custom container images \(e.g. using a Dockerfile\). \[target\] provides methods for doing so.
 
 ```go
 type ProvidesContainerImage interface {
+    // The IRNode is being compiled into the provided target workspace, and should
+    // use methods on target to add its container artifacts into the workspace.
     AddContainerArtifacts(target ContainerWorkspace) error
 }
 ```
 
 <a name="ProvidesContainerInstance"></a>
-## type [ProvidesContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L58-L60>)
+## type [ProvidesContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L60-L64>)
 
 An optional interface for Container IRNodes to implement if the node wants to declare an instance of a container. The container instance can be of a pre\-existing image or of a locally\-defined image that was declared with [ProvidesContainerImage](<#ProvidesContainerImage>).
 
 ```go
 type ProvidesContainerInstance interface {
+    // The IRNode is being compiled into the provided target workspace, and should
+    // use methods on target to declare how the container should be instantiated.
     AddContainerInstance(target ContainerWorkspace) error
 }
 ```

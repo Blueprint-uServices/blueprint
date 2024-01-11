@@ -48,6 +48,8 @@ type (
 	// to generate custom container images (e.g. using a Dockerfile).
 	// [target] provides methods for doing so.
 	ProvidesContainerImage interface {
+		// The IRNode is being compiled into the provided target workspace, and should
+		// use methods on target to add its container artifacts into the workspace.
 		AddContainerArtifacts(target ContainerWorkspace) error
 	}
 
@@ -56,6 +58,8 @@ type (
 	// can be of a pre-existing image or of a locally-defined image that
 	// was declared with [ProvidesContainerImage].
 	ProvidesContainerInstance interface {
+		// The IRNode is being compiled into the provided target workspace, and should
+		// use methods on target to declare how the container should be instantiated.
 		AddContainerInstance(target ContainerWorkspace) error
 	}
 )
