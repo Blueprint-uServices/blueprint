@@ -25,15 +25,11 @@ func makeGoVectorLoggerSpec(spec wiring.WiringSpec) ([]string, error) {
 	applyLoggerDefaults := func(service_name string) string {
 
 		procName := strings.ReplaceAll(service_name, "service", "process")
-		var logger string
 		govector.Instrument(spec, service_name)
-		logger = govector.DefineLogger(spec, procName+"_logger")
 
 		http.Deploy(spec, service_name)
 		proc := goproc.CreateProcess(spec, procName, service_name)
-		if logger != "" {
-			goproc.SetLogger(spec, procName, logger)
-		}
+		govector.Logger(spec, procName)
 		return proc
 	}
 	leaf_db := simple.NoSQLDB(spec, "leaf_db")

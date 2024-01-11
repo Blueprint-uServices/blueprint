@@ -8,33 +8,33 @@ import "github.com/blueprint-uservices/blueprint/plugins/govector"
 
 Package govector provides two plugins:
 
-\(i\) a plugin to wrap the client and server side of a service with a GoVector wrapper to maintain and propagate vector clocks for each process. A vector clock is a logical clock maintained by every process in a distributed system which can then be used to establish partial order between distributed operations. The plugin generates a log file for each process where the incremental vector timestamps are stored to track the propagation of requests.
+1. a plugin to wrap the client and server side of a service with a GoVector wrapper to maintain and propagate vector clocks for each process. A vector clock is a logical clock maintained by every process in a distributed system which can then be used to establish partial order between distributed operations. The plugin generates a log file for each process where the incremental vector timestamps are stored to track the propagation of requests.
+2. a plugin to install a GoVector logger for a given process. The log messages are appended with vector timestamps and added to a log file in chronological order. Log files from all processes can be combined to visualize the full execution of a distributed system.
 
-\(ii\) a plugin to install a GoVector logger for a given process. The log messages are appended with vector timestamps and placed in a log file in chronological order. Log files from all processes can be combined to visualize the full execution of a distributed system.
+Sample generated log entry:
+
+nonleaf\_process\_logger.goveclogger \{"nonleaf\_process\_logger.goveclogger":1\} Initialization Complete
 
 GoVector is a vector clock logging library developed for educational purposes by researchers at UBC Systopia. More information on GoVector: https://github.com/DistributedClocks/GoVector
 
-Example Usage \(for full instrumentation\):
-
-import "github.com/blueprint\-uservices/blueprint/plugins/govector"
+### Wiring Example:
 
 ```
-for _, service := range serviceNames {
+func applyGoVectorOptions() {
+	for _, service := range serviceNames {
     govector.Instrument(spec, service) // Instrument the service to propagate vector clocks
-}
-```
+	}
 
-```
-for _, proc := range procNames {
-    logger := govector.DefineLogger(spec, proc) // Define a logger for the process
-	   goproc.SetLogger(spec, proc, logger) // Set the logger for the process
+	for _, proc := range procNames {
+    logger := govector.Logger(spec, proc) // Define a logger for the process
+	}
 }
 ```
 
 ## Index
 
-- [func DefineLogger\(spec wiring.WiringSpec, loggerName string\) string](<#DefineLogger>)
 - [func Instrument\(spec wiring.WiringSpec, serviceName string\)](<#Instrument>)
+- [func Logger\(spec wiring.WiringSpec, procName string\) string](<#Logger>)
 - [type GoVecLoggerClient](<#GoVecLoggerClient>)
   - [func \(node \*GoVecLoggerClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#GoVecLoggerClient.AddInstantiation>)
   - [func \(node \*GoVecLoggerClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#GoVecLoggerClient.AddInterfaces>)
@@ -63,23 +63,23 @@ for _, proc := range procNames {
   - [func \(node \*GovecServerWrapper\) String\(\) string](<#GovecServerWrapper.String>)
 
 
-<a name="DefineLogger"></a>
-## func [DefineLogger](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/wiring.go#L68>)
-
-```go
-func DefineLogger(spec wiring.WiringSpec, loggerName string) string
-```
-
-Defines a logger with name \`loggerName\`. The logger can then be used in process and service nodes.
-
 <a name="Instrument"></a>
-## func [Instrument](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/wiring.go#L37>)
+## func [Instrument](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/wiring.go#L40>)
 
 ```go
 func Instrument(spec wiring.WiringSpec, serviceName string)
 ```
 
 Instruments the client and server side of a service with govector\-instrumentation to initialize, maintain, and propagate vector clocks. The instrumentation generates logging events appended with vector clock timestamps. Ensures that the logs are sent to a GoVector logger defined with name \`logger\`
+
+<a name="Logger"></a>
+## func [Logger](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/wiring.go#L71>)
+
+```go
+func Logger(spec wiring.WiringSpec, procName string) string
+```
+
+Defines a logger for process with name \`procName\`.
 
 <a name="GoVecLoggerClient"></a>
 ## type [GoVecLoggerClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/govector/ir_logger.go#L16-L25>)
