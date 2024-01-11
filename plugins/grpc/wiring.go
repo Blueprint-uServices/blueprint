@@ -1,6 +1,6 @@
 // Package grpc is a plugin for deploying an application-level Golang service to a gRPC server.
 //
-// # Pre-Requisites
+// # Prerequisites
 //
 // To compile a Blueprint application that uses grpc, the build machine needs to have protocol buffers
 // and the grpc compiler installed.  Installation instructions can be found on the [gRPC Quick Start].
@@ -41,7 +41,8 @@
 // on the machine that is compiling the Blueprint wiring spec.  Installation instructions
 // can be found on the [gRPC Quick Start].
 //
-// [gRPC quick Start]: https://grpc.io/docs/languages/go/quickstart/
+// [grpccodegen]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/grpc/grpccodegen
+// [gRPC Quick Start]: https://grpc.io/docs/languages/go/quickstart/
 package grpc
 
 import (

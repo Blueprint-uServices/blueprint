@@ -8,9 +8,9 @@ import "github.com/blueprint-uservices/blueprint/plugins/grpc"
 
 Package grpc is a plugin for deploying an application\-level Golang service to a gRPC server.
 
-### Pre\\\-Requisites
+### Prerequisites
 
-To compile a Blueprint application that uses grpc, the build machine needs to have protocol buffers and the grpc compiler installed. Installation instructions can be found on the \[gRPC Quick Start\].
+To compile a Blueprint application that uses grpc, the build machine needs to have protocol buffers and the grpc compiler installed. Installation instructions can be found on the [gRPC Quick Start](<https://grpc.io/docs/languages/go/quickstart/>).
 
 ### Wiring Spec Usage
 
@@ -34,9 +34,9 @@ Blueprint can automatically generate these addresses in some circumstances, but 
 
 ### Artifacts Generated
 
-The plugin will generate a server\-side handler that creates and runs a gRPC server, with the service as the request handling logic. The plugin will also generate a client implementation for other services to call the service. The plugin also generates marshalling code for packing arguments into protobuf structs and vice versa. This is implemented within the \[grpccodegen\] package.
+The plugin will generate a server\-side handler that creates and runs a gRPC server, with the service as the request handling logic. The plugin will also generate a client implementation for other services to call the service. The plugin also generates marshalling code for packing arguments into protobuf structs and vice versa. This is implemented within the [grpccodegen](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/grpc/grpccodegen>) package.
 
-To use this plugin requires the protocol buffers and grpc compilers are installed on the machine that is compiling the Blueprint wiring spec. Installation instructions can be found on the \[gRPC Quick Start\].
+To use this plugin requires the protocol buffers and grpc compilers are installed on the machine that is compiling the Blueprint wiring spec. Installation instructions can be found on the [gRPC Quick Start](<https://grpc.io/docs/languages/go/quickstart/>).
 
 ## Index
 
@@ -44,7 +44,7 @@ To use this plugin requires the protocol buffers and grpc compilers are installe
 
 
 <a name="Deploy"></a>
-## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/grpc/wiring.go#L70>)
+## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/grpc/wiring.go#L71>)
 
 ```go
 func Deploy(spec wiring.WiringSpec, serviceName string)
