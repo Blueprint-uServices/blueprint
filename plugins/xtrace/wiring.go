@@ -1,7 +1,8 @@
 // Package xtrace provides three plugins:
-// (i)  a plugin to generate and include an xtrace instance in a Blueprint application.
-// (ii) provides a modifier plugin to wrap the service with an XTrace wrapper to generate XTrace compatible traces/logs by correctly propagating baggage across service boundaries.
-// (iii) a plugin to define an xtrace-based logger for a process. Log events are added as reports to the currently active xtrace task, if one exists. If no such task exists, then no events are logged.
+//
+//  1. A plugin to generate and include an xtrace instance in a Blueprint application.
+//  2. A modifier plugin to wrap the service with an XTrace wrapper to generate XTrace compatible traces/logs by correctly propagating baggage across service boundaries.
+//  3. A plugin to define an xtrace-based logger for a process. Log events are added as reports to the currently active xtrace task, if one exists. If no such task exists, then no events are logged.
 //
 // The package provides a built-in xtrace container that provides the server-side implementation
 // and a go-client for connecting to the server.
