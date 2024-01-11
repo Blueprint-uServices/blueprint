@@ -1,3 +1,4 @@
+// Package linuxgen implements code generation for the goproc plugin.
 package linuxgen
 
 import (

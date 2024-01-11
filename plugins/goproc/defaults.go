@@ -15,6 +15,8 @@ import (
 // Default builders are responsible for building any golang instances that exist in a wiring spec but aren't
 // explicitly added to a goproc within that wiring spec.  The Blueprint compiler groups these
 // "floating" golang instances into a default golang process with the name "goproc".
+//
+// [cmdbuilder]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/cmdbuilder
 func RegisterAsDefaultBuilder() {
 	/* any unattached golang nodes will be instantiated in a "default" golang workspace */
 	ir.RegisterDefaultNamespace[golang.Node]("goproc", buildDefaultGolangWorkspace)

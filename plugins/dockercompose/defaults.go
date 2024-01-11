@@ -15,6 +15,8 @@ import (
 // Default builders are responsible for building any container instances that exist in a wiring spec but aren't
 // explicitly added to a container deployment within that wiring spec.  The Blueprint compiler groups these
 // "floating" container instances into a default dockercompose deployment with the name "docker".
+//
+// [cmdbuilder]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/cmdbuilder
 func RegisterAsDefaultBuilder() {
 	ir.RegisterDefaultNamespace[docker.Container]("containerdeployment", buildDefaultContainerWorkspace)
 }

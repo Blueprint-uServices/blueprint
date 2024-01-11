@@ -111,7 +111,7 @@ Deploy can be used by wiring specs to deploy a golang service in a golang proces
 Adds a modifier to the service that will create the golang process if not already created.
 
 <a name="RegisterAsDefaultBuilder"></a>
-## func [RegisterAsDefaultBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/defaults.go#L18>)
+## func [RegisterAsDefaultBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/defaults.go#L20>)
 
 ```go
 func RegisterAsDefaultBuilder()
@@ -119,32 +119,32 @@ func RegisterAsDefaultBuilder()
 
 RegisterAsDefaultBuilder should be invoked by a wiring spec if it wishes to use goproc as the default way of combining golang instances.
 
-If you are using the \[cmdbuilder\], then goproc is automatically set as the default builder and you do not need to call this function again.
+If you are using the [cmdbuilder](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/cmdbuilder>), then goproc is automatically set as the default builder and you do not need to call this function again.
 
 Default builders are responsible for building any golang instances that exist in a wiring spec but aren't explicitly added to a goproc within that wiring spec. The Blueprint compiler groups these "floating" golang instances into a default golang process with the name "goproc".
 
 <a name="SetLogger"></a>
-## func [SetLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L162>)
+## func [SetLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L160>)
 
 ```go
 func SetLogger(spec wiring.WiringSpec, procName string, loggerNodeName string)
 ```
 
-SetLogger can be used by wiring specs to change the logger used by the process. This method should not need to be used directly. Instead it is used by other plugins such as [opentelemetry](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/opentelemetry>) to install custom loggers.
+SetLogger is not used directly by wiring specs; instead it is used by other plugins such as [opentelemetry](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/opentelemetry>) to install custom loggers.
 
 <a name="SetMetricCollector"></a>
-## func [SetMetricCollector](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L153>)
+## func [SetMetricCollector](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L152>)
 
 ```go
 func SetMetricCollector(spec wiring.WiringSpec, procName string, metricCollNodeName string)
 ```
 
-SetMetricCollector can be used by wiring specs to change the metric collector used by the process. This method should not need to be used directly. Instead it is used by other plugins such as [opentelemetry](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/opentelemetry>) to install custom metric collectors.
+SetMetricCollector is not used directly by wiring specs; instead it is used by other plugins such as [opentelemetry](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/opentelemetry>) to install custom metric collectors.
 
 <a name="Process"></a>
-## type [Process](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L26-L38>)
+## type [Process](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L10-L22>)
 
-An IRNode representing a golang process. This is Blueprint's main implementation of Golang processes
+An IRNode representing a golang process, which is a collection of application\-level golang instances.
 
 ```go
 type Process struct {
@@ -200,7 +200,7 @@ func (node *Process) ImplementsLinuxProcess()
 
 
 <a name="Process.Name"></a>
-### func \(\*Process\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L51>)
+### func \(\*Process\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L34>)
 
 ```go
 func (proc *Process) Name() string
@@ -209,7 +209,7 @@ func (proc *Process) Name() string
 Implements ir.IRNode
 
 <a name="Process.String"></a>
-### func \(\*Process\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L56>)
+### func \(\*Process\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L39>)
 
 ```go
 func (proc *Process) String() string

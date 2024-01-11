@@ -101,7 +101,7 @@ During compilation, generates a docker\-compose file that instantiates the conta
 Returns deploymentName.
 
 <a name="RegisterAsDefaultBuilder"></a>
-## func [RegisterAsDefaultBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/defaults.go#L18>)
+## func [RegisterAsDefaultBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/dockercompose/defaults.go#L20>)
 
 ```go
 func RegisterAsDefaultBuilder()
@@ -109,7 +109,7 @@ func RegisterAsDefaultBuilder()
 
 RegisterAsDefaultBuilder should be invoked by a wiring spec if it wishes to use docker\-compose as the default way of combining container instances.
 
-If you are using the \[cmdbuilder\], then docker\-compose is automatically set as the default builder and you do not need to call this function again.
+If you are using the [cmdbuilder](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/cmdbuilder>), then docker\-compose is automatically set as the default builder and you do not need to call this function again.
 
 Default builders are responsible for building any container instances that exist in a wiring spec but aren't explicitly added to a container deployment within that wiring spec. The Blueprint compiler groups these "floating" container instances into a default dockercompose deployment with the name "docker".
 

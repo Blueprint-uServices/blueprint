@@ -145,8 +145,7 @@ func CreateClientProcess(spec wiring.WiringSpec, procName string, children ...st
 	return procName
 }
 
-// SetMetricCollector can be used by wiring specs to change the metric collector used by the process.
-// This method should not need to be used directly.  Instead it is used by other plugins such as
+// SetMetricCollector is not used directly by wiring specs; instead it is used by other plugins such as
 // [opentelemetry] to install custom metric collectors.
 //
 // [opentelemetry]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/opentelemetry
@@ -154,8 +153,7 @@ func SetMetricCollector(spec wiring.WiringSpec, procName string, metricCollNodeN
 	spec.SetProperty(procName, "metricCollector", metricCollNodeName)
 }
 
-// SetLogger can be used by wiring specs to change the logger used by the process.
-// This method should not need to be used directly.  Instead it is used by other plugins such as
+// SetLogger is not used directly by wiring specs; instead it is used by other plugins such as
 // [opentelemetry] to install custom loggers.
 //
 // [opentelemetry]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/opentelemetry
