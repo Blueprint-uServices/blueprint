@@ -1,31 +1,31 @@
 // Package opentelemetry provides three plugins:
-// (i)  a plugin to generate and include an opentelemetry collector instance in a Blueprint application.
-// (ii) a plugin to wrap the service with an OpenTelemetry wrapper to generate OT compatible traces by starting and stopping client spans for remote calls between services and correctly propagating context between services.
-// (iii) a plugin to install an opentelemetry logger for a go process. The logger adds all the logs as events to the current active span.
+//
+//  1. a plugin to generate and include an opentelemetry collector instance in a Blueprint application.
+//  2. a plugin to wrap the service with an OpenTelemetry wrapper to generate OT compatible traces by starting and stopping client spans for remote calls between services and correctly propagating context between services.
+//  3. a plugin to install an opentelemetry logger for a go process. The logger adds all the logs as events to the current active span.
 //
 // In order to generate complete end-to-end traces of the application, all services of the application need to be instrumented with OpenTelemetry.
 // If the plugin is only applied to a subset of services, the application will run, but the traces it produces won't be end-to-end and won't be useful.
 //
-// The package provides an in-memory trace exporter implementation and a go-client for generating traces on both the server and client side.
+// The package provides a go-client for generating traces on both the server and client side along with the ability to export traces to a custom collector such as jaeger or zipkin.
 // The generated clients handle context propagation correctly on both the server and client sides.
 //
 // The plugin does not support instrumenting clients for backends such as databases, caches, queues, etc. If needed, please consider submitting a PR or contacting the maintainers via google groups or on slack.
 //
 // Example usage (for complete instrumentation):
 //
-// import "github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
-// import "github.com/blueprint-uservices/blueprint/plugins/jaeger"
-// import "github.com/blueprint-uservices/blueprint/plugins/goproc"
+// # Wiring Example
 //
-// jaegerCollector := jaeger.Collector(spec, "jaeger_collector") // Define a custom opentelemetry collector
+// func applyOTeOptions() {
+// 	jaeger.Container(spec, "xtrace_server") // Defines and adds a jaeger server to the wiring spec. More info in Jaeger plugin.
 //
-// for _, service := range serviceNames {
-//    opentelemetry.Instrument(spec, service, jaegerCollector) // Instrument a service with opentelemetry tracing
-// }
+// 	for _, service := range serviceNames {
+//  	 opentelemetry.Instrument(spec, service) // Instrument service with ottrace instrumentation
+// 	}
 //
-// for _, proc := range procNames {
-//    logger := opentelemetry.Logger(spec, proc) // Define an OTTrace logger for the desired process
-//    goproc.SetLogger(spec, proc, logger) // Set the default logger for the desired process
+// 	for _, proc := range processNames {
+//  	 opentelemetry.Logger(spec, proc) // Define an ottrace-logger for the process
+// 	}
 // }
 package opentelemetry
 
