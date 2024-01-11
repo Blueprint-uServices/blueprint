@@ -2,8 +2,8 @@
 package common
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/route"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/train"
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/route"
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/train"
 )
 
 type TripType struct {

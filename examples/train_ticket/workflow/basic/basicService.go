@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"sync"
 
-	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/common"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/price"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/route"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/station"
-	"gitlab.mpi-sws.org/cld/blueprint/examples/train_ticket/workflow/train"
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/common"
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/price"
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/route"
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/station"
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/train"
 	"golang.org/x/exp/slices"
 )
 
