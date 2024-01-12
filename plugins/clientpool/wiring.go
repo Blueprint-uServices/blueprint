@@ -1,18 +1,24 @@
 // Package clientpool is a plugin that wraps the client side of a service to use a pool of N clients, disallowing
 // callers from making more than N concurrent oustanding calls each to the service.
 //
+// # Wiring Spec Usage
+//
+// To use the clientpool plugin in your wiring spec, simply apply it to an application-level service instance:
+//
+//	clientpool.Create(spec, "my_service", 10)
+//
+// # Description
+//
 // When applied, the clientpool plugin instantiates N instances of clients to a service, and callers have exclusive
 // access to a client when making a call.  This effectively limits the caller-side to only having N outstanding calls at
 // a time, with any extra calls blocking until a previous call completes and a client becomes available.
 // By contrast, the default Blueprint behavior is for all callers to share a single client that allows an unlimited
 // number of concurrent calls.
 //
-// To use the clientpool plugin in your wiring spec, simply apply it to an application-level service instance:
-//
-//	clientpool.Create(spec, "my_service", 10)
-//
 // After applying the clientpool plugin to a service, you can continue to apply application-level
 // modifiers to the service.
+//
+// # Artifacts Generated
 //
 // During compilation, the clientpool plugin will generate a client-side wrapper class.  The plugin
 // also utilizes some code in the [runtime/plugins/clientpool] package.
