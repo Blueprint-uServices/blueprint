@@ -90,13 +90,19 @@ func (handler *{{$receiver}}) {{$f.Name -}}
 	var err error
 	defer r.Body.Close()
 	{{range $_, $arg := $f.Arguments}}
+	{{if eq (NameOf $arg.Type) "string" -}}
+	{{$arg.Name}} := r.URL.Query().Get("{{$arg.Name}}")
+	{{- else -}}
 	request_{{$arg.Name}} := r.URL.Query().Get("{{$arg.Name}}")
 	var {{$arg.Name}} {{NameOf $arg.Type}}
-	err = json.Unmarshal([]byte(request_{{$arg.Name}}), &{{$arg.Name}})
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
+	if request_{{$arg.Name}} != "" {
+		err = json.Unmarshal([]byte(request_{{$arg.Name}}), &{{$arg.Name}})
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 	}
+	{{- end}}
 	{{end}}
 	ctx := context.Background()
 	{{RetVars $f "err"}} {{HasNewReturnVars $f}} handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})

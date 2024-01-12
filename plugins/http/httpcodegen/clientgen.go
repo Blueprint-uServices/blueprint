@@ -73,11 +73,15 @@ func New_{{.Name}}(ctx context.Context, serverAddress string) (*{{.Name}}, error
 func (client *{{$receiver}}) {{SignatureWithRetVars $f}} {
 	vals := url.Values{}
 	{{range $_, $arg := $f.Arguments}}
+	{{if eq (NameOf $arg.Type) "string" -}}
+	vals.Add("{{$arg.Name}}", {{$arg.Name}})
+	{{- else -}}
 	bytes_{{$arg.Name}}, err := json.Marshal({{$arg.Name}})
 	if err != nil {
 		return
 	}
 	vals.Add("{{$arg.Name}}", string(bytes_{{$arg.Name}}))
+	{{- end}}
 	{{end}}
 
 	encoded_url, err := url.Parse(client.ServerAddress + "/{{$f.Name}}")
