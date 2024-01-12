@@ -15,7 +15,7 @@ type Order struct {
 	From                   string
 	To                     string
 	Status                 uint16
-	Price                  float32
+	Price                  float64
 }
 
 type OrderInfo struct {

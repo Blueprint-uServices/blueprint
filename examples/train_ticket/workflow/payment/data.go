@@ -5,10 +5,12 @@ type Payment struct {
 	OrderID string
 	UserID  string
 	Price   string
+	Type    string
 }
 
 type Money struct {
 	ID     string
 	UserID string
 	Price  string
+	Type   string
 }

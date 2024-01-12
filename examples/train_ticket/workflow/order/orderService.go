@@ -14,18 +14,18 @@ import (
 
 type OrderService interface {
 	GetTicketListByDateAndTripId(ctx context.Context, travelDate string, trainNumber string) ([]Ticket, error)
-	CreateNewOrder(ctx context.Context, order Order) (Order, error)
-	AddCreateNewOrder(ctx context.Context, order Order) (Order, error)
+	CreateNewOrder(ctx context.Context, o Order) (Order, error)
+	AddCreateNewOrder(ctx context.Context, o Order) (Order, error)
 	QueryOrders(ctx context.Context, orderInfo OrderInfo, accountId string) ([]Order, error)
 	QueryOrdersForRefresh(ctx context.Context, orderInfo OrderInfo, accountId string) ([]Order, error)
 	CalculateSoldTicket(ctx context.Context, travelDate string, trainNumber string) (SoldTicket, error)
-	GetOrderPrice(ctx context.Context, orderId string) (float32, error)
+	GetOrderPrice(ctx context.Context, orderId string) (float64, error)
 	PayOrder(ctx context.Context, orderId string) (Order, error)
 	GetOrderById(ctx context.Context, orderId string) (Order, error)
 	ModifyOrder(ctx context.Context, orderId string, status uint16) (Order, error)
 	SecurityInfoCheck(ctx context.Context, checkDate string, accountId string) (map[string]uint16, error)
-	SaveOrderInfo(ctx context.Context, order Order) (Order, error)
-	UpdateOrder(ctx context.Context, order Order) (Order, error)
+	SaveOrderInfo(ctx context.Context, o Order) (Order, error)
+	UpdateOrder(ctx context.Context, o Order) (Order, error)
 	DeleteOrder(ctx context.Context, orderId string) (string, error)
 	FindAllOrder(ctx context.Context) ([]Order, error)
 }
@@ -73,16 +73,16 @@ func (osi *OrderServiceImpl) GetTicketListByDateAndTripId(ctx context.Context, t
 	return tickets, nil
 }
 
-func (osi *OrderServiceImpl) CreateNewOrder(ctx context.Context, order Order) (Order, error) {
-	return osi.CreateNewOrder(ctx, order)
+func (osi *OrderServiceImpl) CreateNewOrder(ctx context.Context, o Order) (Order, error) {
+	return osi.CreateNewOrder(ctx, o)
 }
 
-func (osi *OrderServiceImpl) AddCreateNewOrder(ctx context.Context, order Order) (Order, error) {
+func (osi *OrderServiceImpl) AddCreateNewOrder(ctx context.Context, o Order) (Order, error) {
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
 	if err != nil {
 		return Order{}, err
 	}
-	query := bson.D{{"accountid", order.AccountId}}
+	query := bson.D{{"accountid", o.AccountId}}
 	res, err := collection.FindOne(ctx, query)
 	if err != nil {
 		return Order{}, errors.New("Order doesn't exist")
@@ -96,13 +96,13 @@ func (osi *OrderServiceImpl) AddCreateNewOrder(ctx context.Context, order Order)
 		return Order{}, errors.New("Order already exists for this account.")
 	}
 
-	order.Id = uuid.New().String()
-	err = collection.InsertOne(ctx, order)
+	o.Id = uuid.New().String()
+	err = collection.InsertOne(ctx, o)
 	if err != nil {
 		return Order{}, nil
 	}
 
-	return order, nil
+	return o, nil
 }
 
 func (osi *OrderServiceImpl) QueryOrders(ctx context.Context, orderInfo OrderInfo, accountId string) ([]Order, error) {
@@ -234,7 +234,7 @@ func (osi *OrderServiceImpl) CalculateSoldTicket(ctx context.Context, travelDate
 	return soldTicket, nil
 }
 
-func (osi *OrderServiceImpl) GetOrderPrice(ctx context.Context, orderId string) (float32, error) {
+func (osi *OrderServiceImpl) GetOrderPrice(ctx context.Context, orderId string) (float64, error) {
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
 	if err != nil {
 		return 0.0, err
@@ -381,10 +381,10 @@ func (osi *OrderServiceImpl) SecurityInfoCheck(ctx context.Context, checkDate st
 	return ret, nil
 }
 
-func (osi *OrderServiceImpl) SaveOrderInfo(ctx context.Context, order Order) (Order, error) {
+func (osi *OrderServiceImpl) SaveOrderInfo(ctx context.Context, o Order) (Order, error) {
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
 
-	query := bson.D{{"id", order.Id}}
+	query := bson.D{{"id", o.Id}}
 	res, err := collection.FindOne(ctx, query)
 	if err != nil {
 		return Order{}, err
@@ -395,24 +395,24 @@ func (osi *OrderServiceImpl) SaveOrderInfo(ctx context.Context, order Order) (Or
 		return Order{}, err
 	}
 	if ok {
-		return osi.UpdateOrder(ctx, order)
+		return osi.UpdateOrder(ctx, o)
 	}
 
-	err = collection.InsertOne(ctx, order)
+	err = collection.InsertOne(ctx, o)
 	if err != nil {
 		return Order{}, nil
 	}
-	return order, nil
+	return o, nil
 }
 
-func (osi *OrderServiceImpl) UpdateOrder(ctx context.Context, order Order) (Order, error) {
+func (osi *OrderServiceImpl) UpdateOrder(ctx context.Context, o Order) (Order, error) {
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
 	if err != nil {
 		return Order{}, err
 	}
 
-	query := bson.D{{"id", order.Id}}
-	ok, err := collection.Upsert(ctx, query, order)
+	query := bson.D{{"id", o.Id}}
+	ok, err := collection.Upsert(ctx, query, o)
 	if err != nil {
 		return Order{}, err
 	}
@@ -420,7 +420,7 @@ func (osi *OrderServiceImpl) UpdateOrder(ctx context.Context, order Order) (Orde
 		return Order{}, errors.New("Unable to update order")
 	}
 
-	return order, nil
+	return o, nil
 }
 
 func (osi *OrderServiceImpl) DeleteOrder(ctx context.Context, orderId string) (string, error) {
