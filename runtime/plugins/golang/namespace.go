@@ -207,7 +207,7 @@ func (b *NamespaceBuilder) Build(ctx context.Context) (*Namespace, error) {
 	signal.Notify(signals, os.Interrupt)
 	go func() {
 		for sig := range signals {
-			slog.Info(fmt.Sprintf("nonleaf_service_process received %v\n", sig))
+			slog.Info(fmt.Sprintf("received %v\n", sig))
 			n.Shutdown(false)
 		}
 	}()

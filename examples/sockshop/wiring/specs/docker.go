@@ -6,6 +6,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/gotests"
 	"github.com/blueprint-uservices/blueprint/plugins/grpc"
+	"github.com/blueprint-uservices/blueprint/plugins/http"
 	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
 	"github.com/blueprint-uservices/blueprint/plugins/mysql"
@@ -37,12 +38,16 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	trace_collector := zipkin.Collector(spec, "zipkin")
 
 	// Modifiers that will be applied to all services
-	applyDockerDefaults := func(serviceName string) {
+	applyDockerDefaults := func(serviceName string, useHTTP ...bool) {
 		// Golang-level modifiers that add functionality
 		retries.AddRetries(spec, serviceName, 3)
 		clientpool.Create(spec, serviceName, 10)
 		opentelemetry.Instrument(spec, serviceName, trace_collector)
-		grpc.Deploy(spec, serviceName)
+		if len(useHTTP) > 0 && useHTTP[0] {
+			http.Deploy(spec, serviceName)
+		} else {
+			grpc.Deploy(spec, serviceName)
+		}
 
 		// Deploying to namespaces
 		goproc.Deploy(spec, serviceName)
@@ -82,7 +87,7 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	applyDockerDefaults(catalogue_service)
 
 	frontend := workflow.Service(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
-	applyDockerDefaults(frontend)
+	applyDockerDefaults(frontend, true) // Only the frontend gets deployed with HTTP
 
 	// Instantiate starting with the frontend which will trigger all other services to be instantiated
 	// Also include the tests
