@@ -23,6 +23,7 @@ type SimpleBackend struct {
 
 	// Interfaces for generating Golang artifacts
 	golang.ProvidesModule
+	golang.ProvidesInterface
 	golang.Instantiable
 
 	InstanceName string
@@ -65,24 +66,29 @@ func (node *SimpleBackend) init() error {
 	return nil
 }
 
+// Implements ir.IRNode
 func (node *SimpleBackend) Name() string {
 	return node.InstanceName
 }
 
+// Implements golang.Service
 func (node *SimpleBackend) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.Iface.ServiceInterface(ctx), nil
 }
 
+// Implements golang.ProvidesModule
 func (node *SimpleBackend) AddToWorkspace(builder golang.WorkspaceBuilder) error {
 	// The backend interface and impl implementation exist in the runtime package
 	// Add blueprint runtime to the workspace
 	return golang.AddRuntimeModule(builder)
 }
 
+// Implements golang.ProvidesInterface
 func (node *SimpleBackend) AddInterfaces(builder golang.ModuleBuilder) error {
 	return node.AddToWorkspace(builder.Workspace())
 }
 
+// Ipmlements golang.Instantiable
 func (node *SimpleBackend) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
@@ -93,6 +99,7 @@ func (node *SimpleBackend) AddInstantiation(builder golang.NamespaceBuilder) err
 	return builder.DeclareConstructor(node.InstanceName, node.Constructor, nil)
 }
 
+// Implements ir.IRNode
 func (node *SimpleBackend) String() string {
 	return fmt.Sprintf("%v = %v()", node.InstanceName, node.BackendImpl)
 }
