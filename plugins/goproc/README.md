@@ -6,6 +6,48 @@
 import "github.com/blueprint-uservices/blueprint/plugins/goproc"
 ```
 
+Package goproc is a plugin for instantiating golang application\-level instances within a single golang process.
+
+### Wiring Spec Usage
+
+To use the goproc plugin in your wiring spec, you can declare a process, giving it a name and specifying which golang instances to include.
+
+```
+goproc.CreateProcess(spec, "my_process", "user_service", "payment_service", "cart_service")
+```
+
+If you are only deploying a single service within the process, you can use the shorter [Deploy](<#Deploy>):
+
+```
+goproc.Deploy(spec, "user_service")
+```
+
+When a service is added to a process, the goproc plugin also adds a modifier to the service. Thus, any application\-level modifiers should be applied to the service \*before\* deploying it into a process.
+
+If you expect services to be reachable from outside the process, then make sure they have been deployed using e.g. the gRPC plugin, prior to deploying the service in a process.
+
+### Default Builder
+
+The goproc plugin is the default builder for "floating" golang instances \(ie, golang instances that haven't been added to any process\).
+
+### Artifacts Generated
+
+During compilation, the plugin creates a golang workspace and pulls in all module dependencies. Within the workspace, the plugin creates a module and instructs all golang instances to generate their code into that module. Finally, the plugin generates a main.go with a main method that instantiates the golang instances.
+
+### Running artifacts
+
+A generated goproc can be run by running the main.go from the workspace directory.
+
+```
+go run {{.procName}}/main.go -h
+```
+
+The goproc may require additional command line arguments \(e.g. bind or dial addresses\) in order to run; if so, running the goproc will report any missing variables.
+
+### Internals
+
+Internally, the goproc plugin makes use of interfaces defined in the [golang](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/golang>) plugin. It can combine any golang.Node IRNodes. The plugin uses the WorkspaceBuilder, ModuleBuilder, and NamespaceBuilder defined by the golang plugin to accumulate and generate code.
+
 ## Index
 
 - [func AddToProcess\(spec wiring.WiringSpec, procName, childName string\)](<#AddToProcess>)
@@ -15,10 +57,6 @@ import "github.com/blueprint-uservices/blueprint/plugins/goproc"
 - [func RegisterAsDefaultBuilder\(\)](<#RegisterAsDefaultBuilder>)
 - [func SetLogger\(spec wiring.WiringSpec, procName string, loggerNodeName string\)](<#SetLogger>)
 - [func SetMetricCollector\(spec wiring.WiringSpec, procName string, metricCollNodeName string\)](<#SetMetricCollector>)
-- [type GolangProcessNamespace](<#GolangProcessNamespace>)
-  - [func \(proc \*GolangProcessNamespace\) Accepts\(nodeType any\) bool](<#GolangProcessNamespace.Accepts>)
-  - [func \(proc \*GolangProcessNamespace\) AddEdge\(name string, edge ir.IRNode\) error](<#GolangProcessNamespace.AddEdge>)
-  - [func \(proc \*GolangProcessNamespace\) AddNode\(name string, node ir.IRNode\) error](<#GolangProcessNamespace.AddNode>)
 - [type Process](<#Process>)
   - [func \(node \*Process\) AddProcessArtifacts\(builder linux.ProcessWorkspace\) error](<#Process.AddProcessArtifacts>)
   - [func \(node \*Process\) AddProcessInstance\(builder linux.ProcessWorkspace\) error](<#Process.AddProcessInstance>)
@@ -29,110 +67,88 @@ import "github.com/blueprint-uservices/blueprint/plugins/goproc"
 
 
 <a name="AddToProcess"></a>
-## func [AddToProcess](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/wiring.go#L11>)
+## func [AddToProcess](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L57>)
 
 ```go
 func AddToProcess(spec wiring.WiringSpec, procName, childName string)
 ```
 
-Adds a child node to an existing process
+AddToProcess can be used by wiring specs to add a golang instance to an existing golang process.
 
 <a name="CreateClientProcess"></a>
-## func [CreateClientProcess](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/wiring.go#L73>)
+## func [CreateClientProcess](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L135>)
 
 ```go
 func CreateClientProcess(spec wiring.WiringSpec, procName string, children ...string) string
 ```
 
-Creates a process that contains clients to the specified children. This is for convenience in serving as a starting point to write a custom client
+CreateClientProcess can be used by wiring specs to create a process that contains only clients of the specified children. This is for convenience in serving as a starting point to write a custom client
 
 <a name="CreateProcess"></a>
-## func [CreateProcess](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/wiring.go#L25>)
+## func [CreateProcess](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L87>)
 
 ```go
 func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) string
 ```
 
-Creates a process with a given name, and adds the provided nodes as children. This method is only needed when creating processes with more than one child node; otherwise it is easier to use [Deploy](<#Deploy>)
+CreateProcess can be used by wiring specs to define a process called procName and to deploy the golang services children. CreateProcess only needs to be used when more than one children are being added to the process; otherwise it is more convenient to use [Deploy](<#Deploy>).
+
+After calling CreateProcess, other golang services can still be added to the process by calling [AddToProcess](<#AddToProcess>) using the same procName.
+
+After calling CreateProcess, any children that are services will be process\-level services that can now have process\-level modifiers applied to them, or can be deployed to containers.
+
+procName is configured with a logger that prints to stdout. To change the logger, call [SetLogger](<#SetLogger>).
+
+procName is configured with a metric collector that prints to stdout. To change the metric collector, call [SetMetricCollector](<#SetMetricCollector>)
 
 <a name="Deploy"></a>
-## func [Deploy](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/wiring.go#L16>)
+## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L66>)
 
 ```go
 func Deploy(spec wiring.WiringSpec, serviceName string) string
 ```
 
-Wraps serviceName with a modifier that deploys the service inside a Golang process
+Deploy can be used by wiring specs to deploy a golang service in a golang process.
+
+Adds a modifier to the service that will create the golang process if not already created.
+
+After calling [Deploy](<#Deploy>), serviceName will be a process\-level service.
 
 <a name="RegisterAsDefaultBuilder"></a>
-## func [RegisterAsDefaultBuilder](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/defaults.go#L9>)
+## func [RegisterAsDefaultBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/defaults.go#L20>)
 
 ```go
 func RegisterAsDefaultBuilder()
 ```
 
+RegisterAsDefaultBuilder should be invoked by a wiring spec if it wishes to use goproc as the default way of combining golang instances.
 
+If you are using the [cmdbuilder](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/cmdbuilder>), then goproc is automatically set as the default builder and you do not need to call this function.
+
+Default builders are responsible for building any golang instances that exist in a wiring spec but aren't explicitly added to a goproc within that wiring spec. The Blueprint compiler groups these "floating" golang instances into a default golang process with the name "goproc".
 
 <a name="SetLogger"></a>
-## func [SetLogger](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/wiring.go#L98>)
+## func [SetLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L166>)
 
 ```go
 func SetLogger(spec wiring.WiringSpec, procName string, loggerNodeName string)
 ```
 
-Override the default logger for this process
+SetLogger is not used directly by wiring specs; instead it is used by other plugins such as [opentelemetry](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/opentelemetry>) to install custom loggers.
 
 <a name="SetMetricCollector"></a>
-## func [SetMetricCollector](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/wiring.go#L93>)
+## func [SetMetricCollector](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L158>)
 
 ```go
 func SetMetricCollector(spec wiring.WiringSpec, procName string, metricCollNodeName string)
 ```
 
-Override the default metric collector for this process
-
-<a name="GolangProcessNamespace"></a>
-## type [GolangProcessNamespace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/wiring.go#L121-L123>)
-
-A \[wiring.NamespaceHandler\] used to build [Process](<#Process>) IRNodes
-
-```go
-type GolangProcessNamespace struct {
-    *Process
-}
-```
-
-<a name="GolangProcessNamespace.Accepts"></a>
-### func \(\*GolangProcessNamespace\) [Accepts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/wiring.go#L126>)
-
-```go
-func (proc *GolangProcessNamespace) Accepts(nodeType any) bool
-```
-
-Implements \[wiring.NamespaceHandler\]
-
-<a name="GolangProcessNamespace.AddEdge"></a>
-### func \(\*GolangProcessNamespace\) [AddEdge](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/wiring.go#L132>)
-
-```go
-func (proc *GolangProcessNamespace) AddEdge(name string, edge ir.IRNode) error
-```
-
-Implements \[wiring.NamespaceHandler\]
-
-<a name="GolangProcessNamespace.AddNode"></a>
-### func \(\*GolangProcessNamespace\) [AddNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/wiring.go#L138>)
-
-```go
-func (proc *GolangProcessNamespace) AddNode(name string, node ir.IRNode) error
-```
-
-Implements \[wiring.NamespaceHandler\]
+SetMetricCollector is not used directly by wiring specs; instead it is used by other plugins such as [opentelemetry](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/opentelemetry>) to install custom metric collectors.
 
 <a name="Process"></a>
-## type [Process](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L26-L38>)
+## type [Process](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L10-L22>)
 
-An IRNode representing a golang process. This is Blueprint's main implementation of Golang processes
+An IRNode representing a golang process, which is a collection of application\-level golang instances.
 
 ```go
 type Process struct {
@@ -146,7 +162,7 @@ type Process struct {
 ```
 
 <a name="Process.AddProcessArtifacts"></a>
-### func \(\*Process\) [AddProcessArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/deploy_linux_.go#L28>)
+### func \(\*Process\) [AddProcessArtifacts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/deploy_linux_.go#L28>)
 
 ```go
 func (node *Process) AddProcessArtifacts(builder linux.ProcessWorkspace) error
@@ -155,7 +171,7 @@ func (node *Process) AddProcessArtifacts(builder linux.ProcessWorkspace) error
 Implements linux.ProvidesProcessArtifacts
 
 <a name="Process.AddProcessInstance"></a>
-### func \(\*Process\) [AddProcessInstance](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/deploy_linux_.go#L55>)
+### func \(\*Process\) [AddProcessInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/deploy_linux_.go#L55>)
 
 ```go
 func (node *Process) AddProcessInstance(builder linux.ProcessWorkspace) error
@@ -164,7 +180,7 @@ func (node *Process) AddProcessInstance(builder linux.ProcessWorkspace) error
 Implements linux.InstantiableProcess
 
 <a name="Process.GenerateArtifacts"></a>
-### func \(\*Process\) [GenerateArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/deploy.go#L37>)
+### func \(\*Process\) [GenerateArtifacts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/deploy.go#L37>)
 
 ```go
 func (node *Process) GenerateArtifacts(workspaceDir string) error
@@ -179,7 +195,7 @@ This will collect and package all of the code for the contained Golang nodes and
 The output code will be runnable on the local filesystem, assuming the user has configured the appropriate environment
 
 <a name="Process.ImplementsLinuxProcess"></a>
-### func \(\*Process\) [ImplementsLinuxProcess](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/deploy_linux_.go#L77>)
+### func \(\*Process\) [ImplementsLinuxProcess](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/deploy_linux_.go#L77>)
 
 ```go
 func (node *Process) ImplementsLinuxProcess()
@@ -188,7 +204,7 @@ func (node *Process) ImplementsLinuxProcess()
 
 
 <a name="Process.Name"></a>
-### func \(\*Process\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L51>)
+### func \(\*Process\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L34>)
 
 ```go
 func (proc *Process) Name() string
@@ -197,7 +213,7 @@ func (proc *Process) Name() string
 Implements ir.IRNode
 
 <a name="Process.String"></a>
-### func \(\*Process\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L56>)
+### func \(\*Process\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/ir_goproc.go#L39>)
 
 ```go
 func (proc *Process) String() string

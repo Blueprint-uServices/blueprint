@@ -37,7 +37,7 @@ The applications must use a backend.RelationalDB \(runtime/core/backend\) as the
 
 
 <a name="Container"></a>
-## func [Container](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/wiring.go#L22>)
+## func [Container](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/wiring.go#L22>)
 
 ```go
 func Container(spec wiring.WiringSpec, dbName string) string
@@ -46,7 +46,7 @@ func Container(spec wiring.WiringSpec, dbName string) string
 Container generate the IRNodes for a mysql server docker container that uses the latest mysql/mysql image and the clients needed by the generated application to communicate with the server.
 
 <a name="MySQLDBContainer"></a>
-## type [MySQLDBContainer](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L14-L23>)
+## type [MySQLDBContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L14-L23>)
 
 Blueprint IR Node that represents the server side docker container
 
@@ -63,7 +63,7 @@ type MySQLDBContainer struct {
 ```
 
 <a name="MySQLDBContainer.AddContainerArtifacts"></a>
-### func \(\*MySQLDBContainer\) [AddContainerArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L84>)
+### func \(\*MySQLDBContainer\) [AddContainerArtifacts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L84>)
 
 ```go
 func (m *MySQLDBContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error
@@ -72,7 +72,7 @@ func (m *MySQLDBContainer) AddContainerArtifacts(target docker.ContainerWorkspac
 
 
 <a name="MySQLDBContainer.AddContainerInstance"></a>
-### func \(\*MySQLDBContainer\) [AddContainerInstance](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L88>)
+### func \(\*MySQLDBContainer\) [AddContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L88>)
 
 ```go
 func (m *MySQLDBContainer) AddContainerInstance(target docker.ContainerWorkspace) error
@@ -81,7 +81,7 @@ func (m *MySQLDBContainer) AddContainerInstance(target docker.ContainerWorkspace
 
 
 <a name="MySQLDBContainer.GenerateArtifacts"></a>
-### func \(\*MySQLDBContainer\) [GenerateArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L80>)
+### func \(\*MySQLDBContainer\) [GenerateArtifacts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L80>)
 
 ```go
 func (m *MySQLDBContainer) GenerateArtifacts(outdir string) error
@@ -90,7 +90,7 @@ func (m *MySQLDBContainer) GenerateArtifacts(outdir string) error
 
 
 <a name="MySQLDBContainer.GetInterface"></a>
-### func \(\*MySQLDBContainer\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L75>)
+### func \(\*MySQLDBContainer\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L75>)
 
 ```go
 func (m *MySQLDBContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -99,7 +99,7 @@ func (m *MySQLDBContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInt
 
 
 <a name="MySQLDBContainer.Name"></a>
-### func \(\*MySQLDBContainer\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L71>)
+### func \(\*MySQLDBContainer\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L71>)
 
 ```go
 func (m *MySQLDBContainer) Name() string
@@ -108,7 +108,7 @@ func (m *MySQLDBContainer) Name() string
 
 
 <a name="MySQLDBContainer.String"></a>
-### func \(\*MySQLDBContainer\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L67>)
+### func \(\*MySQLDBContainer\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L67>)
 
 ```go
 func (m *MySQLDBContainer) String() string
@@ -117,7 +117,7 @@ func (m *MySQLDBContainer) String() string
 
 
 <a name="MySQLDBGoClient"></a>
-## type [MySQLDBGoClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_client.go#L18-L28>)
+## type [MySQLDBGoClient](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_client.go#L18-L28>)
 
 Blueprint IR Node that represents the generated client for the mysql container
 
@@ -136,7 +136,7 @@ type MySQLDBGoClient struct {
 ```
 
 <a name="MySQLDBGoClient.AddInstantiation"></a>
-### func \(\*MySQLDBGoClient\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_client.go#L84>)
+### func \(\*MySQLDBGoClient\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_client.go#L84>)
 
 ```go
 func (m *MySQLDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -145,7 +145,7 @@ func (m *MySQLDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) erro
 
 
 <a name="MySQLDBGoClient.AddInterfaces"></a>
-### func \(\*MySQLDBGoClient\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_client.go#L80>)
+### func \(\*MySQLDBGoClient\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_client.go#L80>)
 
 ```go
 func (n *MySQLDBGoClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -154,7 +154,7 @@ func (n *MySQLDBGoClient) AddInterfaces(builder golang.ModuleBuilder) error
 
 
 <a name="MySQLDBGoClient.AddToWorkspace"></a>
-### func \(\*MySQLDBGoClient\) [AddToWorkspace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_client.go#L76>)
+### func \(\*MySQLDBGoClient\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_client.go#L76>)
 
 ```go
 func (m *MySQLDBGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
@@ -163,7 +163,7 @@ func (m *MySQLDBGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
 
 
 <a name="MySQLDBGoClient.GetInterface"></a>
-### func \(\*MySQLDBGoClient\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_client.go#L72>)
+### func \(\*MySQLDBGoClient\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_client.go#L72>)
 
 ```go
 func (m *MySQLDBGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -172,7 +172,7 @@ func (m *MySQLDBGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInte
 
 
 <a name="MySQLDBGoClient.ImplementsGolangNode"></a>
-### func \(\*MySQLDBGoClient\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_client.go#L94>)
+### func \(\*MySQLDBGoClient\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_client.go#L94>)
 
 ```go
 func (node *MySQLDBGoClient) ImplementsGolangNode()
@@ -181,7 +181,7 @@ func (node *MySQLDBGoClient) ImplementsGolangNode()
 
 
 <a name="MySQLDBGoClient.ImplementsGolangService"></a>
-### func \(\*MySQLDBGoClient\) [ImplementsGolangService](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_client.go#L95>)
+### func \(\*MySQLDBGoClient\) [ImplementsGolangService](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_client.go#L95>)
 
 ```go
 func (node *MySQLDBGoClient) ImplementsGolangService()
@@ -190,7 +190,7 @@ func (node *MySQLDBGoClient) ImplementsGolangService()
 
 
 <a name="MySQLDBGoClient.Name"></a>
-### func \(\*MySQLDBGoClient\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_client.go#L48>)
+### func \(\*MySQLDBGoClient\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_client.go#L48>)
 
 ```go
 func (m *MySQLDBGoClient) Name() string
@@ -199,7 +199,7 @@ func (m *MySQLDBGoClient) Name() string
 
 
 <a name="MySQLDBGoClient.String"></a>
-### func \(\*MySQLDBGoClient\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_client.go#L44>)
+### func \(\*MySQLDBGoClient\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_client.go#L44>)
 
 ```go
 func (m *MySQLDBGoClient) String() string
@@ -208,7 +208,7 @@ func (m *MySQLDBGoClient) String() string
 
 
 <a name="MySQLInterface"></a>
-## type [MySQLInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L26-L29>)
+## type [MySQLInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L26-L29>)
 
 MySQL interface exposed by the docker container.
 
@@ -220,7 +220,7 @@ type MySQLInterface struct {
 ```
 
 <a name="MySQLInterface.GetMethods"></a>
-### func \(\*MySQLInterface\) [GetMethods](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L35>)
+### func \(\*MySQLInterface\) [GetMethods](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L35>)
 
 ```go
 func (m *MySQLInterface) GetMethods() []service.Method
@@ -229,7 +229,7 @@ func (m *MySQLInterface) GetMethods() []service.Method
 
 
 <a name="MySQLInterface.GetName"></a>
-### func \(\*MySQLInterface\) [GetName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L31>)
+### func \(\*MySQLInterface\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/mysql/ir_mysql_container.go#L31>)
 
 ```go
 func (m *MySQLInterface) GetName() string

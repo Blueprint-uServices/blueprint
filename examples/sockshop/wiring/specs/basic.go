@@ -1,10 +1,10 @@
-// Package specs provides various different wiring specs for the SockShop application.
-// These specs are used when running wiring/main.go.
+// Package specs implements wiring specs for the SockShop application.
+//
+// The wiring spec can be specified using the -w option when running wiring/main.go
 package specs
 
 import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
-	"github.com/blueprint-uservices/blueprint/plugins/gotests"
 	"github.com/blueprint-uservices/blueprint/plugins/simple"
 	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
@@ -41,7 +41,5 @@ func makeBasicSpec(spec wiring.WiringSpec) ([]string, error) {
 
 	frontend := workflow.Service(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
 
-	tests := gotests.Test(spec, user_service, payment_service, cart_service, shipping_service, order_service, catalogue_service, frontend)
-
-	return []string{user_service, payment_service, cart_service, shipping_service, queue_master, order_service, catalogue_service, frontend, tests}, nil
+	return []string{user_service, payment_service, cart_service, shipping_service, queue_master, order_service, catalogue_service, frontend}, nil
 }

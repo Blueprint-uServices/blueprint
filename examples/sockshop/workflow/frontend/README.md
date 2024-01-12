@@ -15,7 +15,7 @@ Package frontend implements the SockShop frontend service, typically deployed vi
 
 
 <a name="Frontend"></a>
-## type [Frontend](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/frontend/frontend.go#L17-L80>)
+## type [Frontend](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/sockshop/workflow/frontend/frontend.go#L17-L80>)
 
 The SockShop Frontend receives requests from users and proxies them to the application's other services
 
@@ -87,7 +87,7 @@ type Frontend interface {
 ```
 
 <a name="NewFrontend"></a>
-### func [NewFrontend](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/workflow/frontend/frontend.go#L91>)
+### func [NewFrontend](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/sockshop/workflow/frontend/frontend.go#L91>)
 
 ```go
 func NewFrontend(ctx context.Context, user user.UserService, catalogue catalogue.CatalogueService, cart cart.CartService, order order.OrderService) (Frontend, error)

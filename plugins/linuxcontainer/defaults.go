@@ -6,11 +6,17 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/linux"
 )
 
-/*
-Registers a linux process workspace as the default way of combining and building processes
-*/
-
-// to trigger module initialization and register builders
+// RegisterAsDefaultBuilder should be invoked by a wiring spec if it wishes to use linuxcontainer as the default
+// way of combining process instances.
+//
+// If you are using the [cmdbuilder], then linuxcontainer is automatically set as the default builder and you
+// do not need to call this function.
+//
+// Default builders are responsible for building any process instances that exist in a wiring spec but aren't
+// explicitly added to a container within that wiring spec.  The Blueprint compiler groups these
+// "floating" process instances into a default linux container with the name "linuxcontainer".
+//
+// [cmdbuilder]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/cmdbuilder
 func RegisterAsDefaultBuilder() {
 	ir.RegisterDefaultNamespace[linux.Process]("linuxcontainer", buildDefaultLinuxWorkspace)
 }

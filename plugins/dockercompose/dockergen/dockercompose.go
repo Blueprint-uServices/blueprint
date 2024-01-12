@@ -12,9 +12,8 @@ import (
 )
 
 /*
-Generates the docker-compose file of a docker app
+Used for generating the docker-compose file of a docker app
 */
-
 type DockerComposeFile struct {
 	WorkspaceName string
 	WorkspaceDir  string

@@ -38,7 +38,7 @@ func makeHTTPSpec(spec wiring.WiringSpec) ([]string, error) {
 func applyHTTPDefaults(spec wiring.WiringSpec, serviceName string, collectorName string) string {
 	procName := fmt.Sprintf("%s_process", serviceName)
 	ctrName := fmt.Sprintf("%s_container", serviceName)
-	opentelemetry.InstrumentUsingCustomCollector(spec, serviceName, collectorName)
+	opentelemetry.Instrument(spec, serviceName, collectorName)
 	http.Deploy(spec, serviceName)
 	goproc.CreateProcess(spec, procName, serviceName)
 	return linuxcontainer.CreateContainer(spec, ctrName, procName)

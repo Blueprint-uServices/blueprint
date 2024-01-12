@@ -17,6 +17,12 @@ Any template that is executed using ExecuteTemplate will be able to use
 the helper functions defined in this file within the template.
 */
 
+// A helper function for executing [text/template] templates to string.
+//
+// When executing the provided template body, the body can make use of a number
+// of convenience functions.  See [gogen/template.go] for details.
+//
+// [gogen/template.go]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/golang/gogen/template.go
 func ExecuteTemplate(name string, body string, args any) (string, error) {
 	e := newTemplateExecutor(args)
 
@@ -31,6 +37,12 @@ func ExecuteTemplate(name string, body string, args any) (string, error) {
 	return e.exec(name, body, args)
 }
 
+// A helper function for executing [text/template] templates to file
+//
+// When executing the provided template body, the body can make use of a number
+// of convenience functions.  See [gogen/template.go] for details.
+//
+// [gogen/template.go]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/golang/gogen/template.go
 func ExecuteTemplateToFile(name string, body string, args any, filename string) error {
 	f, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR, 0755)
 	if err != nil {

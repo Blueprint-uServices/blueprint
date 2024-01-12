@@ -6,7 +6,9 @@
 import "github.com/blueprint-uservices/blueprint/examples/sockshop/wiring/specs"
 ```
 
-Package specs provides various different wiring specs for the SockShop application. These specs are used when running wiring/main.go.
+Package specs implements wiring specs for the SockShop application.
+
+The wiring spec can be specified using the \-w option when running wiring/main.go
 
 ## Index
 
@@ -25,13 +27,27 @@ var Basic = wiringcmd.SpecOption{
 }
 ```
 
-<a name="Docker"></a>A wiring spec that deploys each service into its own Docker container and using gRPC to communicate between services. All RPC calls are retried up to 3 times. RPC clients use a client pool with 10 clients. All services are instrumented with OpenTelemetry and traces are exported to Zipkin The user, cart, shipping, and orders services using separate MongoDB instances to store their data. The catalogue service uses MySQL to store catalogue data. The shipping service and queue master service run within the same process \(TODO: separate processes\)
+<a name="Docker"></a>A wiring spec that deploys each service into its own Docker container and using gRPC to communicate between services.
+
+All RPC calls are retried up to 3 times. RPC clients use a client pool with 10 clients. All services are instrumented with OpenTelemetry and traces are exported to Zipkin
+
+The user, cart, shipping, and orders services using separate MongoDB instances to store their data. The catalogue service uses MySQL to store catalogue data. The shipping service and queue master service run within the same process.
 
 ```go
 var Docker = wiringcmd.SpecOption{
     Name:        "docker",
     Description: "Deploys each service in a separate container with gRPC, and uses mongodb as NoSQL database backends.",
     Build:       makeDockerSpec,
+}
+```
+
+<a name="DockerRabbit"></a>A wiring spec that deploys each service into its own Docker container and using gRPC to communicate between services. All RPC calls are retried up to 3 times. RPC clients use a client pool with 10 clients. All services are instrumented with OpenTelemetry and traces are exported to Zipkin The user, cart, shipping, and orders services using separate MongoDB instances to store their data. The catalogue service uses MySQL to store catalogue data. The shipping service and queue master service run within the same process \(TODO: separate processes\)
+
+```go
+var DockerRabbit = wiringcmd.SpecOption{
+    Name:        "rabbit",
+    Description: "Deploys each service in a separate container with gRPC, and uses mongodb as NoSQL database backends and rabbitmq as the queue backend.",
+    Build:       makeDockerRabbitSpec,
 }
 ```
 

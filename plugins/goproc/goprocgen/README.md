@@ -6,13 +6,15 @@
 import "github.com/blueprint-uservices/blueprint/plugins/goproc/goprocgen"
 ```
 
+Package goprocgen implements code generation for the main.go file
+
 ## Index
 
 - [func GenerateMain\(name string, argNodes \[\]ir.IRNode, nodesToInstantiate \[\]ir.IRNode, module golang.ModuleBuilder, namespaceConstructor string\) error](<#GenerateMain>)
 
 
 <a name="GenerateMain"></a>
-## func [GenerateMain](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/goproc/goprocgen/main.go.go#L18-L23>)
+## func [GenerateMain](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/goprocgen/main.go.go#L17-L22>)
 
 ```go
 func GenerateMain(name string, argNodes []ir.IRNode, nodesToInstantiate []ir.IRNode, module golang.ModuleBuilder, namespaceConstructor string) error

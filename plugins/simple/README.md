@@ -6,11 +6,52 @@
 import "github.com/blueprint-uservices/blueprint/plugins/simple"
 ```
 
-Package simple provides basic in\-memory implementations of various Blueprint backends including Cache, Queue, NoSQLDB, and RelationalDB.
+Package simple provides basic in\-memory implementations of the Cache, Queue, NoSQLDB, and RelationalDB [backends](<https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/core/backend>) that are used by workflow services.
 
-These simple in\-memory implementations are useful when compiling all\-in\-one applications, and for use during development and testing of workflow specs.
+The simple backend implementations are alternatives to the heavyweight "full system" implementations such as [memcached](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/memcached>), [rabbitmq](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/rabbitmq>), [mongodb](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/mongodb>), [mysql](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/mysql>), etc.
 
-For a more fully\-fledged microservice application, these simple backends are a poor choice; instead a "proper" implementation such as MySQL, Kafka, MongoDB etc. should be used.
+The simple backend implementations are in\-memory data structures; they must reside within the same process as the services that use them.
+
+### Wiring Spec Usage
+
+To instantiate a simple backend in your wiring spec, use the corresponding method for the backend type, giving the backend instance a name:
+
+```
+simple.NoSQLDB(spec, "my_nosql_db")
+simple.RelationalDB(spec, "my_relational_db")
+simple.Queue(spec, "my_queue")
+simple.Cache(spec, "my_cache")
+```
+
+After instantiating a backend, it can be provided as argument to a workflow service.
+
+### Wiring Spec Example
+
+Consider the [SockShop User Service](<https://github.com/Blueprint-uServices/blueprint/tree/main/examples/sockshop/workflow/user>) which makes use of a \`backend.NoSQLDatabase\`. The service has the following constructor:
+
+```
+func NewUserServiceImpl(ctx context.Context, user_db backend.NoSQLDatabase) (UserService, error)
+```
+
+In the wiring spec, we can instantiate the service and provide it with a simple NoSQLDB as follows:
+
+```
+user_db := simple.NoSQLDB(spec, "user_db")
+user_service := workflow.Service(spec, "user_service", "UserService", user_db)
+```
+
+### Description
+
+The simple implementations are just in\-memory data structures, so they can't be shared by services running in different processes. You will encounter a compilation error if you attempt to do so.
+
+The simple implementations are primarily handy when developing and testing workflows, as they avoiding having to deploy full\-fledged applications. However, they do not necessarily implement all features \(e.g. all operators of a query language\), so in some cases they may be insufficient and you might need to resort to testing using proper backends.
+
+Implementations of the backends can be found in the following locations:
+
+- NoSQLDB: [runtime/plugins/simplenosqldb](<https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/plugins/simplenosqldb>)
+- RelationalDB: [runtime/plugins/sqlitereldb](<https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/plugins/sqlitereldb>)
+- Queue: [runtime/plugins/simplequeue](<https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/plugins/simplequeue>)
+- Cache: [runtime/plugins/simplecache](<https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/plugins/simplecache>)
 
 ## Index
 
@@ -30,43 +71,43 @@ For a more fully\-fledged microservice application, these simple backends are a 
 
 
 <a name="Cache"></a>
-## func [Cache](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/simple/wiring.go#L38>)
+## func [Cache](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/wiring.go#L90>)
 
 ```go
 func Cache(spec wiring.WiringSpec, name string) string
 ```
 
-Defines an in\-memory \[backend.Cache\] instance with the specified name. In the compiled application, uses the \[simplecache.SimpleCache\] implementation from the Blueprint runtime package
+[Cache](<#Cache>) can be used by wiring specs to create an in\-memory \[backend.Cache\] instance with the specified name. In the compiled application, uses the \[simplecache.SimpleCache\] implementation from the Blueprint runtime package
 
 <a name="NoSQLDB"></a>
-## func [NoSQLDB](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/simple/wiring.go#L19>)
+## func [NoSQLDB](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/wiring.go#L71>)
 
 ```go
 func NoSQLDB(spec wiring.WiringSpec, name string) string
 ```
 
-Defines an in\-memory \[backend.NoSQLDatabase\] instance with the specified name. In the compiled application, uses the \[simplenosqldb.SimpleNoSQLDB\] implementation from the Blueprint runtime package The SimpleNoSQLDB has limited support for query and update operations.
+[NoSQLDB](<#NoSQLDB>) can be used by wiring specs to create an in\-memory \[backend.NoSQLDatabase\] instance with the specified name. In the compiled application, uses the \[simplenosqldb.SimpleNoSQLDB\] implementation from the Blueprint runtime package The SimpleNoSQLDB has limited support for query and update operations.
 
 <a name="Queue"></a>
-## func [Queue](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/simple/wiring.go#L32>)
+## func [Queue](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/wiring.go#L84>)
 
 ```go
 func Queue(spec wiring.WiringSpec, name string) string
 ```
 
-Defines an in\-memory \[backend.Queue\] instance with the specified name. In the compiled application, uses the \[simplequeue.SimpleQueue\] implementation from the Blueprint runtime package
+[Queue](<#Queue>) can be used by wiring specs to create an in\-memory \[backend.Queue\] instance with the specified name. In the compiled application, uses the \[simplequeue.SimpleQueue\] implementation from the Blueprint runtime package
 
 <a name="RelationalDB"></a>
-## func [RelationalDB](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/simple/wiring.go#L26>)
+## func [RelationalDB](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/wiring.go#L78>)
 
 ```go
 func RelationalDB(spec wiring.WiringSpec, name string) string
 ```
 
-Defines an in\-memory \[backend.RelationalDB\] instance with the specified name. In the compiled application, uses the \[sqlitereldb.SqliteRelDB\] implementation from the Blueprint runtime package The compiled application might fail to run if gcc is not installed and CGO\_ENABLED is not set.
+[RelationalDB](<#RelationalDB>) can be used by wiring specs to create an in\-memory \[backend.RelationalDB\] instance with the specified name. In the compiled application, uses the \[sqlitereldb.SqliteRelDB\] implementation from the Blueprint runtime package The compiled application might fail to run if gcc is not installed and CGO\_ENABLED is not set.
 
 <a name="SimpleBackend"></a>
-## type [SimpleBackend](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/simple/ir.go#L21-L34>)
+## type [SimpleBackend](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/ir.go#L21-L35>)
 
 The SimpleBackend IR node represents a service or backend implementation that is wholly defined in Blueprint's runtime module. Examples include SimpleCache, SimpleNoSQLDB, etc.
 
@@ -78,6 +119,7 @@ type SimpleBackend struct {
 
     // Interfaces for generating Golang artifacts
     golang.ProvidesModule
+    golang.ProvidesInterface
     golang.Instantiable
 
     InstanceName string
@@ -90,43 +132,43 @@ type SimpleBackend struct {
 ```
 
 <a name="SimpleBackend.AddInstantiation"></a>
-### func \(\*SimpleBackend\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/simple/ir.go#L86>)
+### func \(\*SimpleBackend\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/ir.go#L92>)
 
 ```go
 func (node *SimpleBackend) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
-
+Ipmlements golang.Instantiable
 
 <a name="SimpleBackend.AddInterfaces"></a>
-### func \(\*SimpleBackend\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/simple/ir.go#L82>)
+### func \(\*SimpleBackend\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/ir.go#L87>)
 
 ```go
 func (node *SimpleBackend) AddInterfaces(builder golang.ModuleBuilder) error
 ```
 
-
+Implements golang.ProvidesInterface
 
 <a name="SimpleBackend.AddToWorkspace"></a>
-### func \(\*SimpleBackend\) [AddToWorkspace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/simple/ir.go#L76>)
+### func \(\*SimpleBackend\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/ir.go#L80>)
 
 ```go
 func (node *SimpleBackend) AddToWorkspace(builder golang.WorkspaceBuilder) error
 ```
 
-
+Implements golang.ProvidesModule
 
 <a name="SimpleBackend.GetInterface"></a>
-### func \(\*SimpleBackend\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/simple/ir.go#L72>)
+### func \(\*SimpleBackend\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/ir.go#L75>)
 
 ```go
 func (node *SimpleBackend) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
-
+Implements golang.Service
 
 <a name="SimpleBackend.ImplementsGolangNode"></a>
-### func \(\*SimpleBackend\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/simple/ir.go#L100>)
+### func \(\*SimpleBackend\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/ir.go#L107>)
 
 ```go
 func (node *SimpleBackend) ImplementsGolangNode()
@@ -135,7 +177,7 @@ func (node *SimpleBackend) ImplementsGolangNode()
 
 
 <a name="SimpleBackend.ImplementsGolangService"></a>
-### func \(\*SimpleBackend\) [ImplementsGolangService](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/simple/ir.go#L101>)
+### func \(\*SimpleBackend\) [ImplementsGolangService](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/ir.go#L108>)
 
 ```go
 func (node *SimpleBackend) ImplementsGolangService()
@@ -144,21 +186,21 @@ func (node *SimpleBackend) ImplementsGolangService()
 
 
 <a name="SimpleBackend.Name"></a>
-### func \(\*SimpleBackend\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/simple/ir.go#L68>)
+### func \(\*SimpleBackend\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/ir.go#L70>)
 
 ```go
 func (node *SimpleBackend) Name() string
 ```
 
-
+Implements ir.IRNode
 
 <a name="SimpleBackend.String"></a>
-### func \(\*SimpleBackend\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/simple/ir.go#L96>)
+### func \(\*SimpleBackend\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/ir.go#L103>)
 
 ```go
 func (node *SimpleBackend) String() string
 ```
 
-
+Implements ir.IRNode
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)

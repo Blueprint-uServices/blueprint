@@ -1,12 +1,31 @@
+// Package linux defines compiler interfaces for use by plugins that generate and instantiate linux processes.
+// The package does not provide any wiring spec functionality and is not directly used by Blueprint applications;
+// only by other Blueprint plugins.
+//
+// The noteworthy interfaces are as follows:
+//   - [Process] is an interface for IRNodes that represent linux processes.  If an IRNode implements this
+//     interface then it will ultimately be instantiated in a namespace that supports linux processes, such as a
+//     linux container.
+//   - If a [Process] wants to include code, binaries, or other runnable artifacts, then the IRNode should implement
+//     the [ProvidesProcessArtifacts] interface.
+//   - If the [Process] can be instantiated (e.g. by running a command) then the IRNode should implement the
+//     [InstantiableProcess] interface.
+//
+// Consult the following plugins for examples:
+//   - The [goproc] plugin generates custom process artifacts and provides run commands to run the process (e.g. the 'go run' command)
+//   - The [linuxcontainer] plugin implements a Process namespace that collects together Process nodes and generates
+//     run scripts and a Dockerfile if deploying to docker.
+//
+// [goproc]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc
+// [linuxcontainer]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/linuxcontainer
 package linux
 
 import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 )
 
-/*
-The base IRNode interface for linux processes
-*/
+// An IRNode interface that represents a linux process.  If an IRNode implements this interface then
+// it enables that IRNode to be instantiated within a process namespace, such as a linux container image.
 type Process interface {
 	ir.IRNode
 	ImplementsLinuxProcess()
@@ -18,35 +37,45 @@ processes.
 */
 type (
 
-	/*
-		For process nodes that want to provide code or other artifacts for their process.
-		Methods on the `builder` argument are used for collecting the artifacts
-	*/
+	// An optional interface for Process IRNodes to implement if the node needs
+	// to generate custom artifacts (e.g. generate code that then gets compiled/run)
+	// [target] provides methods for doing so.
 	ProvidesProcessArtifacts interface {
+		// The IRNode is being compiled into the provided target workspace, and should
+		// use methods on target to add its process artifacts into the workspace.
 		AddProcessArtifacts(target ProcessWorkspace) error
 	}
 
-	/*
-		For process nodes that can be instantiated.
-		Methods on the `builder` argument are used for declaring commands to start processes
-	*/
+	// An optional interface for Process IRNodes to implement if the node wants
+	// to declare an instance of a process.  The process can be started by using
+	// standard command-line commands, or by running custom artifacts that were
+	// included by [ProvidesProcessArtifacts]
 	InstantiableProcess interface {
+		// The IRNode is being compiled into the provided target workspace, and should
+		// use methods on target to declare how the process should be instantiated.
 		AddProcessInstance(target ProcessWorkspace) error
 	}
 )
 
-/*
-Builders used by the above code and artifact generation interfaces
-*/
 type (
-	/*
-		A process workspace has commands for adding artifacts to the workspace and
-		instantiating processes in a run.sh method.
-
-		Other plugins can extend this workspace with additional methods.  For example,
-		the Docker plugin extends the workspace to allow custom Dockerfile build
-		commands.
-	*/
+	// [ProcessWorkspace] receives process artifacts and run commands from [Process] nodes
+	// during Blueprint's compilation process.
+	//
+	// A [ProcessWorkspace] instance will be provided to [Process] IRNodes that implement
+	// either the [ProvidesProcessArtifacts] or [InstantiableProcess] interfaces.  The
+	// process IRNodes can invoke methods on this workspace in order to add their artifacts
+	// to the build output.
+	//
+	// After all [Process] instances have added their declarations to the ProcessWorkspace,
+	// the ProcessWorkspace will generate a build.sh that invokes any build scripts added
+	// by [Process] instances, and a run.sh that will run all of the processes.
+	//
+	// The [docker] plugin extends the [ProcessWorkspace] interface to also enable [Process]
+	// IRNodes to add custom Dockerfile commands with a function AddDockerfileCommands.  To
+	// use the docker extensions, the Process IRNode should typecheck the ProcessWorkspace.
+	// See the [docker] plugin for more details.
+	//
+	// [docker]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/docker
 	ProcessWorkspace interface {
 		ir.BuildContext
 
@@ -112,6 +141,7 @@ type (
 		ImplementsProcessWorkspace()
 	}
 
+	// Metadata about a [ProcessWorkspace]
 	ProcessWorkspaceInfo struct {
 		Path   string // fully-qualified path on the filesystem to the workspace
 		Target string // the type of workspace being built

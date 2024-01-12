@@ -20,7 +20,7 @@ This package is primarily used by plugins for testing and workload generators th
 
 
 <a name="ServiceRegistry"></a>
-## type [ServiceRegistry](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/core/registry/registry.go#L17-L24>)
+## type [ServiceRegistry](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/core/registry/registry.go#L17-L24>)
 
 Used for registering constructors for different service clients
 
@@ -31,7 +31,7 @@ type ServiceRegistry[T any] struct {
 ```
 
 <a name="NewServiceRegistry"></a>
-### func [NewServiceRegistry](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/core/registry/registry.go#L26>)
+### func [NewServiceRegistry](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/core/registry/registry.go#L26>)
 
 ```go
 func NewServiceRegistry[T any](name string) *ServiceRegistry[T]
@@ -40,7 +40,7 @@ func NewServiceRegistry[T any](name string) *ServiceRegistry[T]
 
 
 <a name="ServiceRegistry[T].Get"></a>
-### func \(\*ServiceRegistry\[T\]\) [Get](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/core/registry/registry.go#L49>)
+### func \(\*ServiceRegistry\[T\]\) [Get](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/core/registry/registry.go#L49>)
 
 ```go
 func (r *ServiceRegistry[T]) Get(ctx context.Context) (T, error)
@@ -49,7 +49,7 @@ func (r *ServiceRegistry[T]) Get(ctx context.Context) (T, error)
 Returns the service instance or client. If this is the first call to Get, then the client will be built. The client and any build error is cached, and will be returned by any subsequent calls to Get
 
 <a name="ServiceRegistry[T].Register"></a>
-### func \(\*ServiceRegistry\[T\]\) [Register](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/core/registry/registry.go#L38>)
+### func \(\*ServiceRegistry\[T\]\) [Register](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/core/registry/registry.go#L38>)
 
 ```go
 func (r *ServiceRegistry[T]) Register(name string, build func(ctx context.Context) (T, error))
@@ -58,7 +58,7 @@ func (r *ServiceRegistry[T]) Register(name string, build func(ctx context.Contex
 
 
 <a name="ServiceRegistry[T].SetDefault"></a>
-### func \(\*ServiceRegistry\[T\]\) [SetDefault](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/core/registry/registry.go#L34>)
+### func \(\*ServiceRegistry\[T\]\) [SetDefault](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/core/registry/registry.go#L34>)
 
 ```go
 func (r *ServiceRegistry[T]) SetDefault(name string)

@@ -6,7 +6,7 @@
 import "github.com/blueprint-uservices/blueprint/examples/sockshop/wiring"
 ```
 
-Package main provides an application for compiling a number of different wiring specs for the SockShop application.
+An application for compiling the SockShop application. Provides a number of different wiring specs for compiling the application in different configurations.
 
 To display options and usage, invoke:
 

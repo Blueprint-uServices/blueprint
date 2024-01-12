@@ -1,3 +1,62 @@
+// Package golang defines compiler interfaces for use by plugins that generate and instantiate golang code.
+// The package does not provide any wiring spec functionality and it is not directly used by Blueprint applications;
+// only by other Blueprint plugins.
+//
+// # Getting Started
+//
+// The golang package is primarily of interest to plugin developers.  Since the majority of Blueprint plugins
+// operate at the application level and generate golang code, most plugins want to make use of the interfaces
+// and methods defined in this package.  The recommended way of familiarizing yourself with the golang plugin
+// is simply by browsing the code of other plugins, to see how they implement the interfaces.
+// Recommended places to start include:
+//   - the [simple] plugin, which provides simple implementations of backends such as Databases, Caches, etc.
+//     During compilation, all the plugin needs to do is copy code from [runtime/plugins] to the output directory.
+//   - the [retries] plugin, which generates a client-side wrapper to a service.  It contains a relatively
+//     simple implementation of code generation and client instantiation that doesn't extend the service
+//     interface in any way
+//   - the [healthchecker] plugin, which extends a service interface to add a 'healthcheck' API call
+//   - the [grpc] plugin is the most 'heavyweight' example, that includes code parsing and generating client
+//     and server wrapper.
+//
+// # IRNodes
+//   - [Node] is an interface for any IRNode that lives within a golang process.  If an IRNode implements
+//     this interface then it will ultimately reside within a [goproc].
+//   - [Service] is an extension of [Node] that represents a callable interface and instance.
+//   - A [Node] can optionally generate code, instantiate objects, extend existing code, and more.
+//     These tasks form a four-stage code-generation lifecycle.  A [Node] can hook into each of these
+//     stages by implementing the [Instantiable], [ProvidesInterface], [GeneratesFuncs], and/or
+//     [ProvidesModule] interfaces.
+//
+// # Code generation
+//
+// A [Node] can implement one or more of the following interfaces to hook in to the golang code-generation
+// step of compilation:
+//   - [ProvidesInterface] allows a [Node] to define new service interfaces or extend existing ones.  This
+//     is often used by wrapper classes, which might add arguments or methods to a wrapped service.
+//   - [GeneratesFuncs] allows a [Node] to generate an implementation of an interface.  This is also often
+//     used by wrapper classes around services.
+//   - [ProvidesModule] allows a [Node] to copy golang modules into the output workspace, typically if
+//     the plugin has some helper code that it wants to use.
+//   - [Instantiable] allows a [Node] to specify the runtime instances that should be created; typically these
+//     will invoke code gathered using [GeneratesFuncs] or [ProvidesModule].
+//
+// # Code parsing
+//
+// Several plugins are interested in parsing golang code -- principally the workflow spec of an application.
+// The purpose of this parsing is primarily to identify service interfaces, constructors, and methods.
+// Parsing code is implemented in [goparser] and used by plugins such as [workflow] and [gotests].
+//
+// [simple]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/simple
+// [retries]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/retries
+// [healthchecker]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/healthchecker
+// [grpc]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/grpc
+// [goproc]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc
+// [goparser]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/golang/goparser
+// [workflow]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/workflow
+// [gotests]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/gotests
+// [runtime/plugins]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/plugins
+//
+// [gogen]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/golang/gogen
 package golang
 
 import (
@@ -6,46 +65,19 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
 )
 
-/*
-The golang plugin extends Blueprint's IR as follows:
-
-It defines the following IR interfaces:
-
-  - golang.Node is the base interface for any node that lives within a golang process
-  - golang.Service is a golang node that has methods that can be directly called by other golang nodes
-
-To support golang code generation, the following IR interfaces are provided.
-The golang.Process depends on these interfaces for collecting and packaging code, however, usage of these interfaces
-is not intended to be private to just the golang.Process plugin.  Other plugins are permitted to
-use these interfaces.
-
-  - golang.Instantiable is for golang nodes that can generate instantiation source code snippets
-  - golang.ProvidesInterface is for golang nodes that include interfaces or generate new ones
-  - golang.GeneratesFuncs is for golang nodes that generate function implementations
-  - golang.ProvidesModule is for golang nodes that generate or otherwise provide the full source code of modules
-*/
 type (
-	/*
-		golang.Node is the base IRNode interface that should be implemented by any IRNode that
-		wishes to exist within a Golang namespace.
-	*/
+	// Node should be implemented by any IRNode that ought to exist within a Golang namespace.
 	Node interface {
 		ir.IRNode
 		ImplementsGolangNode() // Idiomatically necessary in Go for typecasting correctly
 	}
 
-	/*
-		golang.Service is a golang.Node that exposes an interface that can be directly invoked
-		by other golang.Nodes.
-
-		For example, services within a workflow spec are represented by golang.Service nodes
-		because they have invokable methods.  Similarly plugins such as tracing, which
-		wrap service nodes, are themselves also service nodes, because they have invokable methods.
-
-		golang.Service extends the golang.Instantiable interface, which is part of the codegen
-		process.  Thus any plugin that provides IRNodes that extend golang.Service must implement
-		the code generation methods defined by the golang.Instantiable interface.
-	*/
+	// Service is a [Node] that represents a callable service with an interface, constructor, and methods.
+	// For example, services within a workflow spec are represented by Service nodes because they have
+	// invokable methods.  Similarly plugins such as tracing, which wrap service nodes, are themselves
+	// also service nodes, because they have invokable methods.
+	//
+	// Service nodes must implement the [Instantiable] and [ProvidesInterface] interfaces.
 	Service interface {
 		Node
 		Instantiable      // Services must implement the Instantiable interface in order to create instances
@@ -59,110 +91,72 @@ type (
 Golang code-generation interfaces that IR nodes should implement if they expect to generate code or artifacts
 */
 type (
-	/*
-	   This is an interface for IRNodes that can be used by plugins that want to be able to instantiate things in
-	   the generated code.  For example, a service, or a tracing wrapper, will want to instantiate code.
-
-	   All Services are Instantiable, but not all Instantiable are Services.  For example, a Golang GRPC
-	   server is instantiable but it does not expose methods that can be directly invoked at the application
-	   level.  In constract a Golang GRPC client is a service and is instantiable because it does expose methods
-	   that can be directly invoked.
-
-	   The NamespaceBuilder struct provides functionality for plugins to declare:
-
-	   	(a) how to instantiate instances of things
-	   	(b) relevant types and method signatures for use by other plugins
-	*/
+	// A [Node] should implement Instantiable if it wants to instantiate objects in the generated
+	// golang namespace at runtime.  For example, a service node needs to actually call the service constructor
+	// at runtime, to instantiate the service.
+	//
+	// All [Service] are Instantiable, but not all Instantiable are Services.  For example, a Golang GRPC
+	// server is instantiable but it does not expose methods that can be directly invoked at the application
+	// level.  In constract a Golang GRPC client is a [Service] and is Instantiable because it does expose methods
+	// that can be directly invoked.
 	Instantiable interface {
-		/*
-		   AddInstantion will be invoked during compilation to enable an IRNode to add its instantiation code
-		   to a generated golang file.
-		*/
+
+		// AddInstantiation is invoked during compilation to allow the callee to provide code snippets for instantiating
+		// a golang object, using the provided [NamespaceBuilder]
 		AddInstantiation(NamespaceBuilder) error
 	}
 
-	/*
-		Service nodes need to include interface definitions that callers of the code depend on.  The most basic
-		example is that a workflow service needs to include the code where it's defined.
-
-		Some nodes, primarily modifier nodes, will also generate new interfaces by extending the interfaces
-		of other IRNodes.  For example, tracing nodes might add context arguments; the healthchecker node
-		might add new functions.
-
-		Here is where interfaces should be included or generated.
-
-		There are three interfaces for contributing source code to generated modules:
-		1. RequiresPackage for adding module dependencies to the generated module's go.mod file
-		2. ProvidesInterface for generating struct and interface type declarations
-		3. GeneratesFuncs for generating functions and struct method bodies
-	*/
+	// A [Node] should implement ProvidesInterface if it wants to modify or extend any service interfaces,
+	// particularly those that are defined by other nodes.  For example, a tracing plugin might extend all methods
+	// of an interface to add trace contexts.
 	ProvidesInterface interface {
-		/*
-			AddInterfaces will be invoked during compilation to enable an IRNode to include the code where its
-			interface is defined, e.g. in an external module (like a workflow spec node) or by auto-generating
-			code that defines the interface (like a modifier node).
 
-			AddInterfaces might be called in situations where ONLY the interfaces are needed, but not the
-			implementation.  For example, the client-side of an RPC call needs to know the remote interfaces,
-			but does not need to know the server-side implementation.  That logic belongs in the GenerateFuncs
-			interface and method
-		*/
+		// AddInterfaces is invoked during compilation to allow the callee to add interfaces to the generated output,
+		// using the provided [ModuleBuilder].  Interfaces could come from an external module, or they might need to
+		// be auto-generated (e.g. by inspecting and modifying the interface of a wrapped [Service].
+		//
+		// Plugins typically also provide implementations of their interfaces.  However, code for the implementations
+		// should be provided via [GeneratesFuncs] rather than [ProvidesInterface].
 		AddInterfaces(ModuleBuilder) error
 	}
 
-	/*
-		Some IRNodes generate implementations of service interfaces.  This interface should be used to do so.  This is
-		separate from the GeneratesTypes interface because all structs and interfaces need to be declared before
-		method bodies can be written, because method bodies might need to use structs and interfaces defined in different
-		packages
-
-		There are three interfaces for contributing source code to generated modules:
-		1. RequiresPackage for adding module dependencies to the generated module's go.mod file
-		2. ProvidesInterface for generating struct and interface type declarations
-		3. GeneratesFuncs for generating functions and struct method bodies
-	*/
+	// A [Node] should implement GeneratesFuncs if it wants to implement any service interfaces, whether defined
+	// by the node itself, or from some other node (e.g. if it wraps a service, the service's interface might be
+	// used unmodified).
 	GeneratesFuncs interface {
-		/*
-		   GenerateFuncs will be invoked during compilation to enable an IRNode to write generated code files to
-		   an output module, containing interface and struct definitions
-		*/
+		// GenerateFuncs is invoked during compilation to allow the callee to provide interface implementations and
+		// constructors.  The generated code will be included in the output.
+		//
+		// GenerateFuncs should be used in conjunction with [ProvidesInterface].  [ProvidesInterface] should be used
+		// to declare the interface code, and GeneratesFuncs should be used to declare an interface implementation
+		// and constructor.
 		GenerateFuncs(ModuleBuilder) error
 	}
 
-	/*
-	   This is an interface for IRNodes for plugins that want to include standalone modules in the output workspace.
-	   The most straightforward example is the workflow spec, which will be copied into the output workspace
-	   using this interface.
-
-	   The IRNode must implement the `AddToWorkspace` method, to interact with the `WorkspaceBuilder` to copy
-	   relevant modules.
-	*/
+	// A [Node] should implement ProvidesModule if it uses off-the-shelf code implemented in a golang module, and wants
+	// to copy that code directly into the output.
 	ProvidesModule interface {
-		/*
-			AddToWorkspace will be invoked during compilation to enable an IRNode to copy a local Go module
-			directly into the output workspace directory
-		*/
+		// AddToWorkspace is invoked during compilation to allow the callee to copy golang modules into the output
+		// workspace.  Those modules might contain interface definitions or implementations, that can then be used
+		// by the node, e.g. they can be instantiated if the node is [Instantiable].
 		AddToWorkspace(WorkspaceBuilder) error
 	}
 )
 
-/*
-APIs used by the above IR nodes when they are generating code.
-
-The main implementation of these interfaces is in the [goprocess](../goprocess) plugin
-*/
 type (
+	// Metadata about a golang workspace
 	WorkspaceInfo struct {
 		Path string // fully-qualified path on the filesystem to this workspace
 	}
 
-	/*
-	   WorkspaceBuilder is used by plugins if they want to collect and combine Golang code and modules.
-
-	   An IRNode must implement the ProvidesModule interface; then during compilation, `AddToWorkspace`
-	   will be called, enabling the IRNode to add its code and modules to the output workspace directory
-	   using the methods on `WorkspaceBuilder`.
-	*/
+	// [WorkspaceBuilder] is used during Blueprint's compilation process to enable [Node] implementations
+	// to generate or copy Golang code modules into the output workspace.  A [Node] must also implement the
+	// [ProvidesModule] interface if it wishes to make use of the [WorkspaceBuilder].
+	//
+	// The main use case for [WorkspaceBuilder] is to copy existing golang modules from the local filesystem
+	// into the output workspace.  A specialized use case is for generating golang modules.  However, although
+	// most plugins generate golang code, most would not need to be in control of generating an entire module,
+	// and would probably want to instead use the [ModuleBuilder] to contribute code to a shared module.
 	WorkspaceBuilder interface {
 		ir.BuildContext
 
@@ -208,12 +202,14 @@ type (
 		GetLocalModule(modulePath string) (string, bool)
 	}
 
+	// Metadata about a golang module that resides within a golang workspace
 	ModuleInfo struct {
 		Name    string // Fully-qualified module name being built
 		Version string // Version of the module being built
 		Path    string // The path on the filesystem to the directory containing the module
 	}
 
+	// Metadata about a package within a golang module
 	PackageInfo struct {
 		ShortName   string // Shortname of the package
 		Name        string // Fully package name within the module
@@ -221,19 +217,15 @@ type (
 		Path        string // Fully-qualified path to the package
 	}
 
-	/*
-	   ModuleBuilder is used by IRNodes for plugins that want to generate Golang code and collect it into a module.
-
-	   An IRNode must implement the RequiresPackages interface; then during compilation, `AddToModule`
-	   will be called, enabling the IRNode to add its dependencies and code to the output module using the
-	   methods on `ModuleBuilder`.
-
-	   After creating a module builder, plugins can directly create directories and copy files into
-	   the ModuleDir.  Any go dependencies should be added with the Require function.
-
-	   When finished building the module, plugins should call Finish to finish building the go.mod
-	   file
-	*/
+	// [ModuleBuilder] is used during Blueprint's compilation process by [Node] implementations
+	// that generate code.  A [Node] must also implement the [ProvidesInterface] or [GeneratesFuncs]
+	// interfaces if it wishes to make use of the [ModuleBuilder].
+	//
+	// [ModuleBuilder] enables plugins to create packages within a shared module.  After creating a package,
+	// the plugin should then generate and place its code inside that package.
+	//
+	// go mod tidy will be invoked later as part of the compilation.  Packages that reside locally within the
+	// workspace will be resolved locally.  Any remaining required packages will be automatically resolved.
 	ModuleBuilder interface {
 		ir.BuildContext
 
@@ -256,6 +248,7 @@ type (
 		Workspace() WorkspaceBuilder
 	}
 
+	// Metadata about a namespace code file being generated
 	NamespaceInfo struct {
 		Package  PackageInfo
 		FileName string // Name of the file within the pacakge
@@ -263,91 +256,89 @@ type (
 		FuncName string // Name of the function that builds the namespace
 	}
 
-	/*
-	   NamespaceBuilder is used by IRNodes that implement the Instantiable interface.  The NamespaceBuilder provides
-	   the following methods that can be used by plugins to provide instantiation code:
-
-	     - `Import` declares that a particular package should be imported, as it will be used by the
-	       instantiation code
-
-	     - `Declare` provides a buildFunc as a string that will be inserted into the output file; buildFunc
-	       is used at runtime to create the instance
-
-	   In the generated golang code, instances are declared and created using a simple dependency injection
-	   style.  The runtime dependency injection interface is defined in runtime/plugins/golang/di.go
-
-	   The basic requirement of an instantiable node is that it can provide a buildFunc definition that
-	   will be invoked at runtime to create the instance.  A buildFunc has method signature:
-
-	   	func(n *golang.Namespace) (any, error)
-
-	   The buildFunc will instantiate and return an instance or an error.  If the node needs to be
-	   able to call other instances, it can acquire the instances through the golang.Namespace's Get
-	   method.  For example, the following pseudocode for a tracing wrapper class would get the
-	   underlying handler then return the wrapper class:
-
-	   	func(n *golang.Namespace) (any, error) {
-	   		handler, err := n.Get("serviceA.handler")
-	   		if err != nil {
-	   			return nil, err
-	   		}
-
-	   		serviceA, isValid := handler.(ServiceA)
-	   		if !isValid {
-	   			return nil, blueprint.Errorf("serviceA.handler does not implement ServiceA interface")
-	   		}
-
-	   		return newServiceATracingWrapper(serviceA), nil
-	   	}
-
-	   The above code makes reference to names like `serviceA.handler`; rarely should these names
-	   be hard-coded, instead they would typically be provided by calling or inspecting the IR
-	   dependencies of this node.
-	*/
+	// [NamespaceBuilder] is used during Blueprint's compilation process by [Node] implementations that
+	// want to instantiate code.  A [Node] must also implement the [Instantiable] interface if it wishes to
+	// make use of the [NamespaceBuilder].
+	//
+	// During compilation, the [NamespaceBuilder] will accumulate instantiation code from [Node] instances
+	// that reside within the namespace.  Some nodes might have dependencies on other nodes; these dependencies
+	// are handled automatically by the [NamespaceBuilder].  Some nodes might require arguments be passed in
+	// to the namespace (e.g. command-line arguments like addresses); these are also checked by the [NamespaceBuilder].
+	//
+	// After all [Node] instances have added their declarations to the NamespaceBuilder, the NamespaceBuilder will
+	// generate a golang file with methods for instantiating the namespace.  The namespace instantiation function
+	// will invoke the instantiation code for all relevant nodes, and makes use of additional helper classes
+	// defined in [runtime/plugins/golang].
+	//
+	// The main NamespaceBuilder implementation is in [gogen/namespacebuilder.go]
+	//
+	// [gogen/namespacebuilder.go]: https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/golang/gogen/namespacebuilder.go
+	// [runtime/plugins/golang]: https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/golang
 	NamespaceBuilder interface {
 		ir.BuildContext
 
-		/*
-			Metadata info about the namespace being built
-		*/
+		// Metadata info about the namespace being built
 		Info() NamespaceInfo
 
-		/*
-			Adds an import statement to the generated file; this is necessary for any types
-			declared in other packages that are going to be used in a DI declaration.
-
-			This method returns the type alias that should be used in the generated code.
-			By default the type alias is just the package name, but if there are multiple
-			different imports with the same package name, then aliases will be created
-		*/
+		// Adds an import statement to the generated file; this is necessary for any types
+		// declared in other packages that are going to be used in a DI declaration.
+		//
+		// This method returns the type alias that should be used in the generated code.
+		// By default the type alias is just the package name, but if there are multiple
+		// different imports with the same package name, then aliases will be created
 		Import(packageName string) string
 
-		/*
-			If the provided type is a user type or a builtin type, adds an import statement
-			similar to the `Import` method.
-
-			Returns the name that should be used in code for the type.  For example, if it's
-			a type from an imported package, then would return mypackage.Foo.
-		*/
+		// If the provided type is a user type or a builtin type, adds an import statement
+		// similar to the `Import` method.
+		//
+		// Returns the name that should be used in code for the type.  For example, if it's
+		// a type from an imported package, then would return mypackage.Foo.
 		ImportType(typeName gocode.TypeName) string
 
-		/*
-			Provides the source code of a buildFunc that will be invoked at runtime by the
-			generated code, to build the named instance
-		*/
+		// Declares buildFuncSrc, the golang source code that should be invoked at runtime
+		// to instantiate instanceName.  Most plugins will probably want to use [DeclareConstructor]
+		// rather than [Declare].
+		//
+		// # buildFuncSrc
+		//
+		// buildFuncSrc should be a function with the following signature:
+		//
+		// 	func(n *golang.Namespace) (any, error)
+		//
+		// The first return value of the function should be the instance.  An error can be
+		// returned if anything went wrong when creating the instance.
+		//
+		// # golang.Namespace
+		//
+		// The golang.Namespace argument in the buildFunc method signature is defined in
+		// the [runtime/plugins/golang] package.  This argument enables buildFunc to
+		// get other nodes' instances by name, using the method Get.
+		//
+		// # Example
+		//
+		//     func(n *golang.Namespace) (any, error) {
+		// 	      var cart_db backend.NoSQLDatabase
+		//     	  if err := n.Get("cart_db", &cart_db); err != nil {
+		// 	    	  return nil, err
+		//     	  }
+		// 	      return cart.NewCartService(n.Context(), cart_db)
+		//     }
+		//
+		// [runtime/plugins/golang]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime/plugins/golang
 		Declare(instanceName string, buildFuncSrc string) error
 
-		/*
-			This is like Declare, but instead of having to manually construct the source
-			code, the NamespaceBuilder will automatically create the build func src code,
-			invoking the specified constructor and passing the provided nodes as args
-		*/
+		// [DeclareConstructor] is a simpler version of [Declare] that does not require the
+		// caller manually construct buildFunc source code.
+		//
+		// By invoking [DeclareConstructor], the caller specifies constructor, the func to use
+		// to build name.
+		//
+		// The [NamespaceBuilder] will generate code that instantiates each node in args,
+		// then passes those instances to constructor.
 		DeclareConstructor(name string, constructor *gocode.Constructor, args []ir.IRNode) error
 
-		/*
-			Specify nodes needed by this namespace that exist in a parent namespace
-			and will be passed as runtime arguments
-		*/
+		// Specify nodes needed by this namespace that exist in a parent namespace
+		// and will be passed as runtime arguments
 		RequiredArg(name, description string)
 
 		/*

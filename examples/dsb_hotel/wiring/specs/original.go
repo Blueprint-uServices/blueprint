@@ -32,7 +32,7 @@ func makeOriginalSpec(spec wiring.WiringSpec) ([]string, error) {
 
 	var allServices []string
 	// Define backends
-	trace_collector := jaeger.DefineJaegerCollector(spec, "jaeger")
+	trace_collector := jaeger.Collector(spec, "jaeger")
 	user_db := mongodb.Container(spec, "user_db")
 	recommendations_db := mongodb.Container(spec, "recomd_db")
 	reserv_db := mongodb.Container(spec, "reserv_db")
@@ -40,9 +40,9 @@ func makeOriginalSpec(spec wiring.WiringSpec) ([]string, error) {
 	rate_db := mongodb.Container(spec, "rate_db")
 	profile_db := mongodb.Container(spec, "profile_db")
 
-	reserv_cache := memcached.PrebuiltContainer(spec, "reserv_cache")
-	rate_cache := memcached.PrebuiltContainer(spec, "rate_cache")
-	profile_cache := memcached.PrebuiltContainer(spec, "profile_cache")
+	reserv_cache := memcached.Container(spec, "reserv_cache")
+	rate_cache := memcached.Container(spec, "rate_cache")
+	profile_cache := memcached.Container(spec, "profile_cache")
 
 	// Define internal services
 	user_service := workflow.Service(spec, "user_service", "UserService", user_db)
@@ -95,7 +95,7 @@ func makeOriginalSpec(spec wiring.WiringSpec) ([]string, error) {
 func applyDefaults(spec wiring.WiringSpec, serviceName string, collectorName string) string {
 	procName := fmt.Sprintf("%s_process", serviceName)
 	ctrName := fmt.Sprintf("%s_container", serviceName)
-	opentelemetry.InstrumentUsingCustomCollector(spec, serviceName, collectorName)
+	opentelemetry.Instrument(spec, serviceName, collectorName)
 	grpc.Deploy(spec, serviceName)
 	goproc.CreateProcess(spec, procName, serviceName)
 	return linuxcontainer.CreateContainer(spec, ctrName, procName)
@@ -104,7 +104,7 @@ func applyDefaults(spec wiring.WiringSpec, serviceName string, collectorName str
 func applyHTTPDefaults(spec wiring.WiringSpec, serviceName string, collectorName string) string {
 	procName := fmt.Sprintf("%s_process", serviceName)
 	ctrName := fmt.Sprintf("%s_container", serviceName)
-	opentelemetry.InstrumentUsingCustomCollector(spec, serviceName, collectorName)
+	opentelemetry.Instrument(spec, serviceName, collectorName)
 	http.Deploy(spec, serviceName)
 	goproc.CreateProcess(spec, procName, serviceName)
 	return linuxcontainer.CreateContainer(spec, ctrName, procName)

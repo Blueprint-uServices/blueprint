@@ -6,6 +6,41 @@
 import "github.com/blueprint-uservices/blueprint/plugins/workflow"
 ```
 
+Package workflow instantiates services defined in the application's workflow spec.
+
+### Wiring Spec Usage
+
+The plugin needs to know where to look for workflow spec services. The plugin assumes paths relative to the calling file.
+
+```
+workflow.Init("../workflow", "../other_path")
+```
+
+You can instantiate a service and give it a name by specifying either the name of the service's interface, implementation, or constructor.
+
+```
+payment_service := workflow.Service(spec, "payment_service", "PaymentService")
+```
+
+If a service has arguments \(e.g. another service, a backend\), then those arguments can be added to the call:
+
+```
+user_db := simple.NoSQLDB(spec, "user_db")
+user_service := workflow.Service(spec, "user_service", "UserService", user_db)
+```
+
+If a service has configuration value arguments \(e.g. a timeout\) then string values can be provided for those arguments:
+
+```
+payment_service := workflow.Service(spec, "payment_service", "PaymentService", "500")
+```
+
+The arguments provided to a service must match the arguments needed by the service's constructor in the workflow spec. If they do not match, you will see a compilation error.
+
+### Generated Artifacts
+
+The workflow spec service implementation will be copied into the output directory. Where appropriate, the plugin generates constructor invocations, passing clients of other services/backends as constructor arguments.
+
 ## Index
 
 - [func Init\(srcModulePaths ...string\)](<#Init>)
@@ -19,31 +54,41 @@ import "github.com/blueprint-uservices/blueprint/plugins/workflow"
 
 
 <a name="Init"></a>
-## func [Init](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L29>)
+## func [Init](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L71>)
 
 ```go
 func Init(srcModulePaths ...string)
 ```
 
-The Golang workflow plugin must be initialized in the wiring spec with the location of the workflow spec modules.
+[Init](<#Init>) can be used by wiring specs to point the workflow plugin at the correct location of the application's workflow spec code. It is required to be able to instantiate any services from that workflow spec.
 
-Workflow specs can be included from more than one source module.
+srcModulePaths should be paths to the \*root\* of a go module, ie. a directory containing a go.mod file.
 
-The provided paths should be to the root of a go module \(containing a go.mod file\). The arguments are assumed to be \*\*relative\*\* to the calling file.
+srcModulePaths are assumed to be \*relative\* to the calling file. Typically this means calling something like:
 
-This can be called more than once, which will concatenate all provided srcModulePaths
+```
+workflow.Init("../workflow")
+```
+
+Workflow specs can be included from more than one source module. If also using the [gotests](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/gotests>) plugin, then the location of the tests directory should also be provided, e.g.
+
+```
+workflow.Init("../workflow", "../tests")
+```
+
+[Init](<#Init>) can be called more than once, which will concatenate all provided srcModulePaths. [Reset](<#Reset>) can be used to clear any previously provided module paths.
 
 <a name="Reset"></a>
-## func [Reset](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L42>)
+## func [Reset](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L85>)
 
 ```go
 func Reset()
 ```
 
-
+[Reset](<#Reset>) can be used by wiring specs to clear any srcModulePaths given by previous calls to [Init](<#Init>)
 
 <a name="Service"></a>
-## func [Service](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L81>)
+## func [Service](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L132>)
 
 ```go
 func Service(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string
@@ -51,16 +96,20 @@ func Service(spec wiring.WiringSpec, serviceName, serviceType string, serviceArg
 
 This adds a service to the application, using a definition that was provided in the workflow spec.
 
-\`serviceType\` must refer to a named service that was defined in the workflow spec. If the service doesn't exist, then this will result in a build error.
+[Service](<#Service>) is used by wiring specs to instantiate services from the workflow spec.
 
-\`serviceArgs\` can be zero or more other named nodes that are provided as arguments to the service.
+\`serviceName“ is a unique name for the service instance.
 
-This call creates several definitions within the wiring spec. In particular, \`serviceName\` is defined as a pointer to the actual service, and can thus be modified and
+\`serviceType\` must refer to a named service that was defined in the workflow spec. If the service doesn't exist, then this will result in a build error. serviceType can be the name of an interface, an implementing struct, or a constructor.
+
+\`serviceArgs\` must correspond to the arguments of the service's constructor within the workflow spec. They can either be the names of other nodes that exist within this wiring spec, or string values for configuration arguments. This determination is made by looking at the argument types of the constructor within the workflow spec \(string arguments are treated as configuration; everything else is treated as a service instance\).
+
+After calling [Service](<#Service>), serviceName is an application\-level golang service. Application\-level modifiers can be applied to it, or it can be further deployed into e.g. a goproc, a linuxcontainer, etc.
 
 <a name="WorkflowSpec"></a>
-## type [WorkflowSpec](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/workflowspec.go#L25-L27>)
+## type [WorkflowSpec](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/workflowspec.go#L23-L25>)
 
-Representation of a workflow spec.
+Representation of a parsed workflow spec.
 
 This code makes heavy use of the Golang code parser defined in the Golang plugin. That code parser extracts structs, interfaces, and function definitions from a set of golang modules.
 
@@ -77,16 +126,16 @@ type WorkflowSpec struct {
 ```
 
 <a name="GetSpec"></a>
-### func [GetSpec](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L47>)
+### func [GetSpec](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L90>)
 
 ```go
 func GetSpec() (*WorkflowSpec, error)
 ```
 
-Static initialization of the workflow spec
+[GetSpec](<#GetSpec>) exists to enable other Blueprint plugins to access the parsed [\\\*WorkflowSpec](<#WorkflowSpec>).
 
 <a name="NewWorkflowSpec"></a>
-### func [NewWorkflowSpec](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/workflowspec.go#L39>)
+### func [NewWorkflowSpec](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/workflowspec.go#L39>)
 
 ```go
 func NewWorkflowSpec(srcModuleDirs ...string) (*WorkflowSpec, error)
@@ -97,7 +146,7 @@ Parses the specified module directories and loads workflow specs from there.
 This will return an error if \*any\* of the provided srcModuleDirs are not valid Go modules
 
 <a name="WorkflowSpec.Get"></a>
-### func \(\*WorkflowSpec\) [Get](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/workflowspec.go#L55>)
+### func \(\*WorkflowSpec\) [Get](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/workflowspec.go#L55>)
 
 ```go
 func (spec *WorkflowSpec) Get(name string) (*WorkflowSpecService, error)
@@ -108,13 +157,16 @@ Looks up the named service in the workflow spec. When a wiring spec instantiates
 Returns the service and a constructor
 
 <a name="WorkflowSpecService"></a>
-## type [WorkflowSpecService](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/workflowspec.go#L29-L32>)
+## type [WorkflowSpecService](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/workflowspec.go#L28-L34>)
 
-
+A service in the workflow spec
 
 ```go
 type WorkflowSpecService struct {
-    Iface       *goparser.ParsedInterface
+    // The interface that the service implements
+    Iface *goparser.ParsedInterface
+
+    // The constructor func of the service
     Constructor *goparser.ParsedFunc
 }
 ```

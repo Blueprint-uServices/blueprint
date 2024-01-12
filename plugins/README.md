@@ -1,15 +1,9 @@
 # Plugins
 
-This module contains a range of plugins that implement most of Blueprint's features and functionality.
+Much of Blueprint's features and functionality are implemented by plugins contained in this module.
 
-A large number of plugins are consolidated here for convenience; however to develop a plugin it is perfectly valid for it to reside in a different repository or module.
+Each plugin resides in its own subdirectory and provides its own documentation.
 
-### Related documentation
-- [../docs/manual/wiring.md](docs/manual/wiring.md) describes creating a wiring spec for an application, which will make use of plugins
-- [../docs/manual/plugins.md](docs/manual/plugins.md) gives an overview of the available plugins and their functionality
-- [../docs/manual/plugin_development.md](docs/manual/plugin_development.md) describes how to implement your own Blueprint plugin
+The Blueprint [User Manual](../docs/manual/plugins.md) provides a high-level overview of some of the more prominent plugins.
 
-### Other modules in this repository
-- [../blueprint](../blueprint) implements Blueprint's compiler as well as the [WiringSpec API](../blueprint/pkg/wiring) used by Blueprint applications.
-- [../runtime](../runtime) contains runtime code that is used by Blueprint applications and by plugins
-- [../examples](../examples) contains some example applications
+If you want to develop your own plugin, it is not mandatory for the plugin to live in this directory.  It can reside in a different repository and module.

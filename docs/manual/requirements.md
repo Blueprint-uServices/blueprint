@@ -1,10 +1,19 @@
 # Requirements
 
+Different plugins have different pre-requisites; you only need to install the pre-requisites of a plugin if you intend to use it.  That said, we recommend installing the following:
+
+ * golang 1.20 or higher
+ * Docker
+ * Kubernetes
+ * gRPC
+
 ## Blueprint pre-requisites
 
 Blueprint requires golang 1.20 or higher.
 
 ## Plugin requirements
+
+See the respective plugin documentation in [plugins](../../plugins/) for individual plugin requirements.
 
 ### Plugin compile-time requirements
 
@@ -17,6 +26,6 @@ Plugins are expected to document their requirements.
 ### Plugin runtime requirements
 
 Some plugins do not have compilation-time requirements but do have runtime requirements.  These requirements are optional; they are only needed if the plugin is used.  Examples include:
- - [docker-compose plugin](../plugins/dockerdeployment/) requires that Docker is installed in order to run docker containers
+ - [docker-compose plugin](../plugins/dockercompose/) requires that Docker is installed in order to run docker containers
 
 Plugins are expected to document their requirements.

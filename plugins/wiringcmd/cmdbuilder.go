@@ -1,7 +1,56 @@
-// Package wiringcmd doesn't provide any blueprint IR or wiring spec extensions.
+// Package wiringcmd is a helper package for building wiring spec command line programs.
+// It doesn't provide any wiring spec commands or IR.
 //
-// It is a helper package for building wiring spec command line programs.
-// The Blueprint example applications use the cmdbuilder in their wiring specs
+// The [CmdBuilder] struct enables an application to register multiple wiring spec options
+// in a single main.go.  It adds command line arguments for selecting which wiring spec to compile,
+// and takes care of argument parsing and spec building.
+//
+// Specify the name of a wiring spec with the -w argument, and the output directory with -o.
+//
+// # Usage
+//
+// Define one or more wiring specs.  Each wiring spec should be implemented inside a function
+// with the following signature:
+//
+//	func (spec wiring.WiringSpec) ([]string, error)
+//
+// The function should behave like a typical wiring spec: instantiating workflow services, deploying
+// them inside processes or containers, etc.
+//
+// Next, define a [SpecOption]:
+//
+//	func buildMySpec(spec wiring.WiringSpec) ([]string, error) {
+//		... // does wiring spec stuff
+//	}
+//
+//	var MySpec = wiringcmd.SpecOption{
+//		Name:        "myspec",
+//		Description: "My example wiring spec",
+//		Build:       buildMySpec,
+//	}
+//
+// Lastly, in the main file, call [MakeAndExecute]:
+//
+//	wiringcmd.MakeAndExecute(
+//		"MyApplication",
+//		MySpec
+//	)
+//
+// [MakeAndExecute] accepts any number of specs.  wiringcmd takes care of parsing command line args
+//
+// # Runtime Usage
+//
+// Run your program with
+//
+//	go run main.go -h
+//
+// The wiringcmd plugin takes care of argument parsing, and will list the wiring specs that can be compiled.
+//
+// To compile a spec, run
+//
+//	go run main.go -o build -w myspec
+//
+// [wiring/main.go]: https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/wiring/main.go
 package wiringcmd
 
 import (
@@ -13,12 +62,17 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/logging"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
-	"github.com/blueprint-uservices/blueprint/plugins/dockerdeployment"
+	"github.com/blueprint-uservices/blueprint/plugins/dockercompose"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"golang.org/x/exp/slog"
 )
 
+// A wiring spec option used by [CmdBuilder].  When running the program,
+// this wiring spec can be selected by specifying its [Name] with the -w flag,
+// e.g.
+//
+//	-w {{.Name}}
 type SpecOption struct {
 	Name        string
 	Description string
@@ -40,6 +94,8 @@ type CmdBuilder struct {
 	Registry map[string]SpecOption
 }
 
+// Parses command line flags, and if a valid spec is specified with the -w
+// flag, that exists within specs, executes that spec.
 func MakeAndExecute(name string, specs ...SpecOption) {
 	builder := NewCmdBuilder(name)
 	builder.Add(specs...)
@@ -118,7 +174,7 @@ func (b *CmdBuilder) Build() error {
 	slog.Info("Initializing Blueprint compiler")
 	goproc.RegisterAsDefaultBuilder()
 	linuxcontainer.RegisterAsDefaultBuilder()
-	dockerdeployment.RegisterAsDefaultBuilder()
+	dockercompose.RegisterAsDefaultBuilder()
 
 	// Define the wiring spec
 	slog.Info(fmt.Sprintf("Building %v-%v to %v", b.Name, b.SpecName, b.OutputDir))

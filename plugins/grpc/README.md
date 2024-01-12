@@ -6,20 +6,41 @@
 import "github.com/blueprint-uservices/blueprint/plugins/grpc"
 ```
 
-Package grpc implements a Blueprint plugin that enables any Golang service to be deployed using a gRPC server.
+Package grpc is a plugin for deploying an application\-level Golang service to a gRPC server.
 
-To use the plugin in a Blueprint wiring spec, import this package and use the [Deploy](<#Deploy>) method, ie.
+### Prerequisites
+
+To compile a Blueprint application that uses grpc, the build machine needs to have protocol buffers and the grpc compiler installed. Installation instructions can be found on the [gRPC Quick Start](<https://grpc.io/docs/languages/go/quickstart/>).
+
+### Wiring Spec Usage
+
+To use the grpc plugin in your wiring spec, instantiate a workflow service and then invoke [Deploy](<#Deploy>):
 
 ```
-import "github.com/blueprint-uservices/blueprint/plugins/grpc"
 grpc.Deploy(spec, "my_service")
 ```
 
-See the documentation for [Deploy](<#Deploy>) for more information about its behavior.
+Any application\-level service modifiers \(e.g. tracing\) should be applied to the service \*before\* deploying it with gRPC.
 
-The plugin implements gRPC code generation, as well as generating a server\-side handler and client\-side library that calls the server. This is implemented within the \[grpccodegen\] package.
+After deploying a service to gRPC, you will probably want to deploy the service in a process.
 
-To use this plugin requires the protocol buffers and grpc compilers are installed on the machine that is compiling the Blueprint wiring spec. Installation instructions can be found on the \[gRPC Quick Start\].
+### Example
+
+The SockShop [grpc wiring spec](<https://github.com/Blueprint-uServices/blueprint/tree/main/examples/sockshop/wiring/specs/grpc.go>) uses the grpc plugin.
+
+### Configuration and Arguments
+
+The gRPC server requires an argument \`bind\_addr\` to know which interface and port to bind to. This is a host:port string, typically looking something like "0.0.0.0:12345"
+
+The gRPC client requires an argument \`dial\_addr\` to know which hostname and port to connect to. This is a host:port string, typically looking something like "192.168.1.2:12345" or "myhost:12345"
+
+Blueprint can automatically generate these addresses in some circumstances, but usually they have to be specified by you when running the application, such as when running processes or containers. For example, the process and container plugins will complain if arguments are missing.
+
+### Artifacts Generated
+
+The plugin will generate a server\-side handler that creates and runs a gRPC server, with the service as the request handling logic. The plugin will also generate a client implementation for other services to call the service. The plugin also generates marshalling code for packing arguments into protobuf structs and vice versa. This is implemented within the [grpccodegen](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/grpc/grpccodegen>) package.
+
+To use this plugin requires the protocol buffers and grpc compilers are installed on the machine that is compiling the Blueprint wiring spec. Installation instructions can be found on the [gRPC Quick Start](<https://grpc.io/docs/languages/go/quickstart/>).
 
 ## Index
 
@@ -27,15 +48,15 @@ To use this plugin requires the protocol buffers and grpc compilers are installe
 
 
 <a name="Deploy"></a>
-## func [Deploy](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/grpc/wiring.go#L46>)
+## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/grpc/wiring.go#L76>)
 
 ```go
 func Deploy(spec wiring.WiringSpec, serviceName string)
 ```
 
-Deploys \`serviceName\` as a GRPC server.
+[Deploy](<#Deploy>) can be used by wiring specs to deploy a workflow service using gRPC.
 
-Typically serviceName should be the name of a workflow service that was initially defined using \[workflow.Define\].
+serviceName should be the name of an applciation\-level service; typically one that was defined using workflow.Define.
 
 Like many other modifiers, GRPC modifies the service at the golang level, by generating server\-side handler code and a client\-side library. However, GRPC should be the last golang\-level modifier applied to a service, because thereafter communication between the client and server is no longer at the golang level, but at the network level.
 

@@ -1,3 +1,4 @@
+// Package goprocgen implements code generation for the main.go file
 package goprocgen
 
 import (
@@ -11,10 +12,8 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-/*
-Generates a main.go file in the provided module.  The main method will
-call the namespaceConstructor provided to create and instantiate nodes.
-*/
+// Generates a main.go file in the provided module.  The main method will
+// call the namespaceConstructor provided to create and instantiate nodes.
 func GenerateMain(
 	name string,
 	argNodes []ir.IRNode,

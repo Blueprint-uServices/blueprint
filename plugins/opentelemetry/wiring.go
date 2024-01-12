@@ -20,7 +20,7 @@ import (
 //
 // This call will configure the generated clients on server and client side to use the exporter provided by the custom collector indicated by the `collectorName`.
 // The `collectorName` must be declared in the wiring spec.
-func InstrumentUsingCustomCollector(spec wiring.WiringSpec, serviceName string, collectorName string) {
+func Instrument(spec wiring.WiringSpec, serviceName string, collectorName string) {
 	// The nodes that we are defining
 	clientWrapper := serviceName + ".client.ot"
 	serverWrapper := serviceName + ".server.ot"

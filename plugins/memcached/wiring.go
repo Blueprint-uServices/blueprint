@@ -16,7 +16,7 @@ import (
 
 // Adds a memcached container to the application that defines a cache called `cacheName`
 // which uses the pre-built memcached process container
-func PrebuiltContainer(spec wiring.WiringSpec, cacheName string) string {
+func Container(spec wiring.WiringSpec, cacheName string) string {
 	// The nodes that we are defining
 	ctrName := cacheName + ".ctr"
 	addrName := cacheName + ".addr"

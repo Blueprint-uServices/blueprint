@@ -6,6 +6,19 @@
 import "github.com/blueprint-uservices/blueprint/plugins/linux"
 ```
 
+Package linux defines compiler interfaces for use by plugins that generate and instantiate linux processes. The package does not provide any wiring spec functionality and is not directly used by Blueprint applications; only by other Blueprint plugins.
+
+The noteworthy interfaces are as follows:
+
+- [Process](<#Process>) is an interface for IRNodes that represent linux processes. If an IRNode implements this interface then it will ultimately be instantiated in a namespace that supports linux processes, such as a linux container.
+- If a [Process](<#Process>) wants to include code, binaries, or other runnable artifacts, then the IRNode should implement the [ProvidesProcessArtifacts](<#ProvidesProcessArtifacts>) interface.
+- If the [Process](<#Process>) can be instantiated \(e.g. by running a command\) then the IRNode should implement the [InstantiableProcess](<#InstantiableProcess>) interface.
+
+Consult the following plugins for examples:
+
+- The [goproc](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc>) plugin generates custom process artifacts and provides run commands to run the process \(e.g. the 'go run' command\)
+- The [linuxcontainer](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/linuxcontainer>) plugin implements a Process namespace that collects together Process nodes and generates run scripts and a Dockerfile if deploying to docker.
+
 ## Index
 
 - [func EnvVar\(name string\) string](<#EnvVar>)
@@ -18,42 +31,46 @@ import "github.com/blueprint-uservices/blueprint/plugins/linux"
 
 
 <a name="EnvVar"></a>
-## func [EnvVar](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/util.go#L9>)
+## func [EnvVar](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linux/util.go#L15>)
 
 ```go
 func EnvVar(name string) string
 ```
 
+A utility function for use when using linux environment variables. Converts a string to a compatible environment variable name, e.g.
 
+```
+a.grpc_addr becomes A_GRPC_ADDR.
+```
+
+Punctuation is converted to underscores, and alpha are made uppercase.
 
 <a name="FuncName"></a>
-## func [FuncName](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/util.go#L13>)
+## func [FuncName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linux/util.go#L22>)
 
 ```go
 func FuncName(name string) string
 ```
 
-
+A utility function for use when using commands. Converts a string to a compatible command name. Punctuation is converted to underscores, and alpha are made uppercase.
 
 <a name="InstantiableProcess"></a>
-## type [InstantiableProcess](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L33-L35>)
+## type [InstantiableProcess](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linux/ir.go#L53-L57>)
 
-For process nodes that can be instantiated.
-
-```
-Methods on the `builder` argument are used for declaring commands to start processes
-```
+An optional interface for Process IRNodes to implement if the node wants to declare an instance of a process. The process can be started by using standard command\-line commands, or by running custom artifacts that were included by [ProvidesProcessArtifacts](<#ProvidesProcessArtifacts>)
 
 ```go
 type InstantiableProcess interface {
+    // The IRNode is being compiled into the provided target workspace, and should
+    // use methods on target to declare how the process should be instantiated.
     AddProcessInstance(target ProcessWorkspace) error
 }
 ```
 
 <a name="Process"></a>
-## type [Process](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L10-L13>)
+## type [Process](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linux/ir.go#L29-L32>)
 
-The base IRNode interface for linux processes
+An IRNode interface that represents a linux process. If an IRNode implements this interface then it enables that IRNode to be instantiated within a process namespace, such as a linux container image.
 
 ```go
 type Process interface {
@@ -63,17 +80,15 @@ type Process interface {
 ```
 
 <a name="ProcessWorkspace"></a>
-## type [ProcessWorkspace](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L50-L113>)
+## type [ProcessWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linux/ir.go#L79-L142>)
 
-A process workspace has commands for adding artifacts to the workspace and
+[ProcessWorkspace](<#ProcessWorkspace>) receives process artifacts and run commands from [Process](<#Process>) nodes during Blueprint's compilation process.
 
-```
-instantiating processes in a run.sh method.
+A [ProcessWorkspace](<#ProcessWorkspace>) instance will be provided to [Process](<#Process>) IRNodes that implement either the [ProvidesProcessArtifacts](<#ProvidesProcessArtifacts>) or [InstantiableProcess](<#InstantiableProcess>) interfaces. The process IRNodes can invoke methods on this workspace in order to add their artifacts to the build output.
 
-Other plugins can extend this workspace with additional methods.  For example,
-the Docker plugin extends the workspace to allow custom Dockerfile build
-commands.
-```
+After all [Process](<#Process>) instances have added their declarations to the ProcessWorkspace, the ProcessWorkspace will generate a build.sh that invokes any build scripts added by [Process](<#Process>) instances, and a run.sh that will run all of the processes.
+
+The [docker](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/docker>) plugin extends the [ProcessWorkspace](<#ProcessWorkspace>) interface to also enable [Process](<#Process>) IRNodes to add custom Dockerfile commands with a function AddDockerfileCommands. To use the docker extensions, the Process IRNode should typecheck the ProcessWorkspace. See the [docker](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/docker>) plugin for more details.
 
 ```go
 type ProcessWorkspace interface {
@@ -143,9 +158,9 @@ type ProcessWorkspace interface {
 ```
 
 <a name="ProcessWorkspaceInfo"></a>
-## type [ProcessWorkspaceInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L115-L118>)
+## type [ProcessWorkspaceInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linux/ir.go#L145-L148>)
 
-Builders used by the above code and artifact generation interfaces
+Metadata about a [ProcessWorkspace](<#ProcessWorkspace>)
 
 ```go
 type ProcessWorkspaceInfo struct {
@@ -155,16 +170,14 @@ type ProcessWorkspaceInfo struct {
 ```
 
 <a name="ProvidesProcessArtifacts"></a>
-## type [ProvidesProcessArtifacts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/linux/ir.go#L25-L27>)
+## type [ProvidesProcessArtifacts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linux/ir.go#L43-L47>)
 
-For process nodes that want to provide code or other artifacts for their process.
-
-```
-Methods on the `builder` argument are used for collecting the artifacts
-```
+An optional interface for Process IRNodes to implement if the node needs to generate custom artifacts \(e.g. generate code that then gets compiled/run\) \[target\] provides methods for doing so.
 
 ```go
 type ProvidesProcessArtifacts interface {
+    // The IRNode is being compiled into the provided target workspace, and should
+    // use methods on target to add its process artifacts into the workspace.
     AddProcessArtifacts(target ProcessWorkspace) error
 }
 ```
