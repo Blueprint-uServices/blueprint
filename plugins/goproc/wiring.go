@@ -61,6 +61,8 @@ func AddToProcess(spec wiring.WiringSpec, procName, childName string) {
 // Deploy can be used by wiring specs to deploy a golang service in a golang process.
 //
 // Adds a modifier to the service that will create the golang process if not already created.
+//
+// After calling [Deploy], serviceName will be a process-level service.
 func Deploy(spec wiring.WiringSpec, serviceName string) string {
 	procName := serviceName + "_proc"
 	CreateProcess(spec, procName, serviceName)
@@ -71,7 +73,11 @@ func Deploy(spec wiring.WiringSpec, serviceName string) string {
 // the golang services children.  CreateProcess only needs to be used when more than one children
 // are being added to the process; otherwise it is more convenient to use [Deploy].
 //
-// Children can be subsequently added to procName by calling [AddToProcess]
+// After calling CreateProcess, other golang services can still be added to the process by calling
+// [AddToProcess] using the same procName.
+//
+// After calling CreateProcess, any children that are services will be process-level services
+// that can now have process-level modifiers applied to them, or can be deployed to containers.
 //
 // procName is configured with a logger that prints to stdout.  To change the logger,
 // call [SetLogger].

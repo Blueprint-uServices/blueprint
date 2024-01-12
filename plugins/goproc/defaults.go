@@ -10,7 +10,7 @@ import (
 // way of combining golang instances.
 //
 // If you are using the [cmdbuilder], then goproc is automatically set as the default builder and you
-// do not need to call this function again.
+// do not need to call this function.
 //
 // Default builders are responsible for building any golang instances that exist in a wiring spec but aren't
 // explicitly added to a goproc within that wiring spec.  The Blueprint compiler groups these

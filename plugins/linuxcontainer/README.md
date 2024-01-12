@@ -6,9 +6,64 @@
 import "github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 ```
 
+Package linuxcontainer is a plugin for instantiating multiple linux process instances in a single container deployment.
+
+### Wiring Spec Usage
+
+To use the linuxcontainer plugin in your wiring spec, you can declare a container, giving it a name and specifying which process instances to include
+
+```
+linuxcontainer.CreateContainer(spec, "my_container", "my_process_1", "my_process_2")
+```
+
+You can also add processes to existing linux containers:
+
+```
+linuxcontainer.AddToContainer(spec, "my_container", "my_process_3")
+```
+
+If you are only deploying a single service within the container, you should use the shorter [Deploy](<#Deploy>):
+
+```
+linuxcontainer.Deploy(spec, "my_service")
+```
+
+When a service is added to a container, the linuxcontainer plugin also adds a modifier to the service, so that the service is now converted from a process\-level service to a container\-level service. Any process\-level modifiers should be applied to the service \*before\* deploying it to a container.
+
+To deploy an application\-level service to a container, make sure you first deploy the service to a process \(e.g. with the [goproc](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc>) plugin\) and prior to that \(if desired\) expose it over the network \(e.g. with the [grpc](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/grpc>) plugin\)
+
+### Default Builder
+
+Instead of explicitly combining process instances into a linux container, the linuxcontainer plugin can be configured as the default builder for process instances, by calling [RegisterAsDefaultBuilder](<#RegisterAsDefaultBuilder>) in your wiring spec.
+
+At compile time Blueprint will combine any process instances that exist in the wiring spec but aren't explicitly added to a linux container, and create a default linux container deployment with the name "linuxcontainer".
+
+```
+linuxcontainer.RegisterAsDefaultBuilder()
+```
+
+Calling [RegisterAsDefaultBuilder](<#RegisterAsDefaultBuilder>) is optional and usually unnecessary:
+
+- If your wiring spec uses Blueprint's [cmdbuilder](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/cmdbuilder>) then linuxcontainer is already registered as the default process workspace builder.
+- The default builder only takes effect if there are 1 or more process instances that haven't been added to a linux container. If your wiring spec manually creates linux containers using [CreateContainer](<#CreateContainer>) for all process instances, then the default builder will not have any effect.
+
+### Artifacts Generated
+
+During compilation, the plugin creates a directory to collect the artifacts of all processes contained therein. For example, if one of the processes is a [goproc](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/goproc>), then code for that goproc will be collected into a subdirectory of the container.
+
+The plugin also gathers run scripts and \(optional\) build scripts from all processes, and then generates scripts that, when invoked, will invoke all the build scripts, and invoke all the run scripts.
+
+The linuxcontainer plugin also implements some of the interfaces defined by the [docker](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/docker>) plugin and will generate Dockerfiles in the case when containers are added to a container deployment \(e.g. Kubernetes or docker\-compose\)
+
+### Running artifacts
+
+A container's artifacts will be collected in a subdirectory of the build output based on the container name. Navigate to this directory then invoke run.sh. Only Linux is supported.
+
+Depending on the contents of the container, the run.sh might complain about missing environment variables such as addresses to bind to. These should be set in the calling environment before invoking run.sh.
+
 ## Index
 
-- [func AddProcessToContainer\(spec wiring.WiringSpec, containerName, childName string\)](<#AddProcessToContainer>)
+- [func AddToContainer\(spec wiring.WiringSpec, containerName, childName string\)](<#AddToContainer>)
 - [func CreateContainer\(spec wiring.WiringSpec, containerName string, children ...string\) string](<#CreateContainer>)
 - [func Deploy\(spec wiring.WiringSpec, serviceName string\) string](<#Deploy>)
 - [func RegisterAsDefaultBuilder\(\)](<#RegisterAsDefaultBuilder>)
@@ -22,44 +77,55 @@ import "github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
   - [func \(node \*Container\) ImplementsDockerContainer\(\)](<#Container.ImplementsDockerContainer>)
   - [func \(ctr \*Container\) Name\(\) string](<#Container.Name>)
   - [func \(ctr \*Container\) String\(\) string](<#Container.String>)
-- [type LinuxContainerNamespace](<#LinuxContainerNamespace>)
 
 
-<a name="AddProcessToContainer"></a>
-## func [AddProcessToContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L11>)
+<a name="AddToContainer"></a>
+## func [AddToContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L80>)
 
 ```go
-func AddProcessToContainer(spec wiring.WiringSpec, containerName, childName string)
+func AddToContainer(spec wiring.WiringSpec, containerName, childName string)
 ```
 
-Adds a process to an existing container
+AddToContainer can be used by wiring specs to add a process instance to an existing container deployment
 
 <a name="CreateContainer"></a>
-## func [CreateContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L26>)
+## func [CreateContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L106>)
 
 ```go
 func CreateContainer(spec wiring.WiringSpec, containerName string, children ...string) string
 ```
 
-Adds a container that will explicitly instantiate all of the named child processes The container will also implicitly instantiate any of the dependencies of the children
+CreateContainer can be used by wiring specs to define a container called containerName and to deploy the children processes. CreateContainer only needs to be used when more than one children are being added to the container; otherwise it is more convenient to use [Deploy](<#Deploy>).
+
+After calling CreateContainer, other processes can still be added to the container by calling [AddToContainer](<#AddToContainer>) using the same containerName.
+
+After calling CreateContainer, any children that are services will become container\-level services that can now have container\-level modifiers applied to them, or can be added to container deployments like kubernetes pods.
 
 <a name="Deploy"></a>
-## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L16>)
+## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L90>)
 
 ```go
 func Deploy(spec wiring.WiringSpec, serviceName string) string
 ```
 
-Wraps serviceName with a modifier that deploys the service inside a container
+Deploy can be used by wiring specs to deploy a process\-level service in a linux container.
+
+Adds a modifier to the service that, during compilation, will create the linux container if not already created.
+
+After calling [Deploy](<#Deploy>), serviceName will be a container\-level service.
 
 <a name="RegisterAsDefaultBuilder"></a>
-## func [RegisterAsDefaultBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/defaults.go#L14>)
+## func [RegisterAsDefaultBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/defaults.go#L20>)
 
 ```go
 func RegisterAsDefaultBuilder()
 ```
 
-to trigger module initialization and register builders
+RegisterAsDefaultBuilder should be invoked by a wiring spec if it wishes to use linuxcontainer as the default way of combining process instances.
+
+If you are using the [cmdbuilder](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/cmdbuilder>), then linuxcontainer is automatically set as the default builder and you do not need to call this function.
+
+Default builders are responsible for building any process instances that exist in a wiring spec but aren't explicitly added to a container within that wiring spec. The Blueprint compiler groups these "floating" process instances into a default linux container with the name "linuxcontainer".
 
 <a name="Container"></a>
 ## type [Container](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/ir.go#L13-L24>)
@@ -79,7 +145,7 @@ type Container struct {
 ```
 
 <a name="Container.Accepts"></a>
-### func \(\*Container\) [Accepts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L48>)
+### func \(\*Container\) [Accepts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L128>)
 
 ```go
 func (ctr *Container) Accepts(nodeType any) bool
@@ -106,7 +172,7 @@ func (node *Container) AddContainerInstance(target docker.ContainerWorkspace) er
 Implements dockerDeployer docker.ProvidesContainerInstance
 
 <a name="Container.AddEdge"></a>
-### func \(\*Container\) [AddEdge](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L54>)
+### func \(\*Container\) [AddEdge](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L134>)
 
 ```go
 func (ctr *Container) AddEdge(name string, edge ir.IRNode) error
@@ -115,7 +181,7 @@ func (ctr *Container) AddEdge(name string, edge ir.IRNode) error
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Container.AddNode"></a>
-### func \(\*Container\) [AddNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L60>)
+### func \(\*Container\) [AddNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L140>)
 
 ```go
 func (ctr *Container) AddNode(name string, node ir.IRNode) error
@@ -164,16 +230,5 @@ func (ctr *Container) String() string
 ```
 
 Implements ir.IRNode
-
-<a name="LinuxContainerNamespace"></a>
-## type [LinuxContainerNamespace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L43-L45>)
-
-A \[wiring.NamespaceHandler\] used to build golang process nodes
-
-```go
-type LinuxContainerNamespace struct {
-    *Container
-}
-```
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
