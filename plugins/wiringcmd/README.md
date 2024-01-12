@@ -8,7 +8,9 @@ import "github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 
 Package wiringcmd is a helper package for building wiring spec command line programs. It doesn't provide any wiring spec commands or IR.
 
-Using the cmdbuilder, it is easy to register multiple wiring spec options and use command line arguments to select which one to compile.
+The [CmdBuilder](<#CmdBuilder>) struct enables an application to register multiple wiring spec options in a single main.go. It adds command line arguments for selecting which wiring spec to compile, and takes care of argument parsing and spec building.
+
+Specify the name of a wiring spec with the \-w argument, and the output directory with \-o.
 
 ### Usage
 
@@ -58,7 +60,7 @@ The wiringcmd plugin takes care of argument parsing, and will list the wiring sp
 To compile a spec, run
 
 ```
-go run main.go -o build -w myspec]
+go run main.go -o build -w myspec
 ```
 
 ## Index
@@ -75,7 +77,7 @@ go run main.go -o build -w myspec]
 
 
 <a name="MakeAndExecute"></a>
-## func [MakeAndExecute](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L96>)
+## func [MakeAndExecute](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L99>)
 
 ```go
 func MakeAndExecute(name string, specs ...SpecOption)
@@ -84,7 +86,7 @@ func MakeAndExecute(name string, specs ...SpecOption)
 Parses command line flags, and if a valid spec is specified with the \-w flag, that exists within specs, executes that spec.
 
 <a name="CmdBuilder"></a>
-## type [CmdBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L82-L92>)
+## type [CmdBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L85-L95>)
 
 A helper struct when a Blueprint application supports multiple different wiring specs. Makes it easy to choose which spec to compile. See the Blueprint example applications for usage
 
@@ -103,7 +105,7 @@ type CmdBuilder struct {
 ```
 
 <a name="NewCmdBuilder"></a>
-### func [NewCmdBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L112>)
+### func [NewCmdBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L115>)
 
 ```go
 func NewCmdBuilder(applicationName string) *CmdBuilder
@@ -112,7 +114,7 @@ func NewCmdBuilder(applicationName string) *CmdBuilder
 
 
 <a name="CmdBuilder.Add"></a>
-### func \(\*CmdBuilder\) [Add](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L119>)
+### func \(\*CmdBuilder\) [Add](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L122>)
 
 ```go
 func (b *CmdBuilder) Add(specs ...SpecOption)
@@ -121,7 +123,7 @@ func (b *CmdBuilder) Add(specs ...SpecOption)
 
 
 <a name="CmdBuilder.Build"></a>
-### func \(\*CmdBuilder\) [Build](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L169>)
+### func \(\*CmdBuilder\) [Build](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L172>)
 
 ```go
 func (b *CmdBuilder) Build() error
@@ -130,7 +132,7 @@ func (b *CmdBuilder) Build() error
 
 
 <a name="CmdBuilder.List"></a>
-### func \(\*CmdBuilder\) [List](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L161>)
+### func \(\*CmdBuilder\) [List](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L164>)
 
 ```go
 func (builder *CmdBuilder) List() string
@@ -139,7 +141,7 @@ func (builder *CmdBuilder) List() string
 Returns a list of configured wiring specs
 
 <a name="CmdBuilder.ParseArgs"></a>
-### func \(\*CmdBuilder\) [ParseArgs](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L125>)
+### func \(\*CmdBuilder\) [ParseArgs](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L128>)
 
 ```go
 func (b *CmdBuilder) ParseArgs()
@@ -148,7 +150,7 @@ func (b *CmdBuilder) ParseArgs()
 
 
 <a name="CmdBuilder.ValidateArgs"></a>
-### func \(\*CmdBuilder\) [ValidateArgs](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L137>)
+### func \(\*CmdBuilder\) [ValidateArgs](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L140>)
 
 ```go
 func (b *CmdBuilder) ValidateArgs() error
@@ -157,7 +159,7 @@ func (b *CmdBuilder) ValidateArgs() error
 
 
 <a name="SpecOption"></a>
-## type [SpecOption](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L73-L77>)
+## type [SpecOption](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/wiringcmd/cmdbuilder.go#L76-L80>)
 
 A wiring spec option used by [CmdBuilder](<#CmdBuilder>). When running the program, this wiring spec can be selected by specifying its \[Name\] with the \-w flag, e.g.
 

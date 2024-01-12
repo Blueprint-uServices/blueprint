@@ -1,8 +1,11 @@
 // Package wiringcmd is a helper package for building wiring spec command line programs.
 // It doesn't provide any wiring spec commands or IR.
 //
-// Using the cmdbuilder, it is easy to register multiple wiring spec options and use command
-// line arguments to select which one to compile.
+// The [CmdBuilder] struct enables an application to register multiple wiring spec options
+// in a single main.go.  It adds command line arguments for selecting which wiring spec to compile,
+// and takes care of argument parsing and spec building.
+//
+// Specify the name of a wiring spec with the -w argument, and the output directory with -o.
 //
 // # Usage
 //
@@ -45,7 +48,7 @@
 //
 // To compile a spec, run
 //
-//	go run main.go -o build -w myspec]
+//	go run main.go -o build -w myspec
 //
 // [wiring/main.go]: https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/wiring/main.go
 package wiringcmd
