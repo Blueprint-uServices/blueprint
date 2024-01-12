@@ -80,3 +80,9 @@ type TravelResult struct {
 	Route   route.Route
 	Prices  map[string]string
 }
+
+type Ticket struct {
+	SeatNo       int64
+	StartStation string
+	DestStation  string
+}

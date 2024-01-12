@@ -4,8 +4,10 @@ package order
 import (
 	"context"
 	"errors"
+	"strconv"
 	"time"
 
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/common"
 	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/station"
 	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"github.com/google/uuid"
@@ -18,6 +20,7 @@ type OrderService interface {
 	AddCreateNewOrder(ctx context.Context, o Order) (Order, error)
 	QueryOrders(ctx context.Context, orderInfo OrderInfo, accountId string) ([]Order, error)
 	QueryOrdersForRefresh(ctx context.Context, orderInfo OrderInfo, accountId string) ([]Order, error)
+	GetAllSoldTickets(ctx context.Context, travelDate string, trainNumber string) ([]common.Ticket, error)
 	CalculateSoldTicket(ctx context.Context, travelDate string, trainNumber string) (SoldTicket, error)
 	GetOrderPrice(ctx context.Context, orderId string) (float64, error)
 	PayOrder(ctx context.Context, orderId string) (Order, error)
@@ -176,6 +179,39 @@ func (osi *OrderServiceImpl) QueryOrders(ctx context.Context, orderInfo OrderInf
 
 func (osi *OrderServiceImpl) QueryOrdersForRefresh(ctx context.Context, orderInfo OrderInfo, accountId string) ([]Order, error) {
 	return osi.QueryOrders(ctx, orderInfo, accountId)
+}
+
+func (osi *OrderServiceImpl) GetAllSoldTickets(ctx context.Context, travelDate string, trainNumber string) ([]common.Ticket, error) {
+	var tickets []common.Ticket
+	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
+	if err != nil {
+		return tickets, err
+	}
+
+	query := bson.D{{"$and", bson.A{
+		bson.D{{"traveldate", travelDate}},
+		bson.D{{"trainnumber", trainNumber}},
+	}}}
+	res, err := collection.FindMany(ctx, query)
+	if err != nil {
+		return tickets, err
+	}
+
+	var orders []Order
+	err = res.All(ctx, &orders)
+	if err != nil {
+		return tickets, err
+	}
+
+	for _, o := range orders {
+		ticket := common.Ticket{}
+		seatnum, _ := strconv.ParseInt(o.SeatNumber, 10, 32)
+		ticket.SeatNo = seatnum
+		ticket.StartStation = o.From
+		ticket.DestStation = o.To
+	}
+
+	return tickets, nil
 }
 
 func (osi *OrderServiceImpl) CalculateSoldTicket(ctx context.Context, travelDate string, trainNumber string) (SoldTicket, error) {
