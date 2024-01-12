@@ -4,23 +4,32 @@
 //  2. A modifier plugin to wrap the service with an XTrace wrapper to generate XTrace compatible traces/logs by correctly propagating baggage across service boundaries.
 //  3. A plugin to define an xtrace-based logger for a process. Log events are added as reports to the currently active xtrace task, if one exists. If no such task exists, then no events are logged.
 //
-// The package provides a built-in xtrace container that provides the server-side implementation
-// and a go-client for connecting to the server.
+// # Artifacts Generated
+//
+//  1. The package generates a built-in xtrace container that provides the server-side implementation and a go-client for connecting to the server.
+//  2. Generates client and server side wrappers for instrumented servers that contain xtrace instrumentation (baggage propagation, xtrace event generation)
+//
+// # Wiring Usage
 //
 // In order to generate complete end-to-end traces of the application, all services of the application need to be instrumented with XTrace.
 // If the plugin is only applied to a subset of services, the application will run, but the traces it produces won't be end-to-end and won't be useful.
 //
+// Here are the methods exported by this package for the wiring spec
+//  1. xtrace.Container(spec wiring.WiringSpec, name string): Defines and adds an xtrace server to the wiring spec
+//  2. xtrace.Instrument(spec wiring.WiringSpec, service string): Instruments the client and server side of the service to add xtrace instrumentation (baggage propagation, xtrace events generation)
+//  3. xtrace.Logger(spec wiring.WiringSpec, process string): Defines and installs an xtrace logger as the default logger for the process
+//
 // # Wiring Example
 //
 // func applyXtraceOptions() {
-// 	xtrace.Container(spec, "xtrace_server") // Defines and adds an xtrace server to the wiring spec
+// 	xtrace.Container(spec, "xtrace_server")
 //
 // 	for _, service := range serviceNames {
-//  	 xtrace.Instrument(spec, service) // Instrument service with xtrace instrumentation
+//  	 xtrace.Instrument(spec, service)
 // 	}
 //
 // 	for _, proc := range processNames {
-//  	 xtrace.Logger(spec, proc) // Define an xtrace-logger for the process
+//  	 xtrace.Logger(spec, proc)
 // 	}
 // }
 package xtrace
@@ -134,7 +143,7 @@ func Container(spec wiring.WiringSpec, serverName string) string {
 	return serverName
 }
 
-// Adds an xtrace-based logger to the process with name `processName`.
+// Defines and installs an xtrace-based logger to the process with name `processName`.
 // Instantiates the logger, registers the logger as the default logger for the desired process, and returns the instantiated logger's name.
 // Logged events are added as reports to the currently active XTrace task, if available. If no such task exists, then no log events are generated.
 // Log messages are not printed to stdout as they are captured by the xtrace library and attached to the trace.
