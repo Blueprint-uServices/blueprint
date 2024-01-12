@@ -4,7 +4,6 @@ package order
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/station"
@@ -41,18 +40,24 @@ func NewOrderService(ctx context.Context, stationService station.StationService,
 }
 
 func (osi *OrderServiceImpl) GetTicketListByDateAndTripId(ctx context.Context, travelDate string, trainNumber string) ([]Ticket, error) {
+	var tickets []Ticket
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
+	if err != nil {
+		return tickets, err
+	}
 
-	query := fmt.Sprintf(`{"TravelDate": %s, "TrainNumber": %s}`, travelDate, trainNumber)
-	res, err := collection.FindMany(query)
+	query := bson.D{{"$and", bson.A{
+		bson.D{{"traveldate", travelDate}},
+		bson.D{{"trainnumber", trainNumber}},
+	}}}
+	res, err := collection.FindMany(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 
 	var orders []Order
-	var tickets []Ticket
 
-	err = res.All(&orders)
+	err = res.All(ctx, &orders)
 	if err != nil {
 		return nil, err
 	}
@@ -69,42 +74,30 @@ func (osi *OrderServiceImpl) GetTicketListByDateAndTripId(ctx context.Context, t
 }
 
 func (osi *OrderServiceImpl) CreateNewOrder(ctx context.Context, order Order) (Order, error) {
-	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
-
-	query := fmt.Sprintf(`{"AccountId": %s}`, order.AccountId)
-	res, err := collection.FindOne(query)
-	if err == nil {
-		var exOrder Order
-		res.Decode(&exOrder)
-		if exOrder.Id != "" {
-			return Order{}, errors.New("Order already exists for this account.")
-		}
-	}
-
-	order.Id = uuid.New().String()
-	err = collection.InsertOne(order)
-	if err != nil {
-		return Order{}, nil
-	}
-
-	return order, nil
+	return osi.CreateNewOrder(ctx, order)
 }
 
 func (osi *OrderServiceImpl) AddCreateNewOrder(ctx context.Context, order Order) (Order, error) {
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
-
-	query := fmt.Sprintf(`{"AccountId": %s}`, order.AccountId)
-	res, err := collection.FindOne(query)
-	if err == nil {
-		var exOrder Order
-		res.Decode(&exOrder)
-		if exOrder.Id != "" {
-			return Order{}, errors.New("Order already exists for this account.")
-		}
+	if err != nil {
+		return Order{}, err
+	}
+	query := bson.D{{"accountid", order.AccountId}}
+	res, err := collection.FindOne(ctx, query)
+	if err != nil {
+		return Order{}, errors.New("Order doesn't exist")
+	}
+	var exOrder Order
+	exists, err := res.One(ctx, &exOrder)
+	if err != nil {
+		return Order{}, errors.New("Order already exists for this account")
+	}
+	if exists {
+		return Order{}, errors.New("Order already exists for this account.")
 	}
 
 	order.Id = uuid.New().String()
-	err = collection.InsertOne(order)
+	err = collection.InsertOne(ctx, order)
 	if err != nil {
 		return Order{}, nil
 	}
@@ -114,15 +107,18 @@ func (osi *OrderServiceImpl) AddCreateNewOrder(ctx context.Context, order Order)
 
 func (osi *OrderServiceImpl) QueryOrders(ctx context.Context, orderInfo OrderInfo, accountId string) ([]Order, error) {
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
-
-	query := fmt.Sprintf(`{"AccountId": %s}`, accountId)
-	res, err := collection.FindMany(query)
 	if err != nil {
-		return nil, err
+		return []Order{}, nil
+	}
+
+	query := bson.D{{"accountid", accountId}}
+	res, err := collection.FindMany(ctx, query)
+	if err != nil {
+		return []Order{}, err
 	}
 
 	var orderList []Order
-	err = res.All(&orderList)
+	err = res.All(ctx, &orderList)
 	if err != nil {
 		return nil, err
 	}
@@ -179,50 +175,26 @@ func (osi *OrderServiceImpl) QueryOrders(ctx context.Context, orderInfo OrderInf
 }
 
 func (osi *OrderServiceImpl) QueryOrdersForRefresh(ctx context.Context, orderInfo OrderInfo, accountId string) ([]Order, error) {
-	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
-
-	query := fmt.Sprintf(`{"AccountId": %s}`, accountId)
-	res, err := collection.FindMany(query)
-	if err != nil {
-		return []Order{}, err
-	}
-
-	var orders []Order
-	err = res.All(&orders)
-	if err != nil {
-		return orders, err
-	}
-
-	var stationIds []string
-	for _, order := range orders {
-		stationIds = append(stationIds, order.From)
-		stationIds = append(stationIds, order.To)
-	}
-
-	names, err := osi.stationService.QueryForNameBatch(ctx, stationIds, token)
-	if err != nil {
-		return orders, err
-	}
-
-	for idx, _ := range names {
-		orders[idx].From = names[idx*2]
-		orders[idx].To = names[idx*2+1]
-	}
-
-	return orders, nil
+	return osi.QueryOrders(ctx, orderInfo, accountId)
 }
 
 func (osi *OrderServiceImpl) CalculateSoldTicket(ctx context.Context, travelDate string, trainNumber string) (SoldTicket, error) {
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
+	if err != nil {
+		return SoldTicket{}, err
+	}
 
-	query := fmt.Sprintf(`{"TravelDate": %s, "TrainNumber": %s}`, travelDate, trainNumber)
-	res, err := collection.FindMany(query)
+	query := bson.D{{"$and", bson.A{
+		bson.D{{"traveldate", travelDate}},
+		bson.D{{"trainnumber", trainNumber}},
+	}}}
+	res, err := collection.FindMany(ctx, query)
 	if err != nil {
 		return SoldTicket{}, err
 	}
 
 	var orders []Order
-	err = res.All(&orders)
+	err = res.All(ctx, &orders)
 	if err != nil {
 		return SoldTicket{}, err
 	}
@@ -264,17 +236,23 @@ func (osi *OrderServiceImpl) CalculateSoldTicket(ctx context.Context, travelDate
 
 func (osi *OrderServiceImpl) GetOrderPrice(ctx context.Context, orderId string) (float32, error) {
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
+	if err != nil {
+		return 0.0, err
+	}
 
-	query := fmt.Sprintf(`{"Id": %s}`, orderId)
-	res, err := collection.FindOne(query)
+	query := bson.D{{"id", orderId}}
+	res, err := collection.FindOne(ctx, query)
 	if err != nil {
 		return 0.0, err
 	}
 
 	var order Order
-	err = res.Decode(&order)
+	exists, err := res.One(ctx, &order)
 	if err != nil {
 		return 0.0, err
+	}
+	if !exists {
+		return 0.0, errors.New("Order with id " + orderId + " does not exist")
 	}
 
 	return order.Price, nil
@@ -282,16 +260,25 @@ func (osi *OrderServiceImpl) GetOrderPrice(ctx context.Context, orderId string) 
 
 func (osi *OrderServiceImpl) PayOrder(ctx context.Context, orderId string) (Order, error) {
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
+	if err != nil {
+		return Order{}, err
+	}
 
-	query := fmt.Sprintf(`{"Id": %s}`, orderId)
-	res, err := collection.FindOne(query)
+	query := bson.D{{"id", orderId}}
+	res, err := collection.FindOne(ctx, query)
 	if err != nil {
 		return Order{}, err
 	}
 	var order Order
-	res.Decode(&order)
-	update := fmt.Sprintf(`{"$set": {"Status": %d}}`, Paid)
-	err = collection.UpdateOne(query, update)
+	ok, err := res.One(ctx, &order)
+	if err != nil {
+		return Order{}, err
+	}
+	if !ok {
+		return Order{}, errors.New("Order with id " + orderId + " does not exist")
+	}
+	update := bson.D{{"$set", bson.D{{"status", Paid}}}}
+	_, err = collection.UpdateOne(ctx, query, update)
 	if err != nil {
 		return Order{}, err
 	}
@@ -302,17 +289,23 @@ func (osi *OrderServiceImpl) PayOrder(ctx context.Context, orderId string) (Orde
 
 func (osi *OrderServiceImpl) GetOrderById(ctx context.Context, orderId string) (Order, error) {
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
+	if err != nil {
+		return Order{}, err
+	}
 
-	query := fmt.Sprintf(`{"Id": %s}`, orderId)
-	res, err := collection.FindOne(query)
+	query := bson.D{{"id", orderId}}
+	res, err := collection.FindOne(ctx, query)
 	if err != nil {
 		return Order{}, err
 	}
 
 	var order Order
-	err = res.Decode(&order)
+	exists, err := res.One(ctx, &order)
 	if err != nil {
 		return Order{}, err
+	}
+	if !exists {
+		return Order{}, errors.New("Order with id " + orderId + " does not exist")
 	}
 
 	return order, nil
@@ -320,16 +313,25 @@ func (osi *OrderServiceImpl) GetOrderById(ctx context.Context, orderId string) (
 
 func (osi *OrderServiceImpl) ModifyOrder(ctx context.Context, orderId string, status uint16) (Order, error) {
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
+	if err != nil {
+		return Order{}, err
+	}
 
-	query := fmt.Sprintf(`{"Id": %s}`, orderId)
-	res, err := collection.FindOne(query)
+	query := bson.D{{"id", orderId}}
+	res, err := collection.FindOne(ctx, query)
 	if err != nil {
 		return Order{}, err
 	}
 	var order Order
-	res.Decode(&order)
-	update := fmt.Sprintf(`{"$set": {"Status": %d}}`, status)
-	err = collection.UpdateOne(query, update)
+	exists, err := res.One(ctx, &order)
+	if err != nil {
+		return Order{}, err
+	}
+	if !exists {
+		return Order{}, errors.New("Order with id " + orderId + " does not exist")
+	}
+	update := bson.D{{"$set", bson.D{{"Status", status}}}}
+	_, err = collection.UpdateOne(ctx, query, update)
 	if err != nil {
 		return Order{}, err
 	}
@@ -339,16 +341,23 @@ func (osi *OrderServiceImpl) ModifyOrder(ctx context.Context, orderId string, st
 }
 
 func (osi *OrderServiceImpl) SecurityInfoCheck(ctx context.Context, checkDate string, accountId string) (map[string]uint16, error) {
+	ret := make(map[string]uint16)
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
-
-	query := fmt.Sprintf(`{"AccountId": %s}`, accountId)
-	res, err := collection.FindMany(query) //TODO verify this query works
 	if err != nil {
-		return nil, err
+		return ret, err
+	}
+
+	query := bson.D{{"accountid", accountId}}
+	res, err := collection.FindMany(ctx, query)
+	if err != nil {
+		return ret, err
 	}
 
 	var orders []Order
-	res.All(&orders)
+	err = res.All(ctx, &orders)
+	if err != nil {
+		return ret, err
+	}
 	countTotalValidOrder := uint16(0)
 	countOrderInOneHour := uint16(0)
 
@@ -367,41 +376,48 @@ func (osi *OrderServiceImpl) SecurityInfoCheck(ctx context.Context, checkDate st
 		}
 	}
 
-	return map[string]uint16{
-		"OrderNumInLastHour":   countOrderInOneHour,
-		"OrderNumOfValidOrder": countTotalValidOrder,
-	}, nil
+	ret["OrderNumInLastHour"] = countOrderInOneHour
+	ret["OrderNumOfValidOrder"] = countTotalValidOrder
+	return ret, nil
 }
 
 func (osi *OrderServiceImpl) SaveOrderInfo(ctx context.Context, order Order) (Order, error) {
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
 
-	query := fmt.Sprintf(`{"Id": %s}`, order.Id)
-	_, err = collection.FindOne(query)
+	query := bson.D{{"id", order.Id}}
+	res, err := collection.FindOne(ctx, query)
 	if err != nil {
 		return Order{}, err
 	}
+	var saved_order Order
+	ok, err := res.One(ctx, &saved_order)
+	if err != nil {
+		return Order{}, err
+	}
+	if ok {
+		return osi.UpdateOrder(ctx, order)
+	}
 
-	err = collection.ReplaceOne(query, order)
+	err = collection.InsertOne(ctx, order)
 	if err != nil {
 		return Order{}, nil
 	}
-
 	return order, nil
 }
 
 func (osi *OrderServiceImpl) UpdateOrder(ctx context.Context, order Order) (Order, error) {
 	collection, err := osi.db.GetCollection(ctx, "orders", "orders")
-
-	query := fmt.Sprintf(`{"Id": %s}`, order.Id)
-	_, err = collection.FindOne(query)
 	if err != nil {
 		return Order{}, err
 	}
 
-	err = collection.ReplaceOne(query, order)
+	query := bson.D{{"id", order.Id}}
+	ok, err := collection.Upsert(ctx, query, order)
 	if err != nil {
-		return Order{}, nil
+		return Order{}, err
+	}
+	if !ok {
+		return Order{}, errors.New("Unable to update order")
 	}
 
 	return order, nil
