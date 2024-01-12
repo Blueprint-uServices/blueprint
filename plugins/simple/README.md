@@ -77,7 +77,7 @@ Implementations of the backends can be found in the following locations:
 func Cache(spec wiring.WiringSpec, name string) string
 ```
 
-Defines an in\-memory \[backend.Cache\] instance with the specified name. In the compiled application, uses the \[simplecache.SimpleCache\] implementation from the Blueprint runtime package
+[Cache](<#Cache>) can be used by wiring specs to create an in\-memory \[backend.Cache\] instance with the specified name. In the compiled application, uses the \[simplecache.SimpleCache\] implementation from the Blueprint runtime package
 
 <a name="NoSQLDB"></a>
 ## func [NoSQLDB](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/wiring.go#L71>)
@@ -86,7 +86,7 @@ Defines an in\-memory \[backend.Cache\] instance with the specified name. In the
 func NoSQLDB(spec wiring.WiringSpec, name string) string
 ```
 
-Defines an in\-memory \[backend.NoSQLDatabase\] instance with the specified name. In the compiled application, uses the \[simplenosqldb.SimpleNoSQLDB\] implementation from the Blueprint runtime package The SimpleNoSQLDB has limited support for query and update operations.
+[NoSQLDB](<#NoSQLDB>) can be used by wiring specs to create an in\-memory \[backend.NoSQLDatabase\] instance with the specified name. In the compiled application, uses the \[simplenosqldb.SimpleNoSQLDB\] implementation from the Blueprint runtime package The SimpleNoSQLDB has limited support for query and update operations.
 
 <a name="Queue"></a>
 ## func [Queue](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/wiring.go#L84>)
@@ -95,7 +95,7 @@ Defines an in\-memory \[backend.NoSQLDatabase\] instance with the specified name
 func Queue(spec wiring.WiringSpec, name string) string
 ```
 
-Defines an in\-memory \[backend.Queue\] instance with the specified name. In the compiled application, uses the \[simplequeue.SimpleQueue\] implementation from the Blueprint runtime package
+[Queue](<#Queue>) can be used by wiring specs to create an in\-memory \[backend.Queue\] instance with the specified name. In the compiled application, uses the \[simplequeue.SimpleQueue\] implementation from the Blueprint runtime package
 
 <a name="RelationalDB"></a>
 ## func [RelationalDB](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/wiring.go#L78>)
@@ -104,7 +104,7 @@ Defines an in\-memory \[backend.Queue\] instance with the specified name. In the
 func RelationalDB(spec wiring.WiringSpec, name string) string
 ```
 
-Defines an in\-memory \[backend.RelationalDB\] instance with the specified name. In the compiled application, uses the \[sqlitereldb.SqliteRelDB\] implementation from the Blueprint runtime package The compiled application might fail to run if gcc is not installed and CGO\_ENABLED is not set.
+[RelationalDB](<#RelationalDB>) can be used by wiring specs to create an in\-memory \[backend.RelationalDB\] instance with the specified name. In the compiled application, uses the \[sqlitereldb.SqliteRelDB\] implementation from the Blueprint runtime package The compiled application might fail to run if gcc is not installed and CGO\_ENABLED is not set.
 
 <a name="SimpleBackend"></a>
 ## type [SimpleBackend](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/simple/ir.go#L21-L35>)

@@ -65,27 +65,27 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 )
 
-// Defines an in-memory [backend.NoSQLDatabase] instance with the specified name.
+// [NoSQLDB] can be used by wiring specs to create an in-memory [backend.NoSQLDatabase] instance with the specified name.
 // In the compiled application, uses the [simplenosqldb.SimpleNoSQLDB] implementation from the Blueprint runtime package
 // The SimpleNoSQLDB has limited support for query and update operations.
 func NoSQLDB(spec wiring.WiringSpec, name string) string {
 	return define(spec, name, "NoSQLDatabase", "SimpleNoSQLDB")
 }
 
-// Defines an in-memory [backend.RelationalDB] instance with the specified name.
+// [RelationalDB] can be used by wiring specs to create an in-memory [backend.RelationalDB] instance with the specified name.
 // In the compiled application, uses the [sqlitereldb.SqliteRelDB] implementation from the Blueprint runtime package
 // The compiled application might fail to run if gcc is not installed and CGO_ENABLED is not set.
 func RelationalDB(spec wiring.WiringSpec, name string) string {
 	return define(spec, name, "RelationalDB", "SqliteRelDB")
 }
 
-// Defines an in-memory [backend.Queue] instance with the specified name.
+// [Queue] can be used by wiring specs to create an in-memory [backend.Queue] instance with the specified name.
 // In the compiled application, uses the [simplequeue.SimpleQueue] implementation from the Blueprint runtime package
 func Queue(spec wiring.WiringSpec, name string) string {
 	return define(spec, name, "Queue", "SimpleQueue")
 }
 
-// Defines an in-memory [backend.Cache] instance with the specified name.
+// [Cache] can be used by wiring specs to create an in-memory [backend.Cache] instance with the specified name.
 // In the compiled application, uses the [simplecache.SimpleCache] implementation from the Blueprint runtime package
 func Cache(spec wiring.WiringSpec, name string) string {
 	return define(spec, name, "Cache", "SimpleCache")

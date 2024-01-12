@@ -10,32 +10,32 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-/*
-Representation of a workflow spec.
-
-This code makes heavy use of the Golang code parser defined in the Golang plugin.  That
-code parser extracts structs, interfaces, and function definitions from a set of golang
-modules.
-
-This code adds functionality that:
-  - Identifies valid service interfaces
-  - Matches structs to interfaces that they implement
-  - Finds constructors of structs
-*/
+// Representation of a parsed workflow spec.
+//
+// This code makes heavy use of the Golang code parser defined in the Golang plugin.  That
+// code parser extracts structs, interfaces, and function definitions from a set of golang
+// modules.
+//
+// This code adds functionality that:
+//   - Identifies valid service interfaces
+//   - Matches structs to interfaces that they implement
+//   - Finds constructors of structs
 type WorkflowSpec struct {
 	Parsed *goparser.ParsedModuleSet
 }
 
+// A service in the workflow spec
 type WorkflowSpecService struct {
-	Iface       *goparser.ParsedInterface
+	// The interface that the service implements
+	Iface *goparser.ParsedInterface
+
+	// The constructor func of the service
 	Constructor *goparser.ParsedFunc
 }
 
-/*
-Parses the specified module directories and loads workflow specs from there.
-
-This will return an error if *any* of the provided srcModuleDirs are not valid Go modules
-*/
+// Parses the specified module directories and loads workflow specs from there.
+//
+// This will return an error if *any* of the provided srcModuleDirs are not valid Go modules
 func NewWorkflowSpec(srcModuleDirs ...string) (*WorkflowSpec, error) {
 	parsed, err := goparser.ParseModules(srcModuleDirs...)
 	if err != nil {
