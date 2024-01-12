@@ -31,7 +31,7 @@ Package xtrace provides xtrace\-based runtime components to be used by blueprint
 
 
 <a name="XTraceLogger"></a>
-## type [XTraceLogger](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/log.go#L13-L15>)
+## type [XTraceLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/log.go#L13-L15>)
 
 Implementation of the \[backend.Logger\] interface Note: This logger should only be used in conjunction with the XTracerImpl tracer. Using this logger without using the XTracerImpl tracer would result in no\-op logging behavior.
 
@@ -42,7 +42,7 @@ type XTraceLogger struct {
 ```
 
 <a name="NewXTraceLogger"></a>
-### func [NewXTraceLogger](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/log.go#L32>)
+### func [NewXTraceLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/log.go#L32>)
 
 ```go
 func NewXTraceLogger(ctx context.Context, addr string) (*XTraceLogger, error)
@@ -51,7 +51,7 @@ func NewXTraceLogger(ctx context.Context, addr string) (*XTraceLogger, error)
 Returns a new instance of [XTracerImpl](<#XTracerImpl>) that connects to a xtrace server running at \`addr\`. REQUIRED: An xtrace server must be running at \`addr\`
 
 <a name="XTraceLogger.Debug"></a>
-### func \(\*XTraceLogger\) [Debug](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/log.go#L53>)
+### func \(\*XTraceLogger\) [Debug](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/log.go#L53>)
 
 ```go
 func (l *XTraceLogger) Debug(ctx context.Context, format string, args ...any) (context.Context, error)
@@ -60,7 +60,7 @@ func (l *XTraceLogger) Debug(ctx context.Context, format string, args ...any) (c
 Implements backend.Logger
 
 <a name="XTraceLogger.Error"></a>
-### func \(\*XTraceLogger\) [Error](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/log.go#L71>)
+### func \(\*XTraceLogger\) [Error](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/log.go#L71>)
 
 ```go
 func (l *XTraceLogger) Error(ctx context.Context, format string, args ...any) (context.Context, error)
@@ -69,7 +69,7 @@ func (l *XTraceLogger) Error(ctx context.Context, format string, args ...any) (c
 Implements backend.Logger
 
 <a name="XTraceLogger.Info"></a>
-### func \(\*XTraceLogger\) [Info](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/log.go#L43>)
+### func \(\*XTraceLogger\) [Info](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/log.go#L43>)
 
 ```go
 func (l *XTraceLogger) Info(ctx context.Context, format string, args ...any) (context.Context, error)
@@ -78,7 +78,7 @@ func (l *XTraceLogger) Info(ctx context.Context, format string, args ...any) (co
 Implements backend.Logger
 
 <a name="XTraceLogger.Logf"></a>
-### func \(\*XTraceLogger\) [Logf](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/log.go#L80>)
+### func \(\*XTraceLogger\) [Logf](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/log.go#L80>)
 
 ```go
 func (l *XTraceLogger) Logf(ctx context.Context, opts backend.LogOptions, format string, args ...any) (context.Context, error)
@@ -87,7 +87,7 @@ func (l *XTraceLogger) Logf(ctx context.Context, opts backend.LogOptions, format
 Implements backend.Logger
 
 <a name="XTraceLogger.Warn"></a>
-### func \(\*XTraceLogger\) [Warn](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/log.go#L62>)
+### func \(\*XTraceLogger\) [Warn](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/log.go#L62>)
 
 ```go
 func (l *XTraceLogger) Warn(ctx context.Context, format string, args ...any) (context.Context, error)
@@ -96,7 +96,7 @@ func (l *XTraceLogger) Warn(ctx context.Context, format string, args ...any) (co
 Implements backend.Logger
 
 <a name="XTracer"></a>
-## type [XTracer](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/xtrace_iface.go#L10-L27>)
+## type [XTracer](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/xtrace_iface.go#L10-L27>)
 
 Represents the XTrace tracer interface exposed to applications and used by the xtrace plugin.
 
@@ -122,7 +122,7 @@ type XTracer interface {
 ```
 
 <a name="XTracerImpl"></a>
-## type [XTracerImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L16-L18>)
+## type [XTracerImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L16-L18>)
 
 Implementation of the [XTracer](<#XTracer>) interface
 
@@ -133,7 +133,7 @@ type XTracerImpl struct {
 ```
 
 <a name="NewXTracerImpl"></a>
-### func [NewXTracerImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L22>)
+### func [NewXTracerImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L22>)
 
 ```go
 func NewXTracerImpl(ctx context.Context, addr string) (*XTracerImpl, error)
@@ -142,7 +142,7 @@ func NewXTracerImpl(ctx context.Context, addr string) (*XTracerImpl, error)
 Returns a new instance of [XTracerImpl](<#XTracerImpl>) that connects to a xtrace server running at \`addr\`. REQUIRED: An xtrace server must be running at \`addr\`
 
 <a name="XTracerImpl.Get"></a>
-### func \(\*XTracerImpl\) [Get](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L61>)
+### func \(\*XTracerImpl\) [Get](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L61>)
 
 ```go
 func (xt *XTracerImpl) Get(ctx context.Context) (tracingplane.BaggageContext, error)
@@ -151,7 +151,7 @@ func (xt *XTracerImpl) Get(ctx context.Context) (tracingplane.BaggageContext, er
 Implements the [XTracer](<#XTracer>) interface
 
 <a name="XTracerImpl.IsTracing"></a>
-### func \(\*XTracerImpl\) [IsTracing](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L66>)
+### func \(\*XTracerImpl\) [IsTracing](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L66>)
 
 ```go
 func (xt *XTracerImpl) IsTracing(ctx context.Context) (bool, error)
@@ -160,7 +160,7 @@ func (xt *XTracerImpl) IsTracing(ctx context.Context) (bool, error)
 Implements the [XTracer](<#XTracer>) interface
 
 <a name="XTracerImpl.Log"></a>
-### func \(\*XTracerImpl\) [Log](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L31>)
+### func \(\*XTracerImpl\) [Log](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L31>)
 
 ```go
 func (xt *XTracerImpl) Log(ctx context.Context, msg string) (context.Context, error)
@@ -169,7 +169,7 @@ func (xt *XTracerImpl) Log(ctx context.Context, msg string) (context.Context, er
 Implements the [XTracer](<#XTracer>) interface
 
 <a name="XTracerImpl.LogWithTags"></a>
-### func \(\*XTracerImpl\) [LogWithTags](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L36>)
+### func \(\*XTracerImpl\) [LogWithTags](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L36>)
 
 ```go
 func (xt *XTracerImpl) LogWithTags(ctx context.Context, msg string, tags ...string) (context.Context, error)
@@ -178,7 +178,7 @@ func (xt *XTracerImpl) LogWithTags(ctx context.Context, msg string, tags ...stri
 Implements the [XTracer](<#XTracer>) interface
 
 <a name="XTracerImpl.Merge"></a>
-### func \(\*XTracerImpl\) [Merge](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L51>)
+### func \(\*XTracerImpl\) [Merge](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L51>)
 
 ```go
 func (xt *XTracerImpl) Merge(ctx context.Context, other tracingplane.BaggageContext) (context.Context, error)
@@ -187,7 +187,7 @@ func (xt *XTracerImpl) Merge(ctx context.Context, other tracingplane.BaggageCont
 Implements the [XTracer](<#XTracer>) interface
 
 <a name="XTracerImpl.Set"></a>
-### func \(\*XTracerImpl\) [Set](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L56>)
+### func \(\*XTracerImpl\) [Set](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L56>)
 
 ```go
 func (xt *XTracerImpl) Set(ctx context.Context, baggage tracingplane.BaggageContext) (context.Context, error)
@@ -196,7 +196,7 @@ func (xt *XTracerImpl) Set(ctx context.Context, baggage tracingplane.BaggageCont
 Implements the [XTracer](<#XTracer>) interface
 
 <a name="XTracerImpl.StartTask"></a>
-### func \(\*XTracerImpl\) [StartTask](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L41>)
+### func \(\*XTracerImpl\) [StartTask](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L41>)
 
 ```go
 func (xt *XTracerImpl) StartTask(ctx context.Context, tags ...string) (context.Context, error)
@@ -205,7 +205,7 @@ func (xt *XTracerImpl) StartTask(ctx context.Context, tags ...string) (context.C
 Implements the [XTracer](<#XTracer>) interface
 
 <a name="XTracerImpl.StopTask"></a>
-### func \(\*XTracerImpl\) [StopTask](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L46>)
+### func \(\*XTracerImpl\) [StopTask](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/xtrace/xtrace.go#L46>)
 
 ```go
 func (xt *XTracerImpl) StopTask(ctx context.Context) (context.Context, error)
