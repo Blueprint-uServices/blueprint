@@ -12,7 +12,7 @@ Most out\-of\-the\-box applications will come with a workload generator that can
 
 For details on how to write custom workload generators, see the Writing Workload Generators section below.
 
-### Wiring Spec USage
+### Wiring Spec Usage
 
 To include a workload generator in your wiring spec, specify a name for the workload generator and point it at the implementation. A typical workload generator will also have some arguments that are service clients.
 
