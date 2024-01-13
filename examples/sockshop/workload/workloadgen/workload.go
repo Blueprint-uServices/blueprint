@@ -10,18 +10,22 @@ import (
 
 // The WorkloadGen interface, which the Blueprint compiler will treat as a
 // Workflow service
-type WorkloadGen interface {
-	ImplementsWorkloadGen()
+type SimpleWorkload interface {
+	ImplementsSimpleWorkload(context.Context) error
 }
 
 // workloadGen implementation
 type workloadGen struct {
-	WorkloadGen
+	SimpleWorkload
 
 	frontend frontend.Frontend
 }
 
-func NewWorkloadGen(ctx context.Context, frontend frontend.Frontend) (WorkloadGen, error) {
+func init() {
+	// TODO: define cmd line flags
+}
+
+func NewSimpleWorkload(ctx context.Context, frontend frontend.Frontend) (SimpleWorkload, error) {
 	return &workloadGen{frontend: frontend}, nil
 }
 
@@ -35,4 +39,8 @@ func (s *workloadGen) Run(ctx context.Context) error {
 			fmt.Println("Tick at", t)
 		}
 	}
+}
+
+func (s *workloadGen) ImplementsSimpleWorkload(context.Context) error {
+	return nil
 }

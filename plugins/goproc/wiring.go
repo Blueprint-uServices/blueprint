@@ -99,7 +99,8 @@ func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) 
 	SetLogger(spec, procName, logger)
 
 	// The process node is simply a namespace that accepts [golang.Node] nodes
-	spec.Define(procName, &Process{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
+	nodeType := newGolangProcessNode(procName)
+	spec.Define(procName, nodeType, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		var metric_coll string
 		err := spec.GetProperty(procName, "metricCollector", &metric_coll)
 		if err != nil {

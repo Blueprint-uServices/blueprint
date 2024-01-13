@@ -15,7 +15,7 @@ import (
 
 func main() {
 	// Configure the location of our workflow spec
-	workflow.Init("../workflow", "../tests")
+	workflow.Init("../workflow", "../tests", "../workload")
 
 	// Build a supported wiring spec
 	name := "SockShop"
