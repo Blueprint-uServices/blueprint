@@ -36,7 +36,12 @@ type VoucherServiceImpl struct {
 }
 
 func NewVoucherServiceImpl(ctx context.Context, db backend.RelationalDB, orderService order.OrderService, orderOtherService order.OrderService) (*VoucherServiceImpl, error) {
-	return &VoucherServiceImpl{db, orderService, orderOtherService}, nil
+	v := &VoucherServiceImpl{db, orderService, orderOtherService}
+	_, err := v.db.Exec(ctx, TABLE_QUERY)
+	if err != nil {
+		return nil, err
+	}
+	return v, nil
 }
 
 func (vsi *VoucherServiceImpl) Post(ctx context.Context, orderId string, typ string, token string) (Voucher, error) {
