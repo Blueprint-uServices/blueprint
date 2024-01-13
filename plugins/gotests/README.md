@@ -109,7 +109,7 @@ Your black\-box tests should ideally be idempotent \(e.g. if you call Create to 
 
 
 <a name="Test"></a>
-## func [Test](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/gotests/wiring.go#L143>)
+## func [Test](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/gotests/wiring.go#L141>)
 
 ```go
 func Test(spec wiring.WiringSpec, servicesToTest ...string) string

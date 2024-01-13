@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"flag"
+
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/frontend"
 )
 
@@ -21,15 +23,14 @@ type workloadGen struct {
 	frontend frontend.Frontend
 }
 
-func init() {
-	// TODO: define cmd line flags
-}
+var myarg = flag.Int("myarg", 12345, "help message for myarg")
 
 func NewSimpleWorkload(ctx context.Context, frontend frontend.Frontend) (SimpleWorkload, error) {
 	return &workloadGen{frontend: frontend}, nil
 }
 
 func (s *workloadGen) Run(ctx context.Context) error {
+	fmt.Printf("myarg is %v\n", *myarg)
 	ticker := time.NewTicker(1 * time.Second)
 	for {
 		select {

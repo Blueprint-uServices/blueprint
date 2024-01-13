@@ -2,10 +2,11 @@ package workload
 
 import (
 	"fmt"
-	"log/slog"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/exp/slog"
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/ioutil"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
@@ -64,5 +65,5 @@ func (w *workloadGenerator) GenerateArtifacts(workspaceDir string) error {
 		slog.Error(out.String())
 		return err
 	}
-    return nil
+	return nil
 }

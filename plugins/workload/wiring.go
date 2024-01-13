@@ -1,3 +1,93 @@
+// Package workload is a plugin for creating executable workload generators.
+//
+// Most out-of-the-box applications will come with a workload generator that can be included with the
+// compiled application using this plugin.  Typically the workload generator is implemented in a
+// directory called "workload" next to the application's workflow, wiring, and tests.
+//
+// For details on how to write custom workload generators, see the Writing Workload Generators section
+// below.
+//
+// # Wiring Spec USage
+//
+// To include a workload generator in your wiring spec, specify a name for the workload generator and
+// point it at the implementation.  A typical workload generator will also have some arguments that are
+// service clients.
+//
+//	workload.Generator(spec, "my_workload_gen", "WorkloadImpl", "my_frontend_service")
+//
+// The workload plugin will search the workflow spec modules for a valid workflow service called "WorkflowImpl".
+// It will create and compile a process that runs the service.
+//
+// Workload generators are typically implemented in a separate module from the workflow logic, so you will
+// probably need to make sure that the workload generator module of your application is on the workflow spec
+// search path.  See for example the [SockShop Workload Generator].
+//
+//	workflow.Init("../workflow", "../tests", "../workload")
+//
+// # Running the Workload Generator
+//
+// The workload generator plugin automatically compiles an executable binary.  Navigate to the output
+// directory and run the binary, e.g.
+//
+//	chmod +x ./build/my_workload_gen/my_workload_gen_proc
+//	./build/my_workload_gen/my_workload_gen_proc
+//
+// Your application will probably require some addresses to be provided as arguments, and will complain if
+// they are absent.
+//
+// For convenience, the generated source for the workload generator is also included in the build directory.
+//
+// # Writing Workload Generators
+//
+// It is recommended to implement your workload generator in a separate module called "workload" next to your
+// workflow, wiring, and tests directories.
+//
+// Workload generators are implemented in an identical manner to workflow services.  They receive service
+// clients as arguments.  They can define additional flags for command-line arguments to configure the
+// workload (e.g. number of threads, request rate, etc.).
+//
+// The logic of the workload generator should reside in the Run method.  See [SockShop Workload Generator]
+// for an example.
+//
+// # Example:
+//
+//	// The WorkloadGen interface, to use as the workloadType in the call to workload.Generator
+//	type SimpleWorkload interface {
+//		ImplementsSimpleWorkload(context.Context) error
+//	}
+//
+//	// WorkloadGen implementation
+//	type workloadGen struct {
+//		SimpleWorkload
+//
+//		frontend frontend.Frontend 		// Application client
+//	}
+//
+//	var myarg = flag.Int("myarg", 12345, "help message for myarg")
+//
+//	func NewSimpleWorkload(ctx context.Context, frontend frontend.Frontend) (SimpleWorkload, error) {
+//		return &workloadGen{frontend: frontend}, nil
+//	}
+//
+//	func (s *workloadGen) Run(ctx context.Context) error {
+//		fmt.Printf("myarg is %v\n", *myarg)
+//		ticker := time.NewTicker(1 * time.Second)
+//		for {
+//			// Workload runs here
+//			select {
+//			case <-ctx.Done():
+//				return nil
+//			case t := <-ticker.C:
+//				fmt.Println("Tick at", t)
+//			}
+//		}
+//	}
+//
+//	func (s *workloadGen) ImplementsSimpleWorkload(context.Context) error {
+//		return nil
+//	}
+//
+// [SockShop Workload Generator]: https://github.com/blueprint-uservices/blueprint/tree/main/examples/sockshop/workload
 package workload
 
 import (
