@@ -35,6 +35,8 @@ func TestBasicClientPool(t *testing.T) {
 			leafproc = GolangProcessNode(leaf.grpc.bind_addr) {
 			  leaf = TestLeafService()
 			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
+			  leafproc.logger = SLogger()
+			  leafproc.stdoutmetriccollector = StdoutMetricCollector()
 			}
 			nonleaf.grpc.addr
 			nonleaf.grpc.bind_addr = AddressConfig()
@@ -46,6 +48,8 @@ func TestBasicClientPool(t *testing.T) {
 			  }
 			  nonleaf = TestNonLeafService(leaf.client)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
+			  nonleafproc.logger = SLogger()
+			  nonleafproc.stdoutmetriccollector = StdoutMetricCollector()
 			}
 		  }`)
 
@@ -77,6 +81,8 @@ func TestBasicClientPoolInnerModifier(t *testing.T) {
 			leafproc = GolangProcessNode(leaf.grpc.bind_addr) {
 			  leaf = TestLeafService()
 			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
+			  leafproc.logger = SLogger()
+			  leafproc.stdoutmetriccollector = StdoutMetricCollector()
 			}
 			nonleaf.grpc.addr
 			nonleaf.grpc.bind_addr = AddressConfig()
@@ -89,6 +95,8 @@ func TestBasicClientPoolInnerModifier(t *testing.T) {
 			  }
 			  nonleaf = TestNonLeafService(leaf.client)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
+			  nonleafproc.logger = SLogger()
+			  nonleafproc.stdoutmetriccollector = StdoutMetricCollector()
 			}
 		  }`)
 
@@ -119,6 +127,8 @@ func TestBasicClientPoolOuterModifier(t *testing.T) {
 			leafproc = GolangProcessNode(leaf.grpc.bind_addr) {
 			  leaf = TestLeafService()
 			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
+			  leafproc.logger = SLogger()
+			  leafproc.stdoutmetriccollector = StdoutMetricCollector()
 			}
 			nonleaf.grpc.addr
 			nonleaf.grpc.bind_addr = AddressConfig()
@@ -131,6 +141,8 @@ func TestBasicClientPoolOuterModifier(t *testing.T) {
 			  }
 			  nonleaf = TestNonLeafService(leaf.client)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
+			  nonleafproc.logger = SLogger()
+			  nonleafproc.stdoutmetriccollector = StdoutMetricCollector()
 			}
 		  }`)
 

@@ -32,6 +32,8 @@ func TestServicesWithinSameProcess(t *testing.T) {
 			myproc = GolangProcessNode() {
 			  leaf = TestLeafService()
 			  leaf.client = leaf
+			  myproc.logger = SLogger()
+			  myproc.stdoutmetriccollector = StdoutMetricCollector()
 			  nonleaf = TestNonLeafService(leaf.client)
 			}
 			nonleaf.handler.visibility
@@ -55,11 +57,15 @@ func TestSeparateServicesInSeparateProcesses(t *testing.T) {
             leaf1.handler.visibility
             leaf1proc = GolangProcessNode() {
               leaf1 = TestLeafService()
+			  leaf1proc.logger = SLogger()
+			  leaf1proc.stdoutmetriccollector = StdoutMetricCollector()
             }
             leaf2.handler.visibility
             myproc = GolangProcessNode() {
               leaf2 = TestLeafService()
 			  leaf2.client = leaf2
+			  myproc.logger = SLogger()
+			  myproc.stdoutmetriccollector = StdoutMetricCollector()
               nonleaf = TestNonLeafService(leaf2.client)
             }
             nonleaf.handler.visibility
@@ -85,6 +91,8 @@ func TestAddChildrenToProcess(t *testing.T) {
             myproc = GolangProcessNode() {
               leaf = TestLeafService()
 			  leaf.client = leaf
+			  myproc.logger = SLogger()
+			  myproc.stdoutmetriccollector = StdoutMetricCollector()
               nonleaf = TestNonLeafService(leaf.client)
             }
             nonleaf.handler.visibility
@@ -146,6 +154,8 @@ func TestImplicitServicesWithinSameProcess(t *testing.T) {
               leaf = TestLeafService()
 			  leaf.client = leaf
               nonleaf = TestNonLeafService(leaf.client)
+			  nonleafproc.logger = SLogger()
+			  nonleafproc.stdoutmetriccollector = StdoutMetricCollector()
             }
           }`)
 }
@@ -173,6 +183,8 @@ func TestProcessModifier(t *testing.T) {
 			leafproc = GolangProcessNode(leaf.grpc.bind_addr) {
 			  leaf = TestLeafService()
 			  leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
+			  leafproc.logger = SLogger()
+			  leafproc.stdoutmetriccollector = StdoutMetricCollector()
 			}
 			nonleaf.grpc.addr
 			nonleaf.grpc.bind_addr = AddressConfig()
@@ -182,6 +194,8 @@ func TestProcessModifier(t *testing.T) {
 			  leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 			  nonleaf = TestNonLeafService(leaf.client)
 			  nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
+			  nonleafproc.logger = SLogger()
+			  nonleafproc.stdoutmetriccollector = StdoutMetricCollector()
 			}
 		  }`)
 }

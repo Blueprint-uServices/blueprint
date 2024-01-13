@@ -6,7 +6,6 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/http"
-	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
 	"github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
 	"github.com/blueprint-uservices/blueprint/plugins/simple"
@@ -37,9 +36,9 @@ func makeHTTPSpec(spec wiring.WiringSpec) ([]string, error) {
 
 func applyHTTPDefaults(spec wiring.WiringSpec, serviceName string, collectorName string) string {
 	procName := fmt.Sprintf("%s_process", serviceName)
-	ctrName := fmt.Sprintf("%s_container", serviceName)
+	// ctrName := fmt.Sprintf("%s_container", serviceName)
 	opentelemetry.Instrument(spec, serviceName, collectorName)
 	http.Deploy(spec, serviceName)
-	goproc.CreateProcess(spec, procName, serviceName)
-	return linuxcontainer.CreateContainer(spec, ctrName, procName)
+	return goproc.CreateProcess(spec, procName, serviceName)
+	//return linuxcontainer.CreateContainer(spec, ctrName, procName)
 }
