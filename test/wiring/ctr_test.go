@@ -35,6 +35,8 @@ func TestContainerModifier(t *testing.T) {
 			  leaf_proc = GolangProcessNode(leaf.grpc.bind_addr) {
 				leaf = TestLeafService()
 				leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
+				leaf_proc.logger = SLogger()
+				leaf_proc.stdoutmetriccollector = StdoutMetricCollector()
 			  }
 			}
 			nonleaf.grpc.addr
@@ -46,6 +48,8 @@ func TestContainerModifier(t *testing.T) {
 				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 				nonleaf = TestNonLeafService(leaf.client)
 				nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
+				nonleaf_proc.logger = SLogger()
+				nonleaf_proc.stdoutmetriccollector = StdoutMetricCollector()
 			  }
 			}
 		  }`)
@@ -76,6 +80,8 @@ func TestContainerModifierInstantiation(t *testing.T) {
 			  leaf_proc = GolangProcessNode(leaf.grpc.bind_addr) {
 				leaf = TestLeafService()
 				leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
+				leaf_proc.logger = SLogger()
+				leaf_proc.stdoutmetriccollector = StdoutMetricCollector()
 			  }
 			}
             nonleaf.client = nonleaf.grpc_client
@@ -90,6 +96,8 @@ func TestContainerModifierInstantiation(t *testing.T) {
 				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 				nonleaf = TestNonLeafService(leaf.client)
 				nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
+				nonleaf_proc.logger = SLogger()
+				nonleaf_proc.stdoutmetriccollector = StdoutMetricCollector()
 			  }
 			}
 		  }`)
@@ -121,6 +129,8 @@ func TestContainerMixedInstantiation(t *testing.T) {
 			  leaf_proc = GolangProcessNode(leaf.grpc.bind_addr) {
 				leaf = TestLeafService()
 				leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
+				leaf_proc.logger = SLogger()
+				leaf_proc.stdoutmetriccollector = StdoutMetricCollector()
 			  }
 			}
 			nonleaf.grpc.addr
@@ -132,6 +142,8 @@ func TestContainerMixedInstantiation(t *testing.T) {
 				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 				nonleaf = TestNonLeafService(leaf.client)
 				nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
+				nonleaf_proc.logger = SLogger()
+				nonleaf_proc.stdoutmetriccollector = StdoutMetricCollector()
 			  }
 			}
 		  }`)
@@ -164,6 +176,8 @@ func TestContainerExplicitInstantiation(t *testing.T) {
 			  leaf_proc = GolangProcessNode(leaf.grpc.bind_addr) {
 				leaf = TestLeafService()
 				leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
+				leaf_proc.logger = SLogger()
+				leaf_proc.stdoutmetriccollector = StdoutMetricCollector()
 			  }
 			}
 			nonleaf.grpc.addr
@@ -175,6 +189,8 @@ func TestContainerExplicitInstantiation(t *testing.T) {
 				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 				nonleaf = TestNonLeafService(leaf.client)
 				nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
+				nonleaf_proc.logger = SLogger()
+				nonleaf_proc.stdoutmetriccollector = StdoutMetricCollector()
 			  }
 			}
 		  }`)
@@ -206,6 +222,8 @@ func TestContainerExplicitNamespaceInstantiation(t *testing.T) {
 			  leaf_proc = GolangProcessNode(leaf.grpc.bind_addr) {
 				leaf = TestLeafService()
 				leaf.grpc_server = GRPCServer(leaf, leaf.grpc.bind_addr)
+				leaf_proc.logger = SLogger()
+				leaf_proc.stdoutmetriccollector = StdoutMetricCollector()
 			  }
 			}
 			nonleaf.grpc.addr
@@ -217,6 +235,8 @@ func TestContainerExplicitNamespaceInstantiation(t *testing.T) {
 				leaf.grpc_client = GRPCClient(leaf.grpc.dial_addr)
 				nonleaf = TestNonLeafService(leaf.client)
 				nonleaf.grpc_server = GRPCServer(nonleaf, nonleaf.grpc.bind_addr)
+				nonleaf_proc.logger = SLogger()
+				nonleaf_proc.stdoutmetriccollector = StdoutMetricCollector()
 			  }
 			}
 		  }`)
