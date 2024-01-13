@@ -2,7 +2,7 @@ package workload
 
 import (
 	"fmt"
-	"os"
+	"log/slog"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -55,15 +55,14 @@ func (w *workloadGenerator) GenerateArtifacts(workspaceDir string) error {
 
 	// Build the process
 	mainPath := filepath.Join(procDir, w.ProcNode.ProcName)
-	cmd := exec.Command("go", "build", "-o", "../../..", "-C", mainPath)
+	cmd := exec.Command("go", "build", "-o", "../..", "-C", mainPath)
 	var out strings.Builder
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	fmt.Sprintf("go build -o ../../.. -C %v\n", mainPath)
+	fmt.Sprintf("go build -o ../.. -C %v\n", mainPath)
 	if err := cmd.Run(); err != nil {
+		slog.Error(out.String())
 		return err
 	}
-
-	// Now that the executable is built, remove the proc source dir
-	return os.RemoveAll(workspaceDir)
+    return nil
 }

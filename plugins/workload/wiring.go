@@ -12,8 +12,8 @@ import (
 func Generator(spec wiring.WiringSpec, name string, workloadType string, workloadArgs ...string) string {
 
 	serviceName := name + ".service"
-	procName := name
-	wlgenName := name + ".wlgen"
+	procName := name + ".proc"
+	wlgenName := name
 
 	// Define the service
 	workflow.Service(spec, serviceName, workloadType, workloadArgs...)
