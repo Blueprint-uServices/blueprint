@@ -24,6 +24,11 @@
 //
 //	workflow.Init("../workflow", "../tests", "../workload")
 //
+// # Artifacts Generated
+//
+// The plugin creates a subdirectory in the output containing the workload generator source.
+// The plugin also compiles the workload generator source into an executable that resides in the subdirectory.
+//
 // # Running the Workload Generator
 //
 // The workload generator plugin automatically compiles an executable binary.  Navigate to the output
@@ -87,7 +92,7 @@
 //		return nil
 //	}
 //
-// [SockShop Workload Generator]: https://github.com/blueprint-uservices/blueprint/tree/main/examples/sockshop/workload
+// [SockShop Workload Generator]: https://github.com/blueprint-uservices/blueprint/tree/main/examples/sockshop/workload/workloadgen/workload.go
 package workload
 
 import (
@@ -99,6 +104,11 @@ import (
 	"github.com/pkg/errors"
 )
 
+// [Generator] can be used by wiring specs to build an executable workload generator.
+//
+// workloadType should correspond to a workload generator implementation
+//
+// workloadArgs should correspond to arguments used by the workload generator implementation
 func Generator(spec wiring.WiringSpec, name string, workloadType string, workloadArgs ...string) string {
 
 	serviceName := name + ".service"
