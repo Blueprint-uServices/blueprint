@@ -174,6 +174,7 @@ func (t *TravelServiceImpl) getTickets(ctx context.Context, trip common.Trip, st
 	depart, _ := time.Parse(dateFormat, departureTime)
 	end_time := depart.Add(time.Duration(time_taken) * time.Hour)
 	tr_resp.EndTime = end_time.Format(dateFormat)
+	tr_resp.Duration = (time.Duration(time_taken) * time.Hour).String()
 
 	s := seat.Seat{}
 	s.DstStation = end
@@ -194,6 +195,7 @@ func (t *TravelServiceImpl) getTickets(ctx context.Context, trip common.Trip, st
 		return tr_resp, err
 	}
 	tr_resp.ComfortClass = val
+	tr_resp.StopStations = res.Route.Stations
 	return tr_resp, nil
 }
 

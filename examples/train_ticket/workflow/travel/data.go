@@ -7,6 +7,7 @@ type TripResponse struct {
 	EndStation           string
 	StartingTime         string
 	EndTime              string
+	Duration             string
 	TripId               string
 	TrainTypeId          string
 	PriceForComfortClass float64
