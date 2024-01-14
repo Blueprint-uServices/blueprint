@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/admin"
 	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/basic"
 	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/common"
 	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/route"
@@ -29,7 +28,7 @@ type TravelService interface {
 	QueryInfo(ctx context.Context, startingPlace string, endPlace string, departureTime string) ([]TripResponse, error)
 	GetTripAllDetailInfo(ctx context.Context, id string, from string, to string, travelDate string) (common.Trip, TripResponse, error)
 	QueryAll(ctx context.Context) ([]common.Trip, error)
-	AdminQueryAll(ctx context.Context) ([]admin.AdminTrip, error)
+	AdminQueryAll(ctx context.Context) ([]common.AdminTrip, error)
 }
 
 type TravelServiceImpl struct {
@@ -264,8 +263,8 @@ func (tsi *TravelServiceImpl) QueryAll(ctx context.Context) ([]common.Trip, erro
 	return response, nil
 }
 
-func (t *TravelServiceImpl) AdminQueryAll(ctx context.Context) ([]admin.AdminTrip, error) {
-	var admin_trips []admin.AdminTrip
+func (t *TravelServiceImpl) AdminQueryAll(ctx context.Context) ([]common.AdminTrip, error) {
+	var admin_trips []common.AdminTrip
 	all_trips, err := t.QueryAll(ctx)
 	if err != nil {
 		return admin_trips, err
@@ -279,7 +278,7 @@ func (t *TravelServiceImpl) AdminQueryAll(ctx context.Context) ([]admin.AdminTri
 		if err != nil {
 			continue
 		}
-		admin_trips = append(admin_trips, admin.AdminTrip{T: trip, R: route, TT: ttype})
+		admin_trips = append(admin_trips, common.AdminTrip{T: trip, R: route, TT: ttype})
 	}
 	return admin_trips, nil
 }

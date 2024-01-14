@@ -86,3 +86,9 @@ type Ticket struct {
 	StartStation string
 	DestStation  string
 }
+
+type AdminTrip struct {
+	T  Trip
+	R  route.Route
+	TT train.TrainType
+}
