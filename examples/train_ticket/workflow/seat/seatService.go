@@ -77,7 +77,36 @@ func (s *SeatServiceImpl) GetLeftTicketOfInterval(ctx context.Context, st Seat) 
 	if err != nil {
 		return -1, err
 	}
-	sold_tickets := int64(sold.NoSeat + sold.BusinessSeat + sold.FirstClassSeat + sold.SecondClassSeat + sold.HardSeat + sold.SoftSeat + sold.HardBed + sold.SoftBed + sold.HighSoftBed)
+	var sold_tickets int64
+	switch st.SeatType {
+	case NONE:
+		sold_tickets = int64(sold.NoSeat)
+		break
+	case BUSINESS:
+		sold_tickets = int64(sold.BusinessSeat)
+		break
+	case FIRSTCLASS:
+		sold_tickets = int64(sold.FirstClassSeat)
+		break
+	case SECONDCLASS:
+		sold_tickets = int64(sold.SecondClassSeat)
+		break
+	case HARDSEAT:
+		sold_tickets = int64(sold.HardSeat)
+		break
+	case SOFTSEAT:
+		sold_tickets = int64(sold.SoftSeat)
+		break
+	case HARDBED:
+		sold_tickets = int64(sold.HardBed)
+		break
+	case SOFTBED:
+		sold_tickets = int64(sold.SoftBed)
+		break
+	case HIGHSOFTBED:
+		sold_tickets = int64(sold.HighSoftBed)
+		break
+	}
 
 	direct_proportion, err := s.configService.Find(ctx, "DirectTicketAllocationProportion")
 	if err != nil {
