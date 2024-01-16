@@ -14,6 +14,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/simple"
 	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workload"
 	"github.com/blueprint-uservices/blueprint/plugins/zipkin"
 )
 
@@ -84,7 +85,9 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	frontend := workflow.Service(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
 	applyDockerDefaults(frontend)
 
+	wlgen := workload.Generator(spec, "wlgen", "SimpleWorkload", frontend)
+
 	// Instantiate starting with the frontend which will trigger all other services to be instantiated
 	// Also include the tests
-	return []string{frontend, "gotests"}, nil
+	return []string{frontend, wlgen, "gotests"}, nil
 }

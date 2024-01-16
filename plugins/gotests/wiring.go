@@ -108,8 +108,6 @@
 // [workflow]: https://github.com/blueprint-uservices/blueprint/tree/main/plugins/workflow
 // [User Service]: https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/tests/userservice_test.go
 // [Workflow Tests]: https://github.com/blueprint-uservices/blueprint/tree/main/docs/manual/workflow_tests.md
-//
-// [workflow.Init]: https://github.com/blueprint-uservices/blueprint/tree/main/plugins/workflow
 package gotests
 
 import (

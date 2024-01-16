@@ -1,5 +1,15 @@
 // Package workflow instantiates services defined in the application's workflow spec.
 //
+// A "Workflow Spec" or just "Workflow" defines the core business logic of an application.
+// For example, in a social network application, the workflow defines how users can upload
+// posts, view their timeline feed, follow other users, etc.
+//
+// Users of Blueprint are responsible for writing their application's workflow spec.  They
+// then make use of Blueprint's compiler, and this workflow plugin, to compile the workflow
+// spec into an application.
+//
+// See the [Workflow User Manual Page] for more details on writing workflows.
+//
 // # Wiring Spec Usage
 //
 // The plugin needs to know where to look for workflow spec services.  The plugin assumes
@@ -31,6 +41,8 @@
 // The workflow spec service implementation will be copied into the output directory.
 // Where appropriate, the plugin generates constructor invocations, passing clients of
 // other services/backends as constructor arguments.
+//
+// [Workflow User Manual Page]: https://github.com/Blueprint-uServices/blueprint/blob/main/docs/manual/workflow.md
 package workflow
 
 import (
