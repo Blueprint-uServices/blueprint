@@ -15,7 +15,7 @@
 //
 //	workload.Generator(spec, "my_workload_gen", "WorkloadImpl", "my_frontend_service")
 //
-// The workload plugin will search the workflow spec modules for a valid workflow service called "WorkflowImpl".
+// The workload plugin will search the workflow spec modules for a valid workflow service called "WorkloadImpl".
 // It will create and compile a process that runs the service.
 //
 // Workload generators are typically implemented in a separate module from the workflow logic, so you will
@@ -44,8 +44,9 @@
 //
 // # Writing Workload Generators
 //
-// It is recommended to implement your workload generator in a separate module called "workload" next to your
-// workflow, wiring, and tests directories.
+// You can implement your workload generator within the same package/module as your workflow logic or in a
+// separate package/module.  For convention, we recommend implementing your workload generator in a separate
+// module called "workload" alongside your workflow, wiring, and tests directories.
 //
 // Workload generators are implemented in an identical manner to workflow services.  They receive service
 // clients as arguments.  They can define additional flags for command-line arguments to configure the
