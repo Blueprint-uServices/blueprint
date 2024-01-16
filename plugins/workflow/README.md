@@ -8,6 +8,12 @@ import "github.com/blueprint-uservices/blueprint/plugins/workflow"
 
 Package workflow instantiates services defined in the application's workflow spec.
 
+A "Workflow Spec" or just "Workflow" defines the core business logic of an application. For example, in a social network application, the workflow defines how users can upload posts, view their timeline feed, follow other users, etc.
+
+Users of Blueprint are responsible for writing their application's workflow spec. They then make use of Blueprint's compiler, and this workflow plugin, to compile the workflow spec into an application.
+
+See the [Workflow User Manual Page](<https://github.com/Blueprint-uServices/blueprint/blob/main/docs/manual/workflow.md>) for more details on writing workflows.
+
 ### Wiring Spec Usage
 
 The plugin needs to know where to look for workflow spec services. The plugin assumes paths relative to the calling file.
@@ -54,7 +60,7 @@ The workflow spec service implementation will be copied into the output director
 
 
 <a name="Init"></a>
-## func [Init](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L71>)
+## func [Init](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L83>)
 
 ```go
 func Init(srcModulePaths ...string)
@@ -79,7 +85,7 @@ workflow.Init("../workflow", "../tests")
 [Init](<#Init>) can be called more than once, which will concatenate all provided srcModulePaths. [Reset](<#Reset>) can be used to clear any previously provided module paths.
 
 <a name="Reset"></a>
-## func [Reset](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L85>)
+## func [Reset](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L97>)
 
 ```go
 func Reset()
@@ -88,7 +94,7 @@ func Reset()
 [Reset](<#Reset>) can be used by wiring specs to clear any srcModulePaths given by previous calls to [Init](<#Init>)
 
 <a name="Service"></a>
-## func [Service](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L132>)
+## func [Service](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L144>)
 
 ```go
 func Service(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string
@@ -126,7 +132,7 @@ type WorkflowSpec struct {
 ```
 
 <a name="GetSpec"></a>
-### func [GetSpec](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L90>)
+### func [GetSpec](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L102>)
 
 ```go
 func GetSpec() (*WorkflowSpec, error)

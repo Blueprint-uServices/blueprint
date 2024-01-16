@@ -6,11 +6,11 @@
 import "github.com/blueprint-uservices/blueprint/plugins/workload"
 ```
 
-Package workload is a plugin for creating executable workload generators.
+Package workload is a plugin for creating executable workload generators. A workload is a client to the application that submits requests to the application, thereby generating load.
 
-Most out\-of\-the\-box applications will come with a workload generator that can be included with the compiled application using this plugin. Typically the workload generator is implemented in a directory called "workload" next to the application's workflow, wiring, and tests.
+Most out\-of\-the\-box Blueprint applications will come with a workload generator that can be included with the compiled application using this plugin. Typically the workload generator is implemented in a directory called "workload" next to the application's workflow, wiring, and tests.
 
-For details on how to write custom workload generators, see the Writing Workload Generators section below.
+When writing your own Blueprint application, it is recommended to also write a workload generator for the application, so that it is easy for users to deploy the application and run a workload against it. The section "Writing Workload Generators" below outlines how to write custom workload generators.
 
 ### Wiring Spec Usage
 
@@ -99,7 +99,7 @@ func (s *workloadGen) ImplementsSimpleWorkload(context.Context) error {
 
 
 <a name="Generator"></a>
-## func [Generator](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workload/wiring.go#L113>)
+## func [Generator](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workload/wiring.go#L115>)
 
 ```go
 func Generator(spec wiring.WiringSpec, name string, workloadType string, workloadArgs ...string) string

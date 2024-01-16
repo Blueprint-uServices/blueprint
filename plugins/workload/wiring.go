@@ -1,11 +1,13 @@
-// Package workload is a plugin for creating executable workload generators.
+// Package workload is a plugin for creating executable workload generators.  A workload is a client
+// to the application that submits requests to the application, thereby generating load.
 //
-// Most out-of-the-box applications will come with a workload generator that can be included with the
-// compiled application using this plugin.  Typically the workload generator is implemented in a
+// Most out-of-the-box Blueprint applications will come with a workload generator that can be included
+// with the compiled application using this plugin.  Typically the workload generator is implemented in a
 // directory called "workload" next to the application's workflow, wiring, and tests.
 //
-// For details on how to write custom workload generators, see the Writing Workload Generators section
-// below.
+// When writing your own Blueprint application, it is recommended to also write a workload generator for the
+// application, so that it is easy for users to deploy the application and run a workload against it.
+// The section "Writing Workload Generators" below outlines how to write custom workload generators.
 //
 // # Wiring Spec Usage
 //
