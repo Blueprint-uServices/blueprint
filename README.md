@@ -36,6 +36,8 @@ If you anticipate making use of Blueprint for your research project, we recommen
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Vaastav Anand, Deepak Garg, Antoine Kaufmann, Jonathan Mace\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*29th ACM Symposium on Operating Systems Principles (SOSP '23)*
 
+If you are looking for the artifact that was evaluated for the SOSP paper, it can be found [here](https://gitlab.mpi-sws.org/cld/blueprint), though it is not maintained.  Instead we recommend using the Blueprint implementation contained in this repository.
+
 ### Mailing List & Slack
 
  * Slack: [blueprint-uservices](https://blueprint-uservices.slack.com/)
