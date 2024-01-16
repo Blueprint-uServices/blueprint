@@ -74,7 +74,7 @@ Internally, the goproc plugin makes use of interfaces defined in the [golang](<h
 
 
 <a name="AddToProcess"></a>
-## func [AddToProcess](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L62>)
+## func [AddToProcess](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L64>)
 
 ```go
 func AddToProcess(spec wiring.WiringSpec, procName, childName string)
@@ -83,7 +83,7 @@ func AddToProcess(spec wiring.WiringSpec, procName, childName string)
 AddToProcess can be used by wiring specs to add a golang instance to an existing golang process.
 
 <a name="CreateClientProcess"></a>
-## func [CreateClientProcess](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L141>)
+## func [CreateClientProcess](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L151>)
 
 ```go
 func CreateClientProcess(spec wiring.WiringSpec, procName string, children ...string) string
@@ -92,7 +92,7 @@ func CreateClientProcess(spec wiring.WiringSpec, procName string, children ...st
 CreateClientProcess can be used by wiring specs to create a process that contains only clients of the specified children. This is for convenience in serving as a starting point to write a custom client
 
 <a name="CreateProcess"></a>
-## func [CreateProcess](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L92>)
+## func [CreateProcess](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L102>)
 
 ```go
 func CreateProcess(spec wiring.WiringSpec, procName string, children ...string) string
@@ -109,7 +109,7 @@ procName is configured with a logger that prints to stdout. To change the logger
 procName is configured with a metric collector that prints to stdout. To change the metric collector, call [SetMetricCollector](<#SetMetricCollector>)
 
 <a name="Deploy"></a>
-## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L71>)
+## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L80>)
 
 ```go
 func Deploy(spec wiring.WiringSpec, serviceName string) string
@@ -118,6 +118,14 @@ func Deploy(spec wiring.WiringSpec, serviceName string) string
 Deploy can be used by wiring specs to deploy a golang service in a golang process.
 
 Adds a modifier to the service that will create the golang process if not already created.
+
+The name of the process created is determined by attempting to replace a "\_service" suffix with "\_proc", or adding "\_proc" if serviceName doesn't end with "\_service", e.g.
+
+```
+user_service => user_proc
+user => user_proc
+user_srv => user_srv_proc
+```
 
 After calling [Deploy](<#Deploy>), serviceName will be a process\-level service.
 
@@ -135,7 +143,7 @@ If you are using the [cmdbuilder](<https://github.com/Blueprint-uServices/bluepr
 Default builders are responsible for building any golang instances that exist in a wiring spec but aren't explicitly added to a goproc within that wiring spec. The Blueprint compiler groups these "floating" golang instances into a default golang process with the name "goproc".
 
 <a name="SetLogger"></a>
-## func [SetLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L172>)
+## func [SetLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L182>)
 
 ```go
 func SetLogger(spec wiring.WiringSpec, procName string, loggerNodeName string)
@@ -144,7 +152,7 @@ func SetLogger(spec wiring.WiringSpec, procName string, loggerNodeName string)
 SetLogger is not used directly by wiring specs; instead it is used by other plugins such as [opentelemetry](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/opentelemetry>) to install custom loggers.
 
 <a name="SetMetricCollector"></a>
-## func [SetMetricCollector](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L164>)
+## func [SetMetricCollector](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/goproc/wiring.go#L174>)
 
 ```go
 func SetMetricCollector(spec wiring.WiringSpec, procName string, metricCollNodeName string)

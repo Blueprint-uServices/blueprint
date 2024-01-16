@@ -69,6 +69,8 @@
 package linuxcontainer
 
 import (
+	"strings"
+
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/namespaceutil"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
@@ -86,8 +88,16 @@ func AddToContainer(spec wiring.WiringSpec, containerName, childName string) {
 // Adds a modifier to the service that, during compilation, will create the linux container if
 // not already created.
 //
+// The name of the container created is determined by attempting to replace a "_service" suffix
+// with "_ctr", or adding "_ctr" if serviceName doesn't end with "_service", e.g.
+//
+//	user_service => user_ctr
+//	user => user_ctr
+//	user_srv => user_srv_ctr
+//
 // After calling [Deploy], serviceName will be a container-level service.
 func Deploy(spec wiring.WiringSpec, serviceName string) string {
+	serviceName, _ = strings.CutSuffix(serviceName, "_service")
 	ctrName := serviceName + "_ctr"
 	CreateContainer(spec, ctrName, serviceName)
 	return serviceName
