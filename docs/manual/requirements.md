@@ -1,31 +1,14 @@
 # Requirements
 
-Different plugins have different pre-requisites; you only need to install the pre-requisites of a plugin if you intend to use it.  That said, we recommend installing the following:
+In order to compile a Blueprint application, the build machine must satisfy the pre-requisites listed here.  Note that these requirements apply to the machine on which you are compiling the application; they do not typically also apply to the machine(s) on which you run the application.
 
- * golang 1.20 or higher
- * Docker
- * Kubernetes
- * gRPC
-
-## Blueprint pre-requisites
+## Compiler Requirements
 
 Blueprint requires golang 1.20 or higher.
 
-## Plugin requirements
+We **highly recommend** also installing the following in order to run the Blueprint examples.  Follow the instructions under the **Prerequisites** heading for the following plugins:
+ * [gRPC](../../plugins/grpc)
+ * [Docker](../../plugins/docker)
+ * [Kubernetes](../../plugins/kubernetes)
 
-See the respective plugin documentation in [plugins](../../plugins/) for individual plugin requirements.
-
-### Plugin compile-time requirements
-
-Some plugins have additional requirements necessary to compile applications that use those plugins.  These requirements are optional; they are only needed if the plugin is used.  Examples include:
- - [gRPC plugin](../plugins/grpc) requires that the protobuf and gRPC compiler are installed
- - [Thrift plugin](../plugins/thrift/) requires that Thrift is installed
-
-Plugins are expected to document their requirements.
-
-### Plugin runtime requirements
-
-Some plugins do not have compilation-time requirements but do have runtime requirements.  These requirements are optional; they are only needed if the plugin is used.  Examples include:
- - [docker-compose plugin](../plugins/dockercompose/) requires that Docker is installed in order to run docker containers
-
-Plugins are expected to document their requirements.
+The above dependencies are sufficient for compiling most of the Blueprint example applications.  However, in addition to the above, some plugins might have further dependencies that you will need to install before you can use that plugin.  The plugin will document these dependencies.

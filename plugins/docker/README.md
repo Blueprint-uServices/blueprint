@@ -6,7 +6,15 @@
 import "github.com/blueprint-uservices/blueprint/plugins/docker"
 ```
 
-Package docker defines compiler interfaces for use by plugins that generate and instantiate Docker images. The package does not provide any wiring spec functionality and is not directly used by Blueprint applications; only by other Blueprint plugins.
+Package docker defines compiler interfaces for use by plugins that generate and instantiate Docker images.
+
+### Prerequisites
+
+In order to compile an application that uses Docker, the build machine must have Docker installed. Follow the instructions on the [Docker website](<https://docs.docker.com/engine/install/>). The person writing these instructions was using version 24.0.7.
+
+### Wiring Spec Usage
+
+The package does not provide any wiring spec functionality and is not directly used by Blueprint applications; only by other Blueprint plugins.
 
 The noteworthy interfaces are as follows:
 
@@ -32,7 +40,7 @@ Consult the following plugins for examples:
 
 
 <a name="Container"></a>
-## type [Container](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L37-L40>)
+## type [Container](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L46-L49>)
 
 An IRNode interface that represents containers. If an IRNode implements this interface then it enables that IRNode to be instantiated within container namespaces such as docker\-compose files and Kubernetes pods.
 
@@ -44,7 +52,7 @@ type Container interface {
 ```
 
 <a name="ContainerWorkspace"></a>
-## type [ContainerWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L81-L129>)
+## type [ContainerWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L90-L138>)
 
 [ContainerWorkspace](<#ContainerWorkspace>) receives container images and instances from [Container](<#Container>) nodes during Blueprint's compilation process.
 
@@ -103,7 +111,7 @@ type ContainerWorkspace interface {
 ```
 
 <a name="ContainerWorkspaceInfo"></a>
-## type [ContainerWorkspaceInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L69-L72>)
+## type [ContainerWorkspaceInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L78-L81>)
 
 Metadata about the local build environment used during the compilation process
 
@@ -115,7 +123,7 @@ type ContainerWorkspaceInfo struct {
 ```
 
 <a name="ProcessWorkspace"></a>
-## type [ProcessWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L138-L171>)
+## type [ProcessWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L147-L180>)
 
 ProcessWorkspace enables \[linux.Process\] nodes to add custom Dockerfile commands when the process is being added to a Docker container. ProcessWorkspaces extends \[linux.ProcessWorkspace\] with the method \[ProcessWorkspace.AddDockerfileCommands\].
 
@@ -159,7 +167,7 @@ type ProcessWorkspace interface {
 ```
 
 <a name="ProvidesContainerImage"></a>
-## type [ProvidesContainerImage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L50-L54>)
+## type [ProvidesContainerImage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L59-L63>)
 
 An optional interface for Container IRNodes to implement if the node needs to generate custom container images \(e.g. using a Dockerfile\). \[target\] provides methods for doing so.
 
@@ -172,7 +180,7 @@ type ProvidesContainerImage interface {
 ```
 
 <a name="ProvidesContainerInstance"></a>
-## type [ProvidesContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L60-L64>)
+## type [ProvidesContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/docker/ir.go#L69-L73>)
 
 An optional interface for Container IRNodes to implement if the node wants to declare an instance of a container. The container instance can be of a pre\-existing image or of a locally\-defined image that was declared with [ProvidesContainerImage](<#ProvidesContainerImage>).
 

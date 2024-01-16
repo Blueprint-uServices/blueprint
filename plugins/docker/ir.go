@@ -1,4 +1,12 @@
 // Package docker defines compiler interfaces for use by plugins that generate and instantiate Docker images.
+//
+// # Prerequisites
+//
+// In order to compile an application that uses Docker, the build machine must have Docker installed.  Follow
+// the instructions on the [Docker website].  The person writing these instructions was using version 24.0.7.
+//
+// # Wiring Spec Usage
+//
 // The package does not provide any wiring spec functionality and is not directly used by Blueprint applications;
 // only by other Blueprint plugins.
 //
@@ -24,6 +32,7 @@
 // [linuxcontainer]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/memclinuxcontainerached
 // [dockercompose]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/dockercompose
 // [kubernetes]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/kubernetes
+// [Docker website]: https://docs.docker.com/engine/install/
 package docker
 
 import (

@@ -10,9 +10,7 @@ For the most part, the application directly re-uses the original SockShop code (
 
 ## Getting started
 
-Prerequisites for this tutorial: 
- * gRPC and protocol buffers compiler are installed - https://grpc.io/docs/protoc-installation/
- * docker is installed
+Before running the example applications, make sure you have installed the recommended [prerequisites](requirements.md).
 
 ## Running unit tests prior to compilation
 
@@ -45,9 +43,9 @@ If you navigate to the `build` directory, you will now see a number of build art
 * `build/docker/*` contain the individual docker images for services, including a Dockerfile and the golang source code
 * `build/gotests` contain the unit tests that we ran in the "Running unit tests" section
 
-## Running the application
+## Configure the application
 
-To run the application, navigate to `build/docker` and run `docker-compose up`.  You might see Docker complain about missing environment variables.  Edit the `.env` file in `build/docker` and put the following:
+Before running the application, we must configure some ports that the application will publicly expose.  Navigate to `build/docker` and create/edit the `.env` file:
 
 ```
 USER_DB_BIND_ADDR=0.0.0.0:12345
@@ -61,22 +59,97 @@ SHIPPING_DB_BIND_ADDR=0.0.0.0:12352
 CART_DB_BIND_ADDR=0.0.0.0:12353
 CATALOGUE_DB_BIND_ADDR=0.0.0.0:12354
 CATALOGUE_SERVICE_GRPC_BIND_ADDR=0.0.0.0:12355
-FRONTEND_GRPC_BIND_ADDR=0.0.0.0:12356
+FRONTEND_HTTP_BIND_ADDR=0.0.0.0:12356
 ZIPKIN_BIND_ADDR=0.0.0.0:12357
 SHIPPING_QUEUE_BIND_ADDR=0.0.0.0:12358
 ```
 
+## Running the application
 
-## Running tests in compiled application
+To run the application, navigate to `build/docker` and run `docker-compose up`.  If this is your first time running the application, this will also build the necessary container images.
 
-After running the application, you can run the unit tests against it.
+## Invoke the application
+
+The SockShop application's [frontend API](workflow/frontend) is exposed by HTTP on port 12356 (when using the above configuration).
+
+We can invoke the `ListItems` API to list the socks in the application's catalogue:
+
+```
+curl http://localhost:12356/ListItems?pageSize=100\&pageNum=1
+```
+
+Alternatively in your web browser navigate to [localhost:12356/ListItems?pageSize=100&pageNum=1](http://localhost:12356/ListItems?pageSize=3&pageNum=1)
+
+You should expect to see the following:
+
+```
+{
+  "Ret0": [
+    {
+      "id": "3c59f984-80df-456c-8f56-6a2b57b7a342",
+      "name": "Classic",
+      "description": "Keep it simple.",
+      "imageUrl": [
+        "/catalogue/images/classic.jpg",
+        "/catalogue/images/classic2.jpg"
+      ],
+      "price": 12,
+      "quantity": 127,
+      "tag": [
+        "brown",
+        "green"
+      ]
+    },
+    {
+      "id": "4999b899-e2c7-4e61-a799-68d0778aefe8",
+      "name": "YouTube.sock",
+      "description": "We were not paid to sell this sock. It's just a bit geeky.",
+      "imageUrl": [
+        "/catalogue/images/youtube_1.jpeg",
+        "/catalogue/images/youtube_2.jpeg"
+      ],
+      "price": 10.99,
+      "quantity": 801,
+      "tag": [
+        "formal",
+        "geek"
+      ]
+    },
+    {
+      "id": "6f39c5c3-8ee8-47aa-ac7a-d5c14dcafb02",
+      "name": "Nerd leg",
+      "description": "For all those leg lovers out there. A perfect example of a swivel chair trained calf. Meticulously trained on a diet of sitting and Pina Coladas. Phwarr...",
+      "imageUrl": [
+        "/catalogue/images/bit_of_leg_1.jpeg",
+        "/catalogue/images/bit_of_leg_2.jpeg"
+      ],
+      "price": 7.99,
+      "quantity": 115,
+      "tag": [
+        "blue",
+        "skin"
+      ]
+    }
+  ]
+}
+```
+
+## Viewing Traces
+
+Navigate to [http://localhost:12357](http://localhost:12357) to view the Zipkin WebUI.
+
+Click the "Query" button and you should see a trace with Root "frontend_proc: listitems start".  You can click "Show" to view the trace details.
+
+## Testing the compiled application
+
+You can run unit tests against the compiled application.  After starting the application, navigate to `build/gotests/tests` and run using `go test`, passing the necessary address arguments:
 
 ```
 cd build/gotests/tests
-go test --payment_service.grpc.dial_addr=localhost:12346 --user_service.grpc.dial_addr=localhost:12347 --cart_service.grpc.dial_addr=localhost:12348 --order_service.grpc.dial_addr=localhost:12349 --shipping_service.grpc.dial_addr=localhost:12351 --catalogue_service.grpc.dial_addr=localhost:12355 --frontend.grpc.dial_addr=localhost:12356 --zipkin.dial_addr=localhost:12357
+go test --payment_service.grpc.dial_addr=localhost:12346 --user_service.grpc.dial_addr=localhost:12347 --cart_service.grpc.dial_addr=localhost:12348 --order_service.grpc.dial_addr=localhost:12349 --shipping_service.grpc.dial_addr=localhost:12351 --catalogue_service.grpc.dial_addr=localhost:12355 --frontend.http.dial_addr=localhost:12356 --zipkin.dial_addr=localhost:12357
 ```
 
-To see traces of the requests issued by the tests, navigate to [http://localhost:12357](http://localhost:12357)
+The tests will also generate Zipkin traces which you can view in the Zipkin WebUI at [http://localhost:12357](http://localhost:12357).
 
 ## Next steps
 
@@ -101,3 +174,5 @@ func getSockshopFrontendClient(ctx context.Context) (frontend.Frontend, error) {
     return client, err
 }
 ```
+
+Alternatively, client code to the SockShop frontend is also generated to `build/golang/golang/main.go`

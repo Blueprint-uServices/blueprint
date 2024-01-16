@@ -1,8 +1,14 @@
 # Getting Started with Blueprint
 
-## Run SockShop
+## Prerequisites
 
-Start with the [SockShop](../../examples/sockshop) application.  The documentation of the example application describes how to compile and run the application.
+To run the example applications, you will need to install the recommended [prerequisites](requirements.md).
+
+## Applications
+
+Blueprint has a number of out-of-the-box applications, listed in the [examples](../../examples) directory.
+
+To get started, we will compile and run the SockShop application.  Navigate to the [SockShop](../../examples/sockshop) directory and follow the directions there.
 
 ## Modify SockShop
 
