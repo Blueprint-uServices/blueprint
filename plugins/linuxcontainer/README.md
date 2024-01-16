@@ -80,7 +80,7 @@ Depending on the contents of the container, the run.sh might complain about miss
 
 
 <a name="AddToContainer"></a>
-## func [AddToContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L80>)
+## func [AddToContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L82>)
 
 ```go
 func AddToContainer(spec wiring.WiringSpec, containerName, childName string)
@@ -89,7 +89,7 @@ func AddToContainer(spec wiring.WiringSpec, containerName, childName string)
 AddToContainer can be used by wiring specs to add a process instance to an existing container deployment
 
 <a name="CreateContainer"></a>
-## func [CreateContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L106>)
+## func [CreateContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L116>)
 
 ```go
 func CreateContainer(spec wiring.WiringSpec, containerName string, children ...string) string
@@ -102,7 +102,7 @@ After calling CreateContainer, other processes can still be added to the contain
 After calling CreateContainer, any children that are services will become container\-level services that can now have container\-level modifiers applied to them, or can be added to container deployments like kubernetes pods.
 
 <a name="Deploy"></a>
-## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L90>)
+## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L99>)
 
 ```go
 func Deploy(spec wiring.WiringSpec, serviceName string) string
@@ -111,6 +111,14 @@ func Deploy(spec wiring.WiringSpec, serviceName string) string
 Deploy can be used by wiring specs to deploy a process\-level service in a linux container.
 
 Adds a modifier to the service that, during compilation, will create the linux container if not already created.
+
+The name of the container created is determined by attempting to replace a "\_service" suffix with "\_ctr", or adding "\_ctr" if serviceName doesn't end with "\_service", e.g.
+
+```
+user_service => user_ctr
+user => user_ctr
+user_srv => user_srv_ctr
+```
 
 After calling [Deploy](<#Deploy>), serviceName will be a container\-level service.
 
@@ -145,7 +153,7 @@ type Container struct {
 ```
 
 <a name="Container.Accepts"></a>
-### func \(\*Container\) [Accepts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L128>)
+### func \(\*Container\) [Accepts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L138>)
 
 ```go
 func (ctr *Container) Accepts(nodeType any) bool
@@ -172,7 +180,7 @@ func (node *Container) AddContainerInstance(target docker.ContainerWorkspace) er
 Implements dockerDeployer docker.ProvidesContainerInstance
 
 <a name="Container.AddEdge"></a>
-### func \(\*Container\) [AddEdge](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L134>)
+### func \(\*Container\) [AddEdge](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L144>)
 
 ```go
 func (ctr *Container) AddEdge(name string, edge ir.IRNode) error
@@ -181,7 +189,7 @@ func (ctr *Container) AddEdge(name string, edge ir.IRNode) error
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Container.AddNode"></a>
-### func \(\*Container\) [AddNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L140>)
+### func \(\*Container\) [AddNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L150>)
 
 ```go
 func (ctr *Container) AddNode(name string, node ir.IRNode) error

@@ -52,6 +52,8 @@
 package goproc
 
 import (
+	"strings"
+
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/namespaceutil"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
@@ -67,8 +69,16 @@ func AddToProcess(spec wiring.WiringSpec, procName, childName string) {
 //
 // Adds a modifier to the service that will create the golang process if not already created.
 //
+// The name of the process created is determined by attempting to replace a "_service" suffix
+// with "_proc", or adding "_proc" if serviceName doesn't end with "_service", e.g.
+//
+//	user_service => user_proc
+//	user => user_proc
+//	user_srv => user_srv_proc
+//
 // After calling [Deploy], serviceName will be a process-level service.
 func Deploy(spec wiring.WiringSpec, serviceName string) string {
+	serviceName, _ = strings.CutSuffix(serviceName, "_service")
 	procName := serviceName + "_proc"
 	CreateProcess(spec, procName, serviceName)
 	return serviceName
