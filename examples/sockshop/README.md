@@ -153,6 +153,8 @@ The tests will also generate Zipkin traces which you can view in the Zipkin WebU
 
 ## Next steps
 
+### Custom Clients and Workloads
+
 If you wish to write your own client application, you can import the `build/gotests/testclients` module and instantiate clients to any of the services as follows:
 
 ```
@@ -176,3 +178,10 @@ func getSockshopFrontendClient(ctx context.Context) (frontend.Frontend, error) {
 ```
 
 Alternatively, client code to the SockShop frontend is also generated to `build/golang/golang/main.go`
+
+### Changing the Application's Wiring Spec
+
+The SockShop application comes with a number of out-of-the-box configurations; run `main.go` with the `-h` flag to list them, or view the documentation for the [wiring/specs](wiring/specs) package.
+
+As a starting point for implementing your own custom wiring spec, we recommend duplicating and building off of the [basic.go](wiring/specs/basic.go) wiring spec.  After implementing your spec,
+make sure that you add it to [wiring/main.go](wiring/main.go) so that it can be selected on the command line.
