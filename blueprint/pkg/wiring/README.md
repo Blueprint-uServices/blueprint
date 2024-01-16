@@ -43,7 +43,7 @@ Callers should typically provide nodesToInstantiate to specify which nodes shoul
 If nodesToInstantiate is empty, all nodes will be instantiated, but this might not result in an application with the desired topology. Hence the recommended approach is to explicitly specify which nodes to instantiate.
 
 <a name="BuildFunc"></a>
-## type [BuildFunc](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L24>)
+## type [BuildFunc](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L25>)
 
 Creates an IR node within the provided namespace or within a new child namespace. Other named IR nodes can be fetched from the provided Namespace by invoking \[Namespace.Get\] or other [Namespace](<#Namespace>) methods.
 
@@ -155,7 +155,7 @@ type NamespaceHandler interface {
 ```
 
 <a name="WiringDef"></a>
-## type [WiringDef](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L65-L71>)
+## type [WiringDef](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L66-L72>)
 
 
 
@@ -170,7 +170,7 @@ type WiringDef struct {
 ```
 
 <a name="WiringDef.AddProperty"></a>
-### func \(\*WiringDef\) [AddProperty](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L90>)
+### func \(\*WiringDef\) [AddProperty](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L91>)
 
 ```go
 func (def *WiringDef) AddProperty(key string, value any)
@@ -179,7 +179,7 @@ func (def *WiringDef) AddProperty(key string, value any)
 
 
 <a name="WiringDef.GetProperties"></a>
-### func \(\*WiringDef\) [GetProperties](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L103>)
+### func \(\*WiringDef\) [GetProperties](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L104>)
 
 ```go
 func (def *WiringDef) GetProperties(key string, dst any) error
@@ -188,7 +188,7 @@ func (def *WiringDef) GetProperties(key string, dst any) error
 
 
 <a name="WiringDef.GetProperty"></a>
-### func \(\*WiringDef\) [GetProperty](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L94>)
+### func \(\*WiringDef\) [GetProperty](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L95>)
 
 ```go
 func (def *WiringDef) GetProperty(key string, dst any) error
@@ -197,7 +197,7 @@ func (def *WiringDef) GetProperty(key string, dst any) error
 
 
 <a name="WiringDef.String"></a>
-### func \(\*WiringDef\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L107>)
+### func \(\*WiringDef\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L108>)
 
 ```go
 func (def *WiringDef) String() string
@@ -206,7 +206,7 @@ func (def *WiringDef) String() string
 
 
 <a name="WiringError"></a>
-## type [WiringError](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L246-L248>)
+## type [WiringError](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L254-L256>)
 
 
 
@@ -217,7 +217,7 @@ type WiringError struct {
 ```
 
 <a name="WiringError.Error"></a>
-### func \(WiringError\) [Error](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L250>)
+### func \(WiringError\) [Error](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L258>)
 
 ```go
 func (e WiringError) Error() string
@@ -226,7 +226,7 @@ func (e WiringError) Error() string
 
 
 <a name="WiringOpts"></a>
-## type [WiringOpts](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L53-L63>)
+## type [WiringOpts](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L54-L64>)
 
 Additional options that can be specified when defining a WiringSpec node.
 
@@ -245,7 +245,7 @@ type WiringOpts struct {
 ```
 
 <a name="WiringSpec"></a>
-## type [WiringSpec](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L26-L50>)
+## type [WiringSpec](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L27-L51>)
 
 
 
@@ -278,7 +278,7 @@ type WiringSpec interface {
 ```
 
 <a name="NewWiringSpec"></a>
-### func [NewWiringSpec](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L81>)
+### func [NewWiringSpec](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/wiring/wiring.go#L82>)
 
 ```go
 func NewWiringSpec(name string) WiringSpec

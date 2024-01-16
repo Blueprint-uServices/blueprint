@@ -10,6 +10,7 @@ package wiring
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"strings"
 
@@ -105,6 +106,13 @@ func (def *WiringDef) GetProperties(key string, dst any) error {
 }
 
 func (def *WiringDef) String() string {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("Panic while printing %v: %v\n", def.Name, r)
+			fmt.Println(def.NodeType)
+			os.Exit(1)
+		}
+	}()
 	var b strings.Builder
 	b.WriteString(def.Name)
 	b.WriteString(" = ")
