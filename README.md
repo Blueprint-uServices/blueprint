@@ -10,6 +10,10 @@ Using Blueprint, you can:
 
 Blueprint is particularly aimed at **prototyping and experimentation** use cases.  It is intended for use by anybody, but particularly researchers and practitioners wanting to experiment with microservice applications.  Its central goal is to reduce the amount of effort involved when changing and re-compiling the infrastructure choices of a microservice application.  
 
+## Status
+
+Blueprint is currently pre-release with most initial features implemented.  However, some features may not be implemented yet, some applications may be incomplete, and some aspects of the user guide may be empty.  Please join the [blueprint-uservices](https://blueprint-uservices.slack.com/) Slack if you have any questions, requests, or comments.
+
 ## Getting Started
 
 See the 📖[Getting Started](docs/manual/gettingstarted.md) page of the User Manual to get started compiling and running your first Blueprint application.
