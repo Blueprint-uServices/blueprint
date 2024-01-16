@@ -1,5 +1,5 @@
 // Package wiring provides the entry point for a Blueprint application to create and configure
-// a wiring spec; that wiring spec can enriched and extended by plugins; ultimately it
+// a wiring spec; that wiring spec can be enriched and extended by plugins; ultimately it
 // is used by applications to generate concrete application instances.
 //
 // The starting point for a Blueprint application is the [NewWiringSpec] function.
@@ -19,7 +19,9 @@
 //
 //	err = applicationIR.GenerateArtifacts("build")
 //
-// For more information, consult the Blueprint [User Manual](../../docs/manual)
+// For more information, consult the Blueprint [User Manual].
+//
+// [User Manual]: https://github.com/Blueprint-uServices/blueprint/tree/main/docs/manual
 package wiring
 
 import (
