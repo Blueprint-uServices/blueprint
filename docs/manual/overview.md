@@ -1,4 +1,4 @@
-# Blueprint Overview
+# 2. Blueprint Overview
 
 Blueprint is a compiler for microservice applications.  We recommend first familiarizing yourself with Blueprint's goals by reading our [SOSP 2023](https://blueprint-uservices.github.io/assets/pdf/anand2023blueprint.pdf) paper.
 

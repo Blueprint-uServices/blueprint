@@ -6,6 +6,15 @@ In Blueprint, a workflow is implemented without reference to any of the librarie
 
 While developing an application's workflow, the philosophy should be to assume *nothing* about exactly how the application will be deployed.  Services might be deployed into different processes running on the same machine; in containers distributed across a cluster; or even, directly combined into a single monolith application.
 
+## Initialize your Module
+
+A Blueprint application will likely comprise several golang modules, primarily for the application's workflow spec and wiring spec(s).  By convention, we recommend placing these modules in sibling directories (e.g. `workflow` and `wiring` directories).
+The[Sock Shop](../../examples/sockshop/) application demonstrates this structure and convention.
+
+The `workflow` subdirectory will contain your workflow implementation.  Your workflow module will likely want a dependency on the `github.com/blueprint-uservices/blueprint/runtime` module.
+
+Later, you may choose to also create a `tests` module for [Workflow Tests](workflow_tests.md) and a `workload` module for a custom [Workload Generator](../../plugins/workload), though these are not needed yet.
+
 ## Workflow Services
 
 A Workflow consists of a number of inter-related **Services**.  A service is akin to a microservice or a class that provides some public methods; other services can call those methods.
