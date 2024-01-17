@@ -3,14 +3,20 @@
 # govector
 
 ```go
-import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/govector"
+import "github.com/blueprint-uservices/blueprint/runtime/plugins/govector"
 ```
+
+package govector provides runtime GoVector components to be used by the govector plugin.
+
+Package provides a GoVector logger that maintains vector clocks for a process and correctly propagates the vector clocks to other processes through its service\-level instrumentation.
+
+More info on govector: https://github.com/DistributedClocks/GoVector
 
 ## Index
 
 - [type GoVecLogger](<#GoVecLogger>)
   - [func GetLogger\(\) \*GoVecLogger](<#GetLogger>)
-  - [func NewGoVecLogger\(ctx context.Context, proc\_name string\) \(\*GoVecLogger, error\)](<#NewGoVecLogger>)
+  - [func NewGoVecLogger\(ctx context.Context, loggerName string\) \(\*GoVecLogger, error\)](<#NewGoVecLogger>)
   - [func \(g \*GoVecLogger\) Debug\(ctx context.Context, format string, args ...any\) \(context.Context, error\)](<#GoVecLogger.Debug>)
   - [func \(g \*GoVecLogger\) Error\(ctx context.Context, format string, args ...any\) \(context.Context, error\)](<#GoVecLogger.Error>)
   - [func \(g \*GoVecLogger\) GetSendCtx\(ctx context.Context, msg string\) \(\[\]byte, error\)](<#GoVecLogger.GetSendCtx>)
@@ -18,10 +24,11 @@ import "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/govector"
   - [func \(g \*GoVecLogger\) Logf\(ctx context.Context, options backend.LogOptions, format string, args ...any\) \(context.Context, error\)](<#GoVecLogger.Logf>)
   - [func \(g \*GoVecLogger\) UnpackReceiveCtx\(ctx context.Context, msg string, bytes \[\]byte\) error](<#GoVecLogger.UnpackReceiveCtx>)
   - [func \(g \*GoVecLogger\) Warn\(ctx context.Context, format string, args ...any\) \(context.Context, error\)](<#GoVecLogger.Warn>)
+- [type GoVector](<#GoVector>)
 
 
 <a name="GoVecLogger"></a>
-## type [GoVecLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/govector/log.go#L13-L15>)
+## type [GoVecLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/govector/log.go#L18-L20>)
 
 GoVecLogger implements the GoVector interface \(including the backend.Logger\) by using the GoVector Logger
 
@@ -32,7 +39,7 @@ type GoVecLogger struct {
 ```
 
 <a name="GetLogger"></a>
-### func [GetLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/govector/log.go#L33>)
+### func [GetLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/govector/log.go#L38>)
 
 ```go
 func GetLogger() *GoVecLogger
@@ -41,16 +48,16 @@ func GetLogger() *GoVecLogger
 Returns the current GoVectorLogger. Used by the govector plugin when instrumenting the server and client side objects of services.
 
 <a name="NewGoVecLogger"></a>
-### func [NewGoVecLogger](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/govector/log.go#L20>)
+### func [NewGoVecLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/govector/log.go#L25>)
 
 ```go
-func NewGoVecLogger(ctx context.Context, proc_name string) (*GoVecLogger, error)
+func NewGoVecLogger(ctx context.Context, loggerName string) (*GoVecLogger, error)
 ```
 
 Returns a new object of type GoVecLogger
 
 <a name="GoVecLogger.Debug"></a>
-### func \(\*GoVecLogger\) [Debug](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/govector/log.go#L50>)
+### func \(\*GoVecLogger\) [Debug](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/govector/log.go#L55>)
 
 ```go
 func (g *GoVecLogger) Debug(ctx context.Context, format string, args ...any) (context.Context, error)
@@ -59,7 +66,7 @@ func (g *GoVecLogger) Debug(ctx context.Context, format string, args ...any) (co
 Implements backend.Logger interface
 
 <a name="GoVecLogger.Error"></a>
-### func \(\*GoVecLogger\) [Error](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/govector/log.go#L86>)
+### func \(\*GoVecLogger\) [Error](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/govector/log.go#L91>)
 
 ```go
 func (g *GoVecLogger) Error(ctx context.Context, format string, args ...any) (context.Context, error)
@@ -68,7 +75,7 @@ func (g *GoVecLogger) Error(ctx context.Context, format string, args ...any) (co
 Implements backend.Logger interface
 
 <a name="GoVecLogger.GetSendCtx"></a>
-### func \(\*GoVecLogger\) [GetSendCtx](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/govector/log.go#L38>)
+### func \(\*GoVecLogger\) [GetSendCtx](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/govector/log.go#L43>)
 
 ```go
 func (g *GoVecLogger) GetSendCtx(ctx context.Context, msg string) ([]byte, error)
@@ -77,7 +84,7 @@ func (g *GoVecLogger) GetSendCtx(ctx context.Context, msg string) ([]byte, error
 Implements GoVector interface
 
 <a name="GoVecLogger.Info"></a>
-### func \(\*GoVecLogger\) [Info](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/govector/log.go#L62>)
+### func \(\*GoVecLogger\) [Info](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/govector/log.go#L67>)
 
 ```go
 func (g *GoVecLogger) Info(ctx context.Context, format string, args ...any) (context.Context, error)
@@ -86,7 +93,7 @@ func (g *GoVecLogger) Info(ctx context.Context, format string, args ...any) (con
 Implements backend.Logger interface
 
 <a name="GoVecLogger.Logf"></a>
-### func \(\*GoVecLogger\) [Logf](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/govector/log.go#L98>)
+### func \(\*GoVecLogger\) [Logf](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/govector/log.go#L103>)
 
 ```go
 func (g *GoVecLogger) Logf(ctx context.Context, options backend.LogOptions, format string, args ...any) (context.Context, error)
@@ -95,7 +102,7 @@ func (g *GoVecLogger) Logf(ctx context.Context, options backend.LogOptions, form
 Implements backend.Logger interface
 
 <a name="GoVecLogger.UnpackReceiveCtx"></a>
-### func \(\*GoVecLogger\) [UnpackReceiveCtx](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/govector/log.go#L43>)
+### func \(\*GoVecLogger\) [UnpackReceiveCtx](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/govector/log.go#L48>)
 
 ```go
 func (g *GoVecLogger) UnpackReceiveCtx(ctx context.Context, msg string, bytes []byte) error
@@ -104,12 +111,26 @@ func (g *GoVecLogger) UnpackReceiveCtx(ctx context.Context, msg string, bytes []
 Implements GoVector interface
 
 <a name="GoVecLogger.Warn"></a>
-### func \(\*GoVecLogger\) [Warn](<https://gitlab.mpi-sws.org/cld/blueprint2/blueprint/blob/main/runtime/plugins/govector/log.go#L74>)
+### func \(\*GoVecLogger\) [Warn](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/govector/log.go#L79>)
 
 ```go
 func (g *GoVecLogger) Warn(ctx context.Context, format string, args ...any) (context.Context, error)
 ```
 
 Implements backend.Logger interface
+
+<a name="GoVector"></a>
+## type [GoVector](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/govector/iface.go#L8-L13>)
+
+Represents the GoVector logger interface exposed to applications and used by the GoVector plugin
+
+```go
+type GoVector interface {
+    // Gets the govector context (the vector clock) as a bytes array that will be sent from one process to another
+    GetSendCtx(ctx context.Context, msg string) ([]byte, error)
+    // Unpacks the received context `bytes` and merges the context into the process' current vector clock
+    UnpackReceiveCtx(ctx context.Context, msg string, bytes []byte) error
+}
+```
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
