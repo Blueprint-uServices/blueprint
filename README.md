@@ -1,8 +1,6 @@
 <p align="center">
-  <img src="https://blueprint-uservices.github.io/assets/img/blueprint%20logo.png" width=250/>
+  <img src="https://blueprint-uservices.github.io/assets/img/blueprint%20logo%202.png" width=350/>
 </p>
-
-# Blueprint
 
 Blueprint is an extensible compiler for microservice applications, along with a collection of off-the-shelf microservice benchmark applications.
 
