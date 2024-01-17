@@ -1,0 +1,82 @@
+leaf_process.goveclogger {"leaf_process.goveclogger":1}
+Initialization Complete
+leaf_process.goveclogger {"leaf_process.goveclogger":2, "nonleaf_process.goveclogger":3}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":3, "nonleaf_process.goveclogger":3}
+INFO hello
+leaf_process.goveclogger {"leaf_process.goveclogger":4, "nonleaf_process.goveclogger":3}
+INFO Sending response to the client
+leaf_process.goveclogger {"leaf_process.goveclogger":5, "nonleaf_process.goveclogger":5}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":6, "nonleaf_process.goveclogger":5}
+INFO hello nothing!
+leaf_process.goveclogger {"leaf_process.goveclogger":7, "nonleaf_process.goveclogger":5}
+INFO Sending response to the client
+leaf_process.goveclogger {"leaf_process.goveclogger":8, "nonleaf_process.goveclogger":7}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":9, "nonleaf_process.goveclogger":7}
+INFO Sending response to the client
+leaf_process.goveclogger {"leaf_process.goveclogger":10, "nonleaf_process.goveclogger":16}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":11, "nonleaf_process.goveclogger":16}
+INFO hello
+leaf_process.goveclogger {"leaf_process.goveclogger":12, "nonleaf_process.goveclogger":16}
+INFO Sending response to the client
+leaf_process.goveclogger {"leaf_process.goveclogger":13, "nonleaf_process.goveclogger":18}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":14, "nonleaf_process.goveclogger":18}
+INFO hello nothing!
+leaf_process.goveclogger {"leaf_process.goveclogger":15, "nonleaf_process.goveclogger":18}
+INFO Sending response to the client
+leaf_process.goveclogger {"leaf_process.goveclogger":16, "nonleaf_process.goveclogger":20}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":17, "nonleaf_process.goveclogger":20}
+INFO Sending response to the client
+leaf_process.goveclogger {"leaf_process.goveclogger":18, "nonleaf_process.goveclogger":29}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":19, "nonleaf_process.goveclogger":29}
+INFO hello
+leaf_process.goveclogger {"leaf_process.goveclogger":20, "nonleaf_process.goveclogger":29}
+INFO Sending response to the client
+leaf_process.goveclogger {"leaf_process.goveclogger":21, "nonleaf_process.goveclogger":31}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":22, "nonleaf_process.goveclogger":31}
+INFO hello nothing!
+leaf_process.goveclogger {"leaf_process.goveclogger":23, "nonleaf_process.goveclogger":31}
+INFO Sending response to the client
+leaf_process.goveclogger {"leaf_process.goveclogger":24, "nonleaf_process.goveclogger":33}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":25, "nonleaf_process.goveclogger":33}
+INFO Sending response to the client
+leaf_process.goveclogger {"leaf_process.goveclogger":26, "nonleaf_process.goveclogger":42}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":27, "nonleaf_process.goveclogger":42}
+INFO hello
+leaf_process.goveclogger {"leaf_process.goveclogger":28, "nonleaf_process.goveclogger":42}
+INFO Sending response to the client
+leaf_process.goveclogger {"leaf_process.goveclogger":29, "nonleaf_process.goveclogger":44}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":30, "nonleaf_process.goveclogger":44}
+INFO hello nothing!
+leaf_process.goveclogger {"leaf_process.goveclogger":31, "nonleaf_process.goveclogger":44}
+INFO Sending response to the client
+leaf_process.goveclogger {"leaf_process.goveclogger":32, "nonleaf_process.goveclogger":46}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":33, "nonleaf_process.goveclogger":46}
+INFO Sending response to the client
+leaf_process.goveclogger {"leaf_process.goveclogger":34, "nonleaf_process.goveclogger":55}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":35, "nonleaf_process.goveclogger":55}
+INFO hello
+leaf_process.goveclogger {"leaf_process.goveclogger":36, "nonleaf_process.goveclogger":55}
+INFO Sending response to the client
+leaf_process.goveclogger {"leaf_process.goveclogger":37, "nonleaf_process.goveclogger":57}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":38, "nonleaf_process.goveclogger":57}
+INFO hello nothing!
+leaf_process.goveclogger {"leaf_process.goveclogger":39, "nonleaf_process.goveclogger":57}
+INFO Sending response to the client
+leaf_process.goveclogger {"leaf_process.goveclogger":40, "nonleaf_process.goveclogger":59}
+INFO Unpacking go vec context from client request
+leaf_process.goveclogger {"leaf_process.goveclogger":41, "nonleaf_process.goveclogger":59}
+INFO Sending response to the client

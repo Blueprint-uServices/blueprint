@@ -1,10 +1,7 @@
-// Package govector provides two plugins:
+// Package govector provides a Blueprint plugin for collecting log messages from services using the GoVector vector clock logging library.  GoVector is a vector clock logging library developed for educational purposes by researchers at UBC Systopia.  More information on [GoVector]. This plugin provides APIs to be used by the wiring spec to do the following:
 //
-//  1. a plugin to wrap the client and server side of a service with a GoVector wrapper to maintain and propagate vector clocks for each process. A vector clock is a logical clock maintained by every process in a distributed system which can then be used to establish partial order between distributed operations. The plugin generates a log file for each process where the incremental vector timestamps are stored to track the propagation of requests.
-//  2. a plugin to install a GoVector logger for a given process. The log messages are appended with vector timestamps and added to a log file in chronological order. Log files from all processes can be combined to visualize the full execution of a distributed system.
-//
-// GoVector is a vector clock logging library developed for educational purposes by researchers at UBC Systopia.
-// More information on [GoVector]
+//  1. to wrap the client and server side of a service with a GoVector wrapper to maintain and propagate vector clocks for each process. A vector clock is a logical clock maintained by every process in a distributed system which can then be used to establish partial order between distributed operations. The plugin generates a log file for each process where the incremental vector timestamps are stored to track the propagation of requests.
+//  2. to install a GoVector logger for a given process. The log messages are appended with vector timestamps and added to a log file in chronological order. Log files from all processes can be combined to visualize the full execution of a distributed system.
 //
 // # Wiring Usage
 //
@@ -22,12 +19,10 @@
 //
 // # Runtime Output
 //
-// At runtime, a log file will be generated for each process. Here is a sample generated log entry from a generated log file:
+// At runtime, a log file called `proc_name.goveclogger-Log.txt` will be generated for each process (with name `proc_name`) and placed in that process's directory. Here is a sample generated log entry from a generated log file:
 //
 //	nonleaf_process_logger.goveclogger {"nonleaf_process_logger.goveclogger":1}
 //	Initialization Complete
-//
-// Sample generated log files with blueprint can be found at [govector leaf logs].
 //
 // # Full Wiring Example:
 //
@@ -51,9 +46,11 @@
 //	go install github.com/DistributedClocks/GoVector
 //	GoVector --log_type shiviz --log_dir path/to/logs --outfile out.log
 //
+// Sample log files generated using the [govector_logger] wiring specification for Blueprint's leaf application can be found at [govector leaf logs].
+//
 // [GoVector]: https://github.com/DistributedClocks/GoVector
 // [govector_logger]: https://github.com/Blueprint-uServices/blueprint/tree/main/examples/leaf/wiring/specs/govector.go
-// [govector leaf logs]: https://github.com/Blueprint-uServices/blueprint/tree/main/examples/leaf/wiring/specs/example_logs
+// [govector leaf logs]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/govector/example_logs
 // [ShiViz]: https://bestchai.bitbucket.io/shiviz/
 package govector
 
@@ -67,7 +64,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-// Instruments the client and server side of a service with govector-instrumentation to initialize, maintain, and propagate vector clocks.
+// [Instrument] can be used by the wiring specs to instrument the client and server side of a service with govector-instrumentation to initialize, maintain, and propagate vector clocks.
 // The instrumentation generates logging events appended with vector clock timestamps.
 // Ensures that the logs are sent to a GoVector logger defined with name `logger`
 //
@@ -104,7 +101,7 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 	})
 }
 
-// Installs a govector logger for process with name `procName`.
+// [Logger] can be used by the wiring specs to install a govector logger for process with name `procName`.
 // Replaces the existing installed logger for the process.
 //
 // A process with name `procName` must be defined before this function is called.

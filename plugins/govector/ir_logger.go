@@ -36,10 +36,12 @@ func newGoVecLoggerClient(name string) (*GoVecLoggerClient, error) {
 	return node, nil
 }
 
+// Implements ir.IRNode
 func (node *GoVecLoggerClient) Name() string {
 	return node.ClientName
 }
 
+// Implements ir.IRNode
 func (node *GoVecLoggerClient) String() string {
 	return node.Name() + " = GoVecLogger()"
 }
@@ -62,6 +64,7 @@ func (node *GoVecLoggerClient) init(name string) error {
 	return nil
 }
 
+// Implements golang.Instantiable
 func (node *GoVecLoggerClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.ClientName) {
 		return nil
@@ -72,16 +75,20 @@ func (node *GoVecLoggerClient) AddInstantiation(builder golang.NamespaceBuilder)
 	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []ir.IRNode{&ir.IRValue{Value: node.LoggerName}})
 }
 
+// Implements golang.ProvidesModule
 func (node *GoVecLoggerClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
 	return golang.AddRuntimeModule(builder)
 }
 
+// Implements golang.ProvidesInterface
 func (node *GoVecLoggerClient) AddInterfaces(builder golang.ModuleBuilder) error {
 	return node.AddToWorkspace(builder.Workspace())
 }
 
+// Implements service.ServiceNode
 func (node *GoVecLoggerClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.Iface.ServiceInterface(ctx), nil
 }
 
+// Implements golang.Node
 func (node *GoVecLoggerClient) ImplementsGolangNode() {}

@@ -24,15 +24,20 @@ type GovecServerWrapper struct {
 	Wrapped       golang.Service
 }
 
+// Implements ir.IRNode
 func (node *GovecServerWrapper) Name() string {
 	return node.InstanceName
 }
 
+// Implements ir.IRNode
 func (node *GovecServerWrapper) String() string {
 	return node.Name() + " = GovecServerWrapper(" + node.Wrapped.Name() + ")"
 }
 
-func (node *GovecServerWrapper) ImplementsGolangNode()    {}
+// Implements golang.Node
+func (node *GovecServerWrapper) ImplementsGolangNode() {}
+
+// Implements golang.Service
 func (node *GovecServerWrapper) ImplementsGolangService() {}
 
 func newGovecServerWrapper(name string, wrapped golang.Service) (*GovecServerWrapper, error) {
@@ -62,6 +67,7 @@ func (node *GovecServerWrapper) genInterface(ctx ir.BuildContext) (*gocode.Servi
 	return i, nil
 }
 
+// Implements golang.Instantiable
 func (node *GovecServerWrapper) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.InstanceName) {
 		return nil
@@ -83,6 +89,7 @@ func (node *GovecServerWrapper) AddInstantiation(builder golang.NamespaceBuilder
 	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped})
 }
 
+// Implements golang.GeneratesFuncs
 func (node *GovecServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
 	wrapped_iface, err := golang.GetGoInterface(builder, node.Wrapped)
 	if err != nil {
@@ -97,10 +104,12 @@ func (node *GovecServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) erro
 	return generateServerHandler(builder, wrapped_iface, impl_iface, node.outputPackage)
 }
 
+// Implements service.ServiceNode
 func (node *GovecServerWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.genInterface(ctx)
 }
 
+// Implements golang.PRovidesInterface
 func (node *GovecServerWrapper) AddInterfaces(builder golang.ModuleBuilder) error {
 	iface, err := node.genInterface(builder)
 	if err != nil {

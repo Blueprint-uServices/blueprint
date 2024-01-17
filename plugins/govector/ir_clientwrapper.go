@@ -25,15 +25,20 @@ type GovecClientWrapper struct {
 	GoVecClient   *GoVecLoggerClient
 }
 
+// Implements ir.IRNode
 func (node *GovecClientWrapper) Name() string {
 	return node.InstanceName
 }
 
+// Implements ir.IRNode
 func (node *GovecClientWrapper) String() string {
 	return node.Name() + " = GovecClientWrapper(" + node.Wrapped.Name() + ")"
 }
 
-func (node *GovecClientWrapper) ImplementsGolangNode()    {}
+// Implements golang.Node
+func (node *GovecClientWrapper) ImplementsGolangNode() {}
+
+// Implements golang.Service
 func (node *GovecClientWrapper) ImplementsGolangService() {}
 
 func newGovecClientWrapper(name string, wrapped golang.Service) (*GovecClientWrapper, error) {
@@ -62,6 +67,7 @@ func (node *GovecClientWrapper) genInterface(ctx ir.BuildContext) (*gocode.Servi
 	return i, nil
 }
 
+// Implements golang.Instantiable
 func (node *GovecClientWrapper) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.InstanceName) {
 		return nil
@@ -85,6 +91,7 @@ func (node *GovecClientWrapper) AddInstantiation(builder golang.NamespaceBuilder
 	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped})
 }
 
+// Implements golang.GeneratesFuncs
 func (node *GovecClientWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
 	wrapped_iface, err := golang.GetGoInterface(builder, node.Wrapped)
 	if err != nil {
@@ -99,10 +106,12 @@ func (node *GovecClientWrapper) GenerateFuncs(builder golang.ModuleBuilder) erro
 	return generateClientHandler(builder, wrapped_iface, impl_iface, node.outputPackage)
 }
 
+// Implements service.ServiceNode
 func (node *GovecClientWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.genInterface(ctx)
 }
 
+// Implements golang.ProvidesInterface
 func (node *GovecClientWrapper) AddInterfaces(builder golang.ModuleBuilder) error {
 	return node.Wrapped.AddInterfaces(builder)
 }
