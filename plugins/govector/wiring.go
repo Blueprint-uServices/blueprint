@@ -6,6 +6,16 @@
 // GoVector is a vector clock logging library developed for educational purposes by researchers at UBC Systopia.
 // More information on [GoVector]
 //
+// # Wiring Usage
+//
+// To instrument the service to correctly propagate vector clocks:
+//
+//	govector.Instrument(spec, service)
+//
+// To instantiate a process's vector clock and to redirect a process's logging statements to GoVector:
+//
+//	govector.Logger(spec, proc)
+//
 // # Artifacts generated
 //
 //  1. Generates client and server side wrappers for instrumented services that contain govector instrumentation (vector clock per process, vector clock propagation)
@@ -18,16 +28,6 @@
 //	Initialization Complete
 //
 // Sample generated log files with blueprint can be found at [govector leaf logs].
-//
-// # Wiring Usage
-//
-// To instrument the service to correctly propagate vector clocks:
-//
-//	govector.Instrument(spec, service)
-//
-// To instantiate a process's vector clock and to redirect a process's logging statements to GoVector:
-//
-//	govector.Logger(spec, proc)
 //
 // # Full Wiring Example:
 //
