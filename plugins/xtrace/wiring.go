@@ -1,4 +1,4 @@
-// Package xtrace provides Blueprint plugin for instrumenting services and collecting X-Trace traces. It provides APIs to be used by the wiring spec to do the following:
+// Package xtrace provides a Blueprint plugin for instrumenting services and collecting X-Trace traces. It provides APIs to be used by the wiring spec to do the following:
 //
 //  1. to wrap the service with an XTrace wrapper to generate XTrace compatible traces/logs by correctly propagating baggage across service boundaries. Automatically generates and include an xtrace-server instance in a Blueprint application.
 //  2. to define an xtrace-based logger for a process. Log events are added as reports to the currently active xtrace task, if one exists. If no such task exists, then no events are logged.
