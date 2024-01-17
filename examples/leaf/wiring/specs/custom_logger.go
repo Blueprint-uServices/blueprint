@@ -62,7 +62,7 @@ func makeCustomLoggerSpec(spec wiring.WiringSpec, logger_type string) ([]string,
 		if logger_type == "xtrace" {
 			xtrace.Logger(spec, procName)
 		} else if logger_type == "ot" {
-			opentelemetry.Logger(spec, service_name)
+			opentelemetry.Logger(spec, procName)
 		}
 		return linuxcontainer.CreateContainer(spec, cntrName, procName)
 	}

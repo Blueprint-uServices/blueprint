@@ -49,26 +49,32 @@ func (node *OTTraceLogger) init(name string) error {
 	return nil
 }
 
+// Implements ir.IRNode
 func (node *OTTraceLogger) Name() string {
 	return node.LoggerName
 }
 
+// Implements ir.IRNode
 func (node *OTTraceLogger) String() string {
 	return node.Name() + " = OTTraceLogger()"
 }
 
+// Implements golang.ProvidesModule
 func (node *OTTraceLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error {
 	return golang.AddRuntimeModule(builder)
 }
 
+// Implements golang.ProvidesInterface
 func (node *OTTraceLogger) AddInterfaces(builder golang.ModuleBuilder) error {
 	return node.AddToWorkspace(builder.Workspace())
 }
 
+// Implements golang.ProvidesInterface
 func (node *OTTraceLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.Iface.ServiceInterface(ctx), nil
 }
 
+// Implements golang.Instantiable
 func (node *OTTraceLogger) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.LoggerName) {
 		return nil
@@ -79,4 +85,5 @@ func (node *OTTraceLogger) AddInstantiation(builder golang.NamespaceBuilder) err
 	return builder.DeclareConstructor(node.LoggerName, node.Constructor, []ir.IRNode{})
 }
 
+// Implements ir.IRNode
 func (node *OTTraceLogger) ImplementsGolangNode() {}
