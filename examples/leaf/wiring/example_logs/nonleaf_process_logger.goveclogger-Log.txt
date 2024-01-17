@@ -1,0 +1,132 @@
+nonleaf_process_logger.goveclogger {"nonleaf_process_logger.goveclogger":1}
+Initialization Complete
+nonleaf_process_logger.goveclogger {"nonleaf_process_logger.goveclogger":2}
+INFO Unpacking go vec context from client request
+nonleaf_process_logger.goveclogger {"nonleaf_process_logger.goveclogger":3}
+INFO Preparing to make request for function HelloInt
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":4, "nonleaf_process_logger.goveclogger":4}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":4, "nonleaf_process_logger.goveclogger":5}
+INFO Preparing to make request for function HelloNothing
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":7, "nonleaf_process_logger.goveclogger":6}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":7, "nonleaf_process_logger.goveclogger":7}
+INFO Preparing to make request for function HelloMate
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":9, "nonleaf_process_logger.goveclogger":8}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":9, "nonleaf_process_logger.goveclogger":9}
+INFO ra: hello 0
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":9, "nonleaf_process_logger.goveclogger":10}
+INFO rb: [hi bye]
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":9, "nonleaf_process_logger.goveclogger":11}
+INFO rc: 0
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":9, "nonleaf_process_logger.goveclogger":12}
+INFO rd: 0
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":9, "nonleaf_process_logger.goveclogger":13}
+INFO re: map[hello 0:{0 hello 0 0 map[hello:{greetings mate [cool beans]}]}]
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":9, "nonleaf_process_logger.goveclogger":14}
+INFO Sending response to the client
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":9, "nonleaf_process_logger.goveclogger":15}
+INFO Unpacking go vec context from client request
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":9, "nonleaf_process_logger.goveclogger":16}
+INFO Preparing to make request for function HelloInt
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":12, "nonleaf_process_logger.goveclogger":17}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":12, "nonleaf_process_logger.goveclogger":18}
+INFO Preparing to make request for function HelloNothing
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":15, "nonleaf_process_logger.goveclogger":19}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":15, "nonleaf_process_logger.goveclogger":20}
+INFO Preparing to make request for function HelloMate
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":17, "nonleaf_process_logger.goveclogger":21}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":17, "nonleaf_process_logger.goveclogger":22}
+INFO ra: hello 1
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":17, "nonleaf_process_logger.goveclogger":23}
+INFO rb: [hi bye]
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":17, "nonleaf_process_logger.goveclogger":24}
+INFO rc: 2
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":17, "nonleaf_process_logger.goveclogger":25}
+INFO rd: 1
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":17, "nonleaf_process_logger.goveclogger":26}
+INFO re: map[hello 1:{1 hello 1 0 map[hello:{greetings mate [cool beans]}]}]
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":17, "nonleaf_process_logger.goveclogger":27}
+INFO Sending response to the client
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":17, "nonleaf_process_logger.goveclogger":28}
+INFO Unpacking go vec context from client request
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":17, "nonleaf_process_logger.goveclogger":29}
+INFO Preparing to make request for function HelloInt
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":20, "nonleaf_process_logger.goveclogger":30}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":20, "nonleaf_process_logger.goveclogger":31}
+INFO Preparing to make request for function HelloNothing
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":23, "nonleaf_process_logger.goveclogger":32}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":23, "nonleaf_process_logger.goveclogger":33}
+INFO Preparing to make request for function HelloMate
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":25, "nonleaf_process_logger.goveclogger":34}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":25, "nonleaf_process_logger.goveclogger":35}
+INFO ra: hello 2
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":25, "nonleaf_process_logger.goveclogger":36}
+INFO rb: [hi bye]
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":25, "nonleaf_process_logger.goveclogger":37}
+INFO rc: 4
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":25, "nonleaf_process_logger.goveclogger":38}
+INFO rd: 2
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":25, "nonleaf_process_logger.goveclogger":39}
+INFO re: map[hello 2:{2 hello 2 0 map[hello:{greetings mate [cool beans]}]}]
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":25, "nonleaf_process_logger.goveclogger":40}
+INFO Sending response to the client
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":25, "nonleaf_process_logger.goveclogger":41}
+INFO Unpacking go vec context from client request
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":25, "nonleaf_process_logger.goveclogger":42}
+INFO Preparing to make request for function HelloInt
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":28, "nonleaf_process_logger.goveclogger":43}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":28, "nonleaf_process_logger.goveclogger":44}
+INFO Preparing to make request for function HelloNothing
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":31, "nonleaf_process_logger.goveclogger":45}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":31, "nonleaf_process_logger.goveclogger":46}
+INFO Preparing to make request for function HelloMate
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":33, "nonleaf_process_logger.goveclogger":47}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":33, "nonleaf_process_logger.goveclogger":48}
+INFO ra: hello 3
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":33, "nonleaf_process_logger.goveclogger":49}
+INFO rb: [hi bye]
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":33, "nonleaf_process_logger.goveclogger":50}
+INFO rc: 6
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":33, "nonleaf_process_logger.goveclogger":51}
+INFO rd: 3
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":33, "nonleaf_process_logger.goveclogger":52}
+INFO re: map[hello 3:{3 hello 3 0 map[hello:{greetings mate [cool beans]}]}]
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":33, "nonleaf_process_logger.goveclogger":53}
+INFO Sending response to the client
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":33, "nonleaf_process_logger.goveclogger":54}
+INFO Unpacking go vec context from client request
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":33, "nonleaf_process_logger.goveclogger":55}
+INFO Preparing to make request for function HelloInt
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":36, "nonleaf_process_logger.goveclogger":56}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":36, "nonleaf_process_logger.goveclogger":57}
+INFO Preparing to make request for function HelloNothing
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":39, "nonleaf_process_logger.goveclogger":58}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":39, "nonleaf_process_logger.goveclogger":59}
+INFO Preparing to make request for function HelloMate
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":41, "nonleaf_process_logger.goveclogger":60}
+INFO Unpacking response from server
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":41, "nonleaf_process_logger.goveclogger":61}
+INFO ra: hello 4
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":41, "nonleaf_process_logger.goveclogger":62}
+INFO rb: [hi bye]
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":41, "nonleaf_process_logger.goveclogger":63}
+INFO rc: 8
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":41, "nonleaf_process_logger.goveclogger":64}
+INFO rd: 4
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":41, "nonleaf_process_logger.goveclogger":65}
+INFO re: map[hello 4:{4 hello 4 0 map[hello:{greetings mate [cool beans]}]}]
+nonleaf_process_logger.goveclogger {"leaf_process_logger.goveclogger":41, "nonleaf_process_logger.goveclogger":66}
+INFO Sending response to the client
