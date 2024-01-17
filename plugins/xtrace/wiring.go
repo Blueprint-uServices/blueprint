@@ -29,16 +29,14 @@
 //
 // The following example creates an x-trace server, instruments all services, and uses the xtrace logger in all processes.
 //
-// 	func applyXtraceOptions() {
-//
-// 		for _, service := range serviceNames {
-//  		 xtrace.Instrument(spec, service)
-// 		}
-//
-// 		for _, proc := range processNames {
-//  		 xtrace.Logger(spec, proc)
-// 		}
-// 	}
+//	func applyXtraceOptions() {
+//		for _, service := range serviceNames {
+//			xtrace.Instrument(spec, service)
+//		}
+//		for _, proc := range processNames {
+//			xtrace.Logger(spec, proc)
+//		}
+//	}
 //
 // See the [xtrace_logger] wiring spec for the Leaf application for a further example
 //

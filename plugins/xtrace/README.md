@@ -42,15 +42,13 @@ The following example creates an x\-trace server, instruments all services, and 
 
 ```
 func applyXtraceOptions() {
-
-		for _, service := range serviceNames {
- 		 xtrace.Instrument(spec, service)
-		}
-
-		for _, proc := range processNames {
- 		 xtrace.Logger(spec, proc)
-		}
+	for _, service := range serviceNames {
+		xtrace.Instrument(spec, service)
 	}
+	for _, proc := range processNames {
+		xtrace.Logger(spec, proc)
+	}
+}
 ```
 
 See the [xtrace\\\_logger](<https://github.com/Blueprint-uServices/blueprint/tree/main/examples/leaf/wiring/specs/custom_logger.go>) wiring spec for the Leaf application for a further example
@@ -109,7 +107,7 @@ The traces are generated and sent to the xtrace\-server. To access traces, navig
 
 
 <a name="Instrument"></a>
-## func [Instrument](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/wiring.go#L73>)
+## func [Instrument](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/wiring.go#L71>)
 
 ```go
 func Instrument(spec wiring.WiringSpec, serviceName string)
@@ -126,7 +124,7 @@ xtrace.Instrument(spec, "serviceA")
 ```
 
 <a name="Logger"></a>
-## func [Logger](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/wiring.go#L177>)
+## func [Logger](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/wiring.go#L175>)
 
 ```go
 func Logger(spec wiring.WiringSpec, processName string) string
