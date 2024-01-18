@@ -25,7 +25,8 @@
 // The plugin generates two different env files:
 //   - .local.env assumes all services will be deployed on a single machine; it uses localhost for dial hostnames and 0.0.0.0 for
 //     bind hostnames, e.g. localhost:12345 and 0.0.0.0:12345
-//   - .distributed.env uses the service name as dial hostname and 0.0.0.0 for bind hostname, e.g. user_service:12345 and 0.0.0.0:12345
+//   - .env uses the service name as dial hostname and 0.0.0.0 for bind hostname, e.g. user_service:12345 and 0.0.0.0:12345.  To use
+//     this .env file you will need to ensure that service hostnames are mapped in your /etc/hosts or dns server.
 //
 // # Running Artifacts
 //
@@ -35,37 +36,103 @@
 // For example, if you are running a docker-compose deployment, you can run:
 //
 //	cd build
-//	source .local.env
+//	set -a
+//	. ./.local.env
 //	cd docker
 //	docker-compose up
 //
+// Or:
+//
+//	cd build/docker
+//	docker-compose --env-file=../.local.env build
+//
 // Similarly, workload generator clients and tests will check environment variables for default values.
 //
-// If you are using .distributed.env then the hostnames for services will need to be mapped in your /etc/hosts file
+// If you are using .distributed.env then the hostnames for services will need to be mapped in your /etc/hosts file or dns server.
 //
 // The plugin does not guarantee that the ports (e.g. 12345) are actually available for use on any machine.  This is up to the user.
 package environment
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/address"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/plugins/linux"
 )
 
 func AssignPorts(initialPort uint16) {
-	ir.RegisterDefaultNamespace[ir.IRConfig]("environment", generateEnv)
+	ir.RegisterDefaultNamespace[ir.IRConfig]("environment", func(outputDir string, nodes []ir.IRNode) error {
+		return generateEnvFiles(outputDir, nodes, initialPort)
+	})
 }
 
-// Generates a .env file to outputDir
-func generateEnv(outputDir string, nodes []ir.IRNode) error {
+type addrconfig struct {
+	name        string
+	servicename string
+	dial        *address.DialConfig
+	bind        *address.BindConfig
+}
+
+func addr(name string, bind *address.BindConfig, dial *address.DialConfig) *addrconfig {
+	return &addrconfig{name: name, servicename: strings.Split(name, ".")[0], bind: bind, dial: dial}
+}
+
+func matchDialsToBinds(nodes []ir.IRNode) map[string]*addrconfig {
+	configs := make(map[string]*addrconfig)
 	for _, node := range nodes {
 		if bind, isBindConfig := node.(*address.BindConfig); isBindConfig {
+			name := bind.AddressName
+			if config, hasConfig := configs[name]; hasConfig {
+				config.bind = bind
+			} else {
+				configs[name] = addr(name, bind, nil)
+			}
 			fmt.Printf("BIND %v\n", bind.AddressName)
 		}
 		if dial, isDialConfig := node.(*address.DialConfig); isDialConfig {
+			name := dial.AddressName
+			if config, hasConfig := configs[name]; hasConfig {
+				config.dial = dial
+			} else {
+				configs[name] = addr(name, nil, dial)
+			}
 			fmt.Printf("DIAL %v\n", dial.AddressName)
 		}
 	}
-	return nil
+	return configs
+}
+
+// Generates a .env file to outputDir
+func generateEnvFiles(outputDir string, nodes []ir.IRNode, port uint16) error {
+	addrs := matchDialsToBinds(nodes)
+
+	err := generateEnv(filepath.Join(outputDir, ".local.env"), addrs, port, true)
+	if err != nil {
+		return err
+	}
+
+	return generateEnv(filepath.Join(outputDir, ".env"), addrs, port, false)
+}
+
+func generateEnv(outputFile string, addrs map[string]*addrconfig, port uint16, localhost bool) error {
+	b := strings.Builder{}
+	for _, addr := range addrs {
+		if addr.bind != nil {
+			b.WriteString(fmt.Sprintf("%s=0.0.0.0:%d\n", linux.EnvVar(addr.bind.Key), port))
+		}
+		if addr.dial != nil {
+			hostname := addr.servicename
+			if localhost {
+				hostname = "localhost"
+			}
+			b.WriteString(fmt.Sprintf("%s=%s:%d\n", linux.EnvVar(addr.dial.Key), hostname, port))
+		}
+		port += 1
+	}
+
+	return os.WriteFile(outputFile, []byte(b.String()), 0644)
 }

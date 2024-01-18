@@ -2,9 +2,8 @@ package tests
 
 import (
 	"context"
+	"fmt"
 	"testing"
-
-	"errors"
 
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/cart"
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/catalogue"
@@ -284,7 +283,7 @@ func initCatalogue() error {
 	for _, sock := range socks {
 		_, err := s.AddSock(ctx, sock)
 		if err != nil {
-			return errors.Errorf("unable to add sock %v to catalogue due to %v", sock.Name, err.Error())
+			return fmt.Errorf("unable to add sock %v to catalogue due to %v", sock.Name, err.Error())
 		}
 	}
 
