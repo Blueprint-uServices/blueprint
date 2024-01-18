@@ -17,6 +17,7 @@ require (
 	github.com/google/uuid v1.4.0 // indirect
 	github.com/jmoiron/sqlx v1.3.5 // indirect
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	go.mongodb.org/mongo-driver v1.12.1 // indirect
 	go.opentelemetry.io/otel v1.21.0 // indirect
