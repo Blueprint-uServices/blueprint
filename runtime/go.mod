@@ -9,7 +9,6 @@ require (
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/mattn/go-sqlite3 v1.14.17
-	github.com/pkg/errors v0.9.1
 	github.com/rabbitmq/amqp091-go v1.8.1
 	github.com/stretchr/testify v1.8.4
 	github.com/tracingplane/tracingplane-go v0.0.0-20171025152126-8c4e6f79b148

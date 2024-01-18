@@ -99,12 +99,13 @@
 package workload
 
 import (
+	"errors"
+
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/namespaceutil"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
-	"github.com/pkg/errors"
 )
 
 // [Generator] can be used by wiring specs to build an executable workload generator.

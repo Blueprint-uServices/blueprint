@@ -8,7 +8,6 @@ replace github.com/blueprint-uservices/blueprint/runtime => ../../../runtime
 
 require (
 	github.com/blueprint-uservices/blueprint/examples/sockshop/workflow v0.0.0
-	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/exp v0.0.0-20230728194245-b0cb94b80691
 )

@@ -13,7 +13,6 @@ require golang.org/x/sys v0.14.0 // indirect
 
 require (
 	github.com/blueprint-uservices/blueprint/blueprint v0.0.0
-	github.com/pkg/errors v0.9.1
 	golang.org/x/tools v0.15.0
 )
 

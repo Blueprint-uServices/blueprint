@@ -4,12 +4,13 @@ import (
 	"context"
 	"testing"
 
+	"errors"
+
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/cart"
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/catalogue"
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/frontend"
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/user"
 	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/slices"
 )

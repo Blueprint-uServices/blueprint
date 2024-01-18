@@ -8,7 +8,7 @@ import (
 	"context"
 	"sync/atomic"
 
-	"github.com/pkg/errors"
+	"errors"
 )
 
 // A ClientPool that contains up to Capacity clients. Clients are acquired with
