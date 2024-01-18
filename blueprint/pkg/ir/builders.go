@@ -111,16 +111,6 @@ func (r *registry) buildAll(outputDir string, nodes []IRNode) (err error) {
 		return blueprint.Errorf("unable to create output directory %v due to %v", outputDir, err.Error())
 	}
 
-	configNodes := FilterNodes[IRConfig](nodes)
-	fmt.Printf("%v config nodes:\n", len(configNodes))
-	for _, node := range configNodes {
-		fmt.Println(node)
-	}
-
-	// Exclude metadata nodes and config nodes (for now)
-	// nodes = Remove[IRMetadata](nodes)
-	// nodes = Remove[IRConfig](nodes)
-
 	// Try to group like-nodes into namespaces first
 	for _, builder := range r.namespace {
 		nodes, err = builder.buildCompatibleNodes(outputDir, nodes)

@@ -45,3 +45,27 @@
 //
 // The plugin does not guarantee that the ports (e.g. 12345) are actually available for use on any machine.  This is up to the user.
 package environment
+
+import (
+	"fmt"
+
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/address"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+)
+
+func AssignPorts(initialPort uint16) {
+	ir.RegisterDefaultNamespace[ir.IRConfig]("environment", generateEnv)
+}
+
+// Generates a .env file to outputDir
+func generateEnv(outputDir string, nodes []ir.IRNode) error {
+	for _, node := range nodes {
+		if bind, isBindConfig := node.(*address.BindConfig); isBindConfig {
+			fmt.Printf("BIND %v\n", bind.AddressName)
+		}
+		if dial, isDialConfig := node.(*address.DialConfig); isDialConfig {
+			fmt.Printf("DIAL %v\n", dial.AddressName)
+		}
+	}
+	return nil
+}
