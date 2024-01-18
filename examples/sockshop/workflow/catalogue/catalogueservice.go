@@ -5,7 +5,7 @@ import (
 	"context"
 	"strings"
 
-	"errors"
+	"github.com/pkg/errors"
 
 	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"github.com/google/uuid"
