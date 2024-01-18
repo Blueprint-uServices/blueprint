@@ -20,7 +20,7 @@ The wiring spec can be specified using the \-w option when running wiring/main.g
 <a name="Basic"></a>A simple wiring spec that compiles all services to a single process and therefore directly invoke each other. No RPC, containers, processes etc. are used.
 
 ```go
-var Basic = wiringcmd.SpecOption{
+var Basic = cmdbuilder.SpecOption{
     Name:        "basic",
     Description: "A basic single-process wiring spec with no modifiers",
     Build:       makeBasicSpec,
@@ -34,7 +34,7 @@ All RPC calls are retried up to 3 times. RPC clients use a client pool with 10 c
 The user, cart, shipping, and orders services using separate MongoDB instances to store their data. The catalogue service uses MySQL to store catalogue data. The shipping service and queue master service run within the same process.
 
 ```go
-var Docker = wiringcmd.SpecOption{
+var Docker = cmdbuilder.SpecOption{
     Name:        "docker",
     Description: "Deploys each service in a separate container with gRPC, and uses mongodb as NoSQL database backends.",
     Build:       makeDockerSpec,
@@ -44,7 +44,7 @@ var Docker = wiringcmd.SpecOption{
 <a name="DockerRabbit"></a>A wiring spec that deploys each service into its own Docker container and using gRPC to communicate between services. All RPC calls are retried up to 3 times. RPC clients use a client pool with 10 clients. All services are instrumented with OpenTelemetry and traces are exported to Zipkin The user, cart, shipping, and orders services using separate MongoDB instances to store their data. The catalogue service uses MySQL to store catalogue data. The shipping service and queue master service run within the same process \(TODO: separate processes\)
 
 ```go
-var DockerRabbit = wiringcmd.SpecOption{
+var DockerRabbit = cmdbuilder.SpecOption{
     Name:        "rabbit",
     Description: "Deploys each service in a separate container with gRPC, and uses mongodb as NoSQL database backends and rabbitmq as the queue backend.",
     Build:       makeDockerRabbitSpec,
@@ -54,7 +54,7 @@ var DockerRabbit = wiringcmd.SpecOption{
 <a name="GRPC"></a>A wiring spec that deploys each service to a separate process, with services communicating over GRPC. The user, cart, shipping, and order services use simple in\-memory NoSQL databases to store their data. The catalogue service uses a simple in\-memory sqlite database to store its data. The shipping service and queue master service run within the same process \(TODO: separate processes\)
 
 ```go
-var GRPC = wiringcmd.SpecOption{
+var GRPC = cmdbuilder.SpecOption{
     Name:        "grpc",
     Description: "Deploys each service in a separate process with gRPC.",
     Build:       makeGrpcSpec,

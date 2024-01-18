@@ -1,4 +1,4 @@
-// Package wiringcmd is a helper package for building wiring spec command line programs.
+// Package cmdbuilder is a helper package for building wiring spec command line programs.
 // It doesn't provide any wiring spec commands or IR.
 //
 // The [CmdBuilder] struct enables an application to register multiple wiring spec options
@@ -23,7 +23,7 @@
 //		... // does wiring spec stuff
 //	}
 //
-//	var MySpec = wiringcmd.SpecOption{
+//	var MySpec = cmdbuilder.SpecOption{
 //		Name:        "myspec",
 //		Description: "My example wiring spec",
 //		Build:       buildMySpec,
@@ -31,12 +31,12 @@
 //
 // Lastly, in the main file, call [MakeAndExecute]:
 //
-//	wiringcmd.MakeAndExecute(
+//	cmdbuilder.MakeAndExecute(
 //		"MyApplication",
 //		MySpec
 //	)
 //
-// [MakeAndExecute] accepts any number of specs.  wiringcmd takes care of parsing command line args
+// [MakeAndExecute] accepts any number of specs.  cmdbuilder takes care of parsing command line args
 //
 // # Runtime Usage
 //
@@ -44,14 +44,14 @@
 //
 //	go run main.go -h
 //
-// The wiringcmd plugin takes care of argument parsing, and will list the wiring specs that can be compiled.
+// The cmdbuilder plugin takes care of argument parsing, and will list the wiring specs that can be compiled.
 //
 // To compile a spec, run
 //
 //	go run main.go -o build -w myspec
 //
 // [wiring/main.go]: https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/wiring/main.go
-package wiringcmd
+package cmdbuilder
 
 import (
 	"flag"

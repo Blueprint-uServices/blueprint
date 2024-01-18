@@ -5,15 +5,15 @@ import (
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/plugins/clientpool"
+	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
 	"github.com/blueprint-uservices/blueprint/plugins/simple"
 	"github.com/blueprint-uservices/blueprint/plugins/thrift"
-	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
-var Thrift = wiringcmd.SpecOption{
+var Thrift = cmdbuilder.SpecOption{
 	Name:        "thrift",
 	Description: "Deploys each service in a separate process, communicating using Thrift.",
 	Build:       makeThriftSpec,

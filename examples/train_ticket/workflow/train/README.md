@@ -24,7 +24,7 @@ package train implements ts\-train\-service from the original TrainTicket applic
 
 
 <a name="TrainService"></a>
-## type [TrainService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L12-L27>)
+## type [TrainService](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L12-L27>)
 
 TrainService manages the different types of trains in the application
 
@@ -48,7 +48,7 @@ type TrainService interface {
 ```
 
 <a name="TrainServiceImpl"></a>
-## type [TrainServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L30-L32>)
+## type [TrainServiceImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L30-L32>)
 
 Implementation of TrainService
 
@@ -59,7 +59,7 @@ type TrainServiceImpl struct {
 ```
 
 <a name="NewTrainServiceImpl"></a>
-### func [NewTrainServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L35>)
+### func [NewTrainServiceImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L35>)
 
 ```go
 func NewTrainServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*TrainServiceImpl, error)
@@ -68,7 +68,7 @@ func NewTrainServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*TrainS
 Creates a new TrainService object
 
 <a name="TrainServiceImpl.AllTrains"></a>
-### func \(\*TrainServiceImpl\) [AllTrains](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L141>)
+### func \(\*TrainServiceImpl\) [AllTrains](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L141>)
 
 ```go
 func (ts *TrainServiceImpl) AllTrains(ctx context.Context) ([]TrainType, error)
@@ -77,7 +77,7 @@ func (ts *TrainServiceImpl) AllTrains(ctx context.Context) ([]TrainType, error)
 
 
 <a name="TrainServiceImpl.Create"></a>
-### func \(\*TrainServiceImpl\) [Create](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L39>)
+### func \(\*TrainServiceImpl\) [Create](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L39>)
 
 ```go
 func (ts *TrainServiceImpl) Create(ctx context.Context, tt TrainType) (bool, error)
@@ -86,7 +86,7 @@ func (ts *TrainServiceImpl) Create(ctx context.Context, tt TrainType) (bool, err
 
 
 <a name="TrainServiceImpl.Delete"></a>
-### func \(\*TrainServiceImpl\) [Delete](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L129>)
+### func \(\*TrainServiceImpl\) [Delete](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L129>)
 
 ```go
 func (ts *TrainServiceImpl) Delete(ctx context.Context, id string) (bool, error)
@@ -95,7 +95,7 @@ func (ts *TrainServiceImpl) Delete(ctx context.Context, id string) (bool, error)
 
 
 <a name="TrainServiceImpl.Retrieve"></a>
-### func \(\*TrainServiceImpl\) [Retrieve](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L65>)
+### func \(\*TrainServiceImpl\) [Retrieve](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L65>)
 
 ```go
 func (ts *TrainServiceImpl) Retrieve(ctx context.Context, id string) (TrainType, error)
@@ -104,7 +104,7 @@ func (ts *TrainServiceImpl) Retrieve(ctx context.Context, id string) (TrainType,
 
 
 <a name="TrainServiceImpl.RetrieveByName"></a>
-### func \(\*TrainServiceImpl\) [RetrieveByName](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L86>)
+### func \(\*TrainServiceImpl\) [RetrieveByName](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L86>)
 
 ```go
 func (ts *TrainServiceImpl) RetrieveByName(ctx context.Context, name string) (TrainType, error)
@@ -113,7 +113,7 @@ func (ts *TrainServiceImpl) RetrieveByName(ctx context.Context, name string) (Tr
 
 
 <a name="TrainServiceImpl.RetrieveByNames"></a>
-### func \(\*TrainServiceImpl\) [RetrieveByNames](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L107>)
+### func \(\*TrainServiceImpl\) [RetrieveByNames](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L107>)
 
 ```go
 func (ts *TrainServiceImpl) RetrieveByNames(ctx context.Context, names []string) ([]TrainType, error)
@@ -122,7 +122,7 @@ func (ts *TrainServiceImpl) RetrieveByNames(ctx context.Context, names []string)
 
 
 <a name="TrainServiceImpl.Update"></a>
-### func \(\*TrainServiceImpl\) [Update](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L120>)
+### func \(\*TrainServiceImpl\) [Update](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/train/trainService.go#L120>)
 
 ```go
 func (ts *TrainServiceImpl) Update(ctx context.Context, ttype TrainType) (bool, error)
@@ -131,7 +131,7 @@ func (ts *TrainServiceImpl) Update(ctx context.Context, ttype TrainType) (bool, 
 
 
 <a name="TrainType"></a>
-## type [TrainType](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/train/data.go#L4-L10>)
+## type [TrainType](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/train/data.go#L4-L10>)
 
 
 

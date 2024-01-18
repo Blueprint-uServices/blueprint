@@ -3,6 +3,7 @@ package specs
 import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/plugins/clientpool"
+	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/gotests"
 	"github.com/blueprint-uservices/blueprint/plugins/grpc"
@@ -12,7 +13,6 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
 	"github.com/blueprint-uservices/blueprint/plugins/rabbitmq"
 	"github.com/blueprint-uservices/blueprint/plugins/retries"
-	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 	"github.com/blueprint-uservices/blueprint/plugins/zipkin"
 )
@@ -23,7 +23,7 @@ import (
 // The user, cart, shipping, and orders services using separate MongoDB instances to store their data.
 // The catalogue service uses MySQL to store catalogue data.
 // The shipping service and queue master service run within the same process (TODO: separate processes)
-var DockerRabbit = wiringcmd.SpecOption{
+var DockerRabbit = cmdbuilder.SpecOption{
 	Name:        "rabbit",
 	Description: "Deploys each service in a separate container with gRPC, and uses mongodb as NoSQL database backends and rabbitmq as the queue backend.",
 	Build:       makeDockerRabbitSpec,

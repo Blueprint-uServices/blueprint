@@ -5,14 +5,14 @@ package specs
 
 import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/simple"
-	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
 // A simple wiring spec that compiles all services to a single process and therefore directly invoke each other.
 // No RPC, containers, processes etc. are used.
-var Basic = wiringcmd.SpecOption{
+var Basic = cmdbuilder.SpecOption{
 	Name:        "basic",
 	Description: "A basic single-process wiring spec with no modifiers",
 	Build:       makeBasicSpec,

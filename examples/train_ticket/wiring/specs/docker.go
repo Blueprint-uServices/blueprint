@@ -2,19 +2,19 @@ package specs
 
 import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/gotests"
 	"github.com/blueprint-uservices/blueprint/plugins/http"
 	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
 	"github.com/blueprint-uservices/blueprint/plugins/rabbitmq"
-	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
 // A wiring spec that deploys each service into its own Docker container and uses http to communicate between services.
 // The user service uses MongoDB instance to store their data.
-var Docker = wiringcmd.SpecOption{
+var Docker = cmdbuilder.SpecOption{
 	Name:        "docker",
 	Description: "Deploys each service in a separate container with http, and uses mongodb as NoSQL database backends",
 	Build:       makeDockerSpec,

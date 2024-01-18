@@ -5,17 +5,17 @@ import (
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/plugins/clientpool"
+	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/grpc"
 	"github.com/blueprint-uservices/blueprint/plugins/healthchecker"
 	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
 	"github.com/blueprint-uservices/blueprint/plugins/simple"
-	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
-var Docker = wiringcmd.SpecOption{
+var Docker = cmdbuilder.SpecOption{
 	Name:        "docker",
 	Description: "Deploys each service in a separate container with gRPC, uses mongodb as NoSQL database backends, and applies a number of modifiers.",
 	Build:       makeDockerSpec,

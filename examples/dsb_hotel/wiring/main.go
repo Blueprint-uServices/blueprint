@@ -8,7 +8,7 @@ package main
 
 import (
 	"github.com/blueprint-uservices/blueprint/examples/dsb_hotel/wiring/specs"
-	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
+	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
@@ -16,7 +16,7 @@ func main() {
 	workflow.Init("../workflow", "../tests")
 
 	name := "Hotel"
-	wiringcmd.MakeAndExecute(
+	cmdbuilder.MakeAndExecute(
 		name,
 		specs.Original,
 	)

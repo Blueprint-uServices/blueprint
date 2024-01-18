@@ -5,11 +5,11 @@ import (
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/plugins/clientpool"
+	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/gotests"
 	"github.com/blueprint-uservices/blueprint/plugins/grpc"
 	"github.com/blueprint-uservices/blueprint/plugins/simple"
-	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
@@ -17,7 +17,7 @@ import (
 // The user, cart, shipping, and order services use simple in-memory NoSQL databases to store their data.
 // The catalogue service uses a simple in-memory sqlite database to store its data.
 // The shipping service and queue master service run within the same process (TODO: separate processes)
-var GRPC = wiringcmd.SpecOption{
+var GRPC = cmdbuilder.SpecOption{
 	Name:        "grpc",
 	Description: "Deploys each service in a separate process with gRPC.",
 	Build:       makeGrpcSpec,
