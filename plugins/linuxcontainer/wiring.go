@@ -97,8 +97,8 @@ func AddToContainer(spec wiring.WiringSpec, containerName, childName string) {
 //
 // After calling [Deploy], serviceName will be a container-level service.
 func Deploy(spec wiring.WiringSpec, serviceName string) string {
-	serviceName, _ = strings.CutSuffix(serviceName, "_service")
-	ctrName := serviceName + "_ctr"
+	servicePrefix, _ := strings.CutSuffix(serviceName, "_service")
+	ctrName := servicePrefix + "_ctr"
 	CreateContainer(spec, ctrName, serviceName)
 	return serviceName
 }

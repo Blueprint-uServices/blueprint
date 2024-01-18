@@ -78,8 +78,8 @@ func AddToProcess(spec wiring.WiringSpec, procName, childName string) {
 //
 // After calling [Deploy], serviceName will be a process-level service.
 func Deploy(spec wiring.WiringSpec, serviceName string) string {
-	serviceName, _ = strings.CutSuffix(serviceName, "_service")
-	procName := serviceName + "_proc"
+	servicePrefix, _ := strings.CutSuffix(serviceName, "_service")
+	procName := servicePrefix + "_proc"
 	CreateProcess(spec, procName, serviceName)
 	return serviceName
 }
