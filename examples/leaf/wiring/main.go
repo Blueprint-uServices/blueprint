@@ -25,5 +25,6 @@ func main() {
 		specs.TimeoutRetriesDemo,
 		specs.Xtrace_Logger,
 		specs.OT_Logger,
+		specs.Govector,
 	)
 }
