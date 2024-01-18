@@ -99,8 +99,7 @@
 package workload
 
 import (
-	"errors"
-
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/namespaceutil"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
@@ -164,11 +163,11 @@ func (w *wlgen) AddEdge(name string, edge ir.IRNode) error {
 func (w *wlgen) AddNode(name string, node ir.IRNode) error {
 	proc, isProcNode := node.(*goproc.Process)
 	if !isProcNode {
-		return errors.Errorf("Unexpected node %v = %v", name, node)
+		return blueprint.Errorf("Unexpected node %v = %v", name, node)
 	} else if proc.InstanceName != w.WorkloadName {
-		return errors.Errorf("Unexpected process %v != %v", proc.InstanceName, w.WorkloadName)
+		return blueprint.Errorf("Unexpected process %v != %v", proc.InstanceName, w.WorkloadName)
 	} else if w.ProcNode != nil {
-		return errors.Errorf("Unexpected duplicate workload proc %v", node)
+		return blueprint.Errorf("Unexpected duplicate workload proc %v", node)
 	} else {
 		w.ProcNode = proc
 		return nil
