@@ -28,16 +28,23 @@ type (
 	}
 )
 
+var defaultBuilders = registry{
+	namespace: make(map[reflect.Type]*namespaceBuilder),
+}
+
+func init() {
+	// When building an application we don't need to do anything to IRConfig or IRMetadata nodes by default.
+	// This can, however, be overridden by plugins by calling [RegisterDefaultNamespace]
+	RegisterDefaultNamespace[IRConfig]("ignore_irconfig", func(string, []IRNode) error { return nil })
+	RegisterDefaultNamespace[IRMetadata]("ignore_irmetadata", func(string, []IRNode) error { return nil })
+}
+
 // When building an application, any IR nodes of type T that reside within the top-level
 // application will be built using the specified buildFunc.
 func RegisterDefaultNamespace[T IRNode](name string, buildFunc func(outputDir string, nodes []IRNode) error) {
 	nodeType := reflect.TypeOf(new(T)).Elem()
 	defaultBuilders.addNamespaceBuilder(name, nodeType, buildFunc)
 	slog.Info(fmt.Sprintf("%v registered as the default namespace builder for %v nodes", name, nodeType))
-}
-
-var defaultBuilders = registry{
-	namespace: make(map[reflect.Type]*namespaceBuilder),
 }
 
 func (r *registry) addNamespaceBuilder(name string, nodeType reflect.Type, buildFunc func(outputDir string, nodes []IRNode) error) {
@@ -104,9 +111,15 @@ func (r *registry) buildAll(outputDir string, nodes []IRNode) (err error) {
 		return blueprint.Errorf("unable to create output directory %v due to %v", outputDir, err.Error())
 	}
 
+	configNodes := FilterNodes[IRConfig](nodes)
+	fmt.Printf("%v config nodes:\n", len(configNodes))
+	for _, node := range configNodes {
+		fmt.Println(node)
+	}
+
 	// Exclude metadata nodes and config nodes (for now)
-	nodes = Remove[IRMetadata](nodes)
-	nodes = Remove[IRConfig](nodes)
+	// nodes = Remove[IRMetadata](nodes)
+	// nodes = Remove[IRConfig](nodes)
 
 	// Try to group like-nodes into namespaces first
 	for _, builder := range r.namespace {

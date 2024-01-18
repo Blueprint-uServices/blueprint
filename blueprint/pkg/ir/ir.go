@@ -14,6 +14,7 @@ type IRNode interface {
 // Metadata is an IR node that exists in the IR of an application but does not build
 // any artifacts or provide configuration or anything like that.
 type IRMetadata interface {
+	IRNode
 	ImplementsIRMetadata()
 }
 
