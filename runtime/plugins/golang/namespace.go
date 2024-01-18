@@ -16,6 +16,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slog"
@@ -131,6 +132,16 @@ func (b *NamespaceBuilder) Define(name string, build BuildFunc) {
 	b.buildFuncs[name] = build
 }
 
+// A utility function for use when using linux environment variables.
+// Converts a string to a compatible environment variable name, e.g.
+//
+//	a.grpc_addr becomes A_GRPC_ADDR.
+//
+// Punctuation is converted to underscores, and alpha are made uppercase.
+func EnvVar(name string) string {
+	return strings.ToUpper(ir.CleanName(name))
+}
+
 // Indicates that name is a required node.  When the namespace is built,
 // an error will be returned if any required nodes are missing.
 //
@@ -139,7 +150,7 @@ func (b *NamespaceBuilder) Define(name string, build BuildFunc) {
 func (b *NamespaceBuilder) Required(name string, description string) {
 	b.required[name] = &argNode{
 		name:        name,
-		description: description,
+		description: fmt.Sprintf("%s.  Can also be set with environment variable %s.", description, EnvVar(name)),
 		flag:        flag.String(name, "", description),
 	}
 }
@@ -152,7 +163,7 @@ func (b *NamespaceBuilder) Required(name string, description string) {
 func (b *NamespaceBuilder) Optional(name string, description string) {
 	b.optional[name] = &argNode{
 		name:        name,
-		description: description,
+		description: fmt.Sprintf("%s.  Can also be set with environment variable %s.", description, EnvVar(name)),
 		flag:        flag.String(name, "", description),
 	}
 }
@@ -268,18 +279,30 @@ func (b *NamespaceBuilder) parseFlags() {
 	flag.Parse()
 
 	for _, node := range b.required {
+		envValue := os.Getenv(EnvVar(node.name))
 		if _, exists := b.buildFuncs[node.name]; exists {
-			slog.Warn(fmt.Sprintf("Ignoring command line arg for %v\n", node.name))
+			slog.Warn(fmt.Sprintf("Ignoring command line arg for %v", node.name))
 		} else if *node.flag != "" {
+			if envValue != "" {
+				slog.Warn(fmt.Sprintf("Using command line argument %v=%v and ignoring environment variable %v=%v", node.name, *node.flag, EnvVar(node.name), envValue))
+			}
 			b.Set(node.name, *node.flag)
+		} else if envValue != "" {
+			b.Set(node.name, envValue)
 		}
 	}
 
 	for _, node := range b.optional {
+		envValue := os.Getenv(EnvVar(node.name))
 		if _, exists := b.buildFuncs[node.name]; exists {
 			slog.Warn(fmt.Sprintf("Ignoring command line arg for %v\n", node.name))
 		} else if *node.flag != "" {
+			if envValue != "" {
+				slog.Warn(fmt.Sprintf("Using command line argument %v=%v and ignoring environment variable %v=%v", node.name, *node.flag, EnvVar(node.name), envValue))
+			}
 			b.Set(node.name, *node.flag)
+		} else if envValue != "" {
+			b.Set(node.name, envValue)
 		} else {
 			name := node.name
 			b.Define(node.name, func(n *Namespace) (any, error) {
