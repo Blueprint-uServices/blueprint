@@ -31,7 +31,7 @@ var ErrNotFound = errors.New("not found")
 ```
 
 <a name="CatalogueService"></a>
-## type [CatalogueService](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/sockshop/workflow/catalogue/catalogueservice.go#L16-L42>)
+## type [CatalogueService](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/sockshop/workflow/catalogue/catalogueservice.go#L15-L41>)
 
 The SockShop CatalogueService stores an inventory of Socks being sold by the shop.
 
@@ -66,7 +66,7 @@ type CatalogueService interface {
 ```
 
 <a name="NewCatalogueService"></a>
-### func [NewCatalogueService](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/sockshop/workflow/catalogue/catalogueservice.go#L91>)
+### func [NewCatalogueService](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/sockshop/workflow/catalogue/catalogueservice.go#L90>)
 
 ```go
 func NewCatalogueService(ctx context.Context, db backend.RelationalDB) (CatalogueService, error)
@@ -75,7 +75,7 @@ func NewCatalogueService(ctx context.Context, db backend.RelationalDB) (Catalogu
 Creates a [CatalogueService](<#CatalogueService>) instance that stores the item catalogue in the provided relational database
 
 <a name="Sock"></a>
-## type [Sock](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/sockshop/workflow/catalogue/catalogueservice.go#L45-L56>)
+## type [Sock](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/sockshop/workflow/catalogue/catalogueservice.go#L44-L55>)
 
 Sock describes the things on offer in the catalogue.
 

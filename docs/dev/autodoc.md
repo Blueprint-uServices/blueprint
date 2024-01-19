@@ -27,7 +27,7 @@ examples/*/workload
 The following command, when run from the root of the blueprint repository, refreshes all documentation:
 
 ```
-gomarkdoc --output '{{.Dir}}/README.md' --repository.default-branch main --repository.url https://github.com/blueprint-uservices/blueprint ./blueprint/... ./plugins/... ./runtime/... ./examples/.../wiring/... ./examples/.../workflow/... ./examples/.../workload/...
+gomarkdoc --output '{{.Dir}}/README.md' --repository.default-branch main --repository.url https://github.com/blueprint-uservices/blueprint ./blueprint/... ./plugins/... ./runtime/... ./examples/sockshop/wiring/... ./examples/sockshop/workflow/... ./examples/sockshop/workload/... ./examples/dsb_hotel/wiring/... ./examples/dsb_hotel/workflow/... ./examples/dsb_sn/wiring/... ./examples/dsb_sn/workflow/... ./examples/leaf/wiring/... ./examples/leaf/workflow/... ./examples/train_ticket/wiring/... ./examples/train_ticket/workflow/... 
 ```
 
 For further information see the [gomarkdoc](https://github.com/princjef/gomarkdoc/tree/master) github repo.
