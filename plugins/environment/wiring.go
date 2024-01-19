@@ -59,6 +59,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"golang.org/x/exp/slog"
+
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/address"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/linux"
@@ -91,7 +93,6 @@ func matchDialsToBinds(nodes []ir.IRNode) map[string]*addrconfig {
 			} else {
 				configs[name] = addr(name, bind, nil)
 			}
-			fmt.Printf("BIND %v\n", bind.AddressName)
 		}
 		if dial, isDialConfig := node.(*address.DialConfig); isDialConfig {
 			name := dial.AddressName
@@ -100,7 +101,6 @@ func matchDialsToBinds(nodes []ir.IRNode) map[string]*addrconfig {
 			} else {
 				configs[name] = addr(name, nil, dial)
 			}
-			fmt.Printf("DIAL %v\n", dial.AddressName)
 		}
 	}
 	return configs
@@ -110,8 +110,7 @@ func matchDialsToBinds(nodes []ir.IRNode) map[string]*addrconfig {
 func generateEnvFiles(outputDir string, nodes []ir.IRNode, port uint16) error {
 	addrs := matchDialsToBinds(nodes)
 
-	err := generateEnv(filepath.Join(outputDir, ".local.env"), addrs, port, true)
-	if err != nil {
+	if err := generateEnv(filepath.Join(outputDir, ".local.env"), addrs, port, true); err != nil {
 		return err
 	}
 
@@ -134,5 +133,11 @@ func generateEnv(outputFile string, addrs map[string]*addrconfig, port uint16, l
 		port += 1
 	}
 
-	return os.WriteFile(outputFile, []byte(b.String()), 0644)
+	if err := os.WriteFile(outputFile, []byte(b.String()), 0644); err != nil {
+		return err
+	}
+
+	_, filename := filepath.Split(outputFile)
+	slog.Info(fmt.Sprintf("Generated %s", filename))
+	return nil
 }
