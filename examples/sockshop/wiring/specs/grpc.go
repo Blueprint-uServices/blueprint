@@ -1,16 +1,17 @@
 package specs
 
 import (
-	"strings"
-
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/plugins/clientpool"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/gotests"
 	"github.com/blueprint-uservices/blueprint/plugins/grpc"
+	"github.com/blueprint-uservices/blueprint/plugins/http"
+	"github.com/blueprint-uservices/blueprint/plugins/retries"
 	"github.com/blueprint-uservices/blueprint/plugins/simple"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workload"
 )
 
 // A wiring spec that deploys each service to a separate process, with services communicating over GRPC.
@@ -24,21 +25,23 @@ var GRPC = cmdbuilder.SpecOption{
 }
 
 func makeGrpcSpec(spec wiring.WiringSpec) ([]string, error) {
-	var allServices []string
-	var allProcs []string
 
-	applyDefaults := func(serviceName string) string {
-		name, _ := strings.CutSuffix(serviceName, "service")
-
-		// Apply Blueprint modifiers
+	// Modifiers that will be applied to all services
+	applyDefaults := func(serviceName string, useHTTP ...bool) {
+		// Golang-level modifiers that add functionality
+		retries.AddRetries(spec, serviceName, 3)
 		clientpool.Create(spec, serviceName, 10)
-		grpc.Deploy(spec, serviceName)
-		proc := goproc.CreateProcess(spec, name+"Proc", serviceName)
+		if len(useHTTP) > 0 && useHTTP[0] {
+			http.Deploy(spec, serviceName)
+		} else {
+			grpc.Deploy(spec, serviceName)
+		}
 
-		// Save the service and proc for later instantiation
-		allServices = append(allServices, serviceName)
-		allProcs = append(allProcs, proc)
-		return proc
+		// Deploying to namespaces
+		goproc.Deploy(spec, serviceName)
+
+		// Also add to tests
+		gotests.Test(spec, serviceName)
 	}
 
 	user_db := simple.NoSQLDB(spec, "user_db")
@@ -55,11 +58,11 @@ func makeGrpcSpec(spec wiring.WiringSpec) ([]string, error) {
 	shipqueue := simple.Queue(spec, "shipping_queue")
 	shipdb := simple.NoSQLDB(spec, "shipping_db")
 	shipping_service := workflow.Service(spec, "shipping_service", "ShippingService", shipqueue, shipdb)
-	shipping_proc := applyDefaults(shipping_service)
+	applyDefaults(shipping_service)
 
 	// Deploy queue master to the same process as the shipping proc
 	queue_master := workflow.Service(spec, "queue_master", "QueueMaster", shipqueue, shipping_service)
-	goproc.AddToProcess(spec, shipping_proc, queue_master)
+	goproc.AddToProcess(spec, "shipping_proc", queue_master)
 
 	order_db := simple.NoSQLDB(spec, "order_db")
 	order_service := workflow.Service(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)
@@ -72,8 +75,9 @@ func makeGrpcSpec(spec wiring.WiringSpec) ([]string, error) {
 	frontend := workflow.Service(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
 	applyDefaults(frontend)
 
-	tests := gotests.Test(spec, allServices...)
-	allProcs = append(allProcs, tests)
+	wlgen := workload.Generator(spec, "wlgen", "SimpleWorkload", frontend)
 
-	return allProcs, nil
+	// Instantiate starting with the frontend which will trigger all other services to be instantiated
+	// Also include the tests and wlgen
+	return []string{"frontend_proc", wlgen, "gotests"}, nil
 }

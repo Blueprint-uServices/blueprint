@@ -93,6 +93,6 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	wlgen := workload.Generator(spec, "wlgen", "SimpleWorkload", frontend)
 
 	// Instantiate starting with the frontend which will trigger all other services to be instantiated
-	// Also include the tests
-	return []string{frontend, wlgen, "gotests"}, nil
+	// Also include the tests and wlgen
+	return []string{"frontend_ctr", wlgen, "gotests"}, nil
 }
