@@ -35,13 +35,13 @@ A golang namespace takes care of the following:
 
 
 <a name="EnvVar"></a>
-## func [EnvVar](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L141>)
+## func [EnvVar](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L143>)
 
 ```go
 func EnvVar(name string) string
 ```
 
-A utility function for use when using linux environment variables. Converts a string to a compatible environment variable name, e.g.
+A utility function to deterministically convert a string into a a valid linux environment variable name. This is done by converting all punctuation characters to underscores, and converting alphabetic characters to uppercase \(for convention\), e.g.
 
 ```
 a.grpc_addr becomes A_GRPC_ADDR.
@@ -87,7 +87,7 @@ type Namespace struct {
 ```
 
 <a name="Namespace.Await"></a>
-### func \(\*Namespace\) [Await](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L413>)
+### func \(\*Namespace\) [Await](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L415>)
 
 ```go
 func (n *Namespace) Await()
@@ -96,7 +96,7 @@ func (n *Namespace) Await()
 If any nodes in this namespace are running goroutines, waits for them to finish
 
 <a name="Namespace.Context"></a>
-### func \(\*Namespace\) [Context](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L400>)
+### func \(\*Namespace\) [Context](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L402>)
 
 ```go
 func (n *Namespace) Context() (ctx context.Context)
@@ -107,7 +107,7 @@ ctx can be used by any [BuildFunc](<#BuildFunc>) that wants to start background 
 ctx will be notified on the Done channel if the namespace is shutdown during blocking.
 
 <a name="Namespace.Get"></a>
-### func \(\*Namespace\) [Get](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L348>)
+### func \(\*Namespace\) [Get](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L350>)
 
 ```go
 func (n *Namespace) Get(name string, receiver any) error
@@ -116,7 +116,7 @@ func (n *Namespace) Get(name string, receiver any) error
 Gets a node from this namespace. If the node hasn't been built yet, it will be built.
 
 <a name="Namespace.Shutdown"></a>
-### func \(\*Namespace\) [Shutdown](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L405>)
+### func \(\*Namespace\) [Shutdown](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L407>)
 
 ```go
 func (n *Namespace) Shutdown(awaitCompletion bool)
@@ -151,7 +151,7 @@ Instantiates a new NamespaceBuilder.
 The NamespaceBuilder accumulates node and config variable definitions. Once all definitions are added, the Build\* methods are used to build the namespace.
 
 <a name="NamespaceBuilder.Build"></a>
-### func \(\*NamespaceBuilder\) [Build](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L185>)
+### func \(\*NamespaceBuilder\) [Build](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L187>)
 
 ```go
 func (b *NamespaceBuilder) Build(ctx context.Context) (*Namespace, error)
@@ -166,7 +166,7 @@ Builds and returns the namespace. This will:
 Returns a [Namespace](<#Namespace>) where nodes can now be gotten.
 
 <a name="NamespaceBuilder.BuildWithParent"></a>
-### func \(\*NamespaceBuilder\) [BuildWithParent](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L235>)
+### func \(\*NamespaceBuilder\) [BuildWithParent](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L237>)
 
 ```go
 func (b *NamespaceBuilder) BuildWithParent(parent *Namespace) (*Namespace, error)
@@ -192,7 +192,7 @@ name gives a name to the node that will be built.
 build is a [BuildFunc](<#BuildFunc>) for building the node. build is lazily invoked when Get\(name\) is called on the [Namespace](<#Namespace>)
 
 <a name="NamespaceBuilder.Instantiate"></a>
-### func \(\*NamespaceBuilder\) [Instantiate](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L175>)
+### func \(\*NamespaceBuilder\) [Instantiate](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L177>)
 
 ```go
 func (b *NamespaceBuilder) Instantiate(name string)
@@ -203,7 +203,7 @@ Indicates that name should be eagerly built when the namespace is built.
 The typical usage of this is to ensure that servers get started for namespaces that run servers.
 
 <a name="NamespaceBuilder.Optional"></a>
-### func \(\*NamespaceBuilder\) [Optional](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L163>)
+### func \(\*NamespaceBuilder\) [Optional](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L165>)
 
 ```go
 func (b *NamespaceBuilder) Optional(name string, description string)
@@ -214,7 +214,7 @@ Indicates that name is an optional node. An error will only be returned if the c
 The typical usage of this is when using only a single client from a client library
 
 <a name="NamespaceBuilder.Required"></a>
-### func \(\*NamespaceBuilder\) [Required](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L150>)
+### func \(\*NamespaceBuilder\) [Required](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/golang/namespace.go#L152>)
 
 ```go
 func (b *NamespaceBuilder) Required(name string, description string)

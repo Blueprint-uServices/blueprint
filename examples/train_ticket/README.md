@@ -40,7 +40,7 @@ If you navigate to the `build` directory, you will now see a number of build art
 
 ## Running the application
 
-To run the application, navigate to `build/docker` and run `docker-compose up`.  You might see Docker complain about missing environment variables.  Edit the `.env` file in `build/docker` and put the following:
+To run the application, navigate to `build/docker` and run `docker compose up`.  You might see Docker complain about missing environment variables.  Edit the `.env` file in `build/docker` and put the following:
 
 ```
 ASSURANCE_SERVICE_HTTP_BIND_ADDR=9003

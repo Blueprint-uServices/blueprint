@@ -46,13 +46,13 @@
 // If the dockercompose deployment is not further combined by other plugins, then the entry point to running
 // your application will be using docker-compose.  You can build or run the deployment with:
 //
-//	docker-compose build
-//	docker-compose up
+//	docker compose build
+//	docker compose up
 //
-// Many wiring specs generate .env files to set environment variables; you can point docker-compose to these
+// Many wiring specs generate .env files to set environment variables; you can point docker to these
 // .env files as follows:
 //
-//	docker-compose --env-file=../.local.env build
+//	docker compose --env-file=../.local.env build
 //
 // If you aren't using an env file like the above, Docker might complaion about the absence of necessary
 // environment variables.  You can manually write those to a .env file or set them in your local environment.

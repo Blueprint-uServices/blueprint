@@ -66,7 +66,7 @@ SHIPPING_QUEUE_BIND_ADDR=0.0.0.0:12358
 
 ## Running the application
 
-To run the application, navigate to `build/docker` and run `docker-compose up`.  If this is your first time running the application, this will also build the necessary container images.
+To run the application, navigate to `build/docker` and run `docker compose up`.  If this is your first time running the application, this will also build the necessary container images.
 
 ## Invoke the application
 

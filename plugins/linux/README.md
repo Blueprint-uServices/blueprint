@@ -31,13 +31,13 @@ Consult the following plugins for examples:
 
 
 <a name="EnvVar"></a>
-## func [EnvVar](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linux/util.go#L15>)
+## func [EnvVar](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linux/util.go#L17>)
 
 ```go
 func EnvVar(name string) string
 ```
 
-A utility function for use when using linux environment variables. Converts a string to a compatible environment variable name, e.g.
+A utility function to deterministically convert a string into a a valid linux environment variable name. This is done by converting all punctuation characters to underscores, and converting alphabetic characters to uppercase \(for convention\), e.g.
 
 ```
 a.grpc_addr becomes A_GRPC_ADDR.
@@ -46,7 +46,7 @@ a.grpc_addr becomes A_GRPC_ADDR.
 Punctuation is converted to underscores, and alpha are made uppercase.
 
 <a name="FuncName"></a>
-## func [FuncName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linux/util.go#L22>)
+## func [FuncName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linux/util.go#L24>)
 
 ```go
 func FuncName(name string) string
