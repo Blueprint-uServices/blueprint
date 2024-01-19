@@ -46,8 +46,8 @@ run_{{RunFuncName .Name}} {
 var runFuncTemplate = `
 run_{{RunFuncName .Name}} {
 	export CGO_ENABLED=1
-	cd {{.Name}}
-	go run {{.Name}}/*.go
+	cd {{.Name}}/{{.Name}}
+	go run .
 	{{- range $i, $arg := .Args}} --{{$arg.Name}}=${{EnvVarName $arg.Name}}{{end}} &
 	{{EnvVarName .Name}}=$!
 	return $?
