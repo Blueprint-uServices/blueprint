@@ -15,6 +15,7 @@ type JaegerCollectorContainer struct {
 
 	CollectorName string
 	BindAddr      *address.BindConfig
+	UIBindAddr    *address.BindConfig
 	Iface         *goparser.ParsedInterface
 }
 
@@ -78,6 +79,7 @@ func (node *JaegerCollectorContainer) AddContainerArtifacts(targer docker.Contai
 }
 
 func (node *JaegerCollectorContainer) AddContainerInstance(target docker.ContainerWorkspace) error {
+	node.UIBindAddr.Port = 16686
 	node.BindAddr.Port = 14268
-	return target.DeclarePrebuiltInstance(node.CollectorName, "jaegertracing/all-in-one:latest", node.BindAddr)
+	return target.DeclarePrebuiltInstance(node.CollectorName, "jaegertracing/all-in-one:latest", node.BindAddr, node.UIBindAddr)
 }

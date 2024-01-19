@@ -7,12 +7,12 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/http"
+	"github.com/blueprint-uservices/blueprint/plugins/jaeger"
 	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
 	"github.com/blueprint-uservices/blueprint/plugins/simple"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 	"github.com/blueprint-uservices/blueprint/plugins/xtrace"
-	"github.com/blueprint-uservices/blueprint/plugins/zipkin"
 )
 
 // [Xtrace_Logger] demonstrates how to use a custom logger for Blueprint applications.
@@ -28,10 +28,10 @@ var Xtrace_Logger = cmdbuilder.SpecOption{
 // [OT_Logger] demonstrates how to use a custom logger for Blueprint applications.
 // The wiring spec uses opentelemetry logger as the custom logger for demonstration.
 // Each service is deployed in a separate container with services communicating using HTTP.
-// Launches an zipkin server which collects spans generated from each service wrapped in opentelemetry tracing.
-var OT_Logger = cmdbuilder.SpecOption{
+// Launches an jaeger server which collects spans generated from each service wrapped in opentelemetry tracing.
+var OT_Logger = wiringcmd.SpecOption{
 	Name:        "ot_logger",
-	Description: "Deploys each service in a separate container, communicating using HTTP. Wraps each service in opentelemetry tracing and sets the OTLogger for each process. All spans are collected by the zipkin collector.",
+	Description: "Deploys each service in a separate container, communicating using HTTP. Wraps each service in opentelemetry tracing and sets the OTLogger for each process. All spans are collected by the jaeger collector.",
 	Build:       makeOTLoggerSpec,
 }
 
@@ -46,7 +46,7 @@ func makeXTraceLoggerSpec(spec wiring.WiringSpec) ([]string, error) {
 func makeCustomLoggerSpec(spec wiring.WiringSpec, logger_type string) ([]string, error) {
 	var collector string
 	if logger_type == "ot" {
-		collector = zipkin.Collector(spec, "zipkin")
+		collector = jaeger.Collector(spec, "jaeger")
 	}
 	applyLoggerDefaults := func(service_name string) string {
 
