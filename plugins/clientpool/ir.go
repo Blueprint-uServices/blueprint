@@ -211,8 +211,7 @@ func {{.PoolConstructor}}(parent *golang.Namespace) *{{.PoolName}} {
 {{$receiver := .PoolName -}}
 {{ range $_, $f := .Service.Methods }}
 func (pool *{{$receiver}}) {{SignatureWithRetVars $f}} {
-	var client {{NameOf $service.UserType}}
-	client, err = pool.clients.Pop(ctx)
+	client, err := pool.clients.Pop(ctx)
 	if err != nil {
 		return
 	}
