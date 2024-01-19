@@ -88,6 +88,8 @@ type CmdBuilder struct {
 	OutputDir string
 	Quiet     bool
 	SpecName  string
+	Env       bool
+	Port      uint16
 	Spec      SpecOption
 	Wiring    wiring.WiringSpec
 	IR        *ir.ApplicationNode
@@ -130,12 +132,16 @@ func (b *CmdBuilder) ParseArgs() {
 	output_dir := flag.String("o", "", "Target output directory for compilation.")
 	spec_name := flag.String("w", "", "Wiring spec to compile.  One of:\n"+b.List())
 	quiet := flag.Bool("quiet", false, "Suppress verbose compiler output.")
+	env := flag.Bool("env", true, "Generate a .env file that sets service address and port environment variables")
+	port := flag.Uint("port", 12345, "Sets the port to start at when assigning service ports.  Only used when generating a .env file.")
 
 	flag.Parse()
 
 	b.OutputDir = *output_dir
 	b.Quiet = *quiet
 	b.SpecName = *spec_name
+	b.Env = *env
+	b.Port = uint16(*port)
 }
 
 func (b *CmdBuilder) ValidateArgs() error {
@@ -176,7 +182,9 @@ func (b *CmdBuilder) Build() error {
 	goproc.RegisterAsDefaultBuilder()
 	linuxcontainer.RegisterAsDefaultBuilder()
 	dockercompose.RegisterAsDefaultBuilder()
-	environment.AssignPorts(12345)
+	if b.Env {
+		environment.AssignPorts(b.Port)
+	}
 
 	// Define the wiring spec
 	slog.Info(fmt.Sprintf("Building %v-%v to %v", b.Name, b.SpecName, b.OutputDir))
