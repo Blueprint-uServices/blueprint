@@ -1,8 +1,6 @@
 package specs
 
 import (
-	"fmt"
-
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/plugins/clientpool"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
@@ -13,6 +11,9 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
+// [Thrift] demonstrates how to deploy a service as over RPC using the [thrift] plugin.
+//
+// [thrift]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/thrift
 var Thrift = cmdbuilder.SpecOption{
 	Name:        "thrift",
 	Description: "Deploys each service in a separate process, communicating using Thrift.",
@@ -20,6 +21,13 @@ var Thrift = cmdbuilder.SpecOption{
 }
 
 func makeThriftSpec(spec wiring.WiringSpec) ([]string, error) {
+
+	applyThriftDefaults := func(spec wiring.WiringSpec, serviceName string) string {
+		clientpool.Create(spec, serviceName, 5)
+		thrift.Deploy(spec, serviceName)
+		return goproc.Deploy(spec, serviceName)
+	}
+
 	leaf_db := mongodb.Container(spec, "leaf_db")
 	leaf_cache := simple.Cache(spec, "leaf_cache")
 	leaf_service := workflow.Service(spec, "leaf_service", "LeafServiceImpl", leaf_cache, leaf_db)
@@ -29,11 +37,4 @@ func makeThriftSpec(spec wiring.WiringSpec) ([]string, error) {
 	nonleaf_proc := applyThriftDefaults(spec, nonleaf_service)
 
 	return []string{leaf_proc, nonleaf_proc}, nil
-}
-
-func applyThriftDefaults(spec wiring.WiringSpec, serviceName string) string {
-	procName := fmt.Sprintf("%s_process", serviceName)
-	clientpool.Create(spec, serviceName, 5)
-	thrift.Deploy(spec, serviceName)
-	return goproc.CreateProcess(spec, procName, serviceName)
 }

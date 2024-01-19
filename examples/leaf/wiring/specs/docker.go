@@ -1,8 +1,6 @@
 package specs
 
 import (
-	"fmt"
-
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/plugins/clientpool"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
@@ -15,6 +13,14 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
+// [Docker] demonstrates how to deploy a service in a Docker container using the [docker] plugin.
+// It also wraps services in clientpools using the [clientpool] plugin and and adds a health
+// check API using the [healthchecker] plugin.  Services are deployed over RPC using the [grpc] plugin.
+//
+// [docker]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/docker
+// [clientpool]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/clientpool
+// [grpc]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/grpc
+// [healthchecker]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/healthchecker
 var Docker = cmdbuilder.SpecOption{
 	Name:        "docker",
 	Description: "Deploys each service in a separate container with gRPC, uses mongodb as NoSQL database backends, and applies a number of modifiers.",
@@ -22,6 +28,15 @@ var Docker = cmdbuilder.SpecOption{
 }
 
 func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
+
+	applyDockerDefaults := func(spec wiring.WiringSpec, serviceName string) string {
+		clientpool.Create(spec, serviceName, 5)
+		healthchecker.AddHealthCheckAPI(spec, serviceName)
+		grpc.Deploy(spec, serviceName)
+		goproc.Deploy(spec, serviceName)
+		return linuxcontainer.Deploy(spec, serviceName)
+	}
+
 	leaf_db := mongodb.Container(spec, "leaf_db")
 	leaf_cache := simple.Cache(spec, "leaf_cache")
 	leaf_service := workflow.Service(spec, "leaf_service", "LeafServiceImpl", leaf_cache, leaf_db)
@@ -31,15 +46,4 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	nonleaf_ctr := applyDockerDefaults(spec, nonleaf_service)
 
 	return []string{leaf_ctr, nonleaf_ctr}, nil
-}
-
-func applyDockerDefaults(spec wiring.WiringSpec, serviceName string) string {
-	procName := fmt.Sprintf("%s_process", serviceName)
-	ctrName := fmt.Sprintf("%s_container", serviceName)
-	// opentelemetry.Instrument(spec, serviceName)
-	clientpool.Create(spec, serviceName, 5)
-	healthchecker.AddHealthCheckAPI(spec, serviceName)
-	grpc.Deploy(spec, serviceName)
-	goproc.CreateProcess(spec, procName, serviceName)
-	return linuxcontainer.CreateContainer(spec, ctrName, procName)
 }

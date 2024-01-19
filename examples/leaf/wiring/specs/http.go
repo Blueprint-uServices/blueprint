@@ -1,8 +1,6 @@
 package specs
 
 import (
-	"fmt"
-
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
@@ -14,6 +12,11 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/zipkin"
 )
 
+// [HTTP] demonstrates how to deploy a service as an HTTP webserver using the [http] plugin.
+// The wiring spec also instruments services with distributed tracing using the [opentelemetry] plugin.
+//
+// [http]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/http
+// [opentelemetry]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/opentelemetry
 var HTTP = cmdbuilder.SpecOption{
 	Name:        "http",
 	Description: "Deploys each service in a separate process, communicating using HTTP.  Wraps each service in Zipkin tracing.",
@@ -23,22 +26,19 @@ var HTTP = cmdbuilder.SpecOption{
 func makeHTTPSpec(spec wiring.WiringSpec) ([]string, error) {
 	trace_collector := zipkin.Collector(spec, "zipkin")
 
+	applyHTTPDefaults := func(spec wiring.WiringSpec, serviceName string) string {
+		opentelemetry.Instrument(spec, serviceName, trace_collector)
+		http.Deploy(spec, serviceName)
+		return goproc.Deploy(spec, serviceName)
+	}
+
 	leaf_db := mongodb.Container(spec, "leaf_db")
 	leaf_cache := simple.Cache(spec, "leaf_cache")
 	leaf_service := workflow.Service(spec, "leaf_service", "LeafServiceImpl", leaf_cache, leaf_db)
-	leaf_proc := applyHTTPDefaults(spec, leaf_service, trace_collector)
+	leaf_proc := applyHTTPDefaults(spec, leaf_service)
 
 	nonleaf_service := workflow.Service(spec, "nonleaf_service", "NonLeafService", leaf_service)
-	nonleaf_proc := applyHTTPDefaults(spec, nonleaf_service, trace_collector)
+	nonleaf_proc := applyHTTPDefaults(spec, nonleaf_service)
 
 	return []string{leaf_proc, nonleaf_proc}, nil
-}
-
-func applyHTTPDefaults(spec wiring.WiringSpec, serviceName string, collectorName string) string {
-	procName := fmt.Sprintf("%s_process", serviceName)
-	// ctrName := fmt.Sprintf("%s_container", serviceName)
-	opentelemetry.Instrument(spec, serviceName, collectorName)
-	http.Deploy(spec, serviceName)
-	return goproc.CreateProcess(spec, procName, serviceName)
-	//return linuxcontainer.CreateContainer(spec, ctrName, procName)
 }

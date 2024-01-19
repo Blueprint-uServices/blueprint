@@ -6,10 +6,6 @@
 import "github.com/blueprint-uservices/blueprint/examples/leaf/wiring"
 ```
 
-Package main provides the LeafApp application, primarily used for testing compilation during the plugin development process.
-
-Run with go run examples/leaf/wiring/main.go
-
 ## Index
 
 

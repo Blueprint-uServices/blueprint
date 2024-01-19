@@ -15,7 +15,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/zipkin"
 )
 
-// Wiring specification demonstrates how to use a custom logger for Blueprint applications.
+// [Xtrace_Logger] demonstrates how to use a custom logger for Blueprint applications.
 // The wiring spec uses xtrace logger as the custom logger for demonstration.
 // Each service is deployed in a separate container with services communicating using HTTP.
 // Launches an XTrace server with each service wrapped in xtrace tracing.
@@ -25,7 +25,7 @@ var Xtrace_Logger = cmdbuilder.SpecOption{
 	Build:       makeXTraceLoggerSpec,
 }
 
-// Wiring specification demonstrates how to use a custom logger for Blueprint applications.
+// [OT_Logger] demonstrates how to use a custom logger for Blueprint applications.
 // The wiring spec uses opentelemetry logger as the custom logger for demonstration.
 // Each service is deployed in a separate container with services communicating using HTTP.
 // Launches an zipkin server which collects spans generated from each service wrapped in opentelemetry tracing.

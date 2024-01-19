@@ -13,7 +13,7 @@ import "github.com/blueprint-uservices/blueprint/examples/leaf/wiring/specs"
 
 ## Variables
 
-<a name="Docker"></a>
+<a name="Docker"></a>[Docker](<#Docker>) demonstrates how to deploy a service in a Docker container using the [docker](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/docker>) plugin. It also wraps services in clientpools using the [clientpool](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/clientpool>) plugin and and adds a health check API using the [healthchecker](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/healthchecker>) plugin. Services are deployed over RPC using the [grpc](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/grpc>) plugin.
 
 ```go
 var Docker = cmdbuilder.SpecOption{
@@ -23,7 +23,7 @@ var Docker = cmdbuilder.SpecOption{
 }
 ```
 
-<a name="Govector"></a>Wiring specification demonstrates how to instrument an application using GoVector to propagate vector clocks and to create logs with vector clocks. The wiring spec uses govector logger as the custom logger for processes. Each service is deployed in a separate process with services communicating using HTTP.
+<a name="Govector"></a>[Govector](<#Govector>) demonstrates how to instrument an application using GoVector to propagate vector clocks and to create logs with vector clocks. The wiring spec uses govector logger as the custom logger for processes. Each service is deployed in a separate process with services communicating using HTTP.
 
 ```go
 var Govector = cmdbuilder.SpecOption{
@@ -33,7 +33,7 @@ var Govector = cmdbuilder.SpecOption{
 }
 ```
 
-<a name="HTTP"></a>
+<a name="HTTP"></a>[HTTP](<#HTTP>) demonstrates how to deploy a service as an HTTP webserver using the [http](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/http>) plugin. The wiring spec also instruments services with distributed tracing using the [opentelemetry](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/opentelemetry>) plugin.
 
 ```go
 var HTTP = cmdbuilder.SpecOption{
@@ -43,7 +43,7 @@ var HTTP = cmdbuilder.SpecOption{
 }
 ```
 
-<a name="OT_Logger"></a>Wiring specification demonstrates how to use a custom logger for Blueprint applications. The wiring spec uses opentelemetry logger as the custom logger for demonstration. Each service is deployed in a separate container with services communicating using HTTP. Launches an zipkin server which collects spans generated from each service wrapped in opentelemetry tracing.
+<a name="OT_Logger"></a>[OT\\\_Logger](<#OT_Logger>) demonstrates how to use a custom logger for Blueprint applications. The wiring spec uses opentelemetry logger as the custom logger for demonstration. Each service is deployed in a separate container with services communicating using HTTP. Launches an zipkin server which collects spans generated from each service wrapped in opentelemetry tracing.
 
 ```go
 var OT_Logger = cmdbuilder.SpecOption{
@@ -53,7 +53,7 @@ var OT_Logger = cmdbuilder.SpecOption{
 }
 ```
 
-<a name="Thrift"></a>
+<a name="Thrift"></a>[Thrift](<#Thrift>) demonstrates how to deploy a service as over RPC using the [thrift](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/thrift>) plugin.
 
 ```go
 var Thrift = cmdbuilder.SpecOption{
@@ -83,7 +83,7 @@ var TimeoutRetriesDemo = cmdbuilder.SpecOption{
 }
 ```
 
-<a name="Xtrace_Logger"></a>Wiring specification demonstrates how to use a custom logger for Blueprint applications. The wiring spec uses xtrace logger as the custom logger for demonstration. Each service is deployed in a separate container with services communicating using HTTP. Launches an XTrace server with each service wrapped in xtrace tracing.
+<a name="Xtrace_Logger"></a>[Xtrace\\\_Logger](<#Xtrace_Logger>) demonstrates how to use a custom logger for Blueprint applications. The wiring spec uses xtrace logger as the custom logger for demonstration. Each service is deployed in a separate container with services communicating using HTTP. Launches an XTrace server with each service wrapped in xtrace tracing.
 
 ```go
 var Xtrace_Logger = cmdbuilder.SpecOption{
