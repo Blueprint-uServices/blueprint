@@ -23,7 +23,7 @@ package stationfood implements ts\-station\-food\-service from the original Trai
 
 
 <a name="StationFoodService"></a>
-## type [StationFoodService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L13-L26>)
+## type [StationFoodService](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L13-L26>)
 
 StationFoodService manages food stores across all stations
 
@@ -45,7 +45,7 @@ type StationFoodService interface {
 ```
 
 <a name="StationFoodServiceImpl"></a>
-## type [StationFoodServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L29-L31>)
+## type [StationFoodServiceImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L29-L31>)
 
 Implementation of StationFoodService
 
@@ -56,7 +56,7 @@ type StationFoodServiceImpl struct {
 ```
 
 <a name="NewStationFoodServiceImpl"></a>
-### func [NewStationFoodServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L34>)
+### func [NewStationFoodServiceImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L34>)
 
 ```go
 func NewStationFoodServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*StationFoodServiceImpl, error)
@@ -65,7 +65,7 @@ func NewStationFoodServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*
 Creates and returns a new StationFoodService object
 
 <a name="StationFoodServiceImpl.Cleanup"></a>
-### func \(\*StationFoodServiceImpl\) [Cleanup](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L136>)
+### func \(\*StationFoodServiceImpl\) [Cleanup](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L136>)
 
 ```go
 func (s *StationFoodServiceImpl) Cleanup(ctx context.Context) error
@@ -74,7 +74,7 @@ func (s *StationFoodServiceImpl) Cleanup(ctx context.Context) error
 
 
 <a name="StationFoodServiceImpl.CreateFoodStore"></a>
-### func \(\*StationFoodServiceImpl\) [CreateFoodStore](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L38>)
+### func \(\*StationFoodServiceImpl\) [CreateFoodStore](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L38>)
 
 ```go
 func (s *StationFoodServiceImpl) CreateFoodStore(ctx context.Context, store StationFoodStore) error
@@ -83,7 +83,7 @@ func (s *StationFoodServiceImpl) CreateFoodStore(ctx context.Context, store Stat
 
 
 <a name="StationFoodServiceImpl.GetFoodStoreByID"></a>
-### func \(\*StationFoodServiceImpl\) [GetFoodStoreByID](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L113>)
+### func \(\*StationFoodServiceImpl\) [GetFoodStoreByID](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L113>)
 
 ```go
 func (s *StationFoodServiceImpl) GetFoodStoreByID(ctx context.Context, id string) (StationFoodStore, error)
@@ -92,7 +92,7 @@ func (s *StationFoodServiceImpl) GetFoodStoreByID(ctx context.Context, id string
 
 
 <a name="StationFoodServiceImpl.GetFoodStoresByStationNames"></a>
-### func \(\*StationFoodServiceImpl\) [GetFoodStoresByStationNames](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L91>)
+### func \(\*StationFoodServiceImpl\) [GetFoodStoresByStationNames](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L91>)
 
 ```go
 func (s *StationFoodServiceImpl) GetFoodStoresByStationNames(ctx context.Context, stations []string) ([]StationFoodStore, error)
@@ -101,7 +101,7 @@ func (s *StationFoodServiceImpl) GetFoodStoresByStationNames(ctx context.Context
 
 
 <a name="StationFoodServiceImpl.ListFoodStores"></a>
-### func \(\*StationFoodServiceImpl\) [ListFoodStores](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L56>)
+### func \(\*StationFoodServiceImpl\) [ListFoodStores](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L56>)
 
 ```go
 func (s *StationFoodServiceImpl) ListFoodStores(ctx context.Context) ([]StationFoodStore, error)
@@ -110,7 +110,7 @@ func (s *StationFoodServiceImpl) ListFoodStores(ctx context.Context) ([]StationF
 
 
 <a name="StationFoodServiceImpl.ListFoodStoresByStationName"></a>
-### func \(\*StationFoodServiceImpl\) [ListFoodStoresByStationName](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L73>)
+### func \(\*StationFoodServiceImpl\) [ListFoodStoresByStationName](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/stationFoodService.go#L73>)
 
 ```go
 func (s *StationFoodServiceImpl) ListFoodStoresByStationName(ctx context.Context, station string) ([]StationFoodStore, error)
@@ -119,7 +119,7 @@ func (s *StationFoodServiceImpl) ListFoodStoresByStationName(ctx context.Context
 
 
 <a name="StationFoodStore"></a>
-## type [StationFoodStore](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/data.go#L7-L15>)
+## type [StationFoodStore](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/stationfood/data.go#L7-L15>)
 
 
 

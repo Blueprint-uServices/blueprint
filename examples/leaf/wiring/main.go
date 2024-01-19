@@ -1,12 +1,20 @@
-// Package main provides the LeafApp application, primarily used for
-// testing compilation during the plugin development process.
+// Package main provides the LeafApp application, a simple application designed for demonstrating Blueprint
+// usage and not as a realistic executable application.
 //
-// Run with go run examples/leaf/wiring/main.go
+// The wiring specs in the [specs] directory illustrate the usage of various Blueprint plugins.
+//
+// Leaf is also used by Blueprint developers while developing plugins.
+//
+// # Usage
+//
+// To display usage, run
+//
+//	go run . -h
 package main
 
 import (
 	"github.com/blueprint-uservices/blueprint/examples/leaf/wiring/specs"
-	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
+	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
@@ -16,7 +24,7 @@ func main() {
 
 	// Build a supported wiring spec
 	name := "LeafApp"
-	wiringcmd.MakeAndExecute(
+	cmdbuilder.MakeAndExecute(
 		name,
 		specs.Docker,
 		specs.Thrift,

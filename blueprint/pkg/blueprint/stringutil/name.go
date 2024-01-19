@@ -13,7 +13,7 @@ func Capitalize(s string) string {
 	return string(append([]rune{unicode.ToUpper(r[0])}, r[1:]...))
 }
 
-var r = regexp.MustCompile(`[^a-zA-Z0-9_ ]+`)
+var r = regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
 
 // Returns name with only alphanumeric characters and all other
 // symbols converted to underscores.

@@ -23,7 +23,7 @@ Package user provides an implementation of the UserService UserService uses a ba
 
 
 <a name="User"></a>
-## type [User](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/user/data.go#L3-L11>)
+## type [User](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/user/data.go#L3-L11>)
 
 
 
@@ -40,7 +40,7 @@ type User struct {
 ```
 
 <a name="UserService"></a>
-## type [UserService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L14-L27>)
+## type [UserService](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L14-L27>)
 
 UserService manages the users in the application
 
@@ -62,7 +62,7 @@ type UserService interface {
 ```
 
 <a name="UserServiceImpl"></a>
-## type [UserServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L30-L32>)
+## type [UserServiceImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L30-L32>)
 
 Implementation of UserService
 
@@ -73,7 +73,7 @@ type UserServiceImpl struct {
 ```
 
 <a name="NewUserServiceImpl"></a>
-### func [NewUserServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L35>)
+### func [NewUserServiceImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L35>)
 
 ```go
 func NewUserServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*UserServiceImpl, error)
@@ -82,7 +82,7 @@ func NewUserServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*UserSer
 Creates and returns a UserService object
 
 <a name="UserServiceImpl.DeleteUser"></a>
-### func \(\*UserServiceImpl\) [DeleteUser](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L81>)
+### func \(\*UserServiceImpl\) [DeleteUser](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L81>)
 
 ```go
 func (u *UserServiceImpl) DeleteUser(ctx context.Context, userID string) error
@@ -91,7 +91,7 @@ func (u *UserServiceImpl) DeleteUser(ctx context.Context, userID string) error
 
 
 <a name="UserServiceImpl.FindByUserID"></a>
-### func \(\*UserServiceImpl\) [FindByUserID](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L39>)
+### func \(\*UserServiceImpl\) [FindByUserID](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L39>)
 
 ```go
 func (u *UserServiceImpl) FindByUserID(ctx context.Context, userID string) (User, error)
@@ -100,7 +100,7 @@ func (u *UserServiceImpl) FindByUserID(ctx context.Context, userID string) (User
 
 
 <a name="UserServiceImpl.FindByUsername"></a>
-### func \(\*UserServiceImpl\) [FindByUsername](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L60>)
+### func \(\*UserServiceImpl\) [FindByUsername](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L60>)
 
 ```go
 func (u *UserServiceImpl) FindByUsername(ctx context.Context, username string) (User, error)
@@ -109,7 +109,7 @@ func (u *UserServiceImpl) FindByUsername(ctx context.Context, username string) (
 
 
 <a name="UserServiceImpl.GetAllUsers"></a>
-### func \(\*UserServiceImpl\) [GetAllUsers](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L94>)
+### func \(\*UserServiceImpl\) [GetAllUsers](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L94>)
 
 ```go
 func (u *UserServiceImpl) GetAllUsers(ctx context.Context) ([]User, error)
@@ -118,7 +118,7 @@ func (u *UserServiceImpl) GetAllUsers(ctx context.Context) ([]User, error)
 
 
 <a name="UserServiceImpl.SaveUser"></a>
-### func \(\*UserServiceImpl\) [SaveUser](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L111>)
+### func \(\*UserServiceImpl\) [SaveUser](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L111>)
 
 ```go
 func (u *UserServiceImpl) SaveUser(ctx context.Context, user User) error
@@ -127,7 +127,7 @@ func (u *UserServiceImpl) SaveUser(ctx context.Context, user User) error
 
 
 <a name="UserServiceImpl.UpdateUser"></a>
-### func \(\*UserServiceImpl\) [UpdateUser](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L119>)
+### func \(\*UserServiceImpl\) [UpdateUser](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/user/userService.go#L119>)
 
 ```go
 func (u *UserServiceImpl) UpdateUser(ctx context.Context, user User) (bool, error)

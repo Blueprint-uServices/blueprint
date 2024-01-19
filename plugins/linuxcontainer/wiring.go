@@ -30,7 +30,7 @@
 // configured as the default builder for process instances, by calling [RegisterAsDefaultBuilder] in your wiring spec.
 //
 // At compile time Blueprint will combine any process instances that exist in the wiring spec but aren't explicitly added to
-// a linux container, and create a default linux container deployment with the name "linuxcontainer".
+// a linux container, and create a default linux container deployment with the name "linux".
 //
 //	linuxcontainer.RegisterAsDefaultBuilder()
 //
@@ -96,11 +96,13 @@ func AddToContainer(spec wiring.WiringSpec, containerName, childName string) {
 //	user_srv => user_srv_ctr
 //
 // After calling [Deploy], serviceName will be a container-level service.
+//
+// Returns the name of the container
 func Deploy(spec wiring.WiringSpec, serviceName string) string {
 	servicePrefix, _ := strings.CutSuffix(serviceName, "_service")
 	ctrName := servicePrefix + "_ctr"
 	CreateContainer(spec, ctrName, serviceName)
-	return serviceName
+	return ctrName
 }
 
 // CreateContainer can be used by wiring specs to define a container called containerName and to

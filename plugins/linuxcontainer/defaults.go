@@ -14,17 +14,17 @@ import (
 //
 // Default builders are responsible for building any process instances that exist in a wiring spec but aren't
 // explicitly added to a container within that wiring spec.  The Blueprint compiler groups these
-// "floating" process instances into a default linux container with the name "linuxcontainer".
+// "floating" process instances into a default linux container with the name "linux".
 //
 // [cmdbuilder]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/cmdbuilder
 func RegisterAsDefaultBuilder() {
-	ir.RegisterDefaultNamespace[linux.Process]("linuxcontainer", buildDefaultLinuxWorkspace)
+	ir.RegisterDefaultNamespace[linux.Process]("linux", buildDefaultLinuxWorkspace)
 }
 
 func buildDefaultLinuxWorkspace(outputDir string, nodes []ir.IRNode) error {
-	ctr := newLinuxContainerNode("linuxprocesses")
+	ctr := newLinuxContainerNode("linux")
 	ctr.Nodes = nodes
-	ctrDir, err := ioutil.CreateNodeDir(outputDir, "linuxprocesses")
+	ctrDir, err := ioutil.CreateNodeDir(outputDir, "linux")
 	if err != nil {
 		return err
 	}

@@ -2,12 +2,12 @@
 //
 // To display options and usage, invoke:
 //
-//   go run main.go -h
+//	go run main.go -h
 package main
 
 import (
 	"github.com/blueprint-uservices/blueprint/examples/train_ticket/wiring/specs"
-	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
+	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
@@ -17,7 +17,7 @@ func main() {
 
 	// Build a supported wiring spec
 	name := "TrainTicket"
-	wiringcmd.MakeAndExecute(
+	cmdbuilder.MakeAndExecute(
 		name,
 		specs.Docker,
 	)

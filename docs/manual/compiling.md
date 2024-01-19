@@ -17,7 +17,7 @@ Compilation follows three stages.
 In the first stage, the wiring spec is executed, which defines services and modifies them.  This corresponds to everything up to the `BuildIR` invocation in the wiring spec.  If using the cmdbuilder, Stage 1 will end by printing out the wiring spec definitions, e.g.
 
 ```
-[15:40:15.399] [plugins\wiringcmd\cmdbuilder.go:186] INFO: Constructed SockShop WiringSpec docker:
+[15:40:15.399] [plugins\cmdbuilder\cmdbuilder.go:186] INFO: Constructed SockShop WiringSpec docker:
 SockShop = WiringSpec {
   catalogue_proc.stdoutmetriccollector = stdoutMetricCollector()
   wlgen.service = workflowNode(ptr=[wlgen.service.client] -> [wlgen.service.wlgen.proc -> wlgen.service.dst])
@@ -32,7 +32,7 @@ SockShop = WiringSpec {
 The second stage corresponds to the `BuildIR` call, which constructs nodes representing different entities of the Blueprint application.  If there were any erroneous definitions, `BuildIR` can fail.  If using the cmdbuilder, Stage 2 will end by printing out the application IR, e.g.
 
 ```
-[15:04:25.607] [plugins\wiringcmd\cmdbuilder.go:190] INFO: SockShop docker IR:
+[15:04:25.607] [plugins\cmdbuilder\cmdbuilder.go:190] INFO: SockShop docker IR:
 SockShop = BlueprintApplication() {
   cart_db.addr
   cart_db.bind_addr = AddressConfig()

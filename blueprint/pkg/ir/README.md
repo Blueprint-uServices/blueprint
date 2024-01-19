@@ -75,7 +75,7 @@ func PrettyPrintNamespace(instanceName string, namespaceType string, argNodes []
 
 
 <a name="RegisterDefaultNamespace"></a>
-## func [RegisterDefaultNamespace](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/builders.go#L33>)
+## func [RegisterDefaultNamespace](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/builders.go#L44>)
 
 ```go
 func RegisterDefaultNamespace[T IRNode](name string, buildFunc func(outputDir string, nodes []IRNode) error)
@@ -84,7 +84,7 @@ func RegisterDefaultNamespace[T IRNode](name string, buildFunc func(outputDir st
 When building an application, any IR nodes of type T that reside within the top\-level application will be built using the specified buildFunc.
 
 <a name="ApplicationNode"></a>
-## type [ApplicationNode](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L64-L70>)
+## type [ApplicationNode](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L65-L71>)
 
 The IR Node that represents the whole application. Building a wiring spec will return an ApplicationNode. An ApplicationNode can be built with the GenerateArtifacts method.
 
@@ -99,7 +99,7 @@ type ApplicationNode struct {
 ```
 
 <a name="ApplicationNode.GenerateArtifacts"></a>
-### func \(\*ApplicationNode\) [GenerateArtifacts](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L81>)
+### func \(\*ApplicationNode\) [GenerateArtifacts](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L82>)
 
 ```go
 func (app *ApplicationNode) GenerateArtifacts(dir string) error
@@ -108,7 +108,7 @@ func (app *ApplicationNode) GenerateArtifacts(dir string) error
 
 
 <a name="ApplicationNode.Name"></a>
-### func \(\*ApplicationNode\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L72>)
+### func \(\*ApplicationNode\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L73>)
 
 ```go
 func (node *ApplicationNode) Name() string
@@ -117,7 +117,7 @@ func (node *ApplicationNode) Name() string
 
 
 <a name="ApplicationNode.String"></a>
-### func \(\*ApplicationNode\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L77>)
+### func \(\*ApplicationNode\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L78>)
 
 ```go
 func (node *ApplicationNode) String() string
@@ -126,7 +126,7 @@ func (node *ApplicationNode) String() string
 Print the IR graph
 
 <a name="ArtifactGenerator"></a>
-## type [ArtifactGenerator](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L55-L59>)
+## type [ArtifactGenerator](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L56-L60>)
 
 Most IRNodes can generate code artifacts but they do so in the context of some [BuildContext](<#BuildContext>). A few IRNodes, however, can generate artifacts independent of any external context. Those IRNodes implement the ArtifactGenerator interface. Typically these are namespace nodes such as golang processes, linux containers, or docker deployments.
 
@@ -153,7 +153,7 @@ type BuildContext interface {
 ```
 
 <a name="IRConfig"></a>
-## type [IRConfig](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L24-L35>)
+## type [IRConfig](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L25-L36>)
 
 IRConfig is an IR node that represents a configured or configurable variable. In a generated application, IRConfig nodes typically map down to things like environment variables or command line arguments, and can be passed all the way into specific application\-level instances. IRConfig is also used for addressing.
 
@@ -173,12 +173,13 @@ type IRConfig interface {
 ```
 
 <a name="IRMetadata"></a>
-## type [IRMetadata](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L16-L18>)
+## type [IRMetadata](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L16-L19>)
 
 Metadata is an IR node that exists in the IR of an application but does not build any artifacts or provide configuration or anything like that.
 
 ```go
 type IRMetadata interface {
+    IRNode
     ImplementsIRMetadata()
 }
 ```
@@ -214,7 +215,7 @@ func Remove[T any](nodes []IRNode) []IRNode
 Returns a slice containing all nodes except those of type T
 
 <a name="IRValue"></a>
-## type [IRValue](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L38-L40>)
+## type [IRValue](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L39-L41>)
 
 A hard\-coded value
 
@@ -225,7 +226,7 @@ type IRValue struct {
 ```
 
 <a name="IRValue.Name"></a>
-### func \(\*IRValue\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L42>)
+### func \(\*IRValue\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L43>)
 
 ```go
 func (v *IRValue) Name() string
@@ -234,7 +235,7 @@ func (v *IRValue) Name() string
 
 
 <a name="IRValue.String"></a>
-### func \(\*IRValue\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L46>)
+### func \(\*IRValue\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/ir/ir.go#L47>)
 
 ```go
 func (v *IRValue) String() string

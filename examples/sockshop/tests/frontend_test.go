@@ -2,6 +2,7 @@ package tests
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/cart"
@@ -9,7 +10,6 @@ import (
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/frontend"
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/user"
 	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/slices"
 )
@@ -283,7 +283,7 @@ func initCatalogue() error {
 	for _, sock := range socks {
 		_, err := s.AddSock(ctx, sock)
 		if err != nil {
-			return errors.Errorf("unable to add sock %v to catalogue due to %v", sock.Name, err.Error())
+			return fmt.Errorf("unable to add sock %v to catalogue due to %v", sock.Name, err.Error())
 		}
 	}
 

@@ -2,6 +2,7 @@ package specs
 
 import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/gotests"
 	"github.com/blueprint-uservices/blueprint/plugins/http"
@@ -9,7 +10,6 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/memcached"
 	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
 	"github.com/blueprint-uservices/blueprint/plugins/thrift"
-	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
@@ -17,7 +17,7 @@ import (
 // All services except the Wrk2API service use thrift for communication; WRK2API service provides the http frontend.
 // The user, socialgraph, urlshorten, and usertimeline services use MongoDB instances to store their data.
 // The user, socialgraph, urlshorten, usertimeine, and hometimeline services use memcached instances as the cache data for faster responses.
-var Docker = wiringcmd.SpecOption{
+var Docker = cmdbuilder.SpecOption{
 	Name:        "docker",
 	Description: "Deploys each service in a separate container with thrift, and uses mongodb as NoSQL database backends.",
 	Build:       makeDockerSpec,

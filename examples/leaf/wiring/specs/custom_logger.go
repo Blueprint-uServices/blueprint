@@ -4,32 +4,32 @@ import (
 	"strings"
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/http"
 	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
 	"github.com/blueprint-uservices/blueprint/plugins/simple"
-	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 	"github.com/blueprint-uservices/blueprint/plugins/xtrace"
 	"github.com/blueprint-uservices/blueprint/plugins/zipkin"
 )
 
-// Wiring specification demonstrates how to use a custom logger for Blueprint applications.
+// [Xtrace_Logger] demonstrates how to use a custom logger for Blueprint applications.
 // The wiring spec uses xtrace logger as the custom logger for demonstration.
 // Each service is deployed in a separate container with services communicating using HTTP.
 // Launches an XTrace server with each service wrapped in xtrace tracing.
-var Xtrace_Logger = wiringcmd.SpecOption{
+var Xtrace_Logger = cmdbuilder.SpecOption{
 	Name:        "xtrace_logger",
 	Description: "Deploys each service in a separate container, communicating using HTTP. Wraps each service in XTrace tracing and sets the XTraceLogger for each process.",
 	Build:       makeXTraceLoggerSpec,
 }
 
-// Wiring specification demonstrates how to use a custom logger for Blueprint applications.
+// [OT_Logger] demonstrates how to use a custom logger for Blueprint applications.
 // The wiring spec uses opentelemetry logger as the custom logger for demonstration.
 // Each service is deployed in a separate container with services communicating using HTTP.
 // Launches an zipkin server which collects spans generated from each service wrapped in opentelemetry tracing.
-var OT_Logger = wiringcmd.SpecOption{
+var OT_Logger = cmdbuilder.SpecOption{
 	Name:        "ot_logger",
 	Description: "Deploys each service in a separate container, communicating using HTTP. Wraps each service in opentelemetry tracing and sets the OTLogger for each process. All spans are collected by the zipkin collector.",
 	Build:       makeOTLoggerSpec,

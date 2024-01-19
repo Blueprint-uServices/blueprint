@@ -3,6 +3,7 @@ package specs
 import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/plugins/clientpool"
+	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/gotests"
 	"github.com/blueprint-uservices/blueprint/plugins/grpc"
@@ -13,7 +14,6 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
 	"github.com/blueprint-uservices/blueprint/plugins/retries"
 	"github.com/blueprint-uservices/blueprint/plugins/simple"
-	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 	"github.com/blueprint-uservices/blueprint/plugins/workload"
 	"github.com/blueprint-uservices/blueprint/plugins/zipkin"
@@ -28,7 +28,7 @@ import (
 // The user, cart, shipping, and orders services using separate MongoDB instances to store their data.
 // The catalogue service uses MySQL to store catalogue data.
 // The shipping service and queue master service run within the same process.
-var Docker = wiringcmd.SpecOption{
+var Docker = cmdbuilder.SpecOption{
 	Name:        "docker",
 	Description: "Deploys each service in a separate container with gRPC, and uses mongodb as NoSQL database backends.",
 	Build:       makeDockerSpec,
@@ -93,6 +93,6 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 	wlgen := workload.Generator(spec, "wlgen", "SimpleWorkload", frontend)
 
 	// Instantiate starting with the frontend which will trigger all other services to be instantiated
-	// Also include the tests
-	return []string{frontend, wlgen, "gotests"}, nil
+	// Also include the tests and wlgen
+	return []string{"frontend_ctr", wlgen, "gotests"}, nil
 }

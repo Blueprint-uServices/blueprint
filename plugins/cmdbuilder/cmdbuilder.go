@@ -1,4 +1,4 @@
-// Package wiringcmd is a helper package for building wiring spec command line programs.
+// Package cmdbuilder is a helper package for building wiring spec command line programs.
 // It doesn't provide any wiring spec commands or IR.
 //
 // The [CmdBuilder] struct enables an application to register multiple wiring spec options
@@ -23,7 +23,7 @@
 //		... // does wiring spec stuff
 //	}
 //
-//	var MySpec = wiringcmd.SpecOption{
+//	var MySpec = cmdbuilder.SpecOption{
 //		Name:        "myspec",
 //		Description: "My example wiring spec",
 //		Build:       buildMySpec,
@@ -31,12 +31,12 @@
 //
 // Lastly, in the main file, call [MakeAndExecute]:
 //
-//	wiringcmd.MakeAndExecute(
+//	cmdbuilder.MakeAndExecute(
 //		"MyApplication",
 //		MySpec
 //	)
 //
-// [MakeAndExecute] accepts any number of specs.  wiringcmd takes care of parsing command line args
+// [MakeAndExecute] accepts any number of specs.  cmdbuilder takes care of parsing command line args
 //
 // # Runtime Usage
 //
@@ -44,14 +44,14 @@
 //
 //	go run main.go -h
 //
-// The wiringcmd plugin takes care of argument parsing, and will list the wiring specs that can be compiled.
+// The cmdbuilder plugin takes care of argument parsing, and will list the wiring specs that can be compiled.
 //
 // To compile a spec, run
 //
 //	go run main.go -o build -w myspec
 //
 // [wiring/main.go]: https://github.com/Blueprint-uServices/blueprint/blob/main/examples/sockshop/wiring/main.go
-package wiringcmd
+package cmdbuilder
 
 import (
 	"flag"
@@ -63,6 +63,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/plugins/dockercompose"
+	"github.com/blueprint-uservices/blueprint/plugins/environment"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"golang.org/x/exp/slog"
@@ -87,6 +88,8 @@ type CmdBuilder struct {
 	OutputDir string
 	Quiet     bool
 	SpecName  string
+	Env       bool
+	Port      uint16
 	Spec      SpecOption
 	Wiring    wiring.WiringSpec
 	IR        *ir.ApplicationNode
@@ -129,12 +132,16 @@ func (b *CmdBuilder) ParseArgs() {
 	output_dir := flag.String("o", "", "Target output directory for compilation.")
 	spec_name := flag.String("w", "", "Wiring spec to compile.  One of:\n"+b.List())
 	quiet := flag.Bool("quiet", false, "Suppress verbose compiler output.")
+	env := flag.Bool("env", true, "Generate a .env file that sets service address and port environment variables")
+	port := flag.Uint("port", 12345, "Sets the port to start at when assigning service ports.  Only used when generating a .env file.")
 
 	flag.Parse()
 
 	b.OutputDir = *output_dir
 	b.Quiet = *quiet
 	b.SpecName = *spec_name
+	b.Env = *env
+	b.Port = uint16(*port)
 }
 
 func (b *CmdBuilder) ValidateArgs() error {
@@ -175,6 +182,9 @@ func (b *CmdBuilder) Build() error {
 	goproc.RegisterAsDefaultBuilder()
 	linuxcontainer.RegisterAsDefaultBuilder()
 	dockercompose.RegisterAsDefaultBuilder()
+	if b.Env {
+		environment.AssignPorts(b.Port)
+	}
 
 	// Define the wiring spec
 	slog.Info(fmt.Sprintf("Building %v-%v to %v", b.Name, b.SpecName, b.OutputDir))

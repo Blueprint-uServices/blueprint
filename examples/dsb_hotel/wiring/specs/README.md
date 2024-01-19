@@ -16,7 +16,7 @@ import "github.com/blueprint-uservices/blueprint/examples/dsb_hotel/wiring/specs
 <a name="Original"></a>Wiring spec that represents the original configuration of the HotelReservation application. Each service is deployed in a separate container with all inter\-service communication happening via GRPC. FrontEnd service provides a http frontend for making requests. All services are instrumented with opentelemetry tracing with spans being exported to a central Jaeger collector.
 
 ```go
-var Original = wiringcmd.SpecOption{
+var Original = cmdbuilder.SpecOption{
     Name:        "original",
     Description: "Deploys the original configuration of the DeathStarBench application.",
     Build:       makeOriginalSpec,

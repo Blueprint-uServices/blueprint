@@ -46,13 +46,16 @@
 // If the dockercompose deployment is not further combined by other plugins, then the entry point to running
 // your application will be using docker-compose.  You can build or run the deployment with:
 //
-//	docker-compose build
-//	docker-compose up
+//	docker compose build
+//	docker compose up
 //
-// Although the plugin automatically assigns and sets hostnames and ports for containers, you will still
-// need to set some environment variables for ports to expose on the local host.  If you try to build or run
-// the docker-compose file when these are absent, Docker will complain about their absence.  You can write
-// these to a .env file or set them in your local environment.
+// Many wiring specs generate .env files to set environment variables; you can point docker to these
+// .env files as follows:
+//
+//	docker compose --env-file=../.local.env build
+//
+// If you aren't using an env file like the above, Docker might complaion about the absence of necessary
+// environment variables.  You can manually write those to a .env file or set them in your local environment.
 //
 // For a concrete guide on running a generated docker-compose file, see the [SockShop Getting Started]
 // documentation.

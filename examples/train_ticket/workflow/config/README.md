@@ -22,7 +22,7 @@ package config implements ts\-config\-service from the train ticket application
 
 
 <a name="Config"></a>
-## type [Config](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/config/data.go#L3-L7>)
+## type [Config](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/config/data.go#L3-L7>)
 
 
 
@@ -35,7 +35,7 @@ type Config struct {
 ```
 
 <a name="ConfigService"></a>
-## type [ConfigService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L13-L24>)
+## type [ConfigService](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L13-L24>)
 
 Config Service manages Config variables in the application
 
@@ -55,7 +55,7 @@ type ConfigService interface {
 ```
 
 <a name="ConfigServiceImpl"></a>
-## type [ConfigServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L27-L29>)
+## type [ConfigServiceImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L27-L29>)
 
 Implementation of Config Service
 
@@ -66,7 +66,7 @@ type ConfigServiceImpl struct {
 ```
 
 <a name="NewConfigServiceImpl"></a>
-### func [NewConfigServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L32>)
+### func [NewConfigServiceImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L32>)
 
 ```go
 func NewConfigServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*ConfigServiceImpl, error)
@@ -75,7 +75,7 @@ func NewConfigServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*Confi
 Creates a new ConfigService object
 
 <a name="ConfigServiceImpl.Create"></a>
-### func \(\*ConfigServiceImpl\) [Create](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L36>)
+### func \(\*ConfigServiceImpl\) [Create](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L36>)
 
 ```go
 func (c *ConfigServiceImpl) Create(ctx context.Context, conf Config) error
@@ -84,7 +84,7 @@ func (c *ConfigServiceImpl) Create(ctx context.Context, conf Config) error
 
 
 <a name="ConfigServiceImpl.Delete"></a>
-### func \(\*ConfigServiceImpl\) [Delete](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L87>)
+### func \(\*ConfigServiceImpl\) [Delete](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L87>)
 
 ```go
 func (c *ConfigServiceImpl) Delete(ctx context.Context, name string) error
@@ -93,7 +93,7 @@ func (c *ConfigServiceImpl) Delete(ctx context.Context, name string) error
 
 
 <a name="ConfigServiceImpl.Find"></a>
-### func \(\*ConfigServiceImpl\) [Find](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L66>)
+### func \(\*ConfigServiceImpl\) [Find](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L66>)
 
 ```go
 func (c *ConfigServiceImpl) Find(ctx context.Context, name string) (Config, error)
@@ -102,7 +102,7 @@ func (c *ConfigServiceImpl) Find(ctx context.Context, name string) (Config, erro
 
 
 <a name="ConfigServiceImpl.FindAll"></a>
-### func \(\*ConfigServiceImpl\) [FindAll](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L96>)
+### func \(\*ConfigServiceImpl\) [FindAll](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L96>)
 
 ```go
 func (c *ConfigServiceImpl) FindAll(ctx context.Context) ([]Config, error)
@@ -111,7 +111,7 @@ func (c *ConfigServiceImpl) FindAll(ctx context.Context) ([]Config, error)
 
 
 <a name="ConfigServiceImpl.Update"></a>
-### func \(\*ConfigServiceImpl\) [Update](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L57>)
+### func \(\*ConfigServiceImpl\) [Update](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/config/configService.go#L57>)
 
 ```go
 func (c *ConfigServiceImpl) Update(ctx context.Context, conf Config) (bool, error)

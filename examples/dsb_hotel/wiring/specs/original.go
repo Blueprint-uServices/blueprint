@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/gotests"
 	"github.com/blueprint-uservices/blueprint/plugins/grpc"
@@ -13,7 +14,6 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/memcached"
 	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
 	"github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
-	"github.com/blueprint-uservices/blueprint/plugins/wiringcmd"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
@@ -21,7 +21,7 @@ import (
 // Each service is deployed in a separate container with all inter-service communication happening via GRPC.
 // FrontEnd service provides a http frontend for making requests.
 // All services are instrumented with opentelemetry tracing with spans being exported to a central Jaeger collector.
-var Original = wiringcmd.SpecOption{
+var Original = cmdbuilder.SpecOption{
 	Name:        "original",
 	Description: "Deploys the original configuration of the DeathStarBench application.",
 	Build:       makeOriginalSpec,

@@ -21,7 +21,7 @@ Package consignprice implements ts\-consignprice\-service from the original trai
 
 
 <a name="ConsignPrice"></a>
-## type [ConsignPrice](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/data.go#L3-L10>)
+## type [ConsignPrice](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/data.go#L3-L10>)
 
 
 
@@ -37,7 +37,7 @@ type ConsignPrice struct {
 ```
 
 <a name="ConsignPriceService"></a>
-## type [ConsignPriceService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/consignPriceService.go#L14-L23>)
+## type [ConsignPriceService](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/consignPriceService.go#L14-L23>)
 
 ConsignPriceService manages the prices of consignments
 
@@ -55,7 +55,7 @@ type ConsignPriceService interface {
 ```
 
 <a name="ConsignPriceServiceImpl"></a>
-## type [ConsignPriceServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/consignPriceService.go#L25-L27>)
+## type [ConsignPriceServiceImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/consignPriceService.go#L25-L27>)
 
 
 
@@ -66,7 +66,7 @@ type ConsignPriceServiceImpl struct {
 ```
 
 <a name="NewConsignPriceServiceImpl"></a>
-### func [NewConsignPriceServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/consignPriceService.go#L29>)
+### func [NewConsignPriceServiceImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/consignPriceService.go#L29>)
 
 ```go
 func NewConsignPriceServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (*ConsignPriceServiceImpl, error)
@@ -75,7 +75,7 @@ func NewConsignPriceServiceImpl(ctx context.Context, db backend.NoSQLDatabase) (
 
 
 <a name="ConsignPriceServiceImpl.CreateAndModifyPriceConfig"></a>
-### func \(\*ConsignPriceServiceImpl\) [CreateAndModifyPriceConfig](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/consignPriceService.go#L93>)
+### func \(\*ConsignPriceServiceImpl\) [CreateAndModifyPriceConfig](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/consignPriceService.go#L93>)
 
 ```go
 func (c *ConsignPriceServiceImpl) CreateAndModifyPriceConfig(ctx context.Context, priceConfig ConsignPrice) (ConsignPrice, error)
@@ -84,7 +84,7 @@ func (c *ConsignPriceServiceImpl) CreateAndModifyPriceConfig(ctx context.Context
 
 
 <a name="ConsignPriceServiceImpl.GetPriceByWeightAndRegion"></a>
-### func \(\*ConsignPriceServiceImpl\) [GetPriceByWeightAndRegion](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/consignPriceService.go#L33>)
+### func \(\*ConsignPriceServiceImpl\) [GetPriceByWeightAndRegion](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/consignPriceService.go#L33>)
 
 ```go
 func (c *ConsignPriceServiceImpl) GetPriceByWeightAndRegion(ctx context.Context, weight float64, isWithinRegion bool) (float64, error)
@@ -93,7 +93,7 @@ func (c *ConsignPriceServiceImpl) GetPriceByWeightAndRegion(ctx context.Context,
 
 
 <a name="ConsignPriceServiceImpl.GetPriceConfig"></a>
-### func \(\*ConsignPriceServiceImpl\) [GetPriceConfig](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/consignPriceService.go#L72>)
+### func \(\*ConsignPriceServiceImpl\) [GetPriceConfig](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/consignPriceService.go#L72>)
 
 ```go
 func (c *ConsignPriceServiceImpl) GetPriceConfig(ctx context.Context) (ConsignPrice, error)
@@ -102,7 +102,7 @@ func (c *ConsignPriceServiceImpl) GetPriceConfig(ctx context.Context) (ConsignPr
 
 
 <a name="ConsignPriceServiceImpl.GetPriceInfo"></a>
-### func \(\*ConsignPriceServiceImpl\) [GetPriceInfo](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/consignPriceService.go#L50>)
+### func \(\*ConsignPriceServiceImpl\) [GetPriceInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/consignprice/consignPriceService.go#L50>)
 
 ```go
 func (c *ConsignPriceServiceImpl) GetPriceInfo(ctx context.Context) (string, error)

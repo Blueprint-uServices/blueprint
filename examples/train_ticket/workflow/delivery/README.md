@@ -18,7 +18,7 @@ Package delivery implements ts\-delivery service from the original train ticket 
 
 
 <a name="Delivery"></a>
-## type [Delivery](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/delivery/data.go#L3-L9>)
+## type [Delivery](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/delivery/data.go#L3-L9>)
 
 
 
@@ -33,7 +33,7 @@ type Delivery struct {
 ```
 
 <a name="DeliveryService"></a>
-## type [DeliveryService](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/delivery/deliveryService.go#L16-L18>)
+## type [DeliveryService](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/delivery/deliveryService.go#L16-L18>)
 
 DeliveryService implements the Delivery microservice.
 
@@ -46,7 +46,7 @@ type DeliveryService interface {
 ```
 
 <a name="DeliveryServiceImpl"></a>
-## type [DeliveryServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/delivery/deliveryService.go#L20-L23>)
+## type [DeliveryServiceImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/delivery/deliveryService.go#L20-L23>)
 
 
 
@@ -57,7 +57,7 @@ type DeliveryServiceImpl struct {
 ```
 
 <a name="NewDeliveryServiceImpl"></a>
-### func [NewDeliveryServiceImpl](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/delivery/deliveryService.go#L25>)
+### func [NewDeliveryServiceImpl](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/delivery/deliveryService.go#L25>)
 
 ```go
 func NewDeliveryServiceImpl(ctx context.Context, queue backend.Queue, db backend.NoSQLDatabase) (*DeliveryServiceImpl, error)
@@ -66,7 +66,7 @@ func NewDeliveryServiceImpl(ctx context.Context, queue backend.Queue, db backend
 
 
 <a name="DeliveryServiceImpl.Run"></a>
-### func \(\*DeliveryServiceImpl\) [Run](<https://github.com/Blueprint-uServices/blueprint/blob/main/examples/train_ticket/workflow/delivery/deliveryService.go#L29>)
+### func \(\*DeliveryServiceImpl\) [Run](<https://github.com/blueprint-uservices/blueprint/blob/main/examples/train_ticket/workflow/delivery/deliveryService.go#L29>)
 
 ```go
 func (d *DeliveryServiceImpl) Run(ctx context.Context) error
