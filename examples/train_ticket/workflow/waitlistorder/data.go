@@ -8,12 +8,13 @@ type WaitlistOrder struct {
 	ContactDocType int
 	ContactDocNum  int
 	TrainNumber    string
-	SeatType       int
+	SeatType       int64
 	From           string
 	To             string
 	Price          string
 	WaitUtilTime   string
 	CreatedTime    string
+	TravelTime     string
 	Status         int
 }
 
@@ -25,6 +26,7 @@ type WaitlistOrderVO struct {
 	From      string
 	To        string
 	Price     string
+	ContactID string
 }
 
 const (

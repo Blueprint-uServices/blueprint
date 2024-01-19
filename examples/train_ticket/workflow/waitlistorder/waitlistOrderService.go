@@ -75,7 +75,39 @@ func (w *WaitlistOrderServiceImpl) FindOrderById(ctx context.Context, id string)
 }
 
 func (w *WaitlistOrderServiceImpl) Create(ctx context.Context, vo WaitlistOrderVO) (WaitlistOrder, error) {
-
+	coll, err := w.db.GetCollection(ctx, "waitlist", "waitlist")
+	if err != nil {
+		return WaitlistOrder{}, err
+	}
+	query := bson.D{{"$and", bson.A{
+		bson.D{{"accountid", vo.AccountID}},
+		bson.D{{"seattype", vo.SeatType}},
+		bson.D{{"trainnumber", vo.TripID}},
+		bson.D{{"traveltime", vo.Date}},
+		bson.D{{"from", vo.From}},
+		bson.D{{"to", vo.To}},
+		bson.D{{"contactid", vo.ContactID}},
+	}}}
+	res, err := coll.FindOne(ctx, query)
+	if err != nil {
+		return WaitlistOrder{}, err
+	}
+	var o WaitlistOrder
+	ok, err := res.One(ctx, &o)
+	if err != nil {
+		return WaitlistOrder{}, err
+	}
+	if ok {
+		return o, nil
+	}
+	o.From = vo.From
+	o.To = vo.To
+	o.Price = vo.Price
+	o.ContactID = vo.ContactID
+	o.AccountID = vo.AccountID
+	o.SeatType = vo.SeatType
+	o.TravelTime = vo.Date
+	return o, coll.InsertOne(ctx, o)
 }
 
 func (w *WaitlistOrderServiceImpl) UpdateOrder(ctx context.Context, o WaitlistOrder) error {
@@ -93,6 +125,19 @@ func (w *WaitlistOrderServiceImpl) UpdateOrder(ctx context.Context, o WaitlistOr
 	return nil
 }
 
-func (w *WaitlistOrderServiceImpl) ModifyWaitlistOrderStatus(ctx context.Context, orderId string, status int) error {
-
+func (w *WaitlistOrderServiceImpl) ModifyWaitlistOrderStatus(ctx context.Context, id string, status int) error {
+	coll, err := w.db.GetCollection(ctx, "waitlist", "waitlist")
+	if err != nil {
+		return err
+	}
+	query := bson.D{{"id", id}}
+	update := bson.D{{"$set", bson.D{{"status", status}}}}
+	n, err := coll.UpdateOne(ctx, query, update)
+	if err != nil {
+		return err
+	}
+	if n == 0 {
+		return errors.New("Failed to update waitlistorder")
+	}
+	return nil
 }
