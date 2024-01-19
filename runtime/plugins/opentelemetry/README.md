@@ -24,7 +24,7 @@ import "github.com/blueprint-uservices/blueprint/runtime/plugins/opentelemetry"
 
 
 <a name="OTTraceLogger"></a>
-## type [OTTraceLogger](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/opentelemetry/log.go#L16-L18>)
+## type [OTTraceLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/opentelemetry/log.go#L16-L18>)
 
 Implementation of the \[backend.Logger\] interface for backend.Tracer This logger converts each log statement into an event which is added to a current span. Note: This logger should only be used in conjunction with a backend.Tracer. Using this logger without using a backend.Tracer would result in no\-op logging behavior. Note: This implementation will not be the same as a future OpenTelemetry.Logger which is in beta\-testing for select languages \(not including Go\).
 
@@ -35,7 +35,7 @@ type OTTraceLogger struct {
 ```
 
 <a name="NewOTTraceLogger"></a>
-### func [NewOTTraceLogger](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/opentelemetry/log.go#L21>)
+### func [NewOTTraceLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/opentelemetry/log.go#L21>)
 
 ```go
 func NewOTTraceLogger(ctx context.Context) (*OTTraceLogger, error)
@@ -44,7 +44,7 @@ func NewOTTraceLogger(ctx context.Context) (*OTTraceLogger, error)
 Returns a new OTTraceLogger object
 
 <a name="OTTraceLogger.Debug"></a>
-### func \(\*OTTraceLogger\) [Debug](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/opentelemetry/log.go#L28>)
+### func \(\*OTTraceLogger\) [Debug](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/opentelemetry/log.go#L28>)
 
 ```go
 func (l *OTTraceLogger) Debug(ctx context.Context, format string, args ...any) (context.Context, error)
@@ -53,7 +53,7 @@ func (l *OTTraceLogger) Debug(ctx context.Context, format string, args ...any) (
 Implements backend.Logger
 
 <a name="OTTraceLogger.Error"></a>
-### func \(\*OTTraceLogger\) [Error](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/opentelemetry/log.go#L61>)
+### func \(\*OTTraceLogger\) [Error](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/opentelemetry/log.go#L61>)
 
 ```go
 func (l *OTTraceLogger) Error(ctx context.Context, format string, args ...any) (context.Context, error)
@@ -62,7 +62,7 @@ func (l *OTTraceLogger) Error(ctx context.Context, format string, args ...any) (
 Implements backend.Logger
 
 <a name="OTTraceLogger.Info"></a>
-### func \(\*OTTraceLogger\) [Info](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/opentelemetry/log.go#L39>)
+### func \(\*OTTraceLogger\) [Info](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/opentelemetry/log.go#L39>)
 
 ```go
 func (l *OTTraceLogger) Info(ctx context.Context, format string, args ...any) (context.Context, error)
@@ -71,7 +71,7 @@ func (l *OTTraceLogger) Info(ctx context.Context, format string, args ...any) (c
 Implements backend.Logger
 
 <a name="OTTraceLogger.Logf"></a>
-### func \(\*OTTraceLogger\) [Logf](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/opentelemetry/log.go#L72>)
+### func \(\*OTTraceLogger\) [Logf](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/opentelemetry/log.go#L72>)
 
 ```go
 func (l *OTTraceLogger) Logf(ctx context.Context, opts backend.LogOptions, format string, args ...any) (context.Context, error)
@@ -80,7 +80,7 @@ func (l *OTTraceLogger) Logf(ctx context.Context, opts backend.LogOptions, forma
 Implements backend.Logger
 
 <a name="OTTraceLogger.Warn"></a>
-### func \(\*OTTraceLogger\) [Warn](<https://github.com/Blueprint-uServices/blueprint/blob/main/runtime/plugins/opentelemetry/log.go#L50>)
+### func \(\*OTTraceLogger\) [Warn](<https://github.com/blueprint-uservices/blueprint/blob/main/runtime/plugins/opentelemetry/log.go#L50>)
 
 ```go
 func (l *OTTraceLogger) Warn(ctx context.Context, format string, args ...any) (context.Context, error)

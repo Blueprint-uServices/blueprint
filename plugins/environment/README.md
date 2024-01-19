@@ -32,7 +32,7 @@ USER_SERVICE_GRPC_BIND_ADDR=0.0.0.0:12345
 The plugin generates two different env files:
 
 - .local.env assumes all services will be deployed on a single machine; it uses localhost for dial hostnames and 0.0.0.0 for bind hostnames, e.g. localhost:12345 and 0.0.0.0:12345
-- .distributed.env uses the service name as dial hostname and 0.0.0.0 for bind hostname, e.g. user\_service:12345 and 0.0.0.0:12345
+- .env uses the service name as dial hostname and 0.0.0.0 for bind hostname, e.g. user\_service:12345 and 0.0.0.0:12345. To use this .env file you will need to ensure that service hostnames are mapped in your /etc/hosts or dns server.
 
 ### Running Artifacts
 
@@ -42,14 +42,22 @@ For example, if you are running a docker\-compose deployment, you can run:
 
 ```
 cd build
-source .local.env
+set -a
+. ./.local.env
 cd docker
 docker-compose up
 ```
 
+Or:
+
+```
+cd build/docker
+docker-compose --env-file=../.local.env build
+```
+
 Similarly, workload generator clients and tests will check environment variables for default values.
 
-If you are using .distributed.env then the hostnames for services will need to be mapped in your /etc/hosts file
+If you are using .distributed.env then the hostnames for services will need to be mapped in your /etc/hosts file or dns server.
 
 The plugin does not guarantee that the ports \(e.g. 12345\) are actually available for use on any machine. This is up to the user.
 
@@ -59,7 +67,7 @@ The plugin does not guarantee that the ports \(e.g. 12345\) are actually availab
 
 
 <a name="AssignPorts"></a>
-## func [AssignPorts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/environment/wiring.go#L56>)
+## func [AssignPorts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/environment/wiring.go#L69>)
 
 ```go
 func AssignPorts(initialPort uint16)

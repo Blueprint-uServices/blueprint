@@ -36,7 +36,7 @@ To deploy an application\-level service to a container, make sure you first depl
 
 Instead of explicitly combining process instances into a linux container, the linuxcontainer plugin can be configured as the default builder for process instances, by calling [RegisterAsDefaultBuilder](<#RegisterAsDefaultBuilder>) in your wiring spec.
 
-At compile time Blueprint will combine any process instances that exist in the wiring spec but aren't explicitly added to a linux container, and create a default linux container deployment with the name "linuxcontainer".
+At compile time Blueprint will combine any process instances that exist in the wiring spec but aren't explicitly added to a linux container, and create a default linux container deployment with the name "linux".
 
 ```
 linuxcontainer.RegisterAsDefaultBuilder()
@@ -133,7 +133,7 @@ RegisterAsDefaultBuilder should be invoked by a wiring spec if it wishes to use 
 
 If you are using the [cmdbuilder](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/cmdbuilder>), then linuxcontainer is automatically set as the default builder and you do not need to call this function.
 
-Default builders are responsible for building any process instances that exist in a wiring spec but aren't explicitly added to a container within that wiring spec. The Blueprint compiler groups these "floating" process instances into a default linux container with the name "linuxcontainer".
+Default builders are responsible for building any process instances that exist in a wiring spec but aren't explicitly added to a container within that wiring spec. The Blueprint compiler groups these "floating" process instances into a default linux container with the name "linux".
 
 <a name="Container"></a>
 ## type [Container](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/ir.go#L13-L24>)
