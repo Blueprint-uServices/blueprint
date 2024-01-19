@@ -283,7 +283,7 @@ func (b *NamespaceBuilder) parseFlags() {
 		if _, exists := b.buildFuncs[node.name]; exists {
 			slog.Warn(fmt.Sprintf("Ignoring command line arg for %v", node.name))
 		} else if *node.flag != "" {
-			if envValue != "" {
+			if envValue != "" && envValue != *node.flag {
 				slog.Warn(fmt.Sprintf("Using command line argument %v=%v and ignoring environment variable %v=%v", node.name, *node.flag, EnvVar(node.name), envValue))
 			}
 			b.Set(node.name, *node.flag)
@@ -297,7 +297,7 @@ func (b *NamespaceBuilder) parseFlags() {
 		if _, exists := b.buildFuncs[node.name]; exists {
 			slog.Warn(fmt.Sprintf("Ignoring command line arg for %v\n", node.name))
 		} else if *node.flag != "" {
-			if envValue != "" {
+			if envValue != "" && envValue != *node.flag {
 				slog.Warn(fmt.Sprintf("Using command line argument %v=%v and ignoring environment variable %v=%v", node.name, *node.flag, EnvVar(node.name), envValue))
 			}
 			b.Set(node.name, *node.flag)
