@@ -19,6 +19,15 @@ Currently we use `gomarkdoc` to auto-generate READMEs for the following:
 blueprint
 plugins
 runtime
+examples/*/workflow
+examples/*/wiring
+examples/*/workload
+```
+
+The following command, when run from the root of the blueprint repository, refreshes all documentation:
+
+```
+gomarkdoc --output '{{.Dir}}/README.md' --repository.default-branch main --repository.url https://github.com/blueprint-uservices/blueprint ./blueprint/... ./plugins/... ./runtime/... ./examples/.../wiring/... ./examples/.../workflow/... ./examples/.../workload/...
 ```
 
 For further information see the [gomarkdoc](https://github.com/princjef/gomarkdoc/tree/master) github repo.
