@@ -12,8 +12,6 @@ require (
 require golang.org/x/sys v0.14.0 // indirect
 
 require (
-	github.com/blueprint-uservices/blueprint/blueprint v0.0.0
+	github.com/blueprint-uservices/blueprint/blueprint v0.0.0-20240118214956-4c7cf2978ee5
 	golang.org/x/tools v0.15.0
 )
-
-replace github.com/blueprint-uservices/blueprint/blueprint => ../blueprint

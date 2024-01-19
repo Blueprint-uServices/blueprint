@@ -1,3 +1,5 @@
+github.com/blueprint-uservices/blueprint/blueprint v0.0.0-20240118214956-4c7cf2978ee5 h1:6QBBcQtj+xgRcxpIKt9YlzxhbXLaVIuK7QXO4HdLe/8=
+github.com/blueprint-uservices/blueprint/blueprint v0.0.0-20240118214956-4c7cf2978ee5/go.mod h1:zV7A7jdUp7+9i/ypOd3IPstNrXtf+KKZbcCYVF6PggU=
 github.com/otiai10/copy v1.11.0 h1:OKBD80J/mLBrwnzXqGtFCzprFSGioo30JcmR4APsNwc=
 github.com/otiai10/copy v1.11.0/go.mod h1:rSaLseMUsZFFbsFGc7wCJnnkTAvdc5L6VWxPE4308Ww=
 github.com/otiai10/mint v1.5.1 h1:XaPLeE+9vGbuyEHem1JNk3bYc7KKqyI/na0/mLd/Kks=
