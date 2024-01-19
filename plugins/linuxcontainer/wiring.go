@@ -30,7 +30,7 @@
 // configured as the default builder for process instances, by calling [RegisterAsDefaultBuilder] in your wiring spec.
 //
 // At compile time Blueprint will combine any process instances that exist in the wiring spec but aren't explicitly added to
-// a linux container, and create a default linux container deployment with the name "linuxcontainer".
+// a linux container, and create a default linux container deployment with the name "linux".
 //
 //	linuxcontainer.RegisterAsDefaultBuilder()
 //
