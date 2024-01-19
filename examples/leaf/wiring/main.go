@@ -10,7 +10,6 @@
 // To display usage, run
 //
 //	go run . -h
-
 package main
 
 import (

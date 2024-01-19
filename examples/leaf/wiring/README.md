@@ -6,6 +6,20 @@
 import "github.com/blueprint-uservices/blueprint/examples/leaf/wiring"
 ```
 
+Package main provides the LeafApp application, a simple application designed for demonstrating Blueprint usage and not as a realistic executable application.
+
+The wiring specs in the \[specs\] directory illustrate the usage of various Blueprint plugins.
+
+Leaf is also used by Blueprint developers while developing plugins.
+
+### Usage
+
+To display usage, run
+
+```
+go run . -h
+```
+
 ## Index
 
 
