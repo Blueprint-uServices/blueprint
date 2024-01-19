@@ -89,7 +89,7 @@ func AddToContainer(spec wiring.WiringSpec, containerName, childName string)
 AddToContainer can be used by wiring specs to add a process instance to an existing container deployment
 
 <a name="CreateContainer"></a>
-## func [CreateContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L116>)
+## func [CreateContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L118>)
 
 ```go
 func CreateContainer(spec wiring.WiringSpec, containerName string, children ...string) string
@@ -102,7 +102,7 @@ After calling CreateContainer, other processes can still be added to the contain
 After calling CreateContainer, any children that are services will become container\-level services that can now have container\-level modifiers applied to them, or can be added to container deployments like kubernetes pods.
 
 <a name="Deploy"></a>
-## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L99>)
+## func [Deploy](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L101>)
 
 ```go
 func Deploy(spec wiring.WiringSpec, serviceName string) string
@@ -121,6 +121,8 @@ user_srv => user_srv_ctr
 ```
 
 After calling [Deploy](<#Deploy>), serviceName will be a container\-level service.
+
+Returns the name of the container
 
 <a name="RegisterAsDefaultBuilder"></a>
 ## func [RegisterAsDefaultBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/defaults.go#L20>)
@@ -153,7 +155,7 @@ type Container struct {
 ```
 
 <a name="Container.Accepts"></a>
-### func \(\*Container\) [Accepts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L138>)
+### func \(\*Container\) [Accepts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L140>)
 
 ```go
 func (ctr *Container) Accepts(nodeType any) bool
@@ -180,7 +182,7 @@ func (node *Container) AddContainerInstance(target docker.ContainerWorkspace) er
 Implements dockerDeployer docker.ProvidesContainerInstance
 
 <a name="Container.AddEdge"></a>
-### func \(\*Container\) [AddEdge](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L144>)
+### func \(\*Container\) [AddEdge](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L146>)
 
 ```go
 func (ctr *Container) AddEdge(name string, edge ir.IRNode) error
@@ -189,7 +191,7 @@ func (ctr *Container) AddEdge(name string, edge ir.IRNode) error
 Implements \[wiring.NamespaceHandler\]
 
 <a name="Container.AddNode"></a>
-### func \(\*Container\) [AddNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L150>)
+### func \(\*Container\) [AddNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/linuxcontainer/wiring.go#L152>)
 
 ```go
 func (ctr *Container) AddNode(name string, node ir.IRNode) error
