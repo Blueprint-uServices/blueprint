@@ -34,6 +34,7 @@ import (
 func Collector(spec wiring.WiringSpec, collectorName string) string {
 	// The nodes that we are defining
 	collectorAddr := collectorName + ".addr"
+	collectorUIAddr := collectorName + ".ui.addr"
 	collectorCtr := collectorName + ".ctr"
 	collectorClient := collectorName + ".client"
 
@@ -44,6 +45,10 @@ func Collector(spec wiring.WiringSpec, collectorName string) string {
 			return nil, err
 		}
 		err = address.Bind[*JaegerCollectorContainer](ns, collectorAddr, collector, &collector.BindAddr)
+		if err != nil {
+			return nil, err
+		}
+		err = address.Bind[*JaegerCollectorContainer](ns, collectorUIAddr, collector, &collector.UIBindAddr)
 		return collector, err
 	})
 
@@ -51,9 +56,11 @@ func Collector(spec wiring.WiringSpec, collectorName string) string {
 	ptr := pointer.CreatePointer[*JaegerCollectorClient](spec, collectorName, collectorCtr)
 
 	// Define the address that points to the Jaeger collector
+	address.Define[*JaegerCollectorContainer](spec, collectorUIAddr, collectorCtr)
 	address.Define[*JaegerCollectorContainer](spec, collectorAddr, collectorCtr)
 
-	// Add the address to the pointer
+	// Add the addresses to the pointer
+	ptr.AddAddrModifier(spec, collectorUIAddr)
 	ptr.AddAddrModifier(spec, collectorAddr)
 
 	// Define the Jaeger client and add it to the client side of the pointer
