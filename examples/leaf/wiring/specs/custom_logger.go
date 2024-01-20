@@ -29,7 +29,7 @@ var Xtrace_Logger = cmdbuilder.SpecOption{
 // The wiring spec uses opentelemetry logger as the custom logger for demonstration.
 // Each service is deployed in a separate container with services communicating using HTTP.
 // Launches an jaeger server which collects spans generated from each service wrapped in opentelemetry tracing.
-var OT_Logger = wiringcmd.SpecOption{
+var OT_Logger = cmdbuilder.SpecOption{
 	Name:        "ot_logger",
 	Description: "Deploys each service in a separate container, communicating using HTTP. Wraps each service in opentelemetry tracing and sets the OTLogger for each process. All spans are collected by the jaeger collector.",
 	Build:       makeOTLoggerSpec,
