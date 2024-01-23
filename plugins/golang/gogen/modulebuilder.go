@@ -85,6 +85,12 @@ func (module *ModuleBuilderImpl) CreatePackage(packageName string) (golang.Packa
 }
 
 // Implements [golang.ModuleBuilder]
+func (module *ModuleBuilderImpl) Require(moduleName string, version string) error {
+	// TODO: track the module requires, and generate a go.mod file
+	return fmt.Errorf("not implemented")
+}
+
+// Implements [golang.ModuleBuilder]
 func (module *ModuleBuilderImpl) Workspace() golang.WorkspaceBuilder {
 	return module.workspace
 }

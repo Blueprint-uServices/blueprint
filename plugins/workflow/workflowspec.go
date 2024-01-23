@@ -33,6 +33,25 @@ type WorkflowSpecService struct {
 	Constructor *goparser.ParsedFunc
 }
 
+var parsedModules *goparser.ParsedModuleSet
+
+func init() {
+	// TODO: add Blueprint runtime stuff to parsedModules
+	parsedModules, _ = goparser.ParseModules()
+}
+
+// Returns the fully-qualified package path and shortname of the specified type
+func getTypePackageAndName[T any]() (string, string) {
+	t := reflect.TypeOf(new(T)).Elem()
+	return t.PkgPath(), t.Name()
+}
+
+func GetInterface[T any]() *goparser.ParsedInterface {
+	pkgPath, typeName := getTypePackageAndName[T]()
+
+	return goparser.ParseInterface(t)
+}
+
 // Parses the specified module directories and loads workflow specs from there.
 //
 // This will return an error if *any* of the provided srcModuleDirs are not valid Go modules

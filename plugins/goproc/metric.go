@@ -8,12 +8,12 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 	"golang.org/x/exp/slog"
 )
 
 type stdoutMetricCollector struct {
 	golang.Node
+	service.ServiceNode
 	golang.Instantiable
 
 	CollectorName string
@@ -32,42 +32,44 @@ func newStdOutMetricCollector(name string) (*stdoutMetricCollector, error) {
 }
 
 func (node *stdoutMetricCollector) init(name string) error {
-	workflow.Init("../../runtime")
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
+	// TODO: update this
+	return fmt.Errorf("not implemented")
+	// workflow.Init("../../runtime")
+	// spec, err := workflow.GetSpec()
+	// if err != nil {
+	// 	return err
+	// }
 
-	details, err := spec.Get("StdoutMetricCollector")
-	if err != nil {
-		return err
-	}
+	// details, err := spec.Get("StdoutMetricCollector")
+	// if err != nil {
+	// 	return err
+	// }
 
-	node.Iface = details.Iface
-	node.Constructor = details.Constructor.AsConstructor()
-	return nil
+	// node.Iface = details.Iface
+	// node.Constructor = details.Constructor.AsConstructor()
+	// return nil
 }
 
+// Implements ir.IRNode
 func (node *stdoutMetricCollector) Name() string {
 	return node.CollectorName
 }
 
+// Implements ir.IRNode
 func (node *stdoutMetricCollector) String() string {
 	return node.Name() + " = StdoutMetricCollector()"
 }
 
-func (node *stdoutMetricCollector) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
-}
+// Does not implement golang.ProvidesModule or golang.ProvidesInterface
+// because the stdout logger is implemented in the Blueprint runtime package
+// which is already included in the output by default.
 
-func (node *stdoutMetricCollector) AddInterfaces(builder golang.ModuleBuilder) error {
-	return node.AddToWorkspace(builder.Workspace())
-}
-
+// Implements service.ServiceNode
 func (node *stdoutMetricCollector) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.Iface.ServiceInterface(ctx), nil
 }
 
+// Implements golang.Instantiable
 func (node *stdoutMetricCollector) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.CollectorName) {
 		return nil

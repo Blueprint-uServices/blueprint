@@ -8,12 +8,12 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 	"golang.org/x/exp/slog"
 )
 
 type stdoutLogger struct {
 	golang.Node
+	service.ServiceNode
 	golang.Instantiable
 
 	LoggerName  string
@@ -32,42 +32,44 @@ func newStdoutLogger(name string) (*stdoutLogger, error) {
 }
 
 func (node *stdoutLogger) init(name string) error {
-	workflow.Init("../../runtime")
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
+	// TODO: update this
+	return fmt.Errorf("not implemented")
+	// workflow.Init("../../runtime")
+	// spec, err := workflow.GetSpec()
+	// if err != nil {
+	// 	return err
+	// }
 
-	details, err := spec.Get("SLogger")
-	if err != nil {
-		return err
-	}
+	// details, err := spec.Get("SLogger")
+	// if err != nil {
+	// 	return err
+	// }
 
-	node.Iface = details.Iface
-	node.Constructor = details.Constructor.AsConstructor()
-	return nil
+	// node.Iface = details.Iface
+	// node.Constructor = details.Constructor.AsConstructor()
+	// return nil
 }
 
+// Implements ir.IRNode
 func (node *stdoutLogger) Name() string {
 	return node.LoggerName
 }
 
+// Implements ir.IRNode
 func (node *stdoutLogger) String() string {
 	return node.Name() + " = SLogger()"
 }
 
-func (node *stdoutLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
-}
+// Does not implement golang.ProvidesModule or golang.ProvidesInterface
+// because the stdout logger is implemented in the Blueprint runtime package
+// which is already included in the output by default.
 
-func (node *stdoutLogger) AddInterfaces(builder golang.ModuleBuilder) error {
-	return node.AddToWorkspace(builder.Workspace())
-}
-
+// Implements service.ServiceNode
 func (node *stdoutLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.Iface.ServiceInterface(ctx), nil
 }
 
+// Implements golang.Instantiable
 func (node *stdoutLogger) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.LoggerName) {
 		return nil

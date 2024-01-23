@@ -78,14 +78,20 @@ func (node *SimpleBackend) GetInterface(ctx ir.BuildContext) (service.ServiceInt
 
 // Implements golang.ProvidesModule
 func (node *SimpleBackend) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	// The backend interface and impl implementation exist in the runtime package
-	// Add blueprint runtime to the workspace
-	return golang.AddRuntimeModule(builder)
+	// TODO: move runtime implementation into this package and out of Blueprint runtime package
+	//       afterwards, need to add interfaces from node.Iface and node.Constructor
+	return fmt.Errorf("not implemented")
+	// // The backend interface and impl implementation exist in the runtime package
+	// // Add blueprint runtime to the workspace
+	// return golang.AddRuntimeModule(builder)
 }
 
 // Implements golang.ProvidesInterface
 func (node *SimpleBackend) AddInterfaces(builder golang.ModuleBuilder) error {
-	return node.AddToWorkspace(builder.Workspace())
+	// TODO: move runtime implementation into this package and out of Blueprint runtime package
+	//       afterwards, need to add interfaces from node.Iface and node.Constructor
+	return fmt.Errorf("not implemented")
+	// return node.AddToWorkspace(builder.Workspace())
 }
 
 // Ipmlements golang.Instantiable

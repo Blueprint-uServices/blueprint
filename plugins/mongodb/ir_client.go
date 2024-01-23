@@ -35,10 +35,12 @@ func newMongoDBGoClient(name string, addr *address.DialConfig) (*MongoDBGoClient
 	return client, nil
 }
 
+// Implements ir.IRNode
 func (m *MongoDBGoClient) String() string {
 	return m.InstanceName + " = MongoClient(" + m.Addr.Name() + ")"
 }
 
+// Implements ir.IRNode
 func (m *MongoDBGoClient) Name() string {
 	return m.InstanceName
 }
@@ -63,18 +65,28 @@ func (node *MongoDBGoClient) init(name string) error {
 	return nil
 }
 
+// Implements service.ServiceNode
 func (n *MongoDBGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return n.Iface.ServiceInterface(ctx), nil
 }
 
+// Implements golang.ProvidesModule
 func (n *MongoDBGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
+	// TODO: move runtime implementation into this package and out of Blueprint runtime package
+	//       afterwards, need to add interfaces from node.Iface and node.Constructor
+	return fmt.Errorf("not implemented")
+	// return golang.AddRuntimeModule(builder)
 }
 
+// Implements golang.ProvidesInterface
 func (n *MongoDBGoClient) AddInterfaces(builder golang.ModuleBuilder) error {
-	return n.AddToWorkspace(builder.Workspace())
+	// TODO: move runtime implementation into this package and out of Blueprint runtime package
+	//       afterwards, need to add interfaces from node.Iface and node.Constructor
+	return fmt.Errorf("not implemented")
+	// return n.AddToWorkspace(builder.Workspace())
 }
 
+// Implements golang.Instantiable
 func (n *MongoDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(n.InstanceName) {
 		return nil

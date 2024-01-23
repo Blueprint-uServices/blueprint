@@ -1,13 +1,13 @@
 package golang
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
-	"golang.org/x/exp/slog"
 )
 
 // A convenience function that can be called by other Blueprint plugins.
@@ -44,11 +44,8 @@ func GetGoInterface(ctx ir.BuildContext, node ir.IRNode) (*gocode.ServiceInterfa
 // Ensures that Blueprint's [runtime] module is copied to the output workspace.
 //
 // [runtime]: https://github.com/Blueprint-uServices/blueprint/tree/main/runtime
-func AddRuntimeModule(workspace WorkspaceBuilder) error {
-	if !workspace.Visited("runtime") {
-		slog.Info("Copying local module runtime to workspace")
-		_, err := workspace.AddLocalModuleRelative("runtime", "../../runtime")
-		return err
-	}
-	return nil
+func AddRuntimeModule(module ModuleBuilder) error {
+	// TODO: find runtime module, copy it to workspace if it's local, or add versioned dependency to module if not
+	// TODO: push this into namespace impl so that plugins don't need to do it.
+	return fmt.Errorf("AddRuntimeModule not implemented")
 }

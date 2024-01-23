@@ -41,12 +41,14 @@ func newMySQLDBGoClient(name string, addr *address.DialConfig, username *ir.IRVa
 	return client, nil
 }
 
-func (m *MySQLDBGoClient) String() string {
-	return m.InstanceName + " = MySqlClient(" + m.Addr.Name() + ")"
-}
-
+// Implements ir.IRNode
 func (m *MySQLDBGoClient) Name() string {
 	return m.InstanceName
+}
+
+// Implements ir.IRNode
+func (m *MySQLDBGoClient) String() string {
+	return m.InstanceName + " = MySqlClient(" + m.Addr.Name() + ")"
 }
 
 func (m *MySQLDBGoClient) init(name string) error {
@@ -69,18 +71,28 @@ func (m *MySQLDBGoClient) init(name string) error {
 	return nil
 }
 
+// Implements service.ServiceNode
 func (m *MySQLDBGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return m.Iface.ServiceInterface(ctx), nil
 }
 
+// Implements golang.ProvidesModule
 func (m *MySQLDBGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
+	// TODO: move runtime implementation into this package and out of Blueprint runtime package
+	//       afterwards, need to add interfaces from node.Iface and node.Constructor
+	return fmt.Errorf("not implemented")
+	// return golang.AddRuntimeModule(builder)
 }
 
+// Implements golang.ProvidesInterface
 func (n *MySQLDBGoClient) AddInterfaces(builder golang.ModuleBuilder) error {
-	return n.AddToWorkspace(builder.Workspace())
+	// TODO: move runtime implementation into this package and out of Blueprint runtime package
+	//       afterwards, need to add interfaces from node.Iface and node.Constructor
+	return fmt.Errorf("not implemented")
+	// return n.AddToWorkspace(builder.Workspace())
 }
 
+// Implements golang.Instantiable
 func (m *MySQLDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(m.InstanceName) {
 		return nil

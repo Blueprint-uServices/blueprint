@@ -16,6 +16,7 @@ import (
 // Blueprint IR node representing a client to the jaeger container
 type JaegerCollectorClient struct {
 	golang.Node
+	service.ServiceNode
 	golang.Instantiable
 	ClientName string
 	ServerDial *address.DialConfig
@@ -36,10 +37,12 @@ func newJaegerCollectorClient(name string, addr *address.DialConfig) (*JaegerCol
 	return node, nil
 }
 
+// Implements ir.IRNode
 func (node *JaegerCollectorClient) Name() string {
 	return node.ClientName
 }
 
+// Implements ir.IRNode
 func (node *JaegerCollectorClient) String() string {
 	return node.Name() + " = JaegerClient(" + node.ServerDial.Name() + ")"
 }
@@ -63,6 +66,7 @@ func (node *JaegerCollectorClient) init(name string) error {
 	return nil
 }
 
+// Implements golang.Instantiable
 func (node *JaegerCollectorClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.ClientName) {
@@ -74,16 +78,25 @@ func (node *JaegerCollectorClient) AddInstantiation(builder golang.NamespaceBuil
 	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []ir.IRNode{node.ServerDial})
 }
 
+// Implements service.ServiceNode
 func (node *JaegerCollectorClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.Iface.ServiceInterface(ctx), nil
 }
 
+// Implements golang.ProvidesInterface
 func (node *JaegerCollectorClient) AddInterfaces(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
+	// TODO: move runtime implementation into this package and out of Blueprint runtime package
+	//       afterwards, need to add interfaces from node.Iface and node.Constructor
+	return fmt.Errorf("not implemented")
+	// return golang.AddRuntimeModule(builder)
 }
 
+// Implements golang.ProvidesModule
 func (node *JaegerCollectorClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
+	// TODO: move runtime implementation into this package and out of Blueprint runtime package
+	//       afterwards, need to add interfaces from node.Iface and node.Constructor
+	return fmt.Errorf("not implemented")
+	// return golang.AddRuntimeModule(builder)
 }
 
 func (node *JaegerCollectorClient) ImplementsGolangNode() {}

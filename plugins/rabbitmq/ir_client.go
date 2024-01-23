@@ -37,12 +37,14 @@ func newRabbitmqGoClient(name string, addr *address.DialConfig, queue_name *ir.I
 	return client, nil
 }
 
-func (n *RabbitmqGoClient) String() string {
-	return n.InstanceName + " = RabbitmqClient(" + n.Addr.Name() + ")"
-}
-
+// Implements ir.IRNode
 func (n *RabbitmqGoClient) Name() string {
 	return n.InstanceName
+}
+
+// Implements ir.IRNode
+func (n *RabbitmqGoClient) String() string {
+	return n.InstanceName + " = RabbitmqClient(" + n.Addr.Name() + ")"
 }
 
 func (n *RabbitmqGoClient) init(name string) error {
@@ -64,18 +66,28 @@ func (n *RabbitmqGoClient) init(name string) error {
 	return nil
 }
 
+// Implements service.ServiceNode
 func (n *RabbitmqGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return n.Iface.ServiceInterface(ctx), nil
 }
 
+// Implements golang.ProvidesModule
 func (n *RabbitmqGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
+	// TODO: move runtime implementation into this package and out of Blueprint runtime package
+	//       afterwards, need to add interfaces from node.Iface and node.Constructor
+	return fmt.Errorf("not implemented")
+	// return golang.AddRuntimeModule(builder)
 }
 
+// Implements golang.ProvidesInterface
 func (n *RabbitmqGoClient) AddInterfaces(builder golang.ModuleBuilder) error {
-	return n.AddToWorkspace(builder.Workspace())
+	// TODO: move runtime implementation into this package and out of Blueprint runtime package
+	//       afterwards, need to add interfaces from node.Iface and node.Constructor
+	return fmt.Errorf("not implemented")
+	// return n.AddToWorkspace(builder.Workspace())
 }
 
+// Implements golang.Instantiable
 func (n *RabbitmqGoClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(n.InstanceName) {
 		return nil

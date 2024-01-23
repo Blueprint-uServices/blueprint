@@ -62,11 +62,17 @@ func (node *XTraceLogger) String() string {
 }
 
 func (node *XTraceLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
+	// TODO: move runtime implementation into this package and out of Blueprint runtime package
+	//       afterwards, need to add interfaces from node.Iface and node.Constructor
+	return fmt.Errorf("not implemented")
+	// return golang.AddRuntimeModule(builder)
 }
 
 func (node *XTraceLogger) AddInterfaces(builder golang.ModuleBuilder) error {
-	return node.AddToWorkspace(builder.Workspace())
+	// TODO: move runtime implementation into this package and out of Blueprint runtime package
+	//       afterwards, need to add interfaces from node.Iface and node.Constructor
+	return fmt.Errorf("not implemented")
+	// return node.AddToWorkspace(builder.Workspace())
 }
 
 func (node *XTraceLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {

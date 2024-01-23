@@ -77,12 +77,16 @@ func (node *GoVecLoggerClient) AddInstantiation(builder golang.NamespaceBuilder)
 
 // Implements golang.ProvidesModule
 func (node *GoVecLoggerClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
+	// TODO: move govec logger implementation into this package
+	return fmt.Errorf("not implemented")
+	// return golang.AddRuntimeModule(builder)
 }
 
 // Implements golang.ProvidesInterface
 func (node *GoVecLoggerClient) AddInterfaces(builder golang.ModuleBuilder) error {
-	return node.AddToWorkspace(builder.Workspace())
+	// TODO: move govec logger implementation into this package
+	return fmt.Errorf("not implemented")
+	// return node.AddToWorkspace(builder.Workspace())
 }
 
 // Implements service.ServiceNode

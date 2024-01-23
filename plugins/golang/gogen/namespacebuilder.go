@@ -64,7 +64,7 @@ func NewNamespaceBuilder(module golang.ModuleBuilder, name, fileName, packagePat
 	}
 
 	// Add the runtime module as a dependency, in case it hasn't already
-	err = golang.AddRuntimeModule(module.Workspace())
+	err = golang.AddRuntimeModule(module)
 	if err != nil {
 		return nil, err
 	}
