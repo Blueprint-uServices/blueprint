@@ -2,8 +2,6 @@ go 1.20
 
 use (
 	./blueprint
-	./examples/leaf/wiring
-	./examples/leaf/workflow
 	./examples/sockshop/tests
 	./examples/sockshop/wiring
 	./examples/sockshop/workflow
@@ -21,4 +19,6 @@ use (
 	./runtime
 	./test/wiring
 	./test/workflow
+	./inittest/wiring
+	./inittest/workflow
 )
