@@ -2,6 +2,7 @@ package gocode
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	"golang.org/x/tools/go/packages"
@@ -64,6 +65,60 @@ func IsBasicType(name string) bool {
 	initBasics()
 	_, ok := basics[name]
 	return ok
+}
+
+// Returns a [UserType] for type T,
+func TypeOf[T any]() TypeName {
+	return typeof(reflect.TypeOf(new(T)).Elem())
+}
+
+// converts a reflect.type into the janky typename stuff we have here
+func typeof(t reflect.Type) TypeName {
+	switch t.Kind() {
+	case reflect.Array:
+		return &Slice{SliceOf: typeof(t.Elem())}
+	case reflect.Chan:
+		{
+			switch t.ChanDir() {
+			case reflect.RecvDir:
+				return &ReceiveChan{ReceiveType: typeof(t.Elem())}
+			case reflect.SendDir:
+				return &SendChan{SendType: typeof(t.Elem())}
+			case reflect.BothDir:
+				return &Chan{ChanOf: typeof(t.Elem())}
+			}
+		}
+	case reflect.Func:
+		return &FuncType{}
+	case reflect.Interface:
+		if t.Name() == "" {
+			return &InterfaceType{}
+		} else if t.PkgPath() == "" {
+			return &BasicType{Name: t.Name()}
+		} else {
+			return &UserType{Package: t.PkgPath(), Name: t.Name()}
+		}
+	case reflect.Map:
+		return &Map{KeyType: typeof(t.Key()), ValueType: typeof(t.Elem())}
+	case reflect.Ptr:
+		return &Pointer{PointerTo: typeof(t.Elem())}
+	case reflect.Slice:
+		return &Slice{SliceOf: typeof(t.Elem())}
+	case reflect.Struct:
+		if t.Name() == "" {
+			return &StructType{}
+		} else if t.PkgPath() == "" {
+			return &BasicType{Name: t.Name()}
+		} else {
+			return &UserType{Package: t.PkgPath(), Name: t.Name()}
+		}
+	}
+
+	if t.PkgPath() == "" {
+		return &BasicType{Name: t.Name()}
+	} else {
+		return &UserType{Package: t.PkgPath(), Name: t.Name()}
+	}
 }
 
 // Structs representing the different kinds of TypeName that you can have in Go
