@@ -119,6 +119,8 @@ type (
 func ParseModule(srcDir string) (*ParsedModule, error) {
 	srcDir = filepath.Clean(srcDir)
 
+	fmt.Println("Parsing module", srcDir)
+
 	modfilePath := filepath.Join(srcDir, "go.mod")
 	modfileData, err := os.ReadFile(modfilePath)
 	if err != nil {
