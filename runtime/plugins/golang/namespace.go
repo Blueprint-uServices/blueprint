@@ -13,10 +13,11 @@ import (
 	"os"
 	"os/signal"
 	"reflect"
+	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 
-	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slog"
@@ -141,7 +142,27 @@ func (b *NamespaceBuilder) Define(name string, build BuildFunc) {
 //
 // Punctuation is converted to underscores, and alpha are made uppercase.
 func EnvVar(name string) string {
-	return strings.ToUpper(ir.CleanName(name))
+	return strings.ToUpper(cleanName(name))
+}
+
+var r = regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
+
+// Returns name with only alphanumeric characters and all other
+// symbols converted to underscores.
+//
+// CleanName is primarily used by plugins to convert user-defined
+// service names into names that are valid as e.g. environment variables,
+// command line arguments, etc.
+func cleanName(name string) string {
+	cleanName := r.ReplaceAllString(name, "_")
+	for len(cleanName) > 0 {
+		if _, err := strconv.Atoi(cleanName[0:1]); err != nil {
+			return cleanName
+		} else {
+			cleanName = cleanName[1:]
+		}
+	}
+	return cleanName
 }
 
 // Indicates that name is a required node.  When the namespace is built,

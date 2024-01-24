@@ -74,7 +74,7 @@ func findModules(pkgName string) error {
 		if mod == nil {
 			continue
 		}
-		splits := strings.Split(pkgName, "/")
+		splits := strings.Split(mod.Path, "/")
 		info := &ModuleInfo{
 			ShortName: splits[len(splits)-1],
 			Path:      mod.Path,
