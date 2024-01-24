@@ -20,18 +20,18 @@
 // You can instantiate a service and give it a name by specifying either the name of the
 // service's interface, implementation, or constructor.
 //
-//	payment_service := workflow.Service(spec, "payment_service", "PaymentService")
+//	payment_service := workflow.Service[payment.PaymentService](spec, "payment_service")
 //
 // If a service has arguments (e.g. another service, a backend), then those arguments
 // can be added to the call:
 //
 //	user_db := simple.NoSQLDB(spec, "user_db")
-//	user_service := workflow.Service(spec, "user_service", "UserService", user_db)
+//	user_service := workflow.Service[user.UserService](spec, "user_service", user_db)
 //
 // If a service has configuration value arguments (e.g. a timeout) then string
 // values can be provided for those arguments:
 //
-//	payment_service := workflow.Service(spec, "payment_service", "PaymentService", "500")
+//	payment_service := workflow.Service[payment.PaymentService](spec, "payment_service", "500")
 //
 // The arguments provided to a service must match the arguments needed by the service's
 // constructor in the workflow spec.  If they do not match, you will see a compilation error.

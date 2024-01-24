@@ -74,7 +74,7 @@ workflow.Init("../workflow")
 Initialize a service that exists within the workflow spec.
 
 ```
-echo_service := workflow.Service(spec, "echo_service", "EchoService")
+echo_service := workflow.Service[workflow.EchoService](spec, "echo_service")
 ```
 
 In the above example, we create an instance of "EchoService" and we call it "echo_service".  For more details on creating services, see the [workflow](../../plugins/workflow) plugin documentation.

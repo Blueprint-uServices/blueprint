@@ -95,14 +95,14 @@ func (s *workloadGen) ImplementsSimpleWorkload(context.Context) error {
 
 ## Index
 
-- [func Generator\(spec wiring.WiringSpec, name string, workloadType string, workloadArgs ...string\) string](<#Generator>)
+- [func Generator\[GeneratorType any\]\(spec wiring.WiringSpec, name string, workloadArgs ...string\) string](<#Generator>)
 
 
 <a name="Generator"></a>
 ## func [Generator](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workload/wiring.go#L115>)
 
 ```go
-func Generator(spec wiring.WiringSpec, name string, workloadType string, workloadArgs ...string) string
+func Generator[GeneratorType any](spec wiring.WiringSpec, name string, workloadArgs ...string) string
 ```
 
 [Generator](<#Generator>) can be used by wiring specs to build an executable workload generator.

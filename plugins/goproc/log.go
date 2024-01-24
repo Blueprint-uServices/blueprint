@@ -39,9 +39,15 @@ func (node *stdoutLogger) String() string {
 	return node.Name() + " = SLogger()"
 }
 
-// Does not implement golang.ProvidesModule or golang.ProvidesInterface
-// because the stdout logger is implemented in the Blueprint runtime package
-// which is already included in the output by default.
+// Implements golang.ProvidesModule
+func (node *stdoutLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error {
+	return node.Spec.AddToWorkspace(builder)
+}
+
+// Implements golang.ProvidesInterface
+func (node *stdoutLogger) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.Spec.AddToModule(builder)
+}
 
 // Implements service.ServiceNode
 func (node *stdoutLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {

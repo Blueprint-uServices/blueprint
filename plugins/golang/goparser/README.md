@@ -13,6 +13,11 @@ It is used by Blueprint to parse workflow specs.
 ## Index
 
 - [func ExprStr\(e ast.Expr\) string](<#ExprStr>)
+- [type ModuleInfo](<#ModuleInfo>)
+  - [func FindModule\[T any\]\(\) \(\*ModuleInfo, \*gocode.UserType, error\)](<#FindModule>)
+  - [func FindPackageModule\(pkgName string\) \(\*ModuleInfo, error\)](<#FindPackageModule>)
+  - [func GetModuleInfo\(moduleName string\) \(\*ModuleInfo, error\)](<#GetModuleInfo>)
+  - [func \(m \*ModuleInfo\) String\(\) string](<#ModuleInfo.String>)
 - [type ParsedField](<#ParsedField>)
   - [func \(f \*ParsedField\) Parse\(\) error](<#ParsedField.Parse>)
   - [func \(f \*ParsedField\) String\(\) string](<#ParsedField.String>)
@@ -38,10 +43,14 @@ It is used by Blueprint to parse workflow specs.
   - [func \(mod \*ParsedModule\) Load\(\) error](<#ParsedModule.Load>)
   - [func \(mod \*ParsedModule\) String\(\) string](<#ParsedModule.String>)
 - [type ParsedModuleSet](<#ParsedModuleSet>)
-  - [func ParseModules\(srcDirs ...string\) \(\*ParsedModuleSet, error\)](<#ParseModules>)
-  - [func ParseWorkspace\(workspaceDir string\) \(\*ParsedModuleSet, error\)](<#ParseWorkspace>)
+  - [func New\(parent \*ParsedModuleSet\) \*ParsedModuleSet](<#New>)
+  - [func \(set \*ParsedModuleSet\) Add\(info \*ModuleInfo\) \(\*ParsedModule, error\)](<#ParsedModuleSet.Add>)
   - [func \(set \*ParsedModuleSet\) AddModule\(srcDir string\) \(\*ParsedModule, error\)](<#ParsedModuleSet.AddModule>)
-  - [func \(set \*ParsedModuleSet\) GetPackage\(name string\) \*ParsedPackage](<#ParsedModuleSet.GetPackage>)
+  - [func \(set \*ParsedModuleSet\) AddModules\(srcDirs ...string\) error](<#ParsedModuleSet.AddModules>)
+  - [func \(set \*ParsedModuleSet\) AddWorkspace\(workspaceDir string\) error](<#ParsedModuleSet.AddWorkspace>)
+  - [func \(set \*ParsedModuleSet\) FindInterface\(pkgName string, name string\) \(\*ParsedInterface, error\)](<#ParsedModuleSet.FindInterface>)
+  - [func \(set \*ParsedModuleSet\) FindStruct\(pkgName string, name string\) \(\*ParsedStruct, error\)](<#ParsedModuleSet.FindStruct>)
+  - [func \(set \*ParsedModuleSet\) GetPackage\(name string\) \(\*ParsedPackage, error\)](<#ParsedModuleSet.GetPackage>)
   - [func \(set \*ParsedModuleSet\) String\(\) string](<#ParsedModuleSet.String>)
 - [type ParsedPackage](<#ParsedPackage>)
   - [func \(pkg \*ParsedPackage\) Load\(\) error](<#ParsedPackage.Load>)
@@ -62,8 +71,60 @@ func ExprStr(e ast.Expr) string
 
 Returns a string representation of an expr and its internals Useful for debugging golang code parsers.
 
+<a name="ModuleInfo"></a>
+## type [ModuleInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/module.go#L14-L21>)
+
+Metadata about a module, such as its version and location on the local file system.
+
+```go
+type ModuleInfo struct {
+    ShortName string           // The last part of the module path
+    Path      string           // Fully qualified name of the module
+    Version   string           // Version of the module
+    Dir       string           // Directory containing the module source
+    IsLocal   bool             // True if the module is local (ie with a replace directive), false if it's from gocache
+    GoModule  *packages.Module // The underlying golang module from [golang.org/x/tools/go/packages]
+}
+```
+
+<a name="FindModule"></a>
+### func [FindModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/module.go#L107>)
+
+```go
+func FindModule[T any]() (*ModuleInfo, *gocode.UserType, error)
+```
+
+Finds and returns the module info for a type.
+
+<a name="FindPackageModule"></a>
+### func [FindPackageModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/module.go#L65>)
+
+```go
+func FindPackageModule(pkgName string) (*ModuleInfo, error)
+```
+
+Get the module info for a package.
+
+<a name="GetModuleInfo"></a>
+### func [GetModuleInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/module.go#L32>)
+
+```go
+func GetModuleInfo(moduleName string) (*ModuleInfo, error)
+```
+
+Get the info for a module. Better than reading the go.mod. Better than calling FindPackageModule because the root of the module doesn't need to be a golang package.
+
+<a name="ModuleInfo.String"></a>
+### func \(\*ModuleInfo\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/module.go#L23>)
+
+```go
+func (m *ModuleInfo) String() string
+```
+
+
+
 <a name="ParsedField"></a>
-## type [ParsedField](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L116-L121>)
+## type [ParsedField](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L110-L115>)
 
 
 
@@ -77,7 +138,7 @@ type ParsedField struct {
 ```
 
 <a name="ParsedField.Parse"></a>
-### func \(\*ParsedField\) [Parse](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L361>)
+### func \(\*ParsedField\) [Parse](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L314>)
 
 ```go
 func (f *ParsedField) Parse() error
@@ -86,7 +147,7 @@ func (f *ParsedField) Parse() error
 
 
 <a name="ParsedField.String"></a>
-### func \(\*ParsedField\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L863>)
+### func \(\*ParsedField\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L826>)
 
 ```go
 func (f *ParsedField) String() string
@@ -95,7 +156,7 @@ func (f *ParsedField) String() string
 
 
 <a name="ParsedFile"></a>
-## type [ParsedFile](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L69-L77>)
+## type [ParsedFile](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L63-L71>)
 
 
 
@@ -112,7 +173,7 @@ type ParsedFile struct {
 ```
 
 <a name="ParsedFile.LoadFuncs"></a>
-### func \(\*ParsedFile\) [LoadFuncs](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L674>)
+### func \(\*ParsedFile\) [LoadFuncs](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L627>)
 
 ```go
 func (f *ParsedFile) LoadFuncs() error
@@ -125,7 +186,7 @@ Loads the names of all funcs. If the func has a receiver type, then it is saved 
 This does not parse the arguments or returns of the func
 
 <a name="ParsedFile.LoadImports"></a>
-### func \(\*ParsedFile\) [LoadImports](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L505>)
+### func \(\*ParsedFile\) [LoadImports](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L458>)
 
 ```go
 func (f *ParsedFile) LoadImports() error
@@ -134,7 +195,7 @@ func (f *ParsedFile) LoadImports() error
 
 
 <a name="ParsedFile.LoadStructsAndInterfaces"></a>
-### func \(\*ParsedFile\) [LoadStructsAndInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L542>)
+### func \(\*ParsedFile\) [LoadStructsAndInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L495>)
 
 ```go
 func (f *ParsedFile) LoadStructsAndInterfaces() error
@@ -151,7 +212,7 @@ Does not:
 - look for function declarations
 
 <a name="ParsedFile.LoadVars"></a>
-### func \(\*ParsedFile\) [LoadVars](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L641>)
+### func \(\*ParsedFile\) [LoadVars](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L594>)
 
 ```go
 func (f *ParsedFile) LoadVars() error
@@ -162,7 +223,7 @@ Looks for:
 - vars declared
 
 <a name="ParsedFile.ResolveIdent"></a>
-### func \(\*ParsedFile\) [ResolveIdent](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L419>)
+### func \(\*ParsedFile\) [ResolveIdent](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L372>)
 
 ```go
 func (f *ParsedFile) ResolveIdent(name string, typeParams ...string) gocode.TypeName
@@ -177,7 +238,7 @@ An ident can be:
 - a generic type from a struct or func's type params
 
 <a name="ParsedFile.ResolveSelector"></a>
-### func \(\*ParsedFile\) [ResolveSelector](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L447>)
+### func \(\*ParsedFile\) [ResolveSelector](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L400>)
 
 ```go
 func (f *ParsedFile) ResolveSelector(packageShortName string, name string) gocode.TypeName
@@ -186,7 +247,7 @@ func (f *ParsedFile) ResolveSelector(packageShortName string, name string) gocod
 
 
 <a name="ParsedFile.ResolveType"></a>
-### func \(\*ParsedFile\) [ResolveType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L459>)
+### func \(\*ParsedFile\) [ResolveType](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L412>)
 
 ```go
 func (f *ParsedFile) ResolveType(expr ast.Expr, typeParams ...string) gocode.TypeName
@@ -195,7 +256,7 @@ func (f *ParsedFile) ResolveType(expr ast.Expr, typeParams ...string) gocode.Typ
 If the expr is in the context of a generic struct or func, typeParams provides the additional named type params
 
 <a name="ParsedFile.String"></a>
-### func \(\*ParsedFile\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L809>)
+### func \(\*ParsedFile\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L772>)
 
 ```go
 func (f *ParsedFile) String() string
@@ -204,7 +265,7 @@ func (f *ParsedFile) String() string
 
 
 <a name="ParsedFunc"></a>
-## type [ParsedFunc](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L98-L102>)
+## type [ParsedFunc](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L92-L96>)
 
 
 
@@ -217,7 +278,7 @@ type ParsedFunc struct {
 ```
 
 <a name="ParsedFunc.AsConstructor"></a>
-### func \(\*ParsedFunc\) [AsConstructor](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L768>)
+### func \(\*ParsedFunc\) [AsConstructor](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L721>)
 
 ```go
 func (f *ParsedFunc) AsConstructor() *gocode.Constructor
@@ -226,7 +287,7 @@ func (f *ParsedFunc) AsConstructor() *gocode.Constructor
 
 
 <a name="ParsedFunc.Parse"></a>
-### func \(\*ParsedFunc\) [Parse](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L369>)
+### func \(\*ParsedFunc\) [Parse](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L322>)
 
 ```go
 func (f *ParsedFunc) Parse() error
@@ -235,7 +296,7 @@ func (f *ParsedFunc) Parse() error
 
 
 <a name="ParsedFunc.String"></a>
-### func \(\*ParsedFunc\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L844>)
+### func \(\*ParsedFunc\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L807>)
 
 ```go
 func (f *ParsedFunc) String() string
@@ -244,7 +305,7 @@ func (f *ParsedFunc) String() string
 
 
 <a name="ParsedImport"></a>
-## type [ParsedImport](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L111-L114>)
+## type [ParsedImport](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L105-L108>)
 
 
 
@@ -256,7 +317,7 @@ type ParsedImport struct {
 ```
 
 <a name="ParsedInterface"></a>
-## type [ParsedInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L91-L96>)
+## type [ParsedInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L85-L90>)
 
 
 
@@ -270,7 +331,7 @@ type ParsedInterface struct {
 ```
 
 <a name="ParsedInterface.ServiceInterface"></a>
-### func \(\*ParsedInterface\) [ServiceInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L752>)
+### func \(\*ParsedInterface\) [ServiceInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L705>)
 
 ```go
 func (iface *ParsedInterface) ServiceInterface(ctx ir.BuildContext) *gocode.ServiceInterface
@@ -279,7 +340,7 @@ func (iface *ParsedInterface) ServiceInterface(ctx ir.BuildContext) *gocode.Serv
 
 
 <a name="ParsedInterface.String"></a>
-### func \(\*ParsedInterface\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L834>)
+### func \(\*ParsedInterface\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L797>)
 
 ```go
 func (i *ParsedInterface) String() string
@@ -288,7 +349,7 @@ func (i *ParsedInterface) String() string
 
 
 <a name="ParsedInterface.Type"></a>
-### func \(\*ParsedInterface\) [Type](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L738>)
+### func \(\*ParsedInterface\) [Type](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L691>)
 
 ```go
 func (iface *ParsedInterface) Type() *gocode.UserType
@@ -297,23 +358,24 @@ func (iface *ParsedInterface) Type() *gocode.UserType
 
 
 <a name="ParsedModule"></a>
-## type [ParsedModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L45-L52>)
+## type [ParsedModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L38-L46>)
 
 
 
 ```go
 type ParsedModule struct {
-    ModuleSet *ParsedModuleSet
+    ShortName string                    // Short name of the module
     Name      string                    // Fully qualified name of the module
     Version   string                    // Version of the module
     SrcDir    string                    // Fully qualified location of the module on the filesystem
+    IsLocal   bool                      // Is this a local module or from the go cache?
     Modfile   *modfile.File             // The modfile File struct is sufficiently simple that we just use it directly
     Packages  map[string]*ParsedPackage // Map from fully qualified package name to ParsedPackage
 }
 ```
 
 <a name="ParsedModule.Load"></a>
-### func \(\*ParsedModule\) [Load](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L214>)
+### func \(\*ParsedModule\) [Load](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L167>)
 
 ```go
 func (mod *ParsedModule) Load() error
@@ -322,7 +384,7 @@ func (mod *ParsedModule) Load() error
 
 
 <a name="ParsedModule.String"></a>
-### func \(\*ParsedModule\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L783>)
+### func \(\*ParsedModule\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L736>)
 
 ```go
 func (mod *ParsedModule) String() string
@@ -331,54 +393,116 @@ func (mod *ParsedModule) String() string
 
 
 <a name="ParsedModuleSet"></a>
-## type [ParsedModuleSet](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L30-L32>)
+## type [ParsedModuleSet](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/moduleset.go#L12-L16>)
 
-A set of modules on the local filesystem that contain workflow spec interfaces and implementations. It is allowed for a workflow spec implementation in one package to use the interface defined in another package. However, currently, it is not possible to use workflow spec nodes whose interface or implementation comes entirely from an external module \(ie. a module that exists only as a 'require' directive of a go.mod\)
+Represents a set of code modules that have been parsed.
 
 ```go
 type ParsedModuleSet struct {
-    Modules map[string]*ParsedModule // Map from FQ module name to module object
+    Modules    map[string]*ParsedModule // Map from FQ module name to module object
+    ModuleDirs map[string]*ParsedModule // Map from module SrcDir to module object
+    Parent     *ParsedModuleSet         // Another module set to consult for modules if not present in this one
 }
 ```
 
-<a name="ParseModules"></a>
-### func [ParseModules](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L155>)
+<a name="New"></a>
+### func [New](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/moduleset.go#L19>)
 
 ```go
-func ParseModules(srcDirs ...string) (*ParsedModuleSet, error)
+func New(parent *ParsedModuleSet) *ParsedModuleSet
 ```
 
-Parse the specified module directories
+Returns a new [\\\*ParsedModuleSet](<#ParsedModuleSet>), optionally with a parent module set, which can be nil.
 
-<a name="ParseWorkspace"></a>
-### func [ParseWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L136>)
+<a name="ParsedModuleSet.Add"></a>
+### func \(\*ParsedModuleSet\) [Add](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/moduleset.go#L31>)
 
 ```go
-func ParseWorkspace(workspaceDir string) (*ParsedModuleSet, error)
+func (set *ParsedModuleSet) Add(info *ModuleInfo) (*ParsedModule, error)
 ```
 
-Parse all modules in the specified directory
+Adds a module to the parsed module set. This is the preferred method for adding modules, versus \[AddModule\].
+
+info for a module can be acquired by calling [FindPackageModule](<#FindPackageModule>) or [FindModule](<#FindModule>)
 
 <a name="ParsedModuleSet.AddModule"></a>
-### func \(\*ParsedModuleSet\) [AddModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L185>)
+### func \(\*ParsedModuleSet\) [AddModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/moduleset.go#L51>)
 
 ```go
 func (set *ParsedModuleSet) AddModule(srcDir string) (*ParsedModule, error)
 ```
 
+Manually parse and add a module to the parsed module set
 
+If the srcDir has already been parsed, then this function will do nothing.
 
-<a name="ParsedModuleSet.GetPackage"></a>
-### func \(\*ParsedModuleSet\) [GetPackage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L124>)
+If \[set.Parent\] is not nil, then the module will be copied from \[set.Parent\] rather than re\-parsed.
+
+If \[set\] already contains a module with the same FQ module name as the one in srcDir then this function will return an error.
+
+The parsed module will be assumed to be a local module; if it is not, then set \[IsLocal\] to false
+
+<a name="ParsedModuleSet.AddModules"></a>
+### func \(\*ParsedModuleSet\) [AddModules](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/moduleset.go#L64>)
 
 ```go
-func (set *ParsedModuleSet) GetPackage(name string) *ParsedPackage
+func (set *ParsedModuleSet) AddModules(srcDirs ...string) error
 ```
 
+Manually parse and add multiple modules to the set.
 
+Equivalent to calling \[AddModule\] for each srcDir. If a srcDir has already been parsed then it will not be re\-parsed.
+
+Returns an error if any of the modules cannot be parsed.
+
+<a name="ParsedModuleSet.AddWorkspace"></a>
+### func \(\*ParsedModuleSet\) [AddWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/moduleset.go#L109>)
+
+```go
+func (set *ParsedModuleSet) AddWorkspace(workspaceDir string) error
+```
+
+Parses and adds all modules in the specified workspaceDir
+
+<a name="ParsedModuleSet.FindInterface"></a>
+### func \(\*ParsedModuleSet\) [FindInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/moduleset.go#L188>)
+
+```go
+func (set *ParsedModuleSet) FindInterface(pkgName string, name string) (*ParsedInterface, error)
+```
+
+Looks up the specified interface, possibly searching for and parsing the package.
+
+Returns an error if the package cannot be found or parsed.
+
+Returns the [\\\*ParsedInterface](<#ParsedInterface>) if found, or nil if no such interface exists in the package.
+
+<a name="ParsedModuleSet.FindStruct"></a>
+### func \(\*ParsedModuleSet\) [FindStruct](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/moduleset.go#L171>)
+
+```go
+func (set *ParsedModuleSet) FindStruct(pkgName string, name string) (*ParsedStruct, error)
+```
+
+Looks up the specified struct, possibly searching for and parsing the package.
+
+Returns an error if the package cannot be found or parsed.
+
+Returns the [\\\*ParsedStruct](<#ParsedStruct>) if found, or nil if no such struct exists in the package.
+
+<a name="ParsedModuleSet.GetPackage"></a>
+### func \(\*ParsedModuleSet\) [GetPackage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/moduleset.go#L129>)
+
+```go
+func (set *ParsedModuleSet) GetPackage(name string) (*ParsedPackage, error)
+```
+
+Gets the [\\\*ParsedPackage](<#ParsedPackage>) for the specified name, possibly searching for and parsing the package.
+
+This method will return an error if the package was not found, or if there was a parse error
 
 <a name="ParsedModuleSet.String"></a>
-### func \(\*ParsedModuleSet\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L775>)
+### func \(\*ParsedModuleSet\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L728>)
 
 ```go
 func (set *ParsedModuleSet) String() string
@@ -387,7 +511,7 @@ func (set *ParsedModuleSet) String() string
 
 
 <a name="ParsedPackage"></a>
-## type [ParsedPackage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L54-L67>)
+## type [ParsedPackage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L48-L61>)
 
 
 
@@ -409,7 +533,7 @@ type ParsedPackage struct {
 ```
 
 <a name="ParsedPackage.Load"></a>
-### func \(\*ParsedPackage\) [Load](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L273>)
+### func \(\*ParsedPackage\) [Load](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L226>)
 
 ```go
 func (pkg *ParsedPackage) Load() error
@@ -418,7 +542,7 @@ func (pkg *ParsedPackage) Load() error
 
 
 <a name="ParsedPackage.Parse"></a>
-### func \(\*ParsedPackage\) [Parse](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L327>)
+### func \(\*ParsedPackage\) [Parse](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L280>)
 
 ```go
 func (pkg *ParsedPackage) Parse() error
@@ -427,7 +551,7 @@ func (pkg *ParsedPackage) Parse() error
 
 
 <a name="ParsedPackage.String"></a>
-### func \(\*ParsedPackage\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L795>)
+### func \(\*ParsedPackage\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L748>)
 
 ```go
 func (pkg *ParsedPackage) String() string
@@ -436,7 +560,7 @@ func (pkg *ParsedPackage) String() string
 
 
 <a name="ParsedStruct"></a>
-## type [ParsedStruct](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L79-L89>)
+## type [ParsedStruct](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L73-L83>)
 
 
 
@@ -455,7 +579,7 @@ type ParsedStruct struct {
 ```
 
 <a name="ParsedStruct.String"></a>
-### func \(\*ParsedStruct\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L824>)
+### func \(\*ParsedStruct\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L787>)
 
 ```go
 func (f *ParsedStruct) String() string
@@ -464,7 +588,7 @@ func (f *ParsedStruct) String() string
 
 
 <a name="ParsedStruct.Type"></a>
-### func \(\*ParsedStruct\) [Type](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L745>)
+### func \(\*ParsedStruct\) [Type](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L698>)
 
 ```go
 func (struc *ParsedStruct) Type() *gocode.UserType
@@ -473,7 +597,7 @@ func (struc *ParsedStruct) Type() *gocode.UserType
 
 
 <a name="ParsedVar"></a>
-## type [ParsedVar](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L105-L109>)
+## type [ParsedVar](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/goparser/parser.go#L99-L103>)
 
 Currently we save var statements but don't do anything with them
 

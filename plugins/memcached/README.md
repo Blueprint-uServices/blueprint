@@ -18,7 +18,6 @@ PrebuiltContainer(spec, "fooCache")
 
 - [func Container\(spec wiring.WiringSpec, cacheName string\) string](<#Container>)
 - [type MemcachedContainer](<#MemcachedContainer>)
-  - [func \(node \*MemcachedContainer\) AddContainerArtifacts\(target docker.ContainerWorkspace\) error](<#MemcachedContainer.AddContainerArtifacts>)
   - [func \(node \*MemcachedContainer\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#MemcachedContainer.AddContainerInstance>)
   - [func \(node \*MemcachedContainer\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#MemcachedContainer.GetInterface>)
   - [func \(n \*MemcachedContainer\) Name\(\) string](<#MemcachedContainer.Name>)
@@ -47,7 +46,7 @@ func Container(spec wiring.WiringSpec, cacheName string) string
 Adds a memcached container to the application that defines a cache called \`cacheName\` which uses the pre\-built memcached process container
 
 <a name="MemcachedContainer"></a>
-## type [MemcachedContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L14-L21>)
+## type [MemcachedContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L15-L23>)
 
 Blueprint IR Node that represents a memcached container
 
@@ -55,6 +54,7 @@ Blueprint IR Node that represents a memcached container
 type MemcachedContainer struct {
     backend.Cache
     docker.Container
+    docker.ProvidesContainerInstance
 
     InstanceName string
     BindAddr     *address.BindConfig
@@ -62,53 +62,44 @@ type MemcachedContainer struct {
 }
 ```
 
-<a name="MemcachedContainer.AddContainerArtifacts"></a>
-### func \(\*MemcachedContainer\) [AddContainerArtifacts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L78>)
-
-```go
-func (node *MemcachedContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error
-```
-
-
-
 <a name="MemcachedContainer.AddContainerInstance"></a>
-### func \(\*MemcachedContainer\) [AddContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L82>)
+### func \(\*MemcachedContainer\) [AddContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L70>)
 
 ```go
 func (node *MemcachedContainer) AddContainerInstance(target docker.ContainerWorkspace) error
 ```
 
-
+Implements docker.ProvidesContainerInstance
 
 <a name="MemcachedContainer.GetInterface"></a>
-### func \(\*MemcachedContainer\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L73>)
+### func \(\*MemcachedContainer\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L64>)
 
 ```go
 func (node *MemcachedContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
-
+Implements service.ServiceNode
 
 <a name="MemcachedContainer.Name"></a>
-### func \(\*MemcachedContainer\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L69>)
+### func \(\*MemcachedContainer\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L59>)
 
 ```go
 func (n *MemcachedContainer) Name() string
 ```
 
-
+Implements ir.IRNode
 
 <a name="MemcachedContainer.String"></a>
-### func \(\*MemcachedContainer\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L65>)
+### func \(\*MemcachedContainer\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L54>)
 
 ```go
 func (n *MemcachedContainer) String() string
 ```
 
-
+Implements ir.IRNode
 
 <a name="MemcachedGoClient"></a>
-## type [MemcachedGoClient](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L18-L27>)
+## type [MemcachedGoClient](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L17-L25>)
 
 Blueprint IR Node that represents a client to a memcached container
 
@@ -120,49 +111,48 @@ type MemcachedGoClient struct {
     InstanceName string
     DialAddr     *address.DialConfig
 
-    Iface       *goparser.ParsedInterface
-    Constructor *gocode.Constructor
+    Spec *workflowspec.Service
 }
 ```
 
 <a name="MemcachedGoClient.AddInstantiation"></a>
-### func \(\*MemcachedGoClient\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L81>)
+### func \(\*MemcachedGoClient\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L63>)
 
 ```go
 func (node *MemcachedGoClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
-Part of code generation compilation pass; provides instantiation snippet
+Implements golang.Instantiable
 
 <a name="MemcachedGoClient.AddInterfaces"></a>
-### func \(\*MemcachedGoClient\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L76>)
+### func \(\*MemcachedGoClient\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L58>)
 
 ```go
 func (node *MemcachedGoClient) AddInterfaces(builder golang.ModuleBuilder) error
 ```
 
-
+Implements golang.ProvidesInterface
 
 <a name="MemcachedGoClient.AddToWorkspace"></a>
-### func \(\*MemcachedGoClient\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L72>)
+### func \(\*MemcachedGoClient\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L53>)
 
 ```go
 func (node *MemcachedGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
 ```
 
-
+Implements golang.ProvidesModule
 
 <a name="MemcachedGoClient.GetInterface"></a>
-### func \(\*MemcachedGoClient\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L68>)
+### func \(\*MemcachedGoClient\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L48>)
 
 ```go
 func (n *MemcachedGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
-
+Implements service.ServiceNode
 
 <a name="MemcachedGoClient.ImplementsGolangNode"></a>
-### func \(\*MemcachedGoClient\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L92>)
+### func \(\*MemcachedGoClient\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L74>)
 
 ```go
 func (node *MemcachedGoClient) ImplementsGolangNode()
@@ -171,7 +161,7 @@ func (node *MemcachedGoClient) ImplementsGolangNode()
 
 
 <a name="MemcachedGoClient.ImplementsGolangService"></a>
-### func \(\*MemcachedGoClient\) [ImplementsGolangService](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L93>)
+### func \(\*MemcachedGoClient\) [ImplementsGolangService](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L75>)
 
 ```go
 func (node *MemcachedGoClient) ImplementsGolangService()
@@ -180,25 +170,25 @@ func (node *MemcachedGoClient) ImplementsGolangService()
 
 
 <a name="MemcachedGoClient.Name"></a>
-### func \(\*MemcachedGoClient\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L44>)
+### func \(\*MemcachedGoClient\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L43>)
 
 ```go
 func (n *MemcachedGoClient) Name() string
 ```
 
-
+Implements ir.IRNode
 
 <a name="MemcachedGoClient.String"></a>
-### func \(\*MemcachedGoClient\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L40>)
+### func \(\*MemcachedGoClient\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_client.go#L38>)
 
 ```go
 func (n *MemcachedGoClient) String() string
 ```
 
-
+Implements ir.IRNode
 
 <a name="MemcachedInterface"></a>
-## type [MemcachedInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L25-L28>)
+## type [MemcachedInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L27-L30>)
 
 Memcached interface exposed to other services. This interface can not be modified further.
 
@@ -210,7 +200,7 @@ type MemcachedInterface struct {
 ```
 
 <a name="MemcachedInterface.GetMethods"></a>
-### func \(\*MemcachedInterface\) [GetMethods](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L34>)
+### func \(\*MemcachedInterface\) [GetMethods](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L36>)
 
 ```go
 func (m *MemcachedInterface) GetMethods() []service.Method
@@ -219,7 +209,7 @@ func (m *MemcachedInterface) GetMethods() []service.Method
 
 
 <a name="MemcachedInterface.GetName"></a>
-### func \(\*MemcachedInterface\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L30>)
+### func \(\*MemcachedInterface\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/memcached/ir_memcached_container.go#L32>)
 
 ```go
 func (m *MemcachedInterface) GetName() string
