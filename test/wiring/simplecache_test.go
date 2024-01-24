@@ -5,13 +5,15 @@ import (
 
 	"github.com/blueprint-uservices/blueprint/plugins/simple"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/test/workflow/cache"
+	wf "github.com/blueprint-uservices/blueprint/test/workflow/workflow"
 )
 
 func TestSimpleCache(t *testing.T) {
 	spec := newWiringSpec("TestSimpleCache")
 
 	leaf_cache := simple.Cache(spec, "leaf_cache")
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
+	leaf := workflow.Service[*cache.TestLeafServiceImplWithCache](spec, "leaf", leaf_cache)
 
 	app := assertBuildSuccess(t, spec, leaf, leaf_cache)
 
@@ -28,8 +30,8 @@ func TestSimpleCacheAndServices(t *testing.T) {
 	spec := newWiringSpec("TestSimpleCacheAndServices")
 
 	leaf_cache := simple.Cache(spec, "leaf_cache")
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImplWithCache", leaf_cache)
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*cache.TestLeafServiceImplWithCache](spec, "leaf", leaf_cache)
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	app := assertBuildSuccess(t, spec, leaf, leaf_cache, nonleaf)
 

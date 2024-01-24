@@ -8,9 +8,8 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/mongodb"
 	"golang.org/x/exp/slog"
 )
 
@@ -20,61 +19,46 @@ type MongoDBGoClient struct {
 	backend.NoSQLDB
 	InstanceName string
 	Addr         *address.DialConfig
-	Iface        *goparser.ParsedInterface
-	Constructor  *gocode.Constructor
+
+	Spec *workflowspec.Service
 }
 
 func newMongoDBGoClient(name string, addr *address.DialConfig) (*MongoDBGoClient, error) {
-	client := &MongoDBGoClient{}
-	err := client.init(name)
-	if err != nil {
-		return nil, err
+	spec, err := workflowspec.GetService[mongodb.MongoDB]()
+	client := &MongoDBGoClient{
+		InstanceName: name,
+		Addr:         addr,
+		Spec:         spec,
 	}
-	client.InstanceName = name
-	client.Addr = addr
-	return client, nil
+	return client, err
 }
 
+// Implements ir.IRNode
 func (m *MongoDBGoClient) String() string {
 	return m.InstanceName + " = MongoClient(" + m.Addr.Name() + ")"
 }
 
+// Implements ir.IRNode
 func (m *MongoDBGoClient) Name() string {
 	return m.InstanceName
 }
 
-func (node *MongoDBGoClient) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("MongoDB")
-	if err != nil {
-		return err
-	}
-
-	node.InstanceName = name
-	node.Iface = details.Iface
-	node.Constructor = details.Constructor.AsConstructor()
-
-	return nil
-}
-
+// Implements service.ServiceNode
 func (n *MongoDBGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
-	return n.Iface.ServiceInterface(ctx), nil
+	return n.Spec.Iface.ServiceInterface(ctx), nil
 }
 
+// Implements golang.ProvidesModule
 func (n *MongoDBGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
+	return n.Spec.AddToWorkspace(builder)
 }
 
+// Implements golang.ProvidesInterface
 func (n *MongoDBGoClient) AddInterfaces(builder golang.ModuleBuilder) error {
-	return n.AddToWorkspace(builder.Workspace())
+	return n.Spec.AddToModule(builder)
 }
 
+// Implements golang.Instantiable
 func (n *MongoDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(n.InstanceName) {
 		return nil
@@ -82,7 +66,7 @@ func (n *MongoDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) erro
 
 	slog.Info(fmt.Sprintf("Instantiating MongoClient %v in %v/%v", n.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(n.InstanceName, n.Constructor, []ir.IRNode{n.Addr})
+	return builder.DeclareConstructor(n.InstanceName, n.Spec.Constructor.AsConstructor(), []ir.IRNode{n.Addr})
 }
 
 func (node *MongoDBGoClient) ImplementsGolangNode()    {}

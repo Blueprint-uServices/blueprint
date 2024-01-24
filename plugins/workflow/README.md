@@ -16,29 +16,23 @@ See the [Workflow User Manual Page](<https://github.com/Blueprint-uServices/blue
 
 ### Wiring Spec Usage
 
-The plugin needs to know where to look for workflow spec services. The plugin assumes paths relative to the calling file.
+You can instantiate a service and give it a name, providing the service's interface or implementation type as the type parameter:
 
 ```
-workflow.Init("../workflow", "../other_path")
-```
-
-You can instantiate a service and give it a name by specifying either the name of the service's interface, implementation, or constructor.
-
-```
-payment_service := workflow.Service(spec, "payment_service", "PaymentService")
+payment_service := workflow.Service[payment.PaymentService](spec, "payment_service")
 ```
 
 If a service has arguments \(e.g. another service, a backend\), then those arguments can be added to the call:
 
 ```
 user_db := simple.NoSQLDB(spec, "user_db")
-user_service := workflow.Service(spec, "user_service", "UserService", user_db)
+user_service := workflow.Service[user.UserService](spec, "user_service", user_db)
 ```
 
 If a service has configuration value arguments \(e.g. a timeout\) then string values can be provided for those arguments:
 
 ```
-payment_service := workflow.Service(spec, "payment_service", "PaymentService", "500")
+payment_service := workflow.Service[payment.PaymentService](spec, "payment_service", "500")
 ```
 
 The arguments provided to a service must match the arguments needed by the service's constructor in the workflow spec. If they do not match, you will see a compilation error.
@@ -49,132 +43,24 @@ The workflow spec service implementation will be copied into the output director
 
 ## Index
 
-- [func Init\(srcModulePaths ...string\)](<#Init>)
-- [func Reset\(\)](<#Reset>)
-- [func Service\(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string\) string](<#Service>)
-- [type WorkflowSpec](<#WorkflowSpec>)
-  - [func GetSpec\(\) \(\*WorkflowSpec, error\)](<#GetSpec>)
-  - [func NewWorkflowSpec\(srcModuleDirs ...string\) \(\*WorkflowSpec, error\)](<#NewWorkflowSpec>)
-  - [func \(spec \*WorkflowSpec\) Get\(name string\) \(\*WorkflowSpecService, error\)](<#WorkflowSpec.Get>)
-- [type WorkflowSpecService](<#WorkflowSpecService>)
+- [func Service\[ServiceType any\]\(spec wiring.WiringSpec, serviceName string, serviceArgs ...string\) string](<#Service>)
 
-
-<a name="Init"></a>
-## func [Init](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L83>)
-
-```go
-func Init(srcModulePaths ...string)
-```
-
-[Init](<#Init>) can be used by wiring specs to point the workflow plugin at the correct location of the application's workflow spec code. It is required to be able to instantiate any services from that workflow spec.
-
-srcModulePaths should be paths to the \*root\* of a go module, ie. a directory containing a go.mod file.
-
-srcModulePaths are assumed to be \*relative\* to the calling file. Typically this means calling something like:
-
-```
-workflow.Init("../workflow")
-```
-
-Workflow specs can be included from more than one source module. If also using the [gotests](<https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/gotests>) plugin, then the location of the tests directory should also be provided, e.g.
-
-```
-workflow.Init("../workflow", "../tests")
-```
-
-[Init](<#Init>) can be called more than once, which will concatenate all provided srcModulePaths. [Reset](<#Reset>) can be used to clear any previously provided module paths.
-
-<a name="Reset"></a>
-## func [Reset](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L97>)
-
-```go
-func Reset()
-```
-
-[Reset](<#Reset>) can be used by wiring specs to clear any srcModulePaths given by previous calls to [Init](<#Init>)
 
 <a name="Service"></a>
-## func [Service](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L144>)
+## func [Service](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L69>)
 
 ```go
-func Service(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string
+func Service[ServiceType any](spec wiring.WiringSpec, serviceName string, serviceArgs ...string) string
 ```
-
-This adds a service to the application, using a definition that was provided in the workflow spec.
 
 [Service](<#Service>) is used by wiring specs to instantiate services from the workflow spec.
 
-\`serviceName“ is a unique name for the service instance.
+Type parameter \[ServiceType\] is used to specify the type of the service. It can be the name of an interface or an implementing struct. \[ServiceType\] must be a valid workflow service: all interface methods must have [context.Context](<https://pkg.go.dev/context/#Context>) arguments and \[error\] return values, and a constructor must be defined.
 
-\`serviceType\` must refer to a named service that was defined in the workflow spec. If the service doesn't exist, then this will result in a build error. serviceType can be the name of an interface, an implementing struct, or a constructor.
+\`serviceName\` is a unique name for the service instance.
 
 \`serviceArgs\` must correspond to the arguments of the service's constructor within the workflow spec. They can either be the names of other nodes that exist within this wiring spec, or string values for configuration arguments. This determination is made by looking at the argument types of the constructor within the workflow spec \(string arguments are treated as configuration; everything else is treated as a service instance\).
 
 After calling [Service](<#Service>), serviceName is an application\-level golang service. Application\-level modifiers can be applied to it, or it can be further deployed into e.g. a goproc, a linuxcontainer, etc.
-
-<a name="WorkflowSpec"></a>
-## type [WorkflowSpec](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/workflowspec.go#L23-L25>)
-
-Representation of a parsed workflow spec.
-
-This code makes heavy use of the Golang code parser defined in the Golang plugin. That code parser extracts structs, interfaces, and function definitions from a set of golang modules.
-
-This code adds functionality that:
-
-- Identifies valid service interfaces
-- Matches structs to interfaces that they implement
-- Finds constructors of structs
-
-```go
-type WorkflowSpec struct {
-    Parsed *goparser.ParsedModuleSet
-}
-```
-
-<a name="GetSpec"></a>
-### func [GetSpec](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L102>)
-
-```go
-func GetSpec() (*WorkflowSpec, error)
-```
-
-[GetSpec](<#GetSpec>) exists to enable other Blueprint plugins to access the parsed [\\\*WorkflowSpec](<#WorkflowSpec>).
-
-<a name="NewWorkflowSpec"></a>
-### func [NewWorkflowSpec](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/workflowspec.go#L39>)
-
-```go
-func NewWorkflowSpec(srcModuleDirs ...string) (*WorkflowSpec, error)
-```
-
-Parses the specified module directories and loads workflow specs from there.
-
-This will return an error if \*any\* of the provided srcModuleDirs are not valid Go modules
-
-<a name="WorkflowSpec.Get"></a>
-### func \(\*WorkflowSpec\) [Get](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/workflowspec.go#L55>)
-
-```go
-func (spec *WorkflowSpec) Get(name string) (*WorkflowSpecService, error)
-```
-
-Looks up the named service in the workflow spec. When a wiring spec instantiates a workflow spec service, this method will ultimately get called.
-
-Returns the service and a constructor
-
-<a name="WorkflowSpecService"></a>
-## type [WorkflowSpecService](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/workflowspec.go#L28-L34>)
-
-A service in the workflow spec
-
-```go
-type WorkflowSpecService struct {
-    // The interface that the service implements
-    Iface *goparser.ParsedInterface
-
-    // The constructor func of the service
-    Constructor *goparser.ParsedFunc
-}
-```
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)

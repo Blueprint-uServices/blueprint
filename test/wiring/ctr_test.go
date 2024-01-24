@@ -7,13 +7,14 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/grpc"
 	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	wf "github.com/blueprint-uservices/blueprint/test/workflow/workflow"
 )
 
 func TestContainerModifier(t *testing.T) {
 	spec := newWiringSpec("TestContainerModifier")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	grpc.Deploy(spec, leaf)
 	goproc.Deploy(spec, leaf)
@@ -57,8 +58,8 @@ func TestContainerModifier(t *testing.T) {
 func TestContainerModifierInstantiation(t *testing.T) {
 	spec := newWiringSpec("TestContainerModifierInstantiation")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	grpc.Deploy(spec, leaf)
 	goproc.Deploy(spec, leaf)
@@ -106,8 +107,8 @@ func TestContainerModifierInstantiation(t *testing.T) {
 func TestContainerMixedInstantiation(t *testing.T) {
 	spec := newWiringSpec("TestContainerMixedInstantiation")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	grpc.Deploy(spec, leaf)
 	goproc.Deploy(spec, leaf)
@@ -153,8 +154,8 @@ func TestContainerMixedInstantiation(t *testing.T) {
 func TestContainerExplicitInstantiation(t *testing.T) {
 	spec := newWiringSpec("TestContainerExplicitInstantiation")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	grpc.Deploy(spec, leaf)
 	goproc.Deploy(spec, leaf)
@@ -199,8 +200,8 @@ func TestContainerExplicitInstantiation(t *testing.T) {
 func TestContainerExplicitNamespaceInstantiation(t *testing.T) {
 	spec := newWiringSpec("TestContainerExplicitNamespaceInstantiation")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	grpc.Deploy(spec, leaf)
 	leafproc := goproc.CreateProcess(spec, "leaf_proc", leaf)

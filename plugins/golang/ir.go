@@ -175,14 +175,6 @@ type (
 		AddLocalModule(shortName string, moduleSrcPath string) (string, error)
 
 		/*
-			This is a variant of `AddLocalMethod` provided for convenience; instead of an absolute filesystem path, the
-			specified path is relative to the caller
-
-			Returns the path to the module in the output directory
-		*/
-		AddLocalModuleRelative(shortName string, relativeModuleSrcPath string) (string, error)
-
-		/*
 			This method is used by plugins if they want to create a module in the workspace to then generate code into.
 
 			The specified moduleName must be a golang style module name.
@@ -234,13 +226,17 @@ type (
 		*/
 		Info() ModuleInfo
 
-		/*
-			This creates a package within the module, with the specified package name.
-			It will create the necessary output directories and returns information
-			about the created package.  The provided packageName should take the form a/b/c
-			This call will succeed even if the package already exists on the filesystem.
-		*/
+		// This creates a package within the module, with the specified package name.
+		// It will create the necessary output directories and returns information
+		// about the created package.  The provided packageName should take the form a/b/c
+		// This call will succeed even if the package already exists on the filesystem.
 		CreatePackage(packageName string) (PackageInfo, error)
+
+		// Enables a plugin to add a 'require' statement to the go.mod file for the generated
+		// module.  Typically this is not necessary because a subsequent `go mod tidy` will
+		// automatically pick up module dependencies.  However, if a plugin wishes to explicitly
+		// control the dependency version, it can use this method.
+		Require(moduleName string, version string) error
 
 		/*
 			Gets the WorkspaceBuilder that contains this ModuleBuilder

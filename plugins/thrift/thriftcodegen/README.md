@@ -29,7 +29,7 @@ import "github.com/blueprint-uservices/blueprint/plugins/thrift/thriftcodegen"
 
 
 <a name="CompileThriftFile"></a>
-## func [CompileThriftFile](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L78>)
+## func [CompileThriftFile](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L79>)
 
 ```go
 func CompileThriftFile(thriftFileName string) error
@@ -60,7 +60,7 @@ This function is used by the Thrift plugin to generate the server\-side Thrift s
 It is assumed that outputPackage is the same as the one where the .thrift is generated to
 
 <a name="GenerateThrift"></a>
-## func [GenerateThrift](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L20>)
+## func [GenerateThrift](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L21>)
 
 ```go
 func GenerateThrift(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error
@@ -69,7 +69,7 @@ func GenerateThrift(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 Generates the .thrift file for the provided service interface, then compiles it using \`thrift\`. See the plugin README for the required thrift package dependencies.
 
 <a name="ThriftBuilder"></a>
-## type [ThriftBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L124-L134>)
+## type [ThriftBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L125-L135>)
 
 
 
@@ -88,7 +88,7 @@ type ThriftBuilder struct {
 ```
 
 <a name="NewThriftBuilder"></a>
-### func [NewThriftBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L136>)
+### func [NewThriftBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L137>)
 
 ```go
 func NewThriftBuilder(code *goparser.ParsedModuleSet) *ThriftBuilder
@@ -97,7 +97,7 @@ func NewThriftBuilder(code *goparser.ParsedModuleSet) *ThriftBuilder
 
 
 <a name="ThriftBuilder.AddService"></a>
-### func \(\*ThriftBuilder\) [AddService](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L220>)
+### func \(\*ThriftBuilder\) [AddService](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L221>)
 
 ```go
 func (b *ThriftBuilder) AddService(iface *gocode.ServiceInterface) error
@@ -117,7 +117,7 @@ Generates marshalling functions that convert between Go objects and Thrift struc
 This extends the code in thriftgen.go and is called from thriftgen.go
 
 <a name="ThriftBuilder.GetOrAddMessage"></a>
-### func \(\*ThriftBuilder\) [GetOrAddMessage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L240>)
+### func \(\*ThriftBuilder\) [GetOrAddMessage](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L241>)
 
 ```go
 func (b *ThriftBuilder) GetOrAddMessage(t *gocode.UserType) (*ThriftStructDecl, error)
@@ -126,7 +126,7 @@ func (b *ThriftBuilder) GetOrAddMessage(t *gocode.UserType) (*ThriftStructDecl, 
 
 
 <a name="ThriftBuilder.WriteThriftFile"></a>
-### func \(\*ThriftBuilder\) [WriteThriftFile](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L163>)
+### func \(\*ThriftBuilder\) [WriteThriftFile](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L164>)
 
 ```go
 func (b *ThriftBuilder) WriteThriftFile(outputFilePath string) error
@@ -135,7 +135,7 @@ func (b *ThriftBuilder) WriteThriftFile(outputFilePath string) error
 
 
 <a name="ThriftField"></a>
-## type [ThriftField](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L96-L102>)
+## type [ThriftField](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L97-L103>)
 
 A basic structural representation of the Thrift messages and services
 
@@ -168,7 +168,7 @@ func (f *ThriftField) Unmarshall(imports *gogen.Imports, obj string, pkg string)
 
 
 <a name="ThriftMethodDecl"></a>
-## type [ThriftMethodDecl](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L111-L116>)
+## type [ThriftMethodDecl](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L112-L117>)
 
 
 
@@ -200,7 +200,7 @@ func (m *ThriftMethodDecl) MarshallResponse(imports *gogen.Imports, pkg string) 
 
 
 <a name="ThriftServiceDecl"></a>
-## type [ThriftServiceDecl](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L118-L122>)
+## type [ThriftServiceDecl](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L119-L123>)
 
 
 
@@ -213,7 +213,7 @@ type ThriftServiceDecl struct {
 ```
 
 <a name="ThriftStructDecl"></a>
-## type [ThriftStructDecl](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L104-L109>)
+## type [ThriftStructDecl](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/thrift/thriftcodegen/thriftgen.go#L105-L110>)
 
 
 

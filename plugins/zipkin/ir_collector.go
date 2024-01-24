@@ -6,12 +6,14 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/docker"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/zipkin"
 )
 
 // Blueprint IR node that represents the Zipkin container
 type ZipkinCollectorContainer struct {
 	docker.Container
+	docker.ProvidesContainerInstance
 
 	CollectorName string
 	BindAddr      *address.BindConfig
@@ -33,50 +35,35 @@ func (j *ZipkinInterface) GetMethods() []service.Method {
 }
 
 func newZipkinCollectorContainer(name string) (*ZipkinCollectorContainer, error) {
-	collector := &ZipkinCollectorContainer{
-		CollectorName: name,
-	}
-	err := collector.init(name)
+	spec, err := workflowspec.GetService[zipkin.ZipkinTracer]()
 	if err != nil {
 		return nil, err
+	}
+
+	collector := &ZipkinCollectorContainer{
+		CollectorName: name,
+		Iface:         spec.Iface,
 	}
 	return collector, nil
 }
 
-func (node *ZipkinCollectorContainer) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("ZipkinTracer")
-	if err != nil {
-		return err
-	}
-
-	node.Iface = details.Iface
-	return nil
-}
-
+// Implements ir.IRNode
 func (node *ZipkinCollectorContainer) Name() string {
 	return node.CollectorName
 }
 
+// Implements ir.IRNode
 func (node *ZipkinCollectorContainer) String() string {
 	return node.Name() + " = ZipkinCollector(" + node.BindAddr.Name() + ")"
 }
 
+// Implements service.ServiceNode
 func (node *ZipkinCollectorContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface := node.Iface.ServiceInterface(ctx)
 	return &ZipkinInterface{Wrapped: iface}, nil
 }
 
-func (node *ZipkinCollectorContainer) AddContainerArtifacts(targer docker.ContainerWorkspace) error {
-	return nil
-}
-
+// Implements docker.ProvidesContainerInstance
 func (node *ZipkinCollectorContainer) AddContainerInstance(target docker.ContainerWorkspace) error {
 	node.BindAddr.Port = 9411
 	return target.DeclarePrebuiltInstance(node.CollectorName, "openzipkin/zipkin", node.BindAddr)

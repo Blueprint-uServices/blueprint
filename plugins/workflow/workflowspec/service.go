@@ -1,31 +1,18 @@
-package workflow
+package workflowspec
 
 import (
 	"fmt"
 	"reflect"
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
+	"github.com/blueprint-uservices/blueprint/plugins/golang"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
 	"golang.org/x/exp/slog"
 )
 
-// Representation of a parsed workflow spec.
-//
-// This code makes heavy use of the Golang code parser defined in the Golang plugin.  That
-// code parser extracts structs, interfaces, and function definitions from a set of golang
-// modules.
-//
-// This code adds functionality that:
-//   - Identifies valid service interfaces
-//   - Matches structs to interfaces that they implement
-//   - Finds constructors of structs
-type WorkflowSpec struct {
-	Parsed *goparser.ParsedModuleSet
-}
-
 // A service in the workflow spec
-type WorkflowSpecService struct {
+type Service struct {
 	// The interface that the service implements
 	Iface *goparser.ParsedInterface
 
@@ -33,43 +20,38 @@ type WorkflowSpecService struct {
 	Constructor *goparser.ParsedFunc
 }
 
-// Parses the specified module directories and loads workflow specs from there.
-//
-// This will return an error if *any* of the provided srcModuleDirs are not valid Go modules
-func NewWorkflowSpec(srcModuleDirs ...string) (*WorkflowSpec, error) {
-	parsed, err := goparser.ParseModules(srcModuleDirs...)
-	if err != nil {
-		return nil, err
-	}
-	spec := &WorkflowSpec{}
-	spec.Parsed = parsed
-	return spec, nil
+// Get all modules containing definitions for this service.
+// Could be more than one if the interface and implementation are defined in separate modules.
+func (s *Service) Modules() []*goparser.ParsedModule {
+	return []*goparser.ParsedModule{s.Iface.File.Package.Module, s.Constructor.File.Package.Module}
 }
 
-/*
-Looks up the named service in the workflow spec.  When a wiring spec instantiates a workflow spec
-service, this method will ultimately get called.
-
-Returns the service and a constructor
-*/
-func (spec *WorkflowSpec) Get(name string) (*WorkflowSpecService, error) {
-	// Allowed to name an interface or a struct; different logic depending on which was named.
-
-	for _, mod := range spec.Parsed.Modules {
-		for _, pkg := range mod.Packages {
-			if iface, isIface := pkg.Interfaces[name]; isIface {
-				return spec.makeServiceFromInterface(iface)
-			}
-			if struc, isStruct := pkg.Structs[name]; isStruct {
-				return spec.makeServiceFromStruct(struc)
+func (s *Service) AddToModule(builder golang.ModuleBuilder) error {
+	for _, mod := range s.Modules() {
+		if !mod.IsLocal {
+			if !builder.Visited(mod.Name) {
+				if err := builder.Require(mod.Name, mod.Version); err != nil {
+					return err
+				}
 			}
 		}
 	}
-
-	return nil, blueprint.Errorf("unable to find service %v in workflow spec", name)
+	return nil
 }
 
-func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*WorkflowSpecService, error) {
+func (s *Service) AddToWorkspace(builder golang.WorkspaceBuilder) error {
+	for _, mod := range s.Modules() {
+		if mod.IsLocal {
+			if !builder.Visited(mod.Name) {
+				_, err := builder.AddLocalModule(mod.ShortName, mod.SrcDir)
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*Service, error) {
 	ifaces := spec.findInterfacesFor(struc)
 	if len(ifaces) == 0 {
 		return nil, blueprint.Errorf("unable to find service interfaces for %v", struc.Name)
@@ -106,7 +88,7 @@ func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*
 		slog.Warn(fmt.Sprintf("multiple constructors of struct %v found; using %v", struc.Name, constructors[0].Name))
 	}
 
-	service := &WorkflowSpecService{
+	service := &Service{
 		Iface:       validIfaces[0],
 		Constructor: constructors[0],
 	}
@@ -114,7 +96,7 @@ func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*
 	return service, nil
 }
 
-func (spec *WorkflowSpec) makeServiceFromInterface(iface *goparser.ParsedInterface) (*WorkflowSpecService, error) {
+func (spec *WorkflowSpec) makeServiceFromInterface(iface *goparser.ParsedInterface) (*Service, error) {
 	valid, err := isInterfaceAValidService(iface)
 	if !valid {
 		return nil, blueprint.Errorf("interface %v is not a valid service because %v", iface.Name, err.Error())
@@ -126,7 +108,7 @@ func (spec *WorkflowSpec) makeServiceFromInterface(iface *goparser.ParsedInterfa
 	if len(constructors) > 1 {
 		slog.Warn(fmt.Sprintf("multiple constructors of interface %v found; using %v", iface.Name, constructors[0].Name))
 	}
-	service := &WorkflowSpecService{
+	service := &Service{
 		Iface:       iface,
 		Constructor: constructors[0],
 	}
@@ -166,7 +148,7 @@ For a parsed struct, finds all valid interfaces that the struct implements
 */
 func (spec *WorkflowSpec) findInterfacesFor(struc *goparser.ParsedStruct) []*goparser.ParsedInterface {
 	var ifaces []*goparser.ParsedInterface
-	for _, mod := range spec.Parsed.Modules {
+	for _, mod := range spec.Modules.Modules {
 		for _, pkg := range mod.Packages {
 			for _, iface := range pkg.Interfaces {
 				if valid, _ := implements(struc, iface); valid {
@@ -196,7 +178,7 @@ func implements(struc *goparser.ParsedStruct, iface *goparser.ParsedInterface) (
 
 func (spec *WorkflowSpec) findConstructorsOfIface(iface *goparser.ParsedInterface) []*goparser.ParsedFunc {
 	var constructors []*goparser.ParsedFunc
-	for _, mod := range spec.Parsed.Modules {
+	for _, mod := range spec.Modules.Modules {
 		for _, pkg := range mod.Packages {
 			for _, f := range pkg.Funcs {
 				if isConstructorOfIface(f, iface) {
@@ -210,7 +192,7 @@ func (spec *WorkflowSpec) findConstructorsOfIface(iface *goparser.ParsedInterfac
 
 func (spec *WorkflowSpec) findConstructorsOfStruct(struc *goparser.ParsedStruct) []*goparser.ParsedFunc {
 	var constructors []*goparser.ParsedFunc
-	for _, mod := range spec.Parsed.Modules {
+	for _, mod := range spec.Modules.Modules {
 		for _, pkg := range mod.Packages {
 			for _, f := range pkg.Funcs {
 				if isConstructorOfStruct(f, struc) {

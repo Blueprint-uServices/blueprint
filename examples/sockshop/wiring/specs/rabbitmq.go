@@ -2,6 +2,14 @@ package specs
 
 import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/cart"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/catalogue"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/frontend"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/order"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/payment"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/queuemaster"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/shipping"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/user"
 	"github.com/blueprint-uservices/blueprint/plugins/clientpool"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
@@ -22,7 +30,6 @@ import (
 // All services are instrumented with OpenTelemetry and traces are exported to Zipkin
 // The user, cart, shipping, and orders services using separate MongoDB instances to store their data.
 // The catalogue service uses MySQL to store catalogue data.
-// The shipping service and queue master service run within the same process (TODO: separate processes)
 var DockerRabbit = cmdbuilder.SpecOption{
 	Name:        "rabbit",
 	Description: "Deploys each service in a separate container with gRPC, and uses mongodb as NoSQL database backends and rabbitmq as the queue backend.",
@@ -50,36 +57,36 @@ func makeDockerRabbitSpec(spec wiring.WiringSpec) ([]string, error) {
 	}
 
 	user_db := mongodb.Container(spec, "user_db")
-	user_service := workflow.Service(spec, "user_service", "UserService", user_db)
+	user_service := workflow.Service[user.UserService](spec, "user_service", user_db)
 	applyDockerDefaults(user_service)
 
-	payment_service := workflow.Service(spec, "payment_service", "PaymentService", "500")
+	payment_service := workflow.Service[payment.PaymentService](spec, "payment_service", "500")
 	applyDockerDefaults(payment_service)
 
 	cart_db := mongodb.Container(spec, "cart_db")
-	cart_service := workflow.Service(spec, "cart_service", "CartService", cart_db)
+	cart_service := workflow.Service[cart.CartService](spec, "cart_service", cart_db)
 	applyDockerDefaults(cart_service)
 
 	shipqueue := rabbitmq.Container(spec, "shipping_queue", "shippingq")
 	shipdb := mongodb.Container(spec, "shipping_db")
-	shipping_service := workflow.Service(spec, "shipping_service", "ShippingService", shipqueue, shipdb)
+	shipping_service := workflow.Service[shipping.ShippingService](spec, "shipping_service", shipqueue, shipdb)
 	applyDockerDefaults(shipping_service)
 
-	queue_master := workflow.Service(spec, "queue_master", "QueueMaster", shipqueue, shipping_service)
+	queue_master := workflow.Service[queuemaster.QueueMaster](spec, "queue_master", shipqueue, shipping_service)
 	applyDockerDefaults(queue_master)
 
 	order_db := mongodb.Container(spec, "order_db")
-	order_service := workflow.Service(spec, "order_service", "OrderService", user_service, cart_service, payment_service, shipping_service, order_db)
+	order_service := workflow.Service[order.OrderService](spec, "order_service", user_service, cart_service, payment_service, shipping_service, order_db)
 	applyDockerDefaults(order_service)
 
 	catalogue_db := mysql.Container(spec, "catalogue_db")
-	catalogue_service := workflow.Service(spec, "catalogue_service", "CatalogueService", catalogue_db)
+	catalogue_service := workflow.Service[catalogue.CatalogueService](spec, "catalogue_service", catalogue_db)
 	applyDockerDefaults(catalogue_service)
 
-	frontend := workflow.Service(spec, "frontend", "Frontend", user_service, catalogue_service, cart_service, order_service)
-	applyDockerDefaults(frontend)
+	frontend_service := workflow.Service[frontend.Frontend](spec, "frontend", user_service, catalogue_service, cart_service, order_service)
+	applyDockerDefaults(frontend_service)
 
 	// Instantiate starting with the frontend which will trigger all other services to be instantiated
 	// Also include the tests
-	return []string{frontend, "gotests"}, nil
+	return []string{frontend_service, "gotests"}, nil
 }

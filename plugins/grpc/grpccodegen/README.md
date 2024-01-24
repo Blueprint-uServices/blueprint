@@ -15,7 +15,7 @@ import "github.com/blueprint-uservices/blueprint/plugins/grpc/grpccodegen"
 
 
 <a name="CompileProtoFile"></a>
-## func [CompileProtoFile](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L87>)
+## func [CompileProtoFile](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L88>)
 
 ```go
 func CompileProtoFile(protoFileName string) error
@@ -33,7 +33,7 @@ func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 Generates a gRPC client for the specified service
 
 <a name="GenerateGRPCProto"></a>
-## func [GenerateGRPCProto](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L23>)
+## func [GenerateGRPCProto](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/grpc/grpccodegen/protogen.go#L24>)
 
 ```go
 func GenerateGRPCProto(builder golang.ModuleBuilder, service *gocode.ServiceInterface, outputPackage string) error

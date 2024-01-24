@@ -6,7 +6,8 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/docker"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/jaeger"
 )
 
 // Blueprint IR node that represents the Jaeger container
@@ -16,7 +17,8 @@ type JaegerCollectorContainer struct {
 	CollectorName string
 	BindAddr      *address.BindConfig
 	UIBindAddr    *address.BindConfig
-	Iface         *goparser.ParsedInterface
+
+	Iface *goparser.ParsedInterface
 }
 
 // Jaeger interface exposed to the application.
@@ -34,31 +36,16 @@ func (j *JaegerInterface) GetMethods() []service.Method {
 }
 
 func newJaegerCollectorContainer(name string) (*JaegerCollectorContainer, error) {
-	collector := &JaegerCollectorContainer{
-		CollectorName: name,
-	}
-	err := collector.init(name)
+	spec, err := workflowspec.GetService[jaeger.JaegerTracer]()
 	if err != nil {
 		return nil, err
 	}
+
+	collector := &JaegerCollectorContainer{
+		CollectorName: name,
+		Iface:         spec.Iface,
+	}
 	return collector, nil
-}
-
-func (node *JaegerCollectorContainer) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("JaegerTracer")
-	if err != nil {
-		return err
-	}
-
-	node.Iface = details.Iface
-	return nil
 }
 
 func (node *JaegerCollectorContainer) Name() string {

@@ -7,9 +7,8 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/zipkin"
 	"golang.org/x/exp/slog"
 )
 
@@ -19,71 +18,54 @@ type ZipkinCollectorClient struct {
 	golang.Instantiable
 	ClientName string
 	ServerDial *address.DialConfig
-
-	InstanceName string
-	Iface        *goparser.ParsedInterface
-	Constructor  *gocode.Constructor
+	Spec       *workflowspec.Service
 }
 
 func newZipkinCollectorClient(name string, addr *address.DialConfig) (*ZipkinCollectorClient, error) {
-	node := &ZipkinCollectorClient{}
-	err := node.init(name)
-	if err != nil {
-		return nil, err
+	spec, err := workflowspec.GetService[zipkin.ZipkinTracer]()
+	node := &ZipkinCollectorClient{
+		ClientName: name,
+		ServerDial: addr,
+		Spec:       spec,
 	}
-	node.ClientName = name
-	node.ServerDial = addr
-	return node, nil
+	return node, err
 }
 
+// Implements ir.IRNode
 func (node *ZipkinCollectorClient) Name() string {
 	return node.ClientName
 }
 
+// Implements ir.IRNode
 func (node *ZipkinCollectorClient) String() string {
 	return node.Name() + " = ZipkinClient(" + node.ServerDial.Name() + ")"
 }
 
-func (node *ZipkinCollectorClient) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("ZipkinTracer")
-	if err != nil {
-		return err
-	}
-
-	node.InstanceName = name
-	node.Iface = details.Iface
-	node.Constructor = details.Constructor.AsConstructor()
-	return nil
-}
-
+// Implements golang.Instantiable
 func (node *ZipkinCollectorClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.ClientName) {
 		return nil
 	}
 
-	slog.Info(fmt.Sprintf("Instantiating ZipkinClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
+	slog.Info(fmt.Sprintf("Instantiating ZipkinClient %v in %v/%v", node.ClientName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []ir.IRNode{node.ServerDial})
+	return builder.DeclareConstructor(node.ClientName, node.Spec.Constructor.AsConstructor(), []ir.IRNode{node.ServerDial})
 }
 
+// Implements service.ServiceNode
 func (node *ZipkinCollectorClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
-	return node.Iface.ServiceInterface(ctx), nil
+	return node.Spec.Iface.ServiceInterface(ctx), nil
 }
 
-func (node *ZipkinCollectorClient) AddInterfaces(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
+// Implements golang.ProvidesInterface
+func (node *ZipkinCollectorClient) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.Spec.AddToModule(builder)
 }
 
+// Implements golang.ProvidesModule
 func (node *ZipkinCollectorClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
+	return node.Spec.AddToWorkspace(builder)
 }
 
 func (node *ZipkinCollectorClient) ImplementsGolangNode() {}

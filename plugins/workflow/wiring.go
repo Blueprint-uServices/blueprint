@@ -12,26 +12,21 @@
 //
 // # Wiring Spec Usage
 //
-// The plugin needs to know where to look for workflow spec services.  The plugin assumes
-// paths relative to the calling file.
+// You can instantiate a service and give it a name, providing the service's interface or
+// implementation type as the type parameter:
 //
-//	workflow.Init("../workflow", "../other_path")
-//
-// You can instantiate a service and give it a name by specifying either the name of the
-// service's interface, implementation, or constructor.
-//
-//	payment_service := workflow.Service(spec, "payment_service", "PaymentService")
+//	payment_service := workflow.Service[payment.PaymentService](spec, "payment_service")
 //
 // If a service has arguments (e.g. another service, a backend), then those arguments
 // can be added to the call:
 //
 //	user_db := simple.NoSQLDB(spec, "user_db")
-//	user_service := workflow.Service(spec, "user_service", "UserService", user_db)
+//	user_service := workflow.Service[user.UserService](spec, "user_service", user_db)
 //
 // If a service has configuration value arguments (e.g. a timeout) then string
 // values can be provided for those arguments:
 //
-//	payment_service := workflow.Service(spec, "payment_service", "PaymentService", "500")
+//	payment_service := workflow.Service[payment.PaymentService](spec, "payment_service", "500")
 //
 // The arguments provided to a service must match the arguments needed by the service's
 // constructor in the workflow spec.  If they do not match, you will see a compilation error.
@@ -46,92 +41,22 @@
 package workflow
 
 import (
-	"path/filepath"
-	"runtime"
-
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/pointer"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
-	"golang.org/x/exp/slog"
 )
-
-var workflowSpecModulePaths = make(map[string]struct{})
-var workflowSpec *WorkflowSpec
-
-// [Init] can be used by wiring specs to point the workflow plugin at the correct location of the
-// application's workflow spec code.  It is required to be able to instantiate any services from
-// that workflow spec.
-//
-// srcModulePaths should be paths to the *root* of a go module, ie. a directory containing a go.mod file.
-//
-// srcModulePaths are assumed to be *relative* to the calling file.  Typically this means
-// calling something like:
-//
-//	workflow.Init("../workflow")
-//
-// Workflow specs can be included from more than one source module.  If also using the [gotests] plugin,
-// then the location of the tests directory should also be provided, e.g.
-//
-//	workflow.Init("../workflow", "../tests")
-//
-// [Init] can be called more than once, which will concatenate all provided srcModulePaths.  [Reset]
-// can be used to clear any previously provided module paths.
-//
-// [gotests]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/gotests
-func Init(srcModulePaths ...string) {
-	_, callingFile, _, _ := runtime.Caller(1)
-	dir, _ := filepath.Split(callingFile)
-	for _, path := range srcModulePaths {
-		workflowPath := filepath.Clean(filepath.Join(dir, path))
-		if _, exists := workflowSpecModulePaths[workflowPath]; !exists {
-			slog.Info("Added workflow spec path " + workflowPath)
-			workflowSpecModulePaths[workflowPath] = struct{}{}
-		}
-	}
-	workflowSpec = nil
-}
-
-// [Reset] can be used by wiring specs to clear any srcModulePaths given by previous calls to [Init]
-func Reset() {
-	workflowSpecModulePaths = make(map[string]struct{})
-}
-
-// [GetSpec] exists to enable other Blueprint plugins to access the parsed [*WorkflowSpec].
-func GetSpec() (*WorkflowSpec, error) {
-	if workflowSpec != nil {
-		return workflowSpec, nil
-	}
-
-	if len(workflowSpecModulePaths) == 0 {
-		return nil, blueprint.Errorf("workflow spec src directories haven't been specified; use workflow.Init(srcPath) to add your workflow spec")
-	}
-
-	var modulePaths []string
-	for modulePath := range workflowSpecModulePaths {
-		modulePaths = append(modulePaths, modulePath)
-	}
-	spec, err := NewWorkflowSpec(modulePaths...)
-	if err != nil {
-		return nil, err
-	}
-	workflowSpec = spec
-	return workflowSpec, nil
-}
 
 var strtype = &gocode.BasicType{Name: "string"}
 
-/*
-This adds a service to the application, using a definition that was provided in the workflow spec.
-*/
 // [Service] is used by wiring specs to instantiate services from the workflow spec.
 //
-// `serviceName`` is a unique name for the service instance.
+// Type parameter [ServiceType] is used to specify the type of the service.  It can be the name of an interface
+// or an implementing struct.  [ServiceType] must be a valid workflow service: all interface methods must
+// have [context.Context] arguments and [error] return values, and a constructor must be defined.
 //
-// `serviceType` must refer to a named service that was defined in the workflow spec.  If the service
-// doesn't exist, then this will result in a build error.  serviceType can be the name of an interface,
-// an implementing struct, or a constructor.
+// `serviceName` is a unique name for the service instance.
 //
 // `serviceArgs` must correspond to the arguments of the service's constructor within the workflow spec.
 // They can either be the names of other nodes that exist within this wiring spec, or string values for
@@ -141,13 +66,13 @@ This adds a service to the application, using a definition that was provided in 
 //
 // After calling [Service], serviceName is an application-level golang service.  Application-level modifiers
 // can be applied to it, or it can be further deployed into e.g. a goproc, a linuxcontainer, etc.
-func Service(spec wiring.WiringSpec, serviceName, serviceType string, serviceArgs ...string) string {
+func Service[ServiceType any](spec wiring.WiringSpec, serviceName string, serviceArgs ...string) string {
 	// Define the service
 	handlerName := serviceName + ".handler"
 	spec.Define(handlerName, &workflowHandler{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		// Create the IR node for the handler
 		handler := &workflowHandler{}
-		if err := handler.Init(serviceName, serviceType); err != nil {
+		if err := initWorkflowNode[ServiceType](&handler.workflowNode, serviceName); err != nil {
 			return nil, err
 		}
 
@@ -181,7 +106,7 @@ func Service(spec wiring.WiringSpec, serviceName, serviceType string, serviceArg
 	clientNext := ptr.AddSrcModifier(spec, clientName)
 	spec.Define(clientName, &workflowClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		client := &workflowClient{}
-		if err := client.Init(clientName, serviceType); err != nil {
+		if err := initWorkflowNode[ServiceType](&client.workflowNode, clientName); err != nil {
 			return nil, err
 		}
 		return client, namespace.Get(clientNext, &client.Wrapped)

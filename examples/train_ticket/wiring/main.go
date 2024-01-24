@@ -6,14 +6,15 @@
 package main
 
 import (
+	_ "github.com/blueprint-uservices/blueprint/examples/train_ticket/tests"
 	"github.com/blueprint-uservices/blueprint/examples/train_ticket/wiring/specs"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
 )
 
 func main() {
-	// Configure the location of our workflow spec
-	workflow.Init("../workflow", "../tests")
+	// Configure the location of our tests
+	workflowspec.AddModule("github.com/blueprint-uservices/blueprint/examples/train_ticket/tests")
 
 	// Build a supported wiring spec
 	name := "TrainTicket"

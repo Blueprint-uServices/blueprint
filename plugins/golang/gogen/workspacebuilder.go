@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"path/filepath"
-	"runtime"
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/ioutil"
@@ -141,6 +140,8 @@ func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSr
 		return "", err
 	}
 
+	slog.Info(fmt.Sprintf("Copying local module %s to workspace %s", shortName, workspace.WorkspaceDir))
+
 	return moduleDstPath, cp.Copy(moduleSrcPath, moduleDstPath)
 }
 
@@ -148,15 +149,6 @@ func (workspace *WorkspaceBuilderImpl) AddLocalModule(shortName string, moduleSr
 func (workspace *WorkspaceBuilderImpl) GetLocalModule(modulePath string) (string, bool) {
 	shortName, exists := workspace.ModuleDirs[modulePath]
 	return shortName, exists
-}
-
-// Implements [golang.WorkspaceBuilder]
-func (workspace *WorkspaceBuilderImpl) AddLocalModuleRelative(shortName string, relativeModuleSrcPath string) (string, error) {
-	_, callingFile, _, _ := runtime.Caller(1)
-	dir, _ := filepath.Split(callingFile)
-	moduleSrcPath := filepath.Join(dir, relativeModuleSrcPath)
-	return workspace.AddLocalModule(shortName, moduleSrcPath)
-
 }
 
 func (workspace *WorkspaceBuilderImpl) readModfile(moduleSubDir string) (*modfile.File, error) {

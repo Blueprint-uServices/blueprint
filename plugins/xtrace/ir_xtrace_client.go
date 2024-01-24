@@ -7,9 +7,8 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/xtrace"
 	"golang.org/x/exp/slog"
 )
 
@@ -20,70 +19,53 @@ type XTraceClient struct {
 
 	ClientName     string
 	ServerDialAddr *address.DialConfig
-
-	InstanceName string
-	Iface        *goparser.ParsedInterface
-	Constructor  *gocode.Constructor
+	Spec           *workflowspec.Service
 }
 
 func newXTraceClient(name string, addr *address.DialConfig) (*XTraceClient, error) {
-	node := &XTraceClient{}
-	err := node.init(name)
-	if err != nil {
-		return nil, err
+	spec, err := workflowspec.GetService[xtrace.XTracerImpl]()
+	node := &XTraceClient{
+		ClientName:     name,
+		ServerDialAddr: addr,
+		Spec:           spec,
 	}
-	node.ClientName = name
-	node.ServerDialAddr = addr
-	return node, nil
+	return node, err
 }
 
+// Implements ir.IRNode
 func (node *XTraceClient) Name() string {
 	return node.ClientName
 }
 
+// Implements ir.IRNode
 func (node *XTraceClient) String() string {
 	return node.Name() + " = XTraceClient(" + node.ServerDialAddr.Name() + ")"
 }
 
-func (node *XTraceClient) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("XTracerImpl")
-	if err != nil {
-		return err
-	}
-
-	node.InstanceName = name
-	node.Iface = details.Iface
-	node.Constructor = details.Constructor.AsConstructor()
-	return nil
-}
-
+// Implements golang.Instantiable
 func (node *XTraceClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.ClientName) {
 		return nil
 	}
 
-	slog.Info(fmt.Sprintf("Instantiating XTraceClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
+	slog.Info(fmt.Sprintf("Instantiating XTraceClient %v in %v/%v", node.ClientName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []ir.IRNode{node.ServerDialAddr})
+	return builder.DeclareConstructor(node.ClientName, node.Spec.Constructor.AsConstructor(), []ir.IRNode{node.ServerDialAddr})
 }
 
+// Implements golang.ProvidesModule
 func (node *XTraceClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
+	return node.Spec.AddToWorkspace(builder)
 }
 
+// Implements golang.ProvidesInterface
 func (node *XTraceClient) AddInterfaces(builder golang.ModuleBuilder) error {
-	return node.AddToWorkspace(builder.Workspace())
+	return node.Spec.AddToModule(builder)
 }
 
+// Implements service.ServiceNode
 func (node *XTraceClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
-	return node.Iface.ServiceInterface(ctx), nil
+	return node.Spec.Iface.ServiceInterface(ctx), nil
 }
 
 func (node *XTraceClient) ImplementsGolangNode() {}

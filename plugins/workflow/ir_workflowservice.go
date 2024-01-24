@@ -2,14 +2,13 @@ package workflow
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
 	"golang.org/x/exp/slog"
 )
 
@@ -22,10 +21,7 @@ type workflowNode struct {
 	ServiceType  string // The short-name serviceType used to initialize this workflow service
 
 	// Details of the service, including its interface and constructor
-	ServiceInfo *WorkflowSpecService
-
-	// The workflow spec where this service originated
-	Spec *WorkflowSpec
+	ServiceInfo *workflowspec.Service
 }
 
 // The client-side of a workflow service
@@ -43,22 +39,13 @@ type workflowHandler struct {
 	Args []ir.IRNode
 }
 
-func (n *workflowNode) Init(name, serviceType string) error {
-	// Look up the service details; errors out if the service doesn't exist
-	spec, err := GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get(serviceType)
-	if err != nil {
-		return err
-	}
-
+func initWorkflowNode[ServiceType any](n *workflowNode, name string) (err error) {
 	n.InstanceName = name
-	n.ServiceType = serviceType
-	n.ServiceInfo = details
-	n.Spec = spec
+	n.ServiceInfo, err = workflowspec.GetService[ServiceType]()
+	if err != nil {
+		return err
+	}
+	n.ServiceType = n.ServiceInfo.Iface.Name
 
 	return nil
 }
@@ -73,45 +60,17 @@ func (node *workflowNode) GetInterface(ctx ir.BuildContext) (service.ServiceInte
 
 // Both the client and the handler need to add interfaces to modules that use them.
 func (node *workflowNode) AddInterfaces(builder golang.ModuleBuilder) error {
-	return node.AddToWorkspace(builder.Workspace())
+	return node.ServiceInfo.AddToModule(builder)
 }
 
 // Client and handler side both need to add the service interface to the output
 func (node *workflowNode) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	// Add blueprint runtime to the workspace
-	if err := golang.AddRuntimeModule(builder); err != nil {
-		return err
-	}
-
-	// Add interface module to workspace
-	if _, err := copyModuleToOutputWorkspace(builder, node.ServiceInfo.Iface.File.Package.Module); err != nil {
-		return err
-	}
-
-	return nil
+	return golang.AddToWorkspace(builder, node.ServiceInfo.Iface.File.Package.Module)
 }
 
 // The handler node needs to add the constructor package to the output
 func (node *workflowHandler) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	// Add the service interface and runtime package
-	if err := node.workflowNode.AddToWorkspace(builder); err != nil {
-		return err
-	}
-
-	// Add constructor module to workspace
-	if _, err := copyModuleToOutputWorkspace(builder, node.ServiceInfo.Constructor.File.Package.Module); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func copyModuleToOutputWorkspace(b golang.WorkspaceBuilder, mod *goparser.ParsedModule) (string, error) {
-	_, subdir := filepath.Split(mod.SrcDir)
-	if !b.Visited(mod.Name) {
-		slog.Info(fmt.Sprintf("Copying local module %v to workspace", subdir))
-	}
-	return b.AddLocalModule(subdir, mod.SrcDir)
+	return node.ServiceInfo.AddToWorkspace(builder)
 }
 
 func (node *workflowHandler) AddInstantiation(builder golang.NamespaceBuilder) error {

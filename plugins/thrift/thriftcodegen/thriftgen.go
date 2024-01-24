@@ -12,6 +12,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
 	"golang.org/x/exp/slog"
 )
 
@@ -22,8 +23,8 @@ func GenerateThrift(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 		return nil
 	}
 
-	modules, err := goparser.ParseWorkspace(builder.Workspace().Info().Path)
-	if err != nil {
+	modules := workflowspec.Get().Derive().Modules
+	if err := modules.AddWorkspace(builder.Workspace().Info().Path); err != nil {
 		return err
 	}
 
@@ -36,7 +37,7 @@ func GenerateThrift(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 	tf.ImportName = strings.ToLower(service.BaseName)
 	tf.InternalPkg = tf.PackageName + "/" + tf.ImportName
 
-	err = tf.AddService(service)
+	err := tf.AddService(service)
 	if err != nil {
 		return err
 	}
@@ -242,9 +243,9 @@ func (b *ThriftBuilder) GetOrAddMessage(t *gocode.UserType) (*ThriftStructDecl, 
 		return structDecl, nil
 	}
 
-	pkg := b.Code.GetPackage(t.Package)
-	if pkg == nil {
-		return nil, blueprint.Errorf("could not find package %v for type %v", t.Package, t)
+	pkg, err := b.Code.GetPackage(t.Package)
+	if err != nil {
+		return nil, blueprint.Errorf("could not find package %v for type %v due to: %v", t.Package, t, err)
 	}
 	struc, hasStruct := pkg.Structs[t.Name]
 	if !hasStruct {

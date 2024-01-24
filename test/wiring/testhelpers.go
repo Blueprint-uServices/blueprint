@@ -8,7 +8,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/logging"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
 	"github.com/stretchr/testify/require"
 )
 
@@ -19,9 +19,8 @@ func newWiringSpec(name string) wiring.WiringSpec {
 		logging.DisableCompilerLogging()
 		defer logging.EnableCompilerLogging()
 	}
-	workflow.Reset()
 	spec := wiring.NewWiringSpec(name)
-	workflow.Init("../workflow")
+	workflowspec.AddModule("github.com/blueprint-uservices/blueprint/test/workflow")
 	return spec
 }
 

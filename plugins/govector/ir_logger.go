@@ -6,9 +6,8 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/govector"
 	"golang.org/x/exp/slog"
 )
 
@@ -17,23 +16,17 @@ type GoVecLoggerClient struct {
 	golang.Node
 	golang.Instantiable
 
-	ClientName   string
-	InstanceName string
-	LoggerName   string
-	Iface        *goparser.ParsedInterface
-	Constructor  *gocode.Constructor
+	ClientName string
+	Spec       *workflowspec.Service
 }
 
 func newGoVecLoggerClient(name string) (*GoVecLoggerClient, error) {
-	node := &GoVecLoggerClient{}
-	err := node.init(name)
-	if err != nil {
-		return nil, err
+	spec, err := workflowspec.GetService[govector.GoVecLogger]()
+	node := &GoVecLoggerClient{
+		ClientName: name,
+		Spec:       spec,
 	}
-	node.ClientName = name
-	node.InstanceName = name
-	node.LoggerName = name
-	return node, nil
+	return node, err
 }
 
 // Implements ir.IRNode
@@ -46,48 +39,31 @@ func (node *GoVecLoggerClient) String() string {
 	return node.Name() + " = GoVecLogger()"
 }
 
-func (node *GoVecLoggerClient) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("GoVecLogger")
-	if err != nil {
-		return err
-	}
-
-	node.Iface = details.Iface
-	node.Constructor = details.Constructor.AsConstructor()
-	return nil
-}
-
 // Implements golang.Instantiable
 func (node *GoVecLoggerClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.ClientName) {
 		return nil
 	}
 
-	slog.Info(fmt.Sprintf("Instantiating GoVecLoggerClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
+	slog.Info(fmt.Sprintf("Instantiating GoVecLoggerClient %v in %v/%v", node.ClientName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []ir.IRNode{&ir.IRValue{Value: node.LoggerName}})
+	constructor := node.Spec.Constructor.AsConstructor()
+	return builder.DeclareConstructor(node.ClientName, constructor, []ir.IRNode{&ir.IRValue{Value: node.ClientName}})
 }
 
 // Implements golang.ProvidesModule
 func (node *GoVecLoggerClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
+	return node.Spec.AddToWorkspace(builder)
 }
 
 // Implements golang.ProvidesInterface
 func (node *GoVecLoggerClient) AddInterfaces(builder golang.ModuleBuilder) error {
-	return node.AddToWorkspace(builder.Workspace())
+	return node.Spec.AddToModule(builder)
 }
 
 // Implements service.ServiceNode
 func (node *GoVecLoggerClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
-	return node.Iface.ServiceInterface(ctx), nil
+	return node.Spec.Iface.ServiceInterface(ctx), nil
 }
 
 // Implements golang.Node

@@ -38,7 +38,9 @@ Several plugins are interested in parsing golang code \-\- principally the workf
 
 ## Index
 
-- [func AddRuntimeModule\(workspace WorkspaceBuilder\) error](<#AddRuntimeModule>)
+- [func AddModule\(ctx ir.BuildContext, moduleName string\) error](<#AddModule>)
+- [func AddToModule\(builder ModuleBuilder, mods ...\*goparser.ParsedModule\) error](<#AddToModule>)
+- [func AddToWorkspace\(builder WorkspaceBuilder, mods ...\*goparser.ParsedModule\) error](<#AddToWorkspace>)
 - [func GetGoInterface\(ctx ir.BuildContext, node ir.IRNode\) \(\*gocode.ServiceInterface, error\)](<#GetGoInterface>)
 - [type GeneratesFuncs](<#GeneratesFuncs>)
 - [type Instantiable](<#Instantiable>)
@@ -55,14 +57,36 @@ Several plugins are interested in parsing golang code \-\- principally the workf
 - [type WorkspaceInfo](<#WorkspaceInfo>)
 
 
-<a name="AddRuntimeModule"></a>
-## func [AddRuntimeModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/helpers.go#L47>)
+<a name="AddModule"></a>
+## func [AddModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/helpers.go#L52>)
 
 ```go
-func AddRuntimeModule(workspace WorkspaceBuilder) error
+func AddModule(ctx ir.BuildContext, moduleName string) error
 ```
 
-A convenience function that can be called by other Blueprint plugins. Ensures that Blueprint's [runtime](<https://github.com/Blueprint-uServices/blueprint/tree/main/runtime>) module is copied to the output workspace.
+A convenience function that can be called by other Blueprint plugins. Looks up the specified moduleName \(assuming it is a dependency of the current module\), with the intention of adding it as a dependency to the provided build context.
+
+If ctx is a [ModuleBuilder](<#ModuleBuilder>), this method adds the module as a dependency to the module, ie. as a 'require' to go.mod, but ONLY if the module isn't a local module \(ie. with a replace directive\).
+
+If ctx is a [WorkspaceBuilder](<#WorkspaceBuilder>), this method copies the module to the output workspace, but ONLY if the module is a local module \(ie. with a replace directive\).
+
+<a name="AddToModule"></a>
+## func [AddToModule](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/helpers.go#L85>)
+
+```go
+func AddToModule(builder ModuleBuilder, mods ...*goparser.ParsedModule) error
+```
+
+A convenience function that can be called by other Blueprint plugins. If mod is not a local module, ensures that it is added as a 'require' to go.mod.
+
+<a name="AddToWorkspace"></a>
+## func [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/helpers.go#L100>)
+
+```go
+func AddToWorkspace(builder WorkspaceBuilder, mods ...*goparser.ParsedModule) error
+```
+
+A convenience function that can be called by other Blueprint plugins. If mod is a local module, ensures that it is copied to the output workspace.
 
 <a name="GetGoInterface"></a>
 ## func [GetGoInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/helpers.go#L17>)
@@ -109,7 +133,7 @@ type Instantiable interface {
 ```
 
 <a name="ModuleBuilder"></a>
-## type [ModuleBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L229-L249>)
+## type [ModuleBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L221-L245>)
 
 [ModuleBuilder](<#ModuleBuilder>) is used during Blueprint's compilation process by [Node](<#Node>) implementations that generate code. A [Node](<#Node>) must also implement the [ProvidesInterface](<#ProvidesInterface>) or [GeneratesFuncs](<#GeneratesFuncs>) interfaces if it wishes to make use of the [ModuleBuilder](<#ModuleBuilder>).
 
@@ -126,13 +150,17 @@ type ModuleBuilder interface {
     */
     Info() ModuleInfo
 
-    /*
-    	This creates a package within the module, with the specified package name.
-    	It will create the necessary output directories and returns information
-    	about the created package.  The provided packageName should take the form a/b/c
-    	This call will succeed even if the package already exists on the filesystem.
-    */
+    // This creates a package within the module, with the specified package name.
+    // It will create the necessary output directories and returns information
+    // about the created package.  The provided packageName should take the form a/b/c
+    // This call will succeed even if the package already exists on the filesystem.
     CreatePackage(packageName string) (PackageInfo, error)
+
+    // Enables a plugin to add a 'require' statement to the go.mod file for the generated
+    // module.  Typically this is not necessary because a subsequent `go mod tidy` will
+    // automatically pick up module dependencies.  However, if a plugin wishes to explicitly
+    // control the dependency version, it can use this method.
+    Require(moduleName string, version string) error
 
     /*
     	Gets the WorkspaceBuilder that contains this ModuleBuilder
@@ -142,7 +170,7 @@ type ModuleBuilder interface {
 ```
 
 <a name="ModuleInfo"></a>
-## type [ModuleInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L206-L210>)
+## type [ModuleInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L198-L202>)
 
 Metadata about a golang module that resides within a golang workspace
 
@@ -155,7 +183,7 @@ type ModuleInfo struct {
 ```
 
 <a name="NamespaceBuilder"></a>
-## type [NamespaceBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L277-L360>)
+## type [NamespaceBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L273-L356>)
 
 [NamespaceBuilder](<#NamespaceBuilder>) is used during Blueprint's compilation process by [Node](<#Node>) implementations that want to instantiate code. A [Node](<#Node>) must also implement the [Instantiable](<#Instantiable>) interface if it wishes to make use of the [NamespaceBuilder](<#NamespaceBuilder>).
 
@@ -253,7 +281,7 @@ type NamespaceBuilder interface {
 ```
 
 <a name="NamespaceInfo"></a>
-## type [NamespaceInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L252-L257>)
+## type [NamespaceInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L248-L253>)
 
 Metadata about a namespace code file being generated
 
@@ -279,7 +307,7 @@ type Node interface {
 ```
 
 <a name="PackageInfo"></a>
-## type [PackageInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L213-L218>)
+## type [PackageInfo](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L205-L210>)
 
 Metadata about a package within a golang module
 
@@ -342,7 +370,7 @@ type Service interface {
 ```
 
 <a name="WorkspaceBuilder"></a>
-## type [WorkspaceBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L160-L203>)
+## type [WorkspaceBuilder](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/golang/ir.go#L160-L195>)
 
 [WorkspaceBuilder](<#WorkspaceBuilder>) is used during Blueprint's compilation process to enable [Node](<#Node>) implementations to generate or copy Golang code modules into the output workspace. A [Node](<#Node>) must also implement the [ProvidesModule](<#ProvidesModule>) interface if it wishes to make use of the [WorkspaceBuilder](<#WorkspaceBuilder>).
 
@@ -365,14 +393,6 @@ type WorkspaceBuilder interface {
     		Returns the path to the module in the output directory
     */
     AddLocalModule(shortName string, moduleSrcPath string) (string, error)
-
-    /*
-    	This is a variant of `AddLocalMethod` provided for convenience; instead of an absolute filesystem path, the
-    	specified path is relative to the caller
-
-    	Returns the path to the module in the output directory
-    */
-    AddLocalModuleRelative(shortName string, relativeModuleSrcPath string) (string, error)
 
     /*
     	This method is used by plugins if they want to create a module in the workspace to then generate code into.

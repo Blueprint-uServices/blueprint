@@ -12,6 +12,7 @@ import (
 
 // A simple chan-based queue that implements the [backend.Queue] interface
 type SimpleQueue struct {
+	backend.Queue
 	q chan any
 }
 

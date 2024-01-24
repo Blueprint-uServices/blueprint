@@ -28,7 +28,7 @@ The returned \`collector\` must be used as an argument to the \`opentelemetry.In
 - [func Collector\(spec wiring.WiringSpec, collectorName string\) string](<#Collector>)
 - [type JaegerCollectorClient](<#JaegerCollectorClient>)
   - [func \(node \*JaegerCollectorClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#JaegerCollectorClient.AddInstantiation>)
-  - [func \(node \*JaegerCollectorClient\) AddInterfaces\(builder golang.WorkspaceBuilder\) error](<#JaegerCollectorClient.AddInterfaces>)
+  - [func \(node \*JaegerCollectorClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#JaegerCollectorClient.AddInterfaces>)
   - [func \(node \*JaegerCollectorClient\) AddToWorkspace\(builder golang.WorkspaceBuilder\) error](<#JaegerCollectorClient.AddToWorkspace>)
   - [func \(node \*JaegerCollectorClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#JaegerCollectorClient.GetInterface>)
   - [func \(node \*JaegerCollectorClient\) ImplementsGolangNode\(\)](<#JaegerCollectorClient.ImplementsGolangNode>)
@@ -64,61 +64,61 @@ jaeger.Collector(spec, "jaeger")
 ```
 
 <a name="JaegerCollectorClient"></a>
-## type [JaegerCollectorClient](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L17-L26>)
+## type [JaegerCollectorClient](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L16-L25>)
 
 Blueprint IR node representing a client to the jaeger container
 
 ```go
 type JaegerCollectorClient struct {
     golang.Node
+    service.ServiceNode
     golang.Instantiable
     ClientName string
     ServerDial *address.DialConfig
 
     InstanceName string
-    Iface        *goparser.ParsedInterface
-    Constructor  *gocode.Constructor
+    Spec         *workflowspec.Service
 }
 ```
 
 <a name="JaegerCollectorClient.AddInstantiation"></a>
-### func \(\*JaegerCollectorClient\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L66>)
+### func \(\*JaegerCollectorClient\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L53>)
 
 ```go
 func (node *JaegerCollectorClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
-
+Implements golang.Instantiable
 
 <a name="JaegerCollectorClient.AddInterfaces"></a>
-### func \(\*JaegerCollectorClient\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L81>)
+### func \(\*JaegerCollectorClient\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L70>)
 
 ```go
-func (node *JaegerCollectorClient) AddInterfaces(builder golang.WorkspaceBuilder) error
+func (node *JaegerCollectorClient) AddInterfaces(builder golang.ModuleBuilder) error
 ```
 
-
+Implements golang.ProvidesInterface
 
 <a name="JaegerCollectorClient.AddToWorkspace"></a>
-### func \(\*JaegerCollectorClient\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L85>)
+### func \(\*JaegerCollectorClient\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L75>)
 
 ```go
 func (node *JaegerCollectorClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
 ```
 
-
+Implements golang.ProvidesModule
 
 <a name="JaegerCollectorClient.GetInterface"></a>
-### func \(\*JaegerCollectorClient\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L77>)
+### func \(\*JaegerCollectorClient\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L65>)
 
 ```go
 func (node *JaegerCollectorClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
-
+Implements service.ServiceNode
 
 <a name="JaegerCollectorClient.ImplementsGolangNode"></a>
-### func \(\*JaegerCollectorClient\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L89>)
+### func \(\*JaegerCollectorClient\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L79>)
 
 ```go
 func (node *JaegerCollectorClient) ImplementsGolangNode()
@@ -127,7 +127,7 @@ func (node *JaegerCollectorClient) ImplementsGolangNode()
 
 
 <a name="JaegerCollectorClient.ImplementsOTCollectorClient"></a>
-### func \(\*JaegerCollectorClient\) [ImplementsOTCollectorClient](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L91>)
+### func \(\*JaegerCollectorClient\) [ImplementsOTCollectorClient](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L81>)
 
 ```go
 func (node *JaegerCollectorClient) ImplementsOTCollectorClient()
@@ -136,25 +136,25 @@ func (node *JaegerCollectorClient) ImplementsOTCollectorClient()
 
 
 <a name="JaegerCollectorClient.Name"></a>
-### func \(\*JaegerCollectorClient\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L39>)
+### func \(\*JaegerCollectorClient\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L43>)
 
 ```go
 func (node *JaegerCollectorClient) Name() string
 ```
 
-
+Implements ir.IRNode
 
 <a name="JaegerCollectorClient.String"></a>
-### func \(\*JaegerCollectorClient\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L43>)
+### func \(\*JaegerCollectorClient\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector_client.go#L48>)
 
 ```go
 func (node *JaegerCollectorClient) String() string
 ```
 
-
+Implements ir.IRNode
 
 <a name="JaegerCollectorContainer"></a>
-## type [JaegerCollectorContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L13-L19>)
+## type [JaegerCollectorContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L14-L22>)
 
 Blueprint IR node that represents the Jaeger container
 
@@ -164,12 +164,14 @@ type JaegerCollectorContainer struct {
 
     CollectorName string
     BindAddr      *address.BindConfig
-    Iface         *goparser.ParsedInterface
+    UIBindAddr    *address.BindConfig
+
+    Iface *goparser.ParsedInterface
 }
 ```
 
 <a name="JaegerCollectorContainer.AddContainerArtifacts"></a>
-### func \(\*JaegerCollectorContainer\) [AddContainerArtifacts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L76>)
+### func \(\*JaegerCollectorContainer\) [AddContainerArtifacts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L64>)
 
 ```go
 func (node *JaegerCollectorContainer) AddContainerArtifacts(targer docker.ContainerWorkspace) error
@@ -178,7 +180,7 @@ func (node *JaegerCollectorContainer) AddContainerArtifacts(targer docker.Contai
 
 
 <a name="JaegerCollectorContainer.AddContainerInstance"></a>
-### func \(\*JaegerCollectorContainer\) [AddContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L80>)
+### func \(\*JaegerCollectorContainer\) [AddContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L68>)
 
 ```go
 func (node *JaegerCollectorContainer) AddContainerInstance(target docker.ContainerWorkspace) error
@@ -187,7 +189,7 @@ func (node *JaegerCollectorContainer) AddContainerInstance(target docker.Contain
 
 
 <a name="JaegerCollectorContainer.GetInterface"></a>
-### func \(\*JaegerCollectorContainer\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L71>)
+### func \(\*JaegerCollectorContainer\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L59>)
 
 ```go
 func (node *JaegerCollectorContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -196,7 +198,7 @@ func (node *JaegerCollectorContainer) GetInterface(ctx ir.BuildContext) (service
 
 
 <a name="JaegerCollectorContainer.Name"></a>
-### func \(\*JaegerCollectorContainer\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L63>)
+### func \(\*JaegerCollectorContainer\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L51>)
 
 ```go
 func (node *JaegerCollectorContainer) Name() string
@@ -205,7 +207,7 @@ func (node *JaegerCollectorContainer) Name() string
 
 
 <a name="JaegerCollectorContainer.String"></a>
-### func \(\*JaegerCollectorContainer\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L67>)
+### func \(\*JaegerCollectorContainer\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L55>)
 
 ```go
 func (node *JaegerCollectorContainer) String() string
@@ -214,7 +216,7 @@ func (node *JaegerCollectorContainer) String() string
 
 
 <a name="JaegerInterface"></a>
-## type [JaegerInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L22-L25>)
+## type [JaegerInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L25-L28>)
 
 Jaeger interface exposed to the application.
 
@@ -226,7 +228,7 @@ type JaegerInterface struct {
 ```
 
 <a name="JaegerInterface.GetMethods"></a>
-### func \(\*JaegerInterface\) [GetMethods](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L31>)
+### func \(\*JaegerInterface\) [GetMethods](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L34>)
 
 ```go
 func (j *JaegerInterface) GetMethods() []service.Method
@@ -235,7 +237,7 @@ func (j *JaegerInterface) GetMethods() []service.Method
 
 
 <a name="JaegerInterface.GetName"></a>
-### func \(\*JaegerInterface\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L27>)
+### func \(\*JaegerInterface\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/jaeger/ir_collector.go#L30>)
 
 ```go
 func (j *JaegerInterface) GetName() string

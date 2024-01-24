@@ -41,7 +41,7 @@ var Docker = cmdbuilder.SpecOption{
 }
 ```
 
-<a name="DockerRabbit"></a>A wiring spec that deploys each service into its own Docker container and using gRPC to communicate between services. All RPC calls are retried up to 3 times. RPC clients use a client pool with 10 clients. All services are instrumented with OpenTelemetry and traces are exported to Zipkin The user, cart, shipping, and orders services using separate MongoDB instances to store their data. The catalogue service uses MySQL to store catalogue data. The shipping service and queue master service run within the same process \(TODO: separate processes\)
+<a name="DockerRabbit"></a>A wiring spec that deploys each service into its own Docker container and using gRPC to communicate between services. All RPC calls are retried up to 3 times. RPC clients use a client pool with 10 clients. All services are instrumented with OpenTelemetry and traces are exported to Zipkin The user, cart, shipping, and orders services using separate MongoDB instances to store their data. The catalogue service uses MySQL to store catalogue data.
 
 ```go
 var DockerRabbit = cmdbuilder.SpecOption{

@@ -9,7 +9,7 @@ Full details of all plugins can be found by browsing the [/plugins](../../plugin
 ### ✏️[workflow](../../plugins/workflow)
 Creates named application-level instances of services defined in the application's workflow spec.
 ```
-payment_service := workflow.Service(spec, "payment_service", "PaymentService")
+payment_service := workflow.Service[payment.PaymentService](spec, "payment_service")
 ```
 
 ## Workflow Backends

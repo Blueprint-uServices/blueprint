@@ -81,7 +81,6 @@ The traces are generated and sent to the xtrace\-server. To access traces, navig
   - [func \(node \*XTraceLogger\) Name\(\) string](<#XTraceLogger.Name>)
   - [func \(node \*XTraceLogger\) String\(\) string](<#XTraceLogger.String>)
 - [type XTraceServerContainer](<#XTraceServerContainer>)
-  - [func \(node \*XTraceServerContainer\) AddContainerArtifacts\(target docker.ContainerWorkspace\) error](<#XTraceServerContainer.AddContainerArtifacts>)
   - [func \(node \*XTraceServerContainer\) AddContainerInstance\(target docker.ContainerWorkspace\) error](<#XTraceServerContainer.AddContainerInstance>)
   - [func \(node \*XTraceServerContainer\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#XTraceServerContainer.GetInterface>)
   - [func \(node \*XTraceServerContainer\) Name\(\) string](<#XTraceServerContainer.Name>)
@@ -143,7 +142,7 @@ xtrace.Logger(spec, "my_process") // Define an xtrace-logger for the process `my
 ```
 
 <a name="XTraceClient"></a>
-## type [XTraceClient](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L17-L27>)
+## type [XTraceClient](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L16-L23>)
 
 Blueprint IR Node that represents a client to the Xtrace container
 
@@ -154,51 +153,48 @@ type XTraceClient struct {
 
     ClientName     string
     ServerDialAddr *address.DialConfig
-
-    InstanceName string
-    Iface        *goparser.ParsedInterface
-    Constructor  *gocode.Constructor
+    Spec           *workflowspec.Service
 }
 ```
 
 <a name="XTraceClient.AddInstantiation"></a>
-### func \(\*XTraceClient\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L67>)
+### func \(\*XTraceClient\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L46>)
 
 ```go
 func (node *XTraceClient) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
-
+Implements golang.Instantiable
 
 <a name="XTraceClient.AddInterfaces"></a>
-### func \(\*XTraceClient\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L81>)
+### func \(\*XTraceClient\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L62>)
 
 ```go
 func (node *XTraceClient) AddInterfaces(builder golang.ModuleBuilder) error
 ```
 
-
+Implements golang.ProvidesInterface
 
 <a name="XTraceClient.AddToWorkspace"></a>
-### func \(\*XTraceClient\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L77>)
+### func \(\*XTraceClient\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L57>)
 
 ```go
 func (node *XTraceClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
 ```
 
-
+Implements golang.ProvidesModule
 
 <a name="XTraceClient.GetInterface"></a>
-### func \(\*XTraceClient\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L85>)
+### func \(\*XTraceClient\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L67>)
 
 ```go
 func (node *XTraceClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
-
+Implements service.ServiceNode
 
 <a name="XTraceClient.ImplementsGolangNode"></a>
-### func \(\*XTraceClient\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L89>)
+### func \(\*XTraceClient\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L71>)
 
 ```go
 func (node *XTraceClient) ImplementsGolangNode()
@@ -207,25 +203,25 @@ func (node *XTraceClient) ImplementsGolangNode()
 
 
 <a name="XTraceClient.Name"></a>
-### func \(\*XTraceClient\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L40>)
+### func \(\*XTraceClient\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L36>)
 
 ```go
 func (node *XTraceClient) Name() string
 ```
 
-
+Implements ir.IRNode
 
 <a name="XTraceClient.String"></a>
-### func \(\*XTraceClient\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L44>)
+### func \(\*XTraceClient\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client.go#L41>)
 
 ```go
 func (node *XTraceClient) String() string
 ```
 
-
+Implements ir.IRNode
 
 <a name="XTraceInterface"></a>
-## type [XTraceInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L22-L25>)
+## type [XTraceInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L24-L27>)
 
 The interface exposed by the XTrace server.
 
@@ -237,7 +233,7 @@ type XTraceInterface struct {
 ```
 
 <a name="XTraceInterface.GetMethods"></a>
-### func \(\*XTraceInterface\) [GetMethods](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L31>)
+### func \(\*XTraceInterface\) [GetMethods](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L33>)
 
 ```go
 func (xt *XTraceInterface) GetMethods() []service.Method
@@ -246,7 +242,7 @@ func (xt *XTraceInterface) GetMethods() []service.Method
 
 
 <a name="XTraceInterface.GetName"></a>
-### func \(\*XTraceInterface\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L27>)
+### func \(\*XTraceInterface\) [GetName](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L29>)
 
 ```go
 func (xt *XTraceInterface) GetName() string
@@ -255,7 +251,7 @@ func (xt *XTraceInterface) GetName() string
 
 
 <a name="XTraceLogger"></a>
-## type [XTraceLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L17-L26>)
+## type [XTraceLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L16-L24>)
 
 Blueprint IR Node that represents a process\-level xtrace logger
 
@@ -266,50 +262,49 @@ type XTraceLogger struct {
 
     ServerDialAddr *address.DialConfig
 
-    LoggerName  string
-    Iface       *goparser.ParsedInterface
-    Constructor *gocode.Constructor
+    LoggerName string
+    Spec       *workflowspec.Service
 }
 ```
 
 <a name="XTraceLogger.AddInstantiation"></a>
-### func \(\*XTraceLogger\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L76>)
+### func \(\*XTraceLogger\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L62>)
 
 ```go
 func (node *XTraceLogger) AddInstantiation(builder golang.NamespaceBuilder) error
 ```
 
-
+Implements golang.Instantiable
 
 <a name="XTraceLogger.AddInterfaces"></a>
-### func \(\*XTraceLogger\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L68>)
+### func \(\*XTraceLogger\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L52>)
 
 ```go
 func (node *XTraceLogger) AddInterfaces(builder golang.ModuleBuilder) error
 ```
 
-
+Implements golang.ProvidesInterface
 
 <a name="XTraceLogger.AddToWorkspace"></a>
-### func \(\*XTraceLogger\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L64>)
+### func \(\*XTraceLogger\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L47>)
 
 ```go
 func (node *XTraceLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error
 ```
 
-
+Implements golang.ProvidesModule
 
 <a name="XTraceLogger.GetInterface"></a>
-### func \(\*XTraceLogger\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L72>)
+### func \(\*XTraceLogger\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L57>)
 
 ```go
 func (node *XTraceLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
-
+Implements service.ServiceNode
 
 <a name="XTraceLogger.ImplementsGolangNode"></a>
-### func \(\*XTraceLogger\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L86>)
+### func \(\*XTraceLogger\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L72>)
 
 ```go
 func (node *XTraceLogger) ImplementsGolangNode()
@@ -318,31 +313,32 @@ func (node *XTraceLogger) ImplementsGolangNode()
 
 
 <a name="XTraceLogger.Name"></a>
-### func \(\*XTraceLogger\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L56>)
+### func \(\*XTraceLogger\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L37>)
 
 ```go
 func (node *XTraceLogger) Name() string
 ```
 
-
+Implements ir.IRNode
 
 <a name="XTraceLogger.String"></a>
-### func \(\*XTraceLogger\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L60>)
+### func \(\*XTraceLogger\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_logger.go#L42>)
 
 ```go
 func (node *XTraceLogger) String() string
 ```
 
-
+Implements ir.IRNode
 
 <a name="XTraceServerContainer"></a>
-## type [XTraceServerContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L13-L19>)
+## type [XTraceServerContainer](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L14-L21>)
 
 Blueprint IR Node that represents the Xtrace container
 
 ```go
 type XTraceServerContainer struct {
     docker.Container
+    docker.ProvidesContainerInstance
 
     ServerName string
     BindAddr   *address.BindConfig
@@ -350,50 +346,41 @@ type XTraceServerContainer struct {
 }
 ```
 
-<a name="XTraceServerContainer.AddContainerArtifacts"></a>
-### func \(\*XTraceServerContainer\) [AddContainerArtifacts](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L76>)
-
-```go
-func (node *XTraceServerContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error
-```
-
-
-
 <a name="XTraceServerContainer.AddContainerInstance"></a>
-### func \(\*XTraceServerContainer\) [AddContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L80>)
+### func \(\*XTraceServerContainer\) [AddContainerInstance](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L67>)
 
 ```go
 func (node *XTraceServerContainer) AddContainerInstance(target docker.ContainerWorkspace) error
 ```
 
-
+Implements docker.ProvidesContainerInstance
 
 <a name="XTraceServerContainer.GetInterface"></a>
-### func \(\*XTraceServerContainer\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L71>)
+### func \(\*XTraceServerContainer\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L61>)
 
 ```go
 func (node *XTraceServerContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
 ```
 
-
+Implements service.ServiceNode
 
 <a name="XTraceServerContainer.Name"></a>
-### func \(\*XTraceServerContainer\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L63>)
+### func \(\*XTraceServerContainer\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L51>)
 
 ```go
 func (node *XTraceServerContainer) Name() string
 ```
 
-
+Implements ir.IRNode
 
 <a name="XTraceServerContainer.String"></a>
-### func \(\*XTraceServerContainer\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L67>)
+### func \(\*XTraceServerContainer\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_server.go#L56>)
 
 ```go
 func (node *XTraceServerContainer) String() string
 ```
 
-
+Implements ir.IRNode
 
 <a name="XtraceClientWrapper"></a>
 ## type [XtraceClientWrapper](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/xtrace/ir_xtrace_client_wrapper.go#L18-L27>)

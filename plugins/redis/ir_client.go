@@ -8,9 +8,8 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/redis"
 	"golang.org/x/exp/slog"
 )
 
@@ -18,64 +17,48 @@ import (
 type RedisGoClient struct {
 	golang.Service
 	backend.Cache
+
 	InstanceName string
 	Addr         *address.DialConfig
-
-	Iface       *goparser.ParsedInterface
-	Constructor *gocode.Constructor
+	Spec         *workflowspec.Service
 }
 
 func newRedisGoClient(name string, addr *address.DialConfig) (*RedisGoClient, error) {
-	client := &RedisGoClient{}
-	err := client.init(name)
-	if err != nil {
-		return nil, err
+	spec, err := workflowspec.GetService[redis.RedisCache]()
+	client := &RedisGoClient{
+		InstanceName: name,
+		Addr:         addr,
+		Spec:         spec,
 	}
-	client.InstanceName = name
-	client.Addr = addr
-	return client, nil
+	return client, err
 }
 
+// Implements ir.IRNode
 func (n *RedisGoClient) String() string {
 	return n.InstanceName + " = RedisClient(" + n.Addr.Name() + ")"
 }
 
+// Implements ir.IRNode
 func (n *RedisGoClient) Name() string {
 	return n.InstanceName
 }
 
-func (node *RedisGoClient) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("RedisCache")
-	if err != nil {
-		return err
-	}
-
-	node.InstanceName = name
-	node.Iface = details.Iface
-	node.Constructor = details.Constructor.AsConstructor()
-
-	return nil
-}
-
+// Implements service.ServiceNode
 func (n *RedisGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
-	return n.Iface.ServiceInterface(ctx), nil
+	return n.Spec.Iface.ServiceInterface(ctx), nil
 }
 
+// Implements golang.ProvidesModule
 func (n *RedisGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
+	return n.Spec.AddToWorkspace(builder)
 }
 
+// Implements golang.ProvidesInterface
 func (n *RedisGoClient) AddInterfaces(builder golang.ModuleBuilder) error {
-	return n.AddToWorkspace(builder.Workspace())
+	return n.Spec.AddToModule(builder)
 }
 
+// Implements golang.Instantiable
 func (n *RedisGoClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(n.InstanceName) {
 		return nil
@@ -83,7 +66,7 @@ func (n *RedisGoClient) AddInstantiation(builder golang.NamespaceBuilder) error 
 
 	slog.Info(fmt.Sprintf("Instantiating RedisClient %v in %v/%v", n.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(n.InstanceName, n.Constructor, []ir.IRNode{n.Addr})
+	return builder.DeclareConstructor(n.InstanceName, n.Spec.Constructor.AsConstructor(), []ir.IRNode{n.Addr})
 }
 
 func (node *RedisGoClient) ImplementsGolangNode()    {}

@@ -8,14 +8,18 @@
 package main
 
 import (
+	"fmt"
+
+	_ "github.com/blueprint-uservices/blueprint/examples/sockshop/tests"
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/wiring/specs"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
 )
 
 func main() {
-	// Configure the location of our workflow spec
-	workflow.Init("../workflow", "../tests", "../workload")
+	fmt.Println("hello world")
+	// Make sure tests and workflow can be found
+	workflowspec.AddModule("github.com/blueprint-uservices/blueprint/examples/sockshop/tests")
 
 	// Build a supported wiring spec
 	name := "SockShop"

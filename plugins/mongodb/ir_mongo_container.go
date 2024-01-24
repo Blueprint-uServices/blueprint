@@ -7,12 +7,14 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/docker"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/mongodb"
 )
 
 // Blueprint IR Node that represents the server side docker container
 type MongoDBContainer struct {
 	docker.Container
+	docker.ProvidesContainerInstance
 	backend.NoSQLDB
 
 	InstanceName string
@@ -35,52 +37,35 @@ func (m *MongoInterface) GetMethods() []service.Method {
 }
 
 func newMongoDBContainer(name string) (*MongoDBContainer, error) {
-	proc := &MongoDBContainer{}
-	proc.InstanceName = name
-	err := proc.init(name)
+	spec, err := workflowspec.GetService[mongodb.MongoDB]()
 	if err != nil {
 		return nil, err
+	}
+
+	proc := &MongoDBContainer{
+		InstanceName: name,
+		Iface:        spec.Iface,
 	}
 	return proc, nil
 }
 
-func (node *MongoDBContainer) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("MongoDB")
-	if err != nil {
-		return err
-	}
-	node.Iface = details.Iface
-	return nil
-}
-
+// Implements ir.IRNode
 func (m *MongoDBContainer) String() string {
 	return m.InstanceName + " = MongoDBProcess(" + m.BindAddr.Name() + ")"
 }
 
+// Implements ir.IRNode
 func (m *MongoDBContainer) Name() string {
 	return m.InstanceName
 }
 
+// Implements service.ServiceNode
 func (m *MongoDBContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface := m.Iface.ServiceInterface(ctx)
 	return &MongoInterface{Wrapped: iface}, nil
 }
 
-func (m *MongoDBContainer) GenerateArtifacts(outdir string) error {
-	return nil
-}
-
-func (node *MongoDBContainer) AddContainerArtifacts(targer docker.ContainerWorkspace) error {
-	return nil
-}
-
+// Implements docker.ProvidesContainerInstance
 func (node *MongoDBContainer) AddContainerInstance(target docker.ContainerWorkspace) error {
 	node.BindAddr.Port = 27017
 	return target.DeclarePrebuiltInstance(node.InstanceName, "mongo", node.BindAddr)

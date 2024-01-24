@@ -7,13 +7,15 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/docker"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/memcached"
 )
 
 // Blueprint IR Node that represents a memcached container
 type MemcachedContainer struct {
 	backend.Cache
 	docker.Container
+	docker.ProvidesContainerInstance
 
 	InstanceName string
 	BindAddr     *address.BindConfig
@@ -36,49 +38,35 @@ func (m *MemcachedInterface) GetMethods() []service.Method {
 }
 
 func newMemcachedContainer(name string) (*MemcachedContainer, error) {
-	proc := &MemcachedContainer{}
-	proc.InstanceName = name
-	err := proc.init(name)
+	spec, err := workflowspec.GetService[memcached.Memcached]()
 	if err != nil {
 		return nil, err
+	}
+
+	proc := &MemcachedContainer{
+		InstanceName: name,
+		Iface:        spec.Iface,
 	}
 	return proc, nil
 }
 
-func (node *MemcachedContainer) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("Memcached")
-	if err != nil {
-		return err
-	}
-
-	node.Iface = details.Iface
-	return nil
-}
-
+// Implements ir.IRNode
 func (n *MemcachedContainer) String() string {
 	return n.InstanceName + " = MemcachedProcess(" + n.BindAddr.Name() + ")"
 }
 
+// Implements ir.IRNode
 func (n *MemcachedContainer) Name() string {
 	return n.InstanceName
 }
 
+// Implements service.ServiceNode
 func (node *MemcachedContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface := node.Iface.ServiceInterface(ctx)
 	return &MemcachedInterface{Wrapped: iface}, nil
 }
 
-func (node *MemcachedContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error {
-	return nil
-}
-
+// Implements docker.ProvidesContainerInstance
 func (node *MemcachedContainer) AddContainerInstance(target docker.ContainerWorkspace) error {
 	instanceName := ir.CleanName(node.InstanceName)
 

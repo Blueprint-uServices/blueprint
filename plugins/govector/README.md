@@ -131,7 +131,7 @@ govector.Logger(spec, "my_process")
 ```
 
 <a name="GoVecLoggerClient"></a>
-## type [GoVecLoggerClient](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L16-L25>)
+## type [GoVecLoggerClient](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L15-L21>)
 
 Blueprint IR Node that represents a GoVector logger instance
 
@@ -140,16 +140,13 @@ type GoVecLoggerClient struct {
     golang.Node
     golang.Instantiable
 
-    ClientName   string
-    InstanceName string
-    LoggerName   string
-    Iface        *goparser.ParsedInterface
-    Constructor  *gocode.Constructor
+    ClientName string
+    Spec       *workflowspec.Service
 }
 ```
 
 <a name="GoVecLoggerClient.AddInstantiation"></a>
-### func \(\*GoVecLoggerClient\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L68>)
+### func \(\*GoVecLoggerClient\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L43>)
 
 ```go
 func (node *GoVecLoggerClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -158,7 +155,7 @@ func (node *GoVecLoggerClient) AddInstantiation(builder golang.NamespaceBuilder)
 Implements golang.Instantiable
 
 <a name="GoVecLoggerClient.AddInterfaces"></a>
-### func \(\*GoVecLoggerClient\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L84>)
+### func \(\*GoVecLoggerClient\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L60>)
 
 ```go
 func (node *GoVecLoggerClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -167,7 +164,7 @@ func (node *GoVecLoggerClient) AddInterfaces(builder golang.ModuleBuilder) error
 Implements golang.ProvidesInterface
 
 <a name="GoVecLoggerClient.AddToWorkspace"></a>
-### func \(\*GoVecLoggerClient\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L79>)
+### func \(\*GoVecLoggerClient\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L55>)
 
 ```go
 func (node *GoVecLoggerClient) AddToWorkspace(builder golang.WorkspaceBuilder) error
@@ -176,7 +173,7 @@ func (node *GoVecLoggerClient) AddToWorkspace(builder golang.WorkspaceBuilder) e
 Implements golang.ProvidesModule
 
 <a name="GoVecLoggerClient.GetInterface"></a>
-### func \(\*GoVecLoggerClient\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L89>)
+### func \(\*GoVecLoggerClient\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L65>)
 
 ```go
 func (node *GoVecLoggerClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -185,7 +182,7 @@ func (node *GoVecLoggerClient) GetInterface(ctx ir.BuildContext) (service.Servic
 Implements service.ServiceNode
 
 <a name="GoVecLoggerClient.ImplementsGolangNode"></a>
-### func \(\*GoVecLoggerClient\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L94>)
+### func \(\*GoVecLoggerClient\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L70>)
 
 ```go
 func (node *GoVecLoggerClient) ImplementsGolangNode()
@@ -194,7 +191,7 @@ func (node *GoVecLoggerClient) ImplementsGolangNode()
 Implements golang.Node
 
 <a name="GoVecLoggerClient.Name"></a>
-### func \(\*GoVecLoggerClient\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L40>)
+### func \(\*GoVecLoggerClient\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L33>)
 
 ```go
 func (node *GoVecLoggerClient) Name() string
@@ -203,7 +200,7 @@ func (node *GoVecLoggerClient) Name() string
 Implements ir.IRNode
 
 <a name="GoVecLoggerClient.String"></a>
-### func \(\*GoVecLoggerClient\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L45>)
+### func \(\*GoVecLoggerClient\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/govector/ir_logger.go#L38>)
 
 ```go
 func (node *GoVecLoggerClient) String() string

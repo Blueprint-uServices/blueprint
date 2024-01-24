@@ -8,9 +8,8 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/memcached"
 	"golang.org/x/exp/slog"
 )
 
@@ -22,62 +21,45 @@ type MemcachedGoClient struct {
 	InstanceName string
 	DialAddr     *address.DialConfig
 
-	Iface       *goparser.ParsedInterface
-	Constructor *gocode.Constructor
+	Spec *workflowspec.Service
 }
 
 func newMemcachedGoClient(name string, addr *address.DialConfig) (*MemcachedGoClient, error) {
-	client := &MemcachedGoClient{}
-	err := client.init(name)
-	if err != nil {
-		return nil, err
+	spec, err := workflowspec.GetService[memcached.Memcached]()
+	client := &MemcachedGoClient{
+		InstanceName: name,
+		DialAddr:     addr,
+		Spec:         spec,
 	}
-	client.InstanceName = name
-	client.DialAddr = addr
-	return client, nil
+	return client, err
 }
 
+// Implements ir.IRNode
 func (n *MemcachedGoClient) String() string {
 	return n.InstanceName + " = MemcachedClient(" + n.DialAddr.Name() + ")"
 }
 
+// Implements ir.IRNode
 func (n *MemcachedGoClient) Name() string {
 	return n.InstanceName
 }
 
-func (node *MemcachedGoClient) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("Memcached")
-	if err != nil {
-		return err
-	}
-
-	node.InstanceName = name
-	node.Iface = details.Iface
-	node.Constructor = details.Constructor.AsConstructor()
-
-	return nil
-}
-
+// Implements service.ServiceNode
 func (n *MemcachedGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
-	return n.Iface.ServiceInterface(ctx), nil
+	return n.Spec.Iface.ServiceInterface(ctx), nil
 }
 
+// Implements golang.ProvidesModule
 func (node *MemcachedGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	return golang.AddRuntimeModule(builder)
+	return node.Spec.AddToWorkspace(builder)
 }
 
+// Implements golang.ProvidesInterface
 func (node *MemcachedGoClient) AddInterfaces(builder golang.ModuleBuilder) error {
-	return node.AddToWorkspace(builder.Workspace())
+	return node.Spec.AddToModule(builder)
 }
 
-// Part of code generation compilation pass; provides instantiation snippet
+// Implements golang.Instantiable
 func (node *MemcachedGoClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
@@ -86,7 +68,7 @@ func (node *MemcachedGoClient) AddInstantiation(builder golang.NamespaceBuilder)
 
 	slog.Info(fmt.Sprintf("Instantiating MemcachedClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []ir.IRNode{node.DialAddr})
+	return builder.DeclareConstructor(node.InstanceName, node.Spec.Constructor.AsConstructor(), []ir.IRNode{node.DialAddr})
 }
 
 func (node *MemcachedGoClient) ImplementsGolangNode()    {}

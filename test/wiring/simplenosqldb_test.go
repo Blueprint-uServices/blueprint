@@ -5,6 +5,8 @@ import (
 
 	"github.com/blueprint-uservices/blueprint/plugins/simple"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/test/workflow/nosqldb"
+	wf "github.com/blueprint-uservices/blueprint/test/workflow/workflow"
 )
 
 func TestSimpleNoSQLDB(t *testing.T) {
@@ -12,8 +14,8 @@ func TestSimpleNoSQLDB(t *testing.T) {
 
 	leaf_cache := simple.Cache(spec, "leaf_cache")
 	leaf_db := simple.NoSQLDB(spec, "leaf_db")
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImplWithDB", leaf_cache, leaf_db)
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*nosqldb.TestLeafServiceImplWithDB](spec, "leaf", leaf_cache, leaf_db)
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	app := assertBuildSuccess(t, spec, leaf, leaf_db, nonleaf)
 

@@ -123,7 +123,7 @@ opentelemetry.Logger(spec, "my_process")
 ```
 
 <a name="OTTraceLogger"></a>
-## type [OTTraceLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L16-L23>)
+## type [OTTraceLogger](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L15-L21>)
 
 Blueprint IR Node that represents a process\-level OT trace logger
 
@@ -132,14 +132,13 @@ type OTTraceLogger struct {
     golang.Node
     golang.Instantiable
 
-    LoggerName  string
-    Iface       *goparser.ParsedInterface
-    Constructor *gocode.Constructor
+    LoggerName string
+    Spec       *workflowspec.Service
 }
 ```
 
 <a name="OTTraceLogger.AddInstantiation"></a>
-### func \(\*OTTraceLogger\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L78>)
+### func \(\*OTTraceLogger\) [AddInstantiation](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L58>)
 
 ```go
 func (node *OTTraceLogger) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -148,7 +147,7 @@ func (node *OTTraceLogger) AddInstantiation(builder golang.NamespaceBuilder) err
 Implements golang.Instantiable
 
 <a name="OTTraceLogger.AddInterfaces"></a>
-### func \(\*OTTraceLogger\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L68>)
+### func \(\*OTTraceLogger\) [AddInterfaces](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L48>)
 
 ```go
 func (node *OTTraceLogger) AddInterfaces(builder golang.ModuleBuilder) error
@@ -157,7 +156,7 @@ func (node *OTTraceLogger) AddInterfaces(builder golang.ModuleBuilder) error
 Implements golang.ProvidesInterface
 
 <a name="OTTraceLogger.AddToWorkspace"></a>
-### func \(\*OTTraceLogger\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L63>)
+### func \(\*OTTraceLogger\) [AddToWorkspace](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L43>)
 
 ```go
 func (node *OTTraceLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error
@@ -166,7 +165,7 @@ func (node *OTTraceLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error
 Implements golang.ProvidesModule
 
 <a name="OTTraceLogger.GetInterface"></a>
-### func \(\*OTTraceLogger\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L73>)
+### func \(\*OTTraceLogger\) [GetInterface](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L53>)
 
 ```go
 func (node *OTTraceLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -175,7 +174,7 @@ func (node *OTTraceLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInt
 Implements golang.ProvidesInterface
 
 <a name="OTTraceLogger.ImplementsGolangNode"></a>
-### func \(\*OTTraceLogger\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L89>)
+### func \(\*OTTraceLogger\) [ImplementsGolangNode](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L69>)
 
 ```go
 func (node *OTTraceLogger) ImplementsGolangNode()
@@ -184,7 +183,7 @@ func (node *OTTraceLogger) ImplementsGolangNode()
 Implements ir.IRNode
 
 <a name="OTTraceLogger.Name"></a>
-### func \(\*OTTraceLogger\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L53>)
+### func \(\*OTTraceLogger\) [Name](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L33>)
 
 ```go
 func (node *OTTraceLogger) Name() string
@@ -193,7 +192,7 @@ func (node *OTTraceLogger) Name() string
 Implements ir.IRNode
 
 <a name="OTTraceLogger.String"></a>
-### func \(\*OTTraceLogger\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L58>)
+### func \(\*OTTraceLogger\) [String](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/opentelemetry/ir_ot_logger.go#L38>)
 
 ```go
 func (node *OTTraceLogger) String() string

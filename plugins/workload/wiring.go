@@ -12,19 +12,13 @@
 // # Wiring Spec Usage
 //
 // To include a workload generator in your wiring spec, specify a name for the workload generator and
-// point it at the implementation.  A typical workload generator will also have some arguments that are
-// service clients.
+// provide the workloadgen interface or implementation as type parameter.  A typical workload generator
+// will also have some arguments that are service clients.
 //
-//	workload.Generator(spec, "my_workload_gen", "WorkloadImpl", "my_frontend_service")
+//	workload.Generator[WorkloadImpl](spec, "my_workload_gen", "my_frontend_service")
 //
 // The workload plugin will search the workflow spec modules for a valid workflow service called "WorkloadImpl".
-// It will create and compile a process that runs the service.
-//
-// Workload generators are typically implemented in a separate module from the workflow logic, so you will
-// probably need to make sure that the workload generator module of your application is on the workflow spec
-// search path.  See for example the [SockShop Workload Generator].
-//
-//	workflow.Init("../workflow", "../tests", "../workload")
+// It will create and compile a process that runs the service.  See for example the [SockShop Workload Generator].
 //
 // # Artifacts Generated
 //
@@ -112,14 +106,14 @@ import (
 // workloadType should correspond to a workload generator implementation
 //
 // workloadArgs should correspond to arguments used by the workload generator implementation
-func Generator(spec wiring.WiringSpec, name string, workloadType string, workloadArgs ...string) string {
+func Generator[GeneratorType any](spec wiring.WiringSpec, name string, workloadArgs ...string) string {
 
 	serviceName := name + ".service"
 	procName := name + ".proc"
 	wlgenName := name
 
 	// Define the service
-	workflow.Service(spec, serviceName, workloadType, workloadArgs...)
+	workflow.Service[GeneratorType](spec, serviceName, workloadArgs...)
 
 	// Wrap the service in a process
 	goproc.CreateProcess(spec, procName, serviceName)
