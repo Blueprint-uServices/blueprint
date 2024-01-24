@@ -53,7 +53,7 @@ require (
 )
 
 require (
-	github.com/blueprint-uservices/blueprint/blueprint v0.0.0-20240118214956-4c7cf2978ee5
-	github.com/blueprint-uservices/blueprint/runtime v0.0.0-20240118214956-4c7cf2978ee5
+	github.com/blueprint-uservices/blueprint/blueprint v0.0.0-20240120085724-a66c24cd32b1
+	github.com/blueprint-uservices/blueprint/runtime v0.0.0-20240120085724-a66c24cd32b1
 	golang.org/x/tools v0.15.0
 )

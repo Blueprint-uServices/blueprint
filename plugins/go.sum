@@ -1,9 +1,9 @@
 github.com/DistributedClocks/GoVector v0.0.0-20230316023840-ef1a0c9cb83b h1:A6Rm5fmOrVHLTjFQy6Oxe1q0L2EGfUuYuQZ6KT8JW0E=
 github.com/DistributedClocks/GoVector v0.0.0-20230316023840-ef1a0c9cb83b/go.mod h1:KhO62KYM3s2gEKM3ESiiI4pgvEPHz96Y1R1ceFpyVBg=
-github.com/blueprint-uservices/blueprint/blueprint v0.0.0-20240118214956-4c7cf2978ee5 h1:6QBBcQtj+xgRcxpIKt9YlzxhbXLaVIuK7QXO4HdLe/8=
-github.com/blueprint-uservices/blueprint/blueprint v0.0.0-20240118214956-4c7cf2978ee5/go.mod h1:zV7A7jdUp7+9i/ypOd3IPstNrXtf+KKZbcCYVF6PggU=
-github.com/blueprint-uservices/blueprint/runtime v0.0.0-20240118214956-4c7cf2978ee5 h1:NBGglZZJ2Eej3C+TvYpkdKjuWPjv7lneYOjW8e7B6sg=
-github.com/blueprint-uservices/blueprint/runtime v0.0.0-20240118214956-4c7cf2978ee5/go.mod h1:SPYw5vP4MvWCl8xUpEXb4lUvEqrgG3ckCEnevj7eUCk=
+github.com/blueprint-uservices/blueprint/blueprint v0.0.0-20240120085724-a66c24cd32b1 h1:xKnwKGW4aWgdz6Lr5xqDgHLP894YEBOJtIvezrAE4/4=
+github.com/blueprint-uservices/blueprint/blueprint v0.0.0-20240120085724-a66c24cd32b1/go.mod h1:zV7A7jdUp7+9i/ypOd3IPstNrXtf+KKZbcCYVF6PggU=
+github.com/blueprint-uservices/blueprint/runtime v0.0.0-20240120085724-a66c24cd32b1 h1:SUNySg7ltVOAQGCenZ7Ahs34J80m1oXXl6fZQrST0RY=
+github.com/blueprint-uservices/blueprint/runtime v0.0.0-20240120085724-a66c24cd32b1/go.mod h1:KZO9VA/GtihdKATc419+NZbdNP/rOhInglginrou2v0=
 github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874 h1:N7oVaKyGp8bttX0bfZGmcGkjz7DLQXhAn3DNd3T0ous=
 github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874/go.mod h1:r5xuitiExdLAJ09PR7vBVENGvp4ZuTBeWTGtxuX3K+c=
 github.com/cespare/xxhash/v2 v2.1.2 h1:YRXhKfTDauu4ajMg1TPgFO5jnlC2HCbmLXMcTG5cbYE=
