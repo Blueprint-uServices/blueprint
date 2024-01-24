@@ -16,13 +16,7 @@ See the [Workflow User Manual Page](<https://github.com/Blueprint-uServices/blue
 
 ### Wiring Spec Usage
 
-The plugin needs to know where to look for workflow spec services. The plugin assumes paths relative to the calling file.
-
-```
-workflow.Init("../workflow", "../other_path")
-```
-
-You can instantiate a service and give it a name by specifying either the name of the service's interface, implementation, or constructor.
+You can instantiate a service and give it a name, providing the service's interface or implementation type as the type parameter:
 
 ```
 payment_service := workflow.Service[payment.PaymentService](spec, "payment_service")
@@ -53,7 +47,7 @@ The workflow spec service implementation will be copied into the output director
 
 
 <a name="Service"></a>
-## func [Service](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L74>)
+## func [Service](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L69>)
 
 ```go
 func Service[ServiceType any](spec wiring.WiringSpec, serviceName string, serviceArgs ...string) string

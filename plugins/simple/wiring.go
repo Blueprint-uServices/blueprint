@@ -29,7 +29,7 @@
 // In the wiring spec, we can instantiate the service and provide it with a simple NoSQLDB as follows:
 //
 //	user_db := simple.NoSQLDB(spec, "user_db")
-//	user_service := workflow.Service(spec, "user_service", "UserService", user_db)
+//	user_service := workflow.Service[user.UserService](spec, "user_service", user_db)
 //
 // # Description
 //

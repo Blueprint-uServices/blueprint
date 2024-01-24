@@ -14,19 +14,13 @@ When writing your own Blueprint application, it is recommended to also write a w
 
 ### Wiring Spec Usage
 
-To include a workload generator in your wiring spec, specify a name for the workload generator and point it at the implementation. A typical workload generator will also have some arguments that are service clients.
+To include a workload generator in your wiring spec, specify a name for the workload generator and provide the workloadgen interface or implementation as type parameter. A typical workload generator will also have some arguments that are service clients.
 
 ```
-workload.Generator(spec, "my_workload_gen", "WorkloadImpl", "my_frontend_service")
+workload.Generator[WorkloadImpl](spec, "my_workload_gen", "my_frontend_service")
 ```
 
-The workload plugin will search the workflow spec modules for a valid workflow service called "WorkloadImpl". It will create and compile a process that runs the service.
-
-Workload generators are typically implemented in a separate module from the workflow logic, so you will probably need to make sure that the workload generator module of your application is on the workflow spec search path. See for example the [SockShop Workload Generator](<https://github.com/blueprint-uservices/blueprint/tree/main/examples/sockshop/workload/workloadgen/workload.go>).
-
-```
-workflow.Init("../workflow", "../tests", "../workload")
-```
+The workload plugin will search the workflow spec modules for a valid workflow service called "WorkloadImpl". It will create and compile a process that runs the service. See for example the [SockShop Workload Generator](<https://github.com/blueprint-uservices/blueprint/tree/main/examples/sockshop/workload/workloadgen/workload.go>).
 
 ### Artifacts Generated
 
@@ -99,7 +93,7 @@ func (s *workloadGen) ImplementsSimpleWorkload(context.Context) error {
 
 
 <a name="Generator"></a>
-## func [Generator](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workload/wiring.go#L115>)
+## func [Generator](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workload/wiring.go#L109>)
 
 ```go
 func Generator[GeneratorType any](spec wiring.WiringSpec, name string, workloadArgs ...string) string

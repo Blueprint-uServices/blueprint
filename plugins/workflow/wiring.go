@@ -12,13 +12,8 @@
 //
 // # Wiring Spec Usage
 //
-// The plugin needs to know where to look for workflow spec services.  The plugin assumes
-// paths relative to the calling file.
-//
-//	workflow.Init("../workflow", "../other_path")
-//
-// You can instantiate a service and give it a name by specifying either the name of the
-// service's interface, implementation, or constructor.
+// You can instantiate a service and give it a name, providing the service's interface or
+// implementation type as the type parameter:
 //
 //	payment_service := workflow.Service[payment.PaymentService](spec, "payment_service")
 //

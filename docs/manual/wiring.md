@@ -65,12 +65,6 @@ If we then run the application, it will generate artifacts to `outputDir`.  (Not
 
 To define a service instance, we use Blueprint's [workflow](../../plugins/workflow) plugin.
 
-Point to the location of the workflow spec
-
-```
-workflow.Init("../workflow")
-```
-
 Initialize a service that exists within the workflow spec.
 
 ```
