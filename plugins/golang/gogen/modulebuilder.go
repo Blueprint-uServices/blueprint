@@ -91,6 +91,12 @@ func (module *ModuleBuilderImpl) CreatePackage(packageName string) (golang.Packa
 
 // Implements [golang.ModuleBuilder]
 func (module *ModuleBuilderImpl) Require(moduleName string, version string) error {
+	fmt.Println()
+	fmt.Println("Adding require", moduleName, version)
+	fmt.Println()
+	if version == "" {
+		return blueprint.Errorf("go.mod require needs a version for %v", moduleName)
+	}
 	module.modfile.AddNewRequire(moduleName, version, false)
 	return savemodfile(module.modfile, filepath.Join(module.ModuleDir, "go.mod"))
 }

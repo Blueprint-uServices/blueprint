@@ -119,8 +119,6 @@ type (
 func ParseModule(srcDir string) (*ParsedModule, error) {
 	srcDir = filepath.Clean(srcDir)
 
-	fmt.Println("Parsing module", srcDir)
-
 	modfilePath := filepath.Join(srcDir, "go.mod")
 	modfileData, err := os.ReadFile(modfilePath)
 	if err != nil {
@@ -142,6 +140,19 @@ func ParseModule(srcDir string) (*ParsedModule, error) {
 	mod.SrcDir = srcDir
 	mod.IsLocal = true
 	mod.Packages = make(map[string]*ParsedPackage)
+
+	fmt.Println()
+	fmt.Println("Parsed module", srcDir, "version:", mod.Version)
+	fmt.Println()
+
+	// Try to update the module version if it's on our go path; doesn't work for generated modules.
+	info, err := GetModuleInfo(mod.Name)
+	if err == nil && info.Dir == srcDir {
+		mod.Version = info.Version
+		fmt.Println("Updating version to", mod.Version)
+		fmt.Println(info)
+		fmt.Println()
+	}
 
 	if err := mod.Load(); err != nil {
 		return mod, err

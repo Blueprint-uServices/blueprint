@@ -25,6 +25,42 @@ func (m *ModuleInfo) String() string {
 
 var cache = make(map[string]*ModuleInfo)
 
+// Get the info for a module.  Better than reading the go.mod.
+// Better than calling FindPackageModule because the root of the module
+// doesn't need to be a golang package.
+func GetModuleInfo(moduleName string) (*ModuleInfo, error) {
+	if m, ok := cache[moduleName]; ok {
+		return m, nil
+	}
+
+	pkgs, err := packages.Load(&packages.Config{Mode: packages.NeedModule}, moduleName+"...")
+	if err != nil {
+		return nil, blueprint.Errorf("could not find module %v; is it in your go.mod? %v", moduleName, err)
+	}
+	if len(pkgs) == 0 {
+		return nil, blueprint.Errorf("no module found for %s", moduleName)
+	}
+	for _, pkg := range pkgs {
+		mod := pkg.Module
+		if mod == nil {
+			continue
+		}
+		splits := strings.Split(moduleName, "/")
+		info := &ModuleInfo{
+			ShortName: splits[len(splits)-1],
+			Path:      mod.Path,
+			Version:   mod.Version,
+			Dir:       mod.Dir,
+			IsLocal:   isLocal(mod),
+			GoModule:  mod,
+		}
+		cache[moduleName] = info
+		return info, nil
+	}
+	return nil, blueprint.Errorf("no valid module found for %v", moduleName)
+}
+
+// Get the module info for a package.
 func FindPackageModule(pkgName string) (*ModuleInfo, error) {
 	if m, ok := cache[pkgName]; ok {
 		return m, nil

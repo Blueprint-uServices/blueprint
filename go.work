@@ -5,7 +5,6 @@ use (
 	./examples/sockshop/tests
 	./examples/sockshop/wiring
 	./examples/sockshop/workflow
-	./examples/sockshop/workload
 	./examples/dsb_hotel/tests
 	./examples/dsb_hotel/wiring
 	./examples/dsb_hotel/workflow
