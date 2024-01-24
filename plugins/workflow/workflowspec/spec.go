@@ -3,7 +3,6 @@ package workflowspec
 import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	_ "github.com/blueprint-uservices/blueprint/runtime"
 )
 
 // Representation of a parsed workflow spec.
