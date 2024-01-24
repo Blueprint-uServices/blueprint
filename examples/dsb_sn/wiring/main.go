@@ -9,14 +9,12 @@ package main
 import (
 	_ "github.com/blueprint-uservices/blueprint/examples/dsb_sn/tests"
 	"github.com/blueprint-uservices/blueprint/examples/dsb_sn/wiring/specs"
-	_ "github.com/blueprint-uservices/blueprint/examples/dsb_sn/workflow/socialnetwork"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
 )
 
 func main() {
-	// Configure the location of our workflow spec and tests
-	workflowspec.AddModule("github.com/blueprint-uservices/blueprint/examples/dsb_sn/workflow/socialnetwork")
+	// Configure the location of our tests
 	workflowspec.AddModule("github.com/blueprint-uservices/blueprint/examples/dsb_sn/tests")
 
 	// Build a supported wiring spec

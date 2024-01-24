@@ -20,7 +20,6 @@ func main() {
 	fmt.Println("hello world")
 	// Make sure tests and workflow can be found
 	workflowspec.AddModule("github.com/blueprint-uservices/blueprint/examples/sockshop/tests")
-	workflowspec.AddModule("github.com/blueprint-uservices/blueprint/examples/sockshop/workflow")
 
 	// Build a supported wiring spec
 	name := "SockShop"

@@ -13,8 +13,7 @@ import (
 )
 
 func main() {
-	// Configure the location of our workflow spec
-	workflowspec.AddModule("github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow")
+	// Configure the location of our tests
 	workflowspec.AddModule("github.com/blueprint-uservices/blueprint/examples/train_ticket/tests")
 
 	// Build a supported wiring spec
