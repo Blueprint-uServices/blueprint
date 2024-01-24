@@ -7,7 +7,9 @@
 package main
 
 import (
+	_ "github.com/blueprint-uservices/blueprint/examples/dsb_hotel/tests"
 	"github.com/blueprint-uservices/blueprint/examples/dsb_hotel/wiring/specs"
+	_ "github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workflow/hotelreservation"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
 )
