@@ -6,6 +6,7 @@
 package main
 
 import (
+	_ "github.com/blueprint-uservices/blueprint/examples/train_ticket/tests"
 	"github.com/blueprint-uservices/blueprint/examples/train_ticket/wiring/specs"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
