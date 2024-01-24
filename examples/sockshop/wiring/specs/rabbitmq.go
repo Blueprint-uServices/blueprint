@@ -30,7 +30,6 @@ import (
 // All services are instrumented with OpenTelemetry and traces are exported to Zipkin
 // The user, cart, shipping, and orders services using separate MongoDB instances to store their data.
 // The catalogue service uses MySQL to store catalogue data.
-// The shipping service and queue master service run within the same process (TODO: separate processes)
 var DockerRabbit = cmdbuilder.SpecOption{
 	Name:        "rabbit",
 	Description: "Deploys each service in a separate container with gRPC, and uses mongodb as NoSQL database backends and rabbitmq as the queue backend.",
