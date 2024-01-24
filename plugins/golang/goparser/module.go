@@ -104,6 +104,10 @@ func isLocal(mod *packages.Module) bool {
 
 func FindModule[T any]() (*ModuleInfo, *gocode.UserType, error) {
 	t := reflect.TypeOf(new(T)).Elem()
+	// We also should support pointer types. This is necessary when the constructor of a service returns the type of a pointer to the service implementation instead of the interface.
+	if t.Kind() == reflect.Pointer {
+		t = t.Elem()
+	}
 	if t.PkgPath() == "" || t.Name() == "" {
 		return nil, nil, blueprint.Errorf("type %v is predeclared or not defined and thus has no module", t)
 	}
