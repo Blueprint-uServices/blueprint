@@ -153,13 +153,12 @@ func parseModule(srcDir string) (*ParsedModule, error) {
 		return mod, err
 	}
 
-	slog.Info(fmt.Sprintf("Parsing module %s version=%s local=%s", mod.Name, mod.Version, mod.IsLocal))
-
 	for _, pkg := range mod.Packages {
 		if err := pkg.Parse(); err != nil {
 			return mod, err
 		}
 	}
+	slog.Info(fmt.Sprintf("Parsed %s version=%s local=%v", mod.Name, mod.Version, mod.IsLocal))
 
 	return mod, nil
 }

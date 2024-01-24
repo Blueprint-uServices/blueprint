@@ -34,29 +34,12 @@ func GetModuleInfo(moduleName string) (*ModuleInfo, error) {
 		return m, nil
 	}
 
-	pkgs, err := packages.Load(&packages.Config{Mode: packages.NeedModule, Tests: true}, moduleName+"...")
-	if err != nil {
-		return nil, blueprint.Errorf("could not find module %v; is it in your go.mod? %v", moduleName, err)
+	if err := findModules(moduleName + "..."); err != nil {
+		return nil, err
 	}
-	if len(pkgs) == 0 {
-		return nil, blueprint.Errorf("no module found for %s", moduleName)
-	}
-	for _, pkg := range pkgs {
-		mod := pkg.Module
-		if mod == nil {
-			continue
-		}
-		splits := strings.Split(moduleName, "/")
-		info := &ModuleInfo{
-			ShortName: splits[len(splits)-1],
-			Path:      mod.Path,
-			Version:   mod.Version,
-			Dir:       mod.Dir,
-			IsLocal:   isLocal(mod),
-			GoModule:  mod,
-		}
-		cache[moduleName] = info
-		return info, nil
+
+	if m, ok := cache[moduleName]; ok {
+		return m, nil
 	}
 	return nil, blueprint.Errorf("no valid module found for %v", moduleName)
 }
@@ -67,28 +50,43 @@ func FindPackageModule(pkgName string) (*ModuleInfo, error) {
 		return m, nil
 	}
 
-	pkgs, err := packages.Load(&packages.Config{Mode: packages.NeedModule}, pkgName)
+	if err := findModules(pkgName); err != nil {
+		return nil, err
+	}
+
+	if m, ok := cache[pkgName]; ok {
+		if err := findModules(m.Path + "..."); err != nil {
+			return nil, err
+		}
+		return m, nil
+	}
+	return nil, blueprint.Errorf("no valid module found for %v", pkgName)
+}
+
+func findModules(pkgName string) error {
+	pkgs, err := packages.Load(&packages.Config{Mode: packages.NeedModule, Tests: true}, pkgName)
 	if err != nil {
-		return nil, blueprint.Errorf("could not find package %v; is it in your go.mod? %v", pkgName, err)
+		return blueprint.Errorf("could not find package %v; is it in your go.mod? %v", pkgName, err)
 	}
-	if len(pkgs) != 1 {
-		return nil, blueprint.Errorf("expected 1 package for %s, got %d", pkgName, len(pkgs))
+
+	for _, pkg := range pkgs {
+		mod := pkg.Module
+		if mod == nil {
+			continue
+		}
+		splits := strings.Split(pkgName, "/")
+		info := &ModuleInfo{
+			ShortName: splits[len(splits)-1],
+			Path:      mod.Path,
+			Version:   mod.Version,
+			Dir:       mod.Dir,
+			IsLocal:   isLocal(mod),
+			GoModule:  mod,
+		}
+		cache[pkg.ID] = info
+		cache[mod.Path] = info
 	}
-	mod := pkgs[0].Module
-	if mod == nil {
-		return nil, blueprint.Errorf("nil module for package %s", pkgName)
-	}
-	splits := strings.Split(pkgName, "/")
-	info := &ModuleInfo{
-		ShortName: splits[len(splits)-1],
-		Path:      mod.Path,
-		Version:   mod.Version,
-		Dir:       mod.Dir,
-		IsLocal:   isLocal(mod),
-		GoModule:  mod,
-	}
-	cache[pkgName] = info
-	return info, nil
+	return nil
 }
 
 // Somewhat hacky way of figuring out of the module is a local filesystem module vs. from the go cache.

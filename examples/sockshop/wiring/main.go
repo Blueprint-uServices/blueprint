@@ -8,8 +8,6 @@
 package main
 
 import (
-	"fmt"
-
 	_ "github.com/blueprint-uservices/blueprint/examples/sockshop/tests"
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/wiring/specs"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
@@ -17,7 +15,6 @@ import (
 )
 
 func main() {
-	fmt.Println("hello world")
 	// Make sure tests and workflow can be found
 	workflowspec.AddModule("github.com/blueprint-uservices/blueprint/examples/sockshop/tests")
 
