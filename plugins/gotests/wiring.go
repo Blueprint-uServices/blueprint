@@ -13,16 +13,16 @@
 //
 //	gotests.Test(spec, "my_service")
 //
-// The gotests plugin will search the workflow spec module for any compatible black-box tests, then convert those
+// The gotests plugin will search for any compatible black-box tests, then convert those
 // tests into tests that use clients to the compiled Blueprint application.
 //
-// You will probably also need to ensure that the tests module of your application is in your go.mod and added to the
-// workflow spec search path.  See for example the [SockShop Tests] or [Train Ticket Tests], which have separate tests
-// and workflow modules.
+// Blueprint tests are typically written in a standalone module, and thus the tests module will need to be explicitly
+// added to the wiring's go.mod.  The most straightforward way to do this is, somewhere in the wiring spec (e.g. in main.go)
+// add an anonymous import statement then manually add the workflow spec search path:
 //
-//	 import _ "github.com/blueprint-uservices/blueprint/examples/dsb_hotel/tests"
+//	import _ "github.com/blueprint-uservices/blueprint/examples/dsb_hotel/tests"
 //
-//		workflowspec.AddModule("github.com/blueprint-uservices/blueprint/examples/dsb_hotel/tests")
+//	workflowspec.AddModule("github.com/blueprint-uservices/blueprint/examples/dsb_hotel/tests")
 //
 // # Running Tests
 //
@@ -55,13 +55,16 @@
 // spec search path.
 //
 // The simplest way of ensuring that the test module is in your go.mod is to add an import statement somewhere in
-// your wiring spec:
+// your wiring spec, such as in main.go:
 //
 //	import _ "github.com/blueprint-uservices/blueprint/examples/dsb_hotel/tests"
 //
 // Then manually configure the workflowspec search path:
 //
 //	workflowspec.AddModule("github.com/blueprint-uservices/blueprint/examples/dsb_hotel/tests")
+//
+// If the go compiler complains "no non-test Go files in ..." then add a dummy file to the tests module, e.g. doc.go,
+// that declares the package.
 //
 // # Writing Tests: Test Compatibility
 //
