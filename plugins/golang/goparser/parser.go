@@ -21,15 +21,6 @@ import (
 )
 
 type (
-	// A set of modules on the local filesystem that contain workflow spec interfaces
-	// and implementations.  It is allowed for a workflow spec implementation in one
-	// package to use the interface defined in another package.  However, currently,
-	// it is not possible to use workflow spec nodes whose interface or implementation
-	// comes entirely from an external module (ie. a module that exists only as a
-	// 'require' directive of a go.mod)
-	ParsedModuleSet struct {
-		Modules map[string]*ParsedModule // Map from FQ module name to module object
-	}
 
 	/*
 	   Things to bear in mind:
@@ -43,10 +34,11 @@ type (
 	*/
 
 	ParsedModule struct {
-		ModuleSet *ParsedModuleSet
+		ShortName string                    // Short name of the module
 		Name      string                    // Fully qualified name of the module
 		Version   string                    // Version of the module
 		SrcDir    string                    // Fully qualified location of the module on the filesystem
+		IsLocal   bool                      // Is this a local module or from the go cache?
 		Modfile   *modfile.File             // The modfile File struct is sufficiently simple that we just use it directly
 		Packages  map[string]*ParsedPackage // Map from fully qualified package name to ParsedPackage
 	}
@@ -121,69 +113,12 @@ type (
 	}
 )
 
-func (set *ParsedModuleSet) GetPackage(name string) *ParsedPackage {
-	for _, mod := range set.Modules {
-		if pkg, exists := mod.Packages[name]; exists {
-			return pkg
-		}
-	}
-	return nil
-}
-
-/*
-Parse all modules in the specified directory
-*/
-func ParseWorkspace(workspaceDir string) (*ParsedModuleSet, error) {
-	entries, err := os.ReadDir(workspaceDir)
-	if err != nil {
-		return nil, blueprint.Errorf("unable to read workspace directory %v due to %v", workspaceDir, err.Error())
-	}
-
-	var moduleDirs []string
-	for _, e := range entries {
-		if e.IsDir() {
-			moduleDirs = append(moduleDirs, filepath.Join(workspaceDir, e.Name()))
-		}
-	}
-
-	return ParseModules(moduleDirs...)
-}
-
-/*
-Parse the specified module directories
-*/
-func ParseModules(srcDirs ...string) (*ParsedModuleSet, error) {
-	// Create the module set
-	set := &ParsedModuleSet{}
-	set.Modules = make(map[string]*ParsedModule)
-
-	// Load the modules
-	for _, srcDir := range srcDirs {
-		mod, err := set.AddModule(srcDir)
-		if err != nil {
-			return nil, err
-		}
-		err = mod.Load()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// Parse the modules
-	for _, mod := range set.Modules {
-		for _, pkg := range mod.Packages {
-			err := pkg.Parse()
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	return set, nil
-}
-
-func (set *ParsedModuleSet) AddModule(srcDir string) (*ParsedModule, error) {
+// Parses the module directory specified by srcDir and returns a ParsedModule.
+// All of the packages inside the module will be parsed.
+// srcDir must contain a go.mod file; if it doesn't an error will be returned.
+func ParseModule(srcDir string) (*ParsedModule, error) {
 	srcDir = filepath.Clean(srcDir)
+
 	modfilePath := filepath.Join(srcDir, "go.mod")
 	modfileData, err := os.ReadFile(modfilePath)
 	if err != nil {
@@ -195,18 +130,26 @@ func (set *ParsedModuleSet) AddModule(srcDir string) (*ParsedModule, error) {
 		return nil, blueprint.Errorf("unable to parse %s due to %s", modfilePath, err.Error())
 	}
 
+	nameSplits := strings.Split(modf.Module.Mod.Path, "/")
+
 	mod := &ParsedModule{}
-	mod.ModuleSet = set
 	mod.Modfile = modf
 	mod.Name = modf.Module.Mod.Path
+	mod.ShortName = nameSplits[len(nameSplits)-1]
 	mod.Version = modf.Module.Mod.Version
 	mod.SrcDir = srcDir
+	mod.IsLocal = true
 	mod.Packages = make(map[string]*ParsedPackage)
 
-	if existing, exists := set.Modules[mod.Name]; exists {
-		return nil, blueprint.Errorf("duplicate definition of module %v at %v and %v", mod.Name, existing.SrcDir, srcDir)
+	if err := mod.Load(); err != nil {
+		return mod, err
 	}
-	set.Modules[mod.Name] = mod
+
+	for _, pkg := range mod.Packages {
+		if err := pkg.Parse(); err != nil {
+			return mod, err
+		}
+	}
 
 	return mod, nil
 }
@@ -802,6 +745,16 @@ func (pkg *ParsedPackage) String() string {
 	for _, f := range pkg.Files {
 		b.WriteString("\n")
 		b.WriteString(indent(f.String(), 2))
+	}
+	b.WriteString("\nPackage Interfaces=")
+	for _, iface := range pkg.Interfaces {
+		b.WriteString("\n")
+		b.WriteString(indent(iface.Name, 2))
+	}
+	b.WriteString("\nPackage Structs=")
+	for _, struc := range pkg.Structs {
+		b.WriteString("\n")
+		b.WriteString(indent(struc.Name, 2))
 	}
 	return b.String()
 }

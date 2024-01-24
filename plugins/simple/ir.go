@@ -7,8 +7,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
 	"golang.org/x/exp/slog"
 )
 
@@ -30,40 +29,26 @@ type SimpleBackend struct {
 	BackendType  string // e.g. "NoSQLDatabase"
 	BackendImpl  string // e.g. "SimpleNoSQLDB"
 
-	Iface       *goparser.ParsedInterface // The backend's code interface
-	Constructor *gocode.Constructor       // Constructor for this backend implementation
+	Spec *workflowspec.Service // The backend's interface and implementation
 }
 
 // Creates a [SimpleBackend] IR node.
 //   - name should be a name for the instance, e.g. "my_nosql_db"
-//   - backendType should be the name of the interface this backend implements, e.g. "NoSQLDatabase"
-//   - backendImpl should be the name of the implementation, e.g. "SimpleNoSQLDB"
-func newSimpleBackend(name, backendType, backendImpl string) (*SimpleBackend, error) {
+//   - BackendIface should be the the interface this backend implements, e.g. "NoSQLDatabase"
+//   - BackendImpl should be the the implementation, e.g. "SimpleNoSQLDB"
+func newSimpleBackend[BackendImpl any](name string) (*SimpleBackend, error) {
+	spec, err := workflowspec.GetService[BackendImpl]()
+	if err != nil {
+		return nil, err
+	}
 	node := &SimpleBackend{
 		InstanceName: name,
-		BackendType:  backendType,
-		BackendImpl:  backendImpl,
-	}
-	return node, node.init()
-}
-
-func (node *SimpleBackend) init() error {
-	// We use the workflow spec to load the simple backend interface details
-	workflow.Init("../../runtime")
-
-	// Look up the backend details; errors out if the backend doesn't exist
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-	details, err := spec.Get(node.BackendImpl)
-	if err != nil {
-		return err
+		Spec:         spec,
+		BackendType:  spec.Iface.Name,
+		BackendImpl:  gocode.NameOf[BackendImpl](),
 	}
 
-	node.Iface = details.Iface
-	node.Constructor = details.Constructor.AsConstructor()
-	return nil
+	return node, nil
 }
 
 // Implements ir.IRNode
@@ -73,25 +58,17 @@ func (node *SimpleBackend) Name() string {
 
 // Implements golang.Service
 func (node *SimpleBackend) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
-	return node.Iface.ServiceInterface(ctx), nil
+	return node.Spec.Iface.ServiceInterface(ctx), nil
 }
 
 // Implements golang.ProvidesModule
 func (node *SimpleBackend) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	// TODO: move runtime implementation into this package and out of Blueprint runtime package
-	//       afterwards, need to add interfaces from node.Iface and node.Constructor
-	return fmt.Errorf("not implemented")
-	// // The backend interface and impl implementation exist in the runtime package
-	// // Add blueprint runtime to the workspace
-	// return golang.AddRuntimeModule(builder)
+	return node.Spec.AddToWorkspace(builder)
 }
 
 // Implements golang.ProvidesInterface
 func (node *SimpleBackend) AddInterfaces(builder golang.ModuleBuilder) error {
-	// TODO: move runtime implementation into this package and out of Blueprint runtime package
-	//       afterwards, need to add interfaces from node.Iface and node.Constructor
-	return fmt.Errorf("not implemented")
-	// return node.AddToWorkspace(builder.Workspace())
+	return node.Spec.AddToModule(builder)
 }
 
 // Ipmlements golang.Instantiable
@@ -102,7 +79,7 @@ func (node *SimpleBackend) AddInstantiation(builder golang.NamespaceBuilder) err
 	}
 
 	slog.Info(fmt.Sprintf("Instantiating %v %v in %v/%v", node.BackendImpl, node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
-	return builder.DeclareConstructor(node.InstanceName, node.Constructor, nil)
+	return builder.DeclareConstructor(node.InstanceName, node.Spec.Constructor.AsConstructor(), nil)
 }
 
 // Implements ir.IRNode

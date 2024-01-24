@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"reflect"
 
+	_ "github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workflow/hotelreservation"
 	"github.com/blueprint-uservices/blueprint/examples/leaf/wiring/specs"
 	"github.com/blueprint-uservices/blueprint/examples/leaf/workflow/leaf"
+	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/user"
 	"github.com/blueprint-uservices/blueprint/inittest/workflow/blah"
 	"github.com/blueprint-uservices/blueprint/inittest/workflow/more"
 	"github.com/blueprint-uservices/blueprint/inittest/workflow2/again"
 	blah2 "github.com/blueprint-uservices/blueprint/inittest/workflow2/blah"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
 	"golang.org/x/tools/go/packages"
 )
 
@@ -34,23 +36,15 @@ func getModuleInfo(pkgName string) (*packages.Module, error) {
 }
 
 func print[T any]() {
-	pkg, name := getFullyQualifiedName[T]()
-	fmt.Printf("Pkg: %s, Name: %s\n", pkg, name)
-	mod, err := getModuleInfo(pkg)
+	m, usertype, err := goparser.FindModule[T]()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	if mod == nil {
-		fmt.Println("  nil module")
-		return
-	}
-	fmt.Printf("  Is main: %v\n", mod.Main)
-	fmt.Printf("  Go mod: %s\n", mod.GoMod)
-	fmt.Printf("  Go ver: %s\n", mod.GoVersion)
-	fmt.Printf("  Mod ver: %s\n", mod.Version)
-	fmt.Printf("  Mod dir: %s\n", mod.Dir)
-	fmt.Printf("  is replace: %v\n", mod.Replace != nil)
+
+	fmt.Println(usertype, usertype.Package, usertype.Name)
+	fmt.Println(m)
+	fmt.Println()
 }
 
 func main() {
@@ -61,6 +55,15 @@ func main() {
 	print[blah2.Blah]()
 	print[again.Again]()
 	print[more.More]()
+	print[user.UserService]()
+	print[string]()
+
+	mod, err := goparser.FindPackageModule("github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workflow/hotelreservation")
+	fmt.Println(mod, err)
+
+	// set := goparser.Cache()
+	// pkg, err := set.GetPackage("github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workflow/hotelreservation")
+	// fmt.Println(pkg, err)
 
 	/*
 		Next steps:
@@ -80,7 +83,7 @@ func main() {
 
 	if false {
 		// Configure the location of our workflow spec
-		workflow.Init("../workflow")
+		// workflow.Init("../workflow")
 
 		// Build a supported wiring spec
 		name := "LeafApp"

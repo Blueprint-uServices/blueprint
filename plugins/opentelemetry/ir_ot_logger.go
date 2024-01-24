@@ -6,9 +6,8 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/opentelemetry"
 	"golang.org/x/exp/slog"
 )
 
@@ -17,36 +16,17 @@ type OTTraceLogger struct {
 	golang.Node
 	golang.Instantiable
 
-	LoggerName  string
-	Iface       *goparser.ParsedInterface
-	Constructor *gocode.Constructor
+	LoggerName string
+	Spec       *workflowspec.Service
 }
 
 func newOTTraceLogger(name string) (*OTTraceLogger, error) {
-	node := &OTTraceLogger{}
-	err := node.init(name)
-	if err != nil {
-		return nil, err
+	spec, err := workflowspec.GetService[opentelemetry.OTTraceLogger]()
+	node := &OTTraceLogger{
+		LoggerName: name,
+		Spec:       spec,
 	}
-	node.LoggerName = name
-	return node, nil
-}
-
-func (node *OTTraceLogger) init(name string) error {
-	workflow.Init("../../runtime")
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("OTTraceLogger")
-	if err != nil {
-		return err
-	}
-
-	node.Iface = details.Iface
-	node.Constructor = details.Constructor.AsConstructor()
-	return nil
+	return node, err
 }
 
 // Implements ir.IRNode
@@ -61,23 +41,17 @@ func (node *OTTraceLogger) String() string {
 
 // Implements golang.ProvidesModule
 func (node *OTTraceLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	// TODO: move runtime implementation into this package and out of Blueprint runtime package
-	//       afterwards, need to add interfaces from node.Iface and node.Constructor
-	return fmt.Errorf("not implemented")
-	// return golang.AddRuntimeModule(builder)
+	return node.Spec.AddToWorkspace(builder)
 }
 
 // Implements golang.ProvidesInterface
 func (node *OTTraceLogger) AddInterfaces(builder golang.ModuleBuilder) error {
-	// TODO: move runtime implementation into this package and out of Blueprint runtime package
-	//       afterwards, need to add interfaces from node.Iface and node.Constructor
-	return fmt.Errorf("not implemented")
-	// return node.AddToWorkspace(builder.Workspace())
+	return node.Spec.AddToModule(builder)
 }
 
 // Implements golang.ProvidesInterface
 func (node *OTTraceLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
-	return node.Iface.ServiceInterface(ctx), nil
+	return node.Spec.Iface.ServiceInterface(ctx), nil
 }
 
 // Implements golang.Instantiable
@@ -88,7 +62,7 @@ func (node *OTTraceLogger) AddInstantiation(builder golang.NamespaceBuilder) err
 
 	slog.Info(fmt.Sprintf("Instantiating OTTraceLogger %v in %v/%v", node.LoggerName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.LoggerName, node.Constructor, []ir.IRNode{})
+	return builder.DeclareConstructor(node.LoggerName, node.Spec.Constructor.AsConstructor(), []ir.IRNode{})
 }
 
 // Implements ir.IRNode

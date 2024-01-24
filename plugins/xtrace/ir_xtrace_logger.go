@@ -7,9 +7,8 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/xtrace"
 	"golang.org/x/exp/slog"
 )
 
@@ -20,65 +19,46 @@ type XTraceLogger struct {
 
 	ServerDialAddr *address.DialConfig
 
-	LoggerName  string
-	Iface       *goparser.ParsedInterface
-	Constructor *gocode.Constructor
+	LoggerName string
+	Spec       *workflowspec.Service
 }
 
 func newXTraceLogger(name string, addr *address.DialConfig) (*XTraceLogger, error) {
-	node := &XTraceLogger{}
-	err := node.init(name)
-	if err != nil {
-		return nil, err
+	spec, err := workflowspec.GetService[xtrace.XTraceLogger]()
+	node := &XTraceLogger{
+		LoggerName:     name,
+		ServerDialAddr: addr,
+		Spec:           spec,
 	}
-	node.LoggerName = name
-	node.ServerDialAddr = addr
-	return node, nil
+	return node, err
 }
 
-func (node *XTraceLogger) init(name string) error {
-	workflow.Init("../../runtime")
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("XTraceLogger")
-	if err != nil {
-		return err
-	}
-
-	node.Iface = details.Iface
-	node.Constructor = details.Constructor.AsConstructor()
-	return nil
-}
-
+// Implements ir.IRNode
 func (node *XTraceLogger) Name() string {
 	return node.LoggerName
 }
 
+// Implements ir.IRNode
 func (node *XTraceLogger) String() string {
 	return node.Name() + " = XTraceLogger(" + node.ServerDialAddr.Name() + ")"
 }
 
+// Implements golang.ProvidesModule
 func (node *XTraceLogger) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	// TODO: move runtime implementation into this package and out of Blueprint runtime package
-	//       afterwards, need to add interfaces from node.Iface and node.Constructor
-	return fmt.Errorf("not implemented")
-	// return golang.AddRuntimeModule(builder)
+	return node.Spec.AddToWorkspace(builder)
 }
 
+// Implements golang.ProvidesInterface
 func (node *XTraceLogger) AddInterfaces(builder golang.ModuleBuilder) error {
-	// TODO: move runtime implementation into this package and out of Blueprint runtime package
-	//       afterwards, need to add interfaces from node.Iface and node.Constructor
-	return fmt.Errorf("not implemented")
-	// return node.AddToWorkspace(builder.Workspace())
+	return node.Spec.AddToModule(builder)
 }
 
+// Implements service.ServiceNode
 func (node *XTraceLogger) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
-	return node.Iface.ServiceInterface(ctx), nil
+	return node.Spec.Iface.ServiceInterface(ctx), nil
 }
 
+// Implements golang.Instantiable
 func (node *XTraceLogger) AddInstantiation(builder golang.NamespaceBuilder) error {
 	if builder.Visited(node.LoggerName) {
 		return nil
@@ -86,7 +66,7 @@ func (node *XTraceLogger) AddInstantiation(builder golang.NamespaceBuilder) erro
 
 	slog.Info(fmt.Sprintf("Instantiating XTraceLogger %v in %v/%v", node.LoggerName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.LoggerName, node.Constructor, []ir.IRNode{node.ServerDialAddr})
+	return builder.DeclareConstructor(node.LoggerName, node.Spec.Constructor.AsConstructor(), []ir.IRNode{node.ServerDialAddr})
 }
 
 func (node *XTraceLogger) ImplementsGolangNode() {}

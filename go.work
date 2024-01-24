@@ -6,9 +6,6 @@ use (
 	./examples/sockshop/wiring
 	./examples/sockshop/workflow
 	./examples/sockshop/workload
-	./examples/dsb_hotel/tests
-	./examples/dsb_hotel/wiring
-	./examples/dsb_hotel/workflow
 	./examples/dsb_sn/tests
 	./examples/dsb_sn/wiring
 	./examples/dsb_sn/workflow

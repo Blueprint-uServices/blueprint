@@ -64,8 +64,8 @@ func NewNamespaceBuilder(module golang.ModuleBuilder, name, fileName, packagePat
 	}
 
 	// Add the runtime module as a dependency, in case it hasn't already
-	err = golang.AddRuntimeModule(module)
-	if err != nil {
+	runtimeModule := "github.com/blueprint-uservices/blueprint/runtime"
+	if err := golang.AddModule(module, runtimeModule); err != nil {
 		return nil, err
 	}
 

@@ -8,9 +8,8 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/mysql"
 	"golang.org/x/exp/slog"
 )
 
@@ -18,27 +17,27 @@ import (
 type MySQLDBGoClient struct {
 	golang.Service
 	backend.RelDB
+
 	InstanceName string
 	Username     *ir.IRValue
 	Password     *ir.IRValue
 	DBVal        *ir.IRValue
 	Addr         *address.DialConfig
-	Iface        *goparser.ParsedInterface
-	Constructor  *gocode.Constructor
+
+	Spec *workflowspec.Service
 }
 
 func newMySQLDBGoClient(name string, addr *address.DialConfig, username *ir.IRValue, password *ir.IRValue, dbname *ir.IRValue) (*MySQLDBGoClient, error) {
-	client := &MySQLDBGoClient{}
-	err := client.init(name)
-	if err != nil {
-		return nil, err
+	spec, err := workflowspec.GetService[mysql.MySqlDB]()
+	client := &MySQLDBGoClient{
+		InstanceName: name,
+		Username:     username,
+		Password:     password,
+		DBVal:        dbname,
+		Addr:         addr,
+		Spec:         spec,
 	}
-	client.InstanceName = name
-	client.Addr = addr
-	client.Username = username
-	client.Password = password
-	client.DBVal = dbname
-	return client, nil
+	return client, err
 }
 
 // Implements ir.IRNode
@@ -51,45 +50,19 @@ func (m *MySQLDBGoClient) String() string {
 	return m.InstanceName + " = MySqlClient(" + m.Addr.Name() + ")"
 }
 
-func (m *MySQLDBGoClient) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("MySqlDB")
-	if err != nil {
-		return err
-	}
-
-	m.InstanceName = name
-	m.Iface = details.Iface
-	m.Constructor = details.Constructor.AsConstructor()
-
-	return nil
-}
-
 // Implements service.ServiceNode
 func (m *MySQLDBGoClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
-	return m.Iface.ServiceInterface(ctx), nil
+	return m.Spec.Iface.ServiceInterface(ctx), nil
 }
 
 // Implements golang.ProvidesModule
 func (m *MySQLDBGoClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	// TODO: move runtime implementation into this package and out of Blueprint runtime package
-	//       afterwards, need to add interfaces from node.Iface and node.Constructor
-	return fmt.Errorf("not implemented")
-	// return golang.AddRuntimeModule(builder)
+	return m.Spec.AddToWorkspace(builder)
 }
 
 // Implements golang.ProvidesInterface
 func (n *MySQLDBGoClient) AddInterfaces(builder golang.ModuleBuilder) error {
-	// TODO: move runtime implementation into this package and out of Blueprint runtime package
-	//       afterwards, need to add interfaces from node.Iface and node.Constructor
-	return fmt.Errorf("not implemented")
-	// return n.AddToWorkspace(builder.Workspace())
+	return n.Spec.AddToModule(builder)
 }
 
 // Implements golang.Instantiable
@@ -100,7 +73,7 @@ func (m *MySQLDBGoClient) AddInstantiation(builder golang.NamespaceBuilder) erro
 
 	slog.Info(fmt.Sprintf("Instantiating MySqlClient %v in %v/%v", m.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(m.InstanceName, m.Constructor, []ir.IRNode{m.Addr, m.DBVal, m.Username, m.Password})
+	return builder.DeclareConstructor(m.InstanceName, m.Spec.Constructor.AsConstructor(), []ir.IRNode{m.Addr, m.DBVal, m.Username, m.Password})
 }
 
 func (node *MySQLDBGoClient) ImplementsGolangNode()    {}

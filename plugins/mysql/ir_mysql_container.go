@@ -7,13 +7,15 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/docker"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/mysql"
 )
 
 // Blueprint IR Node that represents the server side docker container
 type MySQLDBContainer struct {
-	docker.Container
 	backend.RelDB
+	docker.Container
+	docker.ProvidesContainerInstance
 
 	InstanceName string
 	BindAddr     *address.BindConfig
@@ -37,54 +39,36 @@ func (m *MySQLInterface) GetMethods() []service.Method {
 }
 
 func newMySQLDBContainer(name, root_password string) (*MySQLDBContainer, error) {
-	cntr := &MySQLDBContainer{}
-	cntr.InstanceName = name
-	cntr.password = root_password
-	err := cntr.init(name)
+	spec, err := workflowspec.GetService[mysql.MySqlDB]()
 	if err != nil {
 		return nil, err
+	}
+
+	cntr := &MySQLDBContainer{
+		InstanceName: name,
+		Iface:        spec.Iface,
+		password:     root_password,
 	}
 	return cntr, nil
 }
 
-func (node *MySQLDBContainer) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("MySqlDB")
-	if err != nil {
-		return err
-	}
-
-	node.Iface = details.Iface
-	return nil
-}
-
+// Implements ir.IRNode
 func (m *MySQLDBContainer) String() string {
 	return m.InstanceName + " = MySqlDBContainer(" + m.BindAddr.Name() + ")"
 }
 
+// Implements ir.IRNode
 func (m *MySQLDBContainer) Name() string {
 	return m.InstanceName
 }
 
+// Implements service.ServiceNode
 func (m *MySQLDBContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface := m.Iface.ServiceInterface(ctx)
 	return &MySQLInterface{Wrapped: iface}, nil
 }
 
-func (m *MySQLDBContainer) GenerateArtifacts(outdir string) error {
-	return nil
-}
-
-func (m *MySQLDBContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error {
-	return nil
-}
-
+// Implements docker.ProvidesContainerInstance
 func (m *MySQLDBContainer) AddContainerInstance(target docker.ContainerWorkspace) error {
 	m.BindAddr.Port = 3306
 	err := target.DeclarePrebuiltInstance(m.InstanceName, "mysql/mysql-server", m.BindAddr)

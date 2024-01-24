@@ -6,12 +6,14 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/docker"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/xtrace"
 )
 
 // Blueprint IR Node that represents the Xtrace container
 type XTraceServerContainer struct {
 	docker.Container
+	docker.ProvidesContainerInstance
 
 	ServerName string
 	BindAddr   *address.BindConfig
@@ -33,50 +35,35 @@ func (xt *XTraceInterface) GetMethods() []service.Method {
 }
 
 func newXTraceServerContainer(name string) (*XTraceServerContainer, error) {
-	server := &XTraceServerContainer{
-		ServerName: name,
-	}
-	err := server.init(name)
+	spec, err := workflowspec.GetService[xtrace.XTracerImpl]()
 	if err != nil {
 		return nil, err
+	}
+
+	server := &XTraceServerContainer{
+		ServerName: name,
+		Iface:      spec.Iface,
 	}
 	return server, nil
 }
 
-func (node *XTraceServerContainer) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("XTracerImpl")
-	if err != nil {
-		return err
-	}
-
-	node.Iface = details.Iface
-	return nil
-}
-
+// Implements ir.IRNode
 func (node *XTraceServerContainer) Name() string {
 	return node.ServerName
 }
 
+// Implements ir.IRNode
 func (node *XTraceServerContainer) String() string {
 	return node.Name() + " = XTraceServer(" + node.BindAddr.Name() + ")"
 }
 
+// Implements service.ServiceNode
 func (node *XTraceServerContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface := node.Iface.ServiceInterface(ctx)
 	return &XTraceInterface{Wrapped: iface}, nil
 }
 
-func (node *XTraceServerContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error {
-	return nil
-}
-
+// Implements docker.ProvidesContainerInstance
 func (node *XTraceServerContainer) AddContainerInstance(target docker.ContainerWorkspace) error {
 	node.BindAddr.Port = 5563
 	return target.DeclarePrebuiltInstance(node.ServerName, "jonathanmace/xtrace-server:latest", node.BindAddr)

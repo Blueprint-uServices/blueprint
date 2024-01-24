@@ -72,6 +72,11 @@ func TypeOf[T any]() TypeName {
 	return typeof(reflect.TypeOf(new(T)).Elem())
 }
 
+// Returns the unqualified shortname for type T
+func NameOf[T any]() string {
+	return reflect.TypeOf(new(T)).Elem().Name()
+}
+
 // converts a reflect.type into the janky typename stuff we have here
 func typeof(t reflect.Type) TypeName {
 	switch t.Kind() {

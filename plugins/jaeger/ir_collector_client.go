@@ -7,9 +7,8 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/golang"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
-	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/jaeger"
 	"golang.org/x/exp/slog"
 )
 
@@ -22,18 +21,21 @@ type JaegerCollectorClient struct {
 	ServerDial *address.DialConfig
 
 	InstanceName string
-	Iface        *goparser.ParsedInterface
-	Constructor  *gocode.Constructor
+	Spec         *workflowspec.Service
 }
 
 func newJaegerCollectorClient(name string, addr *address.DialConfig) (*JaegerCollectorClient, error) {
-	node := &JaegerCollectorClient{}
-	err := node.init(name)
+	spec, err := workflowspec.GetService[jaeger.JaegerTracer]()
 	if err != nil {
 		return nil, err
 	}
-	node.ClientName = name
-	node.ServerDial = addr
+
+	node := &JaegerCollectorClient{
+		InstanceName: name,
+		ClientName:   name,
+		ServerDial:   addr,
+		Spec:         spec,
+	}
 	return node, nil
 }
 
@@ -47,25 +49,6 @@ func (node *JaegerCollectorClient) String() string {
 	return node.Name() + " = JaegerClient(" + node.ServerDial.Name() + ")"
 }
 
-func (node *JaegerCollectorClient) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("JaegerTracer")
-	if err != nil {
-		return err
-	}
-
-	node.InstanceName = name
-	node.Iface = details.Iface
-	node.Constructor = details.Constructor.AsConstructor()
-	return nil
-}
-
 // Implements golang.Instantiable
 func (node *JaegerCollectorClient) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
@@ -75,28 +58,22 @@ func (node *JaegerCollectorClient) AddInstantiation(builder golang.NamespaceBuil
 
 	slog.Info(fmt.Sprintf("Instantiating JaegerClient %v in %v/%v", node.InstanceName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.InstanceName, node.Constructor, []ir.IRNode{node.ServerDial})
+	return builder.DeclareConstructor(node.InstanceName, node.Spec.Constructor.AsConstructor(), []ir.IRNode{node.ServerDial})
 }
 
 // Implements service.ServiceNode
 func (node *JaegerCollectorClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
-	return node.Iface.ServiceInterface(ctx), nil
+	return node.Spec.Iface.ServiceInterface(ctx), nil
 }
 
 // Implements golang.ProvidesInterface
-func (node *JaegerCollectorClient) AddInterfaces(builder golang.WorkspaceBuilder) error {
-	// TODO: move runtime implementation into this package and out of Blueprint runtime package
-	//       afterwards, need to add interfaces from node.Iface and node.Constructor
-	return fmt.Errorf("not implemented")
-	// return golang.AddRuntimeModule(builder)
+func (node *JaegerCollectorClient) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.Spec.AddToModule(builder)
 }
 
 // Implements golang.ProvidesModule
 func (node *JaegerCollectorClient) AddToWorkspace(builder golang.WorkspaceBuilder) error {
-	// TODO: move runtime implementation into this package and out of Blueprint runtime package
-	//       afterwards, need to add interfaces from node.Iface and node.Constructor
-	return fmt.Errorf("not implemented")
-	// return golang.AddRuntimeModule(builder)
+	return node.Spec.AddToWorkspace(builder)
 }
 
 func (node *JaegerCollectorClient) ImplementsGolangNode() {}

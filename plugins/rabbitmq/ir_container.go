@@ -7,13 +7,15 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/docker"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/rabbitmq"
 )
 
 // Blueprint IR Node that represents the server side docker container
 type RabbitmqContainer struct {
-	docker.Container
 	backend.Queue
+	docker.Container
+	docker.ProvidesContainerInstance
 
 	InstanceName string
 	BindAddr     *address.BindConfig
@@ -35,53 +37,34 @@ func (r *RabbitmqInterface) GetMethods() []service.Method {
 }
 
 func newRabbitmqContainer(name string) (*RabbitmqContainer, error) {
-	cntr := &RabbitmqContainer{}
-	cntr.InstanceName = name
-	err := cntr.init(name)
+	spec, err := workflowspec.GetService[rabbitmq.RabbitMQ]()
 	if err != nil {
 		return nil, err
+	}
+	cntr := &RabbitmqContainer{
+		InstanceName: name,
+		Iface:        spec.Iface,
 	}
 	return cntr, nil
 }
 
-func (node *RabbitmqContainer) init(name string) error {
-	workflow.Init("../../runtime")
-
-	spec, err := workflow.GetSpec()
-	if err != nil {
-		return err
-	}
-
-	details, err := spec.Get("RabbitMQ")
-	if err != nil {
-		return err
-	}
-	node.Iface = details.Iface
-
-	return nil
-}
-
+// Implements ir.IRNode
 func (n *RabbitmqContainer) String() string {
 	return n.InstanceName + " = RabbitmqContainer(" + n.BindAddr.Name() + ")"
 }
 
+// Implements ir.IRNode
 func (n *RabbitmqContainer) Name() string {
 	return n.InstanceName
 }
 
+// Implements service.ServiceNode
 func (n *RabbitmqContainer) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	iface := n.Iface.ServiceInterface(ctx)
 	return &RabbitmqInterface{Wrapped: iface}, nil
 }
 
-func (n *RabbitmqContainer) GenerateArtifacts(outdir string) error {
-	return nil
-}
-
-func (n *RabbitmqContainer) AddContainerArtifacts(target docker.ContainerWorkspace) error {
-	return nil
-}
-
+// Implements docker.ProvidesContainerInstance
 func (n *RabbitmqContainer) AddContainerInstance(target docker.ContainerWorkspace) error {
 	n.BindAddr.Port = 5672
 	err := target.DeclarePrebuiltInstance(n.InstanceName, "rabbitmq:3.8", n.BindAddr)

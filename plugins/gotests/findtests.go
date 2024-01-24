@@ -7,7 +7,7 @@ import (
 
 	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/goparser"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
 	"golang.org/x/exp/slog"
 )
 
@@ -21,7 +21,6 @@ type serviceRegistry struct {
 }
 
 type serviceRegistries struct {
-	spec       *workflow.WorkflowSpec
 	registries []*serviceRegistry
 }
 
@@ -52,17 +51,14 @@ var verbose = false
 //
 //	xxx := registry.NewServiceRegistry[xxx](xxx)
 func findWorkflowServiceRegistries() (*serviceRegistries, error) {
-	var err error
 	r := &serviceRegistries{}
 
 	// Load the workflow spec
-	if r.spec, err = workflow.GetSpec(); err != nil {
-		return nil, err
-	}
+	modset := workflowspec.Get().Modules
 
 	// Find instances
 	names := []string{}
-	for _, mod := range r.spec.Parsed.Modules {
+	for _, mod := range modset.Modules {
 		for _, pkg := range mod.Packages {
 			for _, v := range pkg.Vars {
 				vType, isRegistry := isRegistryVar(v)
@@ -75,7 +71,7 @@ func findWorkflowServiceRegistries() (*serviceRegistries, error) {
 
 					// Try to extract the interface of the registry
 					if u, isU := vType.(*gocode.UserType); isU {
-						srv, err := r.spec.Get(u.Name)
+						srv, err := workflowspec.GetServiceByName(u.Package, u.Name)
 						if err == nil {
 							registryInfo.Iface = srv.Iface.ServiceInterface(nil)
 							if verbose {

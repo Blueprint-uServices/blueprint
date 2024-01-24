@@ -112,14 +112,14 @@ import (
 // workloadType should correspond to a workload generator implementation
 //
 // workloadArgs should correspond to arguments used by the workload generator implementation
-func Generator(spec wiring.WiringSpec, name string, workloadType string, workloadArgs ...string) string {
+func Generator[GeneratorType any](spec wiring.WiringSpec, name string, workloadArgs ...string) string {
 
 	serviceName := name + ".service"
 	procName := name + ".proc"
 	wlgenName := name
 
 	// Define the service
-	workflow.Service(spec, serviceName, workloadType, workloadArgs...)
+	workflow.Service[GeneratorType](spec, serviceName, workloadArgs...)
 
 	// Wrap the service in a process
 	goproc.CreateProcess(spec, procName, serviceName)
