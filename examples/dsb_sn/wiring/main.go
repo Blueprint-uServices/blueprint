@@ -9,12 +9,13 @@ package main
 import (
 	"github.com/blueprint-uservices/blueprint/examples/dsb_sn/wiring/specs"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
-	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
 )
 
 func main() {
 	// Configure the location of our workflow spec
-	workflow.Init("../workflow", "../tests")
+	workflowspec.AddModule("github.com/blueprint-uservices/blueprint/examples/dsb_sn/workflow")
+	workflowspec.AddModule("github.com/blueprint-uservices/blueprint/examples/dsb_sn/tests")
 
 	// Build a supported wiring spec
 	name := "SocialNetwork"
