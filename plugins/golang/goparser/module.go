@@ -10,6 +10,7 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
+// Metadata about a module, such as its version and location on the local file system.
 type ModuleInfo struct {
 	ShortName string           // The last part of the module path
 	Path      string           // Fully qualified name of the module
@@ -33,7 +34,7 @@ func GetModuleInfo(moduleName string) (*ModuleInfo, error) {
 		return m, nil
 	}
 
-	pkgs, err := packages.Load(&packages.Config{Mode: packages.NeedModule}, moduleName+"...")
+	pkgs, err := packages.Load(&packages.Config{Mode: packages.NeedModule, Tests: true}, moduleName+"...")
 	if err != nil {
 		return nil, blueprint.Errorf("could not find module %v; is it in your go.mod? %v", moduleName, err)
 	}
@@ -102,6 +103,7 @@ func isLocal(mod *packages.Module) bool {
 	return mod.Main || mod.Replace != nil || strings.HasPrefix(mod.GoMod, mod.Dir)
 }
 
+// Finds and returns the module info for a type.
 func FindModule[T any]() (*ModuleInfo, *gocode.UserType, error) {
 	t := reflect.TypeOf(new(T)).Elem()
 	// We also should support pointer types. This is necessary when the constructor of a service returns the type of a pointer to the service implementation instead of the interface.
@@ -114,16 +116,4 @@ func FindModule[T any]() (*ModuleInfo, *gocode.UserType, error) {
 	mod, err := FindPackageModule(t.PkgPath())
 	usertype := &gocode.UserType{Package: t.PkgPath(), Name: t.Name()}
 	return mod, usertype, err
-}
-
-func print(mod *packages.Module) {
-	fmt.Printf("Module %s\n", mod.Path)
-	fmt.Printf("  Mod ver: %s\n", mod.Version)
-	fmt.Printf("  Go mod: %s\n", mod.GoMod)
-	fmt.Printf("  Go ver: %s\n", mod.GoVersion)
-	fmt.Printf("  Mod dir: %s\n", mod.Dir)
-	fmt.Printf("  GoMod dir: %s\n", mod.GoMod)
-	fmt.Printf("  Is main: %v\n", mod.Main)
-	fmt.Printf("  Is replace: %v\n", mod.Replace != nil)
-	fmt.Printf("  Is indirect: %v\n", mod.Indirect)
 }

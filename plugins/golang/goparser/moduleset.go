@@ -84,7 +84,7 @@ func (set *ParsedModuleSet) AddModules(srcDirs ...string) error {
 
 		// Parse it
 		if mod == nil {
-			if mod, err = ParseModule(srcDir); err != nil {
+			if mod, err = parseModule(srcDir); err != nil {
 				return err
 			}
 		}

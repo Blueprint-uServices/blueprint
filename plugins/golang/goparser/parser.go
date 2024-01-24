@@ -13,6 +13,8 @@ import (
 	"reflect"
 	"strings"
 
+	"golang.org/x/exp/slog"
+
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
@@ -116,7 +118,7 @@ type (
 // Parses the module directory specified by srcDir and returns a ParsedModule.
 // All of the packages inside the module will be parsed.
 // srcDir must contain a go.mod file; if it doesn't an error will be returned.
-func ParseModule(srcDir string) (*ParsedModule, error) {
+func parseModule(srcDir string) (*ParsedModule, error) {
 	srcDir = filepath.Clean(srcDir)
 
 	modfilePath := filepath.Join(srcDir, "go.mod")
@@ -141,22 +143,17 @@ func ParseModule(srcDir string) (*ParsedModule, error) {
 	mod.IsLocal = true
 	mod.Packages = make(map[string]*ParsedPackage)
 
-	fmt.Println()
-	fmt.Println("Parsed module", srcDir, "version:", mod.Version)
-	fmt.Println()
-
 	// Try to update the module version if it's on our go path; doesn't work for generated modules.
 	info, err := GetModuleInfo(mod.Name)
 	if err == nil && info.Dir == srcDir {
 		mod.Version = info.Version
-		fmt.Println("Updating version to", mod.Version)
-		fmt.Println(info)
-		fmt.Println()
 	}
 
 	if err := mod.Load(); err != nil {
 		return mod, err
 	}
+
+	slog.Info(fmt.Sprintf("Parsing module %s version=%s local=%s", mod.Name, mod.Version, mod.IsLocal))
 
 	for _, pkg := range mod.Packages {
 		if err := pkg.Parse(); err != nil {

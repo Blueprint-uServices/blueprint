@@ -232,12 +232,10 @@ type (
 		// This call will succeed even if the package already exists on the filesystem.
 		CreatePackage(packageName string) (PackageInfo, error)
 
-		// Explicitly adds a 'require' statement to the go.mod file for the module and version
-		// specified.
-		//
-		// Typically this is not necessary, because `go mod tidy` will automatically pick up
-		// any module dependencies used by the code.  However, go mod tidy does not pick up
-		// specific dependency versions, in which case this method should be used.
+		// Enables a plugin to add a 'require' statement to the go.mod file for the generated
+		// module.  Typically this is not necessary because a subsequent `go mod tidy` will
+		// automatically pick up module dependencies.  However, if a plugin wishes to explicitly
+		// control the dependency version, it can use this method.
 		Require(moduleName string, version string) error
 
 		/*
