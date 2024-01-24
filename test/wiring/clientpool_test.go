@@ -8,13 +8,14 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/grpc"
 	"github.com/blueprint-uservices/blueprint/plugins/retries"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	wf "github.com/blueprint-uservices/blueprint/test/workflow/workflow"
 )
 
 func TestBasicClientPool(t *testing.T) {
 	spec := newWiringSpec("TestBasicClientPool")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	clientpool.Create(spec, leaf, 7)
 
@@ -58,8 +59,8 @@ func TestBasicClientPool(t *testing.T) {
 func TestBasicClientPoolInnerModifier(t *testing.T) {
 	spec := newWiringSpec("TestBasicClientPoolInnerModifier")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	clientpool.Create(spec, leaf, 7)
 	retries.AddRetries(spec, leaf, 10)
@@ -104,8 +105,8 @@ func TestBasicClientPoolInnerModifier(t *testing.T) {
 func TestBasicClientPoolOuterModifier(t *testing.T) {
 	spec := newWiringSpec("TestBasicClientPoolOuterModifier")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	retries.AddRetries(spec, leaf, 10)
 	clientpool.Create(spec, leaf, 7)
@@ -151,8 +152,8 @@ func TestBasicClientPoolOuterModifier(t *testing.T) {
 func TestInvalidModifierOrder(t *testing.T) {
 	spec := newWiringSpec("TestBasicClientPool")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	grpc.Deploy(spec, leaf)
 	clientpool.Create(spec, leaf, 7)

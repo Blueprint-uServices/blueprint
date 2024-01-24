@@ -6,6 +6,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/grpc"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	wf "github.com/blueprint-uservices/blueprint/test/workflow/workflow"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -19,8 +20,8 @@ Primarily want visibility tests for nodes that are in separate processes but not
 func TestServicesWithinSameProcess(t *testing.T) {
 	spec := newWiringSpec("TestServicesWithinSameProcess")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	myproc := goproc.CreateProcess(spec, "myproc", leaf, nonleaf)
 
@@ -43,9 +44,9 @@ func TestServicesWithinSameProcess(t *testing.T) {
 func TestSeparateServicesInSeparateProcesses(t *testing.T) {
 	spec := newWiringSpec("TestSeparateServicesInSeparateProcesses")
 
-	leaf1 := workflow.Service(spec, "leaf1", "TestLeafServiceImpl")
-	leaf2 := workflow.Service(spec, "leaf2", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf2)
+	leaf1 := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf1")
+	leaf2 := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf2")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf2)
 
 	leaf1proc := goproc.CreateProcess(spec, "leaf1proc", leaf1)
 	myproc := goproc.CreateProcess(spec, "myproc", leaf2, nonleaf)
@@ -77,8 +78,8 @@ func TestAddChildrenToProcess(t *testing.T) {
 
 	myproc := goproc.CreateProcess(spec, "myproc")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	goproc.AddToProcess(spec, myproc, leaf)
 	goproc.AddToProcess(spec, myproc, nonleaf)
@@ -103,8 +104,8 @@ func TestAddChildrenToProcess(t *testing.T) {
 func TestReachabilityErrorForSeparateProcesses(t *testing.T) {
 	spec := newWiringSpec("TestReachabilityErrorForSeparateProcesses")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	leafproc := goproc.CreateProcess(spec, "leafproc", leaf)
 	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
@@ -116,8 +117,8 @@ func TestReachabilityErrorForSeparateProcesses(t *testing.T) {
 func TestClientWithinSameProcess(t *testing.T) {
 	spec := newWiringSpec("TestClientWithinSameProcess")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	nonleafclient := goproc.CreateClientProcess(spec, "nonleafclient", nonleaf)
 
@@ -139,8 +140,8 @@ func TestClientWithinSameProcess(t *testing.T) {
 func TestImplicitServicesWithinSameProcess(t *testing.T) {
 	spec := newWiringSpec("TestImplicitServicesWithinSameProcess")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	nonleafproc := goproc.CreateProcess(spec, "nonleafproc", nonleaf)
 
@@ -163,8 +164,8 @@ func TestImplicitServicesWithinSameProcess(t *testing.T) {
 func TestProcessModifier(t *testing.T) {
 	spec := newWiringSpec("TestProcessModifier")
 
-	leaf := workflow.Service(spec, "leaf", "TestLeafServiceImpl")
-	nonleaf := workflow.Service(spec, "nonleaf", "TestNonLeafService", leaf)
+	leaf := workflow.Service[*wf.TestLeafServiceImpl](spec, "leaf")
+	nonleaf := workflow.Service[wf.TestNonLeafService](spec, "nonleaf", leaf)
 
 	grpc.Deploy(spec, leaf)
 	grpc.Deploy(spec, nonleaf)
