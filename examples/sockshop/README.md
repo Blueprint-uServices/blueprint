@@ -43,30 +43,30 @@ If you navigate to the `build` directory, you will now see a number of build art
 * `build/docker/*` contain the individual docker images for services, including a Dockerfile and the golang source code
 * `build/gotests` contain the unit tests that we ran in the "Running unit tests" section
 
-## Configure the application
+## Configure and run the application
 
-Before running the application, we must configure some ports that the application will publicly expose.  Navigate to `build/docker` and create/edit the `.env` file:
+To run the application, we will need to set a number of environment variables.  Blueprint will generate a `.local.env` file with some default values for these;
+you can modify them if necessary.
+
+Set the docker environment variables:
 
 ```
-USER_DB_BIND_ADDR=0.0.0.0:12345
-PAYMENT_SERVICE_GRPC_BIND_ADDR=0.0.0.0:12346
-USER_SERVICE_GRPC_BIND_ADDR=0.0.0.0:12347
-CART_SERVICE_GRPC_BIND_ADDR=0.0.0.0:12348
-ORDER_SERVICE_GRPC_BIND_ADDR=0.0.0.0:12349
-ORDER_DB_BIND_ADDR=0.0.0.0:12350
-SHIPPING_SERVICE_GRPC_BIND_ADDR=0.0.0.0:12351
-SHIPPING_DB_BIND_ADDR=0.0.0.0:12352
-CART_DB_BIND_ADDR=0.0.0.0:12353
-CATALOGUE_DB_BIND_ADDR=0.0.0.0:12354
-CATALOGUE_SERVICE_GRPC_BIND_ADDR=0.0.0.0:12355
-FRONTEND_HTTP_BIND_ADDR=0.0.0.0:12356
-ZIPKIN_BIND_ADDR=0.0.0.0:12357
-SHIPPING_QUEUE_BIND_ADDR=0.0.0.0:12358
+cd build
+cp .local.env docker/.env
 ```
 
-## Running the application
+If this is your first time, you will need to build the containers:
 
-To run the application, navigate to `build/docker` and run `docker compose up`.  If this is your first time running the application, this will also build the necessary container images.
+```
+cd docker
+docker compose build
+```
+
+Run the application:
+
+```
+docker compose up
+```
 
 ## Invoke the application
 
@@ -142,14 +142,26 @@ Click the "Query" button and you should see a trace with Root "frontend_proc: li
 
 ## Testing the compiled application
 
-You can run unit tests against the compiled application.  After starting the application, navigate to `build/gotests/tests` and run using `go test`, passing the necessary address arguments:
+You can run unit tests against the compiled application.  After starting the application, navigate to `build/gotests/tests` and run using `go test`.  You will need to set a number of address variables, which can either be passed as command line arguments, or sourced as environment variables.  We demonstrate the latter:
 
 ```
-cd build/gotests/tests
-go test --payment_service.grpc.dial_addr=localhost:12346 --user_service.grpc.dial_addr=localhost:12347 --cart_service.grpc.dial_addr=localhost:12348 --order_service.grpc.dial_addr=localhost:12349 --shipping_service.grpc.dial_addr=localhost:12351 --catalogue_service.grpc.dial_addr=localhost:12355 --frontend.http.dial_addr=localhost:12356 --zipkin.dial_addr=localhost:12357
+cd ./build
+set -a
+. ./.local.env
+cd gotests/tests
+go test .
 ```
 
 The tests will also generate Zipkin traces which you can view in the Zipkin WebUI at [http://localhost:12357](http://localhost:12357).
+
+## Running the workload generator
+
+```
+cd ./build
+set -a
+. ./.local.env
+./wlgen/wlgen
+```
 
 ## Next steps
 
