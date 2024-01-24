@@ -42,9 +42,6 @@ func new(modules *goparser.ParsedModuleSet) *WorkflowSpec {
 	spec := &WorkflowSpec{
 		Modules: modules,
 	}
-	if err := spec.ParseModule("github.com/blueprint-uservices/blueprint/runtime"); err != nil {
-		panic("unable to parse Blueprint runtime module: " + err.Error())
-	}
 	return spec
 }
 
