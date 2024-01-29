@@ -13,13 +13,14 @@ import (
 )
 
 type KubeDeploymentFile struct {
-	WorkspaceName string
-	WorkspaceDir  string
-	FileName      string
-	FilePath      string
-	Instances     map[string]instance
-	localServers  map[string]*address.BindConfig
-	localDials    map[string]*address.DialConfig
+	WorkspaceName   string
+	WorkspaceDir    string
+	FileName        string
+	ServiceFilename string
+	FilePath        string
+	Instances       map[string]instance
+	localServers    map[string]*address.BindConfig
+	localDials      map[string]*address.DialConfig
 }
 
 type instance struct {
@@ -30,20 +31,26 @@ type instance struct {
 	Passthrough  map[string]struct{}
 }
 
-func NewKubeDeploymentFile(workspaceName string, workspaceDir string, filename string) *KubeDeploymentFile {
+func NewKubeDeploymentFile(workspaceName string, workspaceDir string, filename string, serviceFilename string) *KubeDeploymentFile {
 	return &KubeDeploymentFile{
-		WorkspaceName: workspaceName,
-		WorkspaceDir:  workspaceDir,
-		FileName:      filename,
-		FilePath:      filepath.Join(workspaceDir, filename),
-		Instances:     make(map[string]instance),
+		WorkspaceName:   workspaceName,
+		WorkspaceDir:    workspaceDir,
+		FileName:        filename,
+		ServiceFilename: serviceFilename,
+		FilePath:        filepath.Join(workspaceDir, filename),
+		Instances:       make(map[string]instance),
 	}
 }
 
 func (k *KubeDeploymentFile) Generate() error {
 	k.ResolveLocalDials()
 	slog.Info(fmt.Sprintf("Generating %v/%v", k.WorkspaceName, k.FileName))
-	return kubetemplate.ExecuteTemplateToFile("kubedeployment", kubernetesTemplate, k, k.FilePath)
+	err := kubetemplate.ExecuteTemplateToFile("kubedeployment", kubernetesTemplate, k, k.FilePath)
+	if err != nil {
+		return err
+	}
+	serviceFilePath := filepath.Join(k.WorkspaceDir, k.ServiceFilename)
+	return kubetemplate.ExecuteTemplateToFile("kubedeployment", kubernetesServiceTemplate, k, serviceFilePath)
 }
 
 func (k *KubeDeploymentFile) AddImageInstance(instanceName string, image string, args ...ir.IRNode) error {
@@ -174,4 +181,19 @@ spec:
       {{-end}}
       restartPolicy: Always
       hostname: {{.InstanceName}}
+`
+
+var kubernetesServiceTemplate = `
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Name}}-service
+spec:
+  selector:
+    blueprint.service: {{.Name}}
+  ports:
+  {{- range $external, $internal := .Ports}}
+    - port: {{$internal}}
+      targetPort: {{$external}}
+  {{- end}}
 `

@@ -73,7 +73,7 @@ func NewKubePodWorkspace(name string, dir string) *kubeDeploymentWorkspace {
 			Target: "kubedeployment",
 		},
 		ImageDirs: make(map[string]string),
-		F:         deploygen.NewKubeDeploymentFile(name, dir, name+"-deployment.yaml"),
+		F:         deploygen.NewKubeDeploymentFile(name, dir, name+"-deployment.yaml", name+"-service.yaml"),
 	}
 }
 
