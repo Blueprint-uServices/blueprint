@@ -6,37 +6,37 @@ import (
 )
 
 // An IRNode representing a Kubernetes pod, which is simply a collection of container instances.
-type Pod struct {
-	kubePod
+type PodDeployment struct {
+	kubePodDeployment
 	PodName string
 	Nodes   []ir.IRNode
 	Edges   []ir.IRNode
 }
 
 // Implements IRNode
-func (node *Pod) Name() string {
+func (node *PodDeployment) Name() string {
 	return node.PodName
 }
 
 // Implements IRNode
-func (node *Pod) String() string {
+func (node *PodDeployment) String() string {
 	return ir.PrettyPrintNamespace(node.PodName, "KubernetesPod", node.Edges, node.Nodes)
 }
 
 // Implements [wiring.NamespaceHandler]
-func (pod *Pod) Accepts(nodeType any) bool {
+func (pod *PodDeployment) Accepts(nodeType any) bool {
 	_, isDockerContainerNode := nodeType.(docker.Container)
 	return isDockerContainerNode
 }
 
 // Implements [wiring.NamespaceHandler]
-func (pod *Pod) AddEdge(name string, edge ir.IRNode) error {
+func (pod *PodDeployment) AddEdge(name string, edge ir.IRNode) error {
 	pod.Edges = append(pod.Edges, edge)
 	return nil
 }
 
 // Implements [wiring.NamespaceHandler]
-func (pod *Pod) AddNode(name string, node ir.IRNode) error {
+func (pod *PodDeployment) AddNode(name string, node ir.IRNode) error {
 	pod.Nodes = append(pod.Nodes, node)
 	return nil
 }
