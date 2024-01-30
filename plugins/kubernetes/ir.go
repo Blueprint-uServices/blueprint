@@ -18,3 +18,15 @@ func (n *Application) Name() string {
 func (n *Application) String() string {
 	return ir.PrettyPrintNamespace(n.AppName, "KubeApp", n.Edges, n.Nodes)
 }
+
+// Implements ir.ArtifactGenerator
+func (n *Application) GenerateArtifacts(dir string) error {
+	nodes := ir.Filter[ir.ArtifactGenerator](n.Nodes)
+	for _, node := range nodes {
+		err := node.GenerateArtifacts(dir)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
