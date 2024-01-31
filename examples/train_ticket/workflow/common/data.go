@@ -92,3 +92,28 @@ type AdminTrip struct {
 	R  route.Route
 	TT train.TrainType
 }
+
+type OrderTicketsInfo struct {
+	AccountID       string
+	ContactID       string
+	TripID          string
+	Date            string
+	From            string
+	To              string
+	Assurance       int64
+	FoodType        int64
+	StationName     string
+	StoreName       string
+	FoodName        string
+	FoodPrice       float64
+	HandleDate      string
+	ConsigneeName   string
+	ConsigneePhone  string
+	ConsigneeWeight float64
+	WithinRegion    bool
+}
+
+type Food struct {
+	Name  string
+	Price float64
+}

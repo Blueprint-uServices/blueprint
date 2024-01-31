@@ -1,10 +1,5 @@
 package food
 
-type Food struct {
-	Name  string
-	Price float64
-}
-
 type FoodOrder struct {
 	ID          string
 	OrderID     string

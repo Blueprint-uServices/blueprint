@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/food"
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/common"
 	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -17,7 +17,7 @@ type TrainFoodService interface {
 	// Get all train food items
 	ListTrainFood(ctx context.Context) ([]TrainFood, error)
 	// List all food items based on `tripid`
-	ListTrainFoodByTripID(ctx context.Context, tripid string) ([]food.Food, error)
+	ListTrainFoodByTripID(ctx context.Context, tripid string) ([]common.Food, error)
 	// Remove all train food items; Only used during testing
 	Cleanup(ctx context.Context) error
 }
@@ -49,22 +49,22 @@ func (t *TrainFoodServiceImpl) ListTrainFood(ctx context.Context) ([]TrainFood, 
 	return all_foods, nil
 }
 
-func (t *TrainFoodServiceImpl) ListTrainFoodByTripID(ctx context.Context, tripid string) ([]food.Food, error) {
+func (t *TrainFoodServiceImpl) ListTrainFoodByTripID(ctx context.Context, tripid string) ([]common.Food, error) {
 	coll, err := t.db.GetCollection(ctx, "trainfood", "trainfood")
 	if err != nil {
-		return []food.Food{}, err
+		return []common.Food{}, err
 	}
 	res, err := coll.FindOne(ctx, bson.D{{"tripid", tripid}})
 	if err != nil {
-		return []food.Food{}, err
+		return []common.Food{}, err
 	}
 	var tf TrainFood
 	exists, err := res.One(ctx, &tf)
 	if err != nil {
-		return []food.Food{}, err
+		return []common.Food{}, err
 	}
 	if !exists {
-		return []food.Food{}, errors.New("Trip with Trip ID " + tripid + " does not exist")
+		return []common.Food{}, errors.New("Trip with Trip ID " + tripid + " does not exist")
 	}
 	return tf.Foods, nil
 }
