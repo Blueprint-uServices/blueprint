@@ -102,6 +102,7 @@ type OrderTicketsInfo struct {
 	To              string
 	Assurance       int64
 	FoodType        int64
+	SeatType        int64
 	StationName     string
 	StoreName       string
 	FoodName        string

@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/food"
+	"github.com/blueprint-uservices/blueprint/examples/train_ticket/workflow/common"
 	"github.com/stretchr/testify/require"
 )
 
-func genTestFoodData() []food.Food {
-	res := []food.Food{}
+func genTestFoodData() []common.Food {
+	res := []common.Food{}
 	for i := 0; i < 10; i++ {
-		f := food.Food{
+		f := common.Food{
 			Name:  fmt.Sprintf("Food%d", i),
 			Price: float64(100*i + 100),
 		}
@@ -20,7 +20,7 @@ func genTestFoodData() []food.Food {
 	return res
 }
 
-func requireFood(t *testing.T, expected food.Food, actual food.Food) {
+func requireFood(t *testing.T, expected common.Food, actual common.Food) {
 	require.Equal(t, expected.Name, actual.Name)
 	require.Equal(t, expected.Price, actual.Price)
 }
