@@ -1,7 +1,6 @@
 package loadbalancer
 
 import (
-	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/pointer"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 )
@@ -25,6 +24,5 @@ func Create(spec wiring.WiringSpec, serviceGroupName string, services []string) 
 	dstName := loadbalancer_name + ".dst"
 	spec.Alias(dstName, loadbalancer_name)
 
-	pointer.CreatePointer[LoadBalancerClient](spec, loadbalancer_name, dstName)
 	return loadbalancer_name
 }

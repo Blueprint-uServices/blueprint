@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/stringutil"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
@@ -25,8 +26,17 @@ type LoadBalancerClient struct {
 }
 
 func newLoadBalancerClient(name string, arg_nodes []ir.IRNode) (*LoadBalancerClient, error) {
+	clients := []golang.Service{}
+	for _, n := range arg_nodes {
+		if c, ok := n.(golang.Service); ok {
+			clients = append(clients, c)
+		} else {
+			return nil, blueprint.Errorf("Expected all clients to load balancer to be golang Services")
+		}
+	}
 	return &LoadBalancerClient{
 		BalancerName:   name,
+		Clients:        clients,
 		ContainedNodes: arg_nodes,
 		outputPackage:  "lb",
 	}, nil
@@ -80,7 +90,7 @@ func (lb *LoadBalancerClient) AddInstantiation(builder golang.NamespaceBuilder) 
 			Name: fmt.Sprintf("New_%v_LoadBalancer", iface.BaseName),
 			Arguments: []gocode.Variable{
 				{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}},
-				{Name: "clients", Type: &gocode.Slice{SliceOf: iface}},
+				{Name: "clients", Type: &gocode.Ellipsis{EllipsisOf: iface}},
 			},
 		},
 	}
@@ -109,7 +119,7 @@ func (lb *LoadBalancerClient) GenerateFuncs(module golang.ModuleBuilder) error {
 	args.Imports = gogen.NewImports(pkg.Name)
 	args.ServiceName = iface.BaseName
 	args.Service = iface
-	lbFileName := filepath.Join(module.Info().Path, args.PackageShortName)
+	lbFileName := filepath.Join(module.Info().Path, args.PackageShortName, lb.BalancerName+".go")
 	args.Imports.AddPackages("context", "github.com/blueprint-uservices/blueprint/runtime/plugins/loadbalancer")
 
 	return gogen.ExecuteTemplateToFile("lb_client_constructor", lbTemplate, args, lbFileName)
@@ -132,9 +142,13 @@ type {{.LBName}} struct {
 	balancer *loadbalancer.LoadBalancer[{{NameOf .Service.UserType}}]
 }
 
-func New_{{.ServiceName}}_LoadBalancer(ctx context.Context, clients []{{NameOf .Service.UserType}}) (*{{.LBName}}, error) {
-	handler := &{{.Name}}{}
-	handler.balancer = loadbalancer.NewLoadBalancer[{{NameOf .Service.UserType}}](ctx, clients)
+func New_{{.ServiceName}}_LoadBalancer(ctx context.Context, clients ...{{NameOf .Service.UserType}}) (*{{.LBName}}, error) {
+	handler := &{{.LBName}}{}
+	clients_arr := []{{NameOf .Service.UserType}}{}
+	for _, c := range clients {
+		clients_arr = append(clients_arr, c)
+	}
+	handler.balancer = loadbalancer.NewLoadBalancer[{{NameOf .Service.UserType}}](ctx, clients_arr)
 	return handler, nil
 }
 
