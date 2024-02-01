@@ -5,12 +5,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/blueprint/stringutil"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/coreplugins/service"
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/ir"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gocode"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/golang/gogen"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/stringutil"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
+	"github.com/blueprint-uservices/blueprint/plugins/golang"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
+	"github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
 )
 
 type LoadBalancerClient struct {
@@ -110,7 +110,7 @@ func (lb *LoadBalancerClient) GenerateFuncs(module golang.ModuleBuilder) error {
 	args.ServiceName = iface.BaseName
 	args.Service = iface
 	lbFileName := filepath.Join(module.Info().Path, args.PackageShortName)
-	args.Imports.AddPackages("context", "gitlab.mpi-sws.org/cld/blueprint/runtime/plugins/loadbalancer")
+	args.Imports.AddPackages("context", "github.com/blueprint-uservices/blueprint/runtime/plugins/loadbalancer")
 
 	return gogen.ExecuteTemplateToFile("lb_client_constructor", lbTemplate, args, lbFileName)
 }

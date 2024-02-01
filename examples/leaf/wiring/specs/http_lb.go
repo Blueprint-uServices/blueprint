@@ -1,38 +1,38 @@
 package specs
 
 import (
-	"gitlab.mpi-sws.org/cld/blueprint/blueprint/pkg/wiring"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/goproc"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/http"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/loadbalancer"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/memcached"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/mongodb"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/wiringcmd"
-	"gitlab.mpi-sws.org/cld/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/examples/leaf/workflow/leaf"
+	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
+	"github.com/blueprint-uservices/blueprint/plugins/goproc"
+	"github.com/blueprint-uservices/blueprint/plugins/http"
+	"github.com/blueprint-uservices/blueprint/plugins/loadbalancer"
+	"github.com/blueprint-uservices/blueprint/plugins/simple"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
-var HTTP_LoadBalancer = wiringcmd.SpecOption{
+var HTTP_LoadBalancer = cmdbuilder.SpecOption{
 	Name:        "http_lb",
 	Description: "Deploys each service in a separate process, communicating using HTTP. Leaf service has 2 replicas and NonLeafService chooses between the two at random.",
 	Build:       makeHTTPLbSpec,
 }
 
 func makeHTTPLbSpec(spec wiring.WiringSpec) ([]string, error) {
-	leaf_cache := memcached.PrebuiltContainer(spec, "leaf_cache")
-	leaf_db := mongodb.PrebuiltContainer(spec, "leaf_db")
+	leaf_cache := simple.Cache(spec, "leaf_cache")
+	leaf_db := simple.NoSQLDB(spec, "leaf_db")
 
-	leaf_service1 := workflow.Define(spec, "leaf_service1", "LeafServiceImpl", leaf_cache, leaf_db)
+	leaf_service1 := workflow.Service[*leaf.LeafServiceImpl](spec, "leaf_service1", leaf_cache, leaf_db)
 	leaf_proc1 := leaf_service1 + "_process"
 	http.Deploy(spec, leaf_service1)
 	leaf_proc1 = goproc.CreateProcess(spec, leaf_proc1, leaf_service1)
-	leaf_service2 := workflow.Define(spec, "leaf_service2", "LeafServiceImpl", leaf_cache, leaf_db)
+	leaf_service2 := workflow.Service[*leaf.LeafServiceImpl](spec, "leaf_service2", leaf_cache, leaf_db)
 	leaf_proc2 := leaf_service2 + "_process"
 	http.Deploy(spec, leaf_service2)
 	leaf_proc2 = goproc.CreateProcess(spec, leaf_proc2, leaf_service2)
 
-	leaf_lb := loadbalancer.Create(spec, []string{leaf_service1, leaf_service2}, "LeafService")
+	leaf_lb := loadbalancer.Create(spec, "LeafService", []string{leaf_service1, leaf_service2})
 
-	nonleaf_service := workflow.Define(spec, "nonleaf_service", "NonLeafService", leaf_lb)
+	nonleaf_service := workflow.Service[leaf.NonLeafService](spec, "nonleaf_service", leaf_lb)
 	nonleaf_proc := nonleaf_service + "_process"
 	http.Deploy(spec, nonleaf_service)
 	nonleaf_proc = goproc.CreateProcess(spec, nonleaf_proc, nonleaf_service)
