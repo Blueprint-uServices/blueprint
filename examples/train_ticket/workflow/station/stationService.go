@@ -27,6 +27,8 @@ type StationService interface {
 	FindID(ctx context.Context, name string) (string, error)
 	// Find the station `ids` for stations with Names `names`
 	FindIDs(ctx context.Context, names []string) ([]string, error)
+	// Returns all stations
+	AllStations(ctx context.Context) ([]Station, error)
 }
 
 // Implementation of the StationService
@@ -147,6 +149,20 @@ func (s *StationServiceImpl) FindByID(ctx context.Context, id string) (Station, 
 		return Station{}, errors.New("Station with id " + id + "does not exist")
 	}
 	return st, nil
+}
+
+func (s *StationServiceImpl) AllStations(ctx context.Context) ([]Station, error) {
+	var stations []Station
+	coll, err := s.stationDB.GetCollection(ctx, "station", "station")
+	if err != nil {
+		return stations, err
+	}
+	res, err := coll.FindMany(ctx, bson.D{})
+	if err != nil {
+		return stations, err
+	}
+	err = res.All(ctx, &stations)
+	return stations, err
 }
 
 func (s *StationServiceImpl) FindByIDs(ctx context.Context, ids []string) ([]Station, error) {
