@@ -3,6 +3,7 @@ package kubepod
 import (
 	"fmt"
 	"path/filepath"
+	"reflect"
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/ioutil"
@@ -29,7 +30,8 @@ type kubeDeploymentWorkspace struct {
 
 	info docker.ContainerWorkspaceInfo
 
-	ImageDirs map[string]string
+	ImageDirs    map[string]string
+	InstanceArgs map[string][]ir.IRNode // argnodes for each instance added to the workspace
 
 	F *deploygen.KubeDeploymentFile
 }
@@ -60,9 +62,6 @@ func (node *PodDeployment) generateArtifacts(workspace *kubeDeploymentWorkspace)
 	if err := workspace.Finish(); err != nil {
 		return err
 	}
-
-	// Reset any port assignments for externally-visible servers
-	address.ResetPorts(node.Edges)
 	return nil
 }
 
@@ -93,22 +92,16 @@ func (p *kubeDeploymentWorkspace) CreateImageDir(imageName string) (string, erro
 
 // Implements docker.ContainerWorkspace
 func (p *kubeDeploymentWorkspace) DeclarePrebuiltInstance(instanceName string, image string, args ...ir.IRNode) error {
-	if err := address.CheckPorts(args); err != nil {
-		return blueprint.Errorf("unable to add docker instance %v due to %v", instanceName, err.Error())
-	}
-
-	return p.F.AddImageInstance(instanceName, image, args...)
+	p.InstanceArgs[instanceName] = args
+	return p.F.AddImageInstance(instanceName, image)
 }
 
 // Implements docker.ContainerWorkspace
 func (p *kubeDeploymentWorkspace) DeclareLocalImage(instanceName string, imageDir string, args ...ir.IRNode) error {
-	// Docker containers should assign all internal server ports (typically using address.AssignPorts) before adding an instance
-	if err := address.CheckPorts(args); err != nil {
-		return blueprint.Errorf("unable to add docker instance %v due to %v", instanceName, err.Error())
-	}
+	p.InstanceArgs[instanceName] = args
 	// For now set image to instanceName
 	image := instanceName
-	return p.F.AddImageInstance(instanceName, image, args...)
+	return p.F.AddImageInstance(instanceName, image)
 }
 
 // Implements docker.ContainerWorkspace
@@ -118,7 +111,105 @@ func (p *kubeDeploymentWorkspace) SetEnvironmentVariable(instanceName string, ke
 
 // Generates the pod config file
 func (p *kubeDeploymentWorkspace) Finish() error {
+	// We didn't set any arguments or environment variables while accumulating instances. Do so now.
+	if err := p.processArgNodes(); err != nil {
+		return err
+	}
+
 	return p.F.Generate()
+}
+
+func asMap[T any](s []*T) map[*T]struct{} {
+	m := make(map[*T]struct{})
+	for _, v := range s {
+		m[v] = struct{}{}
+	}
+	return m
+}
+
+// Goes through each container's arg nodes, determining which need to be passed to the container
+// as environment variables.
+//
+// Has special handling for addresses; containers that bind a server will have ports assigned,
+// and containers that dial to a server within this namespace will have the dial address set.
+//
+// We don't pick external-facing ports for any addresses; these will be set by the caller or user.
+func (p *kubeDeploymentWorkspace) processArgNodes() error {
+
+	// (1) Assign ports to containers
+	// Servers like backends will already be pre-bound to specific ports.  Other servers
+	// like gRPC ones will need a port assigned.
+	// The networking address space in a pod is shared between containers, so port assignments
+	// must be unique across all containers in the pod.
+	var allBinds []*address.BindConfig
+	var assignedBinds map[*address.BindConfig]struct{}
+	var localAddresses map[string]string
+	{
+		localAddresses = make(map[string]string)
+		for _, instanceArgs := range p.InstanceArgs {
+			allBinds = append(allBinds, ir.Filter[*address.BindConfig](instanceArgs)...)
+		}
+
+		_, assigned, err := address.AssignPorts(allBinds)
+		if err != nil {
+			return err
+		}
+		assignedBinds = asMap(assigned)
+
+		localAddresses = make(map[string]string)
+		for _, bind := range allBinds {
+			localAddresses[bind.AddressName] = fmt.Sprintf("localhost:%v", bind.Port)
+		}
+	}
+
+	// (2) Set environment variables for containers
+	// (3) Expose container ports externally
+	for instanceName, instanceArgs := range p.InstanceArgs {
+		binds, dials, remaining := address.Split(instanceArgs)
+
+		// Handle the instanceArgs that are regular config args and not address related
+		for _, arg := range remaining {
+			switch node := arg.(type) {
+			case ir.IRConfig:
+				if node.HasValue() {
+					// Ignore if the value is already set, because it implies it's hard-coded
+					// inside the container image
+				} else {
+					// TODO: if Kubernetes supports pass-through environment variables, then
+					// implement this
+					return blueprint.Errorf("kubernetes doesn't support runtime environment variable passthrough for %v", node.Name())
+				}
+			default:
+				return blueprint.Errorf("container instance %v can only accept IRConfig nodes as arguments, but found %v of type %v", instanceName, arg, reflect.TypeOf(arg))
+			}
+		}
+
+		// If we assigned ports for this container, then set the environment variables for them
+		for _, bind := range binds {
+			if _, isAssigned := assignedBinds[bind]; isAssigned {
+				p.F.AddEnvVar(instanceName, bind.Name(), fmt.Sprintf("0.0.0.0:%v", bind.Port))
+			}
+		}
+
+		// Expose all ports for this container
+		for _, bind := range binds {
+			p.F.ExposePort(instanceName, bind.AddressName, bind.Port)
+		}
+
+		// If a dial is local, then it just calls localhost:port.  If it's not local
+		// then ??????????????????
+		for _, dial := range dials {
+			if addr, isLocalDial := localAddresses[dial.AddressName]; isLocalDial {
+				p.F.AddEnvVar(instanceName, dial.Name(), addr)
+			} else {
+				// TODO: do we pass through an environment variable? how do we know the name to dial for
+				// services that are outside this service?  maybe just use the
+				// service_a.grpc.dial_addr name itself as the service lookup name???
+			}
+		}
+	}
+
+	return nil
 }
 
 func (p *kubeDeploymentWorkspace) ImplementsBuildContext()       {}
