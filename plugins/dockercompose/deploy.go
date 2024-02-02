@@ -176,17 +176,12 @@ func (d *dockerComposeWorkspace) processArgNodes() error {
 		}
 
 		// All ports need to be exposed in the docker-compose file in order to be accessible
-		// to other containers.
-		for _, bind := range binds {
-			d.DockerComposeFile.ExposePort(instanceName, bind.Port)
-			d.DockerComposeFile.MapPortToEnvVar(instanceName, bind.Port, bind.Name())
-		}
-
-		// Save the addresses that are bound in this container instance, so that in a moment
-		// we can set the dial addresses for any other containers that want to dial this serer
+		// to other containers.  We then save the addresses so that other containers can dial
+		// to them.
 		for _, bind := range binds {
 			hostname := ir.CleanName(instanceName)
 			addresses[bind.AddressName] = fmt.Sprintf("%v:%v", hostname, bind.Port)
+			d.DockerComposeFile.ExposePort(instanceName, bind.Port)
 		}
 
 		// The default logic for the docker-compose file is for the user to set environment
