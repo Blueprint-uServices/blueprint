@@ -34,6 +34,19 @@ func Filter[T any](nodes []IRNode) []T {
 	return ts
 }
 
+// Returns a slice containing only nodes of type T,
+// and a slice containing all other nodes
+func Split[T any](nodes []IRNode) (remaining []IRNode, matches []T) {
+	for _, node := range nodes {
+		if t, isT := node.(T); isT {
+			matches = append(matches, t)
+		} else {
+			remaining = append(remaining, node)
+		}
+	}
+	return
+}
+
 // Returns a slice containing only nodes of type T
 func FilterNodes[T any](nodes []IRNode) []IRNode {
 	var ts []IRNode

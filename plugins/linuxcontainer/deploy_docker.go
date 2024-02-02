@@ -3,7 +3,6 @@ package linuxcontainer
 import (
 	"fmt"
 
-	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/address"
 	"github.com/blueprint-uservices/blueprint/plugins/docker"
 	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer/dockergen"
 	"golang.org/x/exp/slog"
@@ -81,11 +80,6 @@ func (node *Container) AddContainerInstance(target docker.ContainerWorkspace) er
 	// The instance only needs to be added to the output directory once
 	if target.Visited(node.InstanceName + ".instance") {
 		return nil
-	}
-
-	// Assign ports to addresses that are bound inside this container
-	if err := address.AssignPorts(node.InstanceName, append(node.Nodes, node.Edges...)); err != nil {
-		return err
 	}
 
 	slog.Info(fmt.Sprintf("Declaring container instance %v", node.InstanceName))
