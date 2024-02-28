@@ -12,11 +12,12 @@ import (
 )
 
 type KubeDeploymentFile struct {
-	WorkspaceName   string
+	Name            string
 	WorkspaceDir    string
 	FileName        string
 	ServiceFilename string
 	FilePath        string
+	NumReplicas     int64
 	Instances       map[string]*instance
 }
 
@@ -29,22 +30,26 @@ type instance struct {
 
 func NewKubeDeploymentFile(workspaceName string, workspaceDir string, filename string, serviceFilename string) *KubeDeploymentFile {
 	return &KubeDeploymentFile{
-		WorkspaceName:   workspaceName,
+		Name:            workspaceName,
 		WorkspaceDir:    workspaceDir,
 		FileName:        filename,
 		ServiceFilename: serviceFilename,
 		FilePath:        filepath.Join(workspaceDir, filename),
 		Instances:       make(map[string]*instance),
+		// For now NumReplicas is fixed.
+		NumReplicas: 1,
 	}
 }
 
 func (k *KubeDeploymentFile) Generate() error {
-	slog.Info(fmt.Sprintf("Generating %v/%v", k.WorkspaceName, k.FileName))
+	slog.Info(fmt.Sprintf("Generating %v/%v", k.Name, k.FileName))
 	err := kubetemplate.ExecuteTemplateToFile("kubedeployment", kubernetesTemplate, k, k.FilePath)
 	if err != nil {
 		return err
 	}
+	slog.Info("NUmber of instances: ", "num", len(k.Instances))
 	serviceFilePath := filepath.Join(k.WorkspaceDir, k.ServiceFilename)
+	slog.Info(fmt.Sprintf("Generating %v/%v", k.Name, k.ServiceFilename))
 	return kubetemplate.ExecuteTemplateToFile("kubedeployment", kubernetesServiceTemplate, k, serviceFilePath)
 }
 
@@ -131,9 +136,10 @@ spec:
           {{- range $name, $port := .Ports}}
             - containerPort: {{$port}}
           {{- end}}
-      {{-end}}
+		  {{- end}}
+      {{- end}}
       restartPolicy: Always
-      hostname: {{.InstanceName}}
+      hostname: {{.Name}}
 `
 
 var kubernetesServiceTemplate = `
