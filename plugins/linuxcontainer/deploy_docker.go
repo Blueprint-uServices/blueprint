@@ -79,6 +79,7 @@ func (node *Container) AddContainerArtifacts(target docker.ContainerWorkspace) e
 func (node *Container) AddContainerInstance(target docker.ContainerWorkspace) error {
 	// The instance only needs to be added to the output directory once
 	if target.Visited(node.InstanceName + ".instance") {
+		slog.Info(fmt.Sprintf("%v already declared as a container", node.InstanceName))
 		return nil
 	}
 
