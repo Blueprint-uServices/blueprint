@@ -71,8 +71,9 @@ func NewKubePodWorkspace(name string, dir string) *kubeDeploymentWorkspace {
 			Path:   filepath.Clean(dir),
 			Target: "kubedeployment",
 		},
-		ImageDirs: make(map[string]string),
-		F:         deploygen.NewKubeDeploymentFile(name, dir, name+"-deployment.yaml", name+"-service.yaml"),
+		ImageDirs:    make(map[string]string),
+		InstanceArgs: make(map[string][]ir.IRNode),
+		F:            deploygen.NewKubeDeploymentFile(name, dir, name+"-deployment.yaml", name+"-service.yaml"),
 	}
 }
 
@@ -98,6 +99,7 @@ func (p *kubeDeploymentWorkspace) DeclarePrebuiltInstance(instanceName string, i
 
 // Implements docker.ContainerWorkspace
 func (p *kubeDeploymentWorkspace) DeclareLocalImage(instanceName string, imageDir string, args ...ir.IRNode) error {
+	slog.Info("Inside DeclareLocalImage")
 	p.InstanceArgs[instanceName] = args
 	// For now set image to instanceName
 	image := instanceName
