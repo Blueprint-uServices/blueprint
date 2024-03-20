@@ -77,6 +77,9 @@ type (
 
 		// Adds a new card for a customer
 		PostCard(ctx context.Context, userID string, card user.Card) (string, error)
+
+		// Loads the catalogue in the catalogue service
+		LoadCatalogue(ctx context.Context) (string, error)
 	}
 )
 
@@ -267,4 +270,41 @@ func (f *frontend) UpdateItem(ctx context.Context, sessionID string, itemID stri
 	}
 
 	return sessionID, f.cart.UpdateItem(ctx, sessionID, cart.Item{ID: item.ID, Quantity: quantity, UnitPrice: item.Price})
+}
+
+func (f *frontend) LoadCatalogue(ctx context.Context) (string, error) {
+	err_msg := "Failed to load catalogue"
+	var alltags = []string{"brown", "geek", "formal", "blue", "skin", "red", "action", "sport", "black", "magic", "green"}
+
+	sock := func(name, description string, price float32, qty int, url1, url2 string, tags ...string) catalogue.Sock {
+		return catalogue.Sock{Name: name, Description: description,
+			Price: price, Quantity: qty, ImageURL_1: url1, ImageURL_2: url2, Tags: tags}
+	}
+
+	var socks = []catalogue.Sock{
+		sock("Weave special", "Limited issue Weave socks.", 17.15, 33, "/catalogue/images/weave1.jpg", "/catalogue/images/weave2.jpg", "geek", "black"),
+		sock("Nerd leg", "For all those leg lovers out there. A perfect example of a swivel chair trained calf. Meticulously trained on a diet of sitting and Pina Coladas. Phwarr...", 7.99, 115, "/catalogue/images/bit_of_leg_1.jpeg", "/catalogue/images/bit_of_leg_2.jpeg", "blue", "skin"),
+		sock("Crossed", "A mature sock, crossed, with an air of nonchalance.", 17.32, 738, "/catalogue/images/cross_1.jpeg", "/catalogue/images/cross_2.jpeg", "formal", "blue", "red", "action"),
+		sock("SuperSport XL", "Ready for action. Engineers: be ready to smash that next bug! Be ready, with these super-action-sport-masterpieces. This particular engineer was chased away from the office with a stick.", 15.00, 820, "/catalogue/images/puma_1.jpeg", "/catalogue/images/puma_2.jpeg", "formal", "sport", "black"),
+		sock("Holy", "Socks fit for a Messiah. You too can experience walking in water with these special edition beauties. Each hole is lovingly proggled to leave smooth edges. The only sock approved by a higher power.", 99.99, 1, "/catalogue/images/holy_1.jpeg", "/catalogue/images/holy_2.jpeg", "action", "magic"),
+		sock("YouTube.sock", "We were not paid to sell this sock. It's just a bit geeky.", 10.99, 801, "/catalogue/images/youtube_1.jpeg", "/catalogue/images/youtube_2.jpeg", "geek", "formal"),
+		sock("Figueroa", "enim officia aliqua excepteur esse deserunt quis aliquip nostrud anim", 14, 808, "/catalogue/images/WAT.jpg", "/catalogue/images/WAT2.jpg", "formal", "blue", "green"),
+		sock("Classic", "Keep it simple.", 12, 127, "/catalogue/images/classic.jpg", "/catalogue/images/classic2.jpg", "brown", "green"),
+		sock("Colourful", "proident occaecat irure et excepteur labore minim nisi amet irure", 18, 438, "/catalogue/images/colourful_socks.jpg", "/catalogue/images/colourful_socks.jpg", "brown", "blue"),
+		sock("Cat socks", "consequat amet cupidatat minim laborum tempor elit ex consequat in", 15, 175, "/catalogue/images/catsocks.jpg", "/catalogue/images/catsocks2.jpg", "brown", "formal", "green"),
+	}
+
+	err := f.catalogue.AddTags(ctx, alltags)
+	if err != nil {
+		return err_msg, err
+	}
+
+	for _, s := range socks {
+		_, err := f.catalogue.AddSock(ctx, s)
+		if err != nil {
+			return err_msg, err
+		}
+	}
+
+	return "Load catalogue successful", nil
 }
