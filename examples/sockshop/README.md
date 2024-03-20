@@ -93,6 +93,8 @@ You should expect to see the following:
 
 The result is empty as the catalogue databases are empty. Once they have been populated, the returned result will consist of more elements.
 
+To populate the catalogue, use the following frontend API [localhost:12356/LoadCatalogue](http:/localhost:12356/LoadCatalogue)
+
 After populating the databases, you should expect to see the following:
 
 ```
