@@ -70,7 +70,10 @@ docker compose up
 
 ## Invoke the application
 
-The SockShop application's [frontend API](workflow/frontend) is exposed by HTTP on port 12356 (when using the above configuration).
+The SockShop application's [frontend API](workflow/frontend) is exposed by HTTP (when using the above configuration).
+The port at which the service will be exposed is determined by the value of the variable `FRONTEND_HTTP_DIAL_ADDR` in the generated `.local.env` file.
+
+For example, the value of the variable might be declared as `FRONTEND_HTTP_DIAL_ADDR=localhost:12356`.
 
 We can invoke the `ListItems` API to list the socks in the application's catalogue:
 
@@ -81,6 +84,18 @@ curl http://localhost:12356/ListItems?pageSize=100\&pageNum=1
 Alternatively in your web browser navigate to [localhost:12356/ListItems?pageSize=100&pageNum=1](http://localhost:12356/ListItems?pageSize=3&pageNum=1)
 
 You should expect to see the following:
+
+```
+{
+  "Ret0":[]
+}
+```
+
+The result is empty as the catalogue databases are empty. Once they have been populated, the returned result will consist of more elements.
+
+To populate the catalogue, use the following frontend API [localhost:12356/LoadCatalogue](http:/localhost:12356/LoadCatalogue)
+
+After populating the databases, you should expect to see the following:
 
 ```
 {
@@ -136,7 +151,7 @@ You should expect to see the following:
 
 ## Viewing Traces
 
-Navigate to [http://localhost:12357](http://localhost:12357) to view the Zipkin WebUI.
+Navigate to Zipkin address defined in the `.local.env` file (eg: [http://localhost:12357](http://localhost:12357)) to view the Zipkin WebUI.
 
 Click the "Query" button and you should see a trace with Root "frontend_proc: listitems start".  You can click "Show" to view the trace details.
 

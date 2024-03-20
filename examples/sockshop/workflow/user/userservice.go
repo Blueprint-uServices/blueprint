@@ -72,8 +72,8 @@ type (
 		Email     string    `json:"-" bson:"email"`
 		Username  string    `json:"username" bson:"username"`
 		Password  string    `json:"-" bson:"password,omitempty"`
-		Addresses []Address `json:"-,omitempty" bson:"-"`
-		Cards     []Card    `json:"-,omitempty" bson:"-"`
+		Addresses []Address `json:"addresses" bson:"-"`
+		Cards     []Card    `json:"cards" bson:"-"`
 		UserID    string    `json:"id" bson:"-"`
 		Salt      string    `json:"-" bson:"salt"`
 	}
