@@ -94,3 +94,8 @@ func (m *Memcached) Mset(ctx context.Context, keys []string, values []interface{
 	}
 	return nil
 }
+
+// Implements the backend.Cache interface
+func (m *Memcached) DeleteAll(ctx context.Context) error {
+	return m.Client.FlushAll()
+}

@@ -32,6 +32,9 @@ type Cache interface {
 	// Delete from the cache
 	Delete(ctx context.Context, key string) error
 
+	// Delete all keys
+	DeleteAll(ctx context.Context) error
+
 	// Treats the value mapped to key as an integer, and increments it
 	Incr(ctx context.Context, key string) (int64, error)
 }

@@ -84,3 +84,8 @@ func (r *RedisCache) Mset(ctx context.Context, keys []string, values []interface
 	}
 	return r.client.MSet(ctx, kv_map).Err()
 }
+
+// Implements the backend.Cache interface
+func (r *RedisCache) DeleteAll(ctx context.Context) error {
+	return r.client.FlushAll(ctx).Err()
+}

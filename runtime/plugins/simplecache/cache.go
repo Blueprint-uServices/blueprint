@@ -81,3 +81,12 @@ func (cache *SimpleCache) Incr(ctx context.Context, key string) (int64, error) {
 	cur += 1
 	return cur, cache.Put(ctx, key, cur)
 }
+
+func (cache *SimpleCache) DeleteAll(ctx context.Context) error {
+	cache.Lock()
+	defer cache.Unlock()
+	for k := range cache.values {
+		delete(cache.values, k)
+	}
+	return nil
+}
