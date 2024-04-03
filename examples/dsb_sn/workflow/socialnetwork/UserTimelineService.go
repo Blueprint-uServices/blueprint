@@ -170,14 +170,15 @@ func (u *UserTimelineServiceImpl) WriteUserTimeline(ctx context.Context, reqID i
 		fmt.Println("Adding a new post for user", userID)
 		postIDstr := strconv.FormatInt(postID, 10)
 		timestampstr := strconv.FormatInt(timestamp, 10)
-		update := fmt.Sprintf(`{"$push": {"Posts": {"$each": [{"PostID": %s, "Timestamp": %s}], "$position": 0}}}`, postIDstr, timestampstr)
+		update := fmt.Sprintf(`{"$push": {"Posts": {"PostID": %s, "Timestamp": %s}}}`, postIDstr, timestampstr)
 		update_d, err := parseNoSQLDBQuery(update)
 		if err != nil {
 			return err
 		}
 		_, err = collection.UpdateMany(ctx, query, update_d)
 		if err != nil {
-			return errors.New("Failed to insert user timeline user to Database")
+			log.Println(err)
+			return errors.New("Failed to update user timeline user to Database")
 		}
 	}
 	var postInfo []PostInfo

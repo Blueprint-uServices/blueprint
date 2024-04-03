@@ -9,8 +9,8 @@ import (
 	"github.com/blueprint-uservices/blueprint/examples/dsb_sn/workflow/socialnetwork"
 	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
-	"github.com/blueprint-uservices/blueprint/runtime/plugins/mongodb"
 	"github.com/blueprint-uservices/blueprint/runtime/plugins/simplecache"
+	"github.com/blueprint-uservices/blueprint/runtime/plugins/simplenosqldb"
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -25,16 +25,17 @@ func init() {
 		return simplecache.NewSimpleCache(ctx)
 	})
 
-	/* // Simplenosqldb doesn't support the operators required for UserTimelineService
+	// Simplenosqldb doesn't support the operators required for UserTimelineService
 	userTimelineDBRegistry.Register("local", func(ctx context.Context) (backend.NoSQLDatabase, error) {
 		return simplenosqldb.NewSimpleNoSQLDB(ctx)
 	})
-	*/
 
 	// Requires that the mongodb server is running.
-	userTimelineDBRegistry.Register("local", func(ctx context.Context) (backend.NoSQLDatabase, error) {
-		return mongodb.NewMongoDB(ctx, "localhost:27017")
-	})
+	/*
+		userTimelineDBRegistry.Register("local", func(ctx context.Context) (backend.NoSQLDatabase, error) {
+			return mongodb.NewMongoDB(ctx, "localhost:27017")
+		})
+	*/
 
 	userTimelineServiceRegistry.Register("local", func(ctx context.Context) (socialnetwork.UserTimelineService, error) {
 		cache, err := userTimelineCacheRegistry.Get(ctx)
