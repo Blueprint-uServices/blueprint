@@ -1,4 +1,4 @@
-module github.com/blueprint-uservices/blueprint/examples/dsb_sn/tests
+module github.com/blueprint-uservices/blueprint/examples/dsb_sn/unittests
 
 go 1.20
 

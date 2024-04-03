@@ -11,7 +11,7 @@ use (
 	./examples/dsb_hotel/tests
 	./examples/dsb_hotel/wiring
 	./examples/dsb_hotel/workflow
-	./examples/dsb_sn/tests
+	./examples/dsb_sn/unittests
 	./examples/dsb_sn/wiring
 	./examples/dsb_sn/workflow
 	./examples/train_ticket/tests
