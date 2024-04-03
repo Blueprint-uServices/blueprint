@@ -10,7 +10,6 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"github.com/blueprint-uservices/blueprint/plugins/memcached"
 	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
-	"github.com/blueprint-uservices/blueprint/plugins/thrift"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
@@ -138,7 +137,7 @@ func makeDockerSpec(spec wiring.WiringSpec) ([]string, error) {
 }
 
 func applyDockerDefaults(spec wiring.WiringSpec, serviceName, procName, ctrName string) string {
-	thrift.Deploy(spec, serviceName)
+	http.Deploy(spec, serviceName)
 	goproc.CreateProcess(spec, procName, serviceName)
 	return linuxcontainer.CreateContainer(spec, ctrName, procName)
 }

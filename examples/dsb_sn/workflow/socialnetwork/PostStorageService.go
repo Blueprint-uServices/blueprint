@@ -23,6 +23,8 @@ type PostStorageService interface {
 	// Returns a list of posts that have ids in the array `postIDs`.
 	// No error is thrown if no post is found.
 	ReadPosts(ctx context.Context, reqID int64, postIDs []int64) ([]Post, error)
+	// Cleanups caches and databases
+	CleanupPostBackends(ctx context.Context) error
 }
 
 // Implementation of [PostStorageService]
@@ -141,4 +143,16 @@ func (p *PostStorageServiceImpl) ReadPosts(ctx context.Context, reqID int64, pos
 		wg.Wait()
 	}
 	return retposts, nil
+}
+
+func (p *PostStorageServiceImpl) CleanupPostBackends(ctx context.Context) error {
+	collection, err := p.postStorageDB.GetCollection(ctx, "post", "post")
+	if err != nil {
+		return err
+	}
+	err = collection.DeleteMany(ctx, bson.D{})
+	if err != nil {
+		return err
+	}
+	return p.postStorageCache.DeleteAll(ctx)
 }

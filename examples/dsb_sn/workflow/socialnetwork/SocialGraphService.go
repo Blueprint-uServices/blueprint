@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // The SocialGraphService interface
@@ -28,6 +29,8 @@ type SocialGraphService interface {
 	UnfollowWithUsername(ctx context.Context, reqID int64, userUsername string, followeeUsername string) error
 	// Inserts a new user with `userID` in the database.
 	InsertUser(ctx context.Context, reqID int64, userID int64) error
+	// Cleansup the database
+	CleanupSocialBackends(ctx context.Context) error
 }
 
 // The format of a follower's info stored in the user info in the social-graph
@@ -364,4 +367,16 @@ func (s *SocialGraphServiceImpl) InsertUser(ctx context.Context, reqID int64, us
 	}
 	user := UserInfo{UserID: userID, Followers: []FollowerInfo{}, Followees: []FolloweeInfo{}}
 	return collection.InsertOne(ctx, user)
+}
+
+func (s *SocialGraphServiceImpl) CleanupSocialBackends(ctx context.Context) error {
+	socialcoll, err := s.socialGraphDB.GetCollection(ctx, "social-graph", "social-graph")
+	if err != nil {
+		return err
+	}
+	err = socialcoll.DeleteMany(ctx, bson.D{})
+	if err != nil {
+		return err
+	}
+	return s.socialGraphCache.DeleteAll(ctx)
 }

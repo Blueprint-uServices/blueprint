@@ -30,6 +30,8 @@ type UserService interface {
 	// Creates and returns a creator object to be included in a Post. The service looks up the userID of the user with the given `username`.
 	// Returns an error if the user with the given `username` is not registered.
 	ComposeCreatorWithUsername(ctx context.Context, reqID int64, username string) (Creator, error)
+	// Cleansup database
+	CleanupUserBackends(ctx context.Context) error
 }
 
 // Implementation of [UserService]
@@ -227,4 +229,17 @@ func (u *UserServiceImpl) RegisterUser(ctx context.Context, reqID int64, firstNa
 	}
 	user_id = user_id & 0x7FFFFFFFFFFFFFFF
 	return u.RegisterUserWithId(ctx, reqID, firstName, lastName, username, password, user_id)
+}
+
+// Implements UserService interface
+func (u *UserServiceImpl) CleanupUserBackends(ctx context.Context) error {
+	coll, err := u.userDB.GetCollection(ctx, "user", "user")
+	if err != nil {
+		return err
+	}
+	err = coll.DeleteMany(ctx, bson.D{})
+	if err != nil {
+		return err
+	}
+	return u.userCache.DeleteAll(ctx)
 }

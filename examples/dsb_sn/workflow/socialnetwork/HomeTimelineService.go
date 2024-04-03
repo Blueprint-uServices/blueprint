@@ -20,6 +20,8 @@ type HomeTimelineService interface {
 	// The new post ID is placed at the nth position in the post ids array.
 	//    post_ids = append(post_ids, `postID`)
 	WriteHomeTimeline(ctx context.Context, reqID int64, postID int64, userID int64, timestamp int64, userMentionIDs []int64) error
+	// Cleanups the cache
+	CleanupHTimelineBackends(ctx context.Context) error
 }
 
 // Implementation of [HomeTimelineService]
@@ -90,4 +92,9 @@ func (h *HomeTimelineServiceImpl) ReadHomeTimeline(ctx context.Context, reqID in
 		return postIDs, err
 	}
 	return postIDs, nil
+}
+
+// Implements HomeTimelineService interface
+func (h *HomeTimelineServiceImpl) CleanupHTimelineBackends(ctx context.Context) error {
+	return h.homeTimelineCache.DeleteAll(ctx)
 }

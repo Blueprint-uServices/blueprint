@@ -21,6 +21,8 @@ type UserTimelineService interface {
 	// The new post ID is placed at the 0th position in the post ids array.
 	//    post_ids = []int64{`postID`, post_ids...)
 	WriteUserTimeline(ctx context.Context, reqID int64, postID int64, userID int64, timestamp int64) error
+	// CleanupUTimelineBackends caches and databases
+	CleanupUTimelineBackends(ctx context.Context) error
 }
 
 // The format of a single post in a user's timeline stored in the backend.
@@ -190,4 +192,17 @@ func (u *UserTimelineServiceImpl) WriteUserTimeline(ctx context.Context, reqID i
 	}
 	postInfo = append(postInfo, PostInfo{PostID: postID, Timestamp: timestamp})
 	return u.userTimelineCache.Put(ctx, userIDStr, postInfo)
+}
+
+// Implements UserTimelineService
+func (u *UserTimelineServiceImpl) CleanupUTimelineBackends(ctx context.Context) error {
+	collection, err := u.userTimelineDB.GetCollection(ctx, "usertimeline", "usertimeline")
+	if err != nil {
+		return err
+	}
+	err = collection.DeleteMany(ctx, bson.D{})
+	if err != nil {
+		return err
+	}
+	return u.userTimelineCache.DeleteAll(ctx)
 }
