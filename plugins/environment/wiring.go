@@ -59,6 +59,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"golang.org/x/exp/slog"
@@ -130,7 +131,14 @@ func generateEnvFiles(outputDir string, nodes []ir.IRNode, port uint16) error {
 
 func generateEnv(outputFile string, addrs map[string]*addrconfig, port uint16, localhost bool) error {
 	b := strings.Builder{}
-	for _, addr := range addrs {
+	// Fix iteration order so that each address is allocated the same port across multiple invocations of this function
+	keys := make([]string, 0, len(addrs))
+	for k := range addrs {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		addr := addrs[k]
 		if addr.bind != nil {
 			b.WriteString(fmt.Sprintf("%s=0.0.0.0:%d\n", linux.EnvVar(addr.bind.Key), port))
 		}

@@ -38,7 +38,7 @@ func makeHTTPSpec(spec wiring.WiringSpec) ([]string, error) {
 	leaf_service := workflow.Service[*leaf.LeafServiceImpl](spec, "leaf_service", leaf_cache, leaf_db)
 	leaf_proc := applyHTTPDefaults(spec, leaf_service)
 
-	nonleaf_service := workflow.Service[leaf.NonLeafServiceImpl](spec, "nonleaf_service", leaf_service)
+	nonleaf_service := workflow.Service[leaf.NonLeafService](spec, "nonleaf_service", leaf_service)
 	nonleaf_proc := applyHTTPDefaults(spec, nonleaf_service)
 
 	return []string{leaf_proc, nonleaf_proc}, nil
