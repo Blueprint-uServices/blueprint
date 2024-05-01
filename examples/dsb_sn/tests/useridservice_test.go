@@ -7,7 +7,6 @@ import (
 	"github.com/blueprint-uservices/blueprint/examples/dsb_sn/workflow/socialnetwork"
 	"github.com/blueprint-uservices/blueprint/runtime/core/registry"
 	"github.com/stretchr/testify/require"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 var userIDServiceRegistry = registry.NewServiceRegistry[socialnetwork.UserIDService]("userId_service")
@@ -40,6 +39,9 @@ func TestGetUserID(t *testing.T) {
 	service, err := userIDServiceRegistry.Get(ctx)
 	require.NoError(t, err)
 
+	// Make sure that the user backends are clean
+	cleanup_user_database(t, ctx)
+
 	// Check username that is not in the database
 	id, err := service.GetUserId(ctx, 1000, hello_user.Username)
 	require.Error(t, err)
@@ -61,6 +63,5 @@ func TestGetUserID(t *testing.T) {
 
 	// Cleanup database
 
-	err = coll.DeleteOne(ctx, bson.D{{"username", hello_user.Username}})
-	require.NoError(t, err)
+	cleanup_user_database(t, ctx)
 }
