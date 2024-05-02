@@ -91,7 +91,7 @@ func (workspace *WorkspaceBuilderImpl) CreateModule(moduleName string, moduleVer
 	workspace.GeneratedModules[moduleShortName] = moduleName
 
 	// Create the go.mod file
-	modfileContents := fmt.Sprintf("module %v\n\ngo 1.21", moduleName)
+	modfileContents := fmt.Sprintf("module %v\n\ngo 1.22", moduleName)
 	modfile := filepath.Join(moduleDir, "go.mod")
 
 	return moduleDir, os.WriteFile(modfile, []byte(modfileContents), 0755)
@@ -167,7 +167,7 @@ func (workspace *WorkspaceBuilderImpl) readModfile(moduleSubDir string) (*modfil
 	return f, nil
 }
 
-var goWorkTemplate = `go 1.21
+var goWorkTemplate = `go 1.22
 
 use (
 	{{ range $dirName, $moduleName := .Modules }}./{{ $dirName }}

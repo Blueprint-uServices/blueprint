@@ -30,6 +30,11 @@ func NewSimpleWorkload(ctx context.Context, frontend frontend.Frontend) (SimpleW
 }
 
 func (s *workloadGen) Run(ctx context.Context) error {
+	_, err := s.frontend.LoadCatalogue(ctx)
+	if err != nil {
+		fmt.Println("Failed to load catalogue")
+		return err
+	}
 	fmt.Printf("myarg is %v\n", *myarg)
 	ticker := time.NewTicker(1 * time.Second)
 	for {
@@ -38,6 +43,11 @@ func (s *workloadGen) Run(ctx context.Context) error {
 			return nil
 		case t := <-ticker.C:
 			fmt.Println("Tick at", t)
+			items, err := s.frontend.ListItems(ctx, []string{}, "", 1, 100)
+			if err != nil {
+				return err
+			}
+			fmt.Println("Got", len(items), "items!")
 		}
 	}
 }
