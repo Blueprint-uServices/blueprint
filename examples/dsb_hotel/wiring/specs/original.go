@@ -5,6 +5,7 @@ import (
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workflow/hotelreservation"
+	"github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workload/workloadgen"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/gotests"
@@ -16,6 +17,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
 	"github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
+	"github.com/blueprint-uservices/blueprint/plugins/workload"
 )
 
 // Wiring spec that represents the original configuration of the HotelReservation application.
@@ -86,6 +88,9 @@ func makeOriginalSpec(spec wiring.WiringSpec) ([]string, error) {
 	frontend_ctr := applyHTTPDefaults(spec, frontend_service, trace_collector)
 	cntrs = append(cntrs, frontend_ctr)
 	allServices = append(allServices, "frontend_service")
+
+	wlgen := workload.Generator[workloadgen.SimpleWorkload](spec, "wlgen", frontend_service)
+	cntrs = append(cntrs, wlgen)
 
 	tests := gotests.Test(spec, allServices...)
 	cntrs = append(cntrs, tests)
