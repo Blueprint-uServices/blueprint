@@ -91,3 +91,17 @@ type HotelProfile struct {
 }
 
 func (hp HotelProfile) remote() {}
+
+type Image struct {
+	Url     string
+	Default bool
+}
+
+type Review struct {
+	ReviewId    string
+	HotelId     string
+	Name        string
+	Rating      float64
+	Description string
+	Img         Image
+}
