@@ -70,6 +70,7 @@ func (node *OpenTelemetryClientWrapper) AddInterfaces(builder golang.ModuleBuild
 
 // Part of code generation compilation pass; provides implementation of interfaces from GenerateInterfaces
 func (node *OpenTelemetryClientWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
+	builder.Require("go.opentelemetry.io/otel/trace", "v1.26.0")
 	wrapped_iface, err := golang.GetGoInterface(builder, node.Wrapped)
 	if err != nil {
 		return err
