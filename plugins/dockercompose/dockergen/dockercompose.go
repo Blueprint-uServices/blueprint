@@ -31,7 +31,6 @@ type instance struct {
 	Ports             map[string]uint16   // Map from bindconfig name to internal port
 	Expose            map[uint16]struct{} // Ports exposed with expose directive
 	Config            map[string]string   // Map from environment variable name to value
-	Passthrough       map[string]struct{} // Environment variables that just get passed through to the container
 }
 
 func NewDockerComposeFile(workspaceName, workspaceDir, fileName string) *DockerComposeFile {
@@ -140,7 +139,6 @@ func (d *DockerComposeFile) addInstance(instanceName string, image string, conta
 		Expose:            make(map[uint16]struct{}),
 		Ports:             make(map[string]uint16),
 		Config:            make(map[string]string),
-		Passthrough:       make(map[string]struct{}),
 	}
 	d.Instances[instanceName] = &instance
 	return nil
