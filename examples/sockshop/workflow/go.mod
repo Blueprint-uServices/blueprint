@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.22.1
 
 require (
-	github.com/blueprint-uservices/blueprint/runtime v0.0.0
+	github.com/blueprint-uservices/blueprint/runtime v0.0.0-20240619221802-d064c5861c1e
 	github.com/google/uuid v1.6.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
@@ -21,5 +21,3 @@ require (
 	go.opentelemetry.io/otel/trace v1.26.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/blueprint-uservices/blueprint/runtime => ../../../runtime

@@ -1,23 +1,23 @@
 module github.com/blueprint-uservices/blueprint/examples/sockshop/wiring
 
-go 1.21
+go 1.22
 
 toolchain go1.22.1
 
-require github.com/blueprint-uservices/blueprint/blueprint v0.0.0
+require github.com/blueprint-uservices/blueprint/blueprint v0.0.0-20240619221802-d064c5861c1e
 
-require github.com/blueprint-uservices/blueprint/plugins v0.0.0
+require github.com/blueprint-uservices/blueprint/plugins v0.0.0-20240619221802-d064c5861c1e
 
 require github.com/blueprint-uservices/blueprint/examples/sockshop/tests v0.0.0
 
 require (
 	github.com/blueprint-uservices/blueprint/examples/sockshop/workflow v0.0.0
-	github.com/blueprint-uservices/blueprint/examples/sockshop/workload v0.0.0-20240405152959-f078915d2306
+	github.com/blueprint-uservices/blueprint/examples/sockshop/workload v0.0.0
 )
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/blueprint-uservices/blueprint/runtime v0.0.0 // indirect
+	github.com/blueprint-uservices/blueprint/runtime v0.0.0-20240619221802-d064c5861c1e // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
@@ -53,12 +53,8 @@ require (
 	golang.org/x/tools v0.20.0 // indirect
 )
 
-replace github.com/blueprint-uservices/blueprint/blueprint => ../../../blueprint
-
-replace github.com/blueprint-uservices/blueprint/plugins => ../../../plugins
-
-replace github.com/blueprint-uservices/blueprint/runtime => ../../../runtime
-
 replace github.com/blueprint-uservices/blueprint/examples/sockshop/workflow => ../workflow
 
 replace github.com/blueprint-uservices/blueprint/examples/sockshop/tests => ../tests
+
+replace github.com/blueprint-uservices/blueprint/examples/sockshop/workload => ../workload

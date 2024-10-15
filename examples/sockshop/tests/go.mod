@@ -4,9 +4,7 @@ go 1.21
 
 toolchain go1.22.1
 
-require github.com/blueprint-uservices/blueprint/runtime v0.0.0
-
-replace github.com/blueprint-uservices/blueprint/runtime => ../../../runtime
+require github.com/blueprint-uservices/blueprint/runtime v0.0.0-20240619221802-d064c5861c1e
 
 require (
 	github.com/blueprint-uservices/blueprint/examples/sockshop/workflow v0.0.0
