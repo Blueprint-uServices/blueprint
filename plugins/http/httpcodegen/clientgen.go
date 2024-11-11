@@ -25,7 +25,7 @@ func GenerateClient(builder golang.ModuleBuilder, service *gocode.ServiceInterfa
 	}
 
 	client.Imports.AddPackages(
-		"net/http", "encoding/json", "context", "time", "net/url", "fmt", "io",
+		"net/http", "encoding/json", "context", "net/url", "fmt", "io", "errors",
 	)
 
 	slog.Info(fmt.Sprintf("Generating %v/%v.go", client.Package.PackageName, client.Name))
@@ -48,21 +48,24 @@ package {{.Package.ShortName}}
 
 type {{.Name}} struct {
 	Client *http.Client
-	Timeout time.Duration
 	ServerAddress string
 }
 
 func New_{{.Name}}(ctx context.Context, serverAddress string) (*{{.Name}}, error) {
-	duration, err := time.ParseDuration("1s")
-	if err != nil {
-		return nil, err
+	defaultRoundTripper := http.DefaultTransport
+	defaultTransportPointer, ok := defaultRoundTripper.(*http.Transport)
+	if !ok {
+		return nil, errors.New("defaultRoundTripper not an *http.Transport")
 	}
+	defaultTransport := *defaultTransportPointer // dereference it to get a copy of the struct that the pointer points to
+	defaultTransport.MaxIdleConns = 60000
+	defaultTransport.MaxIdleConnsPerHost = 60000
+	defaultTransport.MaxConnsPerHost = 10000
 	client := &http.Client{
-		Timeout: duration,
+		Transport: &defaultTransport,
 	}
 	c := &{{.Name}}{}
 	c.Client = client
-	c.Timeout = duration
 	c.ServerAddress = "http://" + serverAddress
 	return c, nil
 }
