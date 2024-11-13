@@ -26,7 +26,7 @@ func GenerateServerHandler(builder golang.ModuleBuilder, service *gocode.Service
 		Imports: gogen.NewImports(pkg.Name),
 	}
 
-	server.Imports.AddPackages("context", "encoding/json", "net/http", "github.com/gorilla/mux", "log")
+	server.Imports.AddPackages("context", "encoding/json", "net/http", "github.com/gorilla/mux")
 
 	slog.Info(fmt.Sprintf("Generating %v/%v_HTTPServer.go", server.Package.PackageName, service.BaseName))
 	outputFile := filepath.Join(server.Package.Path, service.BaseName+"_HTTPServer.go")
@@ -98,7 +98,6 @@ func (handler *{{$receiver}}) {{$f.Name -}}
 	if request_{{$arg.Name}} != "" {
 		err = json.Unmarshal([]byte(request_{{$arg.Name}}), &{{$arg.Name}})
 		if err != nil {
-			log.Println(err.Error())
 			http.Error(w, err.Error(), 500)
 			return
 		}
@@ -108,7 +107,6 @@ func (handler *{{$receiver}}) {{$f.Name -}}
 	ctx := context.Background()
 	{{RetVars $f "err"}} {{HasNewReturnVars $f}} handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
 	if err != nil {
-		log.Println(err.Error())
 		http.Error(w, err.Error(), 500)
 		return
 	}
