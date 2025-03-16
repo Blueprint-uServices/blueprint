@@ -7,7 +7,6 @@ import (
 
 	"github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workflow/hotelreservation"
 	"github.com/blueprint-uservices/blueprint/runtime/core/workload"
-	"golang.org/x/exp/rand"
 )
 
 // Workload specific flags
@@ -22,8 +21,7 @@ type ComplexWorkload interface {
 type complexWldGen struct {
 	ComplexWorkload
 
-	frontend       hotelreservation.FrontEndService
-	proportion_map map[int]workload.RequestFunction
+	frontend hotelreservation.FrontEndService
 }
 
 func NewComplexWorkload(ctx context.Context, frontend hotelreservation.FrontEndService) (ComplexWorkload, error) {
@@ -46,7 +44,7 @@ func statWrapper(fn FnType) workload.Stat {
 
 func (w *complexWldGen) RunSearchHandler(ctx context.Context) workload.Stat {
 	lat, lon, indate, outdate := GenSearchHandler()
-	customerName := "SOSP Attendee"
+	customerName := "Blueprint User"
 	locale := "en"
 	return statWrapper(func() error {
 		_, err := w.frontend.SearchHandler(ctx, customerName, indate, outdate, lat, lon, locale)
@@ -82,15 +80,9 @@ func (w *complexWldGen) RunReservationHandler(ctx context.Context) workload.Stat
 	})
 }
 
-func (w *complexWldGen) RunRequest(ctx context.Context, stat_chan chan workload.Stat) {
-	selection := rand.Intn(100)
-	req_fn := w.proportion_map[selection]
-	stat := req_fn(ctx)
-	stat_chan <- stat
-}
-
 func (w *complexWldGen) Run(ctx context.Context) error {
 	wrk := workload.NewWorkload()
+	// Configure the workload with the client side generators for the various APIs and their respective proportions
 	wrk.AddAPI("SearchHandler", w.RunSearchHandler, 60)
 	wrk.AddAPI("RecommendHandler", w.RunRecommendHandler, 38)
 	wrk.AddAPI("UserHandler", w.RunUserHandler, 1)
