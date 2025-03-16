@@ -1,6 +1,6 @@
 module github.com/blueprint-uservices/blueprint/runtime
 
-go 1.21
+go 1.22
 
 toolchain go1.22.1
 
@@ -26,6 +26,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.26.0
 	go.opentelemetry.io/otel/trace v1.26.0
 	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f
+	gonum.org/v1/gonum v0.15.1
 )
 
 require (
@@ -39,12 +40,10 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/klauspost/compress v1.17.8 // indirect
-	github.com/lib/pq v1.10.9 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/openzipkin/zipkin-go v0.4.3 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
-	github.com/vmihailenco/tagparser v0.1.2 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect

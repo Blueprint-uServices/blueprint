@@ -14,6 +14,8 @@ require github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workload v0.
 
 require github.com/blueprint-uservices/blueprint/examples/dsb_hotel/tests v0.0.0
 
+require github.com/blueprint-uservices/blueprint/examples/dsb_hotel/cmplx_workload v0.0.0
+
 require (
 	github.com/blueprint-uservices/blueprint/runtime v0.0.0-20240619221802-d064c5861c1e // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874 // indirect
@@ -51,3 +53,5 @@ replace github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workflow => 
 replace github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workload => ../workload
 
 replace github.com/blueprint-uservices/blueprint/examples/dsb_hotel/tests => ../tests
+
+replace github.com/blueprint-uservices/blueprint/examples/dsb_hotel/cmplx_workload => ../cmplx_workload
