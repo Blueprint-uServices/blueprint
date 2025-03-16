@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/examples/dsb_hotel/cmplx_workload/workloadgen"
 	"github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workflow/hotelreservation"
-	"github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workload/workloadgen"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/gotests"
@@ -89,7 +89,7 @@ func makeOriginalSpec(spec wiring.WiringSpec) ([]string, error) {
 	cntrs = append(cntrs, frontend_ctr)
 	allServices = append(allServices, "frontend_service")
 
-	wlgen := workload.Generator[workloadgen.SimpleWorkload](spec, "wlgen", frontend_service)
+	wlgen := workload.Generator[workloadgen.ComplexWorkload](spec, "wlgen", frontend_service)
 	cntrs = append(cntrs, wlgen)
 
 	tests := gotests.Test(spec, allServices...)
