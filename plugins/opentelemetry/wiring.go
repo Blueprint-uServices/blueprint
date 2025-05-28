@@ -61,11 +61,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-// [Instrument] can be used by wiring specs to instrument `serviceName` with OpenTelemetry.  This can only be done if `serviceName` is a service declared in the wiring spec using [workflow.Define] and has not yet been deployed over the network using grpc, thrift, or http.
-//
-// This call will configure the generated clients on server and client side to use the exporter provided by the custom collector indicated by the `collectorName`.
-// The `collectorName` must already be declared in the wiring spec.
-func Instrument(spec wiring.WiringSpec, serviceName string, collectorName string) {
+func instrument(spec wiring.WiringSpec, serviceName string, collectorName string, genClientSpan bool) {
 	// The nodes that we are defining
 	clientWrapper := serviceName + ".client.ot"
 	serverWrapper := serviceName + ".server.ot"
@@ -94,7 +90,7 @@ func Instrument(spec wiring.WiringSpec, serviceName string, collectorName string
 			return nil, err
 		}
 
-		return newOpenTelemetryClientWrapper(clientWrapper, server, collectorClient)
+		return newOpenTelemetryClientWrapper(clientWrapper, server, collectorClient, genClientSpan)
 	})
 
 	// Add the server wrapper to the pointer dst
@@ -117,6 +113,18 @@ func Instrument(spec wiring.WiringSpec, serviceName string, collectorName string
 		return newOpenTelemetryServerWrapper(serverWrapper, wrapped, collectorClient)
 	})
 
+}
+
+// [Instrument] can be used by wiring specs to instrument `serviceName` with OpenTelemetry.  This can only be done if `serviceName` is a service declared in the wiring spec using [workflow.Define] and has not yet been deployed over the network using grpc, thrift, or http.
+//
+// This call will configure the generated clients on server and client side to use the exporter provided by the custom collector indicated by the `collectorName`.
+// The `collectorName` must already be declared in the wiring spec.
+func Instrument(spec wiring.WiringSpec, serviceName string, collectorName string) {
+	instrument(spec, serviceName, collectorName, true)
+}
+
+func InstrumentWithoutClientSpans(spec wiring.WiringSpec, serviceName string, collectorName string) {
+	instrument(spec, serviceName, collectorName, false)
 }
 
 // [Logger] can be used by wiring specs to install a process-level ot logger for process `processName` to be used in tandem with an OT Tracer. Replaces the existing logger installed for the process.
