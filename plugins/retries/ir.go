@@ -263,3 +263,93 @@ func (node *RetrierExponentialBackoffClient) AddInstantiation(builder golang.Nam
 
 	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped})
 }
+
+// Blueprint IR node representing a Retry Rate Limiter Client
+type RetrierRateLimiterClient struct {
+	golang.Service
+	golang.GeneratesFuncs
+	golang.Instantiable
+
+	InstanceName string
+	Wrapped      golang.Service
+
+	outputPackage  string
+	Max            int64
+	RetryRateLimit int64 // retried times per second
+}
+
+func (node *RetrierRateLimiterClient) ImplementsGolangNode() {}
+
+func (node *RetrierRateLimiterClient) Name() string {
+	return node.InstanceName
+}
+
+func (node *RetrierRateLimiterClient) String() string {
+	return node.Name() + " = Retrier(" + node.Wrapped.Name() + ")"
+}
+
+func newRetrierRateLimiterClient(name string, server ir.IRNode, max_clients int64, rateLimit int64) (*RetrierRateLimiterClient, error) {
+	serverNode, is_callable := server.(golang.Service)
+	if !is_callable {
+		return nil, blueprint.Errorf("rate limiter client wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
+	}
+
+	// Default rate limit
+	if rateLimit == 0 {
+		rateLimit = 10 // 10 requests per second
+	}
+
+	node := &RetrierRateLimiterClient{}
+	node.InstanceName = name
+	node.Wrapped = serverNode
+	node.outputPackage = "retries"
+	node.Max = max_clients
+	node.RetryRateLimit = rateLimit
+
+	return node, nil
+}
+
+func (node *RetrierRateLimiterClient) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.Wrapped.AddInterfaces(builder)
+}
+
+func (node *RetrierRateLimiterClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
+	return node.Wrapped.GetInterface(ctx)
+}
+
+func (node *RetrierRateLimiterClient) GenerateFuncs(builder golang.ModuleBuilder) error {
+	if builder.Visited(node.InstanceName + ".generateFuncs") {
+		return nil
+	}
+
+	iface, err := golang.GetGoInterface(builder, node)
+	if err != nil {
+		return err
+	}
+
+	return generateRateLimiterClient(builder, iface, node.outputPackage, node.Max, node.RetryRateLimit)
+}
+
+func (node *RetrierRateLimiterClient) AddInstantiation(builder golang.NamespaceBuilder) error {
+	if builder.Visited(node.InstanceName) {
+		return nil
+	}
+
+	iface, err := golang.GetGoInterface(builder, node.Wrapped)
+	if err != nil {
+		return err
+	}
+
+	constructor := &gocode.Constructor{
+		Package: builder.Module().Info().Name + "/" + node.outputPackage,
+		Func: gocode.Func{
+			Name: fmt.Sprintf("New_%v_RetrierRateLimiterClient", iface.BaseName),
+			Arguments: []gocode.Variable{
+				{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}},
+				{Name: "client", Type: iface},
+			},
+		},
+	}
+	
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped})
+}

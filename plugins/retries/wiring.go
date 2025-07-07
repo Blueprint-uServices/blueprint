@@ -130,3 +130,32 @@ func AddRetriesWithExponentialBackoff(spec wiring.WiringSpec, serviceName string
 		return newRetrierExponentialBackoffClient(clientWrapper, wrapped, starting_delay, backoff_limit)
 	})
 }
+
+// Add retrier functionality to all clients of the specified service.
+// Uses a [blueprint.WiringSpec]
+// Modifies the given service such that all clients to that service retry `max_retries` number of times on error.
+// The `retry_rate_limit` is the maximum number of retries per second, if `rate_limit` is set to 0, then there is no rate limit.
+// Usage:
+//
+//	AddRetriesRetryRateLimit(spec, "my_service", 10, 100)
+func AddRetriesRetryRateLimit(spec wiring.WiringSpec, serviceName string, max_retries int64, retry_rate_limit int64) {
+	clientWrapper := serviceName + ".client.retrier"
+
+	ptr := pointer.GetPointer(spec, serviceName)
+	if ptr == nil {
+		slog.Error("Unable to add retries to " + serviceName + " as it is not a pointer")
+		return
+	}
+
+	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
+
+	spec.Define(clientWrapper, &RetrierRateLimiterClient{Max: max_retries, RetryRateLimit: retry_rate_limit}, func(ns wiring.Namespace) (ir.IRNode, error) {
+		var wrapped golang.Service
+
+		if err := ns.Get(clientNext, &wrapped); err != nil {
+			return nil, blueprint.Errorf("Retries %s expected %s to be a golang.Service, but encountered %s", clientWrapper, clientNext, err)
+		}
+
+		return newRetrierRateLimiterClient(clientWrapper, wrapped, max_retries, retry_rate_limit)
+	})
+}
