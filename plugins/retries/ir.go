@@ -191,6 +191,8 @@ type RetrierExponentialBackoffClient struct {
 	outputPackage string
 	StartDelay    string
 	BackoffLimit  string
+
+	UseJitter bool
 }
 
 func (node *RetrierExponentialBackoffClient) ImplementsGolangNode() {}
@@ -203,7 +205,7 @@ func (node *RetrierExponentialBackoffClient) String() string {
 	return node.Name() + " = Retrier(" + node.Wrapped.Name() + ")"
 }
 
-func newRetrierExponentialBackoffClient(name string, server ir.IRNode, delay string, backoff_limit string) (*RetrierExponentialBackoffClient, error) {
+func newRetrierExponentialBackoffClient(name string, server ir.IRNode, delay string, backoff_limit string, use_jitter bool) (*RetrierExponentialBackoffClient, error) {
 	serverNode, is_callable := server.(golang.Service)
 	if !is_callable {
 		return nil, blueprint.Errorf("retrier server wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
@@ -215,7 +217,7 @@ func newRetrierExponentialBackoffClient(name string, server ir.IRNode, delay str
 	node.outputPackage = "retries"
 	node.StartDelay = delay
 	node.BackoffLimit = backoff_limit
-
+	node.UseJitter = use_jitter
 	return node, nil
 }
 
@@ -237,7 +239,7 @@ func (node *RetrierExponentialBackoffClient) GenerateFuncs(builder golang.Module
 		return err
 	}
 
-	return generateExpBackoffClient(builder, iface, node.outputPackage, node.StartDelay, node.BackoffLimit)
+	return generateExpBackoffClient(builder, iface, node.outputPackage, node.StartDelay, node.BackoffLimit, node.UseJitter)
 }
 
 func (node *RetrierExponentialBackoffClient) AddInstantiation(builder golang.NamespaceBuilder) error {
