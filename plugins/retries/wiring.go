@@ -109,7 +109,7 @@ func AddRetriesWithFixedDelay(spec wiring.WiringSpec, serviceName string, max_re
 // Usage:
 //
 //	AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s")
-func AddRetriesWithExponentialBackoff(spec wiring.WiringSpec, serviceName string, starting_delay string, backoff_limit string) {
+func AddRetriesWithExponentialBackoff(spec wiring.WiringSpec, serviceName string, starting_delay string, backoff_limit string, useJitter bool) {
 	clientWrapper := serviceName + ".client.retrierfd"
 
 	ptr := pointer.GetPointer(spec, serviceName)
@@ -127,6 +127,6 @@ func AddRetriesWithExponentialBackoff(spec wiring.WiringSpec, serviceName string
 			return nil, blueprint.Errorf("Retries %s expected %s to be a golang.Service, but encountered %s", clientWrapper, clientNext, err)
 		}
 
-		return newRetrierExponentialBackoffClient(clientWrapper, wrapped, starting_delay, backoff_limit)
+		return newRetrierExponentialBackoffClient(clientWrapper, wrapped, starting_delay, backoff_limit, useJitter)
 	})
 }
