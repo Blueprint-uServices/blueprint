@@ -15,13 +15,13 @@ import "github.com/blueprint-uservices/blueprint/plugins/retries"
  retries.AddRetries(spec, "my_service", 10) // Adds retries with a maximum number of retries
  retries.AddRetriesWithTimeouts(spec, "my_service", 10, "1s") // Adds retries and timeouts
  retries.AddRetriesWithFixedDelay(spec, "my_service", 10, "50ms") // Adds retries with a maximum number of retries and a fixed delay between any two tries.
- retries.AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s") // Adds retries with exponential backoff delay strategy between retries.
+ retries.AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s", false) // Adds retries with exponential backoff delay strategy between retries. In addition, with the  last parameter (true/false) jitter can be used
 ```
 
 ## Index
 
 - [func AddRetries\(spec wiring.WiringSpec, serviceName string, max\_retries int64\)](<#AddRetries>)
-- [func AddRetriesWithExponentialBackoff\(spec wiring.WiringSpec, serviceName string, starting\_delay string, backoff\_limit string\)](<#AddRetriesWithExponentialBackoff>)
+- [func AddRetriesWithExponentialBackoff\(spec wiring.WiringSpec, serviceName string, starting\_delay string, backoff\_limit string\, useJitter bool\)](<#AddRetriesWithExponentialBackoff>)
 - [func AddRetriesWithFixedDelay\(spec wiring.WiringSpec, serviceName string, max\_retries int64, delay string\)](<#AddRetriesWithFixedDelay>)
 - [func AddRetriesWithTimeouts\(spec wiring.WiringSpec, serviceName string, max\_retries int64, timeout string\)](<#AddRetriesWithTimeouts>)
 - [type RetrierClient](<#RetrierClient>)
@@ -67,13 +67,13 @@ AddRetries(spec, "my_service", 10)
 ## func [AddRetriesWithExponentialBackoff](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L112>)
 
 ```go
-func AddRetriesWithExponentialBackoff(spec wiring.WiringSpec, serviceName string, starting_delay string, backoff_limit string)
+func AddRetriesWithExponentialBackoff(spec wiring.WiringSpec, serviceName string, starting_delay string, backoff_limit string, useJitter bool)
 ```
 
-Add retrier functionality to all clients of the specified service with a fixed time delay between the tries. Uses a \[blueprint.WiringSpec\] Modifies the given service such that all clients to that service retry with exponential delay. The \`starting\_delay\` is the first delay to be used before retrying. The retries continue until a \`backoff\_limit\` of delay is reached Usage:
+Add retrier functionality to all clients of the specified service with a fixed time delay between the tries. Uses a \[blueprint.WiringSpec\] Modifies the given service such that all clients to that service retry with exponential delay. The \`starting\_delay\` is the first delay to be used before retrying. The retries continue until a \`backoff\_limit\` of delay is reached. With \`useJitter\` the jitter (randomized delay) can be used. Usage:
 
 ```
-AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s")
+AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s", false)
 ```
 
 <a name="AddRetriesWithFixedDelay"></a>
@@ -214,6 +214,8 @@ type RetrierExponentialBackoffClient struct {
 
     StartDelay   string
     BackoffLimit string
+
+    UseJitter    bool
     // contains filtered or unexported fields
 }
 ```
