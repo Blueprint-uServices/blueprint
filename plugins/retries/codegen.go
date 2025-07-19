@@ -240,8 +240,8 @@ func (client *{{$receiver}}) {{$f.Name}}({{ArgVarsAndTypes $f "ctx context.Conte
             return
         }
 
-		if delay >= client.Limit && delay != client.Delay {
-            return {{RetVars $f "err"}} 
+        if delay >= client.Limit {
+            return
         }
         
         {{if $useJitter -}}
