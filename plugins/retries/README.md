@@ -73,7 +73,7 @@ AddRetries(spec, "my_service", 10)
 ```
 
 <a name="AddRetriesRetryRateLimit"></a>
-## func [AddRetriesRetryRateLimit](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L141>)
+## func [AddRetriesRetryRateLimit](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L143>)
 
 ```go
 func AddRetriesRetryRateLimit(spec wiring.WiringSpec, serviceName string, max_retries int64, retry_rate_limit int64)
@@ -86,16 +86,16 @@ AddRetriesRetryRateLimit(spec, "my_service", 10, 100)
 ```
 
 <a name="AddRetriesWithExponentialBackoff"></a>
-## func [AddRetriesWithExponentialBackoff](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L112>)
+## func [AddRetriesWithExponentialBackoff](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L114>)
 
 ```go
 func AddRetriesWithExponentialBackoff(spec wiring.WiringSpec, serviceName string, starting_delay string, backoff_limit string, useJitter bool)
 ```
 
-Add retrier functionality to all clients of the specified service with a fixed time delay between the tries. Uses a \[blueprint.WiringSpec\] Modifies the given service such that all clients to that service retry with exponential delay. The \`starting\_delay\` is the first delay to be used before retrying. The retries continue until a \`backoff\_limit\` of delay is reached Usage:
+Add retrier functionality to all clients of the specified service with a fixed time delay between the tries. Uses a \[blueprint.WiringSpec\] Modifies the given service such that all clients to that service retry with exponential delay. The \`starting\_delay\` is the first delay to be used before retrying. The retries continue until a \`backoff\_limit\` of delay is reached \`useJitter\` indicates whether to use jitter in the delay or not, jitter is a random value added to the delay. Usage:
 
 ```
-AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s")
+AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s", false)
 ```
 
 <a name="AddRetriesWithFixedDelay"></a>

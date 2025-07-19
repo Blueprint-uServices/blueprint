@@ -106,9 +106,11 @@ func AddRetriesWithFixedDelay(spec wiring.WiringSpec, serviceName string, max_re
 // Modifies the given service such that all clients to that service retry with exponential delay.
 // The `starting_delay` is the first delay to be used before retrying.
 // The retries continue until a `backoff_limit` of delay is reached
+// `useJitter` indicates whether to use jitter in the delay or not, 
+// jitter is a random value added to the delay.
 // Usage:
 //
-//	AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s")
+//	AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s", false)
 func AddRetriesWithExponentialBackoff(spec wiring.WiringSpec, serviceName string, starting_delay string, backoff_limit string, useJitter bool) {
 	clientWrapper := serviceName + ".client.retrierfd"
 
