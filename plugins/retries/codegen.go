@@ -214,7 +214,7 @@ func New_{{.Name}} (ctx context.Context, client {{.Imports.NameOf .Service.UserT
 		return nil, err
 	}
 	handler.Limit = parsed_limit
-    
+	
 	{{if .UseJitter -}}
 	handler.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
 	{{- end}}
@@ -233,39 +233,39 @@ func (client *{{.Name}}) addJitter(d time.Duration) time.Duration {
 {{$useJitter := .UseJitter -}}
 {{ range $_, $f := .Service.Methods }}
 func (client *{{$receiver}}) {{$f.Name}}({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
-    delay := client.Delay
-    for {
-        {{RetVars $f "err"}} = client.Client.{{$f.Name}}({{ArgVars $f "ctx"}})
-        if err == nil {
-            return
-        }
+	delay := client.Delay
+	for {
+		{{RetVars $f "err"}} = client.Client.{{$f.Name}}({{ArgVars $f "ctx"}})
+		if err == nil {
+			return
+		}
 
-        if delay >= client.Limit {
-            return
-        }
-        
-        {{if $useJitter -}}
-        sleepDuration := client.addJitter(delay)
-        {{else -}}
-        sleepDuration := delay
-        {{end}}
-        
-        select {
-        case <-time.After(sleepDuration):
-            // Continue with next attempt
-        case <-ctx.Done():
-            {{if $f.Returns -}}
-            return {{RetVars $f "ctx.Err()"}}
-            {{else -}}
-            return ctx.Err()
-            {{end -}}
-        }
-        
-        delay *= 2
-        if delay > client.Limit {
-            delay = client.Limit
-        }
-    }
+		if delay >= client.Limit {
+			return
+		}
+		
+		{{if $useJitter -}}
+		sleepDuration := client.addJitter(delay)
+		{{else -}}
+		sleepDuration := delay
+		{{end}}
+		
+		select {
+		case <-time.After(sleepDuration):
+			// Continue with next attempt
+		case <-ctx.Done():
+			{{if $f.Returns -}}
+			return {{RetVars $f "ctx.Err()"}}
+			{{else -}}
+			return ctx.Err()
+			{{end -}}
+		}
+		
+		delay *= 2
+		if delay > client.Limit {
+			delay = client.Limit
+		}
+	}
 }
 {{end}}
 `
