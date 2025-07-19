@@ -296,11 +296,6 @@ func newRetrierRateLimiterClient(name string, server ir.IRNode, max_clients int6
 		return nil, blueprint.Errorf("rate limiter client wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
 	}
 
-	// Default rate limit
-	if rateLimit == 0 {
-		rateLimit = 10 // 10 requests per second
-	}
-
 	node := &RetrierRateLimiterClient{}
 	node.InstanceName = name
 	node.Wrapped = serverNode
@@ -352,6 +347,6 @@ func (node *RetrierRateLimiterClient) AddInstantiation(builder golang.NamespaceB
 			},
 		},
 	}
-	
+
 	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped})
 }

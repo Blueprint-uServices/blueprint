@@ -196,9 +196,9 @@ type {{.Name}} struct {
 	Client {{.Imports.NameOf .Service.UserType}}
 	Delay time.Duration
 	Limit time.Duration
-    {{if .UseJitter -}}
-    Rand *rand.Rand
-    {{- end}}
+	{{if .UseJitter -}}
+	Rand *rand.Rand
+	{{- end}}
 }
 
 func New_{{.Name}} (ctx context.Context, client {{.Imports.NameOf .Service.UserType}}) (*{{.Name}}, error) {
@@ -216,15 +216,15 @@ func New_{{.Name}} (ctx context.Context, client {{.Imports.NameOf .Service.UserT
 	handler.Limit = parsed_limit
     
 	{{if .UseJitter -}}
-    handler.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
-    {{- end}}
+	handler.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
+	{{- end}}
 
 	return handler, nil
 }
 
 {{if .UseJitter}}
 func (client *{{.Name}}) addJitter(d time.Duration) time.Duration {
-    return d/2 + time.Duration(client.Rand.Int63n(int64(d/2)))
+	return d/2 + time.Duration(client.Rand.Int63n(int64(d/2)))
 }
 {{end}}
 
@@ -278,7 +278,6 @@ package {{.Package.ShortName}}
 type {{.Name}} struct {
 	Client {{.Imports.NameOf .Service.UserType}}
 	MaxTries int
-	// rateLimit is the maximum number of retries per second
 	tokens float64
 	maxTokens float64
 	refillRate float64

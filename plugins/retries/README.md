@@ -15,13 +15,14 @@ import "github.com/blueprint-uservices/blueprint/plugins/retries"
  retries.AddRetries(spec, "my_service", 10) // Adds retries with a maximum number of retries
  retries.AddRetriesWithTimeouts(spec, "my_service", 10, "1s") // Adds retries and timeouts
  retries.AddRetriesWithFixedDelay(spec, "my_service", 10, "50ms") // Adds retries with a maximum number of retries and a fixed delay between any two tries.
- retries.AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s", false) // Adds retries with exponential backoff delay strategy between retries. In addition, with the  last parameter (true/false) jitter can be used
+ retries.AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s") // Adds retries with exponential backoff delay strategy between retries.
 ```
 
 ## Index
 
 - [func AddRetries\(spec wiring.WiringSpec, serviceName string, max\_retries int64\)](<#AddRetries>)
-- [func AddRetriesWithExponentialBackoff\(spec wiring.WiringSpec, serviceName string, starting\_delay string, backoff\_limit string\, useJitter bool\)](<#AddRetriesWithExponentialBackoff>)
+- [func AddRetriesRetryRateLimit\(spec wiring.WiringSpec, serviceName string, max\_retries int64, retry\_rate\_limit int64\)](<#AddRetriesRetryRateLimit>)
+- [func AddRetriesWithExponentialBackoff\(spec wiring.WiringSpec, serviceName string, starting\_delay string, backoff\_limit string, useJitter bool\)](<#AddRetriesWithExponentialBackoff>)
 - [func AddRetriesWithFixedDelay\(spec wiring.WiringSpec, serviceName string, max\_retries int64, delay string\)](<#AddRetriesWithFixedDelay>)
 - [func AddRetriesWithTimeouts\(spec wiring.WiringSpec, serviceName string, max\_retries int64, timeout string\)](<#AddRetriesWithTimeouts>)
 - [type RetrierClient](<#RetrierClient>)
@@ -48,10 +49,18 @@ import "github.com/blueprint-uservices/blueprint/plugins/retries"
   - [func \(node \*RetrierFixedDelayClient\) ImplementsGolangNode\(\)](<#RetrierFixedDelayClient.ImplementsGolangNode>)
   - [func \(node \*RetrierFixedDelayClient\) Name\(\) string](<#RetrierFixedDelayClient.Name>)
   - [func \(node \*RetrierFixedDelayClient\) String\(\) string](<#RetrierFixedDelayClient.String>)
+- [type RetrierRateLimiterClient](<#RetrierRateLimiterClient>)
+  - [func \(node \*RetrierRateLimiterClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#RetrierRateLimiterClient.AddInstantiation>)
+  - [func \(node \*RetrierRateLimiterClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#RetrierRateLimiterClient.AddInterfaces>)
+  - [func \(node \*RetrierRateLimiterClient\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#RetrierRateLimiterClient.GenerateFuncs>)
+  - [func \(node \*RetrierRateLimiterClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#RetrierRateLimiterClient.GetInterface>)
+  - [func \(node \*RetrierRateLimiterClient\) ImplementsGolangNode\(\)](<#RetrierRateLimiterClient.ImplementsGolangNode>)
+  - [func \(node \*RetrierRateLimiterClient\) Name\(\) string](<#RetrierRateLimiterClient.Name>)
+  - [func \(node \*RetrierRateLimiterClient\) String\(\) string](<#RetrierRateLimiterClient.String>)
 
 
 <a name="AddRetries"></a>
-## func [AddRetries](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L31>)
+## func [AddRetries](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/wiring.go#L31>)
 
 ```go
 func AddRetries(spec wiring.WiringSpec, serviceName string, max_retries int64)
@@ -63,21 +72,34 @@ Add retrier functionality to all clients of the specified service. Uses a \[blue
 AddRetries(spec, "my_service", 10)
 ```
 
+<a name="AddRetriesRetryRateLimit"></a>
+## func [AddRetriesRetryRateLimit](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/wiring.go#L141>)
+
+```go
+func AddRetriesRetryRateLimit(spec wiring.WiringSpec, serviceName string, max_retries int64, retry_rate_limit int64)
+```
+
+Add retrier functionality to all clients of the specified service. Uses a \[blueprint.WiringSpec\] Modifies the given service such that all clients to that service retry \`max\_retries\` number of times on error. The \`retry\_rate\_limit\` is the maximum number of retries per second, if \`rate\_limit\` is set to 0, then there is no rate limit. Usage:
+
+```
+AddRetriesRetryRateLimit(spec, "my_service", 10, 100)
+```
+
 <a name="AddRetriesWithExponentialBackoff"></a>
-## func [AddRetriesWithExponentialBackoff](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L112>)
+## func [AddRetriesWithExponentialBackoff](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/wiring.go#L112>)
 
 ```go
 func AddRetriesWithExponentialBackoff(spec wiring.WiringSpec, serviceName string, starting_delay string, backoff_limit string, useJitter bool)
 ```
 
-Add retrier functionality to all clients of the specified service with a fixed time delay between the tries. Uses a \[blueprint.WiringSpec\] Modifies the given service such that all clients to that service retry with exponential delay. The \`starting\_delay\` is the first delay to be used before retrying. The retries continue until a \`backoff\_limit\` of delay is reached. With \`useJitter\` the jitter (randomized delay) can be used. Usage:
+Add retrier functionality to all clients of the specified service with a fixed time delay between the tries. Uses a \[blueprint.WiringSpec\] Modifies the given service such that all clients to that service retry with exponential delay. The \`starting\_delay\` is the first delay to be used before retrying. The retries continue until a \`backoff\_limit\` of delay is reached Usage:
 
 ```
-AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s", false)
+AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s")
 ```
 
 <a name="AddRetriesWithFixedDelay"></a>
-## func [AddRetriesWithFixedDelay](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L82>)
+## func [AddRetriesWithFixedDelay](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/wiring.go#L82>)
 
 ```go
 func AddRetriesWithFixedDelay(spec wiring.WiringSpec, serviceName string, max_retries int64, delay string)
@@ -90,7 +112,7 @@ AddRetriesWithFixedDelay(spec, "my_service", 10, "50ms")
 ```
 
 <a name="AddRetriesWithTimeouts"></a>
-## func [AddRetriesWithTimeouts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L71>)
+## func [AddRetriesWithTimeouts](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/wiring.go#L71>)
 
 ```go
 func AddRetriesWithTimeouts(spec wiring.WiringSpec, serviceName string, max_retries int64, timeout string)
@@ -117,7 +139,7 @@ AddRetriesWithTimeouts(spec, "my_service", 10, "1s")
 ```
 
 <a name="RetrierClient"></a>
-## type [RetrierClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L15-L25>)
+## type [RetrierClient](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L15-L25>)
 
 Blueprint IR node representing a Retrier
 
@@ -136,7 +158,7 @@ type RetrierClient struct {
 ```
 
 <a name="RetrierClient.AddInstantiation"></a>
-### func \(\*RetrierClient\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L73>)
+### func \(\*RetrierClient\) [AddInstantiation](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L73>)
 
 ```go
 func (node *RetrierClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -145,7 +167,7 @@ func (node *RetrierClient) AddInstantiation(builder golang.NamespaceBuilder) err
 
 
 <a name="RetrierClient.AddInterfaces"></a>
-### func \(\*RetrierClient\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L52>)
+### func \(\*RetrierClient\) [AddInterfaces](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L52>)
 
 ```go
 func (node *RetrierClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -154,7 +176,7 @@ func (node *RetrierClient) AddInterfaces(builder golang.ModuleBuilder) error
 
 
 <a name="RetrierClient.GenerateFuncs"></a>
-### func \(\*RetrierClient\) [GenerateFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L60>)
+### func \(\*RetrierClient\) [GenerateFuncs](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L60>)
 
 ```go
 func (node *RetrierClient) GenerateFuncs(builder golang.ModuleBuilder) error
@@ -163,7 +185,7 @@ func (node *RetrierClient) GenerateFuncs(builder golang.ModuleBuilder) error
 
 
 <a name="RetrierClient.GetInterface"></a>
-### func \(\*RetrierClient\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L56>)
+### func \(\*RetrierClient\) [GetInterface](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L56>)
 
 ```go
 func (node *RetrierClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -172,7 +194,7 @@ func (node *RetrierClient) GetInterface(ctx ir.BuildContext) (service.ServiceInt
 
 
 <a name="RetrierClient.ImplementsGolangNode"></a>
-### func \(\*RetrierClient\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L27>)
+### func \(\*RetrierClient\) [ImplementsGolangNode](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L27>)
 
 ```go
 func (node *RetrierClient) ImplementsGolangNode()
@@ -181,7 +203,7 @@ func (node *RetrierClient) ImplementsGolangNode()
 
 
 <a name="RetrierClient.Name"></a>
-### func \(\*RetrierClient\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L29>)
+### func \(\*RetrierClient\) [Name](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L29>)
 
 ```go
 func (node *RetrierClient) Name() string
@@ -190,7 +212,7 @@ func (node *RetrierClient) Name() string
 
 
 <a name="RetrierClient.String"></a>
-### func \(\*RetrierClient\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L33>)
+### func \(\*RetrierClient\) [String](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L33>)
 
 ```go
 func (node *RetrierClient) String() string
@@ -199,7 +221,7 @@ func (node *RetrierClient) String() string
 
 
 <a name="RetrierExponentialBackoffClient"></a>
-## type [RetrierExponentialBackoffClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L183-L194>)
+## type [RetrierExponentialBackoffClient](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L183-L196>)
 
 Blueprint IR node representing a Retrier with Exponential Backoff
 
@@ -215,13 +237,13 @@ type RetrierExponentialBackoffClient struct {
     StartDelay   string
     BackoffLimit string
 
-    UseJitter    bool
+    UseJitter bool
     // contains filtered or unexported fields
 }
 ```
 
 <a name="RetrierExponentialBackoffClient.AddInstantiation"></a>
-### func \(\*RetrierExponentialBackoffClient\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L243>)
+### func \(\*RetrierExponentialBackoffClient\) [AddInstantiation](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L245>)
 
 ```go
 func (node *RetrierExponentialBackoffClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -230,7 +252,7 @@ func (node *RetrierExponentialBackoffClient) AddInstantiation(builder golang.Nam
 
 
 <a name="RetrierExponentialBackoffClient.AddInterfaces"></a>
-### func \(\*RetrierExponentialBackoffClient\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L222>)
+### func \(\*RetrierExponentialBackoffClient\) [AddInterfaces](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L224>)
 
 ```go
 func (node *RetrierExponentialBackoffClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -239,7 +261,7 @@ func (node *RetrierExponentialBackoffClient) AddInterfaces(builder golang.Module
 
 
 <a name="RetrierExponentialBackoffClient.GenerateFuncs"></a>
-### func \(\*RetrierExponentialBackoffClient\) [GenerateFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L230>)
+### func \(\*RetrierExponentialBackoffClient\) [GenerateFuncs](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L232>)
 
 ```go
 func (node *RetrierExponentialBackoffClient) GenerateFuncs(builder golang.ModuleBuilder) error
@@ -248,7 +270,7 @@ func (node *RetrierExponentialBackoffClient) GenerateFuncs(builder golang.Module
 
 
 <a name="RetrierExponentialBackoffClient.GetInterface"></a>
-### func \(\*RetrierExponentialBackoffClient\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L226>)
+### func \(\*RetrierExponentialBackoffClient\) [GetInterface](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L228>)
 
 ```go
 func (node *RetrierExponentialBackoffClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -257,7 +279,7 @@ func (node *RetrierExponentialBackoffClient) GetInterface(ctx ir.BuildContext) (
 
 
 <a name="RetrierExponentialBackoffClient.ImplementsGolangNode"></a>
-### func \(\*RetrierExponentialBackoffClient\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L196>)
+### func \(\*RetrierExponentialBackoffClient\) [ImplementsGolangNode](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L198>)
 
 ```go
 func (node *RetrierExponentialBackoffClient) ImplementsGolangNode()
@@ -266,7 +288,7 @@ func (node *RetrierExponentialBackoffClient) ImplementsGolangNode()
 
 
 <a name="RetrierExponentialBackoffClient.Name"></a>
-### func \(\*RetrierExponentialBackoffClient\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L198>)
+### func \(\*RetrierExponentialBackoffClient\) [Name](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L200>)
 
 ```go
 func (node *RetrierExponentialBackoffClient) Name() string
@@ -275,7 +297,7 @@ func (node *RetrierExponentialBackoffClient) Name() string
 
 
 <a name="RetrierExponentialBackoffClient.String"></a>
-### func \(\*RetrierExponentialBackoffClient\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L202>)
+### func \(\*RetrierExponentialBackoffClient\) [String](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L204>)
 
 ```go
 func (node *RetrierExponentialBackoffClient) String() string
@@ -284,7 +306,7 @@ func (node *RetrierExponentialBackoffClient) String() string
 
 
 <a name="RetrierFixedDelayClient"></a>
-## type [RetrierFixedDelayClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L98-L109>)
+## type [RetrierFixedDelayClient](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L98-L109>)
 
 Blueprint IR node representing a Retrier with Fixed Delay
 
@@ -304,7 +326,7 @@ type RetrierFixedDelayClient struct {
 ```
 
 <a name="RetrierFixedDelayClient.AddInstantiation"></a>
-### func \(\*RetrierFixedDelayClient\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L158>)
+### func \(\*RetrierFixedDelayClient\) [AddInstantiation](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L158>)
 
 ```go
 func (node *RetrierFixedDelayClient) AddInstantiation(builder golang.NamespaceBuilder) error
@@ -313,7 +335,7 @@ func (node *RetrierFixedDelayClient) AddInstantiation(builder golang.NamespaceBu
 
 
 <a name="RetrierFixedDelayClient.AddInterfaces"></a>
-### func \(\*RetrierFixedDelayClient\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L137>)
+### func \(\*RetrierFixedDelayClient\) [AddInterfaces](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L137>)
 
 ```go
 func (node *RetrierFixedDelayClient) AddInterfaces(builder golang.ModuleBuilder) error
@@ -322,7 +344,7 @@ func (node *RetrierFixedDelayClient) AddInterfaces(builder golang.ModuleBuilder)
 
 
 <a name="RetrierFixedDelayClient.GenerateFuncs"></a>
-### func \(\*RetrierFixedDelayClient\) [GenerateFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L145>)
+### func \(\*RetrierFixedDelayClient\) [GenerateFuncs](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L145>)
 
 ```go
 func (node *RetrierFixedDelayClient) GenerateFuncs(builder golang.ModuleBuilder) error
@@ -331,7 +353,7 @@ func (node *RetrierFixedDelayClient) GenerateFuncs(builder golang.ModuleBuilder)
 
 
 <a name="RetrierFixedDelayClient.GetInterface"></a>
-### func \(\*RetrierFixedDelayClient\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L141>)
+### func \(\*RetrierFixedDelayClient\) [GetInterface](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L141>)
 
 ```go
 func (node *RetrierFixedDelayClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
@@ -340,7 +362,7 @@ func (node *RetrierFixedDelayClient) GetInterface(ctx ir.BuildContext) (service.
 
 
 <a name="RetrierFixedDelayClient.ImplementsGolangNode"></a>
-### func \(\*RetrierFixedDelayClient\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L111>)
+### func \(\*RetrierFixedDelayClient\) [ImplementsGolangNode](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L111>)
 
 ```go
 func (node *RetrierFixedDelayClient) ImplementsGolangNode()
@@ -349,7 +371,7 @@ func (node *RetrierFixedDelayClient) ImplementsGolangNode()
 
 
 <a name="RetrierFixedDelayClient.Name"></a>
-### func \(\*RetrierFixedDelayClient\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L113>)
+### func \(\*RetrierFixedDelayClient\) [Name](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L113>)
 
 ```go
 func (node *RetrierFixedDelayClient) Name() string
@@ -358,10 +380,93 @@ func (node *RetrierFixedDelayClient) Name() string
 
 
 <a name="RetrierFixedDelayClient.String"></a>
-### func \(\*RetrierFixedDelayClient\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L117>)
+### func \(\*RetrierFixedDelayClient\) [String](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L117>)
 
 ```go
 func (node *RetrierFixedDelayClient) String() string
+```
+
+
+
+<a name="RetrierRateLimiterClient"></a>
+## type [RetrierRateLimiterClient](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L270-L281>)
+
+Blueprint IR node representing a Retry Rate Limiter Client
+
+```go
+type RetrierRateLimiterClient struct {
+    golang.Service
+    golang.GeneratesFuncs
+    golang.Instantiable
+
+    InstanceName string
+    Wrapped      golang.Service
+
+    Max            int64
+    RetryRateLimit int64 // retried times per second
+    // contains filtered or unexported fields
+}
+```
+
+<a name="RetrierRateLimiterClient.AddInstantiation"></a>
+### func \(\*RetrierRateLimiterClient\) [AddInstantiation](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L330>)
+
+```go
+func (node *RetrierRateLimiterClient) AddInstantiation(builder golang.NamespaceBuilder) error
+```
+
+
+
+<a name="RetrierRateLimiterClient.AddInterfaces"></a>
+### func \(\*RetrierRateLimiterClient\) [AddInterfaces](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L309>)
+
+```go
+func (node *RetrierRateLimiterClient) AddInterfaces(builder golang.ModuleBuilder) error
+```
+
+
+
+<a name="RetrierRateLimiterClient.GenerateFuncs"></a>
+### func \(\*RetrierRateLimiterClient\) [GenerateFuncs](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L317>)
+
+```go
+func (node *RetrierRateLimiterClient) GenerateFuncs(builder golang.ModuleBuilder) error
+```
+
+
+
+<a name="RetrierRateLimiterClient.GetInterface"></a>
+### func \(\*RetrierRateLimiterClient\) [GetInterface](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L313>)
+
+```go
+func (node *RetrierRateLimiterClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
+```
+
+
+
+<a name="RetrierRateLimiterClient.ImplementsGolangNode"></a>
+### func \(\*RetrierRateLimiterClient\) [ImplementsGolangNode](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L283>)
+
+```go
+func (node *RetrierRateLimiterClient) ImplementsGolangNode()
+```
+
+
+
+<a name="RetrierRateLimiterClient.Name"></a>
+### func \(\*RetrierRateLimiterClient\) [Name](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L285>)
+
+```go
+func (node *RetrierRateLimiterClient) Name() string
+```
+
+
+
+<a name="RetrierRateLimiterClient.String"></a>
+### func \(\*RetrierRateLimiterClient\) [String](<https://github.com/HuSharp/blueprint/blob/main/plugins/retries/ir.go#L289>)
+
+```go
+func (node *RetrierRateLimiterClient) String() string
 ```
 
 
