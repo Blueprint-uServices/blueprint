@@ -15,7 +15,8 @@ import "github.com/blueprint-uservices/blueprint/plugins/retries"
  retries.AddRetries(spec, "my_service", 10) // Adds retries with a maximum number of retries
  retries.AddRetriesWithTimeouts(spec, "my_service", 10, "1s") // Adds retries and timeouts
  retries.AddRetriesWithFixedDelay(spec, "my_service", 10, "50ms") // Adds retries with a maximum number of retries and a fixed delay between any two tries.
- retries.AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s") // Adds retries with exponential backoff delay strategy between retries.
+ retries.AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s", false) // Adds retries with exponential backoff delay strategy between retries with the possibility to apply jitter.
+ retries.AddRetriesRetryRateLimit(spec, "my_service", 10, 100) // Adds retries with rate limit strategy.
 ```
 
 ## Index
