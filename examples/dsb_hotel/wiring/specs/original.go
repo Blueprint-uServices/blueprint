@@ -1,23 +1,17 @@
 package specs
 
 import (
-	"fmt"
-
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/examples/dsb_hotel/cmplx_workload/workloadgen"
 	"github.com/blueprint-uservices/blueprint/examples/dsb_hotel/workflow/hotelreservation"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
-	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/gotests"
-	"github.com/blueprint-uservices/blueprint/plugins/grpc"
-	"github.com/blueprint-uservices/blueprint/plugins/http"
 	"github.com/blueprint-uservices/blueprint/plugins/jaeger"
-	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"github.com/blueprint-uservices/blueprint/plugins/memcached"
 	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
-	"github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 	"github.com/blueprint-uservices/blueprint/plugins/workload"
+	"github.com/blueprint-uservices/blueprint/plugins/crisp"
 )
 
 // Wiring spec that represents the original configuration of the HotelReservation application.
@@ -46,6 +40,11 @@ func makeOriginalSpec(spec wiring.WiringSpec) ([]string, error) {
 	reserv_cache := memcached.Container(spec, "reserv_cache")
 	rate_cache := memcached.Container(spec, "rate_cache")
 	profile_cache := memcached.Container(spec, "profile_cache")
+
+	// Add critical path analysis service as a container
+	analysisContainer := crisp.Container(spec, "trace_analysis")
+	cntrs = append(cntrs, analysisContainer)
+
 
 	// Define internal services
 	user_service := workflow.Service[hotelreservation.UserService](spec, "user_service", user_db)
@@ -96,22 +95,4 @@ func makeOriginalSpec(spec wiring.WiringSpec) ([]string, error) {
 	cntrs = append(cntrs, tests)
 
 	return cntrs, nil
-}
-
-func applyDefaults(spec wiring.WiringSpec, serviceName string, collectorName string) string {
-	procName := fmt.Sprintf("%s_process", serviceName)
-	ctrName := fmt.Sprintf("%s_container", serviceName)
-	opentelemetry.Instrument(spec, serviceName, collectorName)
-	grpc.Deploy(spec, serviceName)
-	goproc.CreateProcess(spec, procName, serviceName)
-	return linuxcontainer.CreateContainer(spec, ctrName, procName)
-}
-
-func applyHTTPDefaults(spec wiring.WiringSpec, serviceName string, collectorName string) string {
-	procName := fmt.Sprintf("%s_process", serviceName)
-	ctrName := fmt.Sprintf("%s_container", serviceName)
-	opentelemetry.Instrument(spec, serviceName, collectorName)
-	http.Deploy(spec, serviceName)
-	goproc.CreateProcess(spec, procName, serviceName)
-	return linuxcontainer.CreateContainer(spec, ctrName, procName)
 }

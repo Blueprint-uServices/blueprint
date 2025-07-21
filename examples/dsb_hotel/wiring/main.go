@@ -19,6 +19,9 @@ func main() {
 	name := "Hotel"
 	cmdbuilder.MakeAndExecute(
 		name,
-		specs.Original,
+		// Change the spec below to select the default experiment/topology.
+		// For example: specs.Original, specs.Chain, specs.Fanin, specs.Fanout
+		// You can also use the -w flag to select the spec at runtime.
+		specs.Fanout,
 	)
 }

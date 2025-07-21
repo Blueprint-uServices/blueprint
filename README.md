@@ -28,6 +28,8 @@ See the 📖[Getting Started](docs/manual/gettingstarted.md) page of the User Ma
 📝[Wiring Spec Plugins](plugins) - plugins that come packaged with Blueprint that can be used in wiring specs to modify applications\
 📓[Workflow Spec Backends](runtime/core) - backend interfaces that can be used in workflow specs when developing applications
 
+🔬[CRISP Critical Path Analysis Guide](CRISP_ANALYSIS.md) - details on integrating, running, and analyzing critical path experiments with the CRISP plugin and Blueprint
+
 ### API Documentation on go.dev
 
 🚀[Blueprint Compiler](https://pkg.go.dev/github.com/blueprint-uservices/blueprint/blueprint)\
