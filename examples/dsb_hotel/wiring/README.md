@@ -2,17 +2,29 @@
 
 # wiring
 
-```go
-import "github.com/blueprint-uservices/blueprint/examples/dsb_hotel/wiring"
-```
-
-Package main provides an application for compiling a number of different wiring specs for the Hotel Reservation application from the DeathStarBench suite.
+This directory contains the wiring logic for the Hotel Reservation application. Wiring specs define the topology and deployment of services.
 
 To display options and usage, invoke:
 
 ```
 go run main.go -h
 ```
+
+## Compiling with a specific wiring spec
+
+To compile the application with a specific wiring spec (e.g., `chain`, `fanin`, `fanout`), run:
+
+```
+go run main.go -w <spec> -o build_<spec>
+```
+
+**Note:**
+- You must specify the correct spec name using the `-w` flag, or by editing the wiring file to set the desired experiment.
+- Alternatively, you can change the default experiment by editing the spec in `main.go` (e.g., change `specs.Fanout` to `specs.Chain`, `specs.Original`, or `specs.Fanin`).
+- If you add or modify a wiring spec in `specs/`, you must recompile using the above command.
+- If you add or update a plugin (such as CRISP for critical path analysis), you must rebuild its Docker image (see the main README for details).
+
+See the main README in the parent directory for full instructions on running the application and analyzing traces.
 
 ## Index
 

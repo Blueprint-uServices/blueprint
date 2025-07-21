@@ -2,6 +2,31 @@
 
 # specs
 
+This directory contains wiring specs for different service topologies (experiments) in the Hotel Reservation application.
+
+## Available wiring specs
+
+- `original`: Full DeathStarBench topology (all services, all dependencies)
+- `chain`: Frontend → Search → Geo (sequential chain)
+- `fanin`: Search → Geo, Profile → Geo (fan-in pattern)
+- `fanout`: Frontend calls all backends directly (star topology)
+
+## Adding or modifying a wiring spec
+
+- Add a new `.go` file in this directory, following the pattern of the existing specs.
+- Register your spec in the `main.go` file if needed.
+- After adding or modifying a spec, recompile the application:
+  ```
+  go run ../main.go -w <your_spec> -o build_<your_spec>
+  ```
+- You must specify the correct spec name using the `-w` flag, or by editing the wiring file to set the desired experiment.
+- Alternatively, you can change the default experiment by editing the spec in `../main.go` (e.g., change `specs.Fanout` to `specs.Chain`, `specs.Original`, or `specs.Fanin`).
+- If your spec uses a new or updated plugin (e.g., CRISP), rebuild its Docker image as described in the main README.
+
+## Purpose
+
+Each wiring spec allows you to experiment with different microservice topologies and analyze their impact on the critical path and system reliability.
+
 ```go
 import "github.com/blueprint-uservices/blueprint/examples/dsb_hotel/wiring/specs"
 ```

@@ -1,8 +1,8 @@
 module github.com/blueprint-uservices/blueprint/examples/leaf/wiring
 
-go 1.22
+go 1.22.0
 
-toolchain go1.22.1
+toolchain go1.24.2
 
 require github.com/blueprint-uservices/blueprint/blueprint v0.0.0-20240619221802-d064c5861c1e
 
@@ -24,6 +24,7 @@ require (
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/openzipkin/zipkin-go v0.4.3 // indirect
 	github.com/otiai10/copy v1.14.0 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/tracingplane/tracingplane-go v0.0.0-20171025152126-8c4e6f79b148 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
@@ -42,13 +43,13 @@ require (
 	go.opentelemetry.io/otel/sdk v1.26.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.26.0 // indirect
 	go.opentelemetry.io/otel/trace v1.26.0 // indirect
-	golang.org/x/crypto v0.22.0 // indirect
-	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f // indirect
-	golang.org/x/mod v0.17.0 // indirect
-	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
-	golang.org/x/tools v0.20.0 // indirect
+	golang.org/x/crypto v0.28.0 // indirect
+	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c // indirect
+	golang.org/x/mod v0.21.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/tools v0.26.0 // indirect
 	google.golang.org/protobuf v1.34.0 // indirect
 )
 
