@@ -351,5 +351,5 @@ func (namespace *namespaceimpl) Error(message string, args ...any) error {
 	} else {
 		slog.Error(fmt.Sprintf("%s %s: %s", namespace.NamespaceType, namespace.Name(), formattedMessage))
 	}
-	return fmt.Errorf(formattedMessage)
+	return blueprint.Errorf(formattedMessage)
 }
