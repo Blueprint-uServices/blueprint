@@ -90,7 +90,7 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 		return newGovecClientWrapper(clientWrapper, wrapped)
 	})
 
-	serverNext := ptr.AddDstModifier(spec, serverWrapper)
+	serverNext := ptr.AddServerModifier(spec, serverWrapper)
 
 	spec.Define(serverWrapper, &GovecServerWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service

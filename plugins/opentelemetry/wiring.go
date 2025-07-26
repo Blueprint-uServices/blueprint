@@ -94,7 +94,7 @@ func instrument(spec wiring.WiringSpec, serviceName string, collectorName string
 	})
 
 	// Add the server wrapper to the pointer dst
-	serverNext := ptr.AddDstModifier(spec, serverWrapper)
+	serverNext := ptr.AddServerModifier(spec, serverWrapper)
 
 	// Define the server wrapper
 	spec.Define(serverWrapper, &OpenTelemetryServerWrapper{}, func(namespace wiring.Namespace) (ir.IRNode, error) {

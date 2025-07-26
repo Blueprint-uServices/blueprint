@@ -94,7 +94,7 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 		return newXtraceClientWrapper(clientWrapper, wrapped, xtraceClient)
 	})
 
-	serverNext := ptr.AddDstModifier(spec, serverWrapper)
+	serverNext := ptr.AddServerModifier(spec, serverWrapper)
 	spec.Define(serverWrapper, &XtraceServerWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
 		if err := ns.Get(serverNext, &wrapped); err != nil {

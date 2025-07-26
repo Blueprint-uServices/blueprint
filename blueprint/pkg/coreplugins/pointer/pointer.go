@@ -172,11 +172,11 @@ func (ptr *PointerDef) AddClientModifier(spec wiring.WiringSpec, modifierName st
 // to add functionality like tracing, or to deploy a service with RPC.
 //
 // A pointer can have multiple modifiers applied to it.  They will be applied in the order
-// that AddDstModifier was caleld.
+// that AddServerModifier was caleld.
 //
-// The return value of AddDstModifier is the name of the _previous_ server side modifier.  This
+// The return value of AddServerModifier is the name of the _previous_ server side modifier.  This
 // can be used within the BuildFunc of modifierName.
-func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName string, options ...ModifierOpts) string {
+func (ptr *PointerDef) AddServerModifier(spec wiring.WiringSpec, modifierName string, options ...ModifierOpts) string {
 	opts := defaultModifierOpts
 	if len(options) > 0 {
 		opts = options[0]
@@ -206,7 +206,7 @@ func (ptr *PointerDef) AddAddrModifier(spec wiring.WiringSpec, addrName string) 
 	}
 
 	// Add a modifier to instantiate address PointsTo
-	nextServer := ptr.AddDstModifier(spec, def.PointsTo)
+	nextServer := ptr.AddServerModifier(spec, def.PointsTo)
 
 	// Set the pointer interface to be the address, rather than the node
 	ptr.interfaceNode = addrName

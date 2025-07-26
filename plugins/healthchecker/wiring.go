@@ -17,22 +17,23 @@ import (
 // Uses a [blueprint.WiringSpec].
 // Usage:
 //
-//  AddHealthCheckAPI(spec, "serviceA")
+//	AddHealthCheckAPI(spec, "serviceA")
 //
 // Result:
-//  Old interface:
-//  type ServiceA interface {
-//     Method1(ctx context.Context, ...) (..., error)
-//     ...
-//     MethodN(ctx context.Context, ...) (..., error)
-//  }
-//  New interface:
-//  type ServiceAHealth interface {
-//     Method1(ctx context.Context, ...) (..., error)
-//     ...
-//     MethodN(ctx context.Context, ...) (..., error)
-//     Health(ctx context.Context) (string, error)
-//  }
+//
+//	Old interface:
+//	type ServiceA interface {
+//	   Method1(ctx context.Context, ...) (..., error)
+//	   ...
+//	   MethodN(ctx context.Context, ...) (..., error)
+//	}
+//	New interface:
+//	type ServiceAHealth interface {
+//	   Method1(ctx context.Context, ...) (..., error)
+//	   ...
+//	   MethodN(ctx context.Context, ...) (..., error)
+//	   Health(ctx context.Context) (string, error)
+//	}
 func AddHealthCheckAPI(spec wiring.WiringSpec, serviceName string) {
 	// The node that we are defining
 	serverWrapper := serviceName + ".server.hc"
@@ -45,7 +46,7 @@ func AddHealthCheckAPI(spec wiring.WiringSpec, serviceName string) {
 	}
 
 	// Add the server wrapper to the pointer dst
-	serverNext := ptr.AddDstModifier(spec, serverWrapper)
+	serverNext := ptr.AddServerModifier(spec, serverWrapper)
 
 	// Define the server wrapper
 	spec.Define(serverWrapper, &HealthCheckerServerWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {

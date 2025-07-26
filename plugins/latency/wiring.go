@@ -5,8 +5,9 @@
 // The plugin will generate a wrapper class that will sleep for a fixed amount of time (the specified latency to be injected)
 // before invoking the handler for handling the request.
 // Example Usage to add 100ms latency to each request:
-//    import "github.com/blueprint-uservices/blueprint/plugins/latency"
-//    latency.AddFixed(spec, "my_service", "100ms")
+//
+//	import "github.com/blueprint-uservices/blueprint/plugins/latency"
+//	latency.AddFixed(spec, "my_service", "100ms")
 //
 // TODO: Allow latency to be injected selectively to a subset of requests based using
 // random sampling or by matching attributes of a request.
@@ -31,7 +32,8 @@ import (
 // Modifies the given service such that the server adds a fixed amount of `latency` while processing the request.
 // The `latency` string must be a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "300ms", "1.5h" or "2h45m". Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". Negative signed values such as "-1.5h" would result in no explicit latency being added; although it might result in the go runtime re-scheduling the running goroutine.
 // Usage:
-//   AddFixed(spec, "my_service", "100ms")
+//
+//	AddFixed(spec, "my_service", "100ms")
 func AddFixed(spec wiring.WiringSpec, serviceName string, latency string) {
 	serverWrapper := serviceName + ".server.latency"
 	ptr := pointer.GetPointer(spec, serviceName)
@@ -39,7 +41,7 @@ func AddFixed(spec wiring.WiringSpec, serviceName string, latency string) {
 		slog.Error("Unable to add a latencyinjector to " + serviceName + " as it is not a pointer")
 	}
 
-	serverNext := ptr.AddDstModifier(spec, serverWrapper)
+	serverNext := ptr.AddServerModifier(spec, serverWrapper)
 
 	spec.Define(serverWrapper, &LatencyInjectorWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
