@@ -127,7 +127,7 @@ func CreatePointer[ClientNodeType any](spec wiring.WiringSpec, name string, serv
 		// This is the lazy implicit instantiation of the server side of the pointer, if
 		// it hasn't explicitly been instantiated somewhere in the wiring spec.
 		namespace.Defer(func() error {
-			return ptr.InstantiateDst(namespace)
+			return ptr.InstantiateServer(namespace)
 		}, wiring.DeferOpts{Front: false})
 
 		var node ir.IRNode
@@ -218,7 +218,7 @@ func (ptr *PointerDef) AddAddrModifier(spec wiring.WiringSpec, addrName string) 
 // If any pointer modifiers are addresses, this will instantiate the server side of the addresses.
 //
 // This is primarily used by namespace plugins.
-func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) error {
+func (ptr *PointerDef) InstantiateServer(namespace wiring.Namespace) error {
 	namespace.Info("Instantiating pointer %s.server from namespace %s", ptr.name, namespace.Name())
 
 	// Instantiating server starts from the interface node between client and server
