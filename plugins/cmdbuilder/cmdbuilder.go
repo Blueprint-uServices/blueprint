@@ -59,6 +59,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/logging"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
@@ -146,17 +147,17 @@ func (b *CmdBuilder) ParseArgs() {
 
 func (b *CmdBuilder) ValidateArgs() error {
 	if b.OutputDir == "" {
-		return fmt.Errorf("output directory not specified, specify with -o")
+		return blueprint.Errorf("output directory not specified, specify with -o")
 	}
 
 	if b.SpecName == "" {
-		return fmt.Errorf("wiring spec not specified, specify with -w")
+		return blueprint.Errorf("wiring spec not specified, specify with -w")
 	}
 
 	if spec, specExists := b.Registry[b.SpecName]; specExists {
 		b.Spec = spec
 	} else {
-		return fmt.Errorf("unknown wiring spec \"%v\", expected one of:\n%v", b.SpecName, b.List())
+		return blueprint.Errorf("unknown wiring spec \"%v\", expected one of:\n%v", b.SpecName, b.List())
 	}
 
 	if b.Quiet {
@@ -191,7 +192,7 @@ func (b *CmdBuilder) Build() error {
 	b.Wiring = wiring.NewWiringSpec(b.Name)
 	nodesToBuild, err := b.Spec.Build(b.Wiring)
 	if err != nil {
-		return fmt.Errorf("unable to build %v-%v wiring due to %v", b.Name, b.SpecName, err.Error())
+		return blueprint.Errorf("unable to build %v-%v wiring due to %v", b.Name, b.SpecName, err.Error())
 	}
 	slog.Info(fmt.Sprintf("Constructed %v WiringSpec %v: \n%v", b.Name, b.SpecName, b.Wiring))
 
@@ -199,14 +200,14 @@ func (b *CmdBuilder) Build() error {
 	b.IR, err = b.Wiring.BuildIR(nodesToBuild...)
 	slog.Info(fmt.Sprintf("%v %v IR: \n%v", b.Name, b.SpecName, b.IR))
 	if err != nil {
-		return fmt.Errorf("unable to construct %v-%v IR due to %v", b.Name, b.SpecName, err.Error())
+		return blueprint.Errorf("unable to construct %v-%v IR due to %v", b.Name, b.SpecName, err.Error())
 	}
 
 	// Generate artifacts
 	slog.Info(fmt.Sprintf("Generating %v-%v artifacts to %v", b.Name, b.SpecName, b.OutputDir))
 	err = b.IR.GenerateArtifacts(b.OutputDir)
 	if err != nil {
-		return fmt.Errorf("unable to generate %v-%v artifacts due to %v", b.Name, b.SpecName, err.Error())
+		return blueprint.Errorf("unable to generate %v-%v artifacts due to %v", b.Name, b.SpecName, err.Error())
 	}
 
 	slog.Info(fmt.Sprintf("Successfully generated %v-%v to %v", b.Name, b.SpecName, b.OutputDir))

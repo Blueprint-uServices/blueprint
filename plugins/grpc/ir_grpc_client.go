@@ -3,6 +3,7 @@ package grpc
 import (
 	"fmt"
 
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/address"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
@@ -51,11 +52,11 @@ func (node *golangClient) GetInterface(ctx ir.BuildContext) (service.ServiceInte
 	}
 	grpc, isGrpc := iface.(*gRPCInterface)
 	if !isGrpc {
-		return nil, fmt.Errorf("grpc client expected a GRPC interface from %v but found %v", node.ServerAddr.Server.Name(), iface)
+		return nil, blueprint.Errorf("grpc client expected a GRPC interface from %v but found %v", node.ServerAddr.Server.Name(), iface)
 	}
 	wrapped, isValid := grpc.Wrapped.(*gocode.ServiceInterface)
 	if !isValid {
-		return nil, fmt.Errorf("grpc client expected the server's GRPC interface to wrap a gocode interface but found %v", grpc)
+		return nil, blueprint.Errorf("grpc client expected the server's GRPC interface to wrap a gocode interface but found %v", grpc)
 	}
 	return wrapped, nil
 }

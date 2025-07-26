@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/address"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/service"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
@@ -49,11 +50,11 @@ func (node *GolangHttpClient) GetInterface(ctx ir.BuildContext) (service.Service
 	}
 	http, isHttp := iface.(*HttpInterface)
 	if !isHttp {
-		return nil, fmt.Errorf("http client expected an HTTP interface from %v but found %v", node.ServerAddr.Name(), iface)
+		return nil, blueprint.Errorf("http client expected an HTTP interface from %v but found %v", node.ServerAddr.Name(), iface)
 	}
 	wrapped, isValid := http.Wrapped.(*gocode.ServiceInterface)
 	if !isValid {
-		return nil, fmt.Errorf("http client expected the server's HTTP interface to wrap a gocode interface but found %v", http)
+		return nil, blueprint.Errorf("http client expected the server's HTTP interface to wrap a gocode interface but found %v", http)
 	}
 	return wrapped, nil
 }

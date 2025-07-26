@@ -48,7 +48,7 @@ func (node *HealthCheckerServerWrapper) AddInterfaces(builder golang.ModuleBuild
 func newHealthCheckerServerWrapper(name string, server ir.IRNode) (*HealthCheckerServerWrapper, error) {
 	serverNode, is_callable := server.(golang.Service)
 	if !is_callable {
-		return nil, fmt.Errorf("healthchecker server wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
+		return nil, blueprint.Errorf("healthchecker server wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
 	}
 
 	node := &HealthCheckerServerWrapper{}
