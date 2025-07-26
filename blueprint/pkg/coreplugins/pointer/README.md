@@ -14,7 +14,7 @@ When a plugin declares an IR node, if that node represents something like a serv
 
 Once a pointer is declared, other plugins can wrap the client or server side of the pointer. Many plugins \*only\* apply to nodes that have pointers declared, and will get compilation errors for non\-pointer nodes.
 
-Other Blueprint plugins apply client and server modifications by calling \[AddSrcModifier\] or \[AddDstModifier\].
+Other Blueprint plugins apply client and server modifications by calling \[AddClientModifier\] or \[AddServerModifier\].
 
 Internally the pointer keeps track of the modifier nodes that have been applied to the pointer.
 
@@ -22,19 +22,19 @@ Typically there is an address node internally that separates the client side and
 
 The server side of a pointer is usually instantiated lazily, because typically the server does not want to live in the same namespace as the client.
 
-The method \[InstantiateDst\] is used by other Blueprint plugins that wish to explicitly instantiate the server side of a pointer in a particular namespace.
+The method \[InstantiateServer\] is used by other Blueprint plugins that wish to explicitly instantiate the server side of a pointer in a particular namespace.
 
 ## Index
 
 - [func RequireUniqueness\(spec wiring.WiringSpec, alias string, visibility any\)](<#RequireUniqueness>)
 - [type ModifierOpts](<#ModifierOpts>)
 - [type PointerDef](<#PointerDef>)
-  - [func CreatePointer\[SrcNodeType any\]\(spec wiring.WiringSpec, name string, dst string, options ...PointerOpts\) \*PointerDef](<#CreatePointer>)
+  - [func CreatePointer\[ClientNodeType any\]\(spec wiring.WiringSpec, name string, server string, options ...PointerOpts\) \*PointerDef](<#CreatePointer>)
   - [func GetPointer\(spec wiring.WiringSpec, name string\) \*PointerDef](<#GetPointer>)
   - [func \(ptr \*PointerDef\) AddAddrModifier\(spec wiring.WiringSpec, addrName string\) string](<#PointerDef.AddAddrModifier>)
-  - [func \(ptr \*PointerDef\) AddDstModifier\(spec wiring.WiringSpec, modifierName string, options ...ModifierOpts\) string](<#PointerDef.AddDstModifier>)
-  - [func \(ptr \*PointerDef\) AddSrcModifier\(spec wiring.WiringSpec, modifierName string\) string](<#PointerDef.AddSrcModifier>)
-  - [func \(ptr \*PointerDef\) InstantiateDst\(namespace wiring.Namespace\) error](<#PointerDef.InstantiateDst>)
+  - [func \(ptr \*PointerDef\) AddClientModifier\(spec wiring.WiringSpec, modifierName string\) string](<#PointerDef.AddClientModifier>)
+  - [func \(ptr \*PointerDef\) AddServerModifier\(spec wiring.WiringSpec, modifierName string, options ...ModifierOpts\) string](<#PointerDef.AddServerModifier>)
+  - [func \(ptr \*PointerDef\) InstantiateServer\(namespace wiring.Namespace\) error](<#PointerDef.InstantiateServer>)
   - [func \(ptr PointerDef\) String\(\) string](<#PointerDef.String>)
 - [type PointerOpts](<#PointerOpts>)
 
@@ -83,10 +83,10 @@ type PointerDef struct {
 ### func [CreatePointer](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L101>)
 
 ```go
-func CreatePointer[SrcNodeType any](spec wiring.WiringSpec, name string, dst string, options ...PointerOpts) *PointerDef
+func CreatePointer[ClientNodeType any](spec wiring.WiringSpec, name string, server string, options ...PointerOpts) *PointerDef
 ```
 
-Creates a pointer called name that points to the specified node dst. Type parameter \[SrcNodeType\] is the nodeType of the client side of the pointer.
+Creates a pointer called name that points to the specified node server. Type parameter \[ClientNodeType\] is the nodeType of the client side of the pointer.
 
 Any plugin that defines client and server nodes should typically declare a pointer to the server node. Declaring a pointer will enable other plugins to apply client or server modifiers to the pointer. Additionally, pointers will automatically instantiate the server side of the pointer when using addresses
 
@@ -108,47 +108,47 @@ Gets the PointerDef metadata for a pointer name that was defined using [CreatePo
 func (ptr *PointerDef) AddAddrModifier(spec wiring.WiringSpec, addrName string) string
 ```
 
-AddAddrModifier is a special case of AddDstModifier where the modifier is an address node.
+AddAddrModifier is a special case of AddServerModifier where the modifier is an address node.
 
 It immediately instantiates the address, and returns it. It defers instantiation of the server side of the address.
 
 The return value of AddAddrModifier is the name of the \_previous\_ server side modifier. This can be used within the BuildFunc of the destination \(PointsTo\) of addrName
 
-<a name="PointerDef.AddDstModifier"></a>
-### func \(\*PointerDef\) [AddDstModifier](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L179>)
+<a name="PointerDef.AddClientModifier"></a>
+### func \(\*PointerDef\) [AddClientModifier](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L160>)
 
 ```go
-func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName string, options ...ModifierOpts) string
-```
-
-Appends a modifier node called modifierName to the server side modifiers of a pointer.
-
-Plugins use this method if they want to wrap the server side of a service, for example to add functionality like tracing, or to deploy a service with RPC.
-
-A pointer can have multiple modifiers applied to it. They will be applied in the order that AddDstModifier was caleld.
-
-The return value of AddDstModifier is the name of the \_previous\_ server side modifier. This can be used within the BuildFunc of modifierName.
-
-<a name="PointerDef.AddSrcModifier"></a>
-### func \(\*PointerDef\) [AddSrcModifier](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L160>)
-
-```go
-func (ptr *PointerDef) AddSrcModifier(spec wiring.WiringSpec, modifierName string) string
+func (ptr *PointerDef) AddClientModifier(spec wiring.WiringSpec, modifierName string) string
 ```
 
 Appends a modifier node called modifierName to the client side modifiers of a pointer.
 
 Plugins use this method if they want to wrap the client side of a service, for example to add functionality like tracing, or to make calls over RPC.
 
-A pointer can have multiple modifiers applied to it. They will be applied in the order that AddSrcModifier was called.
+A pointer can have multiple modifiers applied to it. They will be applied in the order that AddClientModifier was called.
 
-The return value of AddSrcModifier is the name of the \_next\_ client side modifier. This can be used within the BuildFunc of modifierName.
+The return value of AddClientModifier is the name of the \_next\_ client side modifier. This can be used within the BuildFunc of modifierName.
 
-<a name="PointerDef.InstantiateDst"></a>
-### func \(\*PointerDef\) [InstantiateDst](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L221>)
+<a name="PointerDef.AddServerModifier"></a>
+### func \(\*PointerDef\) [AddServerModifier](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L179>)
 
 ```go
-func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) error
+func (ptr *PointerDef) AddServerModifier(spec wiring.WiringSpec, modifierName string, options ...ModifierOpts) string
+```
+
+Appends a modifier node called modifierName to the server side modifiers of a pointer.
+
+Plugins use this method if they want to wrap the server side of a service, for example to add functionality like tracing, or to deploy a service with RPC.
+
+A pointer can have multiple modifiers applied to it. They will be applied in the order that AddServerModifier was caleld.
+
+The return value of AddServerModifier is the name of the \_previous\_ server side modifier. This can be used within the BuildFunc of modifierName.
+
+<a name="PointerDef.InstantiateServer"></a>
+### func \(\*PointerDef\) [InstantiateServer](<https://github.com/blueprint-uservices/blueprint/blob/main/blueprint/pkg/coreplugins/pointer/pointer.go#L221>)
+
+```go
+func (ptr *PointerDef) InstantiateServer(namespace wiring.Namespace) error
 ```
 
 If any pointer modifiers are addresses, this will instantiate the server side of the addresses.
