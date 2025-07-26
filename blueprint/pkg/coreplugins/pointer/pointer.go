@@ -44,23 +44,23 @@ import (
 type PointerDef struct {
 	name string
 
-	srcHead      string
-	srcModifiers []string
-	srcTail      string
+	clientHead      string
+	clientModifiers []string
+	clientTail      string
 
 	// The node that is the interface from src to dst.  Typically this is an address
 	interfaceNode string
 
-	dstHead      string
-	dstModifiers []string
+	serverHead      string
+	serverModifiers []string
 }
 
 func (ptr PointerDef) String() string {
 	b := strings.Builder{}
 	b.WriteString("[")
-	b.WriteString(strings.Join(ptr.srcModifiers, " -> "))
+	b.WriteString(strings.Join(ptr.clientModifiers, " -> "))
 	b.WriteString("] -> [")
-	b.WriteString(strings.Join(ptr.dstModifiers, " -> "))
+	b.WriteString(strings.Join(ptr.serverModifiers, " -> "))
 	b.WriteString("]")
 	return b.String()
 }
@@ -98,31 +98,31 @@ var defaultModifierOpts = ModifierOpts{
 // the server side of the pointer when using addresses
 //
 // Additional pointer options can be specified by providing optional PointerOpts.
-func CreatePointer[SrcNodeType any](spec wiring.WiringSpec, name string, dst string, options ...PointerOpts) *PointerDef {
+func CreatePointer[ClientNodeType any](spec wiring.WiringSpec, name string, server string, options ...PointerOpts) *PointerDef {
 	opts := defaultPointerOpts
 	if len(options) > 0 {
 		opts = options[0]
 	}
 
 	if opts.RequireUniqueness != nil {
-		dstName := name + ".dst"
-		spec.Alias(dstName, dst)
-		RequireUniqueness(spec, dstName, opts.RequireUniqueness)
-		dst = dstName
+		serverName := name + ".dst"
+		spec.Alias(serverName, server)
+		RequireUniqueness(spec, serverName, opts.RequireUniqueness)
+		server = serverName
 	}
 
 	ptr := &PointerDef{}
 	ptr.name = name
-	ptr.srcModifiers = nil
-	ptr.srcHead = name + ".src"
-	ptr.srcTail = ptr.srcHead
-	ptr.interfaceNode = dst
-	ptr.dstHead = dst
-	ptr.dstModifiers = []string{dst}
+	ptr.clientModifiers = nil
+	ptr.clientHead = name + ".src"
+	ptr.clientTail = ptr.clientHead
+	ptr.interfaceNode = server
+	ptr.serverHead = server
+	ptr.serverModifiers = []string{server}
 
-	spec.Alias(ptr.srcTail, ptr.interfaceNode)
+	spec.Alias(ptr.clientTail, ptr.interfaceNode)
 
-	var ptrType SrcNodeType
+	var ptrType ClientNodeType
 	spec.Define(name, ptrType, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		// This is the lazy implicit instantiation of the Dst side of the pointer, if
 		// it hasn't explicitly been instantiated somewhere in the wiring spec.
@@ -131,7 +131,7 @@ func CreatePointer[SrcNodeType any](spec wiring.WiringSpec, name string, dst str
 		}, wiring.DeferOpts{Front: false})
 
 		var node ir.IRNode
-		err := namespace.Get(ptr.srcHead, &node)
+		err := namespace.Get(ptr.clientHead, &node)
 		return node, err
 	})
 
@@ -158,12 +158,12 @@ func GetPointer(spec wiring.WiringSpec, name string) *PointerDef {
 // The return value of AddSrcModifier is the name of the _next_ client side modifier.  This
 // can be used within the BuildFunc of modifierName.
 func (ptr *PointerDef) AddSrcModifier(spec wiring.WiringSpec, modifierName string) string {
-	spec.Alias(ptr.srcTail, modifierName)
-	ptr.srcTail = modifierName + ".ptr.src.next"
-	spec.Alias(ptr.srcTail, ptr.interfaceNode)
-	ptr.srcModifiers = append(ptr.srcModifiers, modifierName)
+	spec.Alias(ptr.clientTail, modifierName)
+	ptr.clientTail = modifierName + ".ptr.src.next"
+	spec.Alias(ptr.clientTail, ptr.interfaceNode)
+	ptr.clientModifiers = append(ptr.clientModifiers, modifierName)
 
-	return ptr.srcTail
+	return ptr.clientTail
 }
 
 // Appends a modifier node called modifierName to the server side modifiers of a pointer.
@@ -181,14 +181,14 @@ func (ptr *PointerDef) AddDstModifier(spec wiring.WiringSpec, modifierName strin
 	if len(options) > 0 {
 		opts = options[0]
 	}
-	nextDst := ptr.dstHead
-	ptr.dstHead = modifierName
+	nextServer := ptr.serverHead
+	ptr.serverHead = modifierName
 	if opts.IsInterfaceNode {
-		ptr.interfaceNode = ptr.dstHead
-		spec.Alias(ptr.srcTail, ptr.interfaceNode)
+		ptr.interfaceNode = ptr.serverHead
+		spec.Alias(ptr.clientTail, ptr.interfaceNode)
 	}
-	ptr.dstModifiers = append([]string{ptr.dstHead}, ptr.dstModifiers...)
-	return nextDst
+	ptr.serverModifiers = append([]string{ptr.serverHead}, ptr.serverModifiers...)
+	return nextServer
 }
 
 // AddAddrModifier is a special case of AddDstModifier where the modifier is an address node.
@@ -206,13 +206,13 @@ func (ptr *PointerDef) AddAddrModifier(spec wiring.WiringSpec, addrName string) 
 	}
 
 	// Add a modifier to instantiate address PointsTo
-	nextDst := ptr.AddDstModifier(spec, def.PointsTo)
+	nextServer := ptr.AddDstModifier(spec, def.PointsTo)
 
 	// Set the pointer interface to be the address, rather than the node
 	ptr.interfaceNode = addrName
-	spec.Alias(ptr.srcTail, ptr.interfaceNode)
+	spec.Alias(ptr.clientTail, ptr.interfaceNode)
 
-	return nextDst
+	return nextServer
 }
 
 // If any pointer modifiers are addresses, this will instantiate the server side of the addresses.
@@ -241,16 +241,16 @@ func (ptr *PointerDef) InstantiateDst(namespace wiring.Namespace) error {
 		return nil
 	}
 
-	// Getting the first dst modifier should cause all of the dst side of the pointer to be instantiated
-	var dst ir.IRNode
-	if namespace.Instantiate(ptr.dstModifiers[0], &dst) != nil {
+	// Getting the first server modifier should cause all of the server side of the pointer to be instantiated
+	var server ir.IRNode
+	if namespace.Instantiate(ptr.serverModifiers[0], &server) != nil {
 		return err
 	}
 
 	// Currently we don't support multiple addresses within a pointer; so getting the first dst modifier
 	// should cause a cascade where the addr destination gets set.  Error out if not.
 	if addr.GetDestination() == nil {
-		return namespace.Error("Attempted to instantiate the server-side of address %v starting with %v but the server failed to instantiate", addr.Name(), ptr.dstModifiers[0])
+		return namespace.Error("Attempted to instantiate the server-side of address %v starting with %v but the server failed to instantiate", addr.Name(), ptr.serverModifiers[0])
 	}
 	return nil
 }
