@@ -58,7 +58,7 @@ func Collector(spec wiring.WiringSpec, collectorName string) string {
 	ptr.AddAddrModifier(spec, collectorAddr)
 
 	// Define the Zipkin collector client and add it to the client side of the pointer
-	clientNext := ptr.AddSrcModifier(spec, collectorClient)
+	clientNext := ptr.AddClientModifier(spec, collectorClient)
 	spec.Define(collectorClient, &ZipkinCollectorClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*ZipkinCollectorContainer](ns, clientNext)
 		if err != nil {

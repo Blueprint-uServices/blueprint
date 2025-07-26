@@ -52,7 +52,7 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 	//
 	// The client-side modifier creates an HTTP client and dials the server address.
 	// It assumes that the next src modifier node will be a golangHttpServer address.
-	clientNext := ptr.AddSrcModifier(spec, httpClient)
+	clientNext := ptr.AddClientModifier(spec, httpClient)
 	spec.Define(httpClient, &GolangHttpClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*golangHttpServer](ns, clientNext)
 		if err != nil {

@@ -37,7 +37,7 @@ func AddRetries(spec wiring.WiringSpec, serviceName string, max_retries int64) {
 		return
 	}
 
-	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
+	clientNext := ptr.AddClientModifier(spec, clientWrapper)
 
 	spec.Define(clientWrapper, &RetrierClient{Max: max_retries}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
@@ -88,7 +88,7 @@ func AddRetriesWithFixedDelay(spec wiring.WiringSpec, serviceName string, max_re
 		return
 	}
 
-	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
+	clientNext := ptr.AddClientModifier(spec, clientWrapper)
 
 	spec.Define(clientWrapper, &RetrierExponentialBackoffClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
@@ -106,7 +106,7 @@ func AddRetriesWithFixedDelay(spec wiring.WiringSpec, serviceName string, max_re
 // Modifies the given service such that all clients to that service retry with exponential delay.
 // The `starting_delay` is the first delay to be used before retrying.
 // The retries continue until a `backoff_limit` of delay is reached
-// `useJitter` indicates whether to use jitter in the delay or not, 
+// `useJitter` indicates whether to use jitter in the delay or not,
 // jitter is a random value added to the delay.
 // Usage:
 //
@@ -120,7 +120,7 @@ func AddRetriesWithExponentialBackoff(spec wiring.WiringSpec, serviceName string
 		return
 	}
 
-	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
+	clientNext := ptr.AddClientModifier(spec, clientWrapper)
 
 	spec.Define(clientWrapper, &RetrierExponentialBackoffClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
@@ -149,7 +149,7 @@ func AddRetriesRetryRateLimit(spec wiring.WiringSpec, serviceName string, max_re
 		return
 	}
 
-	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
+	clientNext := ptr.AddClientModifier(spec, clientWrapper)
 
 	spec.Define(clientWrapper, &RetrierRateLimiterClient{Max: max_retries, RetryRateLimit: retry_rate_limit}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service

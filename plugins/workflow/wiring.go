@@ -103,7 +103,7 @@ func Service[ServiceType any](spec wiring.WiringSpec, serviceName string, servic
 
 	// Add a "service.client" node for convenience
 	clientName := serviceName + ".client"
-	clientNext := ptr.AddSrcModifier(spec, clientName)
+	clientNext := ptr.AddClientModifier(spec, clientName)
 	spec.Define(clientName, &workflowClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		client := &workflowClient{}
 		if err := initWorkflowNode[ServiceType](&client.workflowNode, clientName); err != nil {

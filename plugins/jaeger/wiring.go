@@ -64,7 +64,7 @@ func Collector(spec wiring.WiringSpec, collectorName string) string {
 	ptr.AddAddrModifier(spec, collectorAddr)
 
 	// Define the Jaeger client and add it to the client side of the pointer
-	clientNext := ptr.AddSrcModifier(spec, collectorClient)
+	clientNext := ptr.AddClientModifier(spec, collectorClient)
 	spec.Define(collectorClient, &JaegerCollectorClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*JaegerCollectorContainer](ns, clientNext)
 		if err != nil {

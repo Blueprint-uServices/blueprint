@@ -80,7 +80,7 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 		slog.Error("Unable to deploy " + serviceName + " using GoVector as it is not a pointer")
 	}
 
-	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
+	clientNext := ptr.AddClientModifier(spec, clientWrapper)
 
 	spec.Define(clientWrapper, &GovecClientWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service

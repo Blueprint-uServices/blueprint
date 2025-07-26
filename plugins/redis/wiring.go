@@ -43,7 +43,7 @@ func Container(spec wiring.WiringSpec, cacheName string) string {
 	ptr.AddAddrModifier(spec, addrName)
 
 	// Define the Redis client and add it to the client side of the pointer
-	clientNext := ptr.AddSrcModifier(spec, clientName)
+	clientNext := ptr.AddClientModifier(spec, clientName)
 	spec.Define(clientName, &RedisGoClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*RedisContainer](ns, clientNext)
 		if err != nil {

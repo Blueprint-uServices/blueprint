@@ -74,7 +74,7 @@ func instrument(spec wiring.WiringSpec, serviceName string, collectorName string
 	}
 
 	// Add the client wrapper to the pointer src
-	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
+	clientNext := ptr.AddClientModifier(spec, clientWrapper)
 
 	// Define the client wrapper
 	spec.Define(clientWrapper, &OpenTelemetryClientWrapper{}, func(namespace wiring.Namespace) (ir.IRNode, error) {

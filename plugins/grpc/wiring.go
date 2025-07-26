@@ -93,7 +93,7 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 	//
 	// The client-side modifier creates a gRPC client and dials the server address.
 	// It assumes the next src modifier node will be a golangServer address.
-	clientNext := ptr.AddSrcModifier(spec, grpcClient)
+	clientNext := ptr.AddClientModifier(spec, grpcClient)
 	spec.Define(grpcClient, &golangClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*golangServer](namespace, clientNext)
 		if err != nil {

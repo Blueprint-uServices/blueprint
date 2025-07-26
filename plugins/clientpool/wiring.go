@@ -56,7 +56,7 @@ func Create(spec wiring.WiringSpec, serviceName string, numClients int) {
 	}
 
 	// Add the client wrapper to the pointer src
-	clientNext := ptr.AddSrcModifier(spec, poolName)
+	clientNext := ptr.AddClientModifier(spec, poolName)
 
 	// Define the client pool
 	spec.Define(poolName, &ClientPool{}, func(namespace wiring.Namespace) (ir.IRNode, error) {

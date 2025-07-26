@@ -28,7 +28,7 @@ func AddCircuitBreaker(spec wiring.WiringSpec, serviceName string, min_reqs int6
 		return
 	}
 
-	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
+	clientNext := ptr.AddClientModifier(spec, clientWrapper)
 
 	spec.Define(clientWrapper, &CircuitBreakerClient{Min_Reqs: min_reqs, FailureRate: failure_rate}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service

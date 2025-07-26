@@ -78,7 +78,7 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 		slog.Error("Unable to deploy " + serviceName + " using XTrace as it is not a pointer")
 	}
 
-	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
+	clientNext := ptr.AddClientModifier(spec, clientWrapper)
 	spec.Define(clientWrapper, &XtraceClientWrapper{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service
 		if err := ns.Get(clientNext, &wrapped); err != nil {
@@ -117,7 +117,7 @@ func Instrument(spec wiring.WiringSpec, serviceName string) {
 // The generated container has the name `serviceName`.
 // Usage:
 //
-//  xtrace.container(spec, "xtrace_server")
+//	xtrace.container(spec, "xtrace_server")
 func container(spec wiring.WiringSpec, serverName string) string {
 	// The nodes that we are defining
 	xtraceAddr := serverName + ".addr"
@@ -145,7 +145,7 @@ func container(spec wiring.WiringSpec, serverName string) string {
 	ptr.AddAddrModifier(spec, xtraceAddr)
 
 	// Define the X-Trace client and add it to the client side of the pointer
-	clientNext := ptr.AddSrcModifier(spec, xtraceClient)
+	clientNext := ptr.AddClientModifier(spec, xtraceClient)
 	spec.Define(xtraceClient, &XTraceClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*XTraceServerContainer](ns, clientNext)
 		if err != nil {
@@ -171,7 +171,7 @@ func container(spec wiring.WiringSpec, serverName string) string {
 //
 // # Wiring Spec Usage:
 //
-//   xtrace.Logger(spec, "my_process") // Define an xtrace-logger for the process `my_process`
+//	xtrace.Logger(spec, "my_process") // Define an xtrace-logger for the process `my_process`
 func Logger(spec wiring.WiringSpec, processName string) string {
 	logger := "xtrace_logger"
 	xtrace_server := container(spec, default_xtrace_server_name)

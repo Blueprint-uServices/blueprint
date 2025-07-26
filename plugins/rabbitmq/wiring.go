@@ -41,7 +41,7 @@ func Container(spec wiring.WiringSpec, name string, queue_name string) string {
 	ptr.AddAddrModifier(spec, addrName)
 
 	// Define the Rabbitmq client and add it to the client side of the pointer
-	clientNext := ptr.AddSrcModifier(spec, clientName)
+	clientNext := ptr.AddClientModifier(spec, clientName)
 	spec.Define(clientName, &RabbitmqGoClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*RabbitmqContainer](ns, clientNext)
 		if err != nil {

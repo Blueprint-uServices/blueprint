@@ -4,7 +4,8 @@
 // The plugin will generate a wrapper client class that will wait for a fixed amount of time (the specified timeout value) before canceling the context. Once the context is cancelled, the execution returns to the caller.
 //
 // Example Usage to add a "1s" timeout to each request:
-//  timeouts.Add(spec, "my_service", "1s")
+//
+//	timeouts.Add(spec, "my_service", "1s")
 package timeouts
 
 import (
@@ -23,7 +24,8 @@ import (
 // The `timeout` string must be a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "300ms", "1.5h" or "2h45m". Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 //
 // Usage:
-//   Add(spec, "my_service", "1s")
+//
+//	Add(spec, "my_service", "1s")
 func Add(spec wiring.WiringSpec, serviceName string, timeout string) {
 	clientWrapper := serviceName + ".client.timeout"
 
@@ -32,7 +34,7 @@ func Add(spec wiring.WiringSpec, serviceName string, timeout string) {
 		slog.Error("Unable to add timeouts to " + serviceName + " as it is not a pointer")
 	}
 
-	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
+	clientNext := ptr.AddClientModifier(spec, clientWrapper)
 
 	spec.Define(clientWrapper, &TimeoutClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		var wrapped golang.Service

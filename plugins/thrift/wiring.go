@@ -58,7 +58,7 @@ func Deploy(spec wiring.WiringSpec, serviceName string) {
 	//
 	// The client-side modifier creates a Thrift client and dials the server address.
 	// It assumes the next src modifier node will be a golangThriftServer address.
-	clientNext := ptr.AddSrcModifier(spec, thrift_client)
+	clientNext := ptr.AddClientModifier(spec, thrift_client)
 	spec.Define(thrift_client, &golangThriftClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*golangThriftServer](namespace, clientNext)
 		if err != nil {

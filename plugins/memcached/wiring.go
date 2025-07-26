@@ -42,7 +42,7 @@ func Container(spec wiring.WiringSpec, cacheName string) string {
 	ptr.AddAddrModifier(spec, addrName)
 
 	// Define the memcached client add it to the client side of the pointer
-	clientNext := ptr.AddSrcModifier(spec, clientName)
+	clientNext := ptr.AddClientModifier(spec, clientName)
 	spec.Define(clientName, &MemcachedGoClient{}, func(namespace wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*MemcachedContainer](namespace, clientNext)
 		if err != nil {

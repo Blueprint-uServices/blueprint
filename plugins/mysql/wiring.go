@@ -46,7 +46,7 @@ func Container(spec wiring.WiringSpec, dbName string) string {
 	ptr.AddAddrModifier(spec, addrName)
 
 	// Define the MySQL client and add it to the client side of the pointer
-	clientNext := ptr.AddSrcModifier(spec, clientName)
+	clientNext := ptr.AddClientModifier(spec, clientName)
 	spec.Define(clientName, &MySQLDBGoClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*MySQLDBContainer](ns, clientNext)
 		if err != nil {

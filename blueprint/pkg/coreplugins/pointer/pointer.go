@@ -153,11 +153,11 @@ func GetPointer(spec wiring.WiringSpec, name string) *PointerDef {
 // to add functionality like tracing, or to make calls over RPC.
 //
 // A pointer can have multiple modifiers applied to it.  They will be applied in the order
-// that AddSrcModifier was called.
+// that AddClientModifier was called.
 //
-// The return value of AddSrcModifier is the name of the _next_ client side modifier.  This
+// The return value of AddClientModifier is the name of the _next_ client side modifier.  This
 // can be used within the BuildFunc of modifierName.
-func (ptr *PointerDef) AddSrcModifier(spec wiring.WiringSpec, modifierName string) string {
+func (ptr *PointerDef) AddClientModifier(spec wiring.WiringSpec, modifierName string) string {
 	spec.Alias(ptr.clientTail, modifierName)
 	ptr.clientTail = modifierName + ".ptr.src.next"
 	spec.Alias(ptr.clientTail, ptr.interfaceNode)

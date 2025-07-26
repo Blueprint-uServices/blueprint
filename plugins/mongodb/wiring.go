@@ -44,7 +44,7 @@ func Container(spec wiring.WiringSpec, dbName string) string {
 	ptr.AddAddrModifier(spec, addrName)
 
 	// Define the MongoDB client and add it to the client side of the pointer
-	clientNext := ptr.AddSrcModifier(spec, clientName)
+	clientNext := ptr.AddClientModifier(spec, clientName)
 	spec.Define(clientName, &MongoDBGoClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
 		addr, err := address.Dial[*MongoDBContainer](ns, clientNext)
 		if err != nil {
