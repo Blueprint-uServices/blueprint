@@ -2,11 +2,11 @@ package golang_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
 	"github.com/blueprint-uservices/blueprint/runtime/plugins/golang"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -144,7 +144,7 @@ func TestBuildError(t *testing.T) {
 
 	b.Define(key, func(n *golang.Namespace) (any, error) {
 		count = count + 1
-		return nil, fmt.Errorf("uhoh")
+		return nil, errors.Errorf("uhoh")
 	})
 	n, err := b.Build(context.Background())
 	assert.NoError(t, err)

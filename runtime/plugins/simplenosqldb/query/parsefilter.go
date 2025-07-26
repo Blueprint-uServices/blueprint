@@ -1,10 +1,10 @@
 package query
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -29,7 +29,7 @@ func parseQueries(a bson.A) ([]Filter, error) {
 	for _, v := range a {
 		d, isD := v.(bson.D)
 		if !isD {
-			return nil, fmt.Errorf("invalid query %v; expected a bson.D", v)
+			return nil, errors.Errorf("invalid query %v; expected a bson.D", v)
 		}
 		filter, err := parseQuery(d)
 		if err != nil {
@@ -64,11 +64,11 @@ func parseValues(d bson.D) (Filter, error) {
 	var fieldsSeen []string
 	for _, e := range d {
 		if strings.HasPrefix(e.Key, "$") {
-			return nil, fmt.Errorf("values cannot contain operators; found %v in %v", e.Key, d)
+			return nil, errors.Errorf("values cannot contain operators; found %v in %v", e.Key, d)
 		}
 
 		if strings.Contains(e.Key, ".") {
-			return nil, fmt.Errorf("cannot use selector expression %v within value condition %v", e.Key, d)
+			return nil, errors.Errorf("cannot use selector expression %v within value condition %v", e.Key, d)
 		}
 
 		filter, err := parseValue(e.Value)
@@ -90,9 +90,9 @@ func parseValue(value any) (Filter, error) {
 	case bson.A:
 		return parseArrayValues(v)
 	case bson.E:
-		return nil, fmt.Errorf("values must be composed of bson.D, bson.A, or value literals; not bson.E found in %v", v)
+		return nil, errors.Errorf("values must be composed of bson.D, bson.A, or value literals; not bson.E found in %v", v)
 	case bson.M:
-		return nil, fmt.Errorf("values must be composed of bson.D, bson.A, or value literals; not bson.M found in %v", v)
+		return nil, errors.Errorf("values must be composed of bson.D, bson.A, or value literals; not bson.M found in %v", v)
 	default:
 		return Equals(v), nil
 	}
@@ -119,11 +119,11 @@ func parseArrayValues(a bson.A) (Filter, error) {
 				}
 				arrayFilters = append(arrayFilters, Index(i, filter))
 			}
-			return nil, fmt.Errorf("array values must be composed of bson.D or value literals; not bson.A found in %v", v)
+			return nil, errors.Errorf("array values must be composed of bson.D or value literals; not bson.A found in %v", v)
 		case bson.E:
-			return nil, fmt.Errorf("array values must be composed of bson.D or value literals; not bson.E found in %v", v)
+			return nil, errors.Errorf("array values must be composed of bson.D or value literals; not bson.E found in %v", v)
 		case bson.M:
-			return nil, fmt.Errorf("array values must be composed of bson.D or value literals; not bson.M found in %v", v)
+			return nil, errors.Errorf("array values must be composed of bson.D or value literals; not bson.M found in %v", v)
 		default:
 			arrayFilters = append(arrayFilters, Index(i, Equals(v)))
 		}
@@ -142,7 +142,7 @@ func parseFilterCondition(e bson.E) (Filter, error) {
 		return f, err
 	}
 	if strings.HasPrefix(e.Key, "$") {
-		return nil, fmt.Errorf("encountered unexpected condition key %v in %v", e.Key, e)
+		return nil, errors.Errorf("encountered unexpected condition key %v in %v", e.Key, e)
 	}
 
 	// Now we expect a field selector and a condition or a (possibly nested) value
@@ -185,9 +185,9 @@ func parseFilterCondition(e bson.E) (Filter, error) {
 			return Lookup(e.Key, filter), err
 		}
 	case bson.E:
-		return nil, fmt.Errorf("condition values should be specified using bson.D not bson.E")
+		return nil, errors.Errorf("condition values should be specified using bson.D not bson.E")
 	case bson.M:
-		return nil, fmt.Errorf("condition values should be specified using bson.D not bson.M")
+		return nil, errors.Errorf("condition values should be specified using bson.D not bson.M")
 	default:
 		return Lookup(e.Key, Broadcast(Equals(v))), nil
 	}
@@ -202,7 +202,7 @@ func parseLogicalOperator(e bson.E) (Filter, error) {
 		{
 			a, isA := e.Value.(bson.A)
 			if !isA {
-				return nil, fmt.Errorf(`invalid query: "$and" key must correspond to a bson.A value: %v`, e)
+				return nil, errors.Errorf(`invalid query: "$and" key must correspond to a bson.A value: %v`, e)
 			}
 			filters, err := parseQueries(a)
 			return And(filters...), err
@@ -211,7 +211,7 @@ func parseLogicalOperator(e bson.E) (Filter, error) {
 		{
 			d, isD := e.Value.(bson.D)
 			if !isD {
-				return nil, fmt.Errorf(`invalid query: "$not" key must correspond to a bson.D value: %v`, e)
+				return nil, errors.Errorf(`invalid query: "$not" key must correspond to a bson.D value: %v`, e)
 			}
 			filter, err := parseQuery(d)
 			return Not(filter), err
@@ -220,7 +220,7 @@ func parseLogicalOperator(e bson.E) (Filter, error) {
 		{
 			a, isA := e.Value.(bson.A)
 			if !isA {
-				return nil, fmt.Errorf(`invalid query: "$or" key must correspond to a bson.A value: %v`, e)
+				return nil, errors.Errorf(`invalid query: "$or" key must correspond to a bson.A value: %v`, e)
 			}
 			filters, err := parseQueries(a)
 			return Or(filters...), err
@@ -229,7 +229,7 @@ func parseLogicalOperator(e bson.E) (Filter, error) {
 		{
 			a, isA := e.Value.(bson.A)
 			if !isA {
-				return nil, fmt.Errorf(`invalid query: "$nor" key must correspond to a bson.A value: %v`, e)
+				return nil, errors.Errorf(`invalid query: "$nor" key must correspond to a bson.A value: %v`, e)
 			}
 			filters, err := parseQueries(a)
 			return Not(Or(filters...)), err
@@ -261,7 +261,7 @@ func parseArrayOperators(d bson.D) (Filter, error) {
 		return nil, nil
 	}
 	if len(filters) != len(d) {
-		return nil, fmt.Errorf("invalid mix of array and non-array filter operators %v", d)
+		return nil, errors.Errorf("invalid mix of array and non-array filter operators %v", d)
 	}
 
 	return And(filters...), nil
@@ -273,7 +273,7 @@ func parseArrayOperator(e bson.E) (Filter, error) {
 		{
 			values, isA := e.Value.(bson.A)
 			if !isA {
-				return nil, fmt.Errorf("$all must be an array of values but got %v", e)
+				return nil, errors.Errorf("$all must be an array of values but got %v", e)
 			}
 			var valuefilters []Filter
 			for _, value := range values {
@@ -289,7 +289,7 @@ func parseArrayOperator(e bson.E) (Filter, error) {
 		{
 			d, isD := e.Value.(bson.D)
 			if !isD {
-				return nil, fmt.Errorf("$elemMatch must be a bson.D but got %v", e)
+				return nil, errors.Errorf("$elemMatch must be a bson.D but got %v", e)
 			}
 			filter, err := parseQuery(d)
 			return Broadcast(filter), err
@@ -311,7 +311,7 @@ func parseExistsOperators(key string, d bson.D) (Filter, error) {
 					return nil, nil
 				}
 			} else {
-				return nil, fmt.Errorf("$exists requires a bool value but got %v", e)
+				return nil, errors.Errorf("$exists requires a bool value but got %v", e)
 			}
 		}
 	}
@@ -352,7 +352,7 @@ func parseValueOperator(e bson.E) (Filter, error) {
 		{
 			v := reflect.ValueOf(e.Value)
 			if v.Kind() != reflect.Slice {
-				return nil, fmt.Errorf("$in requires a bson.A value or a slice, but got %v", e)
+				return nil, errors.Errorf("$in requires a bson.A value or a slice, but got %v", e)
 			}
 			var filters []Filter
 			for i := 0; i < v.Len(); i++ {
@@ -369,7 +369,7 @@ func parseValueOperator(e bson.E) (Filter, error) {
 		}
 	case "$nin":
 		{
-			return nil, fmt.Errorf("$nin not implemented; use $nor and $in instead")
+			return nil, errors.Errorf("$nin not implemented; use $nor and $in instead")
 			// filter, err := parseValueOperator(bson.E{"$in", e.Value})
 			// return Not(filter), err
 		}
@@ -378,7 +378,7 @@ func parseValueOperator(e bson.E) (Filter, error) {
 			if strval, isStr := e.Value.(string); isStr {
 				return Regex(strval)
 			}
-			return nil, fmt.Errorf("$regex value must be string but got %v", e.Value)
+			return nil, errors.Errorf("$regex value must be string but got %v", e.Value)
 		}
 	case "$text":
 		fallthrough
@@ -389,7 +389,7 @@ func parseValueOperator(e bson.E) (Filter, error) {
 	case "$expr": // not supported
 		fallthrough
 	default:
-		return nil, fmt.Errorf("unsupported operator %v", e)
+		return nil, errors.Errorf("unsupported operator %v", e)
 	}
 }
 

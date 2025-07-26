@@ -10,6 +10,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/pkg/errors"
 	"golang.org/x/exp/slog"
 )
 
@@ -53,13 +54,13 @@ func (r *ServiceRegistry[T]) Get(ctx context.Context) (T, error) {
 	r.isBuilt = true
 
 	if len(r.registered) == 0 {
-		r.buildError = fmt.Errorf("no clients registered for %v", r.name)
+		r.buildError = errors.Errorf("no clients registered for %v", r.name)
 		return r.built, r.buildError
 	}
 
 	buildFunc, hasDefault := r.registered[r.defaultBuildFunc]
 	if !hasDefault {
-		r.buildError = fmt.Errorf("no client called \"%v\" known for %v", r.defaultBuildFunc, r.name)
+		r.buildError = errors.Errorf("no client called \"%v\" known for %v", r.defaultBuildFunc, r.name)
 		return r.built, r.buildError
 	}
 

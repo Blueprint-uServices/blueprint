@@ -1,10 +1,10 @@
 package query
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -61,7 +61,7 @@ func ParseUpdate(update bson.D) (Update, error) {
 				updates = append(updates, adds...)
 			}
 		default:
-			return nil, fmt.Errorf("unsupported update op %v", op.Key)
+			return nil, errors.Errorf("unsupported update op %v", op.Key)
 		}
 	}
 	return UpdateAll(updates), nil
@@ -70,7 +70,7 @@ func ParseUpdate(update bson.D) (Update, error) {
 func parseSet(args any) ([]Update, error) {
 	d, isD := args.(bson.D)
 	if !isD {
-		return nil, fmt.Errorf("invalid $set operator; expected a bson.D, got %v", args)
+		return nil, errors.Errorf("invalid $set operator; expected a bson.D, got %v", args)
 	}
 	var updates []Update
 	for _, e := range d {
@@ -86,7 +86,7 @@ func parseSet(args any) ([]Update, error) {
 func parseUnset(args any) ([]Update, error) {
 	d, isD := args.(bson.D)
 	if !isD {
-		return nil, fmt.Errorf("invalid $unset operator; expected a bson.D, got %v", args)
+		return nil, errors.Errorf("invalid $unset operator; expected a bson.D, got %v", args)
 	}
 	var updates []Update
 	for _, e := range d {
@@ -98,7 +98,7 @@ func parseUnset(args any) ([]Update, error) {
 func parseInc(args any) ([]Update, error) {
 	d, isD := args.(bson.D)
 	if !isD {
-		return nil, fmt.Errorf("invalid $inc operator; expected a bson.D, got %v", args)
+		return nil, errors.Errorf("invalid $inc operator; expected a bson.D, got %v", args)
 	}
 	var updates []Update
 	for _, e := range d {
@@ -118,7 +118,7 @@ func parseInc(args any) ([]Update, error) {
 		// case float32:
 		// 	updates = append(updates, IncFloat(float64(v)))
 		default:
-			return nil, fmt.Errorf("invalid $inc argument; expect an int, got %v %v", reflect.TypeOf(e.Value), e.Value)
+			return nil, errors.Errorf("invalid $inc argument; expect an int, got %v %v", reflect.TypeOf(e.Value), e.Value)
 		}
 	}
 	return updates, nil
@@ -127,7 +127,7 @@ func parseInc(args any) ([]Update, error) {
 func parsePush(args any) ([]Update, error) {
 	d, isD := args.(bson.D)
 	if !isD {
-		return nil, fmt.Errorf("invalid $push operator; expected a bson.D, got %v", args)
+		return nil, errors.Errorf("invalid $push operator; expected a bson.D, got %v", args)
 	}
 	var updates []Update
 	for _, e := range d {
@@ -135,7 +135,7 @@ func parsePush(args any) ([]Update, error) {
 		if ed, eIsD := e.Value.(bson.D); eIsD {
 			for _, e2 := range ed {
 				if strings.HasPrefix(e2.Key, "$") {
-					return nil, fmt.Errorf("modifiers not currently supported for $push operation; got %v", e2)
+					return nil, errors.Errorf("modifiers not currently supported for $push operation; got %v", e2)
 				}
 			}
 		}
@@ -152,7 +152,7 @@ func parsePush(args any) ([]Update, error) {
 func parseAddToSet(args any) ([]Update, error) {
 	d, isD := args.(bson.D)
 	if !isD {
-		return nil, fmt.Errorf("invalid $addToSet operator; expected a bson.D, got %v", args)
+		return nil, errors.Errorf("invalid $addToSet operator; expected a bson.D, got %v", args)
 	}
 	var updates []Update
 	for _, e := range d {
@@ -160,7 +160,7 @@ func parseAddToSet(args any) ([]Update, error) {
 		if ed, eIsD := e.Value.(bson.D); eIsD {
 			for _, e2 := range ed {
 				if strings.HasPrefix(e2.Key, "$") {
-					return nil, fmt.Errorf("modifiers not currently supported for $push operation; got %v", e2)
+					return nil, errors.Errorf("modifiers not currently supported for $push operation; got %v", e2)
 				}
 			}
 		}
@@ -177,7 +177,7 @@ func parseAddToSet(args any) ([]Update, error) {
 func parsePull(args any) ([]Update, error) {
 	d, isD := args.(bson.D)
 	if !isD {
-		return nil, fmt.Errorf("invalid $pull operator; expected a bson.D, got %v", args)
+		return nil, errors.Errorf("invalid $pull operator; expected a bson.D, got %v", args)
 	}
 	var updates []Update
 	for _, e := range d {
@@ -185,7 +185,7 @@ func parsePull(args any) ([]Update, error) {
 		if ed, eIsD := e.Value.(bson.D); eIsD {
 			for _, e2 := range ed {
 				if strings.HasPrefix(e2.Key, "$") {
-					return nil, fmt.Errorf("modifiers not currently supported for $pull operation; got %v", e2)
+					return nil, errors.Errorf("modifiers not currently supported for $pull operation; got %v", e2)
 				}
 			}
 		}
