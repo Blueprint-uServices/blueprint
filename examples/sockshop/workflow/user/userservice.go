@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
+	errors_ "github.com/pkg/errors"
 )
 
 type (
@@ -210,16 +211,16 @@ var (
 
 func (u *User) validate() error {
 	if u.FirstName == "" {
-		return fmt.Errorf(errMissingField, "FirstName")
+		return errors_.Errorf(errMissingField, "FirstName")
 	}
 	if u.LastName == "" {
-		return fmt.Errorf(errMissingField, "LastName")
+		return errors_.Errorf(errMissingField, "LastName")
 	}
 	if u.Username == "" {
-		return fmt.Errorf(errMissingField, "Username")
+		return errors_.Errorf(errMissingField, "Username")
 	}
 	if u.Password == "" {
-		return fmt.Errorf(errMissingField, "Password")
+		return errors_.Errorf(errMissingField, "Password")
 	}
 	return nil
 }
