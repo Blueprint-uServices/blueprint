@@ -3,13 +3,13 @@ package frontend
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/cart"
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/catalogue"
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/order"
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/user"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 type (
@@ -146,14 +146,14 @@ func (f *frontend) DeleteCart(ctx context.Context, sessionID string) error {
 // GetUser implements Frontend.
 func (f *frontend) GetUser(ctx context.Context, userID string) (user.User, error) {
 	if userID == "" {
-		return user.User{}, fmt.Errorf("no userID specified")
+		return user.User{}, errors.Errorf("no userID specified")
 	}
 
 	users, err := f.user.GetUsers(ctx, userID)
 	if err != nil {
 		return user.User{}, err
 	} else if len(users) == 0 {
-		return user.User{}, fmt.Errorf("invalid userID %v", userID)
+		return user.User{}, errors.Errorf("invalid userID %v", userID)
 	} else {
 		return users[0], nil
 	}
@@ -162,13 +162,13 @@ func (f *frontend) GetUser(ctx context.Context, userID string) (user.User, error
 // GetAddresses implements Frontend.
 func (f *frontend) GetAddress(ctx context.Context, addressID string) (user.Address, error) {
 	if addressID == "" {
-		return user.Address{}, fmt.Errorf("no addressID specified")
+		return user.Address{}, errors.Errorf("no addressID specified")
 	}
 	addrs, err := f.user.GetAddresses(ctx, addressID)
 	if err != nil {
 		return user.Address{}, err
 	} else if len(addrs) == 0 {
-		return user.Address{}, fmt.Errorf("invalid addressID %v", addressID)
+		return user.Address{}, errors.Errorf("invalid addressID %v", addressID)
 	} else {
 		return addrs[0], nil
 	}
@@ -177,13 +177,13 @@ func (f *frontend) GetAddress(ctx context.Context, addressID string) (user.Addre
 // GetCards implements Frontend.
 func (f *frontend) GetCard(ctx context.Context, cardID string) (user.Card, error) {
 	if cardID == "" {
-		return user.Card{}, fmt.Errorf("no cardID specified")
+		return user.Card{}, errors.Errorf("no cardID specified")
 	}
 	cards, err := f.user.GetCards(ctx, cardID)
 	if err != nil {
 		return user.Card{}, err
 	} else if len(cards) == 0 {
-		return user.Card{}, fmt.Errorf("invalid cardID %v", cardID)
+		return user.Card{}, errors.Errorf("invalid cardID %v", cardID)
 	} else {
 		return cards[0], nil
 	}
@@ -197,7 +197,7 @@ func (f *frontend) GetOrder(ctx context.Context, orderID string) (order.Order, e
 // GetOrders implements Frontend.
 func (f *frontend) GetOrders(ctx context.Context, userID string) ([]order.Order, error) {
 	if userID == "" {
-		return nil, fmt.Errorf("no userID specified")
+		return nil, errors.Errorf("no userID specified")
 	}
 	return f.order.GetOrders(ctx, userID)
 }

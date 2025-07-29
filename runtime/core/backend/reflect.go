@@ -1,14 +1,15 @@
 package backend
 
 import (
-	"fmt"
 	"reflect"
+
+	"github.com/pkg/errors"
 )
 
 func GetPointerValue(val any) (any, error) {
 	val_ptr := reflect.ValueOf(val)
 	if val_ptr.Kind() != reflect.Pointer {
-		return nil, fmt.Errorf("cannot indirect non-pointer type %v", val)
+		return nil, errors.Errorf("cannot indirect non-pointer type %v", val)
 	}
 	return reflect.Indirect(val_ptr).Interface(), nil
 }
@@ -21,7 +22,7 @@ src can be anything; dst must be a pointer to the same type as src
 func CopyResult(src any, dst any) error {
 	dst_ptr := reflect.ValueOf(dst)
 	if dst_ptr.Kind() != reflect.Pointer || dst_ptr.IsNil() {
-		return fmt.Errorf("unable to copy result to type %v", reflect.TypeOf(dst))
+		return errors.Errorf("unable to copy result to type %v", reflect.TypeOf(dst))
 	}
 	dst_val := reflect.Indirect(dst_ptr)
 	src_val := reflect.ValueOf(src)
@@ -41,7 +42,7 @@ func CopyResult(src any, dst any) error {
 		return nil
 	} else {
 		if !src_val.Type().AssignableTo(dst_val.Type()) {
-			return fmt.Errorf("unable to copy incompatible types %v and %v", src_val.Type(), dst_val.Type())
+			return errors.Errorf("unable to copy incompatible types %v and %v", src_val.Type(), dst_val.Type())
 		}
 		dst_val.Set(src_val)
 		return nil
@@ -54,7 +55,7 @@ Sets the zero value of a pointer
 func SetZero(dst any) error {
 	receiver_ptr := reflect.ValueOf(dst)
 	if receiver_ptr.Kind() != reflect.Pointer || receiver_ptr.IsNil() {
-		return fmt.Errorf("unable to copy result to type %v", reflect.TypeOf(dst))
+		return errors.Errorf("unable to copy result to type %v", reflect.TypeOf(dst))
 	}
 	reflect.Indirect(receiver_ptr).SetZero()
 	return nil

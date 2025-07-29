@@ -7,9 +7,9 @@ package shipping
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -56,7 +56,7 @@ func (service *shippingImpl) PostShipping(ctx context.Context, shipment Shipment
 	if err != nil {
 		return shipment, err
 	} else if !shipped {
-		return shipment, fmt.Errorf("Unable to submit shipment %v %v to the shipping queue", shipment.ID, shipment.Name)
+		return shipment, errors.Errorf("Unable to submit shipment %v %v to the shipping queue", shipment.ID, shipment.Name)
 	}
 
 	// Insert into the shipment DB
@@ -74,7 +74,7 @@ func (s *shippingImpl) GetShipment(ctx context.Context, id string) (Shipment, er
 	if err != nil {
 		return Shipment{}, err
 	} else if !shipmentExists {
-		return Shipment{}, fmt.Errorf("unknown shipment %v", id)
+		return Shipment{}, errors.Errorf("unknown shipment %v", id)
 	}
 	return shipment, nil
 }
@@ -85,7 +85,7 @@ func (s *shippingImpl) UpdateStatus(ctx context.Context, id string, status strin
 	if err != nil {
 		return err
 	} else if updated == 0 {
-		return fmt.Errorf("unknown shipment %v", id)
+		return errors.Errorf("unknown shipment %v", id)
 	}
 	return nil
 }

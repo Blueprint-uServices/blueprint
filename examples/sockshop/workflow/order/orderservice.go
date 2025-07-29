@@ -6,7 +6,6 @@ package order
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
@@ -16,6 +15,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/examples/sockshop/workflow/user"
 	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -87,7 +87,7 @@ func (s *orderImpl) GetOrder(ctx context.Context, orderID string) (Order, error)
 		return Order{}, err
 	}
 	if !hasResult {
-		return Order{}, fmt.Errorf("order %v does not exist", orderID)
+		return Order{}, errors.Errorf("order %v does not exist", orderID)
 	}
 	return order, nil
 }
@@ -110,13 +110,13 @@ func (s *orderImpl) GetOrders(ctx context.Context, customerID string) ([]Order, 
 func (s *orderImpl) NewOrder(ctx context.Context, customerID, addressID, cardID, cartID string) (Order, error) {
 	// All arguments must be provided
 	if customerID == "" {
-		return Order{}, fmt.Errorf("missing customerID")
+		return Order{}, errors.Errorf("missing customerID")
 	} else if addressID == "" {
-		return Order{}, fmt.Errorf("missing addressID")
+		return Order{}, errors.Errorf("missing addressID")
 	} else if cardID == "" {
-		return Order{}, fmt.Errorf("missing cardID")
+		return Order{}, errors.Errorf("missing cardID")
 	} else if cartID == "" {
-		return Order{}, fmt.Errorf("missing cartID")
+		return Order{}, errors.Errorf("missing cartID")
 	}
 
 	// Fetch data concurrently
@@ -153,13 +153,13 @@ func (s *orderImpl) NewOrder(ctx context.Context, customerID, addressID, cardID,
 		return Order{}, err
 	}
 	if len(items) == 0 {
-		return Order{}, fmt.Errorf("no items in cart")
+		return Order{}, errors.Errorf("no items in cart")
 	} else if len(users) == 0 {
-		return Order{}, fmt.Errorf("unknown customer %v", customerID)
+		return Order{}, errors.Errorf("unknown customer %v", customerID)
 	} else if len(addresses) == 0 {
-		return Order{}, fmt.Errorf("invalid address %v", addressID)
+		return Order{}, errors.Errorf("invalid address %v", addressID)
 	} else if len(cards) == 0 {
-		return Order{}, fmt.Errorf("invalid card %v", cardID)
+		return Order{}, errors.Errorf("invalid card %v", cardID)
 	}
 
 	// Calculate total and authorize payment.
@@ -168,7 +168,7 @@ func (s *orderImpl) NewOrder(ctx context.Context, customerID, addressID, cardID,
 	if err != nil {
 		return Order{}, err
 	} else if !auth.Authorised {
-		return Order{}, fmt.Errorf("payment not authorized due to %v", auth.Message)
+		return Order{}, errors.Errorf("payment not authorized due to %v", auth.Message)
 	}
 
 	// Submit the shipment

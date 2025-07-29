@@ -10,6 +10,8 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+
+	errors_ "github.com/pkg/errors"
 )
 
 // PaymentService provides payment services
@@ -27,7 +29,7 @@ type Authorisation struct {
 func NewPaymentService(ctx context.Context, declineOverAmount string) (PaymentService, error) {
 	amount, err := strconv.ParseFloat(declineOverAmount, 32)
 	if err != nil {
-		return nil, fmt.Errorf("invalid declineOverAmount %v; expected a float32", declineOverAmount)
+		return nil, errors_.Errorf("invalid declineOverAmount %v; expected a float32", declineOverAmount)
 	}
 	return &paymentImpl{
 		declineOverAmount: float32(amount),

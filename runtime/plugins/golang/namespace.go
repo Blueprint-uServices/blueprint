@@ -19,6 +19,7 @@ import (
 	"sync"
 
 	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
+	"github.com/pkg/errors"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slog"
 )
@@ -329,7 +330,7 @@ func (b *NamespaceBuilder) parseFlags() {
 		} else {
 			name := node.name
 			b.Define(node.name, func(n *Namespace) (any, error) {
-				return nil, fmt.Errorf("Required argument %v is not set", name)
+				return nil, errors.Errorf("Required argument %v is not set", name)
 			})
 		}
 	}
@@ -347,7 +348,7 @@ func (b *NamespaceBuilder) checkRequired(parent *Namespace) error {
 		missing = append(missing, node.name)
 	}
 	if len(missing) > 0 {
-		return fmt.Errorf("missing required argnodes [%v]", strings.Join(missing, ", "))
+		return errors.Errorf("missing required argnodes [%v]", strings.Join(missing, ", "))
 	}
 	return nil
 }
@@ -413,7 +414,7 @@ func (n *Namespace) Get(name string, receiver any) error {
 	if n.parent != nil {
 		return n.parent.Get(name, receiver)
 	}
-	return fmt.Errorf("%v unknown %v", n.name, name)
+	return errors.Errorf("%v unknown %v", n.name, name)
 }
 
 // ctx can be used by any [BuildFunc] that wants to start background goroutines,

@@ -1,8 +1,7 @@
 package wiring
 
 import (
-	"fmt"
-
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 )
 
@@ -69,7 +68,7 @@ func (handler *applicationNamespaceHandler) Accepts(any) bool {
 
 // NamespaceHandler
 func (handler *applicationNamespaceHandler) AddEdge(name string, node ir.IRNode) error {
-	return fmt.Errorf("BlueprintApplication %v encountered unexpected edge %v %v", handler.app.ApplicationName, name, node)
+	return blueprint.Errorf("BlueprintApplication %v encountered unexpected edge %v %v", handler.app.ApplicationName, name, node)
 }
 
 // NamespaceHandler

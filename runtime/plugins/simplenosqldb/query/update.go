@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/bsontype"
 )
@@ -172,12 +173,12 @@ func (s *set) Apply(itemRef any) error {
 
 	dst_ptr := reflect.ValueOf(itemRef)
 	if dst_ptr.Kind() != reflect.Pointer || dst_ptr.IsNil() {
-		return fmt.Errorf("set unable to apply update to non-pointer type %v", reflect.TypeOf(itemRef))
+		return errors.Errorf("set unable to apply update to non-pointer type %v", reflect.TypeOf(itemRef))
 	}
 	dst_val := reflect.Indirect(dst_ptr)
 
 	if dst_val.Kind() != reflect.Interface {
-		return fmt.Errorf("set unable to apply update to non-interface type %v", reflect.TypeOf(dst_val))
+		return errors.Errorf("set unable to apply update to non-interface type %v", reflect.TypeOf(dst_val))
 	}
 
 	dst_val.Set(reflect.ValueOf(v))
@@ -203,7 +204,7 @@ func (p *push) Apply(itemRef any) error {
 
 	a, isA := itemVal.(bson.A)
 	if !isA {
-		return fmt.Errorf("push expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+		return errors.Errorf("push expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
 	}
 
 	a = append(a, v)
@@ -228,7 +229,7 @@ func (p *addtoset) Apply(itemRef any) error {
 
 	a, isA := itemVal.(bson.A)
 	if !isA {
-		return fmt.Errorf("expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+		return errors.Errorf("expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
 	}
 
 	// Check if it exists
@@ -254,7 +255,7 @@ func (p *pull) Apply(itemRef any) error {
 
 	a, isA := itemVal.(bson.A)
 	if !isA {
-		return fmt.Errorf("pull expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+		return errors.Errorf("pull expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
 	}
 
 	var updated bson.A
@@ -283,7 +284,7 @@ func (u *unsetfield) Apply(itemRef any) error {
 
 	v, isD := itemVal.(bson.D)
 	if !isD {
-		return fmt.Errorf("unsetfield expected a bson.D but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+		return errors.Errorf("unsetfield expected a bson.D but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
 	}
 
 	// See if the key exists within the document; if so remove it
@@ -304,7 +305,7 @@ func (u *unsetelement) Apply(itemRef any) error {
 
 	v, isA := itemVal.(bson.A)
 	if !isA {
-		return fmt.Errorf("unsetelement expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+		return errors.Errorf("unsetelement expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
 	}
 
 	// Ensure the slice length
@@ -340,7 +341,7 @@ func (i *incint) Apply(itemRef any) error {
 	case int:
 		return backend.CopyResult(v+int(i.amount), itemRef)
 	default:
-		return fmt.Errorf("incint unable to increment non-integer %v", itemVal)
+		return errors.Errorf("incint unable to increment non-integer %v", itemVal)
 	}
 }
 
@@ -356,7 +357,7 @@ func (s *updatefield) Apply(itemRef any) error {
 
 	v, isD := itemVal.(bson.D)
 	if !isD {
-		return fmt.Errorf("updatefield expected a bson.D but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+		return errors.Errorf("updatefield expected a bson.D but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
 	}
 
 	// See if the key exists within the document; if so update in place
@@ -393,7 +394,7 @@ func (s *updateindex) Apply(itemRef any) error {
 
 	v, isA := itemVal.(bson.A)
 	if !isA {
-		return fmt.Errorf("updateindex expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
+		return errors.Errorf("updateindex expected a bson.A but instead found a %v %v", reflect.TypeOf(itemVal), itemVal)
 	}
 
 	// Ensure the slice length
@@ -428,7 +429,7 @@ func (a *updateall) Apply(itemRef any) error {
 func (b *broadcastupdate) Apply(itemRef any) error {
 	item_ptr := reflect.ValueOf(itemRef)
 	if item_ptr.Kind() != reflect.Pointer {
-		return fmt.Errorf("broadcastupdate expect ptr type but got %v", reflect.TypeOf(itemRef))
+		return errors.Errorf("broadcastupdate expect ptr type but got %v", reflect.TypeOf(itemRef))
 	}
 	item_val := reflect.Indirect(item_ptr)
 

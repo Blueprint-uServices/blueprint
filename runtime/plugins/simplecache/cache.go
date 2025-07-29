@@ -3,10 +3,10 @@ package simplecache
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
+	"github.com/pkg/errors"
 )
 
 // A simple map-based cache that implements the [backend.Cache] interface
@@ -39,7 +39,7 @@ func (cache *SimpleCache) Get(ctx context.Context, key string, val interface{}) 
 
 func (cache *SimpleCache) Mset(ctx context.Context, keys []string, values []interface{}) error {
 	if len(keys) != len(values) {
-		return fmt.Errorf("mset received %v keys but %v values", len(keys), len(values))
+		return errors.Errorf("mset received %v keys but %v values", len(keys), len(values))
 	}
 
 	for i, key := range keys {
@@ -53,7 +53,7 @@ func (cache *SimpleCache) Mset(ctx context.Context, keys []string, values []inte
 }
 func (cache *SimpleCache) Mget(ctx context.Context, keys []string, values []interface{}) error {
 	if len(keys) != len(values) {
-		return fmt.Errorf("mget received %v keys but %v values", len(keys), len(values))
+		return errors.Errorf("mget received %v keys but %v values", len(keys), len(values))
 	}
 
 	for i, key := range keys {

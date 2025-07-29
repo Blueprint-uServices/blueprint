@@ -12,6 +12,7 @@ import (
 
 	"github.com/blueprint-uservices/blueprint/runtime/core/backend"
 	"github.com/blueprint-uservices/blueprint/runtime/plugins/simplenosqldb/query"
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -71,7 +72,7 @@ func (c *SimpleCursor) One(ctx context.Context, obj interface{}) (bool, error) {
 func copyResult(src []bson.D, dst any) error {
 	dst_ptr := reflect.ValueOf(dst)
 	if dst_ptr.Kind() != reflect.Pointer || dst_ptr.IsNil() {
-		return fmt.Errorf("unable to copy result to type %v", reflect.TypeOf(dst))
+		return errors.Errorf("unable to copy result to type %v", reflect.TypeOf(dst))
 	}
 	dst_val := reflect.Indirect(dst_ptr)
 
@@ -88,7 +89,7 @@ func copyResult(src []bson.D, dst any) error {
 		return nil
 	}
 
-	return fmt.Errorf("cannot copy slice results to non-slice %v", dst)
+	return errors.Errorf("cannot copy slice results to non-slice %v", dst)
 }
 
 func (c *SimpleCursor) All(ctx context.Context, obj interface{}) error {
