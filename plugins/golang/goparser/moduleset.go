@@ -55,6 +55,11 @@ func (set *ParsedModuleSet) AddModule(srcDir string) (*ParsedModule, error) {
 	return set.ModuleDirs[srcDir], nil
 }
 
+// Avoids parsing the same srcDir multiple times.
+// the line that checks _, exists := set.ModuleDirs[srcDir] doesn't cache parsing when
+// it's a different ParsedModuleSet instance.
+var parsedModules = make(map[string]*ParsedModule)
+
 // Manually parse and add multiple modules to the set.
 //
 // Equivalent to calling [AddModule] for each srcDir. If a srcDir has already
@@ -82,11 +87,17 @@ func (set *ParsedModuleSet) AddModules(srcDirs ...string) error {
 			}
 		}
 
+		if mod, exists := parsedModules[srcDir]; exists {
+			newModules = append(newModules, mod)
+			continue
+		}
+
 		// Parse it
 		if mod == nil {
 			if mod, err = parseModule(srcDir); err != nil {
 				return err
 			}
+			parsedModules[srcDir] = mod
 		}
 
 		// Does the same module exist in multiple different directories?
