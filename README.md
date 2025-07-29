@@ -53,6 +53,8 @@ If you are looking for the artifact that was evaluated for the SOSP paper, it ca
 
 We are a team of researchers:
  * [Vaastav Anand](https://vaastavanand.com/), PhD student at the Max Planck Institute for Software Systems (MPI-SWS)
+ * [Deepak Garg](https://people.mpi-sws.org/~dg/), Faculty at the Max Planck Institute for Software Systems (MPI-SWS)
+ * [Antoine Kaufmann](https://people.mpi-sws.org/~antoinek/), Faculty at the Max Planck Institute for Software Systems (MPI-SWS)
  * [Jonathan Mace](https://www.microsoft.com/en-us/research/people/jonathanmace/), Researcher at Microsoft Research and Adjunct Faculty at the Max Planck Institute for Software Systems (MPI-SWS)
 
 If you are interested in contributing, please contact us on Slack!
