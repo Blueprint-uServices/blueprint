@@ -103,7 +103,12 @@ func (e *Engine) RunOpenLoop(ctx context.Context) {
 	}()
 
 	// Sleep for the desired duration while the requests are launched in the background
-	time.Sleep(e.Duration)
+	sleep_timer := time.NewTimer(e.Duration)
+	defer sleep_timer.Stop()
+	select {
+	case <-ctx.Done():
+	case <-sleep_timer.C:
+	}
 	stop <- true
 	// Wait for all the launched routines to finish
 	wg.Wait()
