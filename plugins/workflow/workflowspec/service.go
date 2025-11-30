@@ -18,6 +18,9 @@ type Service struct {
 
 	// The constructor func of the service
 	Constructor *goparser.ParsedFunc
+
+	// The implementations of the methods in the Interface
+	MethodImpls map[string]*goparser.ParsedFunc
 }
 
 // Get all modules containing definitions for this service.
@@ -91,6 +94,7 @@ func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*
 	service := &Service{
 		Iface:       validIfaces[0],
 		Constructor: constructors[0],
+		MethodImpls: struc.Methods,
 	}
 	slog.Info(fmt.Sprintf("Located %v (%v) in package %v", struc.Name, constructors[0].Name, validIfaces[0].File.Package.Name))
 	return service, nil

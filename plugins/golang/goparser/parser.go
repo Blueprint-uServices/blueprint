@@ -91,8 +91,10 @@ type (
 
 	ParsedFunc struct {
 		gocode.Func
-		File *ParsedFile
-		Ast  *ast.FuncType
+		File     *ParsedFile
+		Ast      *ast.FuncType
+		Body     *ast.BlockStmt
+		Receiver *ast.FieldList
 	}
 
 	// Currently we save var statements but don't do anything with them
@@ -635,6 +637,8 @@ func (f *ParsedFile) LoadFuncs() error {
 		fun.Ast = d.Type
 		fun.File = f
 		fun.Name = d.Name.Name
+		fun.Body = d.Body
+		fun.Receiver = d.Recv
 
 		if d.Recv == nil {
 			// This function is not associated with a struct, but it might still be a constructor
