@@ -20,7 +20,7 @@ type Service struct {
 	Constructor *goparser.ParsedFunc
 
 	// The implementations of the methods in the Interface
-	MethodImpls map[string]*goparser.ParsedFunc
+	Struct *goparser.ParsedStruct
 }
 
 // Get all modules containing definitions for this service.
@@ -94,7 +94,7 @@ func (spec *WorkflowSpec) makeServiceFromStruct(struc *goparser.ParsedStruct) (*
 	service := &Service{
 		Iface:       validIfaces[0],
 		Constructor: constructors[0],
-		MethodImpls: struc.Methods,
+		Struct:      struc,
 	}
 	slog.Info(fmt.Sprintf("Located %v (%v) in package %v", struc.Name, constructors[0].Name, validIfaces[0].File.Package.Name))
 	return service, nil
@@ -112,9 +112,21 @@ func (spec *WorkflowSpec) makeServiceFromInterface(iface *goparser.ParsedInterfa
 	if len(constructors) > 1 {
 		slog.Warn(fmt.Sprintf("multiple constructors of interface %v found; using %v", iface.Name, constructors[0].Name))
 	}
+
+	structs := spec.findStructsFor(iface)
+	if len(structs) == 0 {
+		return nil, blueprint.Errorf("No valid struct found for interface %v", iface)
+	}
+	if len(structs) > 1 {
+		slog.Warn(fmt.Sprintf("multiple strucs implement the interface %v", iface))
+	}
+
+	// TODO: Ideally match the struct with its corresponding constructor here
+
 	service := &Service{
 		Iface:       iface,
 		Constructor: constructors[0],
+		Struct:      structs[0],
 	}
 	slog.Info(fmt.Sprintf("Located %v (%v) in package %v", iface.Name, constructors[0].Name, iface.File.Package.Name))
 	return service, nil
@@ -162,6 +174,23 @@ func (spec *WorkflowSpec) findInterfacesFor(struc *goparser.ParsedStruct) []*gop
 		}
 	}
 	return ifaces
+}
+
+/*
+For a parsed interface, finds all valid struct that implement the provided interface
+*/
+func (spec *WorkflowSpec) findStructsFor(iface *goparser.ParsedInterface) []*goparser.ParsedStruct {
+	var structs []*goparser.ParsedStruct
+	for _, mod := range spec.Modules.Modules {
+		for _, pkg := range mod.Packages {
+			for _, struc := range pkg.Structs {
+				if valid, _ := implements(struc, iface); valid {
+					structs = append(structs, struc)
+				}
+			}
+		}
+	}
+	return structs
 }
 
 /*
