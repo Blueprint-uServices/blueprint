@@ -11,6 +11,12 @@ type IRNode interface {
 	String() string
 }
 
+// Nodes that have IRNodes as children implement this interface
+type HasIRChildren interface {
+	GetNodes() []IRNode
+	ImplementsHasIRChildren()
+}
+
 // Metadata is an IR node that exists in the IR of an application but does not build
 // any artifacts or provide configuration or anything like that.
 type IRMetadata interface {
@@ -65,6 +71,7 @@ type ArtifactGenerator interface {
 type ApplicationNode struct {
 	IRNode
 	ArtifactGenerator
+	HasIRChildren
 
 	ApplicationName string
 	Children        []IRNode
@@ -81,4 +88,30 @@ func (node *ApplicationNode) String() string {
 
 func (app *ApplicationNode) GenerateArtifacts(dir string) error {
 	return defaultBuilders.buildAll(dir, app.Children)
+}
+
+func (app *ApplicationNode) GetNodes() []IRNode {
+	return app.Children
+}
+
+func (app *ApplicationNode) ImplementsHasIRChildren() {}
+
+func (app *ApplicationNode) GetAllIRNodes() []IRNode {
+	return getNodes(app)
+}
+
+func getNodes(node IRNode) []IRNode {
+	var nodes []IRNode
+	// Add self node
+	nodes = append(nodes, node)
+	haschildren, ok := node.(HasIRChildren)
+	if ok {
+		children := haschildren.GetNodes()
+		for _, child := range children {
+			// Recursively add all child nodes
+			children = getNodes(child)
+			nodes = append(nodes, children...)
+		}
+	}
+	return nodes
 }

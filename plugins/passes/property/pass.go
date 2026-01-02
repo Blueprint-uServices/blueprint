@@ -6,6 +6,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/analysis"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
+	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
 
 type PropertyPrintPass struct {
@@ -24,6 +25,13 @@ func (p *PropertyPrintPass) Analyze(spec wiring.WiringSpec, app *ir.ApplicationN
 		for k, v := range def.Properties {
 			log.Printf("\t%v : %v\n", k, v)
 		}
+	}
+	all_nodes := app.GetAllIRNodes()
+	handlers := workflow.FilterWorkflowNodes(all_nodes)
+	log.Println("Application has ", len(all_nodes), " nodes")
+	log.Println("Application has ", len(handlers), " handlers")
+	for _, handler := range handlers {
+		log.Printf("Handler %v has %d methods\n", handler.Name(), len(handler.ServiceInfo.Struct.Methods))
 	}
 	return false, nil
 }

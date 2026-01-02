@@ -9,6 +9,7 @@ var generatedModulePrefix = "blueprint/goproc"
 // An IRNode representing a golang process, which is a collection of application-level golang instances.
 type Process struct {
 	/* The implemented build targets for golang.Process nodes */
+	ir.HasIRChildren
 	filesystemDeployer /* Can be deployed as a basic go process; implemented in deploy.go */
 	linuxDeployer      /* Can be deployed to linux; implemented in deploylinux.go */
 
@@ -39,3 +40,11 @@ func (proc *Process) Name() string {
 func (proc *Process) String() string {
 	return ir.PrettyPrintNamespace(proc.InstanceName, "GolangProcessNode", proc.Edges, proc.Nodes)
 }
+
+// Implements ir.HasIRChildren
+func (proc *Process) GetNodes() []ir.IRNode {
+	return proc.Nodes
+}
+
+// Implements ir.HasIRChildren
+func (proc *Process) ImplementsHasIRChildren() {}
