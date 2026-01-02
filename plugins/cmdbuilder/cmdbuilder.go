@@ -128,7 +128,7 @@ func MakeAndExecuteWithPasses(name string, passes []analysis.IRAnalysisPass, spe
 		os.Exit(1)
 	}
 
-	builder.Passes = passes
+	builder.RegisterPasses(passes...)
 
 	if err := builder.Build(); err != nil {
 		slog.Error(err.Error())
@@ -147,6 +147,10 @@ func (b *CmdBuilder) Add(specs ...SpecOption) {
 	for _, spec := range specs {
 		b.Registry[spec.Name] = spec
 	}
+}
+
+func (b *CmdBuilder) RegisterPasses(passes ...analysis.IRAnalysisPass) {
+	b.Passes = append(b.Passes, passes...)
 }
 
 func (b *CmdBuilder) ParseArgs() {
@@ -226,9 +230,14 @@ func (b *CmdBuilder) Build() error {
 	// Run any analysis passes
 	for _, pass := range b.Passes {
 		slog.Info(fmt.Sprintf("Running analysis pass %s on the IR", pass.Name()))
-		_, err := pass.Analyze(b.IR)
+		is_modified, err := pass.Analyze(b.Wiring, b.IR)
 		if err != nil {
 			return blueprint.Errorf("analysis pass %s was unsuccessful due to %v", pass.Name(), err.Error())
+		}
+		if is_modified {
+			slog.Info(fmt.Sprintf("Analysis Pass %s successfully modified the IR", pass.Name()))
+		} else {
+			slog.Info(fmt.Sprintf("Analysis Pass %s successfully analysed the IR", pass.Name()))
 		}
 	}
 
