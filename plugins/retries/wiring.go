@@ -22,6 +22,8 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+var prop_MAXRETRY = "Retry-Max"
+
 // Add retrier functionality to all clients of the specified service.
 // Uses a [blueprint.WiringSpec]
 // Modifies the given service such that all clients to that service retry `max_retries` number of times on error.
@@ -30,6 +32,8 @@ import (
 //	AddRetries(spec, "my_service", 10)
 func AddRetries(spec wiring.WiringSpec, serviceName string, max_retries int64) {
 	clientWrapper := serviceName + ".client.retrier"
+
+	spec.AddProperty(clientWrapper, prop_MAXRETRY, max_retries)
 
 	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {
@@ -82,6 +86,8 @@ func AddRetriesWithTimeouts(spec wiring.WiringSpec, serviceName string, max_retr
 func AddRetriesWithFixedDelay(spec wiring.WiringSpec, serviceName string, max_retries int64, delay string) {
 	clientWrapper := serviceName + ".client.retrierfd"
 
+	spec.AddProperty(clientWrapper, prop_MAXRETRY, max_retries)
+
 	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {
 		slog.Error("Unable to add retries to " + serviceName + " as it is not a pointer")
@@ -106,13 +112,13 @@ func AddRetriesWithFixedDelay(spec wiring.WiringSpec, serviceName string, max_re
 // Modifies the given service such that all clients to that service retry with exponential delay.
 // The `starting_delay` is the first delay to be used before retrying.
 // The retries continue until a `backoff_limit` of delay is reached
-// `useJitter` indicates whether to use jitter in the delay or not, 
+// `useJitter` indicates whether to use jitter in the delay or not,
 // jitter is a random value added to the delay.
 // Usage:
 //
 //	AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s", false)
 func AddRetriesWithExponentialBackoff(spec wiring.WiringSpec, serviceName string, starting_delay string, backoff_limit string, useJitter bool) {
-	clientWrapper := serviceName + ".client.retrierfd"
+	clientWrapper := serviceName + ".client.retriereb"
 
 	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {
@@ -141,7 +147,9 @@ func AddRetriesWithExponentialBackoff(spec wiring.WiringSpec, serviceName string
 //
 //	AddRetriesRetryRateLimit(spec, "my_service", 10, 100)
 func AddRetriesRetryRateLimit(spec wiring.WiringSpec, serviceName string, max_retries int64, retry_rate_limit int64) {
-	clientWrapper := serviceName + ".client.retrier"
+	clientWrapper := serviceName + ".client.retrierrl"
+
+	spec.AddProperty(clientWrapper, prop_MAXRETRY, max_retries)
 
 	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {

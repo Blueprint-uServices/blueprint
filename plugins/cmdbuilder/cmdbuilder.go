@@ -61,6 +61,7 @@ import (
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/logging"
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/analysis"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/plugins/dockercompose"
@@ -94,6 +95,7 @@ type CmdBuilder struct {
 	Spec      SpecOption
 	Wiring    wiring.WiringSpec
 	IR        *ir.ApplicationNode
+	Passes    []analysis.IRAnalysisPass
 
 	Registry map[string]SpecOption
 }
@@ -116,6 +118,24 @@ func MakeAndExecute(name string, specs ...SpecOption) {
 	}
 }
 
+func MakeAndExecuteWithPasses(name string, passes []analysis.IRAnalysisPass, specs ...SpecOption) {
+	builder := NewCmdBuilder(name)
+	builder.Add(specs...)
+
+	builder.ParseArgs()
+	if err := builder.ValidateArgs(); err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
+
+	builder.RegisterPasses(passes...)
+
+	if err := builder.Build(); err != nil {
+		slog.Error(err.Error())
+		os.Exit(2)
+	}
+}
+
 func NewCmdBuilder(applicationName string) *CmdBuilder {
 	builder := CmdBuilder{}
 	builder.Name = applicationName
@@ -127,6 +147,10 @@ func (b *CmdBuilder) Add(specs ...SpecOption) {
 	for _, spec := range specs {
 		b.Registry[spec.Name] = spec
 	}
+}
+
+func (b *CmdBuilder) RegisterPasses(passes ...analysis.IRAnalysisPass) {
+	b.Passes = append(b.Passes, passes...)
 }
 
 func (b *CmdBuilder) ParseArgs() {
@@ -201,6 +225,20 @@ func (b *CmdBuilder) Build() error {
 	slog.Info(fmt.Sprintf("%v %v IR: \n%v", b.Name, b.SpecName, b.IR))
 	if err != nil {
 		return blueprint.Errorf("unable to construct %v-%v IR due to %v", b.Name, b.SpecName, err.Error())
+	}
+
+	// Run any analysis passes
+	for _, pass := range b.Passes {
+		slog.Info(fmt.Sprintf("Running analysis pass %s on the IR", pass.Name()))
+		is_modified, err := pass.Analyze(b.Wiring, b.IR)
+		if err != nil {
+			return blueprint.Errorf("analysis pass %s was unsuccessful due to %v", pass.Name(), err.Error())
+		}
+		if is_modified {
+			slog.Info(fmt.Sprintf("Analysis Pass %s successfully modified the IR", pass.Name()))
+		} else {
+			slog.Info(fmt.Sprintf("Analysis Pass %s successfully analysed the IR", pass.Name()))
+		}
 	}
 
 	// Generate artifacts

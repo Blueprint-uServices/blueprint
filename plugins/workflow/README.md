@@ -47,7 +47,7 @@ The workflow spec service implementation will be copied into the output director
 
 
 <a name="Service"></a>
-## func [Service](<https://github.com/blueprint-uservices/blueprint/blob/main/plugins/workflow/wiring.go#L69>)
+## func [Service](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/workflow/wiring.go#L69>)
 
 ```go
 func Service[ServiceType any](spec wiring.WiringSpec, serviceName string, serviceArgs ...string) string

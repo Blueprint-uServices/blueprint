@@ -13,8 +13,11 @@
 package main
 
 import (
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/analysis"
 	"github.com/blueprint-uservices/blueprint/examples/leaf/wiring/specs"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
+	"github.com/blueprint-uservices/blueprint/plugins/passes/counter"
+	"github.com/blueprint-uservices/blueprint/plugins/passes/property"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow/workflowspec"
 )
 
@@ -24,8 +27,12 @@ func main() {
 
 	// Build a supported wiring spec
 	name := "LeafApp"
-	cmdbuilder.MakeAndExecute(
+	var passes []analysis.IRAnalysisPass
+	passes = append(passes, counter.NewIRNodeCounterPass())
+	passes = append(passes, property.NewPropertyPrintPass())
+	cmdbuilder.MakeAndExecuteWithPasses(
 		name,
+		passes,
 		specs.Docker,
 		specs.Thrift,
 		specs.HTTP,

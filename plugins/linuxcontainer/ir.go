@@ -12,6 +12,7 @@ will generate a run script that instantiates all contained processes.
 
 type Container struct {
 	ir.IRNode
+	ir.HasIRChildren
 
 	/* The implemented build targets for linuxcontainer.Container nodes */
 	filesystemDeployer /* Can be deployed as a basic collection of processes; implemented in deploy.go */
@@ -40,3 +41,11 @@ func (ctr *Container) Name() string {
 func (ctr *Container) String() string {
 	return ir.PrettyPrintNamespace(ctr.InstanceName, "LinuxContainer", ctr.Edges, ctr.Nodes)
 }
+
+// Implements ir.HasIRChildren
+func (ctr *Container) GetNodes() []ir.IRNode {
+	return ctr.Nodes
+}
+
+// Implements ir.HasIRChildren
+func (ctr *Container) ImplementsHasIRChildren() {}
