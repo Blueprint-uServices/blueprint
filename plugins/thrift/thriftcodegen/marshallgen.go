@@ -43,7 +43,7 @@ package {{.Package}}
 {{ range $_1, $service := .Services -}}
 {{ range $_2, $method := $service.Methods -}}
 // Client-side function to pack {{$service.Name}}.{{$method.Name}} args into a Thrift {{$pkg}}.{{$method.Request.ThriftType.Name}} struct
-func marshall_{{$method.Name}}_req({{$method.MarshallRequest $imports $pkg}}) *{{$pkg}}.{{$method.Request.ThriftType.Name}} {
+func marshall_{{$service.Name}}_{{$method.Name}}_req({{$method.MarshallRequest $imports $pkg}}) *{{$pkg}}.{{$method.Request.ThriftType.Name}} {
 	{{- range $j, $arg := $method.Request.FieldList}}
 	{{$arg.Marshall $imports "" $pkg}}
 	{{- end}}
@@ -51,7 +51,7 @@ func marshall_{{$method.Name}}_req({{$method.MarshallRequest $imports $pkg}}) *{
 }
 
 // Server-side function to unpack {{$service.Name}}.{{$method.Name}} args from a Thrift {{$method.Request.ThriftType.Name}} struct
-func unmarshall_{{$method.Name}}_req(msg *{{$pkg}}.{{$method.Request.ThriftType.Name}}) (
+func unmarshall_{{$service.Name}}_{{$method.Name}}_req(msg *{{$pkg}}.{{$method.Request.ThriftType.Name}}) (
 	{{- range $j, $arg := $method.Request.FieldList}}{{if $j}}, {{end}}{{$arg.Name}} {{$imports.NameOf $arg.SrcType}}{{end -}}
 ) {
 	{{- range $j, $arg := $method.Request.FieldList}}
@@ -61,7 +61,7 @@ func unmarshall_{{$method.Name}}_req(msg *{{$pkg}}.{{$method.Request.ThriftType.
 }
 
 // Server-side function to pack {{$service.Name}}.{{$method.Name}} retvals into a Thrift {{$pkg}}.{{$method.Response.ThriftType.Name}} struct
-func marshall_{{$method.Name}}_rsp({{$method.MarshallResponse $imports $pkg}}) *{{$pkg}}.{{$method.Response.ThriftType.Name}} {
+func marshall_{{$service.Name}}_{{$method.Name}}_rsp({{$method.MarshallResponse $imports $pkg}}) *{{$pkg}}.{{$method.Response.ThriftType.Name}} {
 	{{- range $j, $ret := $method.Response.FieldList}}
 	{{$ret.Marshall $imports "" $pkg}}
 	{{- end}}
@@ -69,7 +69,7 @@ func marshall_{{$method.Name}}_rsp({{$method.MarshallResponse $imports $pkg}}) *
 }
 
 // Client-side function to unpack {{$service.Name}}.{{$method.Name}} retvals from a Thrift {{$method.Response.ThriftType.Name}} struct
-func unmarshall_{{$method.Name}}_rsp(msg *{{$pkg}}.{{$method.Response.ThriftType.Name}}) (
+func unmarshall_{{$service.Name}}_{{$method.Name}}_rsp(msg *{{$pkg}}.{{$method.Response.ThriftType.Name}}) (
 	{{- range $j, $ret := $method.Response.FieldList}}{{if $j}}, {{end}}{{$ret.Name}} {{$imports.NameOf $ret.SrcType}}{{end -}}
 ) {
 	{{- range $j, $ret := $method.Response.FieldList}}
