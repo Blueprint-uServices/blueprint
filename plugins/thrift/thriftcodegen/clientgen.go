@@ -98,7 +98,7 @@ func New_{{.Name}}(ctx context.Context, serverAddress string) (*{{.Name}}, error
 	return handler, nil
 }
 
-{{$service := .Service.Name -}}
+{{$service := .Service.BaseName -}}
 {{$receiver := .Name -}}
 {{$prefix := .ImportPrefix -}}
 {{- range $_, $f := .Service.Methods }}

@@ -219,7 +219,7 @@ func (b *ThriftBuilder) makeFieldList(vars []gocode.Variable) ([]*ThriftField, e
 
 // Adds a service declaration for the provided golang service interface.
 func (b *ThriftBuilder) AddService(iface *gocode.ServiceInterface) error {
-	serviceDecl := b.newService(iface.Name)
+	serviceDecl := b.newService(iface.BaseName)
 	for _, method := range iface.Methods {
 		argList, err := b.makeFieldList(method.Arguments)
 		if err != nil {

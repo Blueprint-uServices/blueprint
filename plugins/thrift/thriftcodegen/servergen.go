@@ -92,7 +92,7 @@ func (handler *{{.Name}}) Run(ctx context.Context) error {
 	return server.Serve()
 }
 
-{{$service := .Service.Name -}}
+{{$service := .Service.BaseName -}}
 {{$receiver := .Name -}}
 {{$prefix := .ImportPrefix -}}
 {{ range $_, $f := .Service.Methods }}
