@@ -97,13 +97,13 @@ func (handler *{{.Name}}) Run(ctx context.Context) error {
 {{$prefix := .ImportPrefix -}}
 {{ range $_, $f := .Service.Methods }}
 func (handler *{{$receiver}}) {{$f.Name -}}(ctx context.Context, req *{{$prefix}}.{{$service}}_{{$f.Name}}_Request) (*{{$prefix}}.{{$service}}_{{$f.Name}}_Response, error) {
-	{{ArgVarsEquals $f}} unmarshall_{{$f.Name}}_req(req)
+	{{ArgVarsEquals $f}} unmarshall_{{$service}}_{{$f.Name}}_req(req)
 	{{RetVars $f "err"}} := handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
 	if err != nil {
 		return nil, err
 	}
 	rsp := &{{$prefix}}.{{$service}}_{{$f.Name}}_Response{}
-	marshall_{{$f.Name}}_rsp(rsp, {{RetVars $f}})
+	marshall_{{$service}}_{{$f.Name}}_rsp(rsp, {{RetVars $f}})
 	return rsp, nil
 }
 {{end}}
