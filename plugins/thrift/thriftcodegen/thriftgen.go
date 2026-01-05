@@ -308,7 +308,7 @@ var thriftToBasic = map[string]string{
 	"bool":   "bool",
 	"string": "string",
 	"byte":   "byte",
-	"double": "double",
+	"double": "float64",
 	"i64":    "int64",
 	"i32":    "int32",
 	"i16":    "int16",

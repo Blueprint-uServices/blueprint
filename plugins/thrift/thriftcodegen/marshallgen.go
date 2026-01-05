@@ -9,6 +9,24 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/golang/gogen"
 )
 
+// Initialisms that should be fully capitalized in Go field names
+var commonInitialisms = map[string]bool{
+	"id": true, "url": true, "uri": true, "http": true, "https": true,
+	"api": true, "json": true, "xml": true, "html": true, "css": true,
+	"sql": true, "ip": true, "tcp": true, "udp": true, "dns": true,
+	"tls": true, "ssl": true, "cpu": true, "ram": true, "uuid": true,
+}
+
+// capitalizeFieldName converts a field name to the format used by Thrifts Go generator
+// Handles initialisms like "id" -> "ID" instead of "Id"
+func capitalizeFieldName(name string) string {
+	lower := strings.ToLower(name)
+	if commonInitialisms[lower] {
+		return strings.ToUpper(name)
+	}
+	return strings.Title(name)
+}
+
 type marshallArgs struct {
 	ThriftBuilder
 	Imports *gogen.Imports
@@ -128,19 +146,19 @@ func (f *ThriftField) Marshall(imports *gogen.Imports, obj string, pkg string) (
 	switch t := f.ThriftGoType.(type) {
 	case *gocode.UserType:
 		{
-			return fmt.Sprintf("msg.%s = marshall_%s_%s(new(%s.%s), &%s%s)", strings.Title(f.Name), pkg, t.Name, pkg, t.Name, obj, f.Name), nil
+			return fmt.Sprintf("msg.%s = marshall_%s_%s(new(%s.%s), &%s%s)", capitalizeFieldName(f.Name), pkg, t.Name, pkg, t.Name, obj, f.Name), nil
 		}
 	case *gocode.BasicType:
 		{
-			return fmt.Sprintf("msg.%s = %s(%s%s)", strings.Title(f.Name), t.Name, obj, f.Name), nil
+			return fmt.Sprintf("msg.%s = %s(%s%s)", capitalizeFieldName(f.Name), t.Name, obj, f.Name), nil
 		}
 	case *gocode.Pointer:
 		{
 			switch pt := t.PointerTo.(type) {
 			case *gocode.UserType:
-				return fmt.Sprintf("msg.%s = marshall_%s_%s(new(%s.%s),%s%s)", strings.Title(f.Name), pkg, pt.Name, pkg, pt.Name, obj, f.Name), nil
+				return fmt.Sprintf("msg.%s = marshall_%s_%s(new(%s.%s),%s%s)", capitalizeFieldName(f.Name), pkg, pt.Name, pkg, pt.Name, obj, f.Name), nil
 			case *gocode.BasicType:
-				return fmt.Sprintf("msg.%s = %s(*%s%s)", strings.Title(f.Name), pt.Name, obj, f.Name), nil
+				return fmt.Sprintf("msg.%s = %s(*%s%s)", capitalizeFieldName(f.Name), pt.Name, obj, f.Name), nil
 			default:
 				return "", blueprint.Errorf("unsupported pointer type %v", pt)
 			}
@@ -154,10 +172,10 @@ func (f *ThriftField) Marshall(imports *gogen.Imports, obj string, pkg string) (
     msg.%s = make(map[%s]*%s.%s)
 	for k, v := range %s%s {
 		msg.%s[k] = marshall_%s_%s(new(%s.%s), &v)
-	}`, strings.Title(f.Name), t.KeyType, pkg, vt.Name, obj, f.Name, strings.Title(f.Name), pkg, vt.Name, pkg, vt.Name), nil
+	}`, capitalizeFieldName(f.Name), t.KeyType, pkg, vt.Name, obj, f.Name, capitalizeFieldName(f.Name), pkg, vt.Name, pkg, vt.Name), nil
 				}
 			case *gocode.BasicType:
-				return fmt.Sprintf("msg.%s = %s%s", strings.Title(f.Name), obj, f.Name), nil
+				return fmt.Sprintf("msg.%s = %s%s", capitalizeFieldName(f.Name), obj, f.Name), nil
 			default:
 				return "", blueprint.Errorf("unsupported/unimplemented map value type %v", vt)
 			}
@@ -168,9 +186,9 @@ func (f *ThriftField) Marshall(imports *gogen.Imports, obj string, pkg string) (
 			case *gocode.UserType:
 				return fmt.Sprintf(
 					"for _, v := range %s%s { msg.%s = append(msg.%s, marshall_%s_%s(new(%s.%s), &v)) }",
-					obj, f.Name, strings.Title(f.Name), strings.Title(f.Name), pkg, st.Name, pkg, st.Name), nil
+					obj, f.Name, capitalizeFieldName(f.Name), capitalizeFieldName(f.Name), pkg, st.Name, pkg, st.Name), nil
 			case *gocode.BasicType:
-				return fmt.Sprintf("msg.%s = %s%s", strings.Title(f.Name), obj, f.Name), nil
+				return fmt.Sprintf("msg.%s = %s%s", capitalizeFieldName(f.Name), obj, f.Name), nil
 			default:
 				return "", blueprint.Errorf("unsupported/unimplemented slice type %v", st)
 			}
@@ -183,19 +201,19 @@ func (f *ThriftField) Unmarshall(imports *gogen.Imports, obj string, pkg string)
 	switch t := f.ThriftGoType.(type) {
 	case *gocode.UserType:
 		{
-			return fmt.Sprintf("unmarshall_%s_%s(msg.%s,&%s%s)", pkg, t.Name, strings.Title(f.Name), obj, f.Name), nil
+			return fmt.Sprintf("unmarshall_%s_%s(msg.%s,&%s%s)", pkg, t.Name, capitalizeFieldName(f.Name), obj, f.Name), nil
 		}
 	case *gocode.BasicType:
 		{
-			return fmt.Sprintf("%s%s = %v(msg.%s)", obj, f.Name, f.SrcType, strings.Title(f.Name)), nil
+			return fmt.Sprintf("%s%s = %v(msg.%s)", obj, f.Name, f.SrcType, capitalizeFieldName(f.Name)), nil
 		}
 	case *gocode.Pointer:
 		{
 			switch pt := t.PointerTo.(type) {
 			case *gocode.UserType:
-				return fmt.Sprintf("unmarshall_%s_%s(msg.%s, %s%s)", pkg, pt.Name, strings.Title(f.Name), obj, f.Name), nil
+				return fmt.Sprintf("unmarshall_%s_%s(msg.%s, %s%s)", pkg, pt.Name, capitalizeFieldName(f.Name), obj, f.Name), nil
 			case *gocode.BasicType:
-				return fmt.Sprintf("%s%s = &%v(msg.%s)", obj, f.Name, f.SrcType, strings.Title(f.Name)), nil
+				return fmt.Sprintf("%s%s = &%v(msg.%s)", obj, f.Name, f.SrcType, capitalizeFieldName(f.Name)), nil
 			default:
 				return "", blueprint.Errorf("unsupported pointer type %v", pt)
 			}
@@ -210,10 +228,10 @@ func (f *ThriftField) Unmarshall(imports *gogen.Imports, obj string, pkg string)
 	for k, v := range msg.%s {
 		objv := %s%s[k]
 		unmarshall_%s_%s(v, &objv)
-	}`, obj, f.Name, imports.NameOf(f.SrcType), strings.Title(f.Name), obj, f.Name, pkg, vt.Name), nil
+	}`, obj, f.Name, imports.NameOf(f.SrcType), capitalizeFieldName(f.Name), obj, f.Name, pkg, vt.Name), nil
 				}
 			case *gocode.BasicType:
-				return fmt.Sprintf("msg.%s = %s%s", strings.Title(f.Name), obj, f.Name), nil
+				return fmt.Sprintf("msg.%s = %s%s", capitalizeFieldName(f.Name), obj, f.Name), nil
 			default:
 				return "", blueprint.Errorf("unsupported map value type %v", t)
 			}
@@ -226,9 +244,9 @@ func (f *ThriftField) Unmarshall(imports *gogen.Imports, obj string, pkg string)
 	%s%s = make(%s, len(msg.%s))
 	for i, v := range msg.%s {
 		unmarshall_%s_%s(v, &%s%s[i])
-	}`, obj, f.Name, imports.NameOf(f.SrcType), strings.Title(f.Name), strings.Title(f.Name), pkg, st.Name, obj, f.Name), nil
+	}`, obj, f.Name, imports.NameOf(f.SrcType), capitalizeFieldName(f.Name), capitalizeFieldName(f.Name), pkg, st.Name, obj, f.Name), nil
 			case *gocode.BasicType:
-				return fmt.Sprintf("%s%s = msg.%s", obj, f.Name, strings.Title(f.Name)), nil
+				return fmt.Sprintf("%s%s = msg.%s", obj, f.Name, capitalizeFieldName(f.Name)), nil
 			default:
 				return "", blueprint.Errorf("unsupported/unimplemented slice type %v", st)
 			}
