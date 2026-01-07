@@ -217,9 +217,9 @@ services:
 	 - {{$name}}:{{$value}}
 	{{- end}}
 	{{- end}}
-	{{- if .Command}}
+	{{- if .CustomCommand}}
 	command:
-	{{- range $_, $val := .Command}}
+	{{- range $_, $val := .CustomCommand}}
 	 - {{$val}}
 	{{- end}}
 	{{- end}}
