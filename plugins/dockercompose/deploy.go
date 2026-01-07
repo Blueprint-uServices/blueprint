@@ -125,6 +125,21 @@ func (d *dockerComposeWorkspace) SetEnvironmentVariable(instanceName string, key
 	return d.DockerComposeFile.AddEnvVar(instanceName, key, val)
 }
 
+// Implements docker.ContainerWorkspace
+func (d *dockerComposeWorkspace) SetCustomCommand(instanceName string, command []string) error {
+	return d.DockerComposeFile.SetCustomCommand(instanceName, command)
+}
+
+// Implements docker.ContainerWorkspace
+func (d *dockerComposeWorkspace) AddVolume(instanceName string, src string, dst string) error {
+	return d.DockerComposeFile.AddVolume(instanceName, src, dst)
+}
+
+// Implements docker.ContainerWorkspace
+func (d *dockerComposeWorkspace) AddCustomConf(instanceName string, src string, dst string) error {
+	return d.DockerComposeFile.AddCustomConf(instanceName, src, dst)
+}
+
 // Generates the docker-compose file
 func (d *dockerComposeWorkspace) Finish() error {
 	// We didn't set any arguments or environment variables while accumulating instances. Do so now.

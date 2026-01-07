@@ -134,6 +134,26 @@ type (
 		// Returns an error if an instance doesn't exist with the name `instanceName`.
 		SetEnvironmentVariable(instanceName string, key string, val string) error
 
+		// Sets a custom command to a container instance. When instanceName is started,
+		// the provided command will be executed to start it.
+		//
+		// Returns an error if an instance doesn't exist with the name `instanceName`.
+		SetCustomCommand(instanceName string, command []string) error
+
+		// Adds a volume to a container instance. When instanceName is started,
+		// volume will be created to persist any downloaded artifacts.
+		//
+		// Returns an error if an instance doesn't exist with the name `instanceName`.
+		AddVolume(instanceName string, src string, dst string) error
+
+		// Adds a custom container-level configuration to a container instance. When instanceName is created, the custom configuration options will be used.
+		// Example:
+		// To add GPU support for the created container:
+		// AddCustomConf("leaf_service", "gpu", "all")
+		//
+		// Returns an error if an instance doesn't exist with the name `instanceName`.
+		AddCustomConf(instanceName string, src string, dst string) error
+
 		ImplementsContainerWorkspace()
 	}
 
