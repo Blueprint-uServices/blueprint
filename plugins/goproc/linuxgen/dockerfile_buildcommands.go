@@ -22,7 +22,7 @@ var dockerfileBuildTemplate = `
 #  custom docker build commands provided by goproc.Process {{.ProcName}}
 #
 
-FROM golang:1.23-bookworm AS {{.ProcName}}
+FROM golang:1.24-bookworm AS {{.ProcName}}
 
 COPY ./{{.ProcName}} /src
 
