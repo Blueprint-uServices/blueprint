@@ -32,6 +32,9 @@ type instance struct {
 	Expose            map[uint16]struct{} // Ports exposed with expose directive
 	Config            map[string]string   // Map from environment variable name to value
 	Passthrough       map[string]struct{} // Environment variables that just get passed through to the container
+	CustomCommand     []string            // Custom command used to start the container
+	Volumes           map[string]string   // Map volumes from host to container
+	CustomConf        map[string]string   // Map custom keys to values at the top-level of the docker file
 }
 
 func NewDockerComposeFile(workspaceName, workspaceDir, fileName string) *DockerComposeFile {
@@ -88,6 +91,36 @@ func (d *DockerComposeFile) AddEnvVar(instanceName string, key string, val strin
 	return nil
 }
 
+// Sets the custom command for the specified instanceName
+func (d *DockerComposeFile) SetCustomCommand(instanceName string, command []string) error {
+	instance, err := d.getInstance(instanceName)
+	if err != nil {
+		return err
+	}
+	instance.CustomCommand = command
+	return nil
+}
+
+// Adds a new volume for the specified instanceName
+func (d *DockerComposeFile) AddVolume(instanceName string, src string, dst string) error {
+	instance, err := d.getInstance(instanceName)
+	if err != nil {
+		return err
+	}
+	instance.Volumes[src] = dst
+	return nil
+}
+
+// Adds a custom container level configuration option for the specified instanceName
+func (d *DockerComposeFile) AddCustomConf(instanceName string, src string, dst string) error {
+	instance, err := d.getInstance(instanceName)
+	if err != nil {
+		return err
+	}
+	instance.CustomConf[src] = dst
+	return nil
+}
+
 // Pass through the specified environment variable key from the calling environment
 func (d *DockerComposeFile) PassthroughEnvVar(instanceName string, key string, optional bool) error {
 	var passthroughValue string
@@ -141,6 +174,9 @@ func (d *DockerComposeFile) addInstance(instanceName string, image string, conta
 		Ports:             make(map[string]uint16),
 		Config:            make(map[string]string),
 		Passthrough:       make(map[string]struct{}),
+		CustomCommand:     []string{},
+		Volumes:           make(map[string]string),
+		CustomConf:        make(map[string]string),
 	}
 	d.Instances[instanceName] = &instance
 	return nil
@@ -175,6 +211,21 @@ services:
      - {{$name}}={{$value}}
     {{- end}}
     {{- end}}
+	{{- if .Volumes}}
+	volumes:
+	{{- range $name, $value := .Volumes}}
+	 - {{$name}}:{{$value}}
+	{{- end}}
+	{{- end}}
+	{{- if .CustomCommand}}
+	command:
+	{{- range $_, $val := .CustomCommand}}
+	 - {{$val}}
+	{{- end}}
+	{{- end}}
+	{{- range $key, $val := .CustomConf}}
+	{{$key}}: {{$val}}
+	{{- end}}
     restart: always
 {{end}}
 `
