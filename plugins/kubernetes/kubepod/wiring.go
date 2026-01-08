@@ -46,7 +46,7 @@ func AddContainerToPod(spec wiring.WiringSpec, podName string, containerName str
 // During compilation, generates the deployment.yaml and service.yaml files for the pod.
 //
 // Returns podName
-func NewKubePod(spec wiring.WiringSpec, podName string, containers ...string) string {
+func NewKubePod(spec wiring.WiringSpec, podName string, registry_addr string, containers ...string) string {
 
 	// If any children were provided in this call, add them to the pod via a property
 	for _, containerName := range containers {
@@ -54,7 +54,7 @@ func NewKubePod(spec wiring.WiringSpec, podName string, containers ...string) st
 	}
 
 	spec.Define(podName, &PodDeployment{}, func(ns wiring.Namespace) (ir.IRNode, error) {
-		pod := &PodDeployment{PodName: podName}
+		pod := &PodDeployment{PodName: podName, DockerRegistryAddr: registry_addr}
 		_, err := namespaceutil.InstantiateNamespace(ns, pod)
 		return pod, err
 	})

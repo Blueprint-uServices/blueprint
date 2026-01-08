@@ -8,9 +8,10 @@ import (
 // An IRNode representing a Kubernetes pod, which is simply a collection of container instances.
 type PodDeployment struct {
 	kubePodDeployment
-	PodName string
-	Nodes   []ir.IRNode
-	Edges   []ir.IRNode
+	PodName            string
+	DockerRegistryAddr string
+	Nodes              []ir.IRNode
+	Edges              []ir.IRNode
 }
 
 // Implements IRNode
