@@ -22,10 +22,13 @@ type KubeDeploymentFile struct {
 }
 
 type instance struct {
-	InstanceName string
-	Image        string
-	Ports        map[string]uint16
-	Config       map[string]string
+	InstanceName  string
+	Image         string
+	Ports         map[string]uint16
+	Config        map[string]string
+	CustomCommand []string
+	Volumes       map[string]string
+	CustomConf    map[string]string
 }
 
 func NewKubeDeploymentFile(workspaceName string, workspaceDir string, filename string, serviceFilename string) *KubeDeploymentFile {
@@ -87,16 +90,46 @@ func (k *KubeDeploymentFile) ExposePort(instanceName string, portName string, po
 	}
 }
 
+func (k *KubeDeploymentFile) AddCustomConf(instanceName string, src string, dst string) error {
+	instance, err := k.getInstance(instanceName)
+	if err != nil {
+		return err
+	}
+	instance.CustomConf[src] = dst
+	return nil
+}
+
+func (k *KubeDeploymentFile) AddVolume(instanceName string, src string, dst string) error {
+	instance, err := k.getInstance(instanceName)
+	if err != nil {
+		return err
+	}
+	instance.Volumes[src] = dst
+	return nil
+}
+
+func (k *KubeDeploymentFile) SetCustomCommand(instanceName string, command []string) error {
+	instance, err := k.getInstance(instanceName)
+	if err != nil {
+		return err
+	}
+	instance.CustomCommand = command
+	return nil
+}
+
 func (k *KubeDeploymentFile) addInstance(instanceName string, image string) error {
 	instanceName = ir.CleanName(instanceName)
 	if _, exists := k.Instances[instanceName]; exists {
 		return blueprint.Errorf("re-declaration of container instance %v of image %v", instanceName, image)
 	}
 	instance := &instance{
-		InstanceName: instanceName,
-		Image:        image,
-		Ports:        make(map[string]uint16),
-		Config:       make(map[string]string),
+		InstanceName:  instanceName,
+		Image:         image,
+		Ports:         make(map[string]uint16),
+		Config:        make(map[string]string),
+		CustomCommand: []string{},
+		Volumes:       make(map[string]string),
+		CustomConf:    make(map[string]string),
 	}
 	k.Instances[instanceName] = instance
 	return nil

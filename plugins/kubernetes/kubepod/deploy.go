@@ -214,5 +214,20 @@ func (p *kubeDeploymentWorkspace) processArgNodes() error {
 	return nil
 }
 
+// Implements docker.ContainerWorkspace
+func (p *kubeDeploymentWorkspace) AddCustomConf(instanceName string, src string, dst string) error {
+	return p.F.AddCustomConf(instanceName, src, dst)
+}
+
+// Implements docker.ContainerWorkspace
+func (p *kubeDeploymentWorkspace) AddVolume(instanceName string, src string, dst string) error {
+	return p.F.AddVolume(instanceName, src, dst)
+}
+
+// Implements docker.ContainerWorkspace
+func (p *kubeDeploymentWorkspace) SetCustomCommand(instanceName string, command []string) error {
+	return p.F.SetCustomCommand(instanceName, command)
+}
+
 func (p *kubeDeploymentWorkspace) ImplementsBuildContext()       {}
 func (p *kubeDeploymentWorkspace) ImplementsContainerWorkspace() {}
