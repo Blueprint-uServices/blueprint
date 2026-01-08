@@ -33,13 +33,15 @@ type kubeDeploymentWorkspace struct {
 	ImageDirs    map[string]string
 	InstanceArgs map[string][]ir.IRNode // argnodes for each instance added to the workspace
 
+	DockerRegistryAddr string
+
 	F *deploygen.KubeDeploymentFile
 }
 
 // Implements ir.ArtifactGenerator
 func (node *PodDeployment) GenerateArtifacts(dir string) error {
 	slog.Info(fmt.Sprintf("Generating container instances for Kubernetes Pod %s in %s", node.Name(), dir))
-	workspace := NewKubePodWorkspace(node.Name(), dir)
+	workspace := NewKubePodWorkspace(node.Name(), dir, node.DockerRegistryAddr)
 	return node.generateArtifacts(workspace)
 }
 
@@ -65,15 +67,16 @@ func (node *PodDeployment) generateArtifacts(workspace *kubeDeploymentWorkspace)
 	return nil
 }
 
-func NewKubePodWorkspace(name string, dir string) *kubeDeploymentWorkspace {
+func NewKubePodWorkspace(name string, dir string, registry_addr string) *kubeDeploymentWorkspace {
 	return &kubeDeploymentWorkspace{
 		info: docker.ContainerWorkspaceInfo{
 			Path:   filepath.Clean(dir),
 			Target: "kubedeployment",
 		},
-		ImageDirs:    make(map[string]string),
-		InstanceArgs: make(map[string][]ir.IRNode),
-		F:            deploygen.NewKubeDeploymentFile(name, dir, name+"-deployment.yaml", name+"-service.yaml"),
+		ImageDirs:          make(map[string]string),
+		InstanceArgs:       make(map[string][]ir.IRNode),
+		DockerRegistryAddr: registry_addr,
+		F:                  deploygen.NewKubeDeploymentFile(name, dir, name+"-deployment.yaml", name+"-service.yaml"),
 	}
 }
 
@@ -102,7 +105,10 @@ func (p *kubeDeploymentWorkspace) DeclareLocalImage(instanceName string, imageDi
 	slog.Info("Inside DeclareLocalImage")
 	p.InstanceArgs[instanceName] = args
 	// For now set image to instanceName
-	image := instanceName
+	var image string
+	if p.DockerRegistryAddr != "" {
+		image = p.DockerRegistryAddr + "/" + instanceName
+	}
 	return p.F.AddImageInstance(instanceName, image)
 }
 
