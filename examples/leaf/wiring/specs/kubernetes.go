@@ -1,6 +1,8 @@
 package specs
 
 import (
+	"flag"
+
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
 	"github.com/blueprint-uservices/blueprint/examples/leaf/workflow/leaf"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
@@ -19,6 +21,8 @@ var Kubernetes = cmdbuilder.SpecOption{
 	Build:       makeKubernetesSpec,
 }
 
+var regAddr = flag.String("registry", "", "Address at which docker registry is hosted that will be used by Kubernetes")
+
 func makeKubernetesSpec(spec wiring.WiringSpec) ([]string, error) {
 	applyKubeDefaults := func(spec wiring.WiringSpec, serviceName string) string {
 		grpc.Deploy(spec, serviceName)
@@ -34,6 +38,6 @@ func makeKubernetesSpec(spec wiring.WiringSpec) ([]string, error) {
 	nonleaf_service := workflow.Service[leaf.NonLeafService](spec, "nonleaf_service", leaf_service)
 	nonleaf_ctr := applyKubeDefaults(spec, nonleaf_service)
 
-	kube_app := kubernetes.NewApplication(spec, "leaf", leaf_db, leaf_ctr, nonleaf_ctr)
+	kube_app := kubernetes.NewApplication(spec, "leaf", *regAddr, leaf_db, leaf_ctr, nonleaf_ctr)
 	return []string{kube_app}, nil
 }

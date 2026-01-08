@@ -25,7 +25,6 @@
 //
 //	kubectl apply -f podName-deployment.yaml
 //	kubectl apply -f podName-service.yaml
-//
 package kubernetes
 
 import (
@@ -36,13 +35,13 @@ import (
 )
 
 // [AddContainerToApplication] can be used by wiring specs to add more containers to a Kubernetes application
-func AddContainerToApplication(spec wiring.WiringSpec, appName string, containerName string) {
-	AddPodToApplication(spec, appName, containerName)
+func AddContainerToApplication(spec wiring.WiringSpec, appName string, registryAddr string, containerName string) {
+	AddPodToApplication(spec, appName, registryAddr, containerName)
 }
 
 // [AddPodToApplication] can be used by wiring specs to bundle multiple containers in a single Kubernetes Pod and add that pod to an application
-func AddPodToApplication(spec wiring.WiringSpec, appName string, containers ...string) {
-	podName := kubepod.NewKubePod(spec, containers[0], containers...)
+func AddPodToApplication(spec wiring.WiringSpec, appName string, registryAddr string, containers ...string) {
+	podName := kubepod.NewKubePod(spec, containers[0], registryAddr, containers...)
 	namespaceutil.AddNodeTo[Application](spec, appName, podName)
 }
 
@@ -55,11 +54,11 @@ func AddPodToApplication(spec wiring.WiringSpec, appName string, containers ...s
 // During compilation, generates the various configuration files for generating pod deployments and services.
 //
 // Returns appName
-func NewApplication(spec wiring.WiringSpec, appName string, containers ...string) string {
+func NewApplication(spec wiring.WiringSpec, appName string, registryAddr string, containers ...string) string {
 
 	// If any children were provided in this call, add them to the app via a property
 	for _, containerName := range containers {
-		AddContainerToApplication(spec, appName, containerName)
+		AddContainerToApplication(spec, appName, registryAddr, containerName)
 	}
 
 	spec.Define(appName, &Application{}, func(ns wiring.Namespace) (ir.IRNode, error) {

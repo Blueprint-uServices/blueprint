@@ -157,6 +157,7 @@ spec:
       {{range $_, $decl := .Instances}}
         - name: {{.InstanceName}}
           image: {{.Image}}
+		  imagePullPolicy: Always
           {{- if .Config}}
           env:
           {{- range $name, $value := .Config}}
