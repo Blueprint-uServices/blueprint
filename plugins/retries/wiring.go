@@ -22,7 +22,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-var prop_MAXRETRY = "Retry-Max"
+var PROP_MAXRETRY = "Retry-Max"
 
 // Add retrier functionality to all clients of the specified service.
 // Uses a [blueprint.WiringSpec]
@@ -33,7 +33,7 @@ var prop_MAXRETRY = "Retry-Max"
 func AddRetries(spec wiring.WiringSpec, serviceName string, max_retries int64) {
 	clientWrapper := serviceName + ".client.retrier"
 
-	spec.AddProperty(clientWrapper, prop_MAXRETRY, max_retries)
+	spec.AddProperty(clientWrapper, PROP_MAXRETRY, max_retries)
 
 	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {
@@ -86,7 +86,7 @@ func AddRetriesWithTimeouts(spec wiring.WiringSpec, serviceName string, max_retr
 func AddRetriesWithFixedDelay(spec wiring.WiringSpec, serviceName string, max_retries int64, delay string) {
 	clientWrapper := serviceName + ".client.retrierfd"
 
-	spec.AddProperty(clientWrapper, prop_MAXRETRY, max_retries)
+	spec.AddProperty(clientWrapper, PROP_MAXRETRY, max_retries)
 
 	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {
@@ -149,7 +149,7 @@ func AddRetriesWithExponentialBackoff(spec wiring.WiringSpec, serviceName string
 func AddRetriesRetryRateLimit(spec wiring.WiringSpec, serviceName string, max_retries int64, retry_rate_limit int64) {
 	clientWrapper := serviceName + ".client.retrierrl"
 
-	spec.AddProperty(clientWrapper, prop_MAXRETRY, max_retries)
+	spec.AddProperty(clientWrapper, PROP_MAXRETRY, max_retries)
 
 	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {

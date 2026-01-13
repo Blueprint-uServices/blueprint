@@ -17,7 +17,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-var prop_TIMEOUT = "Timeout"
+var PROP_TIMEOUT = "Timeout"
 
 // Adds timeouts to client calls for the specified service.
 // Uses a [blueprint.WiringSpec].
@@ -31,7 +31,7 @@ var prop_TIMEOUT = "Timeout"
 func Add(spec wiring.WiringSpec, serviceName string, timeout string) {
 	clientWrapper := serviceName + ".client.timeout"
 
-	spec.AddProperty(clientWrapper, prop_TIMEOUT, timeout)
+	spec.AddProperty(clientWrapper, PROP_TIMEOUT, timeout)
 
 	ptr := pointer.GetPointer(spec, serviceName)
 	if ptr == nil {
