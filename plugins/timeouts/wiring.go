@@ -18,6 +18,7 @@ import (
 )
 
 var PROP_TIMEOUT = "Timeout"
+var IRNODE_TIMEOUT_SUFFIX = ".client.timeout"
 
 // Adds timeouts to client calls for the specified service.
 // Uses a [blueprint.WiringSpec].
@@ -29,7 +30,7 @@ var PROP_TIMEOUT = "Timeout"
 //
 //	Add(spec, "my_service", "1s")
 func Add(spec wiring.WiringSpec, serviceName string, timeout string) {
-	clientWrapper := serviceName + ".client.timeout"
+	clientWrapper := serviceName + IRNODE_TIMEOUT_SUFFIX
 
 	spec.AddProperty(clientWrapper, PROP_TIMEOUT, timeout)
 
