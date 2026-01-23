@@ -25,6 +25,20 @@ type dynamicLBNode struct {
 	ServiceInfo *workflowspec.Service
 }
 
+func (n *dynamicLBNode) Name() string {
+	return n.InstanceName
+}
+
+// Both the client and the handler need to add interfaces to modules that use them.
+func (n *dynamicLBNode) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
+	return n.ServiceInfo.Iface.ServiceInterface(ctx), nil
+}
+
+// Both the client and the handler need to add interfaces to modules that use them.
+func (node *dynamicLBNode) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.ServiceInfo.AddToModule(builder)
+}
+
 type dynamicLBHandler struct {
 	dynamicLBNode
 	golang.GeneratesFuncs
@@ -65,15 +79,6 @@ func (n *dynamicLBHandler) Init(arg_nodes []ir.IRNode) error {
 	n.Args = arg_nodes
 	n.Clients = clients
 	return nil
-}
-
-func (n *dynamicLBHandler) Name() string {
-	return n.InstanceName
-}
-
-// Both the client and the handler need to add interfaces to modules that use them.
-func (n *dynamicLBHandler) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
-	return n.ServiceInfo.Iface.ServiceInterface(ctx), nil
 }
 
 // Override the handler functionality to add more interfaces

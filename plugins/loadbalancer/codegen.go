@@ -34,7 +34,7 @@ func generateLBServer(builder golang.ModuleBuilder, iface *gocode.ServiceInterfa
 		Imports:   gogen.NewImports(pkg.Name),
 	}
 
-	templ.Imports.AddPackages("context", "sync", "time", "errors")
+	templ.Imports.AddPackages("context", "sync")
 	templ.Imports.AddType(&iface.UserType)
 	slog.Info(fmt.Sprintf("Generating %v/%v", templ.Package.PackageName, templ.Name))
 	outputFile := filepath.Join(templ.Package.Path, templ.Name+".go")
