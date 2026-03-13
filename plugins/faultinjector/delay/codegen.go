@@ -25,7 +25,7 @@ func generateServerHandler(builder golang.ModuleBuilder, iface *gocode.ServiceIn
 		Imports:   gogen.NewImports(pkg.Name),
 	}
 
-	server.Imports.AddPackages("context", "time", "math/rand")
+	server.Imports.AddPackages("context", "time", "math/rand", "strconv")
 
 	slog.Info(fmt.Sprintf("Generating %v/%v", server.Package.PackageName, iface.Name))
 	outputFile := filepath.Join(server.Package.Path, iface.Name+".go")
@@ -57,10 +57,14 @@ type {{.Name}} struct {
 	MaxDelay int64
 }
 
-func New_{{.Name}}(ctx context.Context, service {{.Imports.NameOf .Service.UserType}}, max_delay int64) (*{{.Name}}, error) {
+func New_{{.Name}}(ctx context.Context, service {{.Imports.NameOf .Service.UserType}}, max_delay string) (*{{.Name}}, error) {
+	max_delay_val, err := strconv.ParseInt(max_delay, 10, 64)
+	if err != nil {
+		return nil, err
+	}
 	handler := &{{.Name}}{}
 	handler.Service = service
-	handler.MaxDelay = max_delay
+	handler.MaxDelay = max_delay_val
 	return handler, nil
 }
 
@@ -68,7 +72,7 @@ func New_{{.Name}}(ctx context.Context, service {{.Imports.NameOf .Service.UserT
 {{$receiver := .Name -}}
 {{ range $_, $f := .Service.Methods }}
 func (handler *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetTypes $f "error"}}) {
-	val := rand.Int63n(handler.MaxDelay + 1)
+	val := time.Duration(rand.Int63n(handler.MaxDelay + 1))
 	time.Sleep(val * time.Millisecond)
 	return handler.Service.{{$f.Name}}({{ArgVars $f "ctx"}})
 }

@@ -86,6 +86,7 @@ func NewRandomDelayServerWrapper(name string, serverNode golang.Service, maxDela
 	node.InstanceName = name
 	node.Wrapped = serverNode
 	node.outputPackage = "delay"
+	node.MaxDelay = maxDelay
 
 	return node, nil
 }

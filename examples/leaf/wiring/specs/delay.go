@@ -7,8 +7,10 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/faultinjector"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
 	"github.com/blueprint-uservices/blueprint/plugins/http"
+	"github.com/blueprint-uservices/blueprint/plugins/jaeger"
 	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
+	"github.com/blueprint-uservices/blueprint/plugins/opentelemetry"
 	"github.com/blueprint-uservices/blueprint/plugins/simple"
 	"github.com/blueprint-uservices/blueprint/plugins/workflow"
 )
@@ -21,7 +23,9 @@ var Delay = cmdbuilder.SpecOption{
 
 func makeDelaySpec(spec wiring.WiringSpec) ([]string, error) {
 
+	collector := jaeger.Collector(spec, "jaeger")
 	applyDefaults := func(spec wiring.WiringSpec, serviceName string) string {
+		opentelemetry.Instrument(spec, serviceName, collector)
 		http.Deploy(spec, serviceName)
 		goproc.Deploy(spec, serviceName)
 		return linuxcontainer.Deploy(spec, serviceName)
