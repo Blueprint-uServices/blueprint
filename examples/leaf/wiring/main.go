@@ -42,5 +42,6 @@ func main() {
 		specs.OT_Logger,
 		specs.Govector,
 		specs.Replication,
+		specs.Delay,
 	)
 }
