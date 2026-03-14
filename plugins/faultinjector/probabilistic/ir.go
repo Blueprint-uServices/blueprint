@@ -1,4 +1,4 @@
-package delay
+package probabilistic
 
 import (
 	"fmt"
@@ -9,8 +9,8 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/golang/gocode"
 )
 
-// Blueprint IR node representing a RandomDelayServerWrapper
-type RandomDelayServerWrapper struct {
+// Blueprint IR node representing a ServerWrapper
+type ServerWrapper struct {
 	golang.Service
 	golang.GeneratesFuncs
 	golang.Instantiable
@@ -18,30 +18,30 @@ type RandomDelayServerWrapper struct {
 	InstanceName string
 	Wrapped      golang.Service
 
-	MaxDelay int64
+	Probability int
 
 	outputPackage string
 }
 
-func (node *RandomDelayServerWrapper) ImplementsGolangNode() {}
+func (node *ServerWrapper) ImplementsGolangNode() {}
 
-func (node *RandomDelayServerWrapper) Name() string {
+func (node *ServerWrapper) Name() string {
 	return node.InstanceName
 }
 
-func (node *RandomDelayServerWrapper) String() string {
-	return node.Name() + " = RandomDelayServerWrapper(" + node.Wrapped.Name() + ")"
+func (node *ServerWrapper) String() string {
+	return node.Name() + " = ServerWrapper(" + node.Wrapped.Name() + ")"
 }
 
-func (node *RandomDelayServerWrapper) AddInterfaces(builder golang.ModuleBuilder) error {
+func (node *ServerWrapper) AddInterfaces(builder golang.ModuleBuilder) error {
 	return node.Wrapped.AddInterfaces(builder)
 }
 
-func (node *RandomDelayServerWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
+func (node *ServerWrapper) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
 	return node.Wrapped.GetInterface(ctx)
 }
 
-func (node *RandomDelayServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
+func (node *ServerWrapper) GenerateFuncs(builder golang.ModuleBuilder) error {
 	service, err := golang.GetGoInterface(builder, node.Wrapped)
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (node *RandomDelayServerWrapper) GenerateFuncs(builder golang.ModuleBuilder
 	return generateServerHandler(builder, iface, service, node.outputPackage)
 }
 
-func (node *RandomDelayServerWrapper) AddInstantiation(builder golang.NamespaceBuilder) error {
+func (node *ServerWrapper) AddInstantiation(builder golang.NamespaceBuilder) error {
 	// Only generate instantiation code for this instance once
 	if builder.Visited(node.InstanceName) {
 		return nil
@@ -69,24 +69,24 @@ func (node *RandomDelayServerWrapper) AddInstantiation(builder golang.NamespaceB
 	constructor := &gocode.Constructor{
 		Package: builder.Module().Info().Name + "/" + node.outputPackage,
 		Func: gocode.Func{
-			Name: fmt.Sprintf("New_%v_RandomDelayHandler", iface.BaseName),
+			Name: fmt.Sprintf("New_%v_ProbabilisticFailureHandler", iface.BaseName),
 			Arguments: []gocode.Variable{
 				{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}},
 				{Name: "service", Type: iface},
-				{Name: "max_delay", Type: &gocode.BasicType{Name: "string"}},
+				{Name: "probabilistic", Type: &gocode.BasicType{Name: "string"}},
 			},
 		},
 	}
 
-	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, &ir.IRValue{Value: fmt.Sprintf("%v", node.MaxDelay)}})
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped, &ir.IRValue{Value: fmt.Sprintf("%v", node.Probability)}})
 }
 
-func NewRandomDelayServerWrapper(name string, serverNode golang.Service, maxDelay int64) (*RandomDelayServerWrapper, error) {
-	node := &RandomDelayServerWrapper{}
+func NewServerWrapper(name string, serverNode golang.Service, probability int) (*ServerWrapper, error) {
+	node := &ServerWrapper{}
 	node.InstanceName = name
 	node.Wrapped = serverNode
-	node.outputPackage = "delay"
-	node.MaxDelay = maxDelay
+	node.outputPackage = "prob_failure"
+	node.Probability = probability
 
 	return node, nil
 }

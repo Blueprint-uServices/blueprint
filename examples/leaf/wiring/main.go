@@ -43,5 +43,6 @@ func main() {
 		specs.Govector,
 		specs.Replication,
 		specs.Delay,
+		specs.ProbFailure,
 	)
 }
