@@ -10,11 +10,33 @@ Package faultinjector provides Blueprint modifiers for injecting faults in an ap
 
 ## Index
 
+- [func AddProbabilisticFailures\(spec wiring.WiringSpec, serviceName string, probability int\)](<#AddProbabilisticFailures>)
 - [func AddRandomDelay\(spec wiring.WiringSpec, serviceName string, maxDelay int64\)](<#AddRandomDelay>)
 
 
+<a name="AddProbabilisticFailures"></a>
+## func [AddProbabilisticFailures](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/faultinjector/wiring.go#L58>)
+
+```go
+func AddProbabilisticFailures(spec wiring.WiringSpec, serviceName string, probability int)
+```
+
+Fails requests with a given probability on the server side
+
+@param \`spec“: a \[blueprint.WiringSpec\]
+
+@param \`serviceName\`: Name of the service to add probabilistic failures to. There must be an instance with this name in the wiring specification.
+
+@param \`probability\`: Probability of a request failing. Must be in the range of \[1, 100\].
+
+Usage:
+
+```
+faultinjector.AddProbabilisticFailures(spec, "serviceA", 51)
+```
+
 <a name="AddRandomDelay"></a>
-## func [AddRandomDelay](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/faultinjector/wiring.go#L24>)
+## func [AddRandomDelay](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/faultinjector/wiring.go#L27>)
 
 ```go
 func AddRandomDelay(spec wiring.WiringSpec, serviceName string, maxDelay int64)
@@ -22,7 +44,11 @@ func AddRandomDelay(spec wiring.WiringSpec, serviceName string, maxDelay int64)
 
 Adds random delay on the server side implementation of the specified service.
 
-@param spec: a \[blueprint.WiringSpec\] @param serviceName: Name of the service to add delay to. There must be an instance with this name in the wiring specification. @param maxDelay: Specifies the maximum amount of delay to be added \(in milliseconds\)
+@param spec: a \[blueprint.WiringSpec\]
+
+@param serviceName: Name of the service to add delay to. There must be an instance with this name in the wiring specification.
+
+@param maxDelay: Specifies the maximum amount of delay to be added \(in milliseconds\)
 
 Usage:
 
