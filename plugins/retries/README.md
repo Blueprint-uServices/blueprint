@@ -15,14 +15,16 @@ import "github.com/blueprint-uservices/blueprint/plugins/retries"
  retries.AddRetries(spec, "my_service", 10) // Adds retries with a maximum number of retries
  retries.AddRetriesWithTimeouts(spec, "my_service", 10, "1s") // Adds retries and timeouts
  retries.AddRetriesWithFixedDelay(spec, "my_service", 10, "50ms") // Adds retries with a maximum number of retries and a fixed delay between any two tries.
- retries.AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s", false) // Adds retries with exponential backoff delay strategy between retries with the possibility to apply jitter.
- retries.AddRetriesRetryRateLimit(spec, "my_service", 10, 100) // Adds retries with rate limit strategy.
+ retries.AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s") // Adds retries with exponential backoff delay strategy between retries.
+ retries.AddRetriesTokenBucket(spec, "my_service", 10.0, 1.0, 0.05) // Adds retries with a token bucket
 ```
 
 ## Index
 
+- [Variables](<#variables>)
 - [func AddRetries\(spec wiring.WiringSpec, serviceName string, max\_retries int64\)](<#AddRetries>)
 - [func AddRetriesRetryRateLimit\(spec wiring.WiringSpec, serviceName string, max\_retries int64, retry\_rate\_limit int64\)](<#AddRetriesRetryRateLimit>)
+- [func AddRetriesTokenBucket\(spec wiring.WiringSpec, serviceName string, max\_capacity float64, retry\_cost float64, replenish\_amount float64\)](<#AddRetriesTokenBucket>)
 - [func AddRetriesWithExponentialBackoff\(spec wiring.WiringSpec, serviceName string, starting\_delay string, backoff\_limit string, useJitter bool\)](<#AddRetriesWithExponentialBackoff>)
 - [func AddRetriesWithFixedDelay\(spec wiring.WiringSpec, serviceName string, max\_retries int64, delay string\)](<#AddRetriesWithFixedDelay>)
 - [func AddRetriesWithTimeouts\(spec wiring.WiringSpec, serviceName string, max\_retries int64, timeout string\)](<#AddRetriesWithTimeouts>)
@@ -58,10 +60,56 @@ import "github.com/blueprint-uservices/blueprint/plugins/retries"
   - [func \(node \*RetrierRateLimiterClient\) ImplementsGolangNode\(\)](<#RetrierRateLimiterClient.ImplementsGolangNode>)
   - [func \(node \*RetrierRateLimiterClient\) Name\(\) string](<#RetrierRateLimiterClient.Name>)
   - [func \(node \*RetrierRateLimiterClient\) String\(\) string](<#RetrierRateLimiterClient.String>)
+- [type RetrierTokenBucketClient](<#RetrierTokenBucketClient>)
+  - [func \(node \*RetrierTokenBucketClient\) AddInstantiation\(builder golang.NamespaceBuilder\) error](<#RetrierTokenBucketClient.AddInstantiation>)
+  - [func \(node \*RetrierTokenBucketClient\) AddInterfaces\(builder golang.ModuleBuilder\) error](<#RetrierTokenBucketClient.AddInterfaces>)
+  - [func \(node \*RetrierTokenBucketClient\) GenerateFuncs\(builder golang.ModuleBuilder\) error](<#RetrierTokenBucketClient.GenerateFuncs>)
+  - [func \(node \*RetrierTokenBucketClient\) GetInterface\(ctx ir.BuildContext\) \(service.ServiceInterface, error\)](<#RetrierTokenBucketClient.GetInterface>)
+  - [func \(node \*RetrierTokenBucketClient\) ImplementsGolangNode\(\)](<#RetrierTokenBucketClient.ImplementsGolangNode>)
+  - [func \(node \*RetrierTokenBucketClient\) Name\(\) string](<#RetrierTokenBucketClient.Name>)
+  - [func \(node \*RetrierTokenBucketClient\) String\(\) string](<#RetrierTokenBucketClient.String>)
 
+
+## Variables
+
+<a name="IRNODE_RETRIER_EXPONENTIAL_BACKOFF_SUFFIX"></a>
+
+```go
+var IRNODE_RETRIER_EXPONENTIAL_BACKOFF_SUFFIX = ".client.retriereb"
+```
+
+<a name="IRNODE_RETRIER_FIXED_DELAY_SUFFIX"></a>
+
+```go
+var IRNODE_RETRIER_FIXED_DELAY_SUFFIX = ".client.retrierfd"
+```
+
+<a name="IRNODE_RETRIER_RATE_LIMITED_SUFFIX"></a>
+
+```go
+var IRNODE_RETRIER_RATE_LIMITED_SUFFIX = ".client.retrierrl"
+```
+
+<a name="IRNODE_RETRIER_SUFFIX"></a>
+
+```go
+var IRNODE_RETRIER_SUFFIX = ".client.retrier"
+```
+
+<a name="IRNODE_RETRIER_TOKEN_BUCKET_SUFFIX"></a>
+
+```go
+var IRNODE_RETRIER_TOKEN_BUCKET_SUFFIX = ".client.retriertb"
+```
+
+<a name="PROP_MAXRETRY"></a>
+
+```go
+var PROP_MAXRETRY = "Retry-Max"
+```
 
 <a name="AddRetries"></a>
-## func [AddRetries](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L31>)
+## func [AddRetries](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L39>)
 
 ```go
 func AddRetries(spec wiring.WiringSpec, serviceName string, max_retries int64)
@@ -74,7 +122,7 @@ AddRetries(spec, "my_service", 10)
 ```
 
 <a name="AddRetriesRetryRateLimit"></a>
-## func [AddRetriesRetryRateLimit](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L143>)
+## func [AddRetriesRetryRateLimit](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L154>)
 
 ```go
 func AddRetriesRetryRateLimit(spec wiring.WiringSpec, serviceName string, max_retries int64, retry_rate_limit int64)
@@ -86,8 +134,21 @@ Add retrier functionality to all clients of the specified service. Uses a \[blue
 AddRetriesRetryRateLimit(spec, "my_service", 10, 100)
 ```
 
+<a name="AddRetriesTokenBucket"></a>
+## func [AddRetriesTokenBucket](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L187>)
+
+```go
+func AddRetriesTokenBucket(spec wiring.WiringSpec, serviceName string, max_capacity float64, retry_cost float64, replenish_amount float64)
+```
+
+Add retrier functionality to all clients of the specified service. Uses a \[blueprint.WiringSpec\] Modifies the given service such that all clients to that service use a token bucket. The \`capacity\` is the max capacity of the bucket. The \`retry\_cost\` is the cost for 1 attempt at a retry. The \`replenish\_amount\` is the amount of tokens replenished to the bucket Usage:
+
+```
+AddRetriesTokenBucket(spec, "my_service", 10.0, 1.0, 0.05)
+```
+
 <a name="AddRetriesWithExponentialBackoff"></a>
-## func [AddRetriesWithExponentialBackoff](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L114>)
+## func [AddRetriesWithExponentialBackoff](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L125>)
 
 ```go
 func AddRetriesWithExponentialBackoff(spec wiring.WiringSpec, serviceName string, starting_delay string, backoff_limit string, useJitter bool)
@@ -100,7 +161,7 @@ AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s", false)
 ```
 
 <a name="AddRetriesWithFixedDelay"></a>
-## func [AddRetriesWithFixedDelay](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L82>)
+## func [AddRetriesWithFixedDelay](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L91>)
 
 ```go
 func AddRetriesWithFixedDelay(spec wiring.WiringSpec, serviceName string, max_retries int64, delay string)
@@ -113,7 +174,7 @@ AddRetriesWithFixedDelay(spec, "my_service", 10, "50ms")
 ```
 
 <a name="AddRetriesWithTimeouts"></a>
-## func [AddRetriesWithTimeouts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L71>)
+## func [AddRetriesWithTimeouts](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/wiring.go#L80>)
 
 ```go
 func AddRetriesWithTimeouts(spec wiring.WiringSpec, serviceName string, max_retries int64, timeout string)
@@ -468,6 +529,90 @@ func (node *RetrierRateLimiterClient) Name() string
 
 ```go
 func (node *RetrierRateLimiterClient) String() string
+```
+
+
+
+<a name="RetrierTokenBucketClient"></a>
+## type [RetrierTokenBucketClient](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L355-L367>)
+
+Blueprint IR node representing a Retry Token Bucket Client
+
+```go
+type RetrierTokenBucketClient struct {
+    golang.Service
+    golang.GeneratesFuncs
+    golang.Instantiable
+
+    InstanceName string
+    Wrapped      golang.Service
+
+    Capacity     float64
+    ReplenishAmt float64
+    RetryCost    float64
+    // contains filtered or unexported fields
+}
+```
+
+<a name="RetrierTokenBucketClient.AddInstantiation"></a>
+### func \(\*RetrierTokenBucketClient\) [AddInstantiation](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L417>)
+
+```go
+func (node *RetrierTokenBucketClient) AddInstantiation(builder golang.NamespaceBuilder) error
+```
+
+
+
+<a name="RetrierTokenBucketClient.AddInterfaces"></a>
+### func \(\*RetrierTokenBucketClient\) [AddInterfaces](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L396>)
+
+```go
+func (node *RetrierTokenBucketClient) AddInterfaces(builder golang.ModuleBuilder) error
+```
+
+
+
+<a name="RetrierTokenBucketClient.GenerateFuncs"></a>
+### func \(\*RetrierTokenBucketClient\) [GenerateFuncs](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L404>)
+
+```go
+func (node *RetrierTokenBucketClient) GenerateFuncs(builder golang.ModuleBuilder) error
+```
+
+
+
+<a name="RetrierTokenBucketClient.GetInterface"></a>
+### func \(\*RetrierTokenBucketClient\) [GetInterface](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L400>)
+
+```go
+func (node *RetrierTokenBucketClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error)
+```
+
+
+
+<a name="RetrierTokenBucketClient.ImplementsGolangNode"></a>
+### func \(\*RetrierTokenBucketClient\) [ImplementsGolangNode](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L369>)
+
+```go
+func (node *RetrierTokenBucketClient) ImplementsGolangNode()
+```
+
+
+
+<a name="RetrierTokenBucketClient.Name"></a>
+### func \(\*RetrierTokenBucketClient\) [Name](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L371>)
+
+```go
+func (node *RetrierTokenBucketClient) Name() string
+```
+
+
+
+<a name="RetrierTokenBucketClient.String"></a>
+### func \(\*RetrierTokenBucketClient\) [String](<https://github.com/Blueprint-uServices/blueprint/blob/main/plugins/retries/ir.go#L375>)
+
+```go
+func (node *RetrierTokenBucketClient) String() string
 ```
 
 
