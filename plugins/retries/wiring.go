@@ -10,6 +10,7 @@
 //	 retries.AddRetriesWithTimeouts(spec, "my_service", 10, "1s") // Adds retries and timeouts
 //	 retries.AddRetriesWithFixedDelay(spec, "my_service", 10, "50ms") // Adds retries with a maximum number of retries and a fixed delay between any two tries.
 //	 retries.AddRetriesWithExponentialBackoff(spec, "my_service", "100ms", "1s") // Adds retries with exponential backoff delay strategy between retries.
+//	 retries.AddRetriesTokenBucket(spec, "my_service", 10.0, 1.0, 0.05) // Adds retries with a token bucket
 package retries
 
 import (
@@ -27,6 +28,7 @@ var IRNODE_RETRIER_SUFFIX = ".client.retrier"
 var IRNODE_RETRIER_FIXED_DELAY_SUFFIX = ".client.retrierfd"
 var IRNODE_RETRIER_EXPONENTIAL_BACKOFF_SUFFIX = ".client.retriereb"
 var IRNODE_RETRIER_RATE_LIMITED_SUFFIX = ".client.retrierrl"
+var IRNODE_RETRIER_TOKEN_BUCKET_SUFFIX = ".client.retriertb"
 
 // Add retrier functionality to all clients of the specified service.
 // Uses a [blueprint.WiringSpec]
@@ -170,5 +172,36 @@ func AddRetriesRetryRateLimit(spec wiring.WiringSpec, serviceName string, max_re
 		}
 
 		return newRetrierRateLimiterClient(clientWrapper, wrapped, max_retries, retry_rate_limit)
+	})
+}
+
+// Add retrier functionality to all clients of the specified service.
+// Uses a [blueprint.WiringSpec]
+// Modifies the given service such that all clients to that service use a token bucket.
+// The `capacity` is the max capacity of the bucket.
+// The `retry_cost` is the cost for 1 attempt at a retry.
+// The `replenish_amount` is the amount of tokens replenished to the bucket
+// Usage:
+//
+//	AddRetriesTokenBucket(spec, "my_service", 10.0, 1.0, 0.05)
+func AddRetriesTokenBucket(spec wiring.WiringSpec, serviceName string, max_capacity float64, retry_cost float64, replenish_amount float64) {
+	clientWrapper := serviceName + IRNODE_RETRIER_TOKEN_BUCKET_SUFFIX
+
+	ptr := pointer.GetPointer(spec, serviceName)
+	if ptr == nil {
+		slog.Error("Unable to add retries to " + serviceName + " as it is not a pointer")
+		return
+	}
+
+	clientNext := ptr.AddSrcModifier(spec, clientWrapper)
+
+	spec.Define(clientWrapper, &RetrierTokenBucketClient{}, func(ns wiring.Namespace) (ir.IRNode, error) {
+		var wrapped golang.Service
+
+		if err := ns.Get(clientNext, &wrapped); err != nil {
+			return nil, blueprint.Errorf("Retries %s expected %s to be a golang.Service, but encountered %s", clientWrapper, clientNext, err)
+		}
+
+		return newRetrierTokenBucketClient(clientWrapper, wrapped, max_capacity, retry_cost, replenish_amount)
 	})
 }

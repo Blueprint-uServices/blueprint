@@ -350,3 +350,90 @@ func (node *RetrierRateLimiterClient) AddInstantiation(builder golang.NamespaceB
 
 	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped})
 }
+
+// Blueprint IR node representing a Retry Token Bucket Client
+type RetrierTokenBucketClient struct {
+	golang.Service
+	golang.GeneratesFuncs
+	golang.Instantiable
+
+	InstanceName string
+	Wrapped      golang.Service
+
+	outputPackage string
+	Capacity      float64
+	ReplenishAmt  float64
+	RetryCost     float64
+}
+
+func (node *RetrierTokenBucketClient) ImplementsGolangNode() {}
+
+func (node *RetrierTokenBucketClient) Name() string {
+	return node.InstanceName
+}
+
+func (node *RetrierTokenBucketClient) String() string {
+	return node.Name() + " = Retrier(" + node.Wrapped.Name() + ")"
+}
+
+func newRetrierTokenBucketClient(name string, server ir.IRNode, max_cap float64, retry_cost float64, replenish_amount float64) (*RetrierTokenBucketClient, error) {
+	serverNode, is_callable := server.(golang.Service)
+	if !is_callable {
+		return nil, blueprint.Errorf("rate limiter client wrapper requires %s to be a golang service but got %s", server.Name(), reflect.TypeOf(server).String())
+	}
+
+	node := &RetrierTokenBucketClient{}
+	node.InstanceName = name
+	node.Wrapped = serverNode
+	node.outputPackage = "retries"
+	node.Capacity = max_cap
+	node.ReplenishAmt = replenish_amount
+	node.RetryCost = retry_cost
+
+	return node, nil
+}
+
+func (node *RetrierTokenBucketClient) AddInterfaces(builder golang.ModuleBuilder) error {
+	return node.Wrapped.AddInterfaces(builder)
+}
+
+func (node *RetrierTokenBucketClient) GetInterface(ctx ir.BuildContext) (service.ServiceInterface, error) {
+	return node.Wrapped.GetInterface(ctx)
+}
+
+func (node *RetrierTokenBucketClient) GenerateFuncs(builder golang.ModuleBuilder) error {
+	if builder.Visited(node.InstanceName + ".generateFuncs") {
+		return nil
+	}
+
+	iface, err := golang.GetGoInterface(builder, node)
+	if err != nil {
+		return err
+	}
+
+	return generateTokenBucketClient(builder, iface, node.outputPackage, node.Capacity, node.RetryCost, node.ReplenishAmt)
+}
+
+func (node *RetrierTokenBucketClient) AddInstantiation(builder golang.NamespaceBuilder) error {
+	if builder.Visited(node.InstanceName) {
+		return nil
+	}
+
+	iface, err := golang.GetGoInterface(builder, node.Wrapped)
+	if err != nil {
+		return err
+	}
+
+	constructor := &gocode.Constructor{
+		Package: builder.Module().Info().Name + "/" + node.outputPackage,
+		Func: gocode.Func{
+			Name: fmt.Sprintf("New_%v_RetrierTokenBucketClient", iface.BaseName),
+			Arguments: []gocode.Variable{
+				{Name: "ctx", Type: &gocode.UserType{Package: "context", Name: "Context"}},
+				{Name: "client", Type: iface},
+			},
+		},
+	}
+
+	return builder.DeclareConstructor(node.InstanceName, constructor, []ir.IRNode{node.Wrapped})
+}
