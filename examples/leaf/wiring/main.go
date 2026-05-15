@@ -44,5 +44,6 @@ func main() {
 		specs.Replication,
 		specs.Delay,
 		specs.ProbFailure,
+		specs.RetriesDemo,
 	)
 }
