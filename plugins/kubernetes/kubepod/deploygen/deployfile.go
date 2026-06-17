@@ -157,7 +157,7 @@ spec:
       {{range $_, $decl := .Instances}}
         - name: {{.InstanceName}}
           image: {{.Image}}
-		  imagePullPolicy: Always
+          imagePullPolicy: Always
           {{- if .Config}}
           env:
           {{- range $name, $value := .Config}}
@@ -170,7 +170,7 @@ spec:
           {{- range $name, $port := .Ports}}
             - containerPort: {{$port}}
           {{- end}}
-		  {{- end}}
+          {{- end}}
       {{- end}}
       restartPolicy: Always
       hostname: {{.Name}}
@@ -188,7 +188,7 @@ spec:
   {{range $_, $decl := .Instances}}
   {{- range $name, $port := .Ports}}
     - name: {{$name}}
-	  port: {{$port}}
+      port: {{$port}}
       targetPort: {{$port}}
   {{- end}}
   {{- end}}
