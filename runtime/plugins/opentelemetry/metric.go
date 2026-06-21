@@ -19,16 +19,25 @@ func (s *StdoutMetricCollector) GetMetricProvider(ctx context.Context) (metric.M
 	return s.mp, nil
 }
 
-func NewStdoutMetricCollector(ctx context.Context) (*StdoutMetricCollector, error) {
+func NewStdoutMetricCollector(ctx context.Context, duration string) (*StdoutMetricCollector, error) {
 	exp, err := stdoutmetric.New()
+	if err != nil {
+		return nil, err
+	}
+
+	if duration == "" {
+		duration = "1s"
+	}
+
+	timerDuration, err := time.ParseDuration(duration)
 	if err != nil {
 		return nil, err
 	}
 
 	mp := metricsdk.NewMeterProvider(
 		metricsdk.WithReader(metricsdk.NewPeriodicReader(exp,
-			// Default is 1m. Set to 3s for demonstrative purposes.
-			metricsdk.WithInterval(3*time.Second))),
+			// Default is 1m. Set to 1s for demonstrative purposes.
+			metricsdk.WithInterval(timerDuration))),
 	)
 
 	otel.SetMeterProvider(mp)

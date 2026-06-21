@@ -185,11 +185,21 @@ func SetLogger(spec wiring.WiringSpec, procName string, loggerNodeName string) {
 	spec.SetProperty(procName, "logger", loggerNodeName)
 }
 
+// Set MetricPrintFrequency is not used directly by wiring specs; instead it is used bu other plugins such as
+// [opentelemetry] to configure the default metric collector.
+//
+// [opentelemetry]: https://github.com/Blueprint-uServices/blueprint/tree/main/plugins/opentelemetry
+func SetMetricPrintFrequency(spec wiring.WiringSpec, procName string, frequency string) {
+	spec.SetProperty(procName, "metricPrintFrequency", frequency)
+}
+
 // Defines the default metric collector
 func defineStdoutMetricCollector(spec wiring.WiringSpec, processName string) string {
 	collector := processName + ".stdoutmetriccollector"
 	spec.Define(collector, &stdoutMetricCollector{}, func(ns wiring.Namespace) (ir.IRNode, error) {
-		return newStdOutMetricCollector(collector)
+		var printFrequency string
+		spec.GetProperty(processName, "metricPrintFrequency", &printFrequency)
+		return newStdOutMetricCollector(collector, printFrequency)
 	})
 	return collector
 }
