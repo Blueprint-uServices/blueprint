@@ -16,15 +16,17 @@ type stdoutMetricCollector struct {
 	service.ServiceNode
 	golang.Instantiable
 
-	CollectorName string
-	Spec          *workflowspec.Service
+	CollectorName  string
+	PrintFrequency string
+	Spec           *workflowspec.Service
 }
 
-func newStdOutMetricCollector(name string) (*stdoutMetricCollector, error) {
+func newStdOutMetricCollector(name string, printFrequency string) (*stdoutMetricCollector, error) {
 	spec, err := workflowspec.GetService[opentelemetry.StdoutMetricCollector]()
 	node := &stdoutMetricCollector{
-		CollectorName: name,
-		Spec:          spec,
+		CollectorName:  name,
+		PrintFrequency: printFrequency,
+		Spec:           spec,
 	}
 	return node, err
 }
@@ -62,7 +64,7 @@ func (node *stdoutMetricCollector) AddInstantiation(builder golang.NamespaceBuil
 
 	slog.Info(fmt.Sprintf("Instantiating StdoutMetricCollector %v in %v/%v", node.CollectorName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.CollectorName, node.Spec.Constructor.AsConstructor(), []ir.IRNode{})
+	return builder.DeclareConstructor(node.CollectorName, node.Spec.Constructor.AsConstructor(), []ir.IRNode{&ir.IRValue{Value: node.PrintFrequency}})
 }
 
 func (node *stdoutMetricCollector) ImplementsGolangNode() {}

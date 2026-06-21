@@ -40,6 +40,7 @@ func makeHTTPSpec(spec wiring.WiringSpec) ([]string, error) {
 
 	nonleaf_service := workflow.Service[leaf.NonLeafService](spec, "nonleaf_service", leaf_service)
 	nonleaf_proc := applyHTTPDefaults(spec, nonleaf_service)
+	goproc.SetMetricPrintFrequency(spec, leaf_proc, "5s")
 
 	return []string{leaf_proc, nonleaf_proc}, nil
 }
