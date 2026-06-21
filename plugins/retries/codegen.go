@@ -161,6 +161,7 @@ func New_{{.Name}} (ctx context.Context, client {{.Imports.NameOf .Service.UserT
 {{ range $_, $f := .Service.Methods }}
 func (client *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
 	for i := 0; i < client.MaxTries; i++ {
+		ctx = context.WithValue("attempt_num", i+1)
 		{{RetVars $f "err"}} = client.Client.{{$f.Name}}({{ArgVars $f "ctx"}})
 		if err == nil {
 			return
@@ -200,6 +201,7 @@ func New_{{.Name}} (ctx context.Context, client {{.Imports.NameOf .Service.UserT
 {{ range $_, $f := .Service.Methods }}
 func (client *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
 	for i := 0; i < client.MaxTries; i++ {
+		ctx = context.WithValue("attempt_num", i+1)
 		{{RetVars $f "err"}} = client.Client.{{$f.Name}}({{ArgVars $f "ctx"}})
 		if err == nil {
 			return
@@ -258,7 +260,9 @@ func (client *{{.Name}}) addJitter(d time.Duration) time.Duration {
 {{ range $_, $f := .Service.Methods }}
 func (client *{{$receiver}}) {{$f.Name}}({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
 	delay := client.Delay
+	i := 1
 	for {
+		ctx = context.WithValue("attempt_num", i)
 		{{RetVars $f "err"}} = client.Client.{{$f.Name}}({{ArgVars $f "ctx"}})
 		if err == nil {
 			return
@@ -289,6 +293,7 @@ func (client *{{$receiver}}) {{$f.Name}}({{ArgVarsAndTypes $f "ctx context.Conte
 		if delay > client.Limit {
 			delay = client.Limit
 		}
+		i += 1
 	}
 }
 {{end}}
@@ -364,6 +369,7 @@ func (client *{{.Name}}) acquireToken() bool {
 {{ range $_, $f := .Service.Methods }}
 func (client *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
 	// First attempt - no rate limiting
+	ctx = context.WithValue("attempt_num", 1)
 	{{RetVars $f "err"}} = client.Client.{{$f.Name}}({{ArgVars $f "ctx"}})
 	if err == nil {
 		return
@@ -372,6 +378,7 @@ func (client *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Co
 	// Retry attempts with rate limiting
 	for i := 1; i < client.MaxTries; i++ {
 		// Wait for rate limit token
+		ctx = context.WithValue("attempt_num", i)
 		waitErr := client.waitForToken(ctx)
 		if waitErr == nil {
 			// Call the original method
@@ -411,6 +418,7 @@ func New_{{.Name}} (ctx context.Context, client {{.Imports.NameOf .Service.UserT
 {{$node := . -}}
 {{ range $_, $f := .Service.Methods }}
 func (client *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Context"}}) ({{RetVarsAndTypes $f "err error"}}) {
+	ctx = context.WithValue("attempt_num", 1)
 	{{RetVars $f "err"}} = client.Client.{{$f.Name}}({{ArgVars $f "ctx"}})
 	if err != nil {
 		tb := client.TokenBucket
@@ -419,6 +427,7 @@ func (client *{{$receiver}}) {{$f.Name -}} ({{ArgVarsAndTypes $f "ctx context.Co
 			return
 		} else {
 			client.TokenBucket = tb - {{$node.RetryCost}}
+			ctx = context.WithValue("attempt_num", 2)
 			{{RetVars $f "err"}} = client.Client.{{$f.Name}}({{ArgVars $f "ctx"}})
 			if err == nil {
 				client.TokenBucket = math.Min(client.TokenBucket + {{$node.ReplenishAmt}}, {{$node.Capacity}})
