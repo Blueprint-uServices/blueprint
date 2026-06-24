@@ -45,5 +45,6 @@ func main() {
 		specs.Delay,
 		specs.ProbFailure,
 		specs.RetriesDemo,
+		specs.Kubernetes,
 	)
 }
