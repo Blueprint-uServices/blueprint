@@ -1,18 +1,23 @@
 // Package kubernetes is a plugin for instantiating multiple container instances in a Kubernetes cluster.
 //
+// # Pre-requisites
+//
+// 1. Blueprint does NOT generate a Kubernetes cluster or manage the cluster.
+// 2. A docker registry must be running at a location where the kubernetes cluster can download the built images from.
+//
 // # Wiring Spec Usage
 //
 // To use the kubernetes plugin in your wiring spec, you can declare a Kuberenetes application, giving it a name and specifying which containers to include. Each container will be deployed in a separate pod in the Kubernetes cluster.
 //
-//	kubernetes.NewApplication(spec, "my_app", "my_container_1", "my_container_2")
+//	kubernetes.NewApplication(spec, "my_app", "docker_registry:5000", "my_container_1", "my_container_2")
 //
 // You can add more containers to an existing application:
 //
-//	kubernetes.AddContainerToDeployment(spec, "my_app", "my_container_3")
+//	kubernetes.AddContainerToDeployment(spec, "my_app", "docker_registry:5000", "my_container_3")
 //
 // You can also deploy multiple containers in a single pod:
 //
-//	kubernetes.AddPodToApplication(spec, "my_app", "my_container_4", "my_container_5")
+//	kubernetes.AddPodToApplication(spec, "my_app", "my_pod", "docker_registry:5000", "my_container_4", "my_container_5")
 //
 // # Artifacts Generated
 //
@@ -35,13 +40,15 @@ import (
 )
 
 // [AddContainerToApplication] can be used by wiring specs to add more containers to a Kubernetes application
+// PodName selected for this container is containerName + "_pod"
 func AddContainerToApplication(spec wiring.WiringSpec, appName string, registryAddr string, containerName string) {
-	AddPodToApplication(spec, appName, registryAddr, containerName)
+	podName := containerName + "_pod"
+	AddPodToApplication(spec, appName, podName, registryAddr, containerName)
 }
 
 // [AddPodToApplication] can be used by wiring specs to bundle multiple containers in a single Kubernetes Pod and add that pod to an application
-func AddPodToApplication(spec wiring.WiringSpec, appName string, registryAddr string, containers ...string) {
-	podName := kubepod.NewKubePod(spec, containers[0], registryAddr, containers...)
+func AddPodToApplication(spec wiring.WiringSpec, appName string, podName string, registryAddr string, containers ...string) {
+	podName = kubepod.NewKubePod(spec, podName, registryAddr, containers...)
 	namespaceutil.AddNodeTo[Application](spec, appName, podName)
 }
 
