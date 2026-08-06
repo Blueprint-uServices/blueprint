@@ -39,6 +39,7 @@ func newTemplateExecutor(args any) *templateExecutor {
 
 	e.Funcs["EnvVarName"] = e.EnvVarName
 	e.Funcs["Title"] = e.TitleCase
+	e.Funcs["KubernetesName"] = e.KubernetesName
 
 	return e
 }
@@ -59,4 +60,10 @@ func (e *templateExecutor) EnvVarName(name string) (string, error) {
 
 func (e *templateExecutor) TitleCase(arg string) (string, error) {
 	return strings.Title(arg), nil
+}
+
+func (e *templateExecutor) KubernetesName(name string) (string, error) {
+	s := strings.ReplaceAll(name, "_", "-")
+	s = strings.ReplaceAll(s, ".", "-")
+	return s, nil
 }

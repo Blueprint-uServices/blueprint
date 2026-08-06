@@ -155,7 +155,7 @@ spec:
     spec:
       containers:
       {{range $_, $decl := .Instances}}
-        - name: {{.InstanceName}}
+        - name: {{KubernetesName .InstanceName}}
           image: {{.Image}}
           imagePullPolicy: Always
           {{- if .Config}}
@@ -187,7 +187,7 @@ spec:
   ports:
   {{range $_, $decl := .Instances}}
   {{- range $name, $port := .Ports}}
-    - name: {{$name}}
+    - name: {{KubernetesName $name}}
       port: {{$port}}
       targetPort: {{$port}}
   {{- end}}

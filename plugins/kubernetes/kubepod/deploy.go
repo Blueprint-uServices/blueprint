@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"reflect"
+	"strings"
 
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/blueprint/ioutil"
@@ -68,6 +69,7 @@ func (node *PodDeployment) generateArtifacts(workspace *kubeDeploymentWorkspace)
 }
 
 func NewKubePodWorkspace(name string, dir string, registry_addr string) *kubeDeploymentWorkspace {
+	name = strings.ReplaceAll(name, "_", "-") // Change name to match kubernetes expected values
 	return &kubeDeploymentWorkspace{
 		info: docker.ContainerWorkspaceInfo{
 			Path:   filepath.Clean(dir),
