@@ -212,7 +212,8 @@ func (p *kubeDeploymentWorkspace) processArgNodes() error {
 			if addr, isLocalDial := localAddresses[dial.AddressName]; isLocalDial {
 				p.F.AddEnvVar(instanceName, dial.Name(), addr)
 			} else {
-				p.F.AddEnvVar(instanceName, dial.Name(), "${"+strings.ToUpper(dial.Name())+"}")
+				name := strings.ReplaceAll(strings.ToUpper(dial.Name()), ".", "_")
+				p.F.AddEnvVar(instanceName, dial.Name(), "${"+name+"}")
 			}
 		}
 	}
