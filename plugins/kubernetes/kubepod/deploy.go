@@ -212,9 +212,7 @@ func (p *kubeDeploymentWorkspace) processArgNodes() error {
 			if addr, isLocalDial := localAddresses[dial.AddressName]; isLocalDial {
 				p.F.AddEnvVar(instanceName, dial.Name(), addr)
 			} else {
-				// TODO: do we pass through an environment variable? how do we know the name to dial for
-				// services that are outside this service?  maybe just use the
-				// service_a.grpc.dial_addr name itself as the service lookup name???
+				p.F.AddEnvVar(instanceName, dial.Name(), "${"+strings.ToUpper(dial.Name())+"}")
 			}
 		}
 	}

@@ -33,6 +33,8 @@
 package kubernetes
 
 import (
+	"log/slog"
+
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/namespaceutil"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/wiring"
@@ -63,6 +65,8 @@ func AddPodToApplication(spec wiring.WiringSpec, appName string, podName string,
 // Returns appName
 func NewApplication(spec wiring.WiringSpec, appName string, registryAddr string, containers ...string) string {
 
+	appName = appName + "_kubernetes"
+
 	// If any children were provided in this call, add them to the app via a property
 	for _, containerName := range containers {
 		AddContainerToApplication(spec, appName, registryAddr, containerName)
@@ -90,12 +94,14 @@ func (application *Application) Accepts(nodeType any) bool {
 
 // Implements [wiring.NamespaceHandler]
 func (application *Application) AddEdge(name string, edge ir.IRNode) error {
+	slog.Info("Adding edge to " + name)
 	application.Edges = append(application.Edges, edge)
 	return nil
 }
 
 // Implements [wiring.NamespaceHandler]
 func (application *Application) AddNode(name string, node ir.IRNode) error {
+	slog.Info("Adding child node " + name)
 	application.Nodes = append(application.Nodes, node)
 	return nil
 }

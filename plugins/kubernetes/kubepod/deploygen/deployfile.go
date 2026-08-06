@@ -190,6 +190,7 @@ spec:
     - name: {{KubernetesName $name}}
       port: {{$port}}
       targetPort: {{$port}}
+	  nodePort: {{$port}}
   {{- end}}
   {{- end}}
 `
