@@ -1,6 +1,7 @@
 package kubepod
 
 import (
+	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/address"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/docker"
 )
@@ -12,6 +13,8 @@ type PodDeployment struct {
 	DockerRegistryAddr string
 	Nodes              []ir.IRNode
 	Edges              []ir.IRNode
+	AllBinds           []*address.BindConfig
+	AllDials           []*address.DialConfig
 }
 
 // Implements IRNode

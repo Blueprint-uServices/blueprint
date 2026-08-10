@@ -11,6 +11,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/coreplugins/address"
 	"github.com/blueprint-uservices/blueprint/blueprint/pkg/ir"
 	"github.com/blueprint-uservices/blueprint/plugins/docker"
+	"github.com/blueprint-uservices/blueprint/plugins/linux"
 	"golang.org/x/exp/slog"
 
 	"github.com/blueprint-uservices/blueprint/plugins/kubernetes/kubepod/deploygen"
@@ -36,7 +37,16 @@ type kubeDeploymentWorkspace struct {
 
 	DockerRegistryAddr string
 
+	AllBinds []*address.BindConfig
+	AllDials []*address.DialConfig
+
 	F *deploygen.KubeDeploymentFile
+}
+
+// Converts a given name into a format compatible with Kubernetes
+// Replaces "_" with "-"
+func KubernetesName(name string) string {
+	return strings.ReplaceAll(name, "_", "-")
 }
 
 // Implements ir.ArtifactGenerator
@@ -65,11 +75,15 @@ func (node *PodDeployment) generateArtifacts(workspace *kubeDeploymentWorkspace)
 	if err := workspace.Finish(); err != nil {
 		return err
 	}
+
+	node.AllBinds = workspace.AllBinds
+	node.AllDials = workspace.AllDials
+
 	return nil
 }
 
 func NewKubePodWorkspace(name string, dir string, registry_addr string) *kubeDeploymentWorkspace {
-	name = strings.ReplaceAll(name, "_", "-") // Change name to match kubernetes expected values
+	name = KubernetesName(name)
 	return &kubeDeploymentWorkspace{
 		info: docker.ContainerWorkspaceInfo{
 			Path:   filepath.Clean(dir),
@@ -172,6 +186,8 @@ func (p *kubeDeploymentWorkspace) processArgNodes() error {
 		}
 	}
 
+	p.AllBinds = allBinds
+
 	// (2) Set environment variables for containers
 	// (3) Expose container ports externally
 	for instanceName, instanceArgs := range p.InstanceArgs {
@@ -212,10 +228,12 @@ func (p *kubeDeploymentWorkspace) processArgNodes() error {
 			if addr, isLocalDial := localAddresses[dial.AddressName]; isLocalDial {
 				p.F.AddEnvVar(instanceName, dial.Name(), addr)
 			} else {
-				name := strings.ReplaceAll(strings.ToUpper(dial.Name()), ".", "_")
-				p.F.AddEnvVar(instanceName, dial.Name(), "${"+name+"}")
+				name := linux.EnvVar(dial.Name())
+				p.F.AddConfigMapVar(instanceName, name)
 			}
 		}
+
+		p.AllDials = append(p.AllDials, dials...)
 	}
 
 	return nil

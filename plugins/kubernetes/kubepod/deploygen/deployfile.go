@@ -29,6 +29,7 @@ type instance struct {
 	CustomCommand []string
 	Volumes       map[string]string
 	CustomConf    map[string]string
+	ConfigMap     map[string]bool
 }
 
 func NewKubeDeploymentFile(workspaceName string, workspaceDir string, filename string, serviceFilename string) *KubeDeploymentFile {
@@ -78,6 +79,15 @@ func (k *KubeDeploymentFile) AddEnvVar(instanceName string, key string, val stri
 		instance.Config[key] = val
 		return nil
 	}
+}
+
+func (k *KubeDeploymentFile) AddConfigMapVar(instanceName string, key string) error {
+	instance, err := k.getInstance(instanceName)
+	if err != nil {
+		return err
+	}
+	instance.ConfigMap[key] = true
+	return nil
 }
 
 func (k *KubeDeploymentFile) ExposePort(instanceName string, portName string, port uint16) error {
@@ -130,6 +140,7 @@ func (k *KubeDeploymentFile) addInstance(instanceName string, image string) erro
 		CustomCommand: []string{},
 		Volumes:       make(map[string]string),
 		CustomConf:    make(map[string]string),
+		ConfigMap:     make(map[string]bool),
 	}
 	k.Instances[instanceName] = instance
 	return nil
@@ -164,6 +175,13 @@ spec:
             - name: {{$name}}
               value: "{{$value}}"
           {{- end}}
+          {{- range $name, $_ := .ConfigMap}}
+            - name: {{$name}}
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: {{$name}}
+          {{- end}}
           {{- end}}
           {{- if .Ports}}
           ports:
@@ -190,7 +208,6 @@ spec:
     - name: {{KubernetesName $name}}
       port: {{$port}}
       targetPort: {{$port}}
-	  nodePort: {{$port}}
   {{- end}}
   {{- end}}
 `
