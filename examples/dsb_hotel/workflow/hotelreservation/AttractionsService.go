@@ -10,9 +10,9 @@ import (
 
 // AttractionsService implements the Attractions Service from the hotel reservation application
 type AttractionsService interface {
-	NearbyRest(ctx context.Context, lat float64, lon float64) ([]string, error)
-	NearbyMus(ctx context.Context, lat float64, lon float64) ([]string, error)
-	NearbyCinema(ctx context.Context, lat float64, lon float64) ([]string, error)
+	NearbyRest(ctx context.Context, lat float64, lon float64) ([]Restaurant, error)
+	NearbyMus(ctx context.Context, lat float64, lon float64) ([]Museum, error)
+	NearbyCinema(ctx context.Context, lat float64, lon float64) ([]Cinema, error)
 }
 
 // AttractionsServiceImpl finds nearby attractions using indexes populated from
@@ -133,30 +133,45 @@ func (a *AttractionsServiceImpl) newGeoIndex(ctx context.Context, collectionName
 	return index, nil
 }
 
-func nearbyAttractionIDs(index *geoindex.ClusteringIndex, lat float64, lon float64) []string {
+func nearbyAttractions(index *geoindex.ClusteringIndex, lat float64, lon float64) []geoindex.Point {
 	center := &geoindex.GeoPoint{Pid: "", Plat: lat, Plon: lon}
-	points := index.KNearest(
+	return index.KNearest(
 		center,
 		attractionsMaxSearchResults,
 		geoindex.Km(attractionsMaxSearchRadius),
 		func(geoindex.Point) bool { return true },
 	)
+}
 
-	ids := make([]string, 0, len(points))
+func (a *AttractionsServiceImpl) NearbyRest(ctx context.Context, lat float64, lon float64) ([]Restaurant, error) {
+	points := nearbyAttractions(a.restaurants, lat, lon)
+	restaurants := make([]Restaurant, 0, len(points))
 	for _, point := range points {
-		ids = append(ids, point.Id())
+		if restaurant, ok := point.(*Restaurant); ok {
+			restaurants = append(restaurants, *restaurant)
+		}
 	}
-	return ids
+	return restaurants, nil
 }
 
-func (a *AttractionsServiceImpl) NearbyRest(ctx context.Context, lat float64, lon float64) ([]string, error) {
-	return nearbyAttractionIDs(a.restaurants, lat, lon), nil
+func (a *AttractionsServiceImpl) NearbyMus(ctx context.Context, lat float64, lon float64) ([]Museum, error) {
+	points := nearbyAttractions(a.museums, lat, lon)
+	museums := make([]Museum, 0, len(points))
+	for _, point := range points {
+		if museum, ok := point.(*Museum); ok {
+			museums = append(museums, *museum)
+		}
+	}
+	return museums, nil
 }
 
-func (a *AttractionsServiceImpl) NearbyMus(ctx context.Context, lat float64, lon float64) ([]string, error) {
-	return nearbyAttractionIDs(a.museums, lat, lon), nil
-}
-
-func (a *AttractionsServiceImpl) NearbyCinema(ctx context.Context, lat float64, lon float64) ([]string, error) {
-	return nearbyAttractionIDs(a.cinemas, lat, lon), nil
+func (a *AttractionsServiceImpl) NearbyCinema(ctx context.Context, lat float64, lon float64) ([]Cinema, error) {
+	points := nearbyAttractions(a.cinemas, lat, lon)
+	cinemas := make([]Cinema, 0, len(points))
+	for _, point := range points {
+		if cinema, ok := point.(*Cinema); ok {
+			cinemas = append(cinemas, *cinema)
+		}
+	}
+	return cinemas, nil
 }
