@@ -36,7 +36,7 @@ type FrontEndV2ServiceImpl struct {
 	frontendService    *FrontEndServiceImpl
 }
 
-func NewFrontEndV2ServiceImpl(ctx context.Context, searchService SearchService, profileService ProfileService, recommendationService RecommendationService, userService UserService, reservationService ReservationService, attractionsService AttractionsService, reviewService ReviewService) (*FrontEndV2ServiceImpl, error) {
+func NewFrontEndV2ServiceImpl(ctx context.Context, searchService SearchService, profileService ProfileService, recommendationService RecommendationService, userService UserService, reservationService ReservationService, attractionsService AttractionsService, reviewService ReviewService) (FrontEndV2Service, error) {
 	feimpl := &FrontEndServiceImpl{searchService: searchService, profileService: profileService, userService: userService, recommendationService: recommendationService, reservationService: reservationService}
 
 	return &FrontEndV2ServiceImpl{profileService: profileService, attractionsService: attractionsService, reviewService: reviewService, frontendService: feimpl}, nil
