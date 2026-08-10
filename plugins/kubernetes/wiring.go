@@ -25,9 +25,23 @@
 //
 // # Running Artifacts
 //
+// ## Building the containers
+//
+// For each container in the repo, you must build the container and push it to the registry
+//
+//	sudo docker build -t docker_registry:5000/ctr_name // Builds the container locally
+//	sudo docker push docker_registry:5000/ctr_name // Pushes the container to the registry
+//
+// You can check if the container images were pushed using this command
+//
+//	curl http://docker_registry:5000/v2/_catalog
+//
+// ## Running the Application
+//
 // You need to have a working kubernetes cluster and `kubectl` installed.
 // To deploy the pods to the cluster, use the following commands:
 //
+//	kubectl apply -f app_config.yaml
 //	kubectl apply -f podName-deployment.yaml
 //	kubectl apply -f podName-service.yaml
 package kubernetes
