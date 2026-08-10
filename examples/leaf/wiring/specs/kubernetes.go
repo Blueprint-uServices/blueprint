@@ -7,7 +7,7 @@ import (
 	"github.com/blueprint-uservices/blueprint/examples/leaf/workflow/leaf"
 	"github.com/blueprint-uservices/blueprint/plugins/cmdbuilder"
 	"github.com/blueprint-uservices/blueprint/plugins/goproc"
-	"github.com/blueprint-uservices/blueprint/plugins/grpc"
+	"github.com/blueprint-uservices/blueprint/plugins/http"
 	"github.com/blueprint-uservices/blueprint/plugins/kubernetes"
 	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"github.com/blueprint-uservices/blueprint/plugins/mongodb"
@@ -25,7 +25,7 @@ var regAddr = flag.String("registry", "", "Address at which docker registry is h
 
 func makeKubernetesSpec(spec wiring.WiringSpec) ([]string, error) {
 	applyKubeDefaults := func(spec wiring.WiringSpec, serviceName string) string {
-		grpc.Deploy(spec, serviceName)
+		http.Deploy(spec, serviceName)
 		goproc.Deploy(spec, serviceName)
 		return linuxcontainer.Deploy(spec, serviceName)
 	}
