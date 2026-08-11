@@ -8,7 +8,7 @@ type TextService interface {
 
 type TextServiceImpl struct{ composeReviewService ComposeReviewService }
 
-func NewTextServiceImpl(composeReviewService ComposeReviewService) (TextService, error) {
+func NewTextServiceImpl(ctx context.Context, composeReviewService ComposeReviewService) (TextService, error) {
 	return &TextServiceImpl{composeReviewService: composeReviewService}, nil
 }
 

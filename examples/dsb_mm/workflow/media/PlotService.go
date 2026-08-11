@@ -23,7 +23,7 @@ type PlotServiceImpl struct {
 	plotDB    backend.NoSQLDatabase
 }
 
-func NewPlotServiceImpl(plotCache backend.Cache, plotDB backend.NoSQLDatabase) (PlotService, error) {
+func NewPlotServiceImpl(ctx context.Context, plotCache backend.Cache, plotDB backend.NoSQLDatabase) (PlotService, error) {
 	return &PlotServiceImpl{plotCache: plotCache, plotDB: plotDB}, nil
 }
 

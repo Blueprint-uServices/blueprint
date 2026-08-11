@@ -48,7 +48,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return media.NewReviewStorageServiceImpl(cache, db)
+		return media.NewReviewStorageServiceImpl(ctx, cache, db)
 	})
 
 	userReviewServiceRegistry.Register("local", func(ctx context.Context) (media.UserReviewService, error) {
@@ -64,7 +64,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return media.NewUserReviewServiceImpl(reviewStorage, db, cache)
+		return media.NewUserReviewServiceImpl(ctx, reviewStorage, db, cache)
 	})
 
 	movieReviewServiceRegistry.Register("local", func(ctx context.Context) (media.MovieReviewService, error) {
@@ -80,7 +80,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return media.NewMovieReviewServiceImpl(reviewStorage, cache, db)
+		return media.NewMovieReviewServiceImpl(ctx, reviewStorage, cache, db)
 	})
 
 	composeReviewServiceRegistry.Register("local", func(ctx context.Context) (media.ComposeReviewService, error) {
@@ -100,7 +100,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return media.NewComposeReviewServiceImpl(cache, reviewStorage, userReview, movieReview)
+		return media.NewComposeReviewServiceImpl(ctx, cache, reviewStorage, userReview, movieReview)
 	})
 
 	ratingServiceRegistry.Register("local", func(ctx context.Context) (media.RatingService, error) {
@@ -112,7 +112,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return media.NewRatingServiceImpl(composeReview, cache)
+		return media.NewRatingServiceImpl(ctx, composeReview, cache)
 	})
 
 	movieIDServiceRegistry.Register("local", func(ctx context.Context) (media.MovieIdService, error) {
@@ -132,7 +132,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return media.NewMovieIdServiceImpl(cache, db, rating, composeReview)
+		return media.NewMovieIdServiceImpl(ctx, cache, db, rating, composeReview)
 	})
 
 	userServiceRegistry.Register("local", func(ctx context.Context) (media.UserService, error) {
@@ -148,7 +148,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return media.NewUserServiceImpl(cache, db, composeReview, "test-secret")
+		return media.NewUserServiceImpl(ctx, cache, db, composeReview, "test-secret")
 	})
 
 	castInfoServiceRegistry.Register("local", func(ctx context.Context) (media.CastInfoService, error) {
@@ -160,7 +160,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return media.NewCastInfoService(cache, db)
+		return media.NewCastInfoService(ctx, cache, db)
 	})
 
 	plotServiceRegistry.Register("local", func(ctx context.Context) (media.PlotService, error) {
@@ -172,7 +172,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return media.NewPlotServiceImpl(cache, db)
+		return media.NewPlotServiceImpl(ctx, cache, db)
 	})
 
 	movieInfoServiceRegistry.Register("local", func(ctx context.Context) (media.MovieInfoService, error) {
@@ -184,7 +184,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return media.NewMovieInfoServiceImpl(cache, db)
+		return media.NewMovieInfoServiceImpl(ctx, cache, db)
 	})
 
 	textServiceRegistry.Register("local", func(ctx context.Context) (media.TextService, error) {
@@ -192,7 +192,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return media.NewTextServiceImpl(composeReview)
+		return media.NewTextServiceImpl(ctx, composeReview)
 	})
 
 	uniqueIDServiceRegistry.Register("local", func(ctx context.Context) (media.UniqueIdService, error) {
@@ -200,7 +200,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return media.NewUniqueIdServiceImpl(composeReview)
+		return media.NewUniqueIdServiceImpl(ctx, composeReview)
 	})
 
 	pageServiceRegistry.Register("local", func(ctx context.Context) (media.PageService, error) {
@@ -220,7 +220,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return media.NewPageServiceImpl(movieInfo, movieReview, castInfo, plot)
+		return media.NewPageServiceImpl(ctx, movieInfo, movieReview, castInfo, plot)
 	})
 
 	wrk2APIServiceRegistry.Register("local", func(ctx context.Context) (media.Wrk2APIService, error) {
@@ -252,7 +252,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		return media.NewWrk2APIServiceImpl(user, castInfo, text, plot, movieID, movieInfo, uniqueID)
+		return media.NewWrk2APIServiceImpl(ctx, user, castInfo, text, plot, movieID, movieInfo, uniqueID)
 	})
 }
 

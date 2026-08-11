@@ -18,7 +18,7 @@ type RatingServiceImpl struct {
 	mu                   sync.Mutex
 }
 
-func NewRatingServiceImpl(composeReviewService ComposeReviewService, ratingCache backend.Cache) (RatingService, error) {
+func NewRatingServiceImpl(ctx context.Context, composeReviewService ComposeReviewService, ratingCache backend.Cache) (RatingService, error) {
 	return &RatingServiceImpl{composeReviewService: composeReviewService, ratingCache: ratingCache}, nil
 }
 

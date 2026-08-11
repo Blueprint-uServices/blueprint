@@ -18,7 +18,7 @@ type ReviewStorageServiceImpl struct {
 	reviewStorageDB    backend.NoSQLDatabase
 }
 
-func NewReviewStorageServiceImpl(reviewStorageCache backend.Cache, reviewStorageDB backend.NoSQLDatabase) (ReviewStorageService, error) {
+func NewReviewStorageServiceImpl(ctx context.Context, reviewStorageCache backend.Cache, reviewStorageDB backend.NoSQLDatabase) (ReviewStorageService, error) {
 	return &ReviewStorageServiceImpl{reviewStorageCache: reviewStorageCache, reviewStorageDB: reviewStorageDB}, nil
 }
 

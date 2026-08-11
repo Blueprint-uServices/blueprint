@@ -50,7 +50,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func NewUserServiceImpl(userCache backend.Cache, userDB backend.NoSQLDatabase, composeReviewService ComposeReviewService, secret string) (UserService, error) {
+func NewUserServiceImpl(ctx context.Context, userCache backend.Cache, userDB backend.NoSQLDatabase, composeReviewService ComposeReviewService, secret string) (UserService, error) {
 	return &UserServiceImpl{machineID: GetMachineID(), currentTimestamp: -1, secret: secret, userCache: userCache, userDB: userDB, composeReviewService: composeReviewService}, nil
 }
 

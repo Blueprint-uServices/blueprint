@@ -19,7 +19,7 @@ type MovieInfoServiceImpl struct {
 	movieInfoDB    backend.NoSQLDatabase
 }
 
-func NewMovieInfoServiceImpl(movieInfoCache backend.Cache, movieInfoDB backend.NoSQLDatabase) (MovieInfoService, error) {
+func NewMovieInfoServiceImpl(ctx context.Context, movieInfoCache backend.Cache, movieInfoDB backend.NoSQLDatabase) (MovieInfoService, error) {
 	return &MovieInfoServiceImpl{movieInfoCache: movieInfoCache, movieInfoDB: movieInfoDB}, nil
 }
 

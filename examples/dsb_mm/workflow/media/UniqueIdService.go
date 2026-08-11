@@ -33,7 +33,7 @@ func GetMachineID() string {
 	return "0"
 }
 
-func NewUniqueIdServiceImpl(composeReviewService ComposeReviewService) (UniqueIdService, error) {
+func NewUniqueIdServiceImpl(ctx context.Context, composeReviewService ComposeReviewService) (UniqueIdService, error) {
 	return &UniqueIdServiceImpl{composeReviewService: composeReviewService, currentTimestamp: -1, machineID: GetMachineID()}, nil
 }
 

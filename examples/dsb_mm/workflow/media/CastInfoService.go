@@ -18,7 +18,7 @@ type CastInfoServiceImpl struct {
 	castInfoDB    backend.NoSQLDatabase
 }
 
-func NewCastInfoService(castInfoCache backend.Cache, castInfoDB backend.NoSQLDatabase) (CastInfoService, error) {
+func NewCastInfoService(ctx context.Context, castInfoCache backend.Cache, castInfoDB backend.NoSQLDatabase) (CastInfoService, error) {
 	return &CastInfoServiceImpl{castInfoCache: castInfoCache, castInfoDB: castInfoDB}, nil
 }
 

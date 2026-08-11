@@ -25,7 +25,7 @@ type ComposeReviewServiceImpl struct {
 	mu                   sync.Mutex
 }
 
-func NewComposeReviewServiceImpl(composeReviewCache backend.Cache, reviewStorageService ReviewStorageService, userReviewService UserReviewService, movieReviewService MovieReviewService) (ComposeReviewService, error) {
+func NewComposeReviewServiceImpl(ctx context.Context, composeReviewCache backend.Cache, reviewStorageService ReviewStorageService, userReviewService UserReviewService, movieReviewService MovieReviewService) (ComposeReviewService, error) {
 	return &ComposeReviewServiceImpl{
 		composeReviewCache: composeReviewCache, reviewStorageService: reviewStorageService,
 		userReviewService: userReviewService, movieReviewService: movieReviewService,

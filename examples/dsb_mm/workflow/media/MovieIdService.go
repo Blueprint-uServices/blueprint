@@ -20,7 +20,7 @@ type MovieIdServiceImpl struct {
 	composeReviewService ComposeReviewService
 }
 
-func NewMovieIdServiceImpl(movieIdCache backend.Cache, movieIdDB backend.NoSQLDatabase, ratingService RatingService, composeReviewService ComposeReviewService) (MovieIdService, error) {
+func NewMovieIdServiceImpl(ctx context.Context, movieIdCache backend.Cache, movieIdDB backend.NoSQLDatabase, ratingService RatingService, composeReviewService ComposeReviewService) (MovieIdService, error) {
 	return &MovieIdServiceImpl{movieIdCache: movieIdCache, movieIdDB: movieIdDB, ratingService: ratingService, composeReviewService: composeReviewService}, nil
 }
 

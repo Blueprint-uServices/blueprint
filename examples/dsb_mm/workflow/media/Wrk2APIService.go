@@ -25,7 +25,7 @@ type Wrk2APIServiceImpl struct {
 	requestIDSequence atomic.Int64
 }
 
-func NewWrk2APIServiceImpl(userService UserService, castInfoService CastInfoService, textService TextService, plotService PlotService, movieIdService MovieIdService, movieInfoService MovieInfoService, uniqueIdService UniqueIdService) (Wrk2APIService, error) {
+func NewWrk2APIServiceImpl(ctx context.Context, userService UserService, castInfoService CastInfoService, textService TextService, plotService PlotService, movieIdService MovieIdService, movieInfoService MovieInfoService, uniqueIdService UniqueIdService) (Wrk2APIService, error) {
 	return &Wrk2APIServiceImpl{userService: userService, castInfoService: castInfoService, textService: textService, plotService: plotService, movieIdService: movieIdService, movieInfoService: movieInfoService, uniqueIdService: uniqueIdService}, nil
 }
 

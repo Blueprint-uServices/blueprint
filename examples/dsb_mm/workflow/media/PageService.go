@@ -13,7 +13,7 @@ type PageServiceImpl struct {
 	plotService        PlotService
 }
 
-func NewPageServiceImpl(movieInfoService MovieInfoService, movieReviewService MovieReviewService, castInfoService CastInfoService, plotService PlotService) (PageService, error) {
+func NewPageServiceImpl(ctx context.Context, movieInfoService MovieInfoService, movieReviewService MovieReviewService, castInfoService CastInfoService, plotService PlotService) (PageService, error) {
 	return &PageServiceImpl{movieInfoService: movieInfoService, movieReviewService: movieReviewService, castInfoService: castInfoService, plotService: plotService}, nil
 }
 

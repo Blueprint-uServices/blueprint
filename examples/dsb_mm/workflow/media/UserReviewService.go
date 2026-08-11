@@ -26,7 +26,7 @@ type UserReviewServiceImpl struct {
 	mu                   sync.Mutex
 }
 
-func NewUserReviewServiceImpl(reviewStorageService ReviewStorageService, userReviewDB backend.NoSQLDatabase, userReviewCache backend.Cache) (UserReviewService, error) {
+func NewUserReviewServiceImpl(ctx context.Context, reviewStorageService ReviewStorageService, userReviewDB backend.NoSQLDatabase, userReviewCache backend.Cache) (UserReviewService, error) {
 	return &UserReviewServiceImpl{reviewStorageService: reviewStorageService, userReviewDB: userReviewDB, userReviewCache: userReviewCache}, nil
 }
 

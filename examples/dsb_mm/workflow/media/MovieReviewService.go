@@ -31,7 +31,7 @@ type MovieReviewServiceImpl struct {
 	mu                   sync.Mutex
 }
 
-func NewMovieReviewServiceImpl(reviewStorageService ReviewStorageService, movieReviewCache backend.Cache, movieReviewDB backend.NoSQLDatabase) (MovieReviewService, error) {
+func NewMovieReviewServiceImpl(ctx context.Context, reviewStorageService ReviewStorageService, movieReviewCache backend.Cache, movieReviewDB backend.NoSQLDatabase) (MovieReviewService, error) {
 	return &MovieReviewServiceImpl{reviewStorageService: reviewStorageService, movieReviewCache: movieReviewCache, movieReviewDB: movieReviewDB}, nil
 }
 
