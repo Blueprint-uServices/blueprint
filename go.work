@@ -10,6 +10,8 @@ use (
 	./examples/dsb_hotel/workload
 	./examples/dsb_mm/tests
 	./examples/dsb_mm/workflow
+	./examples/dsb_mm/wiring
+	./examples/dsb_mm/workload
 	./examples/dsb_sn/tests
 	./examples/dsb_sn/wiring
 	./examples/dsb_sn/workflow

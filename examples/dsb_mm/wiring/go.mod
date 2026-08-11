@@ -1,6 +1,6 @@
-module github.com/Blueprint-uservices/blueprint/examples/dsb_mm/wiring
+module github.com/blueprint-uservices/blueprint/examples/dsb_mm/wiring
 
-go 1.26.4
+go 1.22.0
 
 require github.com/blueprint-uservices/blueprint/examples/dsb_mm/workload v0.0.0
 

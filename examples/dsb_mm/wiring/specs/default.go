@@ -58,7 +58,7 @@ func makeDefaultSpec(spec wiring.WiringSpec) ([]string, error) {
 	castinfo_ctr := applyHTTPDefaults(spec, castinfo_service, trace_collector)
 	cntrs = append(cntrs, castinfo_ctr)
 
-	reviewstorage_service := workflow.Service[media.ReviewStorageService](spec, review_storage_cache, review_storage_db)
+	reviewstorage_service := workflow.Service[media.ReviewStorageService](spec, "reviewstorage_service", review_storage_cache, review_storage_db)
 	reviewstorage_ctr := applyHTTPDefaults(spec, reviewstorage_service, trace_collector)
 	cntrs = append(cntrs, reviewstorage_ctr)
 
@@ -66,7 +66,7 @@ func makeDefaultSpec(spec wiring.WiringSpec) ([]string, error) {
 	userreview_ctr := applyHTTPDefaults(spec, userreview_service, trace_collector)
 	cntrs = append(cntrs, userreview_ctr)
 
-	moviereview_service := workflow.Service[media.MovieReviewService](spec, "moviereview_service", reviewstorage_service, movie_review_db, movie_review_cache)
+	moviereview_service := workflow.Service[media.MovieReviewService](spec, "moviereview_service", reviewstorage_service, movie_review_cache, movie_review_db)
 	moviereview_ctr := applyHTTPDefaults(spec, moviereview_service, trace_collector)
 	cntrs = append(cntrs, moviereview_ctr)
 

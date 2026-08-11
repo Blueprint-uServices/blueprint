@@ -1,6 +1,6 @@
-module github.com/Blueprint-uservices/blueprint/examples/dsb_mm/workload
+module github.com/blueprint-uservices/blueprint/examples/dsb_mm/workload
 
-go 1.26.4
+go 1.22.0
 
 require (
 	github.com/blueprint-uservices/blueprint/examples/dsb_mm/workflow v0.0.0
