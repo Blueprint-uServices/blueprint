@@ -70,6 +70,12 @@ import (
 	"github.com/blueprint-uservices/blueprint/plugins/linuxcontainer"
 	"golang.org/x/exp/slog"
 )
+// Flags to be parsed and read by [CmdBuilder.ParseArgs()]
+output_dir := flag.String("o", "", "Target output directory for compilation.")
+spec_name := flag.String("w", "", "Wiring spec to compile.  One of:\n"+b.List())
+quiet := flag.Bool("quiet", false, "Suppress verbose compiler output.")
+env := flag.Bool("env", true, "Generate a .env file that sets service address and port environment variables")
+port := flag.Uint("port", 12345, "Sets the port to start at when assigning service ports.  Only used when generating a .env file.")
 
 // A wiring spec option used by [CmdBuilder].  When running the program,
 // this wiring spec can be selected by specifying its [Name] with the -w flag,
@@ -154,12 +160,6 @@ func (b *CmdBuilder) RegisterPasses(passes ...analysis.IRAnalysisPass) {
 }
 
 func (b *CmdBuilder) ParseArgs() {
-	output_dir := flag.String("o", "", "Target output directory for compilation.")
-	spec_name := flag.String("w", "", "Wiring spec to compile.  One of:\n"+b.List())
-	quiet := flag.Bool("quiet", false, "Suppress verbose compiler output.")
-	env := flag.Bool("env", true, "Generate a .env file that sets service address and port environment variables")
-	port := flag.Uint("port", 12345, "Sets the port to start at when assigning service ports.  Only used when generating a .env file.")
-
 	flag.Parse()
 
 	b.OutputDir = *output_dir
