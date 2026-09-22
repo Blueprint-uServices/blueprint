@@ -48,7 +48,7 @@ func (m *MovieIdServiceImpl) RegisterMovieId(ctx context.Context, reqID int, tit
 	if err != nil {
 		return err
 	}
-	result, err := collection.FindOne(ctx, bson.D{{"title", title}})
+	result, err := collection.FindOne(ctx, bson.D{{"movid", movieID}})
 	if err != nil {
 		return err
 	}
