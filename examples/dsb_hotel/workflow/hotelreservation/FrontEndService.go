@@ -41,7 +41,7 @@ func (f *FrontEndServiceImpl) SearchHandler(ctx context.Context, customerName st
 	}
 	available_hotels, err := f.reservationService.CheckAvailability(ctx, "", nearby_hotels, inDate, outDate, 1)
 	if err != nil {
-		return []HotelProfile{}, nil
+		return []HotelProfile{}, err
 	}
 	profiles, err := f.profileService.GetProfiles(ctx, available_hotels, locale)
 	if err != nil {
