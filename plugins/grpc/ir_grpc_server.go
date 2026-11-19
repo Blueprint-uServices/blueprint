@@ -72,6 +72,11 @@ func (node *golangServer) GenerateFuncs(builder golang.ModuleBuilder) error {
 		return nil
 	}
 
+	err = requireModules(builder)
+	if err != nil {
+		return err
+	}
+
 	// Generate the .proto files
 	err = grpccodegen.GenerateGRPCProto(builder, iface, node.outputPackage)
 	if err != nil {

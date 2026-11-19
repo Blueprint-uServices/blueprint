@@ -69,6 +69,11 @@ func (node *golangHttpServer) GenerateFuncs(builder golang.ModuleBuilder) error 
 		return err
 	}
 
+	err = requireModules(builder)
+	if err != nil {
+		return err
+	}
+
 	err = httpcodegen.GenerateServerHandler(builder, iface, node.outputPackage)
 	if err != nil {
 		return err
